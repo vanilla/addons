@@ -16,7 +16,7 @@ $PluginInfo['LocaleDeveloper'] = array(
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
-   'RequiredApplications' => array('Vanilla' => '2.0.10a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.11a'),
    'SettingsUrl' => '/dashboard/settings/localedeveloper',
    'SettingsPermission' => 'Garden.Site.Manage',
 );
