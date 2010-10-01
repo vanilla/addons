@@ -10,17 +10,18 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 $PluginInfo['HTMLPurifier'] = array(
    'Description' => 'Adapts HtmlPurifier to work with Garden.',
-   'Version' => '1.0',
+   'Version' => '1.4.2.0',
    'RequiredApplications' => NULL, 
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://toddburry.com'
+   'AuthorUrl' => 'http://vanillaforums.org/profile/todd'
 );
 //require_once(PATH_LIBRARY.DS.'vendors'.DS.'htmlpurifier'.DS.'class.htmlpurifier.php');
-require_once(dirname(__FILE__).'/htmlpurifier/class.htmlpurifier.php');
+require_once(dirname(__FILE__).'/htmlpurifier/HTMLPurifier.standalone.php');
+spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'));
 
 Gdn::FactoryInstall('HtmlFormatter', 'HTMLPurifierPlugin', __FILE__, Gdn::FactorySingleton);
 
