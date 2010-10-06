@@ -8,9 +8,22 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+/* Note on updating the HtmlPurifier version.
+ * Vanilla includes a Vimeo filter which will not work unless HtmlPurifier is rebuilt. Here are instructions:
+ * 1. Download the full distribution of Html Purifier.
+ * 2. Copy the following files from the existing plugin to HTML Purifier:
+ *  a) Filter/Vimeo.php
+ *  b) ConfigSchema/schema/Filter.Vimeo.txt
+ * 3. From the command line run the following commands from HTML Purifier's maintenance directory:
+ *  a) php generate-schema-cache.php
+ *  b) php generate-standalone.php
+ * 4. Copy the resulting standalone files back to vanilla's plugin.
+ *
+ */
+
 $PluginInfo['HTMLPurifier'] = array(
-   'Description' => 'Adapts HtmlPurifier to work with Garden.',
-   'Version' => '1.4.2.0',
+   'Description' => 'Adapts HtmlPurifier to work with Garden. This plugin is maintained at http://github.com/vanillaforums/Addons.',
+   'Version' => '1.4.2.0.1',
    'RequiredApplications' => NULL, 
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -19,16 +32,13 @@ $PluginInfo['HTMLPurifier'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd'
 );
-//require_once(PATH_LIBRARY.DS.'vendors'.DS.'htmlpurifier'.DS.'class.htmlpurifier.php');
-require_once(dirname(__FILE__).'/htmlpurifier/HTMLPurifier.standalone.php');
-spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'));
-
 Gdn::FactoryInstall('HtmlFormatter', 'HTMLPurifierPlugin', __FILE__, Gdn::FactorySingleton);
 
 class HTMLPurifierPlugin extends Gdn_Plugin {
 	/// CONSTRUCTOR ///
 	public function __construct() {
-		
+      require_once(dirname(__FILE__).'/htmlpurifier/HTMLPurifier.standalone.php');
+      spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'));
 	}
 	
 	/// PROPERTIES ///
