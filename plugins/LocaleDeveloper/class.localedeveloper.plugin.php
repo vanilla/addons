@@ -11,12 +11,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['LocaleDeveloper'] = array(
    'Name' => 'Locale Developer',
-   'Description' => 'Contains useful functions for locale developers.',
-   'Version' => '0.9a',
+   'Description' => 'Contains useful functions for locale developers. When you enable this plugin go to its settings page to change your options. This plugin is maintained at http://github.com/vanillaforums/Addons',
+   'Version' => '1.0',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
-   'RequiredApplications' => array('Vanilla' => '2.0.11a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.11'),
    'SettingsUrl' => '/dashboard/settings/localedeveloper',
    'SettingsPermission' => 'Garden.Site.Manage',
 );
