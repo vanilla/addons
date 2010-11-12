@@ -125,7 +125,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
    public function EnsureDefinitionFile() {
       $Path = $this->LocalePath.'/definitions.php';
       if (!file_exists($Path)) {
-         $Contents = $this->GetFileHeader().self::FormatInfoArray('$ThemeInfo', $this->GetInfoArray());
+         $Contents = $this->GetFileHeader().self::FormatInfoArray('$LocaleInfo', $this->GetInfoArray());
          Gdn_FileSystem::SaveFile($Path, $Contents);
       }
    }
