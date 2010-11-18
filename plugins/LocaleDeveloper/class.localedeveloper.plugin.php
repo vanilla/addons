@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['LocaleDeveloper'] = array(
    'Name' => 'Locale Developer',
    'Description' => 'Contains useful functions for locale developers. When you enable this plugin go to its settings page to change your options. This plugin is maintained at http://github.com/vanillaforums/Addons',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
@@ -124,10 +124,10 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
 
    public function EnsureDefinitionFile() {
       $Path = $this->LocalePath.'/definitions.php';
-      if (!file_exists($Path)) {
-         $Contents = $this->GetFileHeader().self::FormatInfoArray('$ThemeInfo', $this->GetInfoArray());
-         Gdn_FileSystem::SaveFile($Path, $Contents);
-      }
+      if (file_exists($Path))
+         unlink($Path);
+      $Contents = $this->GetFileHeader().self::FormatInfoArray('$LocaleInfo', $this->GetInfoArray());
+      Gdn_FileSystem::SaveFile($Path, $Contents);
    }
 
    public static function FormatInfoArray($VariableName, $Array) {
@@ -187,6 +187,12 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
    }
 
    public function GetInfoArray() {
+      $Info = C('Plugins.LocaleDeveloper');
+      foreach ($Info as $Key => $Value) {
+         if (!$Value)
+            unset($Info[$Key]);
+      }
+
       $InfoArray = array(GetValue('Key', $Info, 'LocaleDeveloper') => array(
           'Locale' => GetValue('Locale', $Info, Gdn::Locale()->Current()),
           'Name' => GetValue('Name', $Info, 'Locale Developer'),
@@ -252,7 +258,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
             }
 
             // Save the settings.
-            SaveToConfig($SaveValues, '', TRUE, TRUE);
+            SaveToConfig($SaveValues, '', array('RemoveEmpty' => TRUE));
 
             $Sender->StatusMessage = T('Your changes have been saved.');
          } elseif ($this->Form->GetFormValue('GenerateChanges')) {

@@ -7,8 +7,11 @@ echo $Form->Open();
 echo $Form->Errors();
 ?>
 <div class="Info">
-   <?php echo sprintf(T('This plugin helps locale package development.', '<p>This plugin helps locale package development. The plugin keeps a working locale pack at <code>%s</code>.</p>'),
-      $this->Data('LocalePath')); ?>
+   <?php echo sprintf(T('This plugin helps locale package development.', 'This plugin helps locale package development. The plugin keeps a working locale pack at <code>%s</code>.'),
+      $this->Data('LocalePath'));
+      echo ' ';
+      echo sprintf(T('For more help on localization check out the page <a href="%s">here</a>.'), 'http://vanillaforums.org/page/localization');
+   ?>
 </div>
 <h3><?php echo T('Settings'); ?></h3>
 <ul>
