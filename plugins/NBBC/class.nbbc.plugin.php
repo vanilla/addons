@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 $PluginInfo['NBBC'] = array(
    'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-   'Version' => '1.0a',
+   'Version' => '1.0b',
    'RequiredApplications' => array('Vanilla' => '2.0.2a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
