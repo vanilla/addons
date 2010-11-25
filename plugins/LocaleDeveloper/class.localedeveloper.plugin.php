@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['LocaleDeveloper'] = array(
    'Name' => 'Locale Developer',
    'Description' => 'Contains useful functions for locale developers. When you enable this plugin go to its settings page to change your options. This plugin is maintained at http://github.com/vanillaforums/Addons',
-   'Version' => '1.0.1',
+   'Version' => '1.1',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
@@ -46,6 +46,12 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
    }
 
 
+   /**
+    * Save the captured definitions.
+    *
+    * @param Gdn_Controller $Sender
+    * @param array $Args
+    */
    public function Base_Render_After($Sender, $Args) {
       $Locale = Gdn::Locale();
       if (!is_a($Locale, 'DeveloperLocale'))
@@ -59,15 +65,35 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
          $Locale->Load($Path);
       }
 
+      // Load the ignore file.
+      $Definition = array();
+      include dirname(__FILE__).'/ignore.php';
+      $Ignore = $Definition;
+      $Definition = array();
+
+      // Figure out whether this as admin or regular page.
+      if (ArrayHasValue($Sender->CssFiles(), 'admin.css')) {
+         $FinalPath = $this->LocalePath.'/captured_admin.php';
+      } else {
+         $FinalPath = $this->LocalePath.'/captured.php';
+      }
+      
+
+      // Load the definitions that have already been captured.
+      if (file_exists($FinalPath)) {
+         include $FinalPath;
+      }
+      $Definition = array_merge($Definition, $Locale->CapturedDefinitions());
+      $Definition = array_diff_key($Definition, $Ignore);
+
       // Save the current definitions.
       $fp = fopen($Path, 'wb');
       fwrite($fp, $this->GetFileHeader());
-      LocaleModel::WriteDefinitions($fp, $Locale->AllDefinitions());
+      LocaleModel::WriteDefinitions($fp, $Definition);
       fclose($fp);
 
       // Copy the file over the existing one.
-      $FinalPath = $this->LocalePath.'/captured.php';
-      rename($Path, $FinalPath);
+      $Result = rename($Path, $FinalPath);
    }
 
    /**

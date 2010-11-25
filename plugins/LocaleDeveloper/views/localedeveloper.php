@@ -38,7 +38,7 @@ echo $Form->Errors();
    </li>
    <li>
       <?php
-      echo $this->Form->CheckBox('CaptureDefinitions', 'Capture definitions throughout the site.');
+      echo $this->Form->CheckBox('CaptureDefinitions', 'Capture definitions throughout the site. You must visit the pages in the site in order for the definitions to be captured. The captured definitions will be put in the <code>captured.php</code> and <code>captured_admin.php</code>.');
       ?>
    </li>
 </ul>

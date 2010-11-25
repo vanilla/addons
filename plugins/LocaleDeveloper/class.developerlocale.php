@@ -17,22 +17,11 @@ class DeveloperLocale extends Gdn_Locale {
       return $Result;
    }
 
-   public function Translate($Code, $Default = FALSE) {
-      // Figure out where the translation was called.
-//      $Trace = debug_backtrace();
-//      $LastIndex = NULL;
-//      foreach ($Trace as $Index => $Item) {
-//         if (in_array(strtolower($Item['function']), array('t', 'translate'))) {
-//            $LastIndex = $Index;
-//            continue;
-//         } else {
-//            break;
-//         }
-//      }
-//      if (isset($Trace[$LastIndex])) {
-//         $TraceItem = $Trace[$LastIndex];
-//      }
+   public function CapturedDefinitions() {
+      return $this->_CapturedDefinitions;
+   }
 
+   public function Translate($Code, $Default = FALSE) {
       $Result = parent::Translate($Code, $Default);
       if ($Code)
          $this->_CapturedDefinitions[$Code] = $Result;
