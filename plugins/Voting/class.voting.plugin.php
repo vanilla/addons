@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Voting'] = array(
    'Name' => 'Voting',
    'Description' => 'Allows users to vote on comments and discussions.',
-   'Version' => '1.0.3b',
+   'Version' => '1.0.4b',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
@@ -20,7 +20,6 @@ $PluginInfo['Voting'] = array(
 );
 
 class VotingPlugin extends Gdn_Plugin {
-	
 	/**
 	 * Admin Toggle to turn Voting on/off
 	 */
@@ -97,7 +96,7 @@ class VotingPlugin extends Gdn_Plugin {
 			, 'div', array('class' => 'StatBox ViewsBox'));
 	
 		// Follows
-		$Title = T($Discussion->Bookmarked == '1' ? 'Undo Follow' : 'Follow');
+		$Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
 		if ($Session->IsValid()) {
 			echo Wrap(Anchor(
 				Wrap(T('Follows')) . Gdn_Format::BigNumber($Discussion->CountBookmarks),
