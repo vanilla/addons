@@ -160,6 +160,7 @@ div.Attachments {
 
 div.Attachments div.AttachmentHeader {
    font-weight: bold;
+   text-align: left;
 }
 
 div.Attachments table.AttachFileContainer {

@@ -3,8 +3,18 @@
    <table class="AttachFileContainer">
       <?php
          $CanDownload = $this->Data('CanDownload');
+         
+         $FileLinkTemplate = CombinePaths(array(
+            'plugin',
+            'FileUpload',
+            '%s', // download type [preview | download]
+            '%d', // media ID
+            '%s'  // filename
+         ));
+         
          foreach ($this->Data('CommentMediaList') as $Media) {
             $IsOwner = (Gdn::Session()->IsValid() && (Gdn::Session()->UserID == GetValue('InsertUserID',$Media,NULL)));
+            $FileLink = sprintf($FileLinkTemplate, '%s', GetValue('MediaID', $Media), GetValue('Name', $Media));
       ?>
             <tr>
                <?php if ($IsOwner || Gdn::Session()->CheckPermission("Garden.Settings.Manage")) { ?>
@@ -12,19 +22,24 @@
                <?php } ?>
                <td>
                   <div class="FilePreview"><?php
-                  $Path = GetValue('Path', $Media);
-                  if (getimagesize(PATH_UPLOADS.'/'.$Path))
-                     echo Img('uploads/'.$Path, array('class' => 'ImageThumbnail'));
-                  else
-                     echo Img('plugins/FileUpload/images/paperclip.png', array('class' => 'ImageThumbnail'));
+                     $PreviewLocation = sprintf($FileLink, 'preview');
+                     echo Img($PreviewLocation, array('class' => 'ImageThumbnail'));
                   ?></div>
                </td>
                <td>
-                  <?php if ($CanDownload) { echo '<a href="'.Url("/discussion/download/{$Media->MediaID}/{$Media->Name}").'">'; } ?>
-                  <?php echo $Media->Name; ?>
+                  <?php if ($CanDownload) { echo '<a href="'.Url(sprintf($FileLink, 'download')).'">'; } ?>
+                  <?php echo GetValue('Name', $Media); ?>
                   <?php if ($CanDownload) { echo '</a>'; } ?>
                </td>
                <td class="FileSize"><?php echo Gdn_Format::Bytes($Media->Size, 0); ?></td>
+               <td class="FileInsert"><?php
+                  if (get_class($this) == 'PostController' && $this->Data("FileUploadCommitting") !== TRUE) {
+                     if ($this->Plugin->SupportedImageType(GetValue('Type', $Media))) {
+                        echo sprintf('<a class="InsertImage" href="%s">%s</a>', Url(sprintf($FileLink, 'download')), T('Insert Image'));
+                     }
+                  }
+                  
+               ?></td>
             </tr>
       <?php
          }

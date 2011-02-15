@@ -82,7 +82,7 @@ class MediaModel extends VanillaModel {
          $this->SQL->Delete($this->Name, array('MediaID' => $MediaID), FALSE);
          
          if ($DeleteFile) {
-            $DirectPath = PATH_UPLOADS.DS.GetValue('Path',$Media);
+            $DirectPath = PATH_LOCAL_UPLOADS.DS.GetValue('Path',$Media);
             if (file_exists($DirectPath))
                @unlink($DirectPath);
          }

@@ -29,6 +29,23 @@ function Gdn_Uploaders() {
       $('div.AttachmentWindow').each(function(i,AttachmentWindow){
          Our.Spawn($(AttachmentWindow));
       });
+      
+      $('a.InsertImage').live('click', jQuery.proxy(function(event) {
+         var Media = $(event.target).attr('href').split('/');
+         Media.pop();
+         var MediaID = Media.pop();
+         this.InsertImage(MediaID, event.target);
+         return false;
+      },this));
+      
+      $('a.EditComment').livequery('click', function(event){
+         $(event.target).parents('li.Comment').find('div.Attachments').css('display', 'none');
+      });
+      
+      $('a.Cancel').livequery('click', function(event){
+         console.log($(event.target).parent());
+         $(event.target).parents('div.Comment').find('div.Attachments').css('display', 'block');
+      });
    }
    
    Gdn_Uploaders.prototype.Spawn = function(AttachmentWindow) {
@@ -65,6 +82,29 @@ function Gdn_Uploaders() {
             rv = parseFloat( RegExp.$1 );
       }
       return rv;
+   }
+   
+   Gdn_Uploaders.prototype.InsertImage = function(ImageID, Anchor) {
+      var FormHolder = false;
+      
+      switch ($(Anchor).parents('div#DiscussionForm').length) {
+         case 0:
+            FormHolder = $(Anchor).parents('div.CommentForm');
+         break;
+         
+         // Discussion
+         default:
+            FormHolder = $(Anchor).parents('div#DiscussionForm');
+         break;
+      }
+      
+      var TextBox = $(FormHolder.find('textarea'));
+      if (!TextBox.length)
+         TextBox = $($(Anchor).parents('div.Comment').find('textarea'));
+      
+      if (!TextBox.length) return false;
+      TextBox.val(TextBox.val()+'{Upload|'+ImageID+'}');
+      return false;
    }
    
 }
@@ -496,26 +536,26 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
                EnableMe.checked = 'true';
                
             // Make the file a link
-            $(FileListing.find('div.FileName')).html('<a href="'+gdn.url('discussion/download/'+MediaID+'/'+Filename)+'">'+Filename+'</a>');
+            $(FileListing.find('div.FileName')).html('<a href="'+gdn.url(JResponse.MediaResponse.FinalImageLocation)+'">'+Filename+'</a>');
                
             $(FileListing.find('div.FileOptions')).append(TrackAll);
             $(FileListing.find('div.UploadProgress')).remove();
             
 				// Add image preview
-				var img = document.createElement('img');
-				img.src = JResponse.MediaResponse.PreviewImageLocation;
-				$(FileListing.find('div.FilePreview')).append(img);
+				var ImagePreview = document.createElement('img');
+				ImagePreview.src = gdn.url(JResponse.MediaResponse.PreviewImageLocation);
+				$(FileListing.find('div.FilePreview')).append(ImagePreview);
 
 				// Add "insert image" button
 				if (JResponse.MediaResponse.FinalImageLocation != '') {
 					var ImageAnchor = $(FileListing.find('a.InsertImage'));
 					ImageAnchor.attr('href', JResponse.MediaResponse.FinalImageLocation);
 					ImageAnchor.show();
-					ImageAnchor.live('click', function() {
-						var txtbox = $(FileListing.parents('form').find('textarea'));
-						txtbox.val(txtbox.val()+'<img src="'+ImageAnchor.attr('href')+'" />');
-						return false;
+/*
+					ImageAnchor.live('click', function(){
+			         return GdnUploaders.InsertImage(MediaID, ImageAnchor);
 					});
+*/
 				}
             
          } else {
