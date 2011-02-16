@@ -14,7 +14,8 @@
          
          foreach ($this->Data('CommentMediaList') as $Media) {
             $IsOwner = (Gdn::Session()->IsValid() && (Gdn::Session()->UserID == GetValue('InsertUserID',$Media,NULL)));
-            $FileLink = sprintf($FileLinkTemplate, '%s', GetValue('MediaID', $Media, ''), GetValue('Name', $Media, ''));
+            $MediaName = html_entity_decode(GetValue('Name', $Media, ''));
+            $FileLink = sprintf($FileLinkTemplate, '%s', GetValue('MediaID', $Media, ''), $MediaName);
       ?>
             <tr>
                <?php if ($IsOwner || Gdn::Session()->CheckPermission("Garden.Settings.Manage")) { ?>
