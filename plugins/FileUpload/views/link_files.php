@@ -14,7 +14,7 @@
          
          foreach ($this->Data('CommentMediaList') as $Media) {
             $IsOwner = (Gdn::Session()->IsValid() && (Gdn::Session()->UserID == GetValue('InsertUserID',$Media,NULL)));
-            $MediaName = html_entity_decode(GetValue('Name', $Media, ''));
+            $MediaName = urldecode(GetValue('Name', $Media, ''));
             $FileLink = sprintf($FileLinkTemplate, '%s', GetValue('MediaID', $Media, ''), $MediaName);
       ?>
             <tr>
@@ -29,7 +29,7 @@
                </td>
                <td>
                   <?php if ($CanDownload) { echo '<a href="'.Url(sprintf($FileLink, 'download')).'">'; } ?>
-                  <?php echo GetValue('Name', $Media); ?>
+                  <?php echo $MediaName; ?>
                   <?php if ($CanDownload) { echo '</a>'; } ?>
                </td>
                <td class="FileSize"><?php echo Gdn_Format::Bytes($Media->Size, 0); ?></td>
