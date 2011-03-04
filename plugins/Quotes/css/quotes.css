@@ -1,0 +1,16 @@
+body ul div.Comment blockquote.UserQuote {
+   padding: 5px 10px;
+   margin-right: 10px;
+   font-style: italic;
+   background-color: #ABDAFB;
+}
+
+div.Comment blockquote.UserQuote div.QuoteAuthor {
+   font-style: normal;
+}
+
+div.Comment blockquote.UserQuote div.QuoteText {
+   color: #232323;
+   border-left: 1px solid grey;
+   padding-left: 5px;
+}
