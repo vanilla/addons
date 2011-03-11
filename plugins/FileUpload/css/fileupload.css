@@ -156,32 +156,11 @@ div.Attachments {
    padding: 4px;
    margin-bottom: 6px;
    margin-right: 7px;
+   text-align: left;
 }
 
 div.Attachments div.AttachmentHeader {
    font-weight: bold;
-   text-align: left;
-}
-
-div.Attachments table.AttachFileContainer {
-   border-collapse: collapse;
-   border: none;
-}
-
-div.Attachments table.AttachFileContainer tr td {
-   padding: 3px;
-   vertical-align: middle;
-}
-
-div.Attachments table.AttachFileContainer tr td a.DeleteFile span {
-   display: none;
-}
-
-div.Attachments table.AttachFileContainer tr td a.DeleteFile {
-   width: 12px;
-   height: 12px;
-   background: transparent url('../images/trash.png') no-repeat top left;
-   display: block;
 }
 
 li div.FileUploadBlock {
@@ -196,54 +175,49 @@ li div.FileUploadBlock div.Detail {
    font-style:          italic;
 }
 
-li table.FileUploadTable th {
-   background-color:    white;
-}
-
-li table.FileUploadTable td:first-child {
-   width:               150px;
-}
 
 li table.FileUploadTable td em {
    font-style:          italic;
    font-size:           80%;
 }
-div.FileAttachment {
-   margin-bottom: 6px;
-}
-div.FilePreview {
-   max-height: 32px;
-   width: 32px;
-   display: inline-block;
-   vertical-align: middle;
-   text-align: center;
-   border: 1px solid #666;
-   background: #fff;
-}
-div.FilePreview img {
-   max-width: 32px;
-   max-height: 32px;
-   display: block;
-   margin: 0 auto;
-}
-div.FileOptions,
-div.FileName,
-div.FileSize {
-   display: inline;
-   margin-right: 6px;
-}
+
 div.UploadProgress {
    display: inline-block;
 }
-img.ImageThumbnail {
-   max-height: 32px;
-   max-width: 32px;
+
+.AttachFileContainer .Attachment {
+   display: inline-block;
+   position: relative;
+   margin: 3px;
 }
-a.InsertImage {
-   background: url('../images/insert.png') 0 0 no-repeat;
-   padding-left: 20px;
+
+.AttachFileContainer .Hover {
+   border: solid 3px white;
+   background: white;
+   margin: 0;
+   box-shadow: 0px 0px 5px #000;
+	-moz-box-shadow: 0px 0px 5px #000;
+	-webkit-box-shadow: 0px 0px 5px #000;
 }
-table.AttachFileContainer td.FileSize {
-   font-size: 11px;
-   color: #888;
+
+.AttachFileContainer .FileMeta {
+   position: absolute;
+   right: -3px;
+   width: 100%;
+   background: #fff;
+   z-index: 100;
+   display: none;
+   border: solid 3px white;
+   box-shadow: 0px 5px 5px #000;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+}
+
+.FileMeta .FileSize {
+   margin-left: 5px;
+   color: #AAAAAA;
+}
+
+.AttachFileContainer .Hover .FileMeta {
+   display: block;
 }

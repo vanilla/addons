@@ -1,49 +1,53 @@
 <div class="Attachments">
    <div class="AttachmentHeader"><?php echo T('Attachments'); ?></div>
-   <table class="AttachFileContainer">
+   <div class="AttachFileContainer">
       <?php
          $CanDownload = $this->Data('CanDownload');
-         
-         $FileLinkTemplate = CombinePaths(array(
-            'plugin',
-            'FileUpload',
-            '%s', // download type [preview | download]
-            '%d', // media ID
-            '%s'  // filename
-         ));
-         
          foreach ($this->Data('CommentMediaList') as $Media) {
             $IsOwner = (Gdn::Session()->IsValid() && (Gdn::Session()->UserID == GetValue('InsertUserID',$Media,NULL)));
-            $MediaName = urldecode(GetValue('Name', $Media, ''));
-            $FileLink = sprintf($FileLinkTemplate, '%s', GetValue('MediaID', $Media, ''), $MediaName);
       ?>
-            <tr>
-               <?php if ($IsOwner || Gdn::Session()->CheckPermission("Garden.Settings.Manage")) { ?>
-                  <td><a class="DeleteFile" href="<?php echo Url("/plugin/fileupload/delete/{$Media->MediaID}"); ?>"><span><?php echo T('Delete'); ?></span></a></td>
-               <?php } ?>
-               <td>
-                  <div class="FilePreview"><?php
-                     $PreviewLocation = sprintf($FileLink, 'preview');
-                     echo Img($PreviewLocation, array('class' => 'ImageThumbnail'));
-                  ?></div>
-               </td>
-               <td>
-                  <?php if ($CanDownload) { echo '<a href="'.Url(sprintf($FileLink, 'download')).'">'; } ?>
-                  <?php echo $MediaName; ?>
-                  <?php if ($CanDownload) { echo '</a>'; } ?>
-               </td>
-               <td class="FileSize"><?php echo Gdn_Format::Bytes($Media->Size, 0); ?></td>
-               <td class="FileInsert"><?php
-                  if (get_class($this) == 'PostController' && $this->Data("FileUploadCommitting") !== TRUE) {
-                     if ($this->Plugin->SupportedImageType(GetValue('Type', $Media))) {
-                        echo sprintf('<a class="InsertImage" href="%s">%s</a>', Url(sprintf($FileLink, 'download')), T('Insert Image'));
+            <div class="Attachment">
+               <div class="FilePreview">
+                  <?php
+                  $Path = GetValue('Path', $Media);
+                  $DownloadUrl = Url("/discussion/download/{$Media->MediaID}/{$Media->Name}");
+
+                  if ($CanDownload)
+                     echo '<a href="'.$DownloadUrl.'">';
+
+                  $ThumbnailUrl = MediaModel::ThumbnailUrl($Media);
+                  echo Img($ThumbnailUrl, array('class' => 'ImageThumbnail'));
+
+                  if ($CanDownload)
+                     echo '</a>';
+
+                  ?></div><div class="FileMeta">
+                     <?php
+                     echo '<div>';
+                     echo '<span class="FileName">', htmlspecialchars($Media->Name), '</span>';
+
+                     if ($Media->ImageWidth && $Media->ImageHeight) {
+                        echo ' <span class="FileSize">'.$Media->ImageWidth.'&#160;x&#160;'.$Media->ImageHeight.'</span>';
                      }
-                  }
-                  
-               ?></td>
-            </tr>
+
+                     echo ' <span class="FileSize">', Gdn_Format::Bytes($Media->Size, 0), '</span>';
+                     echo '</div>';
+
+                     if (StringBeginsWith($this->ControllerName, 'post', TRUE)) {
+                        echo '<div>';
+
+                        echo '<a class="InsertImage" href="'.Asset("/uploads/$Path").'">'.T('Insert Image').'</a>';
+
+                        if ($IsOwner || Gdn::Session()->CheckPermission("Garden.Settings.Manage")) {
+                           echo ' | <a class="DeleteFile" href="'.Url("/plugin/fileupload/delete/{$Media->MediaID}").'"><span>'.T('Delete').'</span></a>';
+                        }
+                        echo '</div>';
+                     }
+                     ?>
+                  </div>
+            </div>
       <?php
          }
       ?>
-   </table>
+   </div>
 </div>

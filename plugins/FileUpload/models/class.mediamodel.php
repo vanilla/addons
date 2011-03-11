@@ -10,8 +10,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class MediaModel extends VanillaModel {
 
+   public static $ThumbnailHeight = 0;
+   public static $ThumbnailWidth = 0;
+
    public function __construct() {
       parent::__construct('Media');
+
+      self::$ThumbnailHeight = C('Plugins.FileUpload.ThumbnailHeight', 128);
+      self::$ThumbnailWidth = C('Plugins.FileUpload.ThumbnailWidth', 256);
    }
    
    public function GetID($MediaID) {
@@ -26,6 +32,16 @@ class MediaModel extends VanillaModel {
          ->FirstRow();
 		
 		return $Data;
+   }
+
+   public static function GetImageSize($Path) {
+      if (!in_array(strtolower(pathinfo($Path, PATHINFO_EXTENSION)), array('bmp', 'gif', 'jpg', 'jpeg', 'png')))
+         return array(0, 0);
+
+      $ImageSize = @getimagesize($Path);
+      if (is_array($ImageSize))
+         return array($ImageSize[0], $ImageSize[1]);
+      return array(0, 0);
    }
    
    public function PreloadDiscussionMedia($DiscussionID, $CommentIDList) {
@@ -45,7 +61,15 @@ class MediaModel extends VanillaModel {
             ->Where('m.ForeignTable', 'comment')
          ->EndWhereGroup()
          ->Get();
-         
+
+      // Assign image heights/widths where necessary.
+      $Data2 = $Data->Result();
+      foreach ($Data2 as &$Row) {
+         if ($Row->ImageHeight === NULL || $Row->ImageWidth === NULL) {
+            list($Row->ImageWidth, $Row->ImageHeight) = self::GetImageSize(PATH_UPLOADS.'/'.ltrim($Row->Path, '/'));
+            $this->SQL->Put('Media', array('ImageWidth' => $Row->ImageWidth, 'ImageHeight' => $Row->ImageHeight), array('MediaID' => $Row->MediaID));
+         }
+      }
 /*
       $DiscussionData = $this->SQL
          ->Select('m.*')
@@ -82,7 +106,7 @@ class MediaModel extends VanillaModel {
          $this->SQL->Delete($this->Name, array('MediaID' => $MediaID), FALSE);
          
          if ($DeleteFile) {
-            $DirectPath = PATH_LOCAL_UPLOADS.DS.GetValue('Path',$Media);
+            $DirectPath = PATH_UPLOADS.DS.GetValue('Path',$Media);
             if (file_exists($DirectPath))
                @unlink($DirectPath);
          }
@@ -103,6 +127,31 @@ class MediaModel extends VanillaModel {
       foreach ($MediaItems as $Media) {
          $this->Delete(GetValue('MediaID',$Media));
       }
+   }
+
+   public static function ThumbnailUrl($Media) {
+      $Width = GetValue('ImageWidth', $Media);
+      $Height = GetValue('ImageHeight', $Media);
+
+      if (!$Width || !$Height)
+         return 'plugins/FileUpload/images/file.png';
+
+      $RequiresThumbnail = FALSE;
+      if (self::$ThumbnailHeight && $Height > self::$ThumbnailHeight)
+         $RequiresThumbnail = TRUE;
+      elseif (self::$ThumbnailWidth && $Width > self::$ThumbnailWidth)
+         $RequiresThumbnail = TRUE;
+
+      $Path = ltrim(GetValue('Path', $Media), '/');
+      if ($RequiresThumbnail) {
+         if (file_exists(PATH_UPLOADS."/thumbnails/$Path"))
+            $Result = "/uploads/thumbnails/$Path";
+         else
+            $Result ="/utility/thumbnail/$Path";
+      } else {
+         $Result = "/uploads/$Path";
+      }
+      return $Result;
    }
    
 }
