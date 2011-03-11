@@ -205,7 +205,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       //$DownloadMode = () ? 'inline' : 'attachment';
       $DownloadMode = 'inline';
       
-      return $this->SafeServe($DownloadPath, $DownloadMode);
+      return $this->SafeServe(PATH_UPLOADS.'/'.$DownloadPath, $DownloadMode);
    }
    
    protected function SafeServe($Path, $DownloadMode) {
