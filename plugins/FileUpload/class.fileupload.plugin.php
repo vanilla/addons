@@ -26,7 +26,7 @@ $PluginInfo['FileUpload'] = array(
 
 //Gdn_LibraryMap::SafeCache('library','class.mediamodel.php',dirname(__FILE__).DS.'models/class.mediamodel.php');
 
-include dirname(__FILE__).'/models/class.mediamodel.php';
+include dirname(__FILE__).'/class.mediamodel.php';
 
 class FileUploadPlugin extends Gdn_Plugin {
 
@@ -38,6 +38,13 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
+   }
+
+   public function PathUploads() {
+      if (defined('PATH_LOCAL_UPLOADS'))
+         return PATH_LOCAL_UPLOADS;
+      else
+         return PATH_UPLOADS;
    }
 
    /**
@@ -304,6 +311,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (StringEndsWith($Controller->RequestMethod, 'Comment', TRUE) && $Type != 'comment') {
          $Type = 'comment';
          $RawType = 'Comment';
+         if (!isset($Controller->Comment))
+            return;
          $Controller->EventArguments['Comment'] = $Controller->Comment;
       }
 
@@ -340,7 +349,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Filename = Gdn::Request()->Filename();
       if (!$Filename) $Filename = $Media->Name;
       
-      $DownloadPath = CombinePaths(array(PATH_UPLOADS,GetValue('Path', $Media)));
+      $DownloadPath = CombinePaths(array($this->PathUploads(),GetValue('Path', $Media)));
 
       if (in_array(strtolower(pathinfo($Filename, PATHINFO_EXTENSION)), array('bmp', 'gif', 'jpg', 'jpeg', 'png')))
          $ServeMode = 'inline';
@@ -420,7 +429,7 @@ class FileUploadPlugin extends Gdn_Plugin {
 
    public function UtilityController_Thumbnail_Create($Sender, $Args) {
       $SubPath = implode('/', $Args);
-      $Path = PATH_UPLOADS."/$SubPath";
+      $Path = $this->PathUploads()."/$SubPath";
       if (!file_exists($Path))
          throw NotFoundException('File');
 
@@ -444,16 +453,23 @@ class FileUploadPlugin extends Gdn_Plugin {
 
       if ($ThumbWidth && $Width > $ThumbWidth) {
          $Width = $ThumbWidth;
-         $Options['Crop'] = TRUE;
+
+         if (!$ThumbHeight) {
+            $Height = round($Width * $SHeight / $SWidth);
+         } else {
+            $Options['Crop'] = TRUE;
+         }
       }
 
-      $TargetPath = PATH_UPLOADS."/thumbnails/$SubPath";
+      $TargetPath = $this->PathUploads()."/thumbnails/$SubPath";
       if (!file_exists(dirname($TargetPath))) {
          mkdir(dirname($TargetPath), 0777, TRUE);
       }
       Gdn_UploadImage::SaveImageAs($Path, $TargetPath, $Height, $Width, $Options);
 
-      Redirect("/uploads/thumbnails/$SubPath");
+      $Url = self::Url($SubPath);
+      Redirect($Url, 302);
+//      Gdn_FileSystem::ServeFile($TargetPath, basename($Path), '', 'inline');
    }
    
    /**
@@ -471,7 +487,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          $Media->ForeignID = $ForeignID;
          $Media->ForeignTable = $ForeignType;
          try {
-            $PlacementStatus = $this->PlaceMedia($Media, Gdn::Session()->UserID);
+//            $PlacementStatus = $this->PlaceMedia($Media, Gdn::Session()->UserID);
             $this->MediaModel->Save($Media);
          } catch (Exception $e) {
             die($e->getMessage());
@@ -497,12 +513,12 @@ class FileUploadPlugin extends Gdn_Plugin {
          array_push($CurrentPath, $FolderPart);
          $TestFolder = CombinePaths($CurrentPath);
          
-         if (!is_dir($TestFolder) && !@mkdir($TestFolder))
+         if (!is_dir($TestFolder) && !@mkdir($TestFolder, 0777, TRUE))
             throw new Exception("Failed creating folder '{$TestFolder}' during PlaceMedia verification loop");
       }
       
       $FileParts = pathinfo($Media->Name);
-      $SourceFilePath = CombinePaths(array(PATH_UPLOADS,$Media->Path));
+      $SourceFilePath = CombinePaths(array($this->PathUploads(),$Media->Path));
       $NewFilePath = CombinePaths(array($TestFolder,$Media->MediaID.'.'.$FileParts['extension']));
       $Success = rename($SourceFilePath, $NewFilePath);
       if (!$Success)
@@ -531,7 +547,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       $ReturnArray = array('FileUpload',$FolderID);
       
       if ($Absolute)
-         array_unshift($ReturnArray, PATH_UPLOADS);
+         array_unshift($ReturnArray, $this->PathUploads());
       
       return ($ReturnString) ? implode(DS,$ReturnArray) : $ReturnArray;
    }
@@ -634,17 +650,6 @@ class FileUploadPlugin extends Gdn_Plugin {
             throw new FileUploadPluginUploadErrorException($ErrorString, $FileErr, $FileName, $FileKey);
          }
          
-         $ScratchPath = PATH_UPLOADS.DS.'FileUpload';
-         if (!is_dir($ScratchPath))
-            @mkdir($ScratchPath);
-         
-         $ScratchPath .= DS . 'scratch';
-         if (!is_dir($ScratchPath))
-            @mkdir($ScratchPath);
-
-         if (!is_dir($ScratchPath))
-            throw new FileUploadPluginUploadErrorException("Internal error, could not save the file.",9,$FileName);
-         
          $FileNameParts = pathinfo($FileName);
          $Extension = strtolower($FileNameParts['extension']);
          $AllowedExtensions = C('Garden.Upload.AllowedFileExtensions', array("*"));
@@ -656,18 +661,25 @@ class FileUploadPlugin extends Gdn_Plugin {
             $Message = sprintf(T('The uploaded file was too big (max %s).'), Gdn_Upload::FormatFileSize($MaxUploadSize));
             throw new FileUploadPluginUploadErrorException($Message, 11, $FileName, $FileKey);
          }
+
+
+
+         $SaveFilename = md5(microtime()).'.'.strtolower($Extension);
+         $SaveFilename = '/FileUpload/'.substr($SaveFilename, 0, 2).'/'.substr($SaveFilename, 2);
+         $SavePath = $this->PathUploads().$SaveFilename;
+         if (!is_dir(dirname($SavePath)))
+            @mkdir(dirname($SavePath), 0777, TRUE);
+
+         if (!is_dir(dirname($SavePath)))
+            throw new FileUploadPluginUploadErrorException("Internal error, could not save the file.", 9, $FileName);
          
-         $TempFileName = "fresh-".md5($FileName)."-".microtime(true).".".$Extension;
-         $ScratchFileName = CombinePaths(array($ScratchPath,$TempFileName));
-         $MoveSuccess = @move_uploaded_file($FileTemp, $ScratchFileName);
+         $MoveSuccess = @move_uploaded_file($FileTemp, $SavePath);
          
          if (!$MoveSuccess)
-            throw new FileUploadPluginUploadErrorException("Internal error, could not move the file.",9,$FileName);
-
-         $Path = CombinePaths(array_merge(array('FileUpload', 'scratch'), array($TempFileName)));
+            throw new FileUploadPluginUploadErrorException("Internal error, could not move the file.", 9, $FileName);
 
          // Get the image dimensions (if this is an image).
-         list($ImageWidth, $ImageHeight) = MediaModel::GetImageSize($ScratchFileName);
+         list($ImageWidth, $ImageHeight) = MediaModel::GetImageSize($SavePath);
 
          $Media = array(
             'Name'            => $FileName,
@@ -678,12 +690,11 @@ class FileUploadPlugin extends Gdn_Plugin {
             'InsertUserID'    => Gdn::Session()->UserID,
             'DateInserted'    => date('Y-m-d H:i:s'),
             'StorageMethod'   => 'local',
-            'Path'            => $Path
+            'Path'            => $SaveFilename
          );
          $MediaID = $this->MediaModel->Save($Media);
          
          $FinalImageLocation = '';
-         $Media['Path'] = 'FileUpload/scratch/'.$TempFileName;
          $PreviewImageLocation = MediaModel::ThumbnailUrl($Media);
 //         $PreviewImageLocation = Asset('plugins/FileUpload/images/file.png');
 //         if (getimagesize($ScratchFileName)) {
@@ -704,8 +715,8 @@ class FileUploadPlugin extends Gdn_Plugin {
             'Filesize'           => $FileSize,
             'FormatFilesize'     => Gdn_Format::Bytes($FileSize,1),
             'ProgressKey'        => $Sender->ApcKey ? $Sender->ApcKey : '',
-            'PreviewImageLocation' => $PreviewImageLocation,
-            'FinalImageLocation' => $FinalImageLocation
+            'PreviewImageLocation' => Asset(MediaModel::ThumbnailUrl($Media)),
+            'FinalImageLocation' => self::Url($SaveFilename)
          );
 
       } catch (FileUploadPluginUploadErrorException $e) {
@@ -801,7 +812,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          $Deleted = FALSE;
          
          if (!$Deleted) {
-            $DirectPath = PATH_UPLOADS.DS.$Media->Path;
+            $DirectPath = $this->PathUploads().DS.$Media->Path;
             if (file_exists($DirectPath))
                $Deleted = @unlink($DirectPath);
          }
@@ -848,7 +859,18 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
 
    public function OnDisable() {
-      SaveToConfig('Plugins.FileUpload.Enabled', FALSE);
+      RemoveFromConfig('Plugins.FileUpload.Enabled');
+   }
+
+   public static function Url($SubPath) {
+      $SubPath = ltrim($SubPath, '/');
+
+      if (method_exists('Gdn_Upload', 'Url'))
+         $Url = Gdn_Upload::Url("/thumbnails/$SubPath");
+      else
+         $Url = "/uploads/thumbnails/$SubPath";
+
+      return $Url;
    }
    
 }

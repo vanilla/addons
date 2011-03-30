@@ -566,17 +566,7 @@ jQuery(document).ready(function(){
    GdnUploaders = new Gdn_Uploaders();
    GdnUploaders.Prepare()
 
-   $('.AttachFileContainer .Attachment').live('mouseenter',
-      function(e) {
-         $(this).addClass('Hover');
-      });
-
-   $('.AttachFileContainer .Attachment').live('mouseleave',
-      function(e) {
-         $(this).removeClass('Hover');
-      });
-
-   $('.AttachFileContainer .InsertImage').click(function() {
+   $('.Attachment .InsertImage').live('click', function() {
       var txtbox = $(this).closest('form').find('textarea');
       txtbox.val(txtbox.val()+'<img src="'+$(this).attr('href')+'" />');
       return false;

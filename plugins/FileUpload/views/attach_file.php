@@ -2,7 +2,6 @@
    <div class="AttachFileContainer">
       <div class="PrototypicalAttachment" style="display:none;">
          <div class="Attachment">
-            <div class="FilePreview"></div>
             <div class="FileMeta">
                <div>
                   <span class="FileName"><?php echo T('FileName'); ?></span>
@@ -11,6 +10,7 @@
                <span class="FileOptions"></span>
                <a class="InsertImage Hidden"><?php echo T('Insert Image'); ?></a>
             </div>
+            <div class="FilePreview"></div>
          </div>
          <div class="UploadProgress">
             <div class="Foreground"><strong><?php echo T('Uploading...'); ?></strong></div>

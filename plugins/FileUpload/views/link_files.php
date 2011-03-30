@@ -1,5 +1,4 @@
 <div class="Attachments">
-   <div class="AttachmentHeader"><?php echo T('Attachments'); ?></div>
    <div class="AttachFileContainer">
       <?php
          $CanDownload = $this->Data('CanDownload');
@@ -10,10 +9,11 @@
                <div class="FilePreview">
                   <?php
                   $Path = GetValue('Path', $Media);
-                  $DownloadUrl = Url("/discussion/download/{$Media->MediaID}/{$Media->Name}");
-
-                  if ($CanDownload)
+                  
+                  if ($CanDownload) {
+                     $DownloadUrl = FileUploadPlugin::Url($Path);
                      echo '<a href="'.$DownloadUrl.'">';
+                  }
 
                   $ThumbnailUrl = MediaModel::ThumbnailUrl($Media);
                   echo Img($ThumbnailUrl, array('class' => 'ImageThumbnail'));
@@ -21,30 +21,40 @@
                   if ($CanDownload)
                      echo '</a>';
 
-                  ?></div><div class="FileMeta">
-                     <?php
-                     echo '<div>';
-                     echo '<span class="FileName">', htmlspecialchars($Media->Name), '</span>';
+                  ?></div>
 
-                     if ($Media->ImageWidth && $Media->ImageHeight) {
-                        echo ' <span class="FileSize">'.$Media->ImageWidth.'&#160;x&#160;'.$Media->ImageHeight.'</span>';
-                     }
+               <div class="FileMeta">
+                  <?php
+                  echo '<div class="FileName">';
 
-                     echo ' <span class="FileSize">', Gdn_Format::Bytes($Media->Size, 0), '</span>';
-                     echo '</div>';
+                  if (isset($DownloadUrl)) {
+                     echo '<a href="'.$DownloadUrl.'">'.htmlspecialchars($Media->Name).'</a>';
+                  } else {
+                     echo htmlspecialchars($Media->Name);
+                  }
 
-                     if (StringBeginsWith($this->ControllerName, 'post', TRUE)) {
-                        echo '<div>';
 
-                        echo '<a class="InsertImage" href="'.Asset("/uploads/$Path").'">'.T('Insert Image').'</a>';
+                  echo '</div>';
 
-                        if ($IsOwner || Gdn::Session()->CheckPermission("Garden.Settings.Manage")) {
-                           echo ' | <a class="DeleteFile" href="'.Url("/plugin/fileupload/delete/{$Media->MediaID}").'"><span>'.T('Delete').'</span></a>';
-                        }
-                        echo '</div>';
-                     }
-                     ?>
-                  </div>
+                  echo '<div class="FileAttributes">';
+                  if ($Media->ImageWidth && $Media->ImageHeight) {
+                     echo ' <span class="FileSize">'.$Media->ImageWidth.'&#160;x&#160;'.$Media->ImageHeight.'</span> - ';
+                  }
+
+                  echo ' <span class="FileSize">', Gdn_Format::Bytes($Media->Size, 0), '</span>';
+                  echo '</div>';
+
+                  $Actions = '';
+                  if (StringBeginsWith($this->ControllerName, 'post', TRUE))
+                     $Actions = ConcatSep(' | ', $Actions, '<a class="InsertImage" href="'.FileUploadPlugin::Url($Path).'">'.T('Insert Image').'</a>');
+
+                  if ($IsOwner || Gdn::Session()->CheckPermission("Garden.Settings.Manage"))
+                     $Actions = ConcatSep(' | ', $Actions, '<a class="DeleteFile" href="'.Url("/plugin/fileupload/delete/{$Media->MediaID}").'"><span>'.T('Delete').'</span></a>');
+
+                  if ($Actions)
+                     echo '<div>', $Actions, '</div>';
+                  ?>
+               </div>
             </div>
       <?php
          }

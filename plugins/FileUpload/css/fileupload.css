@@ -152,10 +152,6 @@ div.AttachFileWrapper div.FileHolder div.AttachFileContainer span {
 }
 
 div.Attachments {
-   background-color: #CFECFF;
-   padding: 4px;
-   margin-bottom: 6px;
-   margin-right: 7px;
    text-align: left;
 }
 
@@ -191,33 +187,31 @@ div.UploadProgress {
    margin: 3px;
 }
 
-.AttachFileContainer .Hover {
-   border: solid 3px white;
-   background: white;
-   margin: 0;
-   box-shadow: 0px 0px 5px #000;
-	-moz-box-shadow: 0px 0px 5px #000;
-	-webkit-box-shadow: 0px 0px 5px #000;
+.Attachment:hover img {
+   z-index: 101;
+   position: relative;
 }
 
-.AttachFileContainer .FileMeta {
+.Attachment .FileMeta {
    position: absolute;
-   right: -3px;
-   width: 100%;
+   left: -5px;
+/*   width: 100%;*/
    background: #fff;
    z-index: 100;
    display: none;
-   border: solid 3px white;
-   box-shadow: 0px 5px 5px #000;
-	-moz-box-shadow: 0px 5px 5px #000;
-	-webkit-box-shadow: 0px 5px 5px #000;
+   padding-top: 100%;
+   top: -5px;
+   border: solid 5px white;
+   box-shadow: 0px 3px 10px #000;
+	-moz-box-shadow: 0px 3px 10px #000;
+	-webkit-box-shadow: 0px 3px 10px #000;
+   min-width: 100%;
 }
 
-.FileMeta .FileSize {
-   margin-left: 5px;
-   color: #AAAAAA;
-}
-
-.AttachFileContainer .Hover .FileMeta {
+.Attachment:hover .FileMeta {
    display: block;
+}
+
+.FileMeta .FileAttributes, .FileMeta .FileName {
+   white-space: nowrap;
 }
