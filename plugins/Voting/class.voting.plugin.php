@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Voting'] = array(
    'Name' => 'Voting',
    'Description' => 'Allows users to vote on comments and discussions.',
-   'Version' => '1.0.4b',
+   'Version' => '1.0.4.1b',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
@@ -356,7 +356,6 @@ class VotingPlugin extends Gdn_Plugin {
       if ($Sender->Head) {
          $Sender->AddJsFile('discussions.js');
          $Sender->AddJsFile('bookmark.js');
-			$Sender->AddJsFile('js/library/jquery.menu.js');
          $Sender->AddJsFile('options.js');
          $Sender->Head->AddRss($Sender->SelfUrl.'/feed.rss', $Sender->Head->Title());
       }
