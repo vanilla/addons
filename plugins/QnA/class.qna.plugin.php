@@ -195,7 +195,7 @@ class QnAPlugin extends Gdn_Plugin {
    public function Base_BeforeDiscussionMeta_Handler($Sender, $Args) {
       $Discussion = $Args['Discussion'];
 
-      if (!GetValue('Type', $Discussion) == 'question')
+      if (strtolower(GetValue('Type', $Discussion)) != 'question')
          return;
 
       $QnA = GetValue('QnA', $Discussion);
@@ -241,15 +241,35 @@ class QnAPlugin extends Gdn_Plugin {
       }
    }
 
-   public function PostController_BeforeBodyInput_Handler($Sender, $Args) {
+   /**
+    * @param Gdn_Controller $Sender
+    * @param array $Args
+    */
+   public function PostController_BeforeFormInputs_Handler($Sender, $Args) {
+      $Sender->AddDefinition('QuestionTitle', T('Question Title'));
+      $Sender->AddDefinition('DiscussionTitle', T('Discussion Title'));
+      $Sender->AddJsFile('qna.js', 'plugins/QnA');
+
       $Form = $Sender->Form;
+      if ($Sender->Form->GetValue('Type') == 'Question') {
+         Gdn::Locale()->SetTranslation('Discussion Title', T('Question Title'));
+      }
 
-      echo '<div class="P">',
-         T('You can either ask a question or start a discussion.', 'You can either ask a question or start a discussion. Choose what you want to do below.'),
-         '</div>';
+      include $Sender->FetchViewLocation('QnAPost', '', 'plugins/QnA');
+   }
 
-      echo '<div class="P">',
-         $Form->RadioList('Type', array('Question' => 'Question', 'Discussion' => 'Discussion')),
-      '</div>';
+   public function PostController_Render_Before($Sender, $Args) {
+      $Form = $Sender->Form; //new Gdn_Form();
+      if (!$Form->IsPostBack()) {
+         if (!property_exists($Sender, 'Discussion')) {
+            $Form->SetFormValue('Type', 'Question');
+         } elseif (!$Form->GetValue('Type')) {
+            $Form->SetValue('Type', 'Discussion');
+         }
+      }
+
+      if ($Form->GetValue('Type') == 'Question') {
+         $Sender->SetData('Title', T('Ask a Question'));
+      }
    }
 }
