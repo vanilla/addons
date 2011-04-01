@@ -27,7 +27,7 @@ class QnAPlugin extends Gdn_Plugin {
    public function Structure() {
       Gdn::Structure()
          ->Table('Discussion')
-         ->Column('QnA', array('Answered', 'Accepted', 'Rejected'), NULL)
+         ->Column('QnA', array('Unanswered', 'Answered', 'Accepted', 'Rejected'), NULL)
          ->Set();
 
       Gdn::Structure()
@@ -38,11 +38,11 @@ class QnAPlugin extends Gdn_Plugin {
       Gdn::SQL()->Replace(
          'ActivityType',
          array('AllowComments' => '0', 'RouteCode' => 'question', 'Notify' => '1', 'Public' => '0', 'ProfileHeadline' => '', 'FullHeadline' => ''),
-         array('Name' => 'QuestionAnswer'));
+         array('Name' => 'QuestionAnswer'), TRUE);
       Gdn::SQL()->Replace(
          'ActivityType',
          array('AllowComments' => '0', 'RouteCode' => 'answer', 'Notify' => '1', 'Public' => '0', 'ProfileHeadline' => '', 'FullHeadline' => ''),
-         array('Name' => 'AnswerAccepted'));
+         array('Name' => 'AnswerAccepted'), TRUE);
    }
 
 
@@ -104,6 +104,9 @@ class QnAPlugin extends Gdn_Plugin {
       $CommentID = $Comment['CommentID'];
       $Discussion = (array)$Args['Discussion'];
 
+      if ($Comment['InsertUserID'] == $Discussion['InsertUserID'])
+         return;
+
       $ActivityID = $ActivityModel->Add(
          $Comment['InsertUserID'],
          'QuestionAnswer',
@@ -160,25 +163,30 @@ class QnAPlugin extends Gdn_Plugin {
          Gdn::SQL()->Put('Comment', array('QnA' => $QnA), array('CommentID' => $Comment['CommentID']));
 
          // Update the discussion.
-         if (!$Discussion['QnA'] || $Discussion['QnA'] = 'Answered')
+         if ($Discussion['QnA'] != $QnA && (!$Discussion['QnA'] || in_array($Discussion['QnA'], array('Unanswered', 'Answered', 'Rejected'))))
             Gdn::SQL()->Put('Discussion', array('QnA' => $QnA), array('DiscussionID' => $Comment['DiscussionID']));
 
          // Record the activity.
-         AddActivity(
-            Gdn::Session()->UserID,
-            'AnswerAccepted',
-            Anchor(Gdn_Format::Text($Discussion['Name']), "/discussion/{$Discussion['DiscussionID']}/".Gdn_Format::Url($Discussion['Name'])),
-            $Comment['InsertUserID'],
-            "/discussion/comment/{$Comment['CommentID']}/#Comment_{$Comment['CommentID']}",
-            TRUE
-         );
+         if ($QnA == 'Accepted') {
+            AddActivity(
+               Gdn::Session()->UserID,
+               'AnswerAccepted',
+               Anchor(Gdn_Format::Text($Discussion['Name']), "/discussion/{$Discussion['DiscussionID']}/".Gdn_Format::Url($Discussion['Name'])),
+               $Comment['InsertUserID'],
+               "/discussion/comment/{$Comment['CommentID']}/#Comment_{$Comment['CommentID']}",
+               TRUE
+            );
+         }
       }
 
       Redirect("/discussion/comment/{$Comment['CommentID']}#Comment_{$Comment['CommentID']}");
    }
 
    public function DiscussionModel_BeforeGet_Handler($Sender, $Args) {
-      if ($QnA = Gdn::Request()->Get('qna')) {
+      if (StringEndsWith(Gdn::Request()->Path(), '/unanswered', TRUE)) {
+         $Args['Wheres']['Type'] = 'Question';
+         $Sender->SQL->WhereIn('d.QnA', array('Unanswered', 'Rejected'));
+      } elseif ($QnA = Gdn::Request()->Get('qna')) {
          $Args['Wheres']['QnA'] = $QnA;
       }
    }
@@ -190,6 +198,42 @@ class QnAPlugin extends Gdn_Plugin {
     */
    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
       $Sender->Validation->ApplyRule('Type', 'Required', T('Choose either whether you want to ask a question or start a discussion.'));
+
+      $Post =& $Args['FormPostValues'];
+      if ($Args['Insert'] && GetValue('Type', $Post) == 'Question') {
+         $Post['QnA'] = 'Unanswered';
+      }
+   }
+
+   public function DiscussionsController_AfterDiscussionTabs_Handler($Sender, $Args) {
+      if (StringEndsWith(Gdn::Request()->Path(), '/unanswered', TRUE))
+         $CssClass = ' class="Active"';
+      else
+         $CssClass = '';
+
+      echo '<li'.$CssClass.'><a class="QnA-UnansweredQuestions" href="/discussions/unanswered">'.T('Unanswered Questions').'<span class="Popin" rel="/discussions/unansweredcount"></span></a></li>';
+   }
+
+   /**
+    * @param DiscussionsController $Sender
+    * @param array $Args
+    */
+   public function DiscussionsController_Unanswered_Create($Sender, $Args) {
+      $Sender->View = 'Index';
+      $Sender->Index(GetValue(0, $Args, ''));
+   }
+
+    /**
+    * @param DiscussionsController $Sender
+    * @param array $Args
+    */
+   public function DiscussionsController_UnansweredCount_Create($Sender, $Args) {
+      Gdn::SQL()->WhereIn('QnA', array('Unanswered', 'Rejected'));
+      $Count = Gdn::SQL()->GetCount('Discussion', array('Type' => 'Question'));
+
+      $Sender->SetData('UnansweredCount', $Count);
+      $Sender->SetData('_Value', $Count);
+      $Sender->Render('Value', 'Utility', 'Dashboard');
    }
 
    public function Base_BeforeDiscussionMeta_Handler($Sender, $Args) {
@@ -202,6 +246,7 @@ class QnAPlugin extends Gdn_Plugin {
       $Title = '';
       switch ($QnA) {
          case '':
+         case 'Unanswered':
          case 'Rejected':
             $Text = 'Question';
             $QnA = 'Question';
