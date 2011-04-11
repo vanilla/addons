@@ -187,7 +187,8 @@ div.UploadProgress {
    margin: 3px;
 }
 
-.Attachment:hover img {
+/*.Attachment:hover img {*/
+.Attachment img {
    z-index: 101;
    position: relative;
 }
@@ -208,10 +209,15 @@ div.UploadProgress {
    min-width: 100%;
 }
 
-.Attachment:hover .FileMeta {
+.Attachment .FileMeta {
    display: block;
 }
 
 .FileMeta .FileAttributes, .FileMeta .FileName {
    white-space: nowrap;
+}
+
+.FilePreview {
+   border: solid 1px red;
+   background: pink;
 }

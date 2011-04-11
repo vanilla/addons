@@ -29,23 +29,32 @@ $PluginInfo['FileUpload'] = array(
 include dirname(__FILE__).'/class.mediamodel.php';
 
 class FileUploadPlugin extends Gdn_Plugin {
-
+   /// PROPERTIES ///
    protected $MediaCache;
-   
+
+
+   /// METHODS ///
+
    public function __construct() {
       $this->MediaCache = array();
-      $this->MediaModel = new MediaModel();
       
       $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
    }
 
-   public function PathUploads() {
-      if (defined('PATH_LOCAL_UPLOADS'))
-         return PATH_LOCAL_UPLOADS;
-      else
-         return PATH_UPLOADS;
+   /**
+    * @return MediaModel
+    */
+   public function MediaModel() {
+      static $MediaModel = NULL;
+
+      if ($MediaModel === NULL) {
+         $MediaModel = new MediaModel();
+      }
+      return $MediaModel;
    }
+
+   /// EVENT HANDLERS ///
 
    /**
     * Adds "Media" menu option to the Forum menu on the dashboard.
@@ -105,13 +114,13 @@ class FileUploadPlugin extends Gdn_Plugin {
          'Status'    => 'failed'
       );
       
-      $Media = $this->MediaModel->GetID($MediaID);
+      $Media = $this->MediaModel()->GetID($MediaID);
 
       if ($Media) {
          $Delete['Media'] = $Media;
          $UserID = GetValue('UserID', Gdn::Session());
          if (GetValue('InsertUserID', $Media, NULL) == $UserID || Gdn::Session()->CheckPermission("Garden.Settings.Manage")) {
-            $this->TrashFile($MediaID);
+            $this->MediaModel()->Delete($Media, TRUE);
             $Delete['Status'] = 'success';
          }
       }
@@ -261,7 +270,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          $CommentIDList[] = $Sender->Comment->CommentID;
       }
       
-      $MediaData = $this->MediaModel->PreloadDiscussionMedia($Sender->DiscussionID, $CommentIDList);
+      $MediaData = $this->MediaModel()->PreloadDiscussionMedia($Sender->DiscussionID, $CommentIDList);
 
       $MediaArray = array();
       if ($MediaData !== FALSE) {
@@ -342,14 +351,14 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (!$this->CanDownload) throw new PermissionException("File could not be streamed: Access is denied");
    
       list($MediaID) = $Sender->RequestArgs;
-      $Media = $this->MediaModel->GetID($MediaID);
+      $Media = $this->MediaModel()->GetID($MediaID);
       
       if (!$Media) return;
       
       $Filename = Gdn::Request()->Filename();
       if (!$Filename) $Filename = $Media->Name;
       
-      $DownloadPath = CombinePaths(array($this->PathUploads(),GetValue('Path', $Media)));
+      $DownloadPath = CombinePaths(array(MediaModel::PathUploads(),GetValue('Path', $Media)));
 
       if (in_array(strtolower(pathinfo($Filename, PATHINFO_EXTENSION)), array('bmp', 'gif', 'jpg', 'jpeg', 'png')))
          $ServeMode = 'inline';
@@ -429,7 +438,7 @@ class FileUploadPlugin extends Gdn_Plugin {
 
    public function UtilityController_Thumbnail_Create($Sender, $Args) {
       $SubPath = implode('/', $Args);
-      $Path = $this->PathUploads()."/$SubPath";
+      $Path = MediaModel::PathUploads()."/$SubPath";
       if (!file_exists($Path))
          throw NotFoundException('File');
 
@@ -440,8 +449,8 @@ class FileUploadPlugin extends Gdn_Plugin {
 
       $Options = array();
 
-      $ThumbHeight = MediaModel::$ThumbnailHeight;
-      $ThumbWidth = MediaModel::$ThumbnailWidth;
+      $ThumbHeight = MediaModel::ThumbnailHeight();
+      $ThumbWidth = MediaModel::ThumbnailWidth();
 
       if (!$ThumbHeight || $SHeight < $ThumbHeight) {
          $Height = $SHeight;
@@ -461,13 +470,13 @@ class FileUploadPlugin extends Gdn_Plugin {
          }
       }
 
-      $TargetPath = $this->PathUploads()."/thumbnails/$SubPath";
+      $TargetPath = MediaModel::PathUploads()."/thumbnails/$SubPath";
       if (!file_exists(dirname($TargetPath))) {
          mkdir(dirname($TargetPath), 0777, TRUE);
       }
       Gdn_UploadImage::SaveImageAs($Path, $TargetPath, $Height, $Width, $Options);
 
-      $Url = self::Url($SubPath);
+      $Url = MediaModel::Url("/thumbnails/$SubPath");
       Redirect($Url, 302);
 //      Gdn_FileSystem::ServeFile($TargetPath, basename($Path), '', 'inline');
    }
@@ -482,13 +491,13 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    protected function AttachFile($FileID, $ForeignID, $ForeignType) {
-      $Media = $this->MediaModel->GetID($FileID);
+      $Media = $this->MediaModel()->GetID($FileID);
       if ($Media) {
          $Media->ForeignID = $ForeignID;
          $Media->ForeignTable = $ForeignType;
          try {
 //            $PlacementStatus = $this->PlaceMedia($Media, Gdn::Session()->UserID);
-            $this->MediaModel->Save($Media);
+            $this->MediaModel()->Save($Media);
          } catch (Exception $e) {
             die($e->getMessage());
             return FALSE;
@@ -547,7 +556,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       $ReturnArray = array('FileUpload',$FolderID);
       
       if ($Absolute)
-         array_unshift($ReturnArray, $this->PathUploads());
+         array_unshift($ReturnArray, MediaModel::PathUploads());
       
       return ($ReturnString) ? implode(DS,$ReturnArray) : $ReturnArray;
    }
@@ -666,7 +675,7 @@ class FileUploadPlugin extends Gdn_Plugin {
 
          $SaveFilename = md5(microtime()).'.'.strtolower($Extension);
          $SaveFilename = '/FileUpload/'.substr($SaveFilename, 0, 2).'/'.substr($SaveFilename, 2);
-         $SavePath = $this->PathUploads().$SaveFilename;
+         $SavePath = MediaModel::PathUploads().$SaveFilename;
          if (!is_dir(dirname($SavePath)))
             @mkdir(dirname($SavePath), 0777, TRUE);
 
@@ -692,7 +701,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             'StorageMethod'   => 'local',
             'Path'            => $SaveFilename
          );
-         $MediaID = $this->MediaModel->Save($Media);
+         $MediaID = $this->MediaModel()->Save($Media);
          
          $FinalImageLocation = '';
          $PreviewImageLocation = MediaModel::ThumbnailUrl($Media);
@@ -715,8 +724,8 @@ class FileUploadPlugin extends Gdn_Plugin {
             'Filesize'           => $FileSize,
             'FormatFilesize'     => Gdn_Format::Bytes($FileSize,1),
             'ProgressKey'        => $Sender->ApcKey ? $Sender->ApcKey : '',
-            'PreviewImageLocation' => Asset(MediaModel::ThumbnailUrl($Media)),
-            'FinalImageLocation' => self::Url($SaveFilename)
+            'PreviewImageLocation' => Url($PreviewImageLocation),
+            'FinalImageLocation' => Url(MediaModel::Url($SaveFilename))
          );
 
       } catch (FileUploadPluginUploadErrorException $e) {
@@ -805,14 +814,14 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    protected function TrashFile($FileID) {
-      $Media = $this->MediaModel->GetID($FileID);
+      $Media = $this->MediaModel()->GetID($FileID);
       
       if ($Media) {
-         $this->MediaModel->Delete($Media);
+         $this->MediaModel()->Delete($Media);
          $Deleted = FALSE;
          
          if (!$Deleted) {
-            $DirectPath = $this->PathUploads().DS.$Media->Path;
+            $DirectPath = MediaModel::PathUploads().DS.$Media->Path;
             if (file_exists($DirectPath))
                $Deleted = @unlink($DirectPath);
          }
@@ -828,12 +837,12 @@ class FileUploadPlugin extends Gdn_Plugin {
    
    public function DiscussionModel_DeleteDiscussion_Handler($Sender) {
       $DiscussionID = $Sender->EventArguments['DiscussionID'];
-      $this->MediaModel->DeleteParent('Discussion', $DiscussionID);
+      $this->MediaModel()->DeleteParent('Discussion', $DiscussionID);
    }
    
    public function CommentModel_DeleteComment_Handler($Sender) {
       $CommentID = $Sender->EventArguments['CommentID'];
-      $this->MediaModel->DeleteParent('Comment', $CommentID);
+      $this->MediaModel()->DeleteParent('Comment', $CommentID);
    }
    
    public function Setup() {
@@ -861,18 +870,6 @@ class FileUploadPlugin extends Gdn_Plugin {
    public function OnDisable() {
       RemoveFromConfig('Plugins.FileUpload.Enabled');
    }
-
-   public static function Url($SubPath) {
-      $SubPath = ltrim($SubPath, '/');
-
-      if (method_exists('Gdn_Upload', 'Url'))
-         $Url = Gdn_Upload::Url("/thumbnails/$SubPath");
-      else
-         $Url = "/uploads/thumbnails/$SubPath";
-
-      return $Url;
-   }
-   
 }
 
 class FileUploadPluginUploadErrorException extends Exception {

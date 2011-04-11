@@ -50,7 +50,7 @@ function Gdn_Uploaders() {
    }
    
    Gdn_Uploaders.prototype.GetUniqID = function() {
-      var NewDate = new Date;
+      var NewDate = new Date();
       return NewDate.getTime();
    }
 
@@ -266,7 +266,6 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
    
 
    Gdn_MultiFileUpload.prototype.ShowUploader = function(NoAnimate) {
-   
       var UploaderElement = this.CurrentUploader;
    
       if (typeof(NoAnimate) == 'object') {

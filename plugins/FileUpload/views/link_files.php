@@ -11,7 +11,7 @@
                   $Path = GetValue('Path', $Media);
                   
                   if ($CanDownload) {
-                     $DownloadUrl = FileUploadPlugin::Url($Path);
+                     $DownloadUrl = MediaModel::Url($Media);
                      echo '<a href="'.$DownloadUrl.'">';
                   }
 
