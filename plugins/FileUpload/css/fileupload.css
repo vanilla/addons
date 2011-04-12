@@ -88,14 +88,19 @@ div.UploadProgress {
    margin: 3px;
 }
 .FilePreview {
-	z-index: 100;
    border: none;
+}
+.MessageList .Item:hover { /* ie fix */
+   z-index: 100;
 }
 .FilePreview img {
 	display: block;
 }
+.Attachment:hover {
+   z-index: 101;
+}
 .Attachment .FileHover {
-	display: none;	
+	display: none;
 }
 .Attachment .FileMeta {
 	padding: 0 4px;
