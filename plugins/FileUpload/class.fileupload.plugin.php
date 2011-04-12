@@ -266,7 +266,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       } elseif ($Sender->Discussion) {
          $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
       }
-      if (isset($Sender->Comment)) {
+      if (isset($Sender->Comment) && isset($Sender->Comment->CommentID)) {
          $CommentIDList[] = $Sender->Comment->CommentID;
       }
       
@@ -365,6 +365,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       else
          $ServeMode = 'attachment';
 
+      $this->EventArguments['Media'] = $Media;
+      $this->FireEvent('BeforeDownload');
       
       return Gdn_FileSystem::ServeFile($DownloadPath, $Filename, '', $ServeMode);
       throw new Exception('File could not be streamed: missing file ('.$DownloadPath.').');
