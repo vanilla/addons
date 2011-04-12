@@ -496,9 +496,11 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             $(FileListing.find('div.UploadProgress')).remove();
             
 				// Add image preview
-				var img = document.createElement('img');
-				img.src = JResponse.MediaResponse.PreviewImageLocation;
+				var img = document.createElement('img'),
+               img2 = document.createElement('img');
+				img.src = img2.src = JResponse.MediaResponse.PreviewImageLocation;
 				$(FileListing.find('div.FilePreview')).append(img);
+            $(FileListing.find('div.FileHover')).prepend(img2);
 
 				// Add "insert image" button
 				if (JResponse.MediaResponse.FinalImageLocation != '') {
