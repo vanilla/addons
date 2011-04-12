@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0b',
+   'Version' => '1.0.1b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -307,7 +307,7 @@ class QnAPlugin extends Gdn_Plugin {
       $Form = $Sender->Form; //new Gdn_Form();
       if (!$Form->IsPostBack()) {
          if (!property_exists($Sender, 'Discussion')) {
-            $Form->SetFormValue('Type', 'Question');
+            $Form->SetValue('Type', 'Question');
          } elseif (!$Form->GetValue('Type')) {
             $Form->SetValue('Type', 'Discussion');
          }
