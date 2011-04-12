@@ -183,7 +183,7 @@ class MediaModel extends VanillaModel {
       } elseif ($UseDownloadUrl) {
          $Url = '/discussion/download/'.GetValue('MediaID', $Media).'/'.rawurlencode(GetValue('Name', $Media));
       } else {
-         $SubPath = ltrim(GetValue('Path', $Media), $SubPath, '/');
+         $SubPath = ltrim(GetValue('Path', $Media), '/');
          if (method_exists('Gdn_Upload', 'Url'))
             $Url = Gdn_Upload::Url("/$SubPath");
          else
