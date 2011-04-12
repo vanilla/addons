@@ -181,43 +181,38 @@ div.UploadProgress {
    display: inline-block;
 }
 
+/* Show More File Info on Hover */
 .AttachFileContainer .Attachment {
    display: inline-block;
    position: relative;
    margin: 3px;
 }
-
-/*.Attachment:hover img {*/
-.Attachment img {
-   z-index: 101;
-   position: relative;
+.FilePreview {
+	z-index: 100;
+   border: none;
 }
-
+.FilePreview img {
+	display: block;
+}
+.Attachment .FileHover {
+	display: none;	
+}
 .Attachment .FileMeta {
-   position: absolute;
-   left: -5px;
-/*   width: 100%;*/
-   background: #fff;
-   z-index: 100;
-   display: none;
-   padding-top: 100%;
-   top: -5px;
-   border: solid 5px white;
-   box-shadow: 0px 3px 10px #000;
-	-moz-box-shadow: 0px 3px 10px #000;
-	-webkit-box-shadow: 0px 3px 10px #000;
-   min-width: 100%;
+	padding: 0 4px;
 }
-
-.Attachment .FileMeta {
-   display: block;
+.Attachment:hover .FileHover {
+	z-index: 101;
+	display: block;
+	background: #fff;
+	padding: 6px;
+	border: 1px solid #555;
+   box-shadow: 0px 2px 10px #000;
+	-moz-box-shadow: 0px 2px 10px #000;
+	-webkit-box-shadow: 0px 2px 10px #000;
+	position: absolute;
+	top: -7px;
+	left: -7px;
 }
-
 .FileMeta .FileAttributes, .FileMeta .FileName {
    white-space: nowrap;
-}
-
-.FilePreview {
-   border: solid 1px red;
-   background: pink;
 }
