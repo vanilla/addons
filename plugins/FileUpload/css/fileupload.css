@@ -2,73 +2,44 @@ body.fileupload div#Content div.Info {
    padding-bottom: 0px;
    margin-bottom: 0px;
 }
-
 body.fileupload div#Content div.Info div.RealtimeMode {
    display: block;
    font-size: 85%;
 }
-
 body.fileupload div#Content div.Info div.RealtimeMode span {
-   padding: 2px 5px;;
-   
+   padding: 2px 5px;  
 }
-
 body.fileupload div#Content div.Info div.RealtimeMode span.FileUploadRealtimeUnavailable {
    color: #ff7c25;
    background-color: #fff1e8;
 }
-
 body.fileupload div#Content div.Info div.RealtimeMode span.FileUploadRealtimeAvailable {
    color: #40aa00;
    background-color: #dfffcb;
 }
-
 #DiscussionForm ul.PostOptions {
    margin-bottom: 0px;
 }
-
-body #DiscussionForm div.AttachFileWrapper form {
-   background: transparent;
-   border: 0px;
-   padding: 0px;
-   margin: 0px;
-   
-}
-
+body #DiscussionForm div.AttachFileWrapper form,
 body #DiscussionForm form.FileUpload {
    background: transparent;
    border: 0px;
-   margin: 0px;
    padding: 0px;
+   margin: 0px;
 }
-
 div.AttachFileWrapper {
    margin-bottom: 2px;
    padding: 5px;
    text-align: left;
 }
-
-input.HiddenFileInput {
-   position: absolute;
-}
-
-input.HiddenFileInput:hover {
-   cursor: pointer;
-}
-
 div.AttachFileWrapper table.AttachFileContainer {
    border-collapse: collapse;
    border: none;
-}
-
-div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment {
-   
 }
 div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td {
    padding: 3px;
    vertical-align: middle;
 }
-
 div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.ProgressBar {
    width: 126px;
    border: 2px solid gray;
@@ -77,7 +48,6 @@ div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.Progres
    background: transparent url('../images/progress_base.gif') no-repeat center left;
    border: 0px;
 }
-
 div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.ProgressBar div.ProgressTicker {
    height: 100%;
    background-color: lime;
@@ -88,162 +58,66 @@ div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.Progres
    padding-right: 2px;
    text-align: right;
 }
-
-div.AttachFileWrapper div.AttachFileLink {
-   position: relative;
-}
-
-div.AttachFileWrapper div.AttachFileLink a {
-   zoom: 1;
-   display: inline;
-   
-   display: inline-block;
-}
-
-div.AttachFileWrapper div.AttachFileLink div.CurrentUploader {
-   height: 0px;
-   width: 350px;
-}
-
 div.AttachFileWrapper div.AttachFileLink div.CurrentUploader input[type=file] {
    display: none;
 }
-
-div.AttachFileWrapper div.NewAttachment {
-   float: left;
-   width: 350px;
-   background-color: white;
-}
-
-div.AttachFileWrapper div.NewAttachment div.FileUploadInput {
-   padding: 10px;
-}
-
-div.AttachFileWrapper div.NewAttachment input.FileUploadButton {
-   font-size: 12px;
-}
-
-div.AttachFileWrapper div.NewAttachment div.MediaManager {
-   border-top: 1px solid #AAAAAA;
-   padding: 5px;
-}
-
-
-div.AttachFileWrapper div.FileHolder {
-   float: left;
-   width: 550px;
-   overflow:hidden;
-   padding: 5px;
-   padding-left: 10px;
-   background-color: #e1f0ff;
-   border-left: 1px solid #AAAAAA;
-}
-
-div.AttachFileWrapper div.FileHolder h3 {
-   font-size: 16px;
-}
-
-div.AttachFileWrapper div.FileHolder div.AttachFileContainer {
-
-}
-
-div.AttachFileWrapper div.FileHolder div.AttachFileContainer span {
-   padding-left: 5px;
-}
-
 div.Attachments {
-   background-color: #CFECFF;
-   padding: 4px;
-   margin-bottom: 6px;
-   margin-right: 7px;
-}
-
-div.Attachments div.AttachmentHeader {
-   font-weight: bold;
    text-align: left;
 }
-
-div.Attachments table.AttachFileContainer {
-   border-collapse: collapse;
-   border: none;
-}
-
-div.Attachments table.AttachFileContainer tr td {
-   padding: 3px;
-   vertical-align: middle;
-}
-
-div.Attachments table.AttachFileContainer tr td a.DeleteFile span {
-   display: none;
-}
-
-div.Attachments table.AttachFileContainer tr td a.DeleteFile {
-   width: 12px;
-   height: 12px;
-   background: transparent url('../images/trash.png') no-repeat top left;
-   display: block;
-}
-
 li div.FileUploadBlock {
-   margin-bottom:       10px;
+   margin-bottom: 10px;
 }
-
 li div.FileUploadBlock h1 {
-   margin-bottom:       0px;
+   margin-bottom: 0px;
 }
-
 li div.FileUploadBlock div.Detail {
-   font-style:          italic;
+   font-style: italic;
 }
-
-li table.FileUploadTable th {
-   background-color:    white;
-}
-
-li table.FileUploadTable td:first-child {
-   width:               150px;
-}
-
-li table.FileUploadTable td em {
-   font-style:          italic;
-   font-size:           80%;
-}
-div.FileAttachment {
-   margin-bottom: 6px;
-}
-div.FilePreview {
-   max-height: 32px;
-   width: 32px;
-   display: inline-block;
-   vertical-align: middle;
-   text-align: center;
-   border: 1px solid #666;
-   background: #fff;
-}
-div.FilePreview img {
-   max-width: 32px;
-   max-height: 32px;
-   display: block;
-   margin: 0 auto;
-}
-div.FileOptions,
-div.FileName,
-div.FileSize {
-   display: inline;
-   margin-right: 6px;
+.PrototypicalAttachment {
+	zoom: 1;
+	*display: inline;
 }
 div.UploadProgress {
    display: inline-block;
 }
-img.ImageThumbnail {
-   max-height: 32px;
-   max-width: 32px;
+.AttachFileContainer .Attachment {
+   display: inline-block;
+	zoom: 1;
+	*display: inline;
+   position: relative;
+   margin: 3px;
 }
-a.InsertImage {
-   background: url('../images/insert.png') 0 0 no-repeat;
-   padding-left: 20px;
+.FilePreview {
+   border: none;
 }
-table.AttachFileContainer td.FileSize {
-   font-size: 11px;
-   color: #888;
+.MessageList .Item:hover { /* ie fix */
+   z-index: 100;
+}
+.FilePreview img {
+	display: block;
+}
+.Attachment:hover {
+   z-index: 101;
+}
+.Attachment .FileHover {
+	display: none;
+}
+.Attachment .FileMeta {
+	padding: 0 4px;
+}
+.Attachment:hover .FileHover {
+	z-index: 101;
+	display: block;
+	background: #fff;
+	padding: 6px;
+	border: 1px solid #555;
+   box-shadow: 0px 2px 10px #000;
+	-moz-box-shadow: 0px 2px 10px #000;
+	-webkit-box-shadow: 0px 2px 10px #000;
+	position: absolute;
+	top: -7px;
+	left: -7px;
+}
+.FileMeta .FileAttributes, .FileMeta .FileName {
+   white-space: nowrap;
 }

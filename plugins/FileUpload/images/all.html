@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en-ca" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+
+   <title>All Categories - Vanilla 2</title>
+<link rel="stylesheet" type="text/css" href="all_files/style_002.css" media="screen">
+<link rel="stylesheet" type="text/css" href="all_files/style.css" media="screen">
+<link rel="shortcut icon" href="http://vanilla.local/themes/default/design/favicon.png" type="image/x-icon">
+<link rel="canonical" href="http://vanilla.local/vanilla/categories/all">
+<script src="all_files/jquery_002.js" type="text/javascript"></script>
+<script src="all_files/jquery_005.js" type="text/javascript"></script>
+<script src="all_files/jquery.js" type="text/javascript"></script>
+<script src="all_files/jquery_003.js" type="text/javascript"></script>
+<script src="all_files/jquery_004.js" type="text/javascript"></script>
+<script src="all_files/global.js" type="text/javascript"></script></head><body id="vanilla_categories_all" class="Vanilla Categories all ">
+   <div id="Frame">
+      <div id="Head">
+         <div class="Menu">
+            <h1><a class="Title" href="http://vanilla.local/"><span>Vanilla 2</span></a></h1>
+            <ul id="Menu"><li><a href="http://vanilla.local/dashboard/settings">Dashboard</a></li>
+<li class=" Highlight"><a href="http://vanilla.local/discussions">Discussions</a></li>
+<li><a href="http://vanilla.local/activity">Activity</a></li>
+<li><a href="http://vanilla.local/messages/all">Inbox</a></li>
+<li class="UserNotifications"><a href="http://vanilla.local/profile/Todd">Todd</a></li>
+<li class="NonTab SignOut"><a href="http://vanilla.local/entry/signout/AV2BSRQ3XIR6?Target=discussions">Sign Out</a></li>
+</ul>            <div class="Search"><form method="get" action="/search">
+<div>
+<input id="Form_Search" name="Search" class="InputBox" type="text"><input id="Form_Go" value="Go" class="Button" type="submit">
+</div>
+</form></div>
+         </div>
+      </div>
+      <div id="Body">
+         <div id="Content"><div class="Tabs Headings CategoryHeadings">
+   <div class="ItemHeading">All Categories</div>
+</div>
+<ul class="DataList CategoryList CategoryListWithHeadings"><li class="Item CategoryHeading Depth1">
+               <div class="ItemContent Category">General</div><div class="Options"><div class="ToggleFlyout OptionsMenu"><div class="MenuTitle">Options</div><ul style="display: none;" class="Flyout MenuItems"><li><a href="http://vanilla.local/vanilla/category/markread?categoryid=1">Mark Read</a></li><li><a href="http://vanilla.local/vanilla/category/unfollow?categoryid=1">Unfollow</a></li></ul></div></div>
+            </li><li class="Item Depth2">
+               <div class="ItemContent Category"><a href="http://vanilla.local/categories/off" class="Title">Off Topic</a><div class="Options"><div class="ToggleFlyout OptionsMenu"><div class="MenuTitle">Options</div><ul style="display: none;" class="Flyout MenuItems"><li><a href="http://vanilla.local/vanilla/category/markread?categoryid=2">Mark Read</a></li><li><a href="http://vanilla.local/vanilla/category/unfollow?categoryid=2">Unfollow</a></li></ul></div></div><div class="CategoryDescription"></div><div class="Meta">
+                     <span class="RSS"><a href="http://vanilla.local/categories/off/feed.rss"><img src="all_files/rss.gif"></a></span>
+                     <span class="DiscussionCount">0 discussions</span>
+                     <span class="CommentCount">0 comments</span><span class="ChildCategories"><b>Child Categories:</b> <a href="http://vanilla.local/categories/dirty-words">Dirty Words</a></span></div>
+               </div>
+            </li></ul></div>
+         <div id="Panel"><a href="http://vanilla.local/post/discussion" class="BigButton NewDiscussion">Start a New Discussion</a></div>
+      </div>
+      <div id="Foot">
+			<!-- Various definitions for Javascript //-->
+<div id="Definitions" style="display: none;">
+<input id="TransportError" value="A fatal error occurred while processing the request.&lt;br /&gt;The server returned the following response: %s" type="hidden">
+<input id="TransientKey" value="AV2BSRQ3XIR6" type="hidden">
+<input id="WebRoot" value="http://vanilla.local/" type="hidden">
+<input id="UrlFormat" value="/{Path}" type="hidden">
+<input id="ConfirmHeading" value="Confirm" type="hidden">
+<input id="ConfirmText" value="Are you sure you want to do that?" type="hidden">
+<input id="Okay" value="Okay" type="hidden">
+<input id="Cancel" value="Cancel" type="hidden">
+<input id="Search" value="Search" type="hidden">
+</div><div><a href="http://vanillaforums.org/">Powered by Vanilla</a></div>		</div>
+   </div>
+	<div id="Sql"><div class="CanonicalUrl"><b>Canonical Url</b>: <a href="http://vanilla.local/vanilla/categories/all">http://vanilla.local/vanilla/categories/all</a></div><h3>5 queries in 0.0036752223968506s</h3>UserModel-&gt;GetSession('1')<small>0.000518s</small><pre>select u.*
+from GDN_User u
+where u.UserID = '1';</pre>UserModel-&gt;GetSession('1')<small>0.001641s</small><pre>set names 'utf8';</pre>CategoryModel-&gt;GetFull()<small>0.000721s</small><pre>select c.Name as `Name`, c.CategoryID as `CategoryID`, c.TreeRight as `TreeRight`, c.TreeLeft as `TreeLeft`, c.Depth as `Depth`, c.Description as `Description`, c.CountDiscussions as `CountDiscussions`, c.CountComments as `CountComments`, c.UrlCode as `UrlCode`, c.LastCommentID as `LastCommentID`, c.PermissionCategoryID as `PermissionCategoryID`, co.DateInserted as `DateLastComment`, co.InsertUserID as `LastCommentUserID`, cu.Name as `LastCommentName`, cu.Photo as `LastCommentPhoto`, co.DiscussionID as `LastDiscussionID`, d.Name as `LastDiscussionName`
+from GDN_Category c
+left join GDN_Comment co on c.LastCommentID = co.CommentID
+left join GDN_User cu on co.InsertUserID = cu.UserID
+left join GDN_Discussion d on d.DiscussionID = co.DiscussionID
+where c.AllowDiscussions = '1'
+order by TreeLeft asc;</pre>UserModel-&gt;GetApplicantCount()<small>0.000317s</small><pre>select count(u.UserID) as `ApplicantCount`
+from GDN_User u
+join GDN_UserRole ur on u.UserID = ur.UserID
+where ur.RoleID = 4;</pre>include('/www/vanilla/applications/dashboard/views/default.master.php')<small>0.000478s</small><pre>select DiscussionID
+from GDN_UserDiscussion UserDiscussion
+where UserID = '1'
+ and Bookmarked = '1';</pre><h3>Controller Data</h3><pre><b>Title</b>: 'All Categories'
+<b>Categories</b>: DataSet
+   <b>Count</b>: 4
+   <b>Fields</b>: Name, CategoryID, TreeRight, TreeLeft, Depth, Description, CountDiscussions, CountComments, UrlCode, LastCommentID, PermissionCategoryID, DateLastComment, LastCommentUserID, LastCommentName, LastCommentPhoto, LastDiscussionID, LastDiscussionName, CountAllDiscussions, CountAllComments
+<b>CssClass</b>: 'Vanilla Categories all '
+</pre><h3>Page completed in 0.4271s</h3></div><div class="InformMessages"></div></body></html>
