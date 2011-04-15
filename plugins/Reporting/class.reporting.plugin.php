@@ -10,6 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Reporting'] = array(
+   'Name' => 'Community Reporting',
    'Description' => 'Allows users to report comments and discussions for content violations or awesomeness.',
    'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.18a'),
@@ -32,17 +33,22 @@ class ReportingPlugin extends Gdn_Plugin {
    public function __construct() {
       $this->ReportEnabled = C('Plugins.Reporting.ReportEnabled', TRUE);
       $this->AwesomeEnabled = C('Plugins.Reporting.AwesomeEnabled', TRUE);
-
-      $this->DrawButtons = C('Plugins.Reporting.DrawButtons', TRUE);
    }
 
    /*
     * Plugin control
     */
-
    public function PluginController_Reporting_Create($Sender) {
       $Sender->Form = new Gdn_Form();
       $this->Dispatch($Sender, $Sender->RequestArgs);
+   }
+
+   /**
+    * Add to dashboard menu.
+    */
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = $Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Moderation', T('Community Reporting'), 'plugin/reporting', 'Garden.Settings.Manage');
    }
 
    /**
@@ -52,13 +58,27 @@ class ReportingPlugin extends Gdn_Plugin {
    */
    public function Controller_Index($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
-      $Sender->Title('Content Reporting');
+      $Sender->Title('Community Reporting');
       $Sender->AddSideMenu('dashboard/settings/plugins');
       $Sender->AddCssFile('reporting.css', 'plugins/Reporting');
+      
+      // Check to see if the admin is toggling a feature
+      $Feature = GetValue('1', $Sender->RequestArgs);
+      $Command = GetValue('2', $Sender->RequestArgs);
+      $TransientKey = GetIncomingValue('TransientKey');
+      if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
+         if (in_array($Feature, array('awesome', 'report'))) {
+            SaveToConfig(
+               'Plugins.Reporting.'.ucfirst($Feature).'Enabled',
+               $Command == 'disable' ? FALSE : TRUE
+            );
+            
+            Redirect('plugin/reporting');
+         }
+      }
 
       $CategoryModel = new CategoryModel();
       $Sender->SetData('Plugins.Reporting.Data', array(
-         'Categories'      => $CategoryModel->GetFull('', 'Vanilla.Discussions.Add'),
          'ReportEnabled'   => $this->ReportEnabled,
          'AwesomeEnabled'  => $this->AwesomeEnabled
       ));
@@ -226,11 +246,9 @@ class ReportingPlugin extends Gdn_Plugin {
     * UI injection
     */
 
-   public function DiscussionController_CommentOptions_Handler($Sender) {
-      if (!$this->DrawButtons) return;
-      
+   public function Base_CommentOptions_Handler($Sender) {
       // You can't report or 'awesome' your own posts
-      if (GetValue('InsertUserID', $Sender->EventArguments['Object']) == GDN::Session()->UserID) return;
+      // if (GetValue('InsertUserID', $Sender->EventArguments['Object']) == GDN::Session()->UserID) return;
       
       $Context = strtolower($Sender->EventArguments['Type']);
       $this->OutputButton(self::BUTTON_TYPE_REPORT, $Context, $Sender);
@@ -269,9 +287,10 @@ class ReportingPlugin extends Gdn_Plugin {
             return;
       }
 
-      $ButtonTitle = T(ucfirst($ButtonType).' Post');
+      $ButtonTitle = T(ucfirst($ButtonType));
+      $ContainerCSS = $ButtonTitle.'Post';
       $EncodedURL = str_replace('=','-',base64_encode($URL));
-      $Sender->Options .= '<span>'.Anchor($ButtonTitle, "plugin/reporting/{$ButtonType}/{$Context}/{$ElementID}/{$EncodedURL}", 'ReportContent Popup') . '</span>';
+      $Sender->Options .= '<span class="'.$ContainerCSS.'">'.Anchor($ButtonTitle, "plugin/reporting/{$ButtonType}/{$Context}/{$ElementID}/{$EncodedURL}", 'ReportContent Popup') . '</span>';
       $Sender->AddCssFile('reporting.css', 'plugins/Reporting');
    }
 

@@ -1,7 +1,9 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
+$CategoryData = GetValue('CategoryData', $this->Data);
+?>
 <h1><?php echo T($this->Data('Title')); ?></h1>
 <div class="Info">
-   <?php echo T('Moderating the content added to your forum can be an important part of making it a welcoming and successful place. The following tools help you and your members to collaborate in keeping your forum on track.'); ?>
+   <?php echo T('Let your users report bad content and tag awesome content in your community.'); ?>
 </div>
 
 <?php
@@ -25,11 +27,10 @@
       </tr>
    </thead>
    <tbody>
-      <tr><td colspan="2" class="Info"><?php echo T('When a member reports something, either for objectionable or laudable content, you can become involved in a private discussion with your moderation team about the consequences. Configure that behaviour below.'); ?></td></tr>
 <?php
 
 $Alt = FALSE;
-$ActionURL = 'plugin/reporting/feature/%s/%s';
+$ActionURL = 'plugin/reporting/feature/%s/%s?TransientKey='.Gdn::Session()->TransientKey();
 foreach ($Features as $Feature => $FeatureDesc) {
    $Alt = $Alt ? FALSE : TRUE;
    list($FeatureName, $FeatureVerb, $FeatureDescription) = $FeatureDesc;
@@ -52,14 +53,7 @@ foreach ($Features as $Feature => $FeatureDesc) {
          ?>
          </div>
       </td>
-      <td class="Alt">
-         <?php 
-            echo Gdn_Format::Text($FeatureDescription); 
-            if ($FeatureEnabled) {
-               echo sprintf(T("When someone <b>%s</b> content, create a %s to discuss it."), $FeatureVerb, $this->Form->DropDown('Plugins.Reporting.CategoryID', $this->CategoryData, array('TextField' => 'Name', 'ValueField' => 'CategoryID')));
-            }
-         ?>
-      </td>
+      <td class="Alt"><?php echo Gdn_Format::Text($FeatureDescription); ?></td>
    </tr>
    
 <?php } ?>

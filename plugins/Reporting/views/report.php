@@ -31,7 +31,7 @@ echo $this->Form->Errors();
       <li>
          <?php
             echo $this->Form->Label('Reason', 'Plugin.Reporting.Reason');
-            echo $this->Form->TextBox('Plugin.Reporting.Reason', array('MultiLine' => TRUE));
+            echo Wrap($this->Form->TextBox('Plugin.Reporting.Reason', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
          ?>
       </li>
       <?php
