@@ -16,7 +16,7 @@
                   $Img = '';
                   
                   if ($CanDownload) {
-                     $DownloadUrl = MediaModel::Url($Media);
+                     $DownloadUrl = Url(MediaModel::Url($Media));
                      $Img = '<a href="'.$DownloadUrl.'">';
                   }
 
@@ -53,7 +53,7 @@
    
                      $Actions = '';
                      if (StringBeginsWith($this->ControllerName, 'post', TRUE))
-                        $Actions = ConcatSep(' | ', $Actions, '<a class="InsertImage" href="'.MediaModel::Url($Path).'">'.T('Insert Image').'</a>');
+                        $Actions = ConcatSep(' | ', $Actions, '<a class="InsertImage" href="'.Url(MediaModel::Url($Path)).'">'.T('Insert Image').'</a>');
    
                      if ($IsOwner || Gdn::Session()->CheckPermission("Garden.Settings.Manage"))
                         $Actions = ConcatSep(' | ', $Actions, '<a class="DeleteFile" href="'.Url("/plugin/fileupload/delete/{$Media->MediaID}").'"><span>'.T('Delete').'</span></a>');
