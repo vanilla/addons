@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Voting'] = array(
    'Name' => 'Voting',
    'Description' => 'Allows users to vote on comments and discussions.',
-   'Version' => '1.0.4.1b',
+   'Version' => '1.0.4.2b',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
@@ -327,7 +327,7 @@ class VotingPlugin extends Gdn_Plugin {
 	/**
 	 * Add the "Popular Questions" tab.
 	 */
-	public function DiscussionsController_AfterAllDiscussionsTab_Handler($Sender) {
+	public function Base_BeforeDiscussionTabs_Handler($Sender) {
 		if (!C('Plugins.Voting.Enabled'))
 			return;
 
