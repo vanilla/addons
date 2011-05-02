@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Reporting'] = array(
    'Name' => 'Community Reporting',
    'Description' => 'Allows users to report comments and discussions for content violations or awesomeness.',
-   'Version' => '1.0',
+   'Version' => '1.0.1b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -251,8 +251,11 @@ class ReportingPlugin extends Gdn_Plugin {
       // if (GetValue('InsertUserID', $Sender->EventArguments['Object']) == GDN::Session()->UserID) return;
       
       $Context = strtolower($Sender->EventArguments['Type']);
-      $this->OutputButton(self::BUTTON_TYPE_REPORT, $Context, $Sender);
-      $this->OutputButton(self::BUTTON_TYPE_AWESOME, $Context, $Sender);
+
+      if ($this->ReportEnabled)
+         $this->OutputButton(self::BUTTON_TYPE_REPORT, $Context, $Sender);
+      if ($this->AwesomeEnabled)
+         $this->OutputButton(self::BUTTON_TYPE_AWESOME, $Context, $Sender);
    }
 
    protected function OutputButton($ButtonType, $Context, $Sender) {
