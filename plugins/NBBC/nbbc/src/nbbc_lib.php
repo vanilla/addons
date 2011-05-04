@@ -197,7 +197,7 @@
 			),
 			'acronym' => Array(
 				'mode' => BBCODE_MODE_ENHANCED,
-				'template' => '<span class="bbcode_acronym" title="{$_default}">{$_content/v}</span>',
+				'template' => '<span class="bbcode_acronym" title="{$_default/e}">{$_content/v}</span>',
 				'class' => 'inline',
 				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
 			),

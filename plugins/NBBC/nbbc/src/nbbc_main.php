@@ -48,8 +48,8 @@
 	//
 	//-----------------------------------------------------------------------------
 
-	define("BBCODE_VERSION", "1.4.4");		// Current version number
-	define("BBCODE_RELEASE", "2010-06-05");	// Current release date
+	define("BBCODE_VERSION", "1.4.5");		// Current version number
+	define("BBCODE_RELEASE", "2010-09-17");	// Current release date
 
 	define("BBCODE_VERBATIM", 2);		// Content type:  Content is not processed as BBCode.
 	define("BBCODE_REQUIRED", 1);		// Content type:  Content may not be empty or whitespace.
