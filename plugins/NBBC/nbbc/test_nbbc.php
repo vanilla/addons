@@ -465,6 +465,11 @@ h1 { text-align: center; }
 			'bbcode' => "The [acronym=\"British Broadcasting Company\"]BBC[/acronym] airs [i]Doctor Who[/i] on Saturdays.",
 			'html' => "The <span class=\"bbcode_acronym\" title=\"British Broadcasting Company\">BBC</span> airs <i>Doctor Who</i> on Saturdays.",
 		),
+		Array(
+			'descr' => "[acronym] safely encodes its content.",
+			'bbcode' => "The [acronym=_\"><script>alert(/XSS/.source)</script><x]Foo[/acronym] is safe.",
+			'html' => "The <span class=\"bbcode_acronym\" title=\"_&quot;&gt;&lt;script&gt;alert(/XSS/.source)&lt;/script&gt;&lt;x\">Foo</span> is safe.",
+		),
 
 		//-----------------------------------------------------------------------------------------
 
@@ -666,6 +671,33 @@ h1 { text-align: center; }
 			'bbcode' => "Send complaints to [email]jo\"hn@@@exa:mple.com[/email].",
 			'html' => "Send complaints to [email]jo&quot;hn@@@exa:mple.com[/email].",
 		),
+/*
+		Array(
+			'descr' => "[video=youtube] gets converted.",
+			'bbcode' => "Watch this cute doggy!!! [video=youtube]dQw4w9WgXcQ[/video]",
+			'html' => "Watch this cute doggy!!! <object width=\"480\" height=\"385\"><param name=\"movie\" value=\"http://www.youtube.com/v/dQw4w9WgXcQ&hl=en_US&fs=1&\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/dQw4w9WgXcQ&hl=en_US&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"480\" height=\"385\"></embed></object>",
+		),
+		Array(
+			'descr' => "[video=hulu] gets converted.",
+			'bbcode' => "Gleeks: [video=hulu]yuo37ilvL7pUlsKJmA6R0g[/video]",
+			'html' => "Gleeks: <object width=\"512\" height=\"288\"><param name=\"movie\" value=\"http://www.hulu.com/embed/yuo37ilvL7pUlsKJmA6R0g\"></param><param name=\"allowFullScreen\" value=\"true\"></param><embed src=\"http://www.hulu.com/embed/yuo37ilvL7pUlsKJmA6R0g\" type=\"application/x-shockwave-flash\"  width=\"512\" height=\"288\" allowFullScreen=\"true\"></embed></object>",
+		),
+		Array(
+			'descr' => "[video] ignores unknown video services.",
+			'bbcode' => "Watch this cute doggy!!! [video=flarb]abcdefg[/video]",
+			'html' => "Watch this cute doggy!!! [video=flarb]abcdefg[/video]",
+		),
+		Array(
+			'descr' => "[video] ignores bad video IDs.",
+			'bbcode' => "Watch this cute doggy!!! [video=youtube]b!:=9_?[/video]",
+			'html' => "Watch this cute doggy!!! [video=youtube]b!:=9_?[/video]",
+		),
+		Array(
+			'descr' => "[video] correctly supports width= and height= modifiers.",
+			'bbcode' => "Watch this cute doggy!!! [video=youtube width=320 height=240]dQw4w9WgXcQ[/video]",
+			'html' => "Watch this cute doggy!!! <object width=\"320\" height=\"240\"><param name=\"movie\" value=\"http://www.youtube.com/v/dQw4w9WgXcQ&hl=en_US&fs=1&\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/dQw4w9WgXcQ&hl=en_US&fs=1&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"320\" height=\"240\"></embed></object>",
+		),
+*/
 		Array(
 			'descr' => "The [[wiki]] special tag produces a wiki link.",
 			'bbcode' => "This is a test of the [[wiki]] tag.",
@@ -997,6 +1029,11 @@ h1 { text-align: center; }
 		Array(
 			'descr' => "[list] and [*] should produce an unordered list.",
 			'bbcode' => "[list][*]One Box[*]Two Boxes[*]Three Boxes[/list]",
+			'html' => "\n<ul class=\"bbcode_list\">\n<li>One Box</li>\n<li>Two Boxes</li>\n<li>Three Boxes</li>\n</ul>\n",
+		),
+		Array(
+			'descr' => "[list] and [*] should produce an unordered list even without [/list].",
+			'bbcode' => "[list][*]One Box[*]Two Boxes[*]Three Boxes",
 			'html' => "\n<ul class=\"bbcode_list\">\n<li>One Box</li>\n<li>Two Boxes</li>\n<li>Three Boxes</li>\n</ul>\n",
 		),
 		Array(

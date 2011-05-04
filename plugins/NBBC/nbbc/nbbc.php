@@ -30,8 +30,8 @@ OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-define("BBCODE_VERSION", "1.4.4");
-define("BBCODE_RELEASE", "2010-06-05");
+define("BBCODE_VERSION", "1.4.5");
+define("BBCODE_RELEASE", "2010-09-17");
 define("BBCODE_VERBATIM", 2);
 define("BBCODE_REQUIRED", 1);
 define("BBCODE_OPTIONAL", 0);
@@ -519,7 +519,7 @@ var $default_tag_rules = Array(
 ),
 'acronym' => Array(
 'mode' => BBCODE_MODE_ENHANCED,
-'template' => '<span class="bbcode_acronym" title="{$_default}">{$_content/v}</span>',
+'template' => '<span class="bbcode_acronym" title="{$_default/e}">{$_content/v}</span>',
 'class' => 'inline',
 'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
 ),
