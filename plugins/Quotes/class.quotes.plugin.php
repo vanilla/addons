@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "This plugin allows users to quote each other's posts easily.",
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
@@ -25,6 +25,13 @@ $PluginInfo['Quotes'] = array(
 );
 
 class QuotesPlugin extends Gdn_Plugin {
+   
+   public function __construct() {
+      parent::__construct();
+      
+      $this->ValidateUsernameRegex = C('Garden.User.ValidationRegex',"[\d\w_]{3,20}");
+      $this->RenderQuotes = C('Plugins.Quotes.RenderQuotes',TRUE);
+   }
 
    public function PluginController_Quotes_Create($Sender) {
 		$this->Dispatch($Sender, $Sender->RequestArgs);
@@ -89,16 +96,24 @@ QUOTE;
    }
    
    protected function RenderQuotes($Sender) {
+      if (!$this->RenderQuotes) return;
+      
+      static $ValidateUsernameRegexChars = NULL;
+      
+      if (is_null($ValidateUsernameRegex))
+         $ValidateUsernameRegex = sprintf("[%s]+", 
+            C('Garden.User.ValidationRegex',"\d\w_"));
+      
       switch ($Sender->EventArguments['Object']->Format) {
          case 'Html':
-            $Sender->EventArguments['Object']->Body = preg_replace_callback('/(<blockquote rel="([\d\w_ ]{3,30})">)/ui', array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
+            $Sender->EventArguments['Object']->Body = preg_replace_callback("/(<blockquote rel=\"({$ValidateUsernameRegex})\">)/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
             $Sender->EventArguments['Object']->Body = str_ireplace('</blockquote>','</p></div></blockquote>',$Sender->EventArguments['Object']->Body);
             break;
             
          case 'BBCode':
 			case 'Markdown':
             // BBCode quotes with authors
-            $Sender->EventArguments['Object']->Body = preg_replace_callback('/(\[quote="?([\d\w_ ]{3,30})"?\])/ui', array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
+            $Sender->EventArguments['Object']->Body = preg_replace_callback("/(\[quote=\"?({$ValidateUsernameRegex})\"?\])/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
             
             // BBCode quotes without authors
             $Sender->EventArguments['Object']->Body = str_ireplace('[quote]','<blockquote class="UserQuote"><div class="QuoteText"><p>',$Sender->EventArguments['Object']->Body);
