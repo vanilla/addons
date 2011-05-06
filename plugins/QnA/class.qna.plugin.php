@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0.1b',
+   'Version' => '1.0.2b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -211,7 +211,7 @@ class QnAPlugin extends Gdn_Plugin {
       else
          $CssClass = '';
 
-      echo '<li'.$CssClass.'><a class="QnA-UnansweredQuestions" href="/discussions/unanswered">'.T('Unanswered Questions').'<span class="Popin" rel="/discussions/unansweredcount"></span></a></li>';
+      echo '<li'.$CssClass.'><a class="QnA-UnansweredQuestions" href="'.Url('/discussions/unanswered').'">'.T('Unanswered Questions').'<span class="Popin" rel="/discussions/unansweredcount"></span></a></li>';
    }
 
    /**
