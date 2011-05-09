@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0.2b',
+   'Version' => '1.0.3b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -47,6 +47,14 @@ class QnAPlugin extends Gdn_Plugin {
 
 
    /// EVENTS ///
+
+   public function Base_BeforeCommentDisplay_Handler($Sender, $Args) {
+      $QnA = GetValueR('Comment.QnA', $Args);
+
+      if ($QnA && isset($Args['CssClass'])) {
+         $Args['CssClass'] = ConcatSep(' ', $Args['CssClass'], "QnA-Item-$QnA");
+      }
+   }
 
    /**
     *
