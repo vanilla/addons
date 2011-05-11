@@ -13,7 +13,7 @@ if (!defined('APPLICATION'))
 
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.0.1b',
+    'Version' => '1.0.2b',
     'RequiredApplications' => array('Vanilla' => '2.0.2a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -78,16 +78,21 @@ class NBBCPlugin extends Gdn_Plugin {
       
       if (is_string($default)) {
          $defaultParts = explode(';', $default); // support vbulletin style quoting.
-         $params['name'] = $defaultParts[0];
-         if (count($defaultParts) >= 2)
-            $params['url'] = $defaultParts[1];
+         $Url = array_pop($defaultParts);
+         if (count($defaultParts) == 0) {
+            $params['name'] = $Url;
+         } else {
+            $params['name'] = implode(';', $defaultParts);
+            $params['url'] = $Url;
+         }
       }
 
       $title = '';
 
       if (isset($params['name'])) {
          $username = trim($params['name']);
-         $title = ConcatSep(' ', $title, Anchor(htmlspecialchars($username), '/profile/'.rawurlencode($username)), T('Quote wrote', 'wrote'));
+         $username = html_entity_decode($username, ENT_QUOTES, 'UTF-8');
+         $title = ConcatSep(' ', $title, Anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/'.rawurlencode($username)), T('Quote wrote', 'wrote'));
       }
 
       if (isset($params['date']))

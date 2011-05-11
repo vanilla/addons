@@ -26,8 +26,8 @@ function Gdn_Uploaders() {
       }
       
       var Our = this;
-      $('div.AttachmentWindow').each(function(i,AttachmentWindow){
-         Our.Spawn($(AttachmentWindow));
+      jQuery('div.AttachmentWindow').each(function(i,AttachmentWindow){
+         Our.Spawn(jQuery(AttachmentWindow));
       });
    }
    
@@ -72,7 +72,7 @@ function Gdn_Uploaders() {
 function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
 
    this.Master = Uploaders;
-   this.AttachmentWindow = $(AttachmentWindow);
+   this.AttachmentWindow = jQuery(AttachmentWindow);
    this.AttachmentWindowHTML = this.AttachmentWindow.html();
 
    this.AttachFileRootName = AttachFileRootName;
@@ -102,25 +102,25 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       var UploaderContainer = document.createElement('div');
       var UploaderContainerID = 'ctnr' + Math.floor(Math.random() * 99999);
       UploaderContainer.id = UploaderContainerID;
-      $(document.body).append(UploaderContainer);
-      this.UploaderContainer = $('#'+UploaderContainerID);
+      jQuery(document.body).append(UploaderContainer);
+      this.UploaderContainer = jQuery('#'+UploaderContainerID);
       
       // Create iframe container
       var IFrameContainer = document.createElement('div');
       var IFrameContainerID = 'frmz' + Math.floor(Math.random() * 99999);
       IFrameContainer.id = IFrameContainerID;
-      $(document.body).append(IFrameContainer);
-      this.IFrameContainer = $('#'+IFrameContainerID);
+      jQuery(document.body).append(IFrameContainer);
+      this.IFrameContainer = jQuery('#'+IFrameContainerID);
       this.IFrameContainer.hide();
       
       // Allow deletes
-      $('div.Attachments a.DeleteFile').popup({
+      jQuery('div.Attachments a.DeleteFile').popup({
          confirm: true,
          followConfirm: false,
          deliveryType: 'JSON',
          afterConfirm: function(json, sender) {
             var MediaData = json.Delete;
-            var FileRow = $(sender).closest('.Attachment');
+            var FileRow = jQuery(sender).closest('.Attachment');
             if (MediaData.Status == 'success') {
                FileRow.remove();
             }
@@ -128,7 +128,7 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       });
         
       this.Reset();
-      $('#'+this.CurrentInput).css('opacity',0);
+      jQuery('#'+this.CurrentInput).css('opacity',0);
    }
    
    Gdn_MultiFileUpload.prototype.Reset = function() {
@@ -226,7 +226,7 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             'id': NewUploaderID+'_apckey',
             'value': this.UniqID + '_' + NewUploaderID
          });
-         $(UploaderForm).append(APCNotifier);
+         jQuery(UploaderForm).append(APCNotifier);
       }
       
       var NewUploader = this.CreateElement('input', {
@@ -235,14 +235,14 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
          'id': NewUploaderID,
          'rel': FormName
       });
-      $(UploaderForm).append(NewUploader);
+      jQuery(UploaderForm).append(NewUploader);
       
       var MaxUploadSize = this.CreateElement('input', {
          'type': 'hidden',
          'name': 'MAX_UPLOAD_SIZE',
          'value': this.MaxUploadSize
       });
-      $(UploaderForm).append(MaxUploadSize);
+      jQuery(UploaderForm).append(MaxUploadSize);
       
       this.CurrentUploader.append(UploaderForm);
       
@@ -259,7 +259,7 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       
       if (AutoShow)
          this.ShowUploader(true);
-      $('#'+this.CurrentInput).change(jQuery.proxy(this.DispatchCurrentUploader,this));
+      jQuery('#'+this.CurrentInput).change(jQuery.proxy(this.DispatchCurrentUploader,this));
       
       return NewUploaderID;
    }
@@ -297,25 +297,25 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
          'id': IFrameName,
          'src': 'about:blank'
       });
-      $(IFrame).css('display','none');
+      jQuery(IFrame).css('display','none');
       
-      $(ContainerDiv).append(IFrame);
-      $(this.IFrameContainer).append(ContainerDiv);
+      jQuery(ContainerDiv).append(IFrame);
+      jQuery(this.IFrameContainer).append(ContainerDiv);
       
       this.IFrames[IFrameName] = {ready:'no'};
       
       // Re-target just to be safe
-      $('#'+IFrameName).load(jQuery.proxy(function(){ this.UploadComplete(IFrameName,TargetUploaderID); }, this));
+      jQuery('#'+IFrameName).load(jQuery.proxy(function(){ this.UploadComplete(IFrameName,TargetUploaderID); }, this));
       
       return IFrameName;
    }
    
    // Submit the form parent of the current uploader and hide the current uploader's input
    Gdn_MultiFileUpload.prototype.DispatchCurrentUploader = function(ChangeEvent) {
-      this.UploaderContainer.append($('form#'+$('#'+this.CurrentInput).attr('rel')));
+      this.UploaderContainer.append(jQuery('form#'+jQuery('#'+this.CurrentInput).attr('rel')));
       
-      var Target = $(ChangeEvent.target);
-      $('#'+Target.attr('rel')).append(Target);
+      var Target = jQuery(ChangeEvent.target);
+      jQuery('#'+Target.attr('rel')).append(Target);
       var UploaderID = Target.attr('id');
       this.RememberFile(Target);
       var IFrameName = Target.parent().attr('target');
@@ -339,13 +339,13 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       FileInput.hide();
       
       // Handle the file list UI
-      var PrototypeFileAttachment = $(this.FileContainer.find('div.PrototypicalAttachment')[0]).clone();
-      var FileNameDiv = $(PrototypeFileAttachment).find('.FileName');
-      var FileSizeDiv = $(PrototypeFileAttachment).find('.FileSize');
-      var ProgressDiv = $(PrototypeFileAttachment).find('.UploadProgress');
-      $(FileNameDiv).html(FileName);
-      $(FileSizeDiv).html('');
-      $($(ProgressDiv).find('div.Background')).css('width','0px');
+      var PrototypeFileAttachment = jQuery(this.FileContainer.find('div.PrototypicalAttachment')[0]).clone();
+      var FileNameDiv = jQuery(PrototypeFileAttachment).find('.FileName');
+      var FileSizeDiv = jQuery(PrototypeFileAttachment).find('.FileSize');
+      var ProgressDiv = jQuery(PrototypeFileAttachment).find('.UploadProgress');
+      jQuery(FileNameDiv).html(FileName);
+      jQuery(FileSizeDiv).html('');
+      jQuery(jQuery(ProgressDiv).find('div.Background')).css('width','0px');
       
       var FileListingID = [FileInput.attr('id'),'listing'].join('_');
       PrototypeFileAttachment.attr('id', FileListingID);
@@ -388,11 +388,11 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             this.ProgressBars[UploaderID].Progress = Progress;
             this.ProgressBars[UploaderID].Total = JProgress.total;
 
-            var FileListing = $('#'+UploaderID+'_listing');
+            var FileListing = jQuery('#'+UploaderID+'_listing');
 
             // Update the filesize
             if (JProgress.total != null && JProgress.total != -1) {
-               $(FileListing.find('.FileSize')).html(JProgress.format_total);
+               jQuery(FileListing.find('.FileSize')).html(JProgress.format_total);
             }
             
             // Update progress bar
@@ -401,7 +401,7 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
                var ProgressForeground = FileListing.find('div.UploadProgress div.Foreground');
                var ProgressBackground = FileListing.find('div.UploadProgress div.Background');
                ProgressForeground.html('<strong>Uploading:</strong> ' + Math.ceil(Progress)+'%');
-               ProgressBackground.css('width', ((Progress * $(UploadProgress).width()) / 100)+'px');
+               ProgressBackground.css('width', ((Progress * jQuery(UploadProgress).width()) / 100)+'px');
                // if (Progress >= 15)
                //    ProgressBar.html(Math.ceil(Progress)+'%');
             }
@@ -476,39 +476,39 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
                'value': MediaID
             });
             
-            var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
+            var FileListing = jQuery('#'+[TargetUploaderID,'listing'].join('_'));
             
             // Update the filesize
             if (JResponse.MediaResponse.Filesize != null) {
-               $(FileListing.find('.FileSize')).html(JResponse.MediaResponse.FormatFilesize);
+               jQuery(FileListing.find('.FileSize')).html(JResponse.MediaResponse.FormatFilesize);
             }
             
-            $(FileListing.find('.FileOptions')).append(EnableMe);
+            jQuery(FileListing.find('.FileOptions')).append(EnableMe);
             
             // FIX IE
             if (this.isIE)
                EnableMe.checked = 'true';
                
             // Make the file a link
-            $(FileListing.find('.FileName')).text(Filename);
+            jQuery(FileListing.find('.FileName')).text(Filename);
                
-            $(FileListing.find('.FileOptions')).append(TrackAll);
-            $(FileListing.find('div.UploadProgress')).remove();
+            jQuery(FileListing.find('.FileOptions')).append(TrackAll);
+            jQuery(FileListing.find('div.UploadProgress')).remove();
             
 				// Add image preview
 				var img = document.createElement('img'),
                img2 = document.createElement('img');
 				img.src = img2.src = JResponse.MediaResponse.PreviewImageLocation;
-				$(FileListing.find('div.FilePreview')).append(img);
-            $(FileListing.find('div.FileHover')).prepend(img2);
+				jQuery(FileListing.find('div.FilePreview')).append(img);
+            jQuery(FileListing.find('div.FileHover')).prepend(img2);
 
 				// Add "insert image" button
 				if (JResponse.MediaResponse.FinalImageLocation != '') {
-					var ImageAnchor = $(FileListing.find('a.InsertImage'));
+					var ImageAnchor = jQuery(FileListing.find('a.InsertImage'));
 					ImageAnchor.attr('href', JResponse.MediaResponse.FinalImageLocation);
 					ImageAnchor.show();
 					ImageAnchor.live('click', function() {
-						var txtbox = $(FileListing.parents('form').find('textarea'));
+						var txtbox = jQuery(FileListing.parents('form').find('textarea'));
 						txtbox.val(txtbox.val()+'<img src="'+ImageAnchor.attr('href')+'" />');
 						return false;
 					});
@@ -526,7 +526,7 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
          clearTimeout(this.ProgressBars[TargetUploaderID].TimerID);
          this.RemoveUploader(TargetUploaderID);
          
-         var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
+         var FileListing = jQuery('#'+[TargetUploaderID,'listing'].join('_'));
          FileListing.html("File upload failed. Reason: "+FailReason);
          FileListing.css({
             'background-color':'#ffbfbf',
@@ -546,8 +546,8 @@ setTimeout(function(){
    }
    
    Gdn_MultiFileUpload.prototype.RemoveUploader = function(UploaderID) {
-      var TargetFrame = $('#'+this.ProgressBars[UploaderID].Target);
-      var TargetForm = $('#'+this.ProgressBars[UploaderID].Target+'_form');
+      var TargetFrame = jQuery('#'+this.ProgressBars[UploaderID].Target);
+      var TargetForm = jQuery('#'+this.ProgressBars[UploaderID].Target+'_form');
       
       TargetFrame.parent().remove();
       TargetForm.remove();
@@ -563,13 +563,13 @@ setTimeout(function(){
 }
 
 var GdnUploaders = null;
-jQuery(document).ready(function(){
+jQuery(document).ready(function($){
    GdnUploaders = new Gdn_Uploaders();
    GdnUploaders.Prepare()
 
    $('.Attachment .InsertImage').live('click', function() {
-      var txtbox = $(this).closest('form').find('textarea');
-      txtbox.val(txtbox.val()+'<img src="'+$(this).attr('href')+'" />');
+      var txtbox = jQuery(this).closest('form').find('textarea');
+      txtbox.val(txtbox.val()+'<img src="'+jQuery(this).attr('href')+'" />');
       return false;
    });
 
