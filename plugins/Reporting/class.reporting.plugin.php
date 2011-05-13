@@ -146,7 +146,7 @@ class ReportingPlugin extends Gdn_Plugin {
       $RegardingActionSupplement = C('Plugins.Reporting.ReportActionSupplement', FALSE);
 
       if ($Sender->Form->AuthenticatedPostBack()) {
-         $RegardingTitle = sprintf(T("Reported: '%s' by %s"), $ElementShortTitle, $ElementAuthorName);
+         $RegardingTitle = sprintf(T("Reported: '{RegardingTitle}' by %s"), $ElementAuthorName);
          $Regarding = Gdn::Regarding()
             ->That($Context, $ElementID, $ReportElement)
             ->ReportIt()
@@ -202,7 +202,7 @@ class ReportingPlugin extends Gdn_Plugin {
       
       if (is_null($ElementTitle))
          $ElementTitle = $ElementExcerpt;
-         
+      
       $ElementShortTitle = (strlen($ElementTitle) <= 143) ? $ElementTitle : substr($ElementTitle, 0, 140).'...';
 
       $ElementAuthorID = GetValue('InsertUserID', $ReportElement);
@@ -224,7 +224,7 @@ class ReportingPlugin extends Gdn_Plugin {
       $RegardingActionSupplement = C('Plugins.Reporting.AwesomeActionSupplement', FALSE);
 
       if ($Sender->Form->AuthenticatedPostBack()) {
-         $RegardingTitle = sprintf(T("Awesome: '%s' by %s"), $ElementShortTitle, $ElementAuthorName);
+         $RegardingTitle = sprintf(T("Awesome: '{RegardingTitle}' by %s"), $ElementAuthorName);
          $Regarding = Gdn::Regarding()
             ->That($Context, $ElementID, $ReportElement)
             ->ItsAwesome()
