@@ -197,6 +197,83 @@ class WhispersPlugin extends Gdn_Plugin {
       $Sender->Options = '';
    }
 
+   public function DiscussionsController_AfterCountMeta_Handler($Sender, $Args) {
+      $Discussion = GetValue('Discussion', $Args);
+      if (!$Discussion)
+         return;
+
+      if ($CountWhispers = GetValue('CountWhispers', $Discussion)) {
+         $Str = '<span class="CommentCount MetaItem">'.Plural($CountWhispers, '%s whisper', '%s whispers').'</span>';
+
+         if (GetValue('NewWhispers', $Discussion)) {
+            $Str .= '<strong class="NewItems MetaItem">'.T('new').'</strong>';
+         }
+         echo $Str;
+      }
+   }
+
+   /**
+    * Join message counts into the discussion list.
+    * @param DiscussionModel $Sender
+    * @param array $Args
+    */
+   public function DiscussionModel_AfterAddColumns_Handler($Sender, $Args) {
+      if (!Gdn::Session()->UserID)
+         return;
+
+      $Data = $Args['Data'];
+      $Result =& $Data->Result();
+
+      // Gather the discussion IDs.
+      $DiscusisonIDs = array();
+
+      foreach ($Result as $Row) {
+         $DiscusisonIDs[] = GetValue('DiscussionID', $Row);
+      }
+
+      // Grab all of the whispers associated to the discussions being looked at.
+      $Sql = Gdn::SQL()
+         ->Select('c.DiscussionID')
+         ->Select('c.CountMessages', 'sum', 'CountMessages')
+         ->Select('c.DateUpdated', 'max', 'DateLastMessage')
+         ->From('Conversation c')
+         ->WhereIn('c.DiscussionID', $DiscusisonIDs)
+         ->GroupBy('c.DiscussionID');
+
+      if (!Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
+         $Sql->Join('UserConversation uc', 'c.ConversationID = uc.ConversationID')
+            ->Where('uc.UserID', Gdn::Session()->UserID);
+      }
+
+      $Conversations = $Sql->Get()->ResultArray();
+      $Conversations = Gdn_DataSet::Index($Conversations, 'DiscussionID');
+
+      foreach ($Result as &$Row) {
+         $DiscusisonID = GetValue('DiscussionID', $Row);
+         $CRow = GetValue($DiscusisonID, $Conversations);
+
+         if (!$CRow)
+            continue;
+
+         $DateLastViewed = GetValue('DateLastViewed', $Row);
+         $DateLastMessage = $CRow['DateLastMessage'];
+         $NewWhispers = Gdn_Format::ToTimestamp($DateLastViewed) < Gdn_Format::ToTimestamp($DateLastMessage);
+
+         SetValue('CountWhispers', $Row, $CRow['CountMessages']);
+         SetValue('DateLastWhisper', $Row, $DateLastMessage);
+         SetValue('NewWhispers', $Row, $NewWhispers);
+      }
+
+   }
+
+   public function MessagesController_BeforeConversation_Handler($Sender, $Args) {
+      $DiscussionID = $Sender->Data('Conversation.DiscussionID');
+      if (!$DiscussionID)
+         return;
+
+      include $Sender->FetchViewLocation('BeforeConversation', '', 'plugins/Whispers');
+   }
+
    public function MessagesController_BeforeConversationMeta_Handler($Sender, $Args) {
       $DiscussionID = GetValueR('Conversation.DiscussionID', $Args);
 
@@ -218,8 +295,14 @@ class WhispersPlugin extends Gdn_Plugin {
          $WhisperTo = trim($Sender->Form->GetFormValue('To'));
          $ConversationID = $Sender->Form->GetFormValue('ConversationID');
 
+         // If this isn't a whisper then post as normal.
          if (!$Whisper)
             return call_user_func_array(array($Sender, 'Comment'), $Args);
+
+         // Grab the discussion for use later.
+         $DiscussionID = $Sender->Form->GetFormValue('DiscussionID');
+         $DiscussionModel = new DiscussionModel();
+         $Discussion = $DiscussionModel->GetID($DiscussionID);
 
          $ConversationModel = new ConversationModel();
          $ConversationMessageModel = new ConversationMessageModel();
@@ -230,6 +313,7 @@ class WhispersPlugin extends Gdn_Plugin {
             // We have to remove the blank conversation ID or else the model won't validate.
             $FormValues = $Sender->Form->FormValues();
             unset($FormValues['ConversationID']);
+            $FormValues['Subject'] = GetValue('Name', $Discussion);
             $Sender->Form->FormValues($FormValues);
 
             $Sender->Form->SetModel($ConversationModel);
@@ -243,8 +327,10 @@ class WhispersPlugin extends Gdn_Plugin {
          if ($Sender->Form->ErrorCount() > 0) {
             $Sender->ErrorMessage($Sender->Form->Errors());
          } else {
+            $LastCommentID = GetValue('LastCommentID', $Discussion);
+
             // Grab the last comment in the discussion.
-            $Sender->RedirectUrl = Url('/'); //Url("discussion/comment/$CommentID/#Comment_$CommentID", TRUE);
+            $Sender->RedirectUrl = Url("discussion/comment/$LastCommentID/#Comment_$LastCommentID", TRUE);
          }
          $Sender->Render();
       } else {
