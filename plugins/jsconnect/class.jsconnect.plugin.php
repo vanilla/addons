@@ -54,7 +54,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       $RegisterUrl = FormatString(GetValue('RegisterUrl', $Provider, ''), $Data);
 
       if ($RegisterUrl)
-         $RegisterLink = ' '.Anchor(sprintf(T('Register with %s'), $Provider['Name']), $RegisterUrl, 'Button RegisterLink');
+         $RegisterLink = ' '.Anchor(sprintf(T('Register with %s', 'Register'), $Provider['Name']), $RegisterUrl, 'Button RegisterLink');
       else
          $RegusterLink = '';
 
