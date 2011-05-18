@@ -301,11 +301,14 @@ class QnAPlugin extends Gdn_Plugin {
    public function PostController_BeforeFormInputs_Handler($Sender, $Args) {
       $Sender->AddDefinition('QuestionTitle', T('Question Title'));
       $Sender->AddDefinition('DiscussionTitle', T('Discussion Title'));
+      $Sender->AddDefinition('QuestionButton', T('Ask Question'));
+      $Sender->AddDefinition('DiscussionButton', T('Post Discussion'));
       $Sender->AddJsFile('qna.js', 'plugins/QnA');
 
       $Form = $Sender->Form;
       if ($Sender->Form->GetValue('Type') == 'Question') {
          Gdn::Locale()->SetTranslation('Discussion Title', T('Question Title'));
+         Gdn::Locale()->SetTranslation('Post Discussion', T('Ask Question'));
       }
 
       include $Sender->FetchViewLocation('QnAPost', '', 'plugins/QnA');
