@@ -22,25 +22,28 @@ class WhispersPlugin extends Gdn_Plugin {
 
    /// Methods ///
 
-   public function GetWhispers($DiscussionID, $Comments) {
+   public function GetWhispers($DiscussionID, $Comments, $Limit, $Offset) {
       $FirstDate = NULL;
       $LastDate = NULL;
 
       if (count($Comments) > 0) {
-         $FirstComment = array_shift($Comments);
-         $FirstDate = GetValue('DateInserted', $FirstComment);
-         array_unshift($Comments, $FirstComment);
-         
+         if ($Offset > 0) {
+            $FirstComment = array_shift($Comments);
+            $FirstDate = GetValue('DateInserted', $FirstComment);
+            array_unshift($Comments, $FirstComment);
+         }
 
-         $LastComment = array_pop($Comments);
-         array_push($Comments, $LastComment);
+         if (count($Comments) < $Limit) {
+            $LastComment = array_pop($Comments);
+            array_push($Comments, $LastComment);
 
-         $LastCommentID = GetValue('CommentID', $LastComment);
+            $LastCommentID = GetValue('CommentID', $LastComment);
 
-         // We need to grab the comment that is one after the last comment.
-         $LastComment = Gdn::SQL()->Limit(1)->GetWhere('Comment', array('DiscussionID' => $DiscussionID, 'CommentID >' => $LastCommentID))->FirstRow();
-         if ($LastComment)
-            $LastDate = GetValue('DateInserted', $LastComment);
+            // We need to grab the comment that is one after the last comment.
+            $LastComment = Gdn::SQL()->Limit(1)->GetWhere('Comment', array('DiscussionID' => $DiscussionID, 'CommentID >' => $LastCommentID))->FirstRow();
+            if ($LastComment)
+               $LastDate = GetValue('DateInserted', $LastComment);
+         }
       }
 
       // Grab the conversations that are associated with this discussion.
@@ -130,7 +133,7 @@ class WhispersPlugin extends Gdn_Plugin {
       $DiscussionID = $Args['DiscussionID'];
       $Comments =& $Args['Comments'];
       $CommentsResult =& $Comments->Result();
-      $Whispers = $this->GetWhispers($DiscussionID, $CommentsResult);
+      $Whispers = $this->GetWhispers($DiscussionID, $CommentsResult, $Args['Limit'], $Args['Offset']);
       $Whispers->DatasetType($Comments->DatasetType());
       
       $CommentsResult = $this->MergeWhispers($CommentsResult, $Whispers->Result());
