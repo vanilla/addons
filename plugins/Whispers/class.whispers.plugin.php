@@ -341,15 +341,22 @@ class WhispersPlugin extends Gdn_Plugin {
             $Sender->ErrorMessage($Sender->Form->Errors());
          } else {
             $LastCommentID = GetValue('LastCommentID', $Discussion);
-
-            // Grab the last comment in the discussion.
             $MessageID = GetValue('LastMessageID', $ConversationMessageModel, FALSE);
-            $HashID = $MessageID ? 'w'.$MessageID : $LastCommentID;
-
+            
             // Randomize the querystring to force the browser to refresh.
             $Rand = mt_rand(10000, 99999);
 
-            $Sender->RedirectUrl = Url("discussion/comment/$LastCommentID?rand=$Rand#Comment_$HashID", TRUE);
+            if ($LastCommentID) {
+               // Link to the last comment.
+               $HashID = $MessageID ? 'w'.$MessageID : $LastCommentID;
+
+               $Sender->RedirectUrl = Url("discussion/comment/$LastCommentID?rand=$Rand#Comment_$HashID", TRUE);
+            } else {
+               // Link to the discussion.
+               $Hash = $MessageID ? "Comment_w$MessageID" : 'Item_1';
+               $Name = rawurlencode(GetValue('Name', $Discussion, 'x'));
+               $Sender->RedirectUrl = Url("discussion/$DiscussionID/$Name?rand=$Rand#$Hash", TRUE);
+            }
          }
          $Sender->Render();
       } else {
