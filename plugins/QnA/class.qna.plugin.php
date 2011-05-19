@@ -60,6 +60,8 @@ class QnAPlugin extends Gdn_Plugin {
       if (!$Discussion || !$Comment || !GetValue('Type', $Discussion) == 'question')
          return;
 
+			if (GetValue('Type', $Discussion) != 'Question') return;
+
       // Check permissions.
       $CanAccept = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
       $CanAccept |= Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && Gdn::Session()->UserID != GetValue('InsertUserID', $Comment);
@@ -69,7 +71,15 @@ class QnAPlugin extends Gdn_Plugin {
 
       $QnA = GetValue('QnA', $Comment);
       if ($QnA)
-         return;
+      {
+				 echo '<span class="'.$QnA.'">'.$QnA.'</span>';
+              $Query = http_build_query(array('commentid' => GetValue('CommentID', $Comment), 'tkey' => Gdn::Session()->TransientKey()));
+	if ($QnA == "Rejected")
+		echo '<span>'.Anchor(T('Undo-Reject', 'Undo-Reject'), '/discussion/qna/unaccept?'.$Query, array('class' => 'QnA-Unaccept', 'title' => T('Accept this answer.'))).'</span>';
+	else
+      echo '<span>'.Anchor(T('Undo-Accept', 'Undo-Accept'), '/discussion/qna/unaccept?'.$Query, array('class' => 'QnA-Unaccept', 'title' => T('Accept this answer.'))).'</span>';
+	return;
+      }
 
       // Write the links.
       $Query = http_build_query(array('commentid' => GetValue('CommentID', $Comment), 'tkey' => Gdn::Session()->TransientKey()));
@@ -156,6 +166,8 @@ class QnAPlugin extends Gdn_Plugin {
          case 'reject':
             $QnA = 'Rejected';
             break;
+         case "unaccept":
+            $QnA = "";
       }
 
       if (isset($QnA)) {
@@ -163,8 +175,10 @@ class QnAPlugin extends Gdn_Plugin {
          Gdn::SQL()->Put('Comment', array('QnA' => $QnA), array('CommentID' => $Comment['CommentID']));
 
          // Update the discussion.
-         if ($Discussion['QnA'] != $QnA && (!$Discussion['QnA'] || in_array($Discussion['QnA'], array('Unanswered', 'Answered', 'Rejected'))))
-            Gdn::SQL()->Put('Discussion', array('QnA' => $QnA), array('DiscussionID' => $Comment['DiscussionID']));
+         if ($Discussion['QnA'] != $QnA && (!$Discussion['QnA'] || in_array($Discussion['QnA'], array('Unanswered', 'Answered', 'Rejected', 'Accepted', '')))) {
+        	if ($QnA == "") $QnA = "Answered"; 
+	   Gdn::SQL()->Put('Discussion', array('QnA' => $QnA), array('DiscussionID' => $Comment['DiscussionID']));
+	}
 
          // Record the activity.
          if ($QnA == 'Accepted') {
@@ -239,7 +253,7 @@ class QnAPlugin extends Gdn_Plugin {
    public function Base_BeforeDiscussionMeta_Handler($Sender, $Args) {
       $Discussion = $Args['Discussion'];
 
-      if (strtolower(GetValue('Type', $Discussion)) != 'question')
+	  if (strtolower(GetValue('Type', $Discussion)) != 'question')
          return;
 
       $QnA = GetValue('QnA', $Discussion);
@@ -252,7 +266,7 @@ class QnAPlugin extends Gdn_Plugin {
             $QnA = 'Question';
             break;
          case 'Answered':
-            $Text = 'Answered';
+            $Text = 'Has Replies';
             if (GetValue('InsertUserID', $Discussion) == Gdn::Session()->UserID) {
                $QnA = 'Answered Alert';
                $Title = ' title="'.T("Someone's answered your question. You need to accept/reject the answer.").'"';
@@ -299,6 +313,7 @@ class QnAPlugin extends Gdn_Plugin {
       if ($Sender->Form->GetValue('Type') == 'Question') {
          Gdn::Locale()->SetTranslation('Discussion Title', T('Question Title'));
       }
+      
 
       include $Sender->FetchViewLocation('QnAPost', '', 'plugins/QnA');
    }
@@ -312,7 +327,6 @@ class QnAPlugin extends Gdn_Plugin {
             $Form->SetValue('Type', 'Discussion');
          }
       }
-
       if ($Form->GetValue('Type') == 'Question') {
          $Sender->SetData('Title', T('Ask a Question'));
       }
