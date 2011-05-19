@@ -45,7 +45,7 @@ class WhispersPlugin extends Gdn_Plugin {
 
       // Grab the conversations that are associated with this discussion.
       $Sql = Gdn::SQL()
-         ->Select('c.ConversationID')
+         ->Select('c.ConversationID, c.DateUpdated')
          ->From('Conversation c')
          ->Where('c.DiscussionID', $DiscussionID);
 
@@ -134,6 +134,19 @@ class WhispersPlugin extends Gdn_Plugin {
       $Whispers->DatasetType($Comments->DatasetType());
       
       $CommentsResult = $this->MergeWhispers($CommentsResult, $Whispers->Result());
+
+      // Check to see if the whispers are more recent than the last comment in the discussion so that the discussion will update the watch.
+      if (isset(Gdn::Controller()->Discussion)) {
+         $Discussion =& Gdn::Controller()->Discussion;
+         $DateLastComment = Gdn_Format::ToTimestamp(GetValue('DateLastComment', $Discussion));
+
+         foreach ($this->Conversations as $Conversation) {
+            if (Gdn_Format::ToTimestamp($Conversation['DateUpdated']) > $DateLastComment) {
+               SetValue('DateLastComment', $Discussion, $Conversation['DateUpdated']);
+               $DateLastComment = Gdn_Format::ToTimestamp($Conversation['DateUpdated']);
+            }
+         }
+      }
    }
 
    /**
@@ -330,7 +343,13 @@ class WhispersPlugin extends Gdn_Plugin {
             $LastCommentID = GetValue('LastCommentID', $Discussion);
 
             // Grab the last comment in the discussion.
-            $Sender->RedirectUrl = Url("discussion/comment/$LastCommentID/#Comment_$LastCommentID", TRUE);
+            $MessageID = GetValue('LastMessageID', $ConversationMessageModel, FALSE);
+            $HashID = $MessageID ? 'w'.$MessageID : $LastCommentID;
+
+            // Randomize the querystring to force the browser to refresh.
+            $Rand = mt_rand(10000, 99999);
+
+            $Sender->RedirectUrl = Url("discussion/comment/$LastCommentID?rand=$Rand#Comment_$HashID", TRUE);
          }
          $Sender->Render();
       } else {
