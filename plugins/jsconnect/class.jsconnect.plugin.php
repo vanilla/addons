@@ -208,7 +208,7 @@ class JsConnectPlugin extends Gdn_Plugin {
          $Sender->AddDefinition('JsAuthenticateUrl', self::ConnectUrl($Provider, TRUE));
          $Sender->AddJsFile('jsconnect.js', 'plugins/jsconnect');
          $Sender->SetData('Title', T('Connecting...'));
-         $Sender->Form->Action = '/entry/connect/jsconnect?display=popup';
+         $Sender->Form->Action = Url('/entry/connect/jsconnect?display=popup');
          $Sender->Form->AddHidden('JsConnect', '');
          $Sender->Form->AddHidden('Target', $Sender->Request->Get('Target', '/'));
 
@@ -278,6 +278,8 @@ class JsConnectPlugin extends Gdn_Plugin {
       switch (strtolower(GetValue(0, $Args))) {
          case 'addedit':
             $this->Settings_AddEdit($Sender, $Args);
+            break;
+         case 'delete':
             break;
          default:
             $this->Settings_Index($Sender, $Args);

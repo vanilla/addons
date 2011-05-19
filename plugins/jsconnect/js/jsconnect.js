@@ -21,6 +21,9 @@ if (jsUrl) {
          var connectData = $.param(data);
          $('#Form_JsConnect').val(connectData);
          $('form').submit();
+      },
+      error: function(data, x, y) {
+         $('form').attr('action', gdn.url('/entry/jsconnect/error'));
       }
    });
 }
@@ -77,6 +80,12 @@ $.fn.jsconnect = function(options) {
                $(elems).find('.JsConnect-Connect').hide();
                $(elems).find('.JsConnect-Guest').show();
             }
+            $(elems).show();
+         },
+         error: function(data, x, y) {
+            $(elems).find('.JsConnect-Connect').hide();
+            $(elems).find('.JsConnect-Guest').show();
+
             $(elems).show();
          }
       });
