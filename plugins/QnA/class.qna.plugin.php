@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0.1b',
+   'Version' => '1.0.3b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -47,6 +47,14 @@ class QnAPlugin extends Gdn_Plugin {
 
 
    /// EVENTS ///
+
+   public function Base_BeforeCommentDisplay_Handler($Sender, $Args) {
+      $QnA = GetValueR('Comment.QnA', $Args);
+
+      if ($QnA && isset($Args['CssClass'])) {
+         $Args['CssClass'] = ConcatSep(' ', $Args['CssClass'], "QnA-Item-$QnA");
+      }
+   }
 
    /**
     *
@@ -225,7 +233,7 @@ class QnAPlugin extends Gdn_Plugin {
       else
          $CssClass = '';
 
-      echo '<li'.$CssClass.'><a class="QnA-UnansweredQuestions" href="/discussions/unanswered">'.T('Unanswered Questions').'<span class="Popin" rel="/discussions/unansweredcount"></span></a></li>';
+      echo '<li'.$CssClass.'><a class="QnA-UnansweredQuestions" href="'.Url('/discussions/unanswered').'">'.T('Unanswered Questions').'<span class="Popin" rel="/discussions/unansweredcount"></span></a></li>';
    }
 
    /**
@@ -307,11 +315,14 @@ class QnAPlugin extends Gdn_Plugin {
    public function PostController_BeforeFormInputs_Handler($Sender, $Args) {
       $Sender->AddDefinition('QuestionTitle', T('Question Title'));
       $Sender->AddDefinition('DiscussionTitle', T('Discussion Title'));
+      $Sender->AddDefinition('QuestionButton', T('Ask Question'));
+      $Sender->AddDefinition('DiscussionButton', T('Post Discussion'));
       $Sender->AddJsFile('qna.js', 'plugins/QnA');
 
       $Form = $Sender->Form;
       if ($Sender->Form->GetValue('Type') == 'Question') {
          Gdn::Locale()->SetTranslation('Discussion Title', T('Question Title'));
+         Gdn::Locale()->SetTranslation('Post Discussion', T('Ask Question'));
       }
       
 

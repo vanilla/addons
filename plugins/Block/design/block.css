@@ -1,0 +1,48 @@
+body ul.MessageList li.UserBlock div.Meta {
+   background-color: #202020;
+   color: #606060;
+}
+
+body ul.MessageList li.UserBlock div.Meta a {
+   color: #606060;
+}
+
+body ul.MessageList li.UserBlock div.Comment {
+   display: none;
+}
+
+body ul.MessageList li.UserBlock div.Meta {
+   cursor: pointer;
+}
+
+.Meta a.ProfileLink {
+   position: relative;
+   display: block;
+   float: left;
+   margin-right: 10px;
+   width: 40px;
+   height: 40px;
+}
+
+.Meta a.ProfileLink img {
+   position: absolute;
+   
+   width: 40px;
+   height: 40px;
+}
+
+.Meta a.ProfileLink div.UserBlockOption {
+   position: absolute;
+   
+   width: 40px;
+   height: 40px;
+   
+   background: rgb(0, 0, 0) !important;
+   background: rgba(0, 0, 0, 0.7) !important;
+   
+   line-height: 40px;
+   font-size: 8px;
+   text-transform: uppercase;
+   text-align: center;
+   color: white;
+}
