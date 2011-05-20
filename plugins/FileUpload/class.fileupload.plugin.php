@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions, comments and conversations.',
-   'Version' => '1.4.3',
+   'Version' => '1.4.4',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -848,7 +848,11 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
+      $this->Structure();
+      SaveToConfig('Plugins.FileUpload.Enabled', TRUE);
+   }
 
+   public function Structure() {
       $Structure = Gdn::Structure();
       $Structure
          ->Table('Media')
@@ -865,8 +869,6 @@ class FileUploadPlugin extends Gdn_Plugin {
          ->Column('ForeignID', 'int(11)', TRUE)
          ->Column('ForeignTable', 'varchar(24)', TRUE)
          ->Set(FALSE, FALSE);
-      
-      SaveToConfig('Plugins.FileUpload.Enabled', TRUE);
    }
 
    public function OnDisable() {
