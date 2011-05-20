@@ -8,8 +8,8 @@
 $PluginInfo['Whispers'] = array(
    'Name' => 'Whispers',
    'Description' => "This plugin brings back functionality similar to the popular Vanilla 1 whispers.",
-   'Version' => '1.0a',
-   'RequiredApplications' => array('Vanilla' => '2.0.18a1', 'Conversations' => '2.0.18a1'),
+   'Version' => '1.0',
+   'RequiredApplications' => array('Vanilla' => '2.0.18a3', 'Conversations' => '2.0.18a3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
