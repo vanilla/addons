@@ -114,33 +114,53 @@ $Definition['Edit Preferences'] = 'Edit Preferences';
 $Definition['Email'] = 'Email';
 $Definition['Email Notifications'] = 'Email Notifications';
 $Definition['Email Unavailable'] = 'Email Unavailable';
+$Definition['EmailHeader'] = 'Hello {User.Name}!
+';
+$Definition['EmailFooter'] = '
+Have a great day!';
+
 $Definition['EmailInvitation'] = 'Hello!
 
 %1$s has invited you to join %2$s. If you want to join, you can do so by clicking this link:
 
-  %3$s
-
-Have a great day!';
+  %3$s';
 $Definition['EmailMembershipApproved'] = 'Hello %1$s,
 
 You have been approved for membership. Sign in now at the following link:
 
-  %2$s
-  
-Have a great day!';
+  %2$s';
+$Definition['EmailWelcome'] = '%2$s has created an account for you at %3$s. Your login credentials are:
+
+  Email: %6$s
+  Password: %5$s
+  Url: %4$s';
+$Definition['EmailPassword'] = '%2$s has reset your password at %3$s. Your login credentials are now:
+
+  Email: %6$s
+  Password: %5$s
+  Url: %4$s';
+$Definition['EmailConfirmEmail'] = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,url,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
+$Definition['EmailWelcomeRegister'] = 'You have successfully registered for an account at {Title}. Here is your information:
+
+  Username: {User.Name}
+  Email: {User.Email}
+
+You can access the site at {/,url,domain}.';
+$Definition['EmailWelcomeConnect'] = 'You have successfully connected to {Title}. Here is your information:
+
+  Username: {User.Name}
+  Connected With: {ProviderName}
+
+You can access the site at {/,url,domain}.';
+$Definition['PasswordRequest'] = 'Someone has requested to reset your password at %2$s. To reset your password, follow this link:
+
+  %3$s
+
+If you did not make this request, disregard this email.';
 $Definition['EmailNotification'] = '%1$s
 
 Follow the link below to check it out:
 %2$s
-
-Have a great day!';
-$Definition['EmailPassword'] = 'Hello %1$s,
-
-%2$s has reset your password at %3$s. Your login credentials are now:
-
-  Email: %6$s
-  Password: %5$s
-  Url: %4$s
 
 Have a great day!';
 $Definition['EmailStoryNotification'] = '%1$s
@@ -150,35 +170,6 @@ $Definition['EmailStoryNotification'] = '%1$s
 ---
 Follow the link below to check it out:
 %2$s
-
-Have a great day!';
-$Definition['EmailWelcome'] = 'Hello %1$s,
-
-%2$s has created an account for you at %3$s. Your login credentials are:
-
-  Email: %6$s
-  Password: %5$s
-  Url: %4$s
-
-Have a great day!';
-$Definition['EmailWelcomeConnect'] = 'Hello {User.Name},
-
-You have successfully connected to {Title}. Here is your information:
-
-  Username: {User.Name}
-  Connected With: {ProviderName}
-
-You can access the site at {/,url,domain}.
-
-Have a great day!';
-$Definition['EmailWelcomeRegister'] = 'Hello {User.Name},
-
-You have successfully registered for an account at {Title}. Here is your information:
-
-  Username: {User.Name}
-  Email: {User.Email}
-
-You can access the site at {/,url,domain}.
 
 Have a great day!';
 $Definition['Enter the email address of the person you would like to invite:'] = 'Enter the email address of the person you would like to invite:';
