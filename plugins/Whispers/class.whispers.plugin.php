@@ -89,6 +89,7 @@ class WhispersPlugin extends Gdn_Plugin {
          SetValue('DiscussionID', $Whisper, $DiscussionID);
          SetValue('CommentID', $Whisper, 'w'.GetValue('MessageID', $Whisper));
          SetValue('Type', $Whisper, 'Whisper');
+         SetValue('Url', $Whisper, '');
 
          $Participants = GetValueR(GetValue('ConversationID', $Whisper).'.Participants', $Conversations);
          SetValue('Participants', $Whisper, $Participants);
