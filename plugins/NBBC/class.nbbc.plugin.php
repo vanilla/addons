@@ -62,6 +62,24 @@ class NBBCPlugin extends Gdn_Plugin {
           'plain_end' => "\n",
       ));
 
+      $BBCode->AddRule('spoiler',
+      Array(
+          'mode' => BBCODE_MODE_ENHANCED,
+          'template' => "\n".'<div class="UserSpoiler">
+<div class="SpoilerTitle">'.T('Spoiler').': </div>
+<div class="SpoilerReveal"></div>
+<div class="SpoilerText" style="display: none;">{$_content/v}</div></div>'."\n",
+          'class' => 'code',
+          'allow_in' => Array('listitem', 'block', 'columns'),
+          'content' => BBCODE_VERBATIM,
+          'before_tag' => "sns",
+          'after_tag' => "sn",
+          'before_endtag' => "sn",
+          'after_endtag' => "sns",
+          'plain_start' => "\n<b>Code:</b>\n",
+          'plain_end' => "\n",
+      ));
+
       $this->_BBCode = $BBCode;
    }
 
