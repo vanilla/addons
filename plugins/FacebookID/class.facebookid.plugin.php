@@ -29,6 +29,9 @@ class FacebookIDPlugin extends Gdn_Plugin {
    public function Base_CommentInfo_Handler($Sender, $Args) {
       if (!Gdn::Session()->CheckPermission('Plugins.FacebookID.View'))
          return;
+
+      if (!isset($Sender->Data['Discussion']))
+         return;
       
       if (!$this->FacebookIDs)
          $this->FacebookIDs = $this->GetFacebookIDs(array($Sender->Data['Discussion'], $Sender->Data['Comments']), 'InsertUserID');
