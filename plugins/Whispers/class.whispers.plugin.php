@@ -158,7 +158,7 @@ class WhispersPlugin extends Gdn_Plugin {
     * @param args $Args
     */
    public function DiscussionController_AfterBodyField_Handler($Sender, $Args) {
-      $Sender->AddJsFile('whispers.js', 'plugins/Whispers'); //, array('hint' => 'inline'));
+      $Sender->AddJsFile('whispers.js', 'plugins/Whispers', array('hint' => 'inline'));
       $Sender->AddJsFile('jquery.autogrow.js');
       $Sender->AddJsFile('jquery.autocomplete.js');
 
