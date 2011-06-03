@@ -228,7 +228,8 @@ class QnAPlugin extends Gdn_Plugin {
     */
    public function DiscussionsController_Unanswered_Create($Sender, $Args) {
       $Sender->View = 'Index';
-      $Sender->Index(GetValue(0, $Args, ''));
+      $Sender->SetData('_PagerUrl', 'discussions/unanswered/{Page}');
+      $Sender->Index(GetValue(0, $Args, 'p1'));
    }
 
     /**
