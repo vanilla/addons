@@ -191,7 +191,9 @@ class QnAPlugin extends Gdn_Plugin {
    }
 
    public function DiscussionModel_BeforeGet_Handler($Sender, $Args) {
-      if (StringEndsWith(Gdn::Request()->Path(), '/unanswered', TRUE)) {
+      $Unanswered = Gdn::Controller()->ClassName == 'DiscussionsController' && Gdn::Controller()->RequestMethod == 'unanswered';
+
+      if ($Unanswered) {
          $Args['Wheres']['Type'] = 'Question';
          $Sender->SQL->WhereIn('d.QnA', array('Unanswered', 'Rejected'));
       } elseif ($QnA = Gdn::Request()->Get('qna')) {
