@@ -10,7 +10,7 @@ if (!defined('APPLICATION'))
 $PluginInfo['StopForumSpam'] = array(
     'Name' => 'Stop Forum Spam',
     'Description' => "Integrates the spammer blacklist from stopforumspam.com",
-    'Version' => '1.0a',
+    'Version' => '1.0b',
     'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -80,6 +80,31 @@ class StopForumSpamPlugin extends Gdn_Plugin {
       return FALSE;
    }
 
+   public function Setup() {
+      $this->Structure();
+   }
+
+   public function Structure() {
+      // Get a user for operations.
+      $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'StopForumSpam', 'Admin' => 2))->Value('UserID');
+
+      if (!$UserID) {
+         $UserID = Gdn::SQL()->Insert('User', array(
+            'Name' => 'StopForumSpam',
+            'Password' => RandomString('20'),
+            'HashMethod' => 'Random',
+            'Email' => 'stopforumspam@domain.com',
+            'DateInserted' => Gdn_Format::ToDateTime(),
+            'Admin' => '2'
+         ));
+      }
+      SaveToConfig('Plugins.StopForumSpam.UserID', $UserID);
+   }
+
+   public function UserID() {
+      return C('Plugins.StopForumSpam.UserID', NULL);
+   }
+
    /// Event Handlers ///
 
    public function Base_CheckSpam_Handler($Sender, $Args) {
@@ -88,12 +113,16 @@ class StopForumSpamPlugin extends Gdn_Plugin {
          return;
 
       $RecordType = $Args['RecordType'];
-      $Data = $Args['Data'];
+      $Data =& $Args['Data'];
 
       $Result = FALSE;
       switch ($RecordType) {
-         case 'User':
+         case 'Registration':
             $Result = self::Check($Data);
+            if ($Result) {
+               $Data['Log_InsertUserID'] = $this->UserID();
+               $Data['RecordIPAddress'] = Gdn::Request()->IpAddress();
+            }
             break;
          case 'Comment':
          case 'Discussion':
