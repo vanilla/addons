@@ -74,10 +74,11 @@ class StopForumSpamPlugin extends Gdn_Plugin {
          $EmailFrequency = GetValueR('email.frequency', $Result, 0);
 
          // Ban ip addresses appearing more than threshold.
+         $IsSpam = FALSE;
          if ($IPFrequency > 5) {
-            $Result = TRUE;;
+            $IsSpam = TRUE;;
          } elseif ($EmailFrequency > 20) {
-            $Result = TRUE;
+            $IsSpam = TRUE;
          }
 
          if ($Result) {
