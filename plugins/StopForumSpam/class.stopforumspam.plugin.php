@@ -85,7 +85,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
             $Data['_Meta']['IP Frequency'] = $IPFrequency;
             $Data['_Meta']['Email Frequency'] = $EmailFrequency;
          }
-         return $Result;
+         return $IsSpam;
       }
 
       return FALSE;
