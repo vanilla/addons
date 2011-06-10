@@ -22,7 +22,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
    /// Properties ///
    /// Methods ///
 
-   public static function Check($Data) {
+   public static function Check(&$Data) {
       // Make the request.
       $Get = array();
 
@@ -70,11 +70,21 @@ class StopForumSpamPlugin extends Gdn_Plugin {
       if ($ResultString) {
          $Result = json_decode($ResultString, TRUE);
 
-         // Ban ip addresses appearing more than o
-         if (GetValueR('ip.frequency', $Result) > 5)
-            return TRUE;
-         elseif (GetValueR('email.frequency', $Result) > 20)
-            return TRUE;
+         $IPFrequency = GetValueR('ip.frequency', $Result, 0);
+         $EmailFrequency = GetValueR('email.frequency', $Result, 0);
+
+         // Ban ip addresses appearing more than threshold.
+         if (GetValueR('ip.frequency', $Result) > 5) {
+            $Result = TRUE;;
+         } elseif (GetValueR('email.frequency', $Result) > 20) {
+            $Result = TRUE;
+         }
+
+         if ($Result) {
+            $Data['_Meta']['IP Frequency'] = $IPFrequency;
+            $Data['_Meta']['Email Frequency'] = $EmailFrequency;
+         }
+         return $Result;
       }
 
       return FALSE;
