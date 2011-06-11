@@ -791,7 +791,7 @@ return "<a href=\"{$bbcode->wiki_url}$name\" class=\"bbcode_wiki\">"
 function DoImage($bbcode, $action, $name, $default, $params, $content) {
 if ($action == BBCODE_CHECK) return true;
 $content = trim($bbcode->UnHTMLEncode(strip_tags($content)));
-if (preg_match("/\\.(?:gif|jpeg|jpg|jpe|png)$/", $content)) {
+if (preg_match("/\\.(?:gif|jpeg|jpg|jpe|png)$/i", $content)) {
 if (preg_match("/^[a-zA-Z0-9_][^:]+$/", $content)) {
 if (!preg_match("/(?:\\/\\.\\.\\/)|(?:^\\.\\.\\/)|(?:^\\/)/", $content)) {
 $info = @getimagesize("{$bbcode->local_img_dir}/{$content}");

@@ -13,7 +13,7 @@ if (!defined('APPLICATION'))
 
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.0.2b',
+    'Version' => '1.0.3b',
     'RequiredApplications' => array('Vanilla' => '2.0.2a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
