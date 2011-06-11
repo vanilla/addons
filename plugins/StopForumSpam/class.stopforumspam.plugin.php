@@ -10,7 +10,7 @@ if (!defined('APPLICATION'))
 $PluginInfo['StopForumSpam'] = array(
     'Name' => 'Stop Forum Spam',
     'Description' => "Integrates the spammer blacklist from stopforumspam.com",
-    'Version' => '1.0b',
+    'Version' => '1.0.1b',
     'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -22,7 +22,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
    /// Properties ///
    /// Methods ///
 
-   public static function Check(&$Data) {
+   public static function Check(&$Data, &$Options) {
       // Make the request.
       $Get = array();
 
@@ -73,12 +73,16 @@ class StopForumSpamPlugin extends Gdn_Plugin {
          $IPFrequency = GetValueR('ip.frequency', $Result, 0);
          $EmailFrequency = GetValueR('email.frequency', $Result, 0);
 
-         // Ban ip addresses appearing more than threshold.
          $IsSpam = FALSE;
-         if ($IPFrequency > 5) {
-            $IsSpam = TRUE;;
-         } elseif ($EmailFrequency > 20) {
+
+         // Flag registrations as spam above a certain threshold.
+         if ($IPFrequency > C('Plugins.StopForumSpam.IPThreshold1', 5) || $EmailFrequency > C('Plugins.StopForumSpam.EmailIPThreshold1', 20)) {
             $IsSpam = TRUE;
+         }
+         
+         // Don't even log registrations that are above another threahold.
+         if ($IPFrequency > C('Plugins.StopForumSpam.IPThreshold2', 50) || $EmailFrequency > C('Plugins.StopForumSpam.EmailIPThreshold2', 100)) {
+            $Options['Log'] = FALSE;
          }
 
          if ($Result) {
@@ -125,11 +129,12 @@ class StopForumSpamPlugin extends Gdn_Plugin {
 
       $RecordType = $Args['RecordType'];
       $Data =& $Args['Data'];
+      $Options =& $Args['Options'];
 
       $Result = FALSE;
       switch ($RecordType) {
          case 'Registration':
-            $Result = self::Check($Data);
+            $Result = self::Check($Data, $Options);
             if ($Result) {
                $Data['Log_InsertUserID'] = $this->UserID();
                $Data['RecordIPAddress'] = Gdn::Request()->IpAddress();
