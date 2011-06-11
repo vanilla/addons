@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0.3b',
+   'Version' => '1.0.4b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -65,7 +65,7 @@ class QnAPlugin extends Gdn_Plugin {
       $Discussion = GetValue('Discussion', $Args);
       $Comment = GetValue('Comment', $Args);
 
-      if (!$Discussion || !$Comment || !GetValue('Type', $Discussion) == 'question')
+      if (!$Discussion || !$Comment || strtolower(GetValue('Type', $Discussion)) != 'question')
          return;
 
       // Check permissions.
@@ -113,6 +113,8 @@ class QnAPlugin extends Gdn_Plugin {
       $Discussion = (array)$Args['Discussion'];
 
       if ($Comment['InsertUserID'] == $Discussion['InsertUserID'])
+         return;
+      if (strtolower($Discussion['Type']) != 'question')
          return;
 
       $ActivityID = $ActivityModel->Add(
