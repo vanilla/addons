@@ -36,6 +36,7 @@ class FileUploadPlugin extends Gdn_Plugin {
    /// METHODS ///
 
    public function __construct() {
+      parent::__construct();
       $this->MediaCache = array();
       
       $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
