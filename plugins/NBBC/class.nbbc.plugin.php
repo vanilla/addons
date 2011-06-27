@@ -29,6 +29,8 @@ class NBBCPlugin extends Gdn_Plugin {
 
    /// CONSTRUCTOR ///
    public function __construct() {
+      parent::__construct();
+      
       require_once(dirname(__FILE__) . '/nbbc/nbbc.php');
       $BBCode = new BBCode();
       $BBCode->smiley_url = Url('/plugins/NBBC/design/smileys');
