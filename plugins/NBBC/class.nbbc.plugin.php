@@ -13,7 +13,7 @@ if (!defined('APPLICATION'))
 
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.0.2b',
+    'Version' => '1.0.3b',
     'RequiredApplications' => array('Vanilla' => '2.0.2a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -59,6 +59,24 @@ class NBBCPlugin extends Gdn_Plugin {
           'before_endtag' => "sns",
           'after_endtag' => "sns",
           'plain_start' => "\n<b>Quote:</b>\n",
+          'plain_end' => "\n",
+      ));
+
+      $BBCode->AddRule('spoiler',
+      Array(
+          'mode' => BBCODE_MODE_ENHANCED,
+          'template' => "\n".'<div class="UserSpoiler">
+<div class="SpoilerTitle">'.T('Spoiler').': </div>
+<div class="SpoilerReveal"></div>
+<div class="SpoilerText" style="display: none;">{$_content/v}</div></div>'."\n",
+          'class' => 'code',
+          'allow_in' => Array('listitem', 'block', 'columns'),
+          'content' => BBCODE_VERBATIM,
+          'before_tag' => "sns",
+          'after_tag' => "sn",
+          'before_endtag' => "sn",
+          'after_endtag' => "sns",
+          'plain_start' => "\n<b>Code:</b>\n",
           'plain_end' => "\n",
       ));
 

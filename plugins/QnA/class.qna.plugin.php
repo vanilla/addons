@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0.2b',
+   'Version' => '1.0.4b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -48,6 +48,14 @@ class QnAPlugin extends Gdn_Plugin {
 
    /// EVENTS ///
 
+   public function Base_BeforeCommentDisplay_Handler($Sender, $Args) {
+      $QnA = GetValueR('Comment.QnA', $Args);
+
+      if ($QnA && isset($Args['CssClass'])) {
+         $Args['CssClass'] = ConcatSep(' ', $Args['CssClass'], "QnA-Item-$QnA");
+      }
+   }
+
    /**
     *
     * @param Gdn_Controller $Sender
@@ -57,7 +65,7 @@ class QnAPlugin extends Gdn_Plugin {
       $Discussion = GetValue('Discussion', $Args);
       $Comment = GetValue('Comment', $Args);
 
-      if (!$Discussion || !$Comment || !GetValue('Type', $Discussion) == 'question')
+      if (!$Discussion || !$Comment || strtolower(GetValue('Type', $Discussion)) != 'question')
          return;
 
       // Check permissions.
@@ -105,6 +113,8 @@ class QnAPlugin extends Gdn_Plugin {
       $Discussion = (array)$Args['Discussion'];
 
       if ($Comment['InsertUserID'] == $Discussion['InsertUserID'])
+         return;
+      if (strtolower($Discussion['Type']) != 'question')
          return;
 
       $ActivityID = $ActivityModel->Add(
@@ -183,7 +193,9 @@ class QnAPlugin extends Gdn_Plugin {
    }
 
    public function DiscussionModel_BeforeGet_Handler($Sender, $Args) {
-      if (StringEndsWith(Gdn::Request()->Path(), '/unanswered', TRUE)) {
+      $Unanswered = Gdn::Controller()->ClassName == 'DiscussionsController' && Gdn::Controller()->RequestMethod == 'unanswered';
+
+      if ($Unanswered) {
          $Args['Wheres']['Type'] = 'Question';
          $Sender->SQL->WhereIn('d.QnA', array('Unanswered', 'Rejected'));
       } elseif ($QnA = Gdn::Request()->Get('qna')) {
@@ -220,7 +232,8 @@ class QnAPlugin extends Gdn_Plugin {
     */
    public function DiscussionsController_Unanswered_Create($Sender, $Args) {
       $Sender->View = 'Index';
-      $Sender->Index(GetValue(0, $Args, ''));
+      $Sender->SetData('_PagerUrl', 'discussions/unanswered/{Page}');
+      $Sender->Index(GetValue(0, $Args, 'p1'));
    }
 
     /**
@@ -293,11 +306,14 @@ class QnAPlugin extends Gdn_Plugin {
    public function PostController_BeforeFormInputs_Handler($Sender, $Args) {
       $Sender->AddDefinition('QuestionTitle', T('Question Title'));
       $Sender->AddDefinition('DiscussionTitle', T('Discussion Title'));
+      $Sender->AddDefinition('QuestionButton', T('Ask Question'));
+      $Sender->AddDefinition('DiscussionButton', T('Post Discussion'));
       $Sender->AddJsFile('qna.js', 'plugins/QnA');
 
       $Form = $Sender->Form;
       if ($Sender->Form->GetValue('Type') == 'Question') {
          Gdn::Locale()->SetTranslation('Discussion Title', T('Question Title'));
+         Gdn::Locale()->SetTranslation('Post Discussion', T('Ask Question'));
       }
 
       include $Sender->FetchViewLocation('QnAPost', '', 'plugins/QnA');
