@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "This plugin allows users to quote each other easily.",
-   'Version' => '1.2.1',
+   'Version' => '1.2.2',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla'),
    'RequiredTheme' => FALSE, 
