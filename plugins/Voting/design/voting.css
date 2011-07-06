@@ -218,15 +218,3 @@ div.AnswerTabs ul {
 	display: inline-block;
 	margin: 0 10px;
 }
-#Form_Discussion ul.PostOptions {
-	display: none;
-}
-
-/*
-  TODO:
-  FOLLOWING USERS,
-  SHOW FOLLOWED & FOLLOWING USERS ON PROFILE PAGE IN SIDEBAR 
-  SHOW HIGHLY VOTED QUESTIONS & ANSWERS IN PROFILES
-  WRITE "ASK MARK A QUESTION" ON USER PROFILE PAGE
- 
-*/
