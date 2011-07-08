@@ -72,7 +72,7 @@ class HTMLPurifierPlugin extends Gdn_Plugin {
 		if (!file_exists(PATH_CACHE.'/HtmlPurifier')) mkdir(PATH_CACHE.'/HtmlPurifier');
 		$ConfigDefaults = array(
 			'HtmlPurifier.AutoFormat.Linkify' => TRUE,
-			'HtmlPurifier.AutoFormat.AutoParagraph' => FALSE,
+			'HtmlPurifier.AutoFormat.AutoParagraph' => TRUE,
 			'HtmlPurifier.Cache.SerializerPath' => PATH_CACHE . '/HtmlPurifier'
 		);
 		$ConfigValues = array();
