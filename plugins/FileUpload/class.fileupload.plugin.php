@@ -36,6 +36,7 @@ class FileUploadPlugin extends Gdn_Plugin {
    /// METHODS ///
 
    public function __construct() {
+      parent::__construct();
       $this->MediaCache = array();
       
       $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
@@ -66,7 +67,6 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    public function PluginController_FileUpload_Create($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('FileUpload');
       $Sender->AddSideMenu('plugin/fileupload');
       $Sender->Form = new Gdn_Form();
@@ -115,14 +115,38 @@ class FileUploadPlugin extends Gdn_Plugin {
       );
       
       $Media = $this->MediaModel()->GetID($MediaID);
+      
+      // Get the category so we can figure out whether or not the user has permission to delete.
+      if (GetValue('ForeignTable', $Media) == 'discussion') {
+         $PermissionCategoryID = Gdn::SQL()
+            ->Select('c.PermissionCategoryID')
+            ->From('Discussion d')
+            ->Join('Category c', 'd.CategoryID = c.CategoryID')
+            ->Where('d.DiscussionID', GetValue('ForeignID', $Media))
+            ->Get()->Value('PermissionCategoryID');
+         $Permission = 'Vanilla.Discussions.Edit';
+      } else {
+         $PermissionCategoryID = Gdn::SQL()
+            ->Select('c.PermissionCategoryID')
+            ->From('Comment cm')
+            ->Join('Discussion d', 'd.DiscussionID = cm.DiscussionID')
+            ->Join('Category c', 'd.CategoryID = c.CategoryID')
+            ->Where('cm.CommentID', GetValue('ForeignID', $Media))
+            ->Get()->Value('PermissionCategoryID');
+         $Permission = 'Vanilla.Comments.Edit';
+      }
 
       if ($Media) {
          $Delete['Media'] = $Media;
          $UserID = GetValue('UserID', Gdn::Session());
-         if (GetValue('InsertUserID', $Media, NULL) == $UserID || Gdn::Session()->CheckPermission("Garden.Settings.Manage")) {
+         if (GetValue('InsertUserID', $Media, NULL) == $UserID || Gdn::Session()->CheckPermission($Permission, TRUE, 'Category', $PermissionCategoryID)) {
             $this->MediaModel()->Delete($Media, TRUE);
             $Delete['Status'] = 'success';
+         } else {
+            throw PermissionException();
          }
+      } else {
+         throw NotFoundException('Media');
       }
       
       $Sender->SetJSON('Delete', $Delete);

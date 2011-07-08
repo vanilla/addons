@@ -306,7 +306,7 @@ class WhispersPlugin extends Gdn_Plugin {
     */
    public function PostController_Comment_Create($Sender, $Args) {
       if ($Sender->Form->IsPostBack()) {
-         $Sender->Form->InputPrefix = 'Comment';
+         $Sender->Form->SetModel($Sender->CommentModel);
 
          $Whisper = $Sender->Form->GetFormValue('Whisper');
          $WhisperTo = trim($Sender->Form->GetFormValue('To'));
@@ -336,8 +336,6 @@ class WhispersPlugin extends Gdn_Plugin {
             $Sender->Form->SetModel($ConversationModel);
             $ConversationModel->Validation->ApplyRule('DiscussionID', 'Required');
          }
-         
-         $Sender->Form->InputPrefix = 'Comment';
 
          $ID = $Sender->Form->Save($ConversationMessageModel);
 

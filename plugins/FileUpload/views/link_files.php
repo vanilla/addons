@@ -50,12 +50,17 @@
    
                      echo ' <span class="FileSize">', Gdn_Format::Bytes($Media->Size, 0), '</span>';
                      echo '</div>';
-   
+                     
                      $Actions = '';
                      if (StringBeginsWith($this->ControllerName, 'post', TRUE))
                         $Actions = ConcatSep(' | ', $Actions, '<a class="InsertImage" href="'.Url(MediaModel::Url($Path)).'">'.T('Insert Image').'</a>');
+                     
+                     if (GetValue('ForeignTable', $Media) == 'discussion')
+                        $PermissionName = "Vanilla.Discussions.Edit";
+                     else
+                        $PermissionName = "Vanilla.Comments.Edit";
    
-                     if ($IsOwner || Gdn::Session()->CheckPermission("Garden.Settings.Manage"))
+                     if ($IsOwner || Gdn::Session()->CheckPermission($PermissionName, TRUE, 'Category', $this->Data('Discussion.PermissionCategoryID')))
                         $Actions = ConcatSep(' | ', $Actions, '<a class="DeleteFile" href="'.Url("/plugin/fileupload/delete/{$Media->MediaID}").'"><span>'.T('Delete').'</span></a>');
    
                      if ($Actions)

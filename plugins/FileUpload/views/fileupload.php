@@ -20,7 +20,7 @@
    <div class="RealtimeMode">
       <?php echo sprintf(T('Realtime progress bars: %s'),$RealtimeStatus); ?>
       <?php if (!$ApcAvailable) { ?>
-         <div><?php echo T('For information on how to enable realtime progress bars, check out <a href="http://ca.php.net/manual/en/book.apc.php">Alternative PHP Cache (APC)</a>'); ?></div>
+         <div><?php echo T('For information on how to enable realtime progress bars, check out <a href="http://php.net/manual/en/book.apc.php">Alternative PHP Cache (APC)</a>'); ?></div>
       <?php } ?>
    </div>
 </div>
