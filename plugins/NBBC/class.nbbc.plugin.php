@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('APPLICATION'))
-   exit();
+<?php if (!defined('APPLICATION')) exit();
 /*
   Copyright 2008, 2009 Vanilla Forums Inc.
   This file is part of Garden.
@@ -13,7 +10,7 @@ if (!defined('APPLICATION'))
 
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.0.4b',
+    'Version' => '1.0.5b',
     'RequiredApplications' => array('Vanilla' => '2.0.2a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -30,62 +27,9 @@ class NBBCPlugin extends Gdn_Plugin {
    /// CONSTRUCTOR ///
    public function __construct() {
       parent::__construct();
-      
-      require_once(dirname(__FILE__) . '/nbbc/nbbc.php');
-      $BBCode = new BBCode();
-      $BBCode->smiley_url = Url('/plugins/NBBC/design/smileys');
-      $BBCode->SetAllowAmpersand(TRUE);
-
-
-      $BBCode->AddRule('code',
-      Array(
-          'mode' => BBCODE_MODE_ENHANCED,
-          'template' => "\n<pre>{\$_content/v}\n</pre>\n",
-          'class' => 'code',
-          'allow_in' => Array('listitem', 'block', 'columns'),
-          'content' => BBCODE_VERBATIM,
-          'before_tag' => "sns",
-          'after_tag' => "sn",
-          'before_endtag' => "sn",
-          'after_endtag' => "sns",
-          'plain_start' => "\n<b>Code:</b>\n",
-          'plain_end' => "\n",
-      ));
-
-      $BBCode->AddRule('quote',
-      array('mode' => BBCODE_MODE_CALLBACK,
-          'method' => array($this, "DoQuote"),
-          'allow_in' => Array('listitem', 'block', 'columns'),
-          'before_tag' => "sns",
-          'after_tag' => "sns",
-          'before_endtag' => "sns",
-          'after_endtag' => "sns",
-          'plain_start' => "\n<b>Quote:</b>\n",
-          'plain_end' => "\n",
-      ));
-
-      $BBCode->AddRule('spoiler',
-      Array(
-          'simple_start' => "\n".'<div class="UserSpoiler">
-<div class="SpoilerTitle">'.T('Spoiler').': </div>
-<div class="SpoilerReveal"></div>
-<div class="SpoilerText" style="display: none;">',
-'simple_end' => "</div></div>\n",
-'allow_in' => Array('listitem', 'block', 'columns'),
-'before_tag' => "sns",
-'after_tag' => "sns",
-'before_endtag' => "sns",
-'after_endtag' => "sns",
-'plain_start' => "\n",
-'plain_end' => "\n"));
-
-      $this->_BBCode = $BBCode;
    }
 
    /// PROPERTIES ///
-
-   /** @var BBCode */
-   protected $_BBCode;
 
    /// METHODS ///
 
@@ -139,8 +83,64 @@ class NBBCPlugin extends Gdn_Plugin {
    }
 
    public function Format($String) {
-      $Result = $this->_BBCode->Parse($String);
-      return "<!-- BBCode -->\n".$Result."<!-- End BBCode -->";
+      $Result = $this->NBBC()->Parse($String);
+      return $Result;
+   }
+   
+   protected $_NBBC = NULL;
+   public function NBBC() {
+      if ($this->_NBBC === NULL) {
+         require_once(dirname(__FILE__) . '/nbbc/nbbc.php');
+         $BBCode = new BBCode();
+         $BBCode->smiley_url = Url('/plugins/NBBC/design/smileys');
+         $BBCode->SetAllowAmpersand(TRUE);
+
+
+         $BBCode->AddRule('code',
+         Array(
+             'mode' => BBCODE_MODE_ENHANCED,
+             'template' => "\n<pre>{\$_content/v}\n</pre>\n",
+             'class' => 'code',
+             'allow_in' => Array('listitem', 'block', 'columns'),
+             'content' => BBCODE_VERBATIM,
+             'before_tag' => "sns",
+             'after_tag' => "sn",
+             'before_endtag' => "sn",
+             'after_endtag' => "sns",
+             'plain_start' => "\n<b>Code:</b>\n",
+             'plain_end' => "\n",
+         ));
+
+         $BBCode->AddRule('quote',
+         array('mode' => BBCODE_MODE_CALLBACK,
+             'method' => array($this, "DoQuote"),
+             'allow_in' => Array('listitem', 'block', 'columns'),
+             'before_tag' => "sns",
+             'after_tag' => "sns",
+             'before_endtag' => "sns",
+             'after_endtag' => "sns",
+             'plain_start' => "\n<b>Quote:</b>\n",
+             'plain_end' => "\n",
+         ));
+
+         $BBCode->AddRule('spoiler',
+         Array(
+             'simple_start' => "\n".'<div class="UserSpoiler">
+   <div class="SpoilerTitle">'.T('Spoiler').': </div>
+   <div class="SpoilerReveal"></div>
+   <div class="SpoilerText" style="display: none;">',
+   'simple_end' => "</div></div>\n",
+   'allow_in' => Array('listitem', 'block', 'columns'),
+   'before_tag' => "sns",
+   'after_tag' => "sns",
+   'before_endtag' => "sns",
+   'after_endtag' => "sns",
+   'plain_start' => "\n",
+   'plain_end' => "\n"));
+         
+         $this->_NBBC = $BBCode;
+      }
+      return $this->_NBBC;
    }
 
    public function Setup() {
