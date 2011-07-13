@@ -1193,8 +1193,8 @@ $/Dx", $string);
 function HTMLEncode($string) {
 if (!$this->allow_ampersand)
 return htmlspecialchars($string);
-else return str_replace(Array('<', '>', '"'),
-Array('&lt;', '&gt;', '&quot;'), $string);
+else return str_replace(Array('<', '>'), //, '"'),
+Array('&lt;', '&gt;'), $string); //, '&quot;'), $string);
 }
 function FixupOutput($string) {
 if (!$this->detect_urls) {
