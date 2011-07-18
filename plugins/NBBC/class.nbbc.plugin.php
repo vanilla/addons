@@ -138,7 +138,11 @@ class NBBCPlugin extends Gdn_Plugin {
    'plain_start' => "\n",
    'plain_end' => "\n"));
          
+         
+         $this->EventArguments['BBCode'] = $BBCode;
+         $this->FireEvent('AfterNBBCSetup');
          $this->_NBBC = $BBCode;
+         
       }
       return $this->_NBBC;
    }
