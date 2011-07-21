@@ -14,7 +14,7 @@ $PluginInfo['Quotes'] = array(
    'Description' => "This plugin allows users to quote each other easily.",
    'Version' => '1.2.2',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla'),
+   'RequiredApplications' => array('vanilla' => "2.0"),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
