@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Voting'] = array(
    'Name' => 'Voting',
    'Description' => 'Allows users to vote on comments and discussions.',
-   'Version' => '1.1b',
+   'Version' => '1.1.1b',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
@@ -399,9 +399,7 @@ class VotingPlugin extends Gdn_Plugin {
 //		if (!C('Plugins.Voting.Enabled'))
 //			return;
 
-      $Sender->SQL->Select('d.Score')
-         ->Select('iu.Email', '', 'FirstEmail')
-         ->Select('lcu.Email', '', 'LastEmail');
+      $Sender->SQL->Select('d.Score');
    }
 	
 	/**
