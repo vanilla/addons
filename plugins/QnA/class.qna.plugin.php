@@ -197,7 +197,7 @@ class QnAPlugin extends Gdn_Plugin {
 
       if ($Unanswered) {
          $Args['Wheres']['Type'] = 'Question';
-         $Sender->SQL->WhereIn('d.QnA', array('Unanswered', 'Rejected'));
+         $Sender->SQL->WhereIn('d.QnA', array('Unanswered','Answered', 'Rejected'));
       } elseif ($QnA = Gdn::Request()->Get('qna')) {
          $Args['Wheres']['QnA'] = $QnA;
       }
@@ -223,7 +223,7 @@ class QnAPlugin extends Gdn_Plugin {
       else
          $CssClass = '';
 
-      echo '<li'.$CssClass.'><a class="QnA-UnansweredQuestions" href="'.Url('/discussions/unanswered').'">'.T('Unanswered Questions').'<span class="Popin" rel="/discussions/unansweredcount"></span></a></li>';
+      echo '<li'.$CssClass.'><a class="QnA-UnansweredQuestions" href="'.Url('/discussions/unanswered').'">'.T('Open Questions').'<span class="Popin" rel="/discussions/unansweredcount"></span></a></li>';
    }
 
    /**
@@ -241,7 +241,7 @@ class QnAPlugin extends Gdn_Plugin {
     * @param array $Args
     */
    public function DiscussionsController_UnansweredCount_Create($Sender, $Args) {
-      Gdn::SQL()->WhereIn('QnA', array('Unanswered', 'Rejected'));
+      Gdn::SQL()->WhereIn('QnA', array('Unanswered','Answered', 'Rejected'));
       $Count = Gdn::SQL()->GetCount('Discussion', array('Type' => 'Question'));
 
       $Sender->SetData('UnansweredCount', $Count);
