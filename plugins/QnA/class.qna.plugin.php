@@ -235,6 +235,17 @@ class QnAPlugin extends Gdn_Plugin {
       $Sender->SetData('_PagerUrl', 'discussions/unanswered/{Page}');
       $Sender->Index(GetValue(0, $Args, 'p1'));
    }
+   
+   /**
+    *
+    * @param DiscussionsController $Sender
+    * @param type $Args 
+    */
+   public function DiscussionsController_Render_Before($Sender, $Args) {
+      if (strcasecmp($Sender->RequestMethod, 'unanswered') == 0) {
+         $Sender->SetData('CountDiscussions', FALSE);
+      }
+   }
 
     /**
     * @param DiscussionsController $Sender
