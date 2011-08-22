@@ -209,7 +209,7 @@ class QnAPlugin extends Gdn_Plugin {
     * @param array $Args
     */
    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
-      $Sender->Validation->ApplyRule('Type', 'Required', T('Choose either whether you want to ask a question or start a discussion.'));
+//      $Sender->Validation->ApplyRule('Type', 'Required', T('Choose whether you want to ask a question or start a discussion.'));
 
       $Post =& $Args['FormPostValues'];
       if ($Args['Insert'] && GetValue('Type', $Post) == 'Question') {
