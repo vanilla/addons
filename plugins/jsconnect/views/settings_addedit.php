@@ -20,6 +20,11 @@ echo $this->Form->Open(), $this->Form->Errors();
    </li>
    <li>
      <?php
+      echo $this->Form->CheckBox('TestMode',    'This connection is in test-mode.');
+     ?> 
+   </li>
+   <li>
+     <?php
      echo $this->Form->Label('Site Name', 'Name'),
      '<div class="Info">'.T('Enter a short name for the site.', 'Enter a short name for the site. This is displayed the signin buttons.').'</div>',
       $this->Form->TextBox('Name');
@@ -51,7 +56,7 @@ echo $this->Form->Open(), $this->Form->Errors();
 <?php
 echo '<div class="Buttons">';
 echo $this->Form->Button('Save');
-echo $this->Form->Button('Generate Client ID and Secret', array('Name' => $this->Form->EscapeFieldName('Generate')));
+echo $this->Form->Button('Generate Client ID and Secret', array('Name' => 'Generate'));
 echo '</div>';
 
 echo $this->Form->Close();

@@ -4,7 +4,7 @@
    <?php echo T('You can connect to multiple sites that support jsConnect.'); ?>
 </div>
 <div class="FilterMenu"><?php
-   echo Anchor(T('Add Connection'), '/settings/jsconnect/addedit', 'SmallButton Popup');
+   echo Anchor(T('Add Connection'), '/settings/jsconnect/addedit', 'SmallButton');
 ?></div>
 <table class="AltRows">
    <thead>

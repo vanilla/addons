@@ -40,7 +40,11 @@ function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
    if (isset($Error))
       $Result = $Error;
    elseif (is_array($User) && count($User) > 0) {
-      $Result = SignJsConnect($User, $ClientID, $Secret, TRUE);
+      if ($Secure === NULL) {
+         $Result = $User;
+      } else {
+         $Result = SignJsConnect($User, $ClientID, $Secret, TRUE);
+      }
    } else
       $Result = array('name' => '', 'photourl' => '');
    
