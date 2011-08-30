@@ -24,7 +24,7 @@
          <td><?php echo htmlspecialchars($Provider['AuthenticateUrl']); ?></td>
          <td>
             <?php 
-            echo Anchor(T('Test URL'), JsConnectPlugin::ConnectUrl($Provider, TRUE));
+            echo Anchor(T('Test URL'), str_replace('=?', '=test', JsConnectPlugin::ConnectUrl($Provider, TRUE)));
             ?>
             <div class="JsConnectContainer UserInfo"></div>
          </td>

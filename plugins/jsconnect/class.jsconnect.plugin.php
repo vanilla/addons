@@ -8,7 +8,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'An SSO plugin that uses json(p) to connect to vanilla, allowing for cross-domain sso.',
-   'Version' => '1.0.1b',
+   'Version' => '1.0.2b',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -56,7 +56,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       if ($RegisterUrl)
          $RegisterLink = ' '.Anchor(sprintf(T('Register with %s', 'Register'), $Provider['Name']), $RegisterUrl, 'Button RegisterLink');
       else
-         $RegusterLink = '';
+         $RegisterLink = '';
 
       $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">
          <div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button SignInLink').$RegisterLink.'</div>
@@ -310,7 +310,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       $Sender->Form = $Form;
 
       if ($Form->AuthenticatedPostBack()) {
-         if ($Form->GetFormValue('Generate')) {
+         if ($Form->GetFormValue('Generate') || $Sender->Request->Post('Generate')) {
             $Form->SetFormValue('AuthenticationKey', mt_rand());
             $Form->SetFormValue('AssociationSecret', md5(mt_rand()));
 
