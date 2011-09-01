@@ -258,7 +258,7 @@ class VotingPlugin extends Gdn_Plugin {
          $NewUserVote = $VoteType == 'voteup' ? 1 : -1;
          $FinalVote = intval($OldUserVote) + intval($NewUserVote);
          // Allow admins to vote unlimited.
-         $AllowVote = $Session->CheckPermission('Vanilla.Comments.Edit');
+         $AllowVote = $Session->CheckPermission('Garden.Moderation.Manage');
          // Only allow users to vote up or down by 1.
          if (!$AllowVote)
             $AllowVote = $FinalVote > -2 && $FinalVote < 2;
@@ -336,7 +336,7 @@ class VotingPlugin extends Gdn_Plugin {
          
          $FinalVote = intval($OldUserVote) + intval($NewUserVote);
          // Allow admins to vote unlimited.
-         $AllowVote = $Session->CheckPermission('Vanilla.Comments.Edit');
+         $AllowVote = $Session->CheckPermission('Garden.Moderation.Manage');
          // Only allow users to vote up or down by 1.
          if (!$AllowVote)
             $AllowVote = $FinalVote > -2 && $FinalVote < 2;
