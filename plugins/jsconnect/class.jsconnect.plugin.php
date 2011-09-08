@@ -191,30 +191,39 @@ class JsConnectPlugin extends Gdn_Plugin {
 
    /**
     *
-    * @param Gdn_Controller $Sender
+    * @param EntryController $Sender
     * @param array $Args
     */
    public function EntryController_JsConnect_Create($Sender, $Args) {
-      if (GetValue(0, $Args)) {
-         parse_str($Sender->Form->GetFormValue('JsConnect'), $JsData);
+      if ($Arg = GetValue(0, $Args)) {
+         if ($Arg == 'guest') {
+//            Redirect('/');
+            $Sender->AddDefinition('CheckPopup', TRUE);
+            $Sender->RedirectUrl = '/';
+            $Sender->Render('JsConnect', '', 'plugins/jsconnect');
+         } else {
+            parse_str($Sender->Form->GetFormValue('JsConnect'), $JsData);
 
-         $Error = GetValue('error', $JsData);
-         $Message = GetValue('message', $JsData);
+            $Error = GetValue('error', $JsData);
+            $Message = GetValue('message', $JsData);
 
-         $Sender->Form->AddError($Message ? htmlspecialchars($Message) : htmlspecialchars($Error));
-         $Sender->SetData('Title', T('Error'));
-         $Sender->Render('JsConnect_Error', '', 'plugins/jsconnect');
+            $Sender->Form->AddError($Message ? htmlspecialchars($Message) : htmlspecialchars($Error));
+            $Sender->SetData('Title', T('Error'));
+            $Sender->Render('JsConnect_Error', '', 'plugins/jsconnect');
+         }
       } else {
          $client_id = $Sender->SetData('client_id', $Sender->Request->Get('client_id', 0));
          $Provider = self::GetProvider($client_id);
 
          if (empty($Provider))
             throw NotFoundException('Provider');
+         
+         $Get = ArrayTranslate($Sender->Request->Get(), array('client_id', 'display'));
 
          $Sender->AddDefinition('JsAuthenticateUrl', self::ConnectUrl($Provider, TRUE));
          $Sender->AddJsFile('jsconnect.js', 'plugins/jsconnect');
          $Sender->SetData('Title', T('Connecting...'));
-         $Sender->Form->Action = Url('/entry/connect/jsconnect?client_id='.urlencode($client_id).'&display=popup');
+         $Sender->Form->Action = Url('/entry/connect/jsconnect?'.  http_build_query($Get));
          $Sender->Form->AddHidden('JsConnect', '');
          $Sender->Form->AddHidden('Target', $Sender->Request->Get('Target', '/'));
 

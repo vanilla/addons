@@ -9,8 +9,8 @@ if (jsUrl) {
          if (data['error']) {
             $('form').attr('action', gdn.url('/entry/jsconnect/error'));
          } else if (!data['name']) {
-            data = {'error': 'unauthorized', 'message': 'You are not signed in.' };
-            $('form').attr('action', gdn.url('/entry/jsconnect/error'));
+//            data = {'error': 'unauthorized', 'message': 'You are not signed in.' };
+            $('form').attr('action', gdn.url('/entry/jsconnect/guest'));
          } else {
             for(var key in data) {
                if (data[key] == null)
