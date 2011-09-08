@@ -183,8 +183,10 @@ class JsConnectPlugin extends Gdn_Plugin {
    }
    
    public function Base_Render_Before($Sender, $Args) {
-      $Sender->AddJSFile('jsconnect.js', 'plugins/jsconnect');
-      $Sender->AddCssFile('jsconnect.css', 'plugins/jsconnect');
+      if (!Gdn::Session()->UserID) {
+         $Sender->AddJSFile('jsconnect.js', 'plugins/jsconnect');
+         $Sender->AddCssFile('jsconnect.css', 'plugins/jsconnect');
+      }
    }
 
    /**
