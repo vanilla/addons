@@ -66,7 +66,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       return $Result;
    }
    
-   public static function ConnectUrl($Provider, $Secure = FALSE) {
+   public static function ConnectUrl($Provider, $Secure = FALSE, $Callback = TRUE) {
       if (!is_array($Provider))
          $Provider = self::GetProvider($Provider);
       
@@ -89,7 +89,9 @@ class JsConnectPlugin extends Gdn_Plugin {
       if (StringBeginsWith($Query['Target'], '/entry/signin'))
          $Query['Target'] = '/';
       
-      $Result = $Url.'?'.http_build_query($Query).'&callback=?';
+      $Result = $Url.'?'.http_build_query($Query);
+      if ($Callback)
+         $Result .= '&callback=?';
       return $Result;
    }
 
