@@ -1,4 +1,13 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<div class="Help Aside">
+   <?php
+   echo '<h2>', T('Need More Help?'), '</h2>';
+   echo '<ul>';
+   echo '<li>', Anchor(T('jsConnect Documentation'), 'http://vanillaforums.org/docs/jsconnect'), '</li>';
+   echo '<li>', Anchor(T('jsConnect Client Libraries'), 'http://vanillaforums.org/docs/jsconnect#libraries'), '</li>';
+   echo '</ul>';
+   ?>
+</div>
 <h1><?php echo T('JS Connect Settings'); ?></h1>
 <div class="Info">
    <?php echo T('You can connect to multiple sites that support jsConnect.'); ?>
