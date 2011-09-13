@@ -314,3 +314,44 @@ $Definition['You cannot disable the %1$s plugin because the %2$s plugin requires
 $Definition['You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'] = 'You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.';
 $Definition['Your changes have been saved.'] = 'Your changes have been saved.';
 $Definition['Your settings have been saved.'] = 'Your settings have been saved.';
+
+$Definition['Change Picture'] = 'Change Picture';
+$Definition['Edit Thumbnail'] = 'Edit Thumbnail';
+$Definition['Remove Picture'] = 'Remove Picture';
+$Definition['Get More Themes'] = 'Get More Themes';
+$Definition['Add Role'] = 'Add Role';
+$Definition['Role Name'] = 'Role Name';
+$Definition['Check all permissions that apply to this role:'] = 'Check all permissions that apply to this role:';
+$Definition['Allow'] = 'Allow';
+$Definition['Manage'] = 'Manage';
+
+//Forum settings:
+$Definition['Add Category'] = 'Add Category';
+$Definition['Don\'t use Categories'] = 'Don\'t use Categories';
+$Definition['Authors can always edit their posts'] = 'Authors can always edit their posts';
+$Definition['Authors can edit for 1 month after posting'] = 'Authors can edit for 1 month after posting';
+$Definition['Authors can edit for 1 week after posting'] = 'Authors can edit for 1 week after posting';
+$Definition['Authors can edit for 1 day after posting'] = 'Authors can edit for 1 day after posting';
+$Definition['Authors can edit for 30 minutes after posting'] = 'Authors can edit for 30 minutes after posting';
+$Definition['Authors can edit for 15 minutes after posting'] = 'Authors can edit for 15 minutes after posting';
+$Definition['Authors can edit for 5 minutes after posting'] = 'Authors can edit for 5 minutes after posting';
+$Definition['Authors cannot edit their posts'] = 'Authors cannot edit their posts';
+$Definition['Don\'t Refresh'] = 'Don\'t Refresh';
+$Definition['Every 5 seconds'] = 'Every 5 seconds';
+$Definition['Every 10 seconds'] = 'Every 10 seconds';
+$Definition['Every 30 seconds'] = 'Every 30 seconds';
+$Definition['Every 1 minute'] = 'Every 1 minute';
+$Definition['Every 5 minutes'] = 'Every 5 minutes';
+$Definition['Use categories to organize discussions'] = 'Use categories to organize discussions';
+$Definition['Exclude archived discussions from the discussions list'] = 'Exclude archived discussions from the discussions list';
+
+//Addons:
+$Definition['Get More Plugins'] = 'Get More Plugins';
+$Definition['Get More Applications'] = 'Get More Applications';
+
+//Settings:
+$Definition['Use an SMTP server to send email'] = 'Use an SMTP server to send email';
+$Definition['Get more information on creating custom routes'] = 'Get more information on creating custom routes';
+
+//Import:
+$Definition['Use My Current Password'] = 'Use My Current Password';

@@ -115,6 +115,7 @@ jQuery(document).ready(function($) {
             success: function(json) {
                // Change the Vote count
                $(votes).text(json.TotalScore);
+               gdn.inform(json);
             }
          });
          return false;

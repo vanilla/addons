@@ -393,13 +393,16 @@ class BBCodeLibrary {
 var $default_smileys = Array(
 ':)' => 'smile.gif', ':-)' => 'smile.gif',
 '=)' => 'smile.gif', '=-)' => 'smile.gif',
+'=((' => 'brokensad.gif', ':-((' => 'waah.gif',
 ':(' => 'frown.gif', ':-(' => 'frown.gif',
 '=(' => 'frown.gif', '=-(' => 'frown.gif',
 ':D' => 'bigsmile.gif', ':-D' => 'bigsmile.gif',
 '=D' => 'bigsmile.gif', '=-D' => 'bigsmile.gif',
+'X(' => 'hella_angry.gif', '#:-s' => 'phew.gif',
 '>:('=> 'angry.gif', '>:-('=> 'angry.gif',
 '>=('=> 'angry.gif', '>=-('=> 'angry.gif',
 'D:' => 'angry.gif', 'D-:' => 'angry.gif',
+'>:D<' => 'hug.gif', ':>' => 'smug.gif',
 'D=' => 'angry.gif', 'D-=' => 'angry.gif',
 '>:)'=> 'evil.gif', '>:-)'=> 'evil.gif',
 '>=)'=> 'evil.gif', '>=-)'=> 'evil.gif',
@@ -423,12 +426,12 @@ var $default_smileys = Array(
 '=/' => 'irritated.gif', '=-/' => 'irritated.gif',
 ':\\' => 'irritated.gif', ':-\\' => 'irritated.gif',
 '=\\' => 'irritated.gif', '=-\\' => 'irritated.gif',
-':P' => 'tongue.gif', ':-P' => 'tongue.gif',
+':P' => 'tongue.gif', ':-P' => 'tongue.gif', ':p' => 'tongue.gif',
 '=P' => 'tongue.gif', '=-P' => 'tongue.gif',
-'X-P' => 'tongue.gif',
+'X-P' => 'tongue.gif',':X' => 'kiss.gif', ':*' => 'kiss2.gif',
 '8)' => 'bigeyes.gif', '8-)' => 'bigeyes.gif',
-'B)' => 'cool.gif', 'B-)' => 'cool.gif',
-';)' => 'wink.gif', ';-)' => 'wink.gif',
+'B)' => 'cool.gif', 'B-)' => 'cool.gif', ';;)' => 'bat.gif',
+';)' => 'wink.gif', ';-)' => 'wink.gif', ':">' => 'blush.gif',
 ';D' => 'bigwink.gif', ';-D' => 'bigwink.gif',
 '^_^'=> 'anime.gif', '^^;' => 'sweatdrop.gif',
 '>_>'=> 'lookright.gif', '>.>' => 'lookright.gif',
@@ -791,7 +794,7 @@ return "<a href=\"{$bbcode->wiki_url}$name\" class=\"bbcode_wiki\">"
 function DoImage($bbcode, $action, $name, $default, $params, $content) {
 if ($action == BBCODE_CHECK) return true;
 $content = trim($bbcode->UnHTMLEncode(strip_tags($content)));
-if (preg_match("/\\.(?:gif|jpeg|jpg|jpe|png)$/", $content)) {
+if (preg_match("/\\.(?:gif|jpeg|jpg|jpe|png)$/i", $content)) {
 if (preg_match("/^[a-zA-Z0-9_][^:]+$/", $content)) {
 if (!preg_match("/(?:\\/\\.\\.\\/)|(?:^\\.\\.\\/)|(?:^\\/)/", $content)) {
 $info = @getimagesize("{$bbcode->local_img_dir}/{$content}");
@@ -1193,8 +1196,8 @@ $/Dx", $string);
 function HTMLEncode($string) {
 if (!$this->allow_ampersand)
 return htmlspecialchars($string);
-else return str_replace(Array('<', '>', '"'),
-Array('&lt;', '&gt;', '&quot;'), $string);
+else return str_replace(Array('<', '>'), //, '"'),
+Array('&lt;', '&gt;'), $string); //, '&quot;'), $string);
 }
 function FixupOutput($string) {
 if (!$this->detect_urls) {

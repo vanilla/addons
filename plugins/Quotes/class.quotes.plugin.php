@@ -11,10 +11,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
-   'Description' => "This plugin allows users to quote each other's posts easily.",
-   'Version' => '1.2.1',
+   'Description' => "This plugin allows users to quote each other easily.",
+   'Version' => '1.2.2',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => FALSE,
+   'RequiredApplications' => array('Vanilla' => '2.0.10'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
@@ -29,7 +29,12 @@ class QuotesPlugin extends Gdn_Plugin {
    public function __construct() {
       parent::__construct();
       
-      $this->ValidateUsernameRegex = C('Garden.User.ValidationRegex',"[\d\w_]{3,20}");
+      if (function_exists('ValidateUsernameRegex'))
+         $this->ValidateUsernameRegex = ValidateUsernameRegex();
+      else
+         $this->ValidateUsernameRegex = "[\d\w_]{3,20}";
+      
+      // Whether to handle drawing quotes or leave it up to some other plugin
       $this->RenderQuotes = C('Plugins.Quotes.RenderQuotes',TRUE);
    }
 
@@ -63,6 +68,7 @@ class QuotesPlugin extends Gdn_Plugin {
    }
    
    protected function PrepareController($Sender) {
+      //if (!$this->RenderQuotes) return;
       $Sender->AddJsFile($this->GetResource('js/quotes.js', FALSE, FALSE));
       $Sender->AddCssFile($this->GetResource('css/quotes.css', FALSE, FALSE));
    }
@@ -98,7 +104,7 @@ QUOTE;
    protected function RenderQuotes($Sender) {
       if (!$this->RenderQuotes) return;
       
-      static $ValidateUsernameRegexChars = NULL;
+      static $ValidateUsernameRegex = NULL;
       
       if (is_null($ValidateUsernameRegex))
          $ValidateUsernameRegex = sprintf("[%s]+", 
@@ -218,7 +224,7 @@ BLOCKQUOTE;
    }
    
    public function Setup() {
-      SaveToConfig('Garden.Html.SafeStyles',FALSE);
+      SaveToConfig('Garden.Html.SafeStyles', FALSE);
    }
    
    public function OnDisable() {

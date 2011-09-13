@@ -1,8 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
+ * This file contains the client code for Vanilla jsConnect single sign on.
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @version 1.0b
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
+
+define('JS_TIMEOUT', 24 * 60);
 
 function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
    $User = array_change_key_case($User);
@@ -25,7 +30,7 @@ function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
          $Error = array('error' => 'invalid_request', 'message' => 'The timestamp parameter is missing or invalid.');
       elseif (!isset($Request['signature']))
          $Error = array('error' => 'invalid_request', 'message' => 'Missing  signature parameter.');
-      elseif (($Diff = abs($Request['timestamp'] - JsTimestamp())) > 30 * 60)
+      elseif (($Diff = abs($Request['timestamp'] - JsTimestamp())) > JS_TIMEOUT)
          $Error = array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.');
       else {
          // Make sure the timestamp hasn't timed out.
@@ -38,7 +43,11 @@ function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
    if (isset($Error))
       $Result = $Error;
    elseif (is_array($User) && count($User) > 0) {
-      $Result = SignJsConnect($User, $ClientID, $Secret, TRUE);
+      if ($Secure === NULL) {
+         $Result = $User;
+      } else {
+         $Result = SignJsConnect($User, $ClientID, $Secret, TRUE);
+      }
    } else
       $Result = array('name' => '', 'photourl' => '');
    
@@ -74,5 +83,5 @@ function SignJsConnect($Data, $ClientID, $Secret, $ReturnData = FALSE) {
 }
 
 function JsTimestamp() {
-   return time() + date("Z");
+   return time();
 }

@@ -89,6 +89,7 @@ class WhispersPlugin extends Gdn_Plugin {
          SetValue('DiscussionID', $Whisper, $DiscussionID);
          SetValue('CommentID', $Whisper, 'w'.GetValue('MessageID', $Whisper));
          SetValue('Type', $Whisper, 'Whisper');
+         SetValue('Url', $Whisper, '');
 
          $Participants = GetValueR(GetValue('ConversationID', $Whisper).'.Participants', $Conversations);
          SetValue('Participants', $Whisper, $Participants);
@@ -157,7 +158,7 @@ class WhispersPlugin extends Gdn_Plugin {
     * @param args $Args
     */
    public function DiscussionController_AfterBodyField_Handler($Sender, $Args) {
-      $Sender->AddJsFile('whispers.js', 'plugins/Whispers'); //, array('hint' => 'inline'));
+      $Sender->AddJsFile('whispers.js', 'plugins/Whispers', array('hint' => 'inline'));
       $Sender->AddJsFile('jquery.autogrow.js');
       $Sender->AddJsFile('jquery.autocomplete.js');
 
@@ -305,7 +306,7 @@ class WhispersPlugin extends Gdn_Plugin {
     */
    public function PostController_Comment_Create($Sender, $Args) {
       if ($Sender->Form->IsPostBack()) {
-         $Sender->Form->InputPrefix = 'Comment';
+         $Sender->Form->SetModel($Sender->CommentModel);
 
          $Whisper = $Sender->Form->GetFormValue('Whisper');
          $WhisperTo = trim($Sender->Form->GetFormValue('To'));
@@ -335,8 +336,6 @@ class WhispersPlugin extends Gdn_Plugin {
             $Sender->Form->SetModel($ConversationModel);
             $ConversationModel->Validation->ApplyRule('DiscussionID', 'Required');
          }
-         
-         $Sender->Form->InputPrefix = 'Comment';
 
          $ID = $Sender->Form->Save($ConversationMessageModel);
 

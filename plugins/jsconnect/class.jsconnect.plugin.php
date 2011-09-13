@@ -8,8 +8,8 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'An SSO plugin that uses json(p) to connect to vanilla, allowing for cross-domain sso.',
-   'Version' => '1.0b',
-   'RequiredApplications' => array('Vanilla' => '2.0.17'),
+   'Version' => '1.0.3b',
+   'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
@@ -56,7 +56,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       if ($RegisterUrl)
          $RegisterLink = ' '.Anchor(sprintf(T('Register with %s', 'Register'), $Provider['Name']), $RegisterUrl, 'Button RegisterLink');
       else
-         $RegusterLink = '';
+         $RegisterLink = '';
 
       $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">
          <div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button SignInLink').$RegisterLink.'</div>
@@ -66,7 +66,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       return $Result;
    }
    
-   public static function ConnectUrl($Provider, $Secure = FALSE) {
+   public static function ConnectUrl($Provider, $Secure = FALSE, $Callback = TRUE) {
       if (!is_array($Provider))
          $Provider = self::GetProvider($Provider);
       
@@ -89,7 +89,9 @@ class JsConnectPlugin extends Gdn_Plugin {
       if (StringBeginsWith($Query['Target'], '/entry/signin'))
          $Query['Target'] = '/';
       
-      $Result = $Url.'?'.http_build_query($Query).'&callback=?';
+      $Result = $Url.'?'.http_build_query($Query);
+      if ($Callback)
+         $Result .= '&callback=?';
       return $Result;
    }
 
@@ -144,23 +146,25 @@ class JsConnectPlugin extends Gdn_Plugin {
       parse_str($Form->GetFormValue('JsConnect'), $JsData);
 
       // Make sure the data is valid.
-      $client_id = GetValue('client_id', $JsData, GetValue('clientid', $JsData, FALSE, TRUE), TRUE);
+      $client_id = GetValue('client_id', $JsData, GetValue('clientid', $JsData, $Sender->Request->Get('client_id'), TRUE), TRUE);
       $Signature = GetValue('signature', $JsData, FALSE, TRUE);
       $String = GetValue('string', $JsData, FALSE, TRUE); // debugging
 
       if (!$client_id)
          throw new Gdn_UserException(sprintf(T('ValidateRequired'), 'client_id'), 400);
-      if (!$Signature)
-         throw new Gdn_UserException(sprintf(T('ValidateRequired'), 'signature'), 400);
-
       $Provider = self::GetProvider($client_id);
       if (!$Provider)
          throw new Gdn_UserException(sprintf(T('Unknown client: %s.'), $client_id), 400);
+      
+      if (!GetValue('TestMode', $Provider)) {
+         if (!$Signature)
+            throw new Gdn_UserException(sprintf(T('ValidateRequired'), 'signature'), 400);      
 
-      // Validate the signature.
-      $CalculatedSignature = SignJsConnect($JsData, $client_id, GetValue('AssociationSecret', $Provider));
-      if ($CalculatedSignature != $Signature)
-         throw new Gdn_UserException(T("Signature invalid."), 400);
+         // Validate the signature.
+         $CalculatedSignature = SignJsConnect($JsData, $client_id, GetValue('AssociationSecret', $Provider));
+         if ($CalculatedSignature != $Signature)
+            throw new Gdn_UserException(T("Signature invalid."), 400);
+      }
 
       $Form->AddHidden('JsConnect', $JsData);
       $Form->SetFormValue('UniqueID', GetValue('uniqueid', $JsData));
@@ -179,36 +183,47 @@ class JsConnectPlugin extends Gdn_Plugin {
    }
    
    public function Base_Render_Before($Sender, $Args) {
-      $Sender->AddJSFile('jsconnect.js', 'plugins/jsconnect');
-      $Sender->AddCssFile('jsconnect.css', 'plugins/jsconnect');
+      if (!Gdn::Session()->UserID) {
+         $Sender->AddJSFile('jsconnect.js', 'plugins/jsconnect');
+         $Sender->AddCssFile('jsconnect.css', 'plugins/jsconnect');
+      }
    }
 
    /**
     *
-    * @param Gdn_Controller $Sender
+    * @param EntryController $Sender
     * @param array $Args
     */
    public function EntryController_JsConnect_Create($Sender, $Args) {
-      if (GetValue(0, $Args)) {
-         parse_str($Sender->Form->GetFormValue('JsConnect'), $JsData);
+      if ($Arg = GetValue(0, $Args)) {
+         if ($Arg == 'guest') {
+//            Redirect('/');
+            $Sender->AddDefinition('CheckPopup', TRUE);
+            $Sender->RedirectUrl = '/';
+            $Sender->Render('JsConnect', '', 'plugins/jsconnect');
+         } else {
+            parse_str($Sender->Form->GetFormValue('JsConnect'), $JsData);
 
-         $Error = GetValue('error', $JsData);
-         $Message = GetValue('message', $JsData);
+            $Error = GetValue('error', $JsData);
+            $Message = GetValue('message', $JsData);
 
-         $Sender->Form->AddError($Message ? htmlspecialchars($Message) : htmlspecialchars($Error));
-         $Sender->SetData('Title', T('Error'));
-         $Sender->Render('JsConnect_Error', '', 'plugins/jsconnect');
+            $Sender->Form->AddError($Message ? htmlspecialchars($Message) : htmlspecialchars($Error));
+            $Sender->SetData('Title', T('Error'));
+            $Sender->Render('JsConnect_Error', '', 'plugins/jsconnect');
+         }
       } else {
          $client_id = $Sender->SetData('client_id', $Sender->Request->Get('client_id', 0));
          $Provider = self::GetProvider($client_id);
 
          if (empty($Provider))
             throw NotFoundException('Provider');
+         
+         $Get = ArrayTranslate($Sender->Request->Get(), array('client_id', 'display'));
 
          $Sender->AddDefinition('JsAuthenticateUrl', self::ConnectUrl($Provider, TRUE));
          $Sender->AddJsFile('jsconnect.js', 'plugins/jsconnect');
          $Sender->SetData('Title', T('Connecting...'));
-         $Sender->Form->Action = Url('/entry/connect/jsconnect?display=popup');
+         $Sender->Form->Action = Url('/entry/connect/jsconnect?'.  http_build_query($Get));
          $Sender->Form->AddHidden('JsConnect', '');
          $Sender->Form->AddHidden('Target', $Sender->Request->Get('Target', '/'));
 
@@ -261,9 +276,16 @@ class JsConnectPlugin extends Gdn_Plugin {
       
       $client_id = GetValue('AuthenticationKey', $Provider);
       $Secret = GetValue('AssociationSecret', $Provider);
-      if (Gdn::Session()->IsValid())
+      if (Gdn::Session()->IsValid()) {
          $User = ArrayTranslate((array)Gdn::Session()->User, array('UserID' => 'UniqueID', 'Name', 'Email', 'PhotoUrl', 'DateOfBirth', 'Gender'));
-      else
+//         $Sfx = 'F';
+//         $User['UniqueID'] .= $Sfx;
+//         $User['Name'] .= $Sfx;
+//         $User['Email'] = str_replace('@', '+'.$Sfx.'@', $User['Email']);
+         if (!$User['PhotoUrl'] && function_exists('UserPhotoDefaultUrl')) {
+            $User['PhotoUrl'] = Url(UserPhotoDefaultUrl(Gdn::Session()->User), TRUE);
+         }
+      } else
          $User = array();
       
       ob_clean();
@@ -301,7 +323,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       $Sender->Form = $Form;
 
       if ($Form->AuthenticatedPostBack()) {
-         if ($Form->GetFormValue('Generate')) {
+         if ($Form->GetFormValue('Generate') || $Sender->Request->Post('Generate')) {
             $Form->SetFormValue('AuthenticationKey', mt_rand());
             $Form->SetFormValue('AssociationSecret', md5(mt_rand()));
 
@@ -317,13 +339,17 @@ class JsConnectPlugin extends Gdn_Plugin {
             $Values = ArrayTranslate($Values, array('Name', 'AuthenticationKey', 'URL', 'AssociationSecret', 'AuthenticateUrl', 'SignInUrl', 'RegisterUrl'));
             $Values['AuthenticationSchemeAlias'] = 'jsconnect';
             $Values['AssociationHashMethod'] = 'md5';
+            $Values['Attributes'] = serialize(array('TestMode' => $Form->GetFormValue('TestMode')));
 
-            if ($client_id) {
-               Gdn::SQL()->Put('UserAuthenticationProvider', $Values, array('AuthenticationKey' => $client_id));
-            } else {
-               Gdn::SQL()->Options('Ignore', TRUE)->Insert('UserAuthenticationProvider', $Values);
+            if ($Form->ErrorCount() == 0) {
+               if ($client_id) {
+                  Gdn::SQL()->Put('UserAuthenticationProvider', $Values, array('AuthenticationKey' => $client_id));
+               } else {
+                  Gdn::SQL()->Options('Ignore', TRUE)->Insert('UserAuthenticationProvider', $Values);
+               }
+               
+               $Sender->RedirectUrl = Url('/settings/jsconnect');
             }
-            $Sender->RedirectUrl = Url('/settings/jsconnect');
          }
       } else {
          if ($client_id) {

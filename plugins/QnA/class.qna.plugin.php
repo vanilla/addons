@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0.3b',
+   'Version' => '1.0.4b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -65,7 +65,7 @@ class QnAPlugin extends Gdn_Plugin {
       $Discussion = GetValue('Discussion', $Args);
       $Comment = GetValue('Comment', $Args);
 
-      if (!$Discussion || !$Comment || !GetValue('Type', $Discussion) == 'question')
+      if (!$Discussion || !$Comment || strtolower(GetValue('Type', $Discussion)) != 'question')
          return;
 
       // Check permissions.
@@ -113,6 +113,8 @@ class QnAPlugin extends Gdn_Plugin {
       $Discussion = (array)$Args['Discussion'];
 
       if ($Comment['InsertUserID'] == $Discussion['InsertUserID'])
+         return;
+      if (strtolower($Discussion['Type']) != 'question')
          return;
 
       $ActivityID = $ActivityModel->Add(
@@ -191,7 +193,9 @@ class QnAPlugin extends Gdn_Plugin {
    }
 
    public function DiscussionModel_BeforeGet_Handler($Sender, $Args) {
-      if (StringEndsWith(Gdn::Request()->Path(), '/unanswered', TRUE)) {
+      $Unanswered = Gdn::Controller()->ClassName == 'DiscussionsController' && Gdn::Controller()->RequestMethod == 'unanswered';
+
+      if ($Unanswered) {
          $Args['Wheres']['Type'] = 'Question';
          $Sender->SQL->WhereIn('d.QnA', array('Unanswered', 'Rejected'));
       } elseif ($QnA = Gdn::Request()->Get('qna')) {
@@ -205,7 +209,7 @@ class QnAPlugin extends Gdn_Plugin {
     * @param array $Args
     */
    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
-      $Sender->Validation->ApplyRule('Type', 'Required', T('Choose either whether you want to ask a question or start a discussion.'));
+//      $Sender->Validation->ApplyRule('Type', 'Required', T('Choose whether you want to ask a question or start a discussion.'));
 
       $Post =& $Args['FormPostValues'];
       if ($Args['Insert'] && GetValue('Type', $Post) == 'Question') {
@@ -228,7 +232,19 @@ class QnAPlugin extends Gdn_Plugin {
     */
    public function DiscussionsController_Unanswered_Create($Sender, $Args) {
       $Sender->View = 'Index';
-      $Sender->Index(GetValue(0, $Args, ''));
+      $Sender->SetData('_PagerUrl', 'discussions/unanswered/{Page}');
+      $Sender->Index(GetValue(0, $Args, 'p1'));
+   }
+   
+   /**
+    *
+    * @param DiscussionsController $Sender
+    * @param type $Args 
+    */
+   public function DiscussionsController_Render_Before($Sender, $Args) {
+      if (strcasecmp($Sender->RequestMethod, 'unanswered') == 0) {
+         $Sender->SetData('CountDiscussions', FALSE);
+      }
    }
 
     /**
@@ -290,7 +306,7 @@ class QnAPlugin extends Gdn_Plugin {
       // Check to see if the user has answered questions.
       $Count = Gdn::SQL()->GetCount('Discussion', array('Type' => 'Question', 'InsertUserID' => Gdn::Session()->UserID, 'QnA' => 'Answered'));
       if ($Count > 0) {
-         $Sender->InformMessage(FormatString(T('You have answered questions', 'You have answered <a href="{/discussions/mine?qna=Answered,url}">questions</a>. Make sure you accept/reject the answers.')), '');
+         $Sender->InformMessage(FormatString(T("You've asked questions that have now been answered", "<a href=\"{/discussions/mine?qna=Answered,url}\">You've asked questions that now have answers</a>. Make sure you accept/reject the answers.")), '');
       }
    }
 
