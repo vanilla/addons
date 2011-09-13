@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions, comments and conversations.',
-   'Version' => '1.4.3',
+   'Version' => '1.5',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -23,27 +23,32 @@ $PluginInfo['FileUpload'] = array(
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
+/**
+1.5 Changes: Add hooks for API uploading. Add docs. Fix constructor to call parent.
+*/
 
 //Gdn_LibraryMap::SafeCache('library','class.mediamodel.php',dirname(__FILE__).DS.'models/class.mediamodel.php');
 
 include dirname(__FILE__).'/class.mediamodel.php';
 
 class FileUploadPlugin extends Gdn_Plugin {
-   /// PROPERTIES ///
+   /** @var array */
    protected $MediaCache;
 
-
-   /// METHODS ///
-
+   /**
+    * Permission checks & property prep.
+    */
    public function __construct() {
+      parent::__construct();
       $this->MediaCache = array();
-      
       $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
    }
 
    /**
-    * @return MediaModel
+    * Get instance of MediaModel.
+    *
+    * @return object MediaModel
     */
    public function MediaModel() {
       static $MediaModel = NULL;
@@ -53,8 +58,6 @@ class FileUploadPlugin extends Gdn_Plugin {
       }
       return $MediaModel;
    }
-
-   /// EVENT HANDLERS ///
 
    /**
     * Adds "Media" menu option to the Forum menu on the dashboard.
@@ -437,13 +440,18 @@ class FileUploadPlugin extends Gdn_Plugin {
          $this->TrashFile($DeleteID);
       }
    }
-
+   
+   /**
+    * Create and display a thumbnail of an uploaded file.
+    */
    public function UtilityController_Thumbnail_Create($Sender, $Args) {
       $SubPath = implode('/', $Args);
-      $Path = MediaModel::PathUploads()."/$SubPath";
+
+      // Get actual path to the file
+      $Path = Gdn_Upload::CopyLocal($SubPath);
       if (!file_exists($Path))
          throw NotFoundException('File');
-
+      
       // Figure out the dimensions of the upload.
       $ImageSize = getimagesize($Path);
       $SHeight = $ImageSize[1];
@@ -477,6 +485,10 @@ class FileUploadPlugin extends Gdn_Plugin {
          mkdir(dirname($TargetPath), 0777, TRUE);
       }
       Gdn_UploadImage::SaveImageAs($Path, $TargetPath, $Height, $Width, $Options);
+      
+      // Cleanup if we're using a scratch copy
+      if ($Path != MediaModel::PathUploads().'/'.$SubPath)
+         @unlink($Path);
 
       $Url = MediaModel::Url("/thumbnails/$SubPath");
       Redirect($Url, 302);
@@ -584,13 +596,10 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    /**
-    * PostController_Upload_Create function.
-    * 
-    * Controller method that allows plugin to handle ajax file uploads
+    * Allows plugin to handle ajax file uploads.
     *
     * @access public
-    * @param mixed &$Sender
-    * @return void
+    * @param object $Sender
     */
    public function PostController_Upload_Create($Sender) {
       if (!$this->IsEnabled()) return;
@@ -661,37 +670,51 @@ class FileUploadPlugin extends Gdn_Plugin {
             throw new FileUploadPluginUploadErrorException($ErrorString, $FileErr, $FileName, $FileKey);
          }
          
+         // Analyze file extension
          $FileNameParts = pathinfo($FileName);
          $Extension = strtolower($FileNameParts['extension']);
          $AllowedExtensions = C('Garden.Upload.AllowedFileExtensions', array("*"));
          if (!in_array($Extension, $AllowedExtensions) && !in_array('*',$AllowedExtensions))
             throw new FileUploadPluginUploadErrorException("Uploaded file type is not allowed.", 11, $FileName, $FileKey);
-
+         
+         // Check upload size
          $MaxUploadSize = Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize', '1G'));
          if ($FileSize > $MaxUploadSize) {
             $Message = sprintf(T('The uploaded file was too big (max %s).'), Gdn_Upload::FormatFileSize($MaxUploadSize));
             throw new FileUploadPluginUploadErrorException($Message, 11, $FileName, $FileKey);
          }
-
-
-
+         
+         // Build filename
          $SaveFilename = md5(microtime()).'.'.strtolower($Extension);
          $SaveFilename = '/FileUpload/'.substr($SaveFilename, 0, 2).'/'.substr($SaveFilename, 2);
-         $SavePath = MediaModel::PathUploads().$SaveFilename;
-         if (!is_dir(dirname($SavePath)))
-            @mkdir(dirname($SavePath), 0777, TRUE);
-
-         if (!is_dir(dirname($SavePath)))
-            throw new FileUploadPluginUploadErrorException("Internal error, could not save the file.", 9, $FileName);
          
-         $MoveSuccess = @move_uploaded_file($FileTemp, $SavePath);
+         // Fire event for hooking save location
+         $this->EventArguments['Path'] = $FileTemp;
+         $Parsed = Gdn_Upload::Parse($SaveFilename);
+         $this->EventArguments['Parsed'] =& $Parsed;
+         $Handled = FALSE;
+         $this->EventArguments['Handled'] =& $Handled;
+         $this->FireEvent('UploadSaveAs');
+         $SavePath = $Parsed['Name'];
+                  
+         if (!$Handled) {
+            // Build save location
+            $SavePath = MediaModel::PathUploads().$SaveFilename;
+            if (!is_dir(dirname($SavePath)))
+               @mkdir(dirname($SavePath), 0777, TRUE);
+            if (!is_dir(dirname($SavePath)))
+               throw new FileUploadPluginUploadErrorException("Internal error, could not save the file.", 9, $FileName);
+            
+            // Move to permanent location
+            $MoveSuccess = @move_uploaded_file($FileTemp, $SavePath);
+            if (!$MoveSuccess)
+               throw new FileUploadPluginUploadErrorException("Internal error, could not move the file.", 9, $FileName);            
+         }
          
-         if (!$MoveSuccess)
-            throw new FileUploadPluginUploadErrorException("Internal error, could not move the file.", 9, $FileName);
-
          // Get the image dimensions (if this is an image).
          list($ImageWidth, $ImageHeight) = MediaModel::GetImageSize($SavePath);
-
+                  
+         // Save Media data
          $Media = array(
             'Name'            => $FileName,
             'Type'            => $FileType,
@@ -704,7 +727,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             'Path'            => $SaveFilename
          );
          $MediaID = $this->MediaModel()->Save($Media);
-         
+                  
          $FinalImageLocation = '';
          $PreviewImageLocation = MediaModel::ThumbnailUrl($Media);
 //         $PreviewImageLocation = Asset('plugins/FileUpload/images/file.png');
@@ -727,7 +750,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             'FormatFilesize'     => Gdn_Format::Bytes($FileSize,1),
             'ProgressKey'        => $Sender->ApcKey ? $Sender->ApcKey : '',
             'PreviewImageLocation' => Url($PreviewImageLocation),
-            'FinalImageLocation' => Url(MediaModel::Url($SaveFilename))
+            'FinalImageLocation' => Url(MediaModel::Url($Parsed['Name']))
          );
 
       } catch (FileUploadPluginUploadErrorException $e) {
@@ -750,16 +773,13 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    /**
-    * PostController_Checkupload_Create function.
-    *
     * Controller method that allows an AJAX call to check the progress of a file
     * upload that is currently in progress.
     * 
     * @access public
-    * @param mixed &$Sender
-    * @return void
+    * @param object $Sender
     */
-   public function PostController_Checkupload_Create($Sender) {
+   public function PostController_CheckUpload_Create($Sender) {
       list($ApcKey) = $Sender->RequestArgs;
       
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
@@ -778,9 +798,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       );
       
       if ($ApcAvailable) {
-         
          $UploadStatus = apc_fetch('upload_'.$ApcKey, $Success);
-         
+
          if (!$Success)
             $UploadStatus = array(
                'current'   => 0,
@@ -789,11 +808,8 @@ class FileUploadPlugin extends Gdn_Plugin {
             
          $Progress['progress'] = ($UploadStatus['current'] / $UploadStatus['total']) * 100;
          $Progress['total'] = $UploadStatus['total'];
-            
-         
          $Progress['format_total'] = Gdn_Format::Bytes($Progress['total'],1);
          $Progress['cache'] = $UploadStatus;
-         
       }
          
       $Sender->SetJSON('Progress', $Progress);
@@ -809,18 +825,22 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    /**
-    * TrashFile function.
+    * Delete an uploaded file & its media record.
     * 
     * @access protected
-    * @param mixed $FileID
-    * @return void
+    * @param int $MediaID Unique ID on Media table.
     */
-   protected function TrashFile($FileID) {
-      $Media = $this->MediaModel()->GetID($FileID);
+   protected function TrashFile($MediaID) {
+      $Media = $this->MediaModel()->GetID($MediaID);
       
       if ($Media) {
          $this->MediaModel()->Delete($Media);
          $Deleted = FALSE;
+         
+         // Allow interception
+         $this->EventArguments['Parsed'] = Gdn_Upload::Parse($Media->Path);
+         $this->EventArguments['Handled'] =& $Deleted; // Allow skipping steps below
+         $this->FireEvent('TrashFile');
          
          if (!$Deleted) {
             $DirectPath = MediaModel::PathUploads().DS.$Media->Path;

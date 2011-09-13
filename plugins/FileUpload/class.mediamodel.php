@@ -26,8 +26,24 @@ class MediaModel extends VanillaModel {
 		
 		return $Data;
    }
-
+   
+   /**
+    * If passed path leads to an image, return size
+    *
+    * @param string $Path Path to file.
+    * @return array [0] => Height, [1] => Width.
+    */
    public static function GetImageSize($Path) {
+      // Static FireEvent for intercepting non-local files.
+      $Sender = new stdClass();
+      $Sender->Returns = array();
+      $Sender->EventArguments = array();
+      $Sender->EventArguments['Path'] =& $Path;
+      $Sender->EventArguments['Parsed'] = Gdn_Upload::Parse($Path);
+      Gdn::PluginManager()->CallEventHandlers($Sender, 'FileUploadPlugin', 'CopyLocal');
+      
+      //die($Path);
+   
       if (!in_array(strtolower(pathinfo($Path, PATHINFO_EXTENSION)), array('bmp', 'gif', 'jpg', 'jpeg', 'png')))
          return array(0, 0);
 
@@ -119,7 +135,12 @@ class MediaModel extends VanillaModel {
          $this->Delete(GetValue('MediaID',$Media));
       }
    }
-
+   
+   /**
+    * Return path to upload folder.
+    *
+    * @return string Path to upload folder.
+    */
    public static function PathUploads() {
       if (defined('PATH_LOCAL_UPLOADS'))
          return PATH_LOCAL_UPLOADS;
