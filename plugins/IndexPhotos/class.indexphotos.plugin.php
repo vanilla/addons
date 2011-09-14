@@ -23,15 +23,8 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     * Display user photo before each discussion row.
     */
    public function DiscussionsController_BeforeDiscussionContent_Handler($Sender) {
-      // Build fake user object
-      $Discussion = $Sender->EventArguments['Discussion'];
-      $FirstUser = new stdClass();
-      $FirstUser->Email = $Discussion->FirstEmail;
-      $FirstUser->Name = $Discussion->FirstName;
-      $FirstUser->Photo = $Discussion->FirstPhoto;
-      $FirstUser->UserID = $Discussion->FirstUserID;
-
-      // Get photo (let Gravatar hook in)
+      // Build user object & output photo
+      $FirstUser = UserBuilder($Sender->EventArguments['Discussion'], 'First');
       echo UserPhoto($FirstUser);
    }
 }
