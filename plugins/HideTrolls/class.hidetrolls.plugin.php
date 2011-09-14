@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
+// TODO: Verify that activity feed works properly with/without troll content. Added new event to core to get it working.
+
 $PluginInfo['HideTrolls'] = array(
    'Name' => 'Hide Trolls',
    'Description' => "Allows you to mark users as trolls, making it so that only they can see their comments & discussions. They essentially become invisible to other users and eventually just leave because no-one responds to them.",
