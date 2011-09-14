@@ -8,6 +8,7 @@
  *  - Troll Annoyances (slow page loading times, random over capacity errors, form submission failures, etc).
  *  - Trolls' posts don't bump the thread.
  *  - Admin page that shows all trolls and their punishments
+ *  - Sink troll comments by default
  *  - Custom per-troll punishments
  *  - Speed optimizations (add troll state to user attributes, and return from troll specific functions quickly when possible).
  */
@@ -151,5 +152,29 @@ class TrollManagementPlugin extends Gdn_Plugin {
 		$Object = $Sender->EventArguments[$EventArgumentName];
 		if (GetValue('IsTroll', $Object))
 			echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: 0 0 8px; background: rgba(0, 0, 0, 0.6); color: #fff; font-size: 11px;"><strong style="font-weight: bold;">Troll</strong><br />This user has been marked as a troll.<br />This content is only visible to you and the troll.<br/ >This message does not appear for the troll.</div>';
+	}
+	
+	/**
+	 * Do not let troll comments bump discussions.
+	 */
+	public function CommentModel_BeforeUpdateCommentCount_Handler($Sender) {
+		$Trolls = C('Plugins.TrollManagement.Cache');
+		if (!is_array($Trolls))
+			return;
+		
+		if (in_array(Gdn::Session()->UserID, $Trolls))
+			$Sender->EventArguments['Discussion']['Sink'] = TRUE;
+	}
+	
+	/**
+	 * Auto-sink troll discussions.
+	 */
+	public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender) {
+		$Trolls = C('Plugins.TrollManagement.Cache');
+		if (!is_array($Trolls))
+			return;
+		
+		if (in_array(Gdn::Session()->UserID, $Trolls)) {
+			$Sender->EventArguments['FormPostValues']['Sink'] = 1;
 	}
 }
