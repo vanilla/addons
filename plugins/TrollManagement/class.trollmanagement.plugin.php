@@ -1,9 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
 
-// TODO: Verify that activity feed works properly with/without troll content. Added new event to core to get it working.
+/**
+ * TODO:
+ * Verify that activity feed works properly with/without troll content. Added new event to core to get it working.
+ * Add additional troll management options:
+ *  - Disemvoweler
+ *  - Troll Annoyances (slow page loading times, random over capacity errors, form submission failures, etc).
+ */
 
-$PluginInfo['HideTrolls'] = array(
-   'Name' => 'Hide Trolls',
+$PluginInfo['TrollManagement'] = array(
+   'Name' => 'Troll Management',
    'Description' => "Allows you to mark users as trolls, making it so that only they can see their comments & discussions. They essentially become invisible to other users and eventually just leave because no-one responds to them.",
    'Version' => '1',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
@@ -12,7 +18,7 @@ $PluginInfo['HideTrolls'] = array(
    'AuthorUrl' => 'http://vanillaforums.com'
 );
 
-class HideTrollsPlugin extends Gdn_Plugin {
+class TrollManagementPlugin extends Gdn_Plugin {
    
 	/**
 	 * Validates the current user's permissions & transientkey and then marks a user as a troll.
@@ -26,10 +32,13 @@ class HideTrollsPlugin extends Gdn_Plugin {
 			if (!is_array($Trolls))
 				$Trolls = array();
 			
+			// Toggle
 			if (!in_array($TrollUserID, $Trolls)) {
 				$Trolls[] = $TrollUserID;
-				SaveToConfig('Plugins.HideTrolls.Users', $Trolls);
+			} else {
+				unset($Trolls[array_search($TrollUserID, $Trolls)]);
 			}
+			SaveToConfig('Plugins.TrollManagement.Cache', $Trolls);
 		}
 		Redirect('profile/'.$TrollUserID.'/troll');
 	}
@@ -41,7 +50,7 @@ class HideTrollsPlugin extends Gdn_Plugin {
 		if (!Gdn::Session()->CheckPermission('Garden.Users.Edit'))
 			return;
 		
-		$Trolls = C('Plugins.HideTrolls.Users');
+		$Trolls = C('Plugins.TrollManagement.Cache');
 		if (!is_array($Trolls))
 			$Trolls = array();
 			
@@ -77,7 +86,7 @@ class HideTrollsPlugin extends Gdn_Plugin {
 	 */
 	private function _CleanDataSet($Sender, $DataEventArgument) {
 		// Don't do anything if there are no trolls
-		$Trolls = C('Plugins.HideTrolls.Users');
+		$Trolls = C('Plugins.TrollManagement.Cache');
 		if (!is_array($Trolls))
 			return;
 		
@@ -123,7 +132,7 @@ class HideTrollsPlugin extends Gdn_Plugin {
 	
 	private function _ShowAdmin($Sender, $EventArgumentName) {
 		// Don't do anything if there are no trolls
-		$Trolls = C('Plugins.HideTrolls.Users');
+		$Trolls = C('Plugins.TrollManagement.Cache');
 		if (!is_array($Trolls))
 			return;
 		
