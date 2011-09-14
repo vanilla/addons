@@ -6,6 +6,7 @@
  * Add additional troll management options:
  *  - Disemvoweler
  *  - Troll Annoyances (slow page loading times, random over capacity errors, form submission failures, etc).
+ *  - Trolls' posts don't bump the thread.
  *  - Admin page that shows all trolls and their punishments
  *  - Custom per-troll punishments
  *  - Speed optimizations (add troll state to user attributes, and return from troll specific functions quickly when possible).
