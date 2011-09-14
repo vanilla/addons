@@ -1,0 +1,9 @@
+ul.Discussions li img {
+   height: 45px;
+   width: 45px;
+   float: left;
+}
+
+.Discussion.ItemContent {
+   padding-left: 55px;
+}
