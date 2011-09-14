@@ -33,7 +33,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
       Gdn::Structure()
          ->Table('User')
          ->Column('Troll', 'int', '0')
-			->Column('Fingerprint', 'varchar(50)', '')
+			->Column('Fingerprint', 'varchar(50)', null)
          ->Set();
 	}	
    
