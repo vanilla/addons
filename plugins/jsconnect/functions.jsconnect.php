@@ -2,13 +2,26 @@
 /**
  * This file contains the client code for Vanilla jsConnect single sign on.
  * @author Todd Burry <todd@vanillaforums.com>
- * @version 1.0b
+ * @version 1.1b
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
 define('JS_TIMEOUT', 24 * 60);
 
+/**
+ * Write the jsConnect string for single sign on.
+ * @param array $User An array containing information about the currently signed on user. If no user is signed in then this should be an empty array.
+ * @param array $Request An array of the $_GET request.
+ * @param string $ClientID The string client ID that you set up in the jsConnect settings page.
+ * @param string $Secret The string secred that you set up in the jsConnect settings page.
+ * @param string|bool $Secure Whether or not to check for security. This is one of these values.
+ *  - true: Check for security and sign the response with an md5 hash.
+ *  - false: Don't check for security, but sign the response with an md5 hash.
+ *  - string: Check for security and sign the response with the given hash algorithm. See hash_algos() for what your server can support.
+ *  - null: Don't check for security and don't sign the response.
+ * @since 1.1b Added the ability to provide a hash algorithm to $Secure.
+ */
 function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
    $User = array_change_key_case($User);
    
@@ -34,7 +47,7 @@ function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
          $Error = array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.');
       else {
          // Make sure the timestamp hasn't timed out.
-         $Signature = md5($Request['timestamp'].$Secret);
+         $Signature = JsHash($Request['timestamp'].$Secret, $Secure);
          if ($Signature != $Request['signature'])
             $Error = array('error' => 'access_denied', 'message' => 'Signature invalid.');
       }
@@ -46,7 +59,7 @@ function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
       if ($Secure === NULL) {
          $Result = $User;
       } else {
-         $Result = SignJsConnect($User, $ClientID, $Secret, TRUE);
+         $Result = SignJsConnect($User, $ClientID, $Secret, $Secure, TRUE);
       }
    } else
       $Result = array('name' => '', 'photourl' => '');
@@ -59,7 +72,7 @@ function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
       echo $Json;
 }
 
-function SignJsConnect($Data, $ClientID, $Secret, $ReturnData = FALSE) {
+function SignJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = FALSE) {
    $Data = array_change_key_case($Data);
    ksort($Data);
 
@@ -70,7 +83,7 @@ function SignJsConnect($Data, $ClientID, $Secret, $ReturnData = FALSE) {
    
    $String = http_build_query($Data);
 //   echo "$String\n";
-   $Signature = md5($String.$Secret);
+   $Signature = JsHash($String.$Secret, $HashType);
    
    if ($ReturnData) {
       $Data['client_id'] = $ClientID;
@@ -79,6 +92,27 @@ function SignJsConnect($Data, $ClientID, $Secret, $ReturnData = FALSE) {
       return $Data;
    } else {
       return $Signature;
+   }
+}
+
+/**
+ * Return the hash of a string.
+ * @param string $String The string to hash.
+ * @param string|bool $Secure The hash algorithm to use. TRUE means md5.
+ * @return string 
+ * @since 1.1b
+ */
+function JsHash($String, $Secure = TRUE) {
+   switch ($Secure) {
+      case 'sha1':
+         return sha1($String);
+         break;
+      case 'md5':
+      case TRUE:
+      case FALSE:
+         return md5($String);
+      default:
+         return hash($Secure, $String);
    }
 }
 

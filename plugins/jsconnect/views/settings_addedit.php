@@ -1,4 +1,13 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<div class="Help Aside">
+   <?php
+   echo '<h2>', T('Need More Help?'), '</h2>';
+   echo '<ul>';
+   echo '<li>', Anchor(T('jsConnect Documentation'), 'http://vanillaforums.org/docs/jsconnect'), '</li>';
+   echo '<li>', Anchor(T('jsConnect Client Libraries'), 'http://vanillaforums.org/docs/jsconnect#libraries'), '</li>';
+   echo '</ul>';
+   ?>
+</div>
 <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
 echo $this->Form->Open(), $this->Form->Errors();
@@ -17,11 +26,6 @@ echo $this->Form->Open(), $this->Form->Errors();
      '<div class="Info">'.T('The secret secures the sign in process.', 'The secret secures the sign in process. Do <b>NOT</b> give the secret out to anyone.').'</div>',
       $this->Form->TextBox('AssociationSecret');
      ?>
-   </li>
-   <li>
-     <?php
-      echo $this->Form->CheckBox('TestMode',    'This connection is in test-mode.');
-     ?> 
    </li>
    <li>
      <?php
@@ -50,6 +54,23 @@ echo $this->Form->Open(), $this->Form->Errors();
      '<div class="Info">'.T('The url that users go to to register for a new account.').'</div>',
       $this->Form->TextBox('RegisterUrl', array('class' => 'InputBox BigInput'));
      ?>
+   </li>
+   <li>
+      <h2>Advanced</h2>
+   </li>
+   <li>
+      <?php
+      $HashAlgos = hash_algos();
+      $HashAlgos = ArrayCombine($HashAlgos, $HashAlgos);
+      echo $this->Form->Label('Hash Algorithm', 'HashType'),
+      '<div class="Info">'.T("Choose md5 if you're not sure what to choose.", "You can select a custom hash algorithm to sign your requests. The hash algorithm must also be used in your client library. Choose md5 if you're not sure what to choose.").'</div>',
+      $this->Form->DropDown('HashType', $HashAlgos, array('Default' => 'md5'));
+      ?>
+   </li>
+   <li>
+     <?php
+      echo $this->Form->CheckBox('TestMode', 'This connection is in test-mode.');
+     ?> 
    </li>
 </ul>
 

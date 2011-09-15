@@ -8,7 +8,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'An SSO plugin that uses json(p) to connect to vanilla, allowing for cross-domain sso.',
-   'Version' => '1.0.3b',
+   'Version' => '1.1b',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -79,7 +79,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       if ($Secure) {
          include_once dirname(__FILE__).'/functions.jsconnect.php';
          $Query['timestamp'] = JsTimestamp();
-         $Query['signature'] = md5(($Query['timestamp']).$Provider['AssociationSecret']);
+         $Query['signature'] = JsHash(($Query['timestamp']).$Provider['AssociationSecret'], GetValue('HashType', $Provider));
       }
 
       if (($Target = Gdn::Request()->Get('Target')))
@@ -124,6 +124,50 @@ class JsConnectPlugin extends Gdn_Plugin {
    
    /// EVENT HANDLERS ///
    
+   /**
+    * If the authenticating server can share cookies, the jsConnect will try a server to server connection here.
+    * @param Gdn_Dispatcher $Sender
+    * @param array $Args 
+    */
+//   public function Base_BeforeDispatch_Handler($Sender, $Args) {
+//      if (Gdn::Session()->UserID > 0)
+//         return; // user signed in, don't check
+//      
+//      // Check to see if we've already checked recently so that we don't flood every request.
+//      $CookieName = C('Garden.Cookie.Name', 'Vanilla').'-ConnectFlood';
+//      
+//      if (GetValue($CookieName, $_COOKIE)) {
+//         return;
+//      }
+//      setcookie($CookieName, TRUE, time() + 60, '/'); // flood control 1 min
+//      
+//      // Make a request to the external server.
+//      $Providers = self::GetAllProviders();
+//      @session_write_close();
+//      foreach ($Providers as $Provider) {
+//         $Url = self::ConnectUrl($Provider, TRUE, FALSE);
+//         if (strpos($Url, 'jsConnectPHP') === FALSE)
+//            continue;
+//         
+//         echo htmlspecialchars($Url).'<br />';
+//         
+//         try {
+//            $Response = ProxyRequest($Url, 5, TRUE);
+//            echo($Response."<br />\n");
+//         } catch (Exception $Ex) {
+//            echo "Error: ";
+//            echo $Ex->getMessage()."<br />\n";
+//            continue;
+//         }
+//         $Data = @json_decode($Response, TRUE);
+//         
+//         if (is_array($Data)) {
+//            $Data['Url'] = $Url;
+//            print_r($Data);
+//         }
+//      }
+//   }
+   
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {	
       $Providers = self::GetProvider();
       foreach ($Providers as $Provider) {
@@ -161,7 +205,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             throw new Gdn_UserException(sprintf(T('ValidateRequired'), 'signature'), 400);      
 
          // Validate the signature.
-         $CalculatedSignature = SignJsConnect($JsData, $client_id, GetValue('AssociationSecret', $Provider));
+         $CalculatedSignature = SignJsConnect($JsData, $client_id, GetValue('AssociationSecret', $Provider), GetValue('HashType', $Provider, 'md5'));
          if ($CalculatedSignature != $Signature)
             throw new Gdn_UserException(T("Signature invalid."), 400);
       }
@@ -339,7 +383,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $Values = ArrayTranslate($Values, array('Name', 'AuthenticationKey', 'URL', 'AssociationSecret', 'AuthenticateUrl', 'SignInUrl', 'RegisterUrl'));
             $Values['AuthenticationSchemeAlias'] = 'jsconnect';
             $Values['AssociationHashMethod'] = 'md5';
-            $Values['Attributes'] = serialize(array('TestMode' => $Form->GetFormValue('TestMode')));
+            $Values['Attributes'] = serialize(array('HashType' => $Form->GetFormValue('HashType'), 'TestMode' => $Form->GetFormValue('TestMode')));
 
             if ($Form->ErrorCount() == 0) {
                if ($client_id) {
