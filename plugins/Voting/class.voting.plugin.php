@@ -410,7 +410,7 @@ class VotingPlugin extends Gdn_Plugin {
 //			return;
 
 		echo '<li'.($Sender->RequestMethod == 'popular' ? ' class="Active"' : '').'>'
-			.Anchor(T('Popular'), '/discussions/popular', 'PopularDiscussions')
+			.Anchor(T('Popular'), '/discussions/popular', 'PopularDiscussions TabLink')
 		.'</li>';
 	}
 
