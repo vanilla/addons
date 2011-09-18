@@ -222,8 +222,14 @@ class QnAPlugin extends Gdn_Plugin {
          $CssClass = ' class="Active"';
       else
          $CssClass = '';
+      
+      $Count = Gdn::Cache()->Get('QnA-UnansweredCount');
+      if ($Count === Gdn_Cache::CACHEOP_FAILURE)
+         $Count = '<span class="Popin Count" rel="/discussions/unansweredcount">';
+      else
+         $Count = '<span class="Count">'.$Count.'</span>';
 
-      echo '<li'.$CssClass.'><a class="QnA-UnansweredQuestions" href="'.Url('/discussions/unanswered').'">'.T('Unanswered Questions').'<span class="Popin" rel="/discussions/unansweredcount"></span></a></li>';
+      echo '<li'.$CssClass.'><a class="TabLink QnA-UnansweredQuestions" href="'.Url('/discussions/unanswered').'">'.T('Unanswered Questions', 'Unanswered').$Count.'</span></a></li>';
    }
 
    /**
@@ -254,10 +260,20 @@ class QnAPlugin extends Gdn_Plugin {
    public function DiscussionsController_UnansweredCount_Create($Sender, $Args) {
       Gdn::SQL()->WhereIn('QnA', array('Unanswered', 'Rejected'));
       $Count = Gdn::SQL()->GetCount('Discussion', array('Type' => 'Question'));
+      Gdn::Cache()->Store('QnA-UnansweredCount', $Count, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));
 
       $Sender->SetData('UnansweredCount', $Count);
       $Sender->SetData('_Value', $Count);
       $Sender->Render('Value', 'Utility', 'Dashboard');
+   }
+   
+   public function Base_BeforeDiscussionName_Handler($Sender, $Args) {
+      $Discussion = $Args['Discussion'];
+
+      if (strtolower(GetValue('Type', $Discussion)) != 'question')
+         return;
+      
+      $Args['CssClass'] .= ' Something here';
    }
 
    public function Base_BeforeDiscussionMeta_Handler($Sender, $Args) {

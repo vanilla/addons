@@ -12,8 +12,8 @@
 <div class="YesScript">
    <div class="Tabs">
       <ul>
-         <li class="<?php echo $Form->GetValue('Type') == 'Question' ? 'Active' : '' ?>"><a id="QnA_Question" class="QnAButton" rel="Question" href="#"><?php echo T('Ask a Question'); ?></a></li>
-         <li class="<?php echo $Form->GetValue('Type') == 'Discussion' ? 'Active' : '' ?>"><a id="QnA_Discussion" class="QnAButton" rel="Discussion" href="#"><?php echo T('Start a New Discussion'); ?></a></li>
+         <li class="<?php echo $Form->GetValue('Type') == 'Question' ? 'Active' : '' ?>"><a id="QnA_Question" class="QnAButton TabLink" rel="Question" href="#"><?php echo T('Ask a Question'); ?></a></li>
+         <li class="<?php echo $Form->GetValue('Type') == 'Discussion' ? 'Active' : '' ?>"><a id="QnA_Discussion" class="QnAButton TabLink" rel="Discussion" href="#"><?php echo T('Start a New Discussion'); ?></a></li>
       </ul>
    </div>
 </div>
