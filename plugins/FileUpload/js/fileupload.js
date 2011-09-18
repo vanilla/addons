@@ -508,8 +508,19 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
 					ImageAnchor.attr('href', JResponse.MediaResponse.FinalImageLocation);
 					ImageAnchor.show();
 					ImageAnchor.live('click', function() {
-						var txtbox = jQuery(FileListing.parents('form').find('textarea'));
-						txtbox.val(txtbox.val()+'<img src="'+ImageAnchor.attr('href')+'" />');
+					   var insertimg = '<img src="'+ImageAnchor.attr('href')+'" />';
+					   // Test if we're working with CLEditor
+					   var wysiwyg = jQuery(FileListing.parents('form').find('iframe'));
+						if (wysiwyg) {
+						   // Insert into WYSIWYG iframe
+						   var editorbox = wysiwyg.contents().find('body');
+						   editorbox.html(function(index, oldhtml) { return oldhtml+insertimg });
+						}
+						else {
+						   // Normal textarea (no WYSIWYG)
+						   var txtbox = jQuery(FileListing.parents('form').find('textarea'));
+						   txtbox.val(txtbox.val()+insertimg);
+						}
 						return false;
 					});
 				}
