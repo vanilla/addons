@@ -3,7 +3,7 @@
 $PluginInfo['IndexPhotos'] = array(
    'Name' => 'IndexPhotos',
    'Description' => "Adds user photos to discussions list.",
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18b4'),
    'RegisterPermissions' => FALSE,
    'Author' => "Matt Lincoln Russell",
@@ -18,11 +18,32 @@ class IndexPhotosPlugin extends Gdn_Plugin {
    public function DiscussionsController_Render_Before($Sender) {
       $Sender->AddCssFile($this->GetResource('design/indexphotos.css', FALSE, FALSE));
    }
+   
+   /**
+    * Extra style sheet.
+    */
+   public function CategoriesController_Render_Before($Sender) {
+      $Sender->AddCssFile($this->GetResource('design/indexphotos.css', FALSE, FALSE));
+   }
 
    /**
-    * Display user photo before each discussion row.
+    * Trigger on All Discussions.
     */
    public function DiscussionsController_BeforeDiscussionContent_Handler($Sender) {
+      $this->DisplayPhoto($Sender);
+   }
+   
+   /**
+    * Trigger on Categories.
+    */
+   public function CategoriesController_BeforeDiscussionContent_Handler($Sender) {
+      $this->DisplayPhoto($Sender);
+   }
+   
+   /**
+    * Display user photo for first user in each discussion.
+    */
+   protected function DisplayPhoto($Sender) {
       // Build user object & output photo
       $FirstUser = UserBuilder($Sender->EventArguments['Discussion'], 'First');
       echo UserPhoto($FirstUser);
