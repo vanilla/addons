@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions and comments.',
-   'Version' => '1.5',
+   'Version' => '1.5.1',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -100,10 +100,10 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    public function Controller_Index($Sender) {
-      $Sender->AddCssFile($this->GetWebResource('css/fileupload.css'));
+      $Sender->AddCssFile('fileupload.css', 'plugins/FileUpload');
       $Sender->AddCssFile('admin.css');
       
-      $Sender->Render($this->GetView('fileupload.php'));
+      $Sender->Render('FileUpload', '', 'plugins/FileUpload');
    }
    
    public function Controller_Delete($Sender) {
@@ -195,8 +195,8 @@ class FileUploadPlugin extends Gdn_Plugin {
    protected function PrepareController($Controller) {
       if (!$this->IsEnabled()) return;
       
-      $Controller->AddCssFile($this->GetResource('css/fileupload.css', FALSE, FALSE));
-      $Controller->AddJsFile($this->GetResource('js/fileupload.js', FALSE, FALSE));
+      $Controller->AddCssFile('fileupload.css', 'plugins/FileUpload');
+      $Controller->AddJsFile('fileupload.js', 'plugins/FileUpload');
       $Controller->AddDefinition('apcavailable',self::ApcAvailable());
       $Controller->AddDefinition('uploaderuniq',uniqid(''));
       
