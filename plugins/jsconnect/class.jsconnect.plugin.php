@@ -8,7 +8,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'An SSO plugin that uses json(p) to connect to vanilla, allowing for cross-domain sso.',
-   'Version' => '1.1b',
+   'Version' => '1.1.1b',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -60,7 +60,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
       $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">
          <div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button SignInLink').$RegisterLink.'</div>
-         <div class="JsConnect-Connect"><a class="PopupWindow ConnectLink" popupHeight="300" popupWidth="600">'.Img('/applications/dashboard/design/images/usericon.gif', array('class' => 'ProfilePhotoSmall UserPhoto')).'<span class="Username"></span><div class="ConnectLabel">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div></a></div>
+         <div class="JsConnect-Connect"><a class="PopupWindow NoMSIE ConnectLink" popupHeight="300" popupWidth="600">'.Img('/applications/dashboard/design/images/usericon.gif', array('class' => 'ProfilePhotoSmall UserPhoto')).'<span class="Username"></span><div class="ConnectLabel">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div></a></div>
       </div>';
       
       return $Result;
@@ -333,7 +333,7 @@ class JsConnectPlugin extends Gdn_Plugin {
          $User = array();
       
       ob_clean();
-      WriteJsConnect($User, $Sender->Request->Get(), $client_id, $Secret);
+      WriteJsConnect($User, $Sender->Request->Get(), $client_id, $Secret, GetValue('HashType', $Provider, TRUE));
       exit();
    }
    
