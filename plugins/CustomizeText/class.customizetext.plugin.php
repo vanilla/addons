@@ -37,7 +37,6 @@ class CustomizeTextLocale extends Gdn_Locale {
    public function SaveTranslations($Translations) {
 		// Load existing definitions
       $Path = PATH_CONF . "/locale.php";
-		// var_dump($Path);
 		$Definition = array();
       if (file_exists($Path))
          require($Path);
@@ -94,61 +93,12 @@ class CustomizeTextLocale extends Gdn_Locale {
          return substr($Code, 1);
 
       if (array_key_exists($Code, $this->_Definition)) {
-			// decho($Code, 'found: ');
          return $this->_Definition[$Code];
       } else {
-//			decho($Code, 'not found: ');
-//			var_dump($this->_Definition[$Code]);
 			// Assign it to my "unsaved" collection.
 			$this->_UnsavedDefinitions[$Code] = $Default;
-
-			// And return it
          return $Default;
       }
-
-		/*
-		global $CustomizeTextTranslations, $CustomizeTextMasterView;
-		$CustomizeTextBlackList = array(
-			'Save Changes',
-			'Revert to Original',
-			'Sign In',
-			'Request a new password',
-			'Apply for Membership',
-			'Male',
-			'Female',
-			'I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>',
-			'Post Comment',
-			'Save Comment',
-			'Post Discussion',
-			'Save Draft',
-			'Preview',
-			'Save'
-		);
-		
-		if ($CustomizeTextMasterView == 'admin')
-			return parent::Translate($Code, $Default);
-			
-		$Index = count($CustomizeTextTranslations);
-      if ($Default === FALSE)
-         $Default = $Code;
-
-		$Return = '';
-      // Codes that begin with @ are considered literals.
-      if (substr_compare('@', $Code, 0, 1) == 0) {
-         $Return = substr($Code, 1);
-      } else if (array_key_exists($Code, $this->_Definition)) {
-         $Return = $this->_Definition[$Code];
-      } else {
-			$Return = $Default;
-      }
-
-		if (in_array($Code, $CustomizeTextBlackList)) {
-			return $Return;
-		} else {
-			$CustomizeTextTranslations[] = array($Code, $Default ? $Default : $Code, $Return);
-			return '<span class="Translatable Translation-'.$Index.'">'.$Return.'</span>';
-		}
-		*/
    }
 	
 	/**
@@ -238,88 +188,6 @@ class CustomizeTextPlugin extends Gdn_Plugin {
 	
 	/**
 	 * Add the inline text editor css to non-dashboard pages for admins.
-	public function Base_Render_Before($Sender) {
-		global $CustomizeTextMasterView;
-		$CustomizeTextMasterView = $Sender->MasterView();
-		if ($Sender->MasterView == 'admin')
-			return;
-		
-// reset translation wraps
-		if (property_exists($Sender, 'Head'))
-			$Sender->Head->AddString("
-<style type=\"text/css\">
-
-/* Make room for this plugin * /
-body { padding-bottom: 200px; }
-
-/* Make sure that all translation wrappers are reset to baseline css. * /
-span.Translatable {
-   margin: 0 !important;
-   padding: 0 !important;
-   border: 0 !important;
-   outline: 0 !important;
-   font-weight: inherit !important;
-   font-style: inherit !important;
-   font-size: 100% !important;
-   font-family: inherit !important;
-   vertical-align: baseline !important;
-	background: transparent !important;
-	color: inherit !important;
-}
-.CustomizeTextForm {
-	border-top: 4px solid rgba(200,200,200,0.2);
-   text-align: left !important;
-   position: fixed;
-   top: auto;
-   bottom: 0px;
-   left: 0px;
-	right: 0px;
-   z-index: 150;
-   margin: 0 !important;
-   padding: 0 !important;
-   list-style: none !important;
-   font-size: 12px;
-   display: block;
-	background: rgba(255,255,255,0.9);
-	color: #000;
-	box-shadow: 0 0 3px #000;
-	-moz-box-shadow: 0 0 8px #999;
-}
-* html .CustomizeTextForm {
-  position: absolute;
-  top: auto;
-  margin-left: 0px;
-  overflow: visible; 
-  bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
-}
-.CustomizeTextFormWrapper {
-	padding: 20px;
-}
-.CustomizeTextForm form {
-	display: none;
-}
-.CustomizeTextForm em {
-	font-style: italic;
-}
-.CustomizeTextForm form label {
-	font-weight: bold;
-	display: block;
-}
-.CustomizeTextForm textarea {
-	height: 80px;
-	width: 99%;
-}
-.CustomizeTextForm .Loading {
-	display: inline-block;
-	width: 20px;
-	height: auto;
-}
-</style>");
-	}
-		 */
-
-	/**
-	 * Add the inline text editor css to non-dashboard pages for admins.
 	 */
 	public function Base_AfterBody_Handler($Sender) {
 		/**
@@ -331,53 +199,5 @@ span.Translatable {
 		if (count($UnsavedDefinitions))
 			$Locale->SaveTranslations($UnsavedDefinitions);
 
-		/*
-		if ($Sender->MasterView == 'admin')
-			return;
-
-		global $CustomizeTextTranslations;
-		?>
-<script type="text/javascript" language="javascript">
-jQuery(document).ready(function($) {
-	$('span.Translatable').hover(function() {
-		var index = $(this).attr('className').replace('Translatable Translation-', '');
-		var CustomizeTextTranslations = <?php echo json_encode($CustomizeTextTranslations); ?>;
-		// gdn.informMessage(CustomizeTextTranslations[index][1]);
-		$('.CustomizeTextForm form').slideDown('fast');
-		$('#Form_Code').val(CustomizeTextTranslations[index][0]);
-		$('.Original div').text(CustomizeTextTranslations[index][1]);
-		$('#Form_Edit').val(CustomizeTextTranslations[index][2]);
-		$('#Form_Edit').focus();
-	});
-	$('#Form_SaveChanges').click(function() {
-		$('.CustomizeTextForm').find('.Loading').remove(); // remove old spinners
-		$(this).after('<div class="Loading">&#160;</div>'); // add new spinner
-		return false;
-	});
-	
-});
-</script>
-<div class="CustomizeTextForm">
-	<div class="CustomizeTextFormWrapper">
-		<strong>Hover over text on the screen to edit.</strong>
-		<br /><em>Note: if hovering over text doesn't make it editable, it means that the text cannot be changed.</em>
-		<?php
-		$Form = new Gdn_Form();
-		echo $Form->Open();
-		echo $Form->Hidden('Code');
-		echo '<div class="Original">
-			<strong>Original:</strong>
-			<div></div>
-		</div>';
-		echo $Form->Label('Edit', 'Edit');
-		echo $Form->TextBox('Edit', array('class' => 'Edit', 'MultiLine' => TRUE));
-		echo $Form->Button('Save Changes');
-		echo $Form->Close();
-		?>
-	</div>
-</div>
-		<?php
-		*/
 	}
-	
 }
