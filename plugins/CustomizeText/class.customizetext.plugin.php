@@ -163,7 +163,7 @@ class CustomizeTextPlugin extends Gdn_Plugin {
 				// Look for matches
 				$k = strtolower($Key);
 				$d = strtolower($Definition);
-				if (strlen($Keywords) > 0 && (strpos($k, $Keywords) !== FALSE || strpos($d, $Keywords) !== FALSE)) {
+				if ($Keywords == '*' || (strlen($Keywords) > 0 && (strpos($k, $Keywords) !== FALSE || strpos($d, $Keywords) !== FALSE))) {
 					$Sender->Matches[$Key] = $Definition;
 
 					// Save changes in matches

@@ -7,7 +7,8 @@ $CountMatches = count($this->Matches);
 echo $this->Form->Open();
 ?>
 <style type="text/css">
-textarea.TextBox { height: 22px; min-height: 22px; }
+textarea.TextBox { height: 22px; min-height: 22px; width: 600px; }
+ul input.InputBox { width: 600px; }
 #Form_Go { margin: 0 20px !important; }
 </style>
 <script type="text/javascript" language="javascript">
@@ -19,10 +20,10 @@ jQuery(document).ready(function($) {
 <h1>Customize Text</h1>
 <div class="Info">
    <?php
-		echo 'Editable text definitions: '.Wrap($CountDefinitions, 'strong');
       echo $this->Form->Errors();
-      echo '<p>Search for the text you want to customize. Partial searches work. For example: "disc" will return "discussion" and "all discussions", etc.</p>';
-		echo '<p>'.Anchor('Find Editable Text', '/settings/customizetext/rebuild', 'SmallButton').'</p>';
+      echo 'Search for the text you want to customize. Partial searches work. For example: "disc" will return "discussion" and "all discussions", etc.';
+		echo '<p>Editable text definitions: '.Wrap($CountDefinitions, 'strong');
+		echo ' ('.Anchor('find more', '/settings/customizetext/rebuild').')</p>';
 		echo '<br />';
       echo $this->Form->TextBox('Keywords');
       echo $this->Form->Button(T('Go'));
@@ -41,10 +42,11 @@ if ($this->Form->GetValue('Keywords', '') != '') {
 		echo $this->Form->Hidden('code_'.$Loop, array('value' => $Key));
 		$OldCode = $this->Form->GetValue('code_'.$Loop);
 		$NewDef = $this->Form->GetValue('def_'.$Loop);
+		$MultiLine = strlen($Definition) > 100 || strpos($Definition, "\n");
 		if ($OldCode == $Key && $NewDef !== FALSE && $NewDef != $Definition)
-			echo $this->Form->TextBox('def_'.$Loop, array('multiline' => TRUE));
+			echo $this->Form->TextBox('def_'.$Loop, array('multiline' => $MultiLine));
 		else
-			echo $this->Form->TextBox('def_'.$Loop, array('value' => $Definition, 'multiline' => TRUE));
+			echo $this->Form->TextBox('def_'.$Loop, array('value' => $Definition, 'multiline' => $MultiLine));
 			
 		echo '</li>';
 		$Loop++;
