@@ -9,6 +9,7 @@ $PluginInfo['TouchIcon'] = array(
    'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
+   'MobileFriendly' => TRUE,
    'SettingsUrl' => '/settings/touchicon',
    'SettingsPermission' => 'Garden.Settings.Manage'
 );

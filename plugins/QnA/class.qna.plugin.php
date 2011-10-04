@@ -10,6 +10,7 @@ $PluginInfo['QnA'] = array(
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
    'Version' => '1.0.4b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
+   'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
