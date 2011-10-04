@@ -17,7 +17,8 @@ $PluginInfo['CustomizeText'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+   'AuthorUrl' => 'http://vanillaforums.com',
+	'SettingsUrl' => 'settings/customizetext'
 );
 
 $CustomizeTextTranslations = array();
@@ -195,9 +196,10 @@ class CustomizeTextPlugin extends Gdn_Plugin {
 		 * any new definitions have been found and save them if they have.
 		 */
 		$Locale = Gdn::Locale();
-		$UnsavedDefinitions = $Locale->GetUnsavedDefinitions();
-		if (count($UnsavedDefinitions))
-			$Locale->SaveTranslations($UnsavedDefinitions);
-
+		if (method_exists($Locale, 'GetUnsavedDefinitions')) {
+			$UnsavedDefinitions = $Locale->GetUnsavedDefinitions();
+			if (count($UnsavedDefinitions))
+				$Locale->SaveTranslations($UnsavedDefinitions);
+		}
 	}
 }

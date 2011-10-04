@@ -10,21 +10,35 @@ echo $this->Form->Open();
 textarea.TextBox { height: 22px; min-height: 22px; width: 600px; }
 ul input.InputBox { width: 600px; }
 #Form_Go { margin: 0 20px !important; }
+.Popular { border: 2px dotted #ccc; border-width: 2px 0; padding: 20px; }
 </style>
 <script type="text/javascript" language="javascript">
 jQuery(document).ready(function($) {
 	if ($.autogrow)
       $('textarea.TextBox').autogrow();
+		
+	$('.Popular a').click(function() {
+		$('input[name$=Keywords]').val($(this).attr('term'));
+		
+		$('form').submit();
+		return false;
+	});
 });
 </script>
 <h1>Customize Text</h1>
 <div class="Info">
    <?php
       echo $this->Form->Errors();
-      echo 'Search for the text you want to customize. Partial searches work. For example: "disc" will return "discussion" and "all discussions", etc.';
-		echo '<p>Editable text definitions: '.Wrap($CountDefinitions, 'strong');
-		echo ' ('.Anchor('find more', '/settings/customizetext/rebuild').')</p>';
-		echo '<br />';
+      echo 'Search for the text you want to customize. Partial searches work. For example: "disc" will return "discussion" and "all discussions", etc. ';
+		echo 'There are currently '.Wrap($CountDefinitions, 'strong').' definitions available for editing. ';
+		echo Anchor('Find More', '/settings/customizetext/rebuild', 'SmallButton');
+	?>
+</div>
+<div class="Popular">
+	Popular Searches: <a term="howdy" href="#">Howdy Stranger</a>, <a term="module" href="#">It looks like you're new here...</a>, <a term="disc" href="#">Discussions</a>, <a term="comment" href="#">Comments</a>, <a term="email" href="#">Email</a>, <a term="*" href="#">Everything</a>.
+</div>
+<div class="Info">
+	<?php
       echo $this->Form->TextBox('Keywords');
       echo $this->Form->Button(T('Go'));
    ?>
