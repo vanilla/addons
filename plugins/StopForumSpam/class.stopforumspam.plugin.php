@@ -114,7 +114,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
             'Admin' => '2'
          ));
       }
-      SaveToConfig('Plugins.StopForumSpam.UserID', $UserID);
+      SaveToConfig('Plugins.StopForumSpam.UserID', $UserID, array('CheckExisting' => TRUE));
    }
 
    public function UserID() {
