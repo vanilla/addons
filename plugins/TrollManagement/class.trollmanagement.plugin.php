@@ -18,6 +18,7 @@ $PluginInfo['TrollManagement'] = array(
    'Description' => "Allows you to mark users as trolls, making it so that only they can see their comments & discussions. They essentially become invisible to other users and eventually just leave because no-one responds to them.",
    'Version' => '1',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
+   'MobileFriendly' => TRUE,
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'
