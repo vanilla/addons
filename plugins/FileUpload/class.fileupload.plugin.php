@@ -16,6 +16,7 @@ $PluginInfo['FileUpload'] = array(
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
+   'MobileFriendly' => TRUE,
    'RegisterPermissions' => array('Plugins.Attachments.Upload.Allow','Plugins.Attachments.Download.Allow'),
    'SettingsUrl' => '/dashboard/plugin/fileupload',
    'SettingsPermission' => 'Garden.Settings.Manage',
