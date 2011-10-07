@@ -53,14 +53,28 @@ class JsConnectPlugin extends Gdn_Plugin {
       $SignInUrl = FormatString(GetValue('SignInUrl', $Provider, ''), $Data);
       $RegisterUrl = FormatString(GetValue('RegisterUrl', $Provider, ''), $Data);
 
-      if ($RegisterUrl)
+      if ($RegisterUrl && !GetValue('NoRegister', $Options))
          $RegisterLink = ' '.Anchor(sprintf(T('Register with %s', 'Register'), $Provider['Name']), $RegisterUrl, 'Button RegisterLink');
       else
          $RegisterLink = '';
+      
+      if (IsMobile()) {
+         $PopupWindow = '';
+      } else {
+         $PopupWindow = 'PopupWindow';
+      }
+      
+      if (GetValue('NoConnectLabel', $Options)) {
+         $ConnectLabel = '';
+      } else {
+         $ConnectLabel = '<span class="Username"></span><div class="ConnectLabel">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div>';
+      }
 
       $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">
          <div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button SignInLink').$RegisterLink.'</div>
-         <div class="JsConnect-Connect"><a class="PopupWindow NoMSIE ConnectLink" popupHeight="300" popupWidth="600">'.Img('/applications/dashboard/design/images/usericon.gif', array('class' => 'ProfilePhotoSmall UserPhoto')).'<span class="Username"></span><div class="ConnectLabel">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div></a></div>
+         <div class="JsConnect-Connect"><a class="'.$PopupWindow.' NoMSIE ConnectLink" popupHeight="300" popupWidth="600">'.Img('/applications/dashboard/design/images/usericon.gif', array('class' => 'ProfilePhotoSmall UserPhoto')).
+            $ConnectLabel.
+         '</a></div>
       </div>';
       
       return $Result;
@@ -169,9 +183,16 @@ class JsConnectPlugin extends Gdn_Plugin {
 //   }
    
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {	
-      $Providers = self::GetProvider();
+      $Providers = self::GetAllProviders();
       foreach ($Providers as $Provider) {
          echo "\n".self::ConnectButton($Provider);
+      }
+	}
+   
+   public function Base_BeforeSignInLink_Handler($Sender) {
+      $Providers = self::GetAllProviders();
+      foreach ($Providers as $Provider) {
+         echo "\n".Wrap(self::ConnectButton($Provider, array('NoRegister' => TRUE, 'NoConnectLabel' => TRUE)), 'li', array('class' => 'Connect jsConnect'));
       }
 	}
 
