@@ -83,8 +83,8 @@ class QnAPlugin extends Gdn_Plugin {
       // Write the links.
       $Query = http_build_query(array('commentid' => GetValue('CommentID', $Comment), 'tkey' => Gdn::Session()->TransientKey()));
 
-      echo '<span>'.Anchor(T('Accept', 'Accept'), '/discussion/qna/accept?'.$Query, array('class' => 'QnA-Yes', 'title' => T('Accept this answer.'))).'</span>'.
-         '<span>'.Anchor(T('Reject', 'Reject'), '/discussion/qna/reject?'.$Query, array('class' => 'QnA-No', 'title' => T('Reject this answer.'))).'</span>';
+      echo ' <span class="MItem">'.Anchor(T('Accept', 'Accept'), '/discussion/qna/accept?'.$Query, array('class' => 'QnA-Yes', 'title' => T('Accept this answer.'))).'</span> '.
+         ' <span class="MItem">'.Anchor(T('Reject', 'Reject'), '/discussion/qna/reject?'.$Query, array('class' => 'QnA-No', 'title' => T('Reject this answer.'))).'</span> ';
 
       static $InformMessage = TRUE;
 
@@ -102,8 +102,8 @@ class QnAPlugin extends Gdn_Plugin {
       $QnA = GetValueR('Comment.QnA', $Args);
 
       if ($QnA && ($QnA == 'Accepted' || Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))) {
-         $Title = sprintf(T('This answer was %s.'), T('Q&A '.$QnA, $QnA));
-         echo '<div class="QnA-Box QnA-'.$QnA.'" title="'.htmlspecialchars($Title).'"><div>'.$Title.'</div></div>';
+         $Title = sprintf(T('%s Answer'), T('Q&A '.$QnA, $QnA));
+         echo ' <span class="Tag QnA-Box QnA-'.$QnA.'" title="'.htmlspecialchars($Title).'"><span>'.$Title.'</span></span> ';
       }
    }
 
