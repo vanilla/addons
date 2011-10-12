@@ -151,6 +151,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
    }
 
    public function SettingsController_StopForumSpam_Create($Sender, $Args) {
+      $Sender->Permission('Garden.Settings.Manage');
       $Conf = new ConfigurationModule($Sender);
 		$Conf->Initialize(array(
 			'Plugins.StopForumSpam.IPThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 5, 'Description' => 'IP addresses reported this many times will be flagged as spam.'),
