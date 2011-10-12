@@ -286,13 +286,14 @@ class VotingPlugin extends Gdn_Plugin {
                   $LogOptions['OtherUserIDs'] = $OtherUserIDs;
 
                   // Add the comment to moderation.
-                  LogModel::Insert('Moderate', 'Comment', $Data, $LogOptions);
+                  if ($Total > C('Plugins.Voting.ModThreshold2', -20))
+                     LogModel::Insert('Moderate', 'Comment', $Data, $LogOptions);
                }
                $Moderate = TRUE;
             }
             if ($Total <= C('Plugins.Voting.ModThreshold2', -20)) {
                // Remove the comment.
-               $CommentModel->Delete($CommentID, array('Log' => FALSE));
+               $CommentModel->Delete($CommentID, array('Log' => 'Moderate'));
                
                $Sender->InformMessage(sprintf(T('The %s has been removed for moderation.'), T('comment')));
             } elseif ($Moderate) {
@@ -372,13 +373,14 @@ class VotingPlugin extends Gdn_Plugin {
                   $LogOptions['OtherUserIDs'] = $OtherUserIDs;
 
                   // Add the comment to moderation.
-                  LogModel::Insert('Moderate', 'Discussion', $Data, $LogOptions);
+                  if ($Total > C('Plugins.Voting.ModThreshold2', -20))
+                     LogModel::Insert('Moderate', 'Discussion', $Data, $LogOptions);
                }
                $Moderate = TRUE;
             }
             if ($Total <= C('Plugins.Voting.ModThreshold2', -20)) {
                // Remove the comment.
-               $DiscussionModel->Delete($DiscussionID, array('Log' => FALSE, 'LogOperation' => 'Moderate'));
+               $DiscussionModel->Delete($DiscussionID, array('Log' => 'Moderate'));
                
                $Sender->InformMessage(sprintf(T('The %s has been removed for moderation.'), T('discussion')));
             } elseif ($Moderate) {
