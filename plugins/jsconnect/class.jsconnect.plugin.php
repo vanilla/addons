@@ -260,7 +260,7 @@ class JsConnectPlugin extends Gdn_Plugin {
     * @param EntryController $Sender
     * @param array $Args
     */
-   public function EntryController_JsConnect_Create($Sender, $Args) {
+   public function EntryController_JsConnect_Create($Sender, $Args = array()) {
       if ($Arg = GetValue(0, $Args)) {
          if ($Arg == 'guest') {
 //            Redirect('/');
@@ -333,7 +333,7 @@ class JsConnectPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     * @param array $Args 
     */
-   public function ProfileController_JsConnect_Create($Sender, $Args) {
+   public function ProfileController_JsConnect_Create($Sender, $Args = array()) {
       include_once dirname(__FILE__).'/functions.jsconnect.php';
       
       $client_id = $Sender->Request->Get('client_id', 0);
@@ -359,7 +359,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       exit();
    }
    
-   public function SettingsController_JsConnect_Create($Sender, $Args) {
+   public function SettingsController_JsConnect_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->AddSideMenu();
 

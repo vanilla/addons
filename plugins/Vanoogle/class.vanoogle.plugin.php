@@ -39,7 +39,7 @@ class Vanoogle extends Gdn_Plugin {
 	 * Build the setting page.
 	 * @param $Sender
 	 */
-	public function SettingsController_Vanoogle_Create(&$Sender) {
+	public function SettingsController_Vanoogle_Create($Sender) {
 		$Sender->Permission('Garden.Settings.Manage');
 		
 		$Validation = new Gdn_Validation();
