@@ -206,7 +206,7 @@ class VanillaCommentRepliesPlugin extends Gdn_Plugin {
    /*
     * Add a Reply method to the DiscussionController to handle linking directly to a reply
     */
-   public function DiscussionController_Reply_Create(&$Sender, $ReplyCommentID) {
+   public function DiscussionController_Reply_Create($Sender, $ReplyCommentID) {
       // Get the discussionID and parent CommentID
       $ReplyModel = Gdn::Factory('ReplyModel');
       $Reply = $ReplyModel->GetID($ReplyCommentID);
@@ -247,7 +247,7 @@ class VanillaCommentRepliesPlugin extends Gdn_Plugin {
    /*
     * Add a Reply method to Vanilla's Post controller
     */
-   public function PostController_Reply_Create(&$Sender, $EventArguments = '') {
+   public function PostController_Reply_Create($Sender, $EventArguments = '') {
       $Sender->View = $this->GetView('vanilla_post_reply.php');
       $ReplyCommentID = 0;
       if (is_array($EventArguments) && array_key_exists(0, $EventArguments))

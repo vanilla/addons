@@ -83,7 +83,7 @@ class VanillaCommentScorePlugin extends Gdn_Plugin {
     * @param DiscussionController $Sender The controller that is implementing this method.
     * @param array $Args The arguments for the operation.
     */
-   public function DiscussionController_Score_Create($Sender, $Args) {
+   public function DiscussionController_Score_Create($Sender, $Args = array()) {
       $CommentID = $Args[0];
       $ScoreKey = (substr($Args[1], 0, 3) == 'Neg' ? -1 : 1);
       //$TransientKey = $Args[2];
