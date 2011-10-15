@@ -16,6 +16,7 @@ $PluginInfo['FileUpload'] = array(
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
+   'MobileFriendly' => TRUE,
    'RegisterPermissions' => array('Plugins.Attachments.Upload.Allow','Plugins.Attachments.Download.Allow'),
    'SettingsUrl' => '/dashboard/plugin/fileupload',
    'SettingsPermission' => 'Garden.Settings.Manage',
@@ -467,7 +468,7 @@ class FileUploadPlugin extends Gdn_Plugin {
    /**
     * Create and display a thumbnail of an uploaded file.
     */
-   public function UtilityController_Thumbnail_Create($Sender, $Args) {
+   public function UtilityController_Thumbnail_Create($Sender, $Args = array()) {
       $SubPath = implode('/', $Args);
 
       // Get actual path to the file

@@ -213,7 +213,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
 
 		$Object = $Sender->EventArguments[$EventArgumentName];
 		if (GetValue('IsTroll', $Object))
-			echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: 0 0 8px; background: rgba(0, 0, 0, 0.6); color: #fff; font-size: 11px;">'.T('Troll.Content', '<strong style="font-weight: bold;">Troll</strong><br />This user has been marked as a troll.<br />This content is only visible to you and the troll.<br/ >This message does not appear for the troll.').'</div>';
+			echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: -4px 0 8px; background: rgba(0, 0, 0, 0.05); color: #d00; font-size: 11px;">'.T('Troll.Content', '<strong style="font-weight: bold;">Troll</strong><br />This user has been marked as a troll.<br />This content is only visible to you and the troll.<br/ >This message does not appear for the troll.').'</div>';
 	}
 	
 	/**

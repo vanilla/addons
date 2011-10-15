@@ -304,7 +304,7 @@ class WhispersPlugin extends Gdn_Plugin {
     * @param array $Args
     * @return mixed
     */
-   public function PostController_Comment_Create($Sender, $Args) {
+   public function PostController_Comment_Create($Sender, $Args = array()) {
       if ($Sender->Form->IsPostBack()) {
          $Sender->Form->SetModel($Sender->CommentModel);
 

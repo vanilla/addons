@@ -114,7 +114,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
             'Admin' => '2'
          ));
       }
-      SaveToConfig('Plugins.StopForumSpam.UserID', $UserID);
+      SaveToConfig('Plugins.StopForumSpam.UserID', $UserID, array('CheckExisting' => TRUE));
    }
 
    public function UserID() {
@@ -150,7 +150,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
       $Sender->EventArguments['IsSpam'] = $Result;
    }
 
-   public function SettingsController_StopForumSpam_Create($Sender, $Args) {
+   public function SettingsController_StopForumSpam_Create($Sender, $Args = array()) {
       $Conf = new ConfigurationModule($Sender);
 		$Conf->Initialize(array(
 			'Plugins.StopForumSpam.IPThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 5, 'Description' => 'IP addresses reported this many times will be flagged as spam.'),

@@ -8,7 +8,7 @@ $PluginInfo['TouchIcon'] = array(
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com',
-   'RequiredApplications' => array('Vanilla' => '2.0.17'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'MobileFriendly' => TRUE,
    'SettingsUrl' => '/settings/touchicon',
    'SettingsPermission' => 'Garden.Settings.Manage'
@@ -24,19 +24,6 @@ class TouchIconPlugin extends Gdn_Plugin {
          'utility/showtouchicon',
          'Internal'
       );
-      
-      // Copy default icon
-      $File = new Gdn_FileSystem();
-      if (!$File->Exists(PATH_ROOT . DS . 'uploads' . DS . 'TouchIcon' . DS . 'apple-touch-icon.png')) {
-         try {
-            $File->Copy(
-               PATH_ROOT . DS . 'plugins' . DS . 'TouchIcon' . DS . 'design' . DS . 'default.png',
-               PATH_ROOT . DS . 'uploads' . DS . 'TouchIcon' . DS . 'apple-touch-icon.png'
-            );
-         } catch (Exception $ex) { 
-            // Cry silently.
-         }
-      }
    }
    
    /**
@@ -56,19 +43,20 @@ class TouchIconPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->AddSideMenu('dashboard/settings/touchicon');
       $Sender->Title(T('Touch Icon'));
-
-      $Sender->SetData('TouchIcon', 'TouchIcon/apple-touch-icon.png');
       
       if ($Sender->Form->AuthenticatedPostBack()) {
-         $Upload = new Gdn_Upload();
+         $Upload = new Gdn_UploadImage();
          try {
             // Validate the upload
             $TmpImage = $Upload->ValidateUpload('TouchIcon', FALSE);
             if ($TmpImage) {
                // Save the uploaded image
-               $Upload->SaveAs(
+               $Upload->SaveImageAs(
                   $TmpImage,
-                  PATH_ROOT . DS . 'uploads' . DS . 'TouchIcon' . DS . 'apple-touch-icon.png'
+                  PATH_ROOT.'/uploads/TouchIcon/apple-touch-icon.png',
+                  114,
+                  114,
+                  array('OutputType' => 'png', 'ImageQuality' => '8')
                );
             }
          } catch (Exception $ex) {
@@ -88,12 +76,17 @@ class TouchIconPlugin extends Gdn_Plugin {
     * @access public
     */
    public function UtilityController_ShowTouchIcon_Create($Sender) {
+      $DefaultPath = PATH_ROOT.'/plugins/TouchIcon/design/default.png';
+      $IconPath = 'TouchIcon/apple-touch-icon.png';
       $File = new Gdn_FileSystem();
-      $File->ServeFile(
-         PATH_ROOT . DS . 'uploads' . DS . 'TouchIcon' . DS . 'apple-touch-icon.png', 
-         'apple-touch-icon.png', 
-         'image/png', 
-         'inline'
-      );
+      
+      // Figure out file path to serve & send
+      $Path = Gdn_Upload::CopyLocal($IconPath);
+      $ServePath = (file_exists($Path)) ? $Path : $DefaultPath;
+      $File->ServeFile($ServePath, 'apple-touch-icon.png', 'image/png', 'inline');
+      
+      // Cleanup if we're using a scratch copy
+      if (file_exists($Path) && $Path != MediaModel::PathUploads().'/'.$IconPath)
+         @unlink($Path);
    }
 }

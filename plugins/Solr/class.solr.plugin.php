@@ -17,7 +17,7 @@ $PluginInfo['Solr'] = array(
 );
 
 class SolrPlugin extends Gdn_Plugin {
-   public function SettingsController_Solr_Create($Sender, $Args) {
+   public function SettingsController_Solr_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
 
       $Conf = new ConfigurationModule($Sender);

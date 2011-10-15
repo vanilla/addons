@@ -28,7 +28,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
       $Menu->AddLink('Forum', T('Civil Tongue'), 'plugin/tongue', 'Plugins.CivilTongue.Manage');
    }
 
-	public function PluginController_Tongue_Create(&$Sender, $Args = array()) {
+	public function PluginController_Tongue_Create($Sender, $Args = array()) {
 		$Sender->Permission('Plugins.CivilTongue.Manage');	
 		$Sender->Form = new Gdn_Form();
 		$Validation = new Gdn_Validation();
