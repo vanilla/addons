@@ -20,7 +20,17 @@
          'action'  => Url('plugin/feeddiscussions/addfeed')
       ));
       echo $this->Form->Errors();
-      
+      $cateModel = new CategoryModel();
+     $cat = $cateModel->GetFull();
+	  //$i = 0;
+	  foreach($cat as $detail)
+	  {
+		if($detail->CategoryID >= 0){
+		$cate['Name'][$detail->CategoryID] = $detail->Name;
+		//$cate['CatID'][$i] = $detail->CategoryID;
+		}
+		//$i++;
+	  }
       $Refreshments = array(
                "1h"  => T("Hourly"),
                "1d"  => T("Daily"),
@@ -43,9 +53,11 @@
                
          <li><?php
             echo $this->Form->Label('Minimum Polling Frequency', 'FeedDiscussions.FeedOption.Refresh');
-            echo $this->Form->DropDown('FeedDiscussions.FeedOption.Refresh', $Refreshments, array(
-               'value'  => "1d"
-            ));
+            echo $this->Form->DropDown('FeedDiscussions.FeedOption.Refresh', $Refreshments, array( 'value'  => "1d" ));
+         ?></li>
+		 <li><?php
+            echo $this->Form->Label('Category', 'FeedDiscussions.FeedOption.Category');
+            echo $this->Form->DropDown('FeedDiscussions.FeedOption.Category', $cate['Name'], array('IncludeNull' => FALSE));
          ?></li>
       </ul>
    <?php
@@ -64,6 +76,9 @@
       foreach ($this->Data['Feeds'] as $FeedURL => $FeedItem) {
          $LastUpdate = $FeedItem['LastImport'];
          $Frequency = GetValue($FeedItem['Refresh'], $Refreshments, T('Unknown'));
+		 $cateModel = new CategoryModel();
+	  $cat = $cateModel->GetFull($FeedItem['Category']);
+	  $Categ = $cat->Name; 
 ?>
          <div class="FeedItem">
             <div class="DeleteFeed">
@@ -74,6 +89,7 @@
                <div class="FeedItemInfo">
                   <span>Updated: <?php echo $LastUpdate; ?></span>
                   <span>Refresh: <?php echo $Frequency; ?></span>
+				  <span>Category: <?php echo $Categ; ?></span>
                </div>
             </div>
          </div>
