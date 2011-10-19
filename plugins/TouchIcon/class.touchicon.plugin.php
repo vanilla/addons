@@ -58,6 +58,7 @@ class TouchIconPlugin extends Gdn_Plugin {
                   114,
                   array('OutputType' => 'png', 'ImageQuality' => '8')
                );
+               SaveToConfig('Plugins.TouchIcon.Uploaded', TRUE);
             }
          } catch (Exception $ex) {
             $Sender->Form->AddError($ex->getMessage());
@@ -70,23 +71,16 @@ class TouchIconPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Show icon.
+    * Redirect to icon.
     *
     * @since 1.0
     * @access public
     */
    public function UtilityController_ShowTouchIcon_Create($Sender) {
-      $DefaultPath = PATH_ROOT.'/plugins/TouchIcon/design/default.png';
-      $IconPath = 'TouchIcon/apple-touch-icon.png';
-      $File = new Gdn_FileSystem();
-      
-      // Figure out file path to serve & send
-      $Path = Gdn_Upload::CopyLocal($IconPath);
-      $ServePath = (file_exists($Path)) ? $Path : $DefaultPath;
-      $File->ServeFile($ServePath, 'apple-touch-icon.png', 'image/png', 'inline');
-      
-      // Cleanup if we're using a scratch copy
-      if (file_exists($Path) && $Path != MediaModel::PathUploads().'/'.$IconPath)
-         @unlink($Path);
+      $DefaultPath = 'plugins/TouchIcon/design/default.png';
+      $IconPath = Gdn_Upload::Url('TouchIcon/apple-touch-icon.png');
+      $Redirect = (C('Plugins.TouchIcon.Uploaded')) ? $IconPath : $DefaultPath;
+      Redirect($Redirect, 301);
+      exit();
    }
 }
