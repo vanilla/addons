@@ -105,9 +105,9 @@ ul.DataList div.Options {
 ul.DataList div.Meta {
 	z-index: 5;
 }
-/*div.Meta span.CommentCount {
+div.Meta span.CommentCount {
 	display: none;
-}*/
+}
 ul.DataList div.Meta strong {
 	box-shadow: 0px 0px 2px #777;
 	-moz-box-shadow: 0px 0px 2px #777;
