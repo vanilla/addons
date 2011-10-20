@@ -17,9 +17,8 @@ echo $this->Form->Errors();
                array('class' => 'Info')
             );
             
-         $TouchIcon = $this->Data('TouchIcon');
          echo Wrap(
-            Img(Gdn_Upload::Url($TouchIcon)),
+            Img('/apple-touch-icon.png'),
             'div'
          );
          echo Wrap(

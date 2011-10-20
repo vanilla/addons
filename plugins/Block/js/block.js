@@ -5,7 +5,6 @@ jQuery(document).ready(function($){
    });
 
    $('.UserBlocked .Meta').live('click', function(event) {
-      console.log('click!');
       var el = $(event.target);
       if (!el.hasClass('UserBlocked'))
          el = el.parents('.UserBlocked');
@@ -17,9 +16,11 @@ jQuery(document).ready(function($){
    });
    
    $('span.Author a.ProfileLink').live('hover',function(event){
+      console.log(event.type);
+      console.log(event.target);
       var el = $(event.target);
       if (!el.hasClass('ProfileLink'))
-         el = el.parents('.ProfileLink');
+         el = el.closest('.ProfileLink');
       
       if (event.type == 'mouseover') {
          var overlay = document.createElement('div');

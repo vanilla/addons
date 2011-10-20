@@ -150,7 +150,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
       $Sender->EventArguments['IsSpam'] = $Result;
    }
 
-   public function SettingsController_StopForumSpam_Create($Sender, $Args) {
+   public function SettingsController_StopForumSpam_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
       $Conf = new ConfigurationModule($Sender);
 		$Conf->Initialize(array(

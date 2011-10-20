@@ -116,7 +116,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
     *
     * @var SettingsController $Sender
     */
-   public function SettingsController_LocaleDeveloper_Create($Sender, $Args) {
+   public function SettingsController_LocaleDeveloper_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
 
       $Sender->AddSideMenu();

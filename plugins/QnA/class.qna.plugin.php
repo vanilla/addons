@@ -146,7 +146,7 @@ class QnAPlugin extends Gdn_Plugin {
     * @param DiscussionController $Sender
     * @param array $Args
     */
-   public function DiscussionController_QnA_Create($Sender, $Args) {
+   public function DiscussionController_QnA_Create($Sender, $Args = array()) {
       $Comment = Gdn::SQL()->GetWhere('Comment', array('CommentID' => $Sender->Request->Get('commentid')))->FirstRow(DATASET_TYPE_ARRAY);
       if (!$Comment)
          throw NotFoundException('Comment');
@@ -237,7 +237,7 @@ class QnAPlugin extends Gdn_Plugin {
     * @param DiscussionsController $Sender
     * @param array $Args
     */
-   public function DiscussionsController_Unanswered_Create($Sender, $Args) {
+   public function DiscussionsController_Unanswered_Create($Sender, $Args = array()) {
       $Sender->View = 'Index';
       $Sender->SetData('_PagerUrl', 'discussions/unanswered/{Page}');
       $Sender->Index(GetValue(0, $Args, 'p1'));
@@ -258,7 +258,7 @@ class QnAPlugin extends Gdn_Plugin {
     * @param DiscussionsController $Sender
     * @param array $Args
     */
-   public function DiscussionsController_UnansweredCount_Create($Sender, $Args) {
+   public function DiscussionsController_UnansweredCount_Create($Sender, $Args = array()) {
       Gdn::SQL()->WhereIn('QnA', array('Unanswered', 'Rejected'));
       $Count = Gdn::SQL()->GetCount('Discussion', array('Type' => 'Question'));
       Gdn::Cache()->Store('QnA-UnansweredCount', $Count, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));

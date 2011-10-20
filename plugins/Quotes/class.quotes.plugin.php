@@ -89,7 +89,7 @@ class QuotesPlugin extends Gdn_Plugin {
       $QuoteURL = Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE);
       $QuoteText = T('Quote');
       echo <<<QUOTE
-      <span class="CommentQuote"><a href="{$QuoteURL}">{$QuoteText}</a></span>
+      <span class="MItem CommentQuote"><a href="{$QuoteURL}">{$QuoteText}</a></span>
 QUOTE;
    }
    
