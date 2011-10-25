@@ -215,7 +215,7 @@ class VanillaCommentRepliesPlugin extends Gdn_Plugin {
       
       // Figure out how many comments are before this one
       $Offset = $Sender->CommentModel->GetOffset($CommentID);
-      $Limit = Gdn::Config('Vanilla.Comments.PerPage', 50);
+      $Limit = Gdn::Config('Vanilla.Comments.PerPage', 30);
       
       // (((67 comments / 10 perpage) = 6.7) rounded down = 6) * 10 perpage = offset 60;
       $Offset = floor($Offset / $Limit) * $Limit;
