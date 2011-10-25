@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 // Loop the currently loaded locale definitions looking for matches
 $Locale = Gdn::Locale();
-$Definitions = $Locale->GetDefinitions();
+$Definitions = $Locale->GetDeveloperDefinitions();
 $CountDefinitions = count($Definitions);
 $CountMatches = count($this->Matches);
 echo $this->Form->Open();
