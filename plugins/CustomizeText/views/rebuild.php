@@ -31,7 +31,7 @@ $Urls = array(
 );
 array_map('Url', $Urls);
 $Locale = Gdn::Locale();
-$Definitions = $Locale->GetDefinitions();
+$Definitions = $Locale->GetDeveloperDefinitions();
 $CountDefinitions = count($Definitions);
 ?>
 <h1><?php echo T('Customize Text'); ?></h1>

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Locale = Gdn::Locale();
-$Definitions = $Locale->GetDefinitions();
+$Definitions = $Locale->GetDeveloperDefinitions();
 $CountDefinitions = count($Definitions);
 ?>
 <h1><?php echo T('Customize Text'); ?></h1>
