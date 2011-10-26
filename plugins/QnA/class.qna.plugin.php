@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0.4b',
+   'Version' => '1.0.5b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -27,13 +27,22 @@ class QnAPlugin extends Gdn_Plugin {
 
    public function Structure() {
       Gdn::Structure()
-         ->Table('Discussion')
+         ->Table('Discussion');
+      
+      $QnAExists = Gdn::Structure()->ColumnExists('QnA');
+      $DateAcceptedExists = Gdn::Structure()->ColumnExists('DateAccepted');
+      
+      Gdn::Structure()
          ->Column('QnA', array('Unanswered', 'Answered', 'Accepted', 'Rejected'), NULL)
+         ->Column('DateAccepted', 'datetime', TRUE) // The 
+         ->Column('DateOfAnswer', 'datetime', TRUE) // The time to answer an accepted question.
          ->Set();
 
       Gdn::Structure()
          ->Table('Comment')
          ->Column('QnA', array('Accepted', 'Rejected'), NULL)
+         ->Column('DateAccepted', 'datetime', TRUE)
+         ->Column('AcceptedUserID', 'int', TRUE)
          ->Set();
 
       Gdn::SQL()->Replace(
@@ -44,6 +53,24 @@ class QnAPlugin extends Gdn_Plugin {
          'ActivityType',
          array('AllowComments' => '0', 'RouteCode' => 'answer', 'Notify' => '1', 'Public' => '0', 'ProfileHeadline' => '', 'FullHeadline' => ''),
          array('Name' => 'AnswerAccepted'), TRUE);
+      
+      if ($QnAExists && !$DateAcceptedExists) {
+         // Default the date accepted to the accepted answer's date.
+         $Px = Gdn::Database()->DatabasePrefix;
+         $Sql = "update {$Px}Discussion d set DateAccepted = (select min(c.DateInserted) from {$Px}Comment c where c.DiscussionID = d.DiscussionID and c.QnA = 'Accepted')";
+         Gdn::SQL()->Query($Sql, 'update');
+         Gdn::SQL()->Update('Discussion')
+            ->Set('DateOfAnswer', 'DateAccepted', FALSE, FALSE)
+            ->Put();
+         
+         Gdn::SQL()->Update('Comment c')
+            ->Join('Discussion d', 'c.CommentID = d.DiscussionID')
+            ->Set('c.DateAccepted', 'c.DateInserted', FALSE, FALSE)
+            ->Set('c.AcceptedUserID', 'd.InsertUserID', FALSE, FALSE)
+            ->Where('c.QnA', 'Accepted')
+            ->Where('c.DateAccepted', NULL)
+            ->Put();
+      }
    }
 
 
@@ -170,12 +197,28 @@ class QnAPlugin extends Gdn_Plugin {
       }
 
       if (isset($QnA)) {
+         $DiscussionSet = array('QnA' => $QnA);
+         $CommentSet = array('QnA' => $QnA);
+         
+         if ($QnA == 'Accepted') {
+            $CommentSet['DateAccepted'] = Gdn_Format::ToDateTime();
+            $CommentSet['AcceptedUserID'] = Gdn::Session()->UserID;
+            
+            if (!$Discussion['DateAccepted']) {
+               $DiscussionSet['DateAccepted'] = Gdn_Format::ToDateTime();
+               $DiscussionSet['DateOfAnswer'] = $Comment['DateInserted'];
+            }
+         }
+         
          // Update the comment.
-         Gdn::SQL()->Put('Comment', array('QnA' => $QnA), array('CommentID' => $Comment['CommentID']));
+         Gdn::SQL()->Put('Comment', $CommentSet, array('CommentID' => $Comment['CommentID']));
 
          // Update the discussion.
          if ($Discussion['QnA'] != $QnA && (!$Discussion['QnA'] || in_array($Discussion['QnA'], array('Unanswered', 'Answered', 'Rejected'))))
-            Gdn::SQL()->Put('Discussion', array('QnA' => $QnA), array('DiscussionID' => $Comment['DiscussionID']));
+            Gdn::SQL()->Put(
+               'Discussion', 
+               $DiscussionSet, 
+               array('DiscussionID' => $Comment['DiscussionID']));
 
          // Record the activity.
          if ($QnA == 'Accepted') {
@@ -307,7 +350,7 @@ class QnAPlugin extends Gdn_Plugin {
             $QnA = FALSE;
       }
       if ($QnA) {
-         echo '<span class="Tag QnA-Tag-'.$QnA.'"'.$Title.'>'.T("Q&A $Text", $Text).'</span> ';
+         echo ' <span class="Tag QnA-Tag-'.$QnA.'"'.$Title.'>'.T("Q&A $Text", $Text).'</span> ';
       }
    }
 
