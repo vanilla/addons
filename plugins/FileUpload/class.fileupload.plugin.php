@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions and comments.',
-   'Version' => '1.5.2',
+   'Version' => '1.5.3',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -470,6 +470,11 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function UtilityController_Thumbnail_Create($Sender, $Args = array()) {
       $SubPath = implode('/', $Args);
+      $Name = $SubPath;
+      
+      if (StringEndsWith($SubPath, '.bmp.png', TRUE)) {
+         $SubPath = StringEndsWith($SubPath, '.png', TRUE, TRUE);
+      }
 
       // Get actual path to the file
       $Path = Gdn_Upload::CopyLocal($SubPath);
@@ -504,7 +509,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          }
       }
 
-      $TargetPath = MediaModel::PathUploads()."/thumbnails/$SubPath";
+      $TargetPath = MediaModel::PathUploads()."/thumbnails/$Name";
       if (!file_exists(dirname($TargetPath))) {
          mkdir(dirname($TargetPath), 0777, TRUE);
       }
@@ -514,7 +519,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       if ($Path != MediaModel::PathUploads().'/'.$SubPath)
          @unlink($Path);
 
-      $Url = MediaModel::Url("/thumbnails/$SubPath");
+      $Url = MediaModel::Url("/thumbnails/$Name");
       Redirect($Url, 302);
 //      Gdn_FileSystem::ServeFile($TargetPath, basename($Path), '', 'inline');
    }

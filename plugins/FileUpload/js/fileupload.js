@@ -527,7 +527,7 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             
          } else {
             // FAILURE
-            FailReason = '<pre>'+JResponse.MediaResponse.StrError+'</pre>';
+            FailReason = JResponse.MediaResponse.StrError;
             this.ProgressBars[TargetUploaderID].Complete = true;
             
          }
@@ -537,21 +537,11 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
          clearTimeout(this.ProgressBars[TargetUploaderID].TimerID);
          this.RemoveUploader(TargetUploaderID);
          
+         gdn.informError(FailReason);
+         
          var FileListing = jQuery('#'+[TargetUploaderID,'listing'].join('_'));
-         FileListing.html("File upload failed. Reason: "+FailReason);
-         FileListing.css({
-            'background-color':'#ffbfbf',
-            'color':'#a70000',
-            'padding-left':'20px',
-            'background-position':'8px center',
-            'cursor':'pointer'
-         });
-         FileListing.click(function(){FileListing.remove();});
-         /*
-setTimeout(function(){
-            FileListing.fadeTo(1500,0,function(){ FileListing.animate({'height':0},600,function(){ FileListing.remove(); }) });
-         },6000);
-*/
+         FileListing.remove();
+         
          delete this.ProgressBars[TargetUploaderID];
       }
    }

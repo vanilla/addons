@@ -48,8 +48,13 @@ class MediaModel extends VanillaModel {
          return array(0, 0);
 
       $ImageSize = @getimagesize($Path);
-      if (is_array($ImageSize))
+      if (is_array($ImageSize)) {
+//         if (!in_array($ImageSize[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG)))
+//            return array(0, 0);
+         
          return array($ImageSize[0], $ImageSize[1]);
+      }
+      
       return array(0, 0);
    }
    
@@ -179,7 +184,10 @@ class MediaModel extends VanillaModel {
 
       $Path = ltrim(GetValue('Path', $Media), '/');
       if ($RequiresThumbnail) {
-         $ThumbPath = MediaModel::PathUploads()."/thumbnails/$Path";
+//         $ThumbPath = MediaModel::PathUploads()."/thumbnails/$Path";
+         if (StringEndsWith($Path, '.bmp', TRUE))
+            $Path .= '.png';
+         
          if (file_exists(MediaModel::PathUploads()."/thumbnails/$Path"))
             $Result = "/uploads/thumbnails/$Path";
          else
