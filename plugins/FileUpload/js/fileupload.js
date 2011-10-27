@@ -40,7 +40,7 @@ function Gdn_Uploaders() {
       this.Uploaders[this.UploaderIndex].isIE = this.isIE;
       this.Uploaders[this.UploaderIndex].ieVersion = this.ieVersion;
       this.Uploaders[this.UploaderIndex].CompatibilityMode = this.CompatibilityMode;
-      this.Uploaders[this.UploaderIndex].Apc((gdn.definition('apcavailable')) ? 'true' : 'false');
+      this.Uploaders[this.UploaderIndex].Apc((gdn.definition('apcavailable')) ? true : false);
       this.Uploaders[this.UploaderIndex].Ready();
       this.UploaderIndex++;
    }

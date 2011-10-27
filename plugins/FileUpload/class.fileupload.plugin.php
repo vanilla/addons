@@ -812,6 +812,12 @@ class FileUploadPlugin extends Gdn_Plugin {
          
          if ($e->getFilename() != '???')
             $MediaResponse['StrError'] = '('.$e->getFilename().') '.$MediaResponse['StrError'];
+      } catch (Exception $Ex) {
+         $MediaResponse = array(
+            'Status'          => 'failed',
+            'ErrorCode'       => $Ex->getCode(),
+            'StrError'        => $Ex->getMessage()
+         );
       }
       
       $Sender->SetJSON('MediaResponse', $MediaResponse);
