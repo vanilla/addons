@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions and comments.',
-   'Version' => '1.5.3',
+   'Version' => '1.5.4',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -469,12 +469,9 @@ class FileUploadPlugin extends Gdn_Plugin {
     * Create and display a thumbnail of an uploaded file.
     */
    public function UtilityController_Thumbnail_Create($Sender, $Args = array()) {
+      $MediaID = array_shift($Args);
       $SubPath = implode('/', $Args);
       $Name = $SubPath;
-      
-      if (StringEndsWith($SubPath, '.bmp.png', TRUE)) {
-         $SubPath = StringEndsWith($SubPath, '.png', TRUE, TRUE);
-      }
 
       // Get actual path to the file
       $Path = Gdn_Upload::CopyLocal($SubPath);
@@ -523,6 +520,13 @@ class FileUploadPlugin extends Gdn_Plugin {
       // Cleanup if we're using a scratch copy
       if ($Path != MediaModel::PathUploads().'/'.$SubPath)
          @unlink($Path);
+      
+      if (is_numeric($MediaID)) {
+         // Save the thumbnail information.
+         $Model = new MediaModel();
+         $Media = array('MediaID' => $MediaID, 'ThumbWidth' => $Width, 'ThumbHeight' => $Height, 'ThumbPath' => "/thumbnails/$Name");
+         $Model->Save($Media);
+      }
 
       $Url = MediaModel::Url("/thumbnails/$Name");
       Redirect($Url, 301);
@@ -918,6 +922,11 @@ class FileUploadPlugin extends Gdn_Plugin {
          ->Column('ImageHeight', 'usmallint', NULL)
          ->Column('StorageMethod', 'varchar(24)')
          ->Column('Path', 'varchar(255)')
+         
+         ->Column('ThumbWidth', 'usmallint', NULL)
+         ->Column('ThumbHeight', 'usmallint', NULL)
+         ->Column('ThumbPath', 'varchar(255)', NULL)
+      
          ->Column('InsertUserID', 'int(11)')
          ->Column('DateInserted', 'datetime')
          ->Column('ForeignID', 'int(11)', TRUE)

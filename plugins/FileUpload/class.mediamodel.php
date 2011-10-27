@@ -170,6 +170,9 @@ class MediaModel extends VanillaModel {
    }
 
    public static function ThumbnailUrl($Media) {
+      if (GetValue('ThumbPath', $Media))
+         return '/uploads/'.ltrim(GetValue('ThumbPath', $Media), '/');
+      
       $Width = GetValue('ImageWidth', $Media);
       $Height = GetValue('ImageHeight', $Media);
 
@@ -184,14 +187,7 @@ class MediaModel extends VanillaModel {
 
       $Path = ltrim(GetValue('Path', $Media), '/');
       if ($RequiresThumbnail) {
-//         $ThumbPath = MediaModel::PathUploads()."/thumbnails/$Path";
-         if (StringEndsWith($Path, '.bmp', TRUE))
-            $Path .= '.png';
-         
-         if (file_exists(MediaModel::PathUploads()."/thumbnails/$Path"))
-            $Result = "/uploads/thumbnails/$Path";
-         else
-            $Result = "/utility/thumbnail/$Path";
+         $Result = '/utility/thumbnail/'.GetValue('MediaID', $Media, 'x').'/'.$Path;
       } else {
          $Result = "/uploads/$Path";
       }
