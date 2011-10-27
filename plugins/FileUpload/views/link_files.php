@@ -21,7 +21,7 @@
                   }
 
                   $ThumbnailUrl = MediaModel::ThumbnailUrl($Media);
-                  $Img .= Img($ThumbnailUrl, array('class' => 'ImageThumbnail'));
+                  $Img .= Img($ThumbnailUrl, array('class' => 'ImageThumbnail', 'width' => GetValue('ThumbWidth', $Media), 'height' => GetValue('ThumbHeight', $Media)));
 
                   if ($CanDownload)
                      $Img .= '</a>';
