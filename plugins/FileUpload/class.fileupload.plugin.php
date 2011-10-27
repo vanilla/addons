@@ -483,7 +483,14 @@ class FileUploadPlugin extends Gdn_Plugin {
       $SHeight = $ImageSize[1];
       $SWidth = $ImageSize[0];
       
-      if ($ImageSize[2] == IMAGETYPE_BMP) {
+      if (!in_array($ImageSize[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
+         if (is_numeric($MediaID)) {
+            // Fix the thumbnail information so this isn't requested again and again.
+            $Model = new MediaModel();
+            $Media = array('MediaID' => $MediaID, 'ImageWidth' => 0, 'ImageHeight' => 0, 'ThumbPath' => NULL);
+            $Model->Save($Media);
+         }
+         
          $Url = Asset('/plugins/FileUpload/images/file.png');
          Redirect($Url, 301);
       }
