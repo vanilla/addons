@@ -44,13 +44,13 @@ class MediaModel extends VanillaModel {
       
       //die($Path);
    
-      if (!in_array(strtolower(pathinfo($Path, PATHINFO_EXTENSION)), array('bmp', 'gif', 'jpg', 'jpeg', 'png')))
+      if (!in_array(strtolower(pathinfo($Path, PATHINFO_EXTENSION)), array('gif', 'jpg', 'jpeg', 'png')))
          return array(0, 0);
 
       $ImageSize = @getimagesize($Path);
       if (is_array($ImageSize)) {
-//         if (!in_array($ImageSize[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG)))
-//            return array(0, 0);
+         if (!in_array($ImageSize[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG)))
+            return array(0, 0);
          
          return array($ImageSize[0], $ImageSize[1]);
       }

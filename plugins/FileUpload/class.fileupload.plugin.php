@@ -485,6 +485,11 @@ class FileUploadPlugin extends Gdn_Plugin {
       $ImageSize = getimagesize($Path);
       $SHeight = $ImageSize[1];
       $SWidth = $ImageSize[0];
+      
+      if ($ImageSize[2] == IMAGETYPE_BMP) {
+         $Url = Asset('/plugins/FileUpload/images/file.png');
+         Redirect($Url, 301);
+      }
 
       $Options = array();
 
@@ -520,7 +525,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          @unlink($Path);
 
       $Url = MediaModel::Url("/thumbnails/$Name");
-      Redirect($Url, 302);
+      Redirect($Url, 301);
 //      Gdn_FileSystem::ServeFile($TargetPath, basename($Path), '', 'inline');
    }
    
