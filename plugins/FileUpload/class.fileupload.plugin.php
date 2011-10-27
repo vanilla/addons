@@ -765,6 +765,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             'Path'            => $SaveFilename
          );
          $MediaID = $this->MediaModel()->Save($Media);
+         $Media['MediaID'] = $MediaID;
                   
          $FinalImageLocation = '';
          $PreviewImageLocation = MediaModel::ThumbnailUrl($Media);
