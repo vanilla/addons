@@ -171,7 +171,7 @@ class MediaModel extends VanillaModel {
 
    public static function ThumbnailUrl($Media) {
       if (GetValue('ThumbPath', $Media))
-         return '/uploads/'.ltrim(GetValue('ThumbPath', $Media), '/');
+         return Gdn_Upload::Url(ltrim(GetValue('ThumbPath', $Media), '/'));
       
       $Width = GetValue('ImageWidth', $Media);
       $Height = GetValue('ImageHeight', $Media);
@@ -187,9 +187,9 @@ class MediaModel extends VanillaModel {
 
       $Path = ltrim(GetValue('Path', $Media), '/');
       if ($RequiresThumbnail) {
-         $Result = '/utility/thumbnail/'.GetValue('MediaID', $Media, 'x').'/'.$Path;
+         $Result = Url('/utility/thumbnail/'.GetValue('MediaID', $Media, 'x').'/'.$Path, TRUE);
       } else {
-         $Result = "/uploads/$Path";
+         $Result = Gdn_Upload::Url($Path);
       }
       return $Result;
    }
