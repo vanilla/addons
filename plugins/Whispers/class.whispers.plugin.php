@@ -8,7 +8,7 @@
 $PluginInfo['Whispers'] = array(
    'Name' => 'Whispers',
    'Description' => "This plugin brings back functionality similar to the popular Vanilla 1 whispers.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18a3', 'Conversations' => '2.0.18a3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -220,10 +220,10 @@ class WhispersPlugin extends Gdn_Plugin {
          return;
 
       if ($CountWhispers = GetValue('CountWhispers', $Discussion)) {
-         $Str = '<span class="CommentCount MetaItem">'.Plural($CountWhispers, '%s whisper', '%s whispers').'</span>';
+         $Str = ' <span class="CommentCount MItem">'.Plural($CountWhispers, '%s whisper', '%s whispers').'</span> ';
 
          if (GetValue('NewWhispers', $Discussion)) {
-            $Str .= '<strong class="NewItems MetaItem">'.T('new').'</strong>';
+            $Str .= ' <strong class="HasNew">'.T('new').'</strong> ';
          }
          echo $Str;
       }
