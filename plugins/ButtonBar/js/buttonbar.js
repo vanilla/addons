@@ -289,6 +289,8 @@ jQuery(document).ready(function($) {
       },
       
       PrepareHtml: function(ButtonBarObj, TextArea) {
+         ButtonBar.DisableButton(ButtonBarObj, 'spoiler');
+         
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
             .html('You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php">Simple Html</a></b> in your post.')
