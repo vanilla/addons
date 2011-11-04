@@ -285,14 +285,14 @@ jQuery(document).ready(function($) {
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
             .html('You can use <b><a href="http://en.wikipedia.org/wiki/BBCode">BBCode</a></b> in your post.')
-            .after(TextArea);
+            .insertAfter(TextArea);
       },
       
       PrepareHtml: function(ButtonBarObj, TextArea) {
          $("<div></div>")
             .addClass('ButtonBarMarkupHint')
             .html('You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php">Simple Html</a></b> in your post.')
-            .after(TextArea);
+            .insertAfter(TextArea);
       },
       
       PrepareMarkdown: function(ButtonBarObj, TextArea) {
