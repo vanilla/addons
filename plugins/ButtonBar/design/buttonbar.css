@@ -56,12 +56,12 @@
    background-color: white;
 }
 
-.ButtonBar .Bold { background-image: url('images/bold.png'); }
-.ButtonBar .Italic { background-image: url('images/italic.png'); }
-.ButtonBar .Underline { background-image: url('images/underline.png'); }
-.ButtonBar .Strike { background-image: url('images/strike.png'); }
-.ButtonBar .Code { background-image: url('images/code.png'); }
-.ButtonBar .Image { background-image: url('images/image.png'); }
-.ButtonBar .Url { background-image: url('images/url.png'); }
-.ButtonBar .Quote { background-image: url('images/quote.png'); }
-.ButtonBar .Spoiler { background-image: url('images/spoiler.png'); }
+.ButtonBar .ButtonBarBold { background-image: url('images/bold.png'); }
+.ButtonBar .ButtonBarItalic { background-image: url('images/italic.png'); }
+.ButtonBar .ButtonBarUnderline { background-image: url('images/underline.png'); }
+.ButtonBar .ButtonBarStrike { background-image: url('images/strike.png'); }
+.ButtonBar .ButtonBarCode { background-image: url('images/code.png'); }
+.ButtonBar .ButtonBarImage { background-image: url('images/image.png'); }
+.ButtonBar .ButtonBarUrl { background-image: url('images/url.png'); }
+.ButtonBar .ButtonBarQuote { background-image: url('images/quote.png'); }
+.ButtonBar .ButtonBarSpoiler { background-image: url('images/spoiler.png'); }
