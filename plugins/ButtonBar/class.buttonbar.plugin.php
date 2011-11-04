@@ -4,7 +4,6 @@
  * ButtonBar Plugin
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
- * @version 1.0b3
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Addons
@@ -86,7 +85,7 @@ class ButtonBarPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender 
     */
    public function PostController_BeforeBodyInput_Handler($Sender) {
-      $this->AttachButtonBar($Sender);
+      $this->AttachButtonBar($Sender, TRUE);
    }
    
    /**
@@ -98,8 +97,13 @@ class ButtonBarPlugin extends Gdn_Plugin {
     * 
     * @param Gdn_Controller $Sender 
     */
-   protected function AttachButtonBar($Sender) {
-      echo $Sender->FetchView('buttonbar','','plugins/ButtonBar');
+   protected function AttachButtonBar($Sender, $Wrap = FALSE) {
+      $View = $Sender->FetchView('buttonbar','','plugins/ButtonBar');
+      
+      if ($Wrap)
+         echo Wrap($View, 'div', array('class' => 'P'));
+      else
+         echo $View;
    }
    
 }

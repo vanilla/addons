@@ -558,7 +558,7 @@ jQuery(document).ready(function($) {
    
    // Always find new button bars and handle their events
    $('.ButtonBar').livequery(function(){
-      var TextArea = $(this).parent('div').find('div.TextBoxWrapper textarea')[0];
+      var TextArea = $(this).closest('form').find('div.TextBoxWrapper textarea')[0];
       ButtonBar.AttachTo(TextArea);
    });
    
