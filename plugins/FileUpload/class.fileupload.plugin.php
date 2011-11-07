@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions and comments.',
-   'Version' => '1.5.4',
+   'Version' => '1.5.5',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -375,7 +375,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_Download_Create($Sender) {
       if (!$this->IsEnabled()) return;
-      if (!$this->CanDownload) throw new PermissionException("File could not be streamed: Access is denied");
+      if (!$this->CanDownload) throw PermissionException("File could not be streamed: Access is denied");
    
       list($MediaID) = $Sender->RequestArgs;
       $Media = $this->MediaModel()->GetID($MediaID);
