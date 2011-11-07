@@ -19,9 +19,6 @@ div.AnswerTabs li a:visited {
 	background: none;
 	border: none;
 }
-.Loading {
-   background: url('images/progress.gif') center center no-repeat #fff;
-}
 div.AnswerTabs li.Active a {
 	padding: 6px 10px 5px;
 	position: relative;
@@ -95,12 +92,12 @@ ul.Discussions div.ItemContent a.Title {
 ul.DataList li.Item {
 	position: relative;
 }
-ul.DataList div.Options {
+ul.Discussions .Options {
 	float:none;
 	width:auto;
 	position: absolute;
 	top: 2px;
-	right: 208px;
+	right: 215px;
 }
 ul.DataList div.Meta {
 	z-index: 5;
