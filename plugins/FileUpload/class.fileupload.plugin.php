@@ -1,17 +1,24 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+
+/**
+ * FileUpload Plugin
+ * 
+ * This plugin enables file uploads and attachments to discussions and comments.
+ * 
+ * Changes: 
+ *  1.5     Add hooks for API uploading. Add docs. Fix constructor to call parent.
+ *  1.5.6   Add hook for discussions/download
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Addons
+ */
 
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions and comments.',
-   'Version' => '1.5.4',
+   'Version' => '1.5.6',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -24,11 +31,6 @@ $PluginInfo['FileUpload'] = array(
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
-/**
-1.5 Changes: Add hooks for API uploading. Add docs. Fix constructor to call parent.
-*/
-
-//Gdn_LibraryMap::SafeCache('library','class.mediamodel.php',dirname(__FILE__).DS.'models/class.mediamodel.php');
 
 include dirname(__FILE__).'/class.mediamodel.php';
 
@@ -375,7 +377,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_Download_Create($Sender) {
       if (!$this->IsEnabled()) return;
-      if (!$this->CanDownload) throw new PermissionException("File could not be streamed: Access is denied");
+      if (!$this->CanDownload) throw PermissionException("File could not be streamed: Access is denied");
    
       list($MediaID) = $Sender->RequestArgs;
       $Media = $this->MediaModel()->GetID($MediaID);
@@ -393,11 +395,17 @@ class FileUploadPlugin extends Gdn_Plugin {
       else
          $ServeMode = 'attachment';
 
+      $Served = FALSE;
+      $this->EventArguments['DownloadPath'] = $DownloadPath;
+      $this->EventArguments['ServeMode'] = $ServeMode;
       $this->EventArguments['Media'] = $Media;
+      $this->EventArguments['Served'] = &$Served;
       $this->FireEvent('BeforeDownload');
       
-      return Gdn_FileSystem::ServeFile($DownloadPath, $Filename, '', $ServeMode);
-      throw new Exception('File could not be streamed: missing file ('.$DownloadPath.').');
+      if (!$Served) {
+         return Gdn_FileSystem::ServeFile($DownloadPath, $Filename, '', $ServeMode);
+         throw new Exception('File could not be streamed: missing file ('.$DownloadPath.').');
+      }
       
       exit();
    }

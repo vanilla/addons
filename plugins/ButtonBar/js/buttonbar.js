@@ -157,7 +157,7 @@ $.fn.insertRoundTag = function(tagName, opts, props){
    if (props) {
       var focusing = false;
       for ( var param in props) {
-         if (hasFocused) { strEnd = strEnd + ' ' + param + '="' + props[param] + '"'; continue; }
+         if (hasFocused) {strEnd = strEnd + ' ' + param + '="' + props[param] + '"';continue;}
          
          if (!hasFocused) {
             strStart = strStart + ' ' + param + '="' + props[param];
@@ -184,6 +184,8 @@ $.fn.insertRoundTag = function(tagName, opts, props){
       
       strEnd = strEnd + opener + closeslice + closetag + closer + suffix;
    } else {
+      if (closeslice && closeslice.length)
+         closeslice = " "+closeslice;
       if (!hasFocused)
          strStart = strStart + closeslice + closer + suffix;
       else
@@ -243,11 +245,12 @@ jQuery(document).ready(function($) {
          ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+l');
          ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+q');
          ButtonBar.BindShortcut(TextArea, 'prompturl', 'ctrl+shift+l');
+         ButtonBar.BindShortcut(TextArea, 'post', 'tab');
       },
       
       BindShortcut: function(TextArea, Operation, Shortcut, ShortcutMode, OpFunction) {
          if (OpFunction == undefined)
-            OpFunction = function(e){ ButtonBar.Perform(TextArea, Operation, e); }
+            OpFunction = function(e){ButtonBar.Perform(TextArea, Operation, e);}
          
          if (ShortcutMode == undefined)
             ShortcutMode = 'keydown';
@@ -317,6 +320,12 @@ jQuery(document).ready(function($) {
          
          // Call performer
          ButtonBar[PerformMethod](TextArea,Operation);
+         
+         switch (Operation) {
+            case 'post':
+               $(TextArea).closest('form').find('.CommentButton').focus();
+               break;
+         }
       },
       
       PerformBBCode: function(TextArea, Operation) {
