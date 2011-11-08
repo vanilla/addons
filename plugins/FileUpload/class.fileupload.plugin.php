@@ -387,9 +387,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Filename = Gdn::Request()->Filename();
       if (!$Filename) $Filename = $Media->Name;
       
-      // Get actual path to the file
-      $DownloadPath = Gdn_Upload::CopyLocal(GetValue('Path', $Media));
-      
+      $DownloadPath = CombinePaths(array(MediaModel::PathUploads(),GetValue('Path', $Media)));
+
       if (in_array(strtolower(pathinfo($Filename, PATHINFO_EXTENSION)), array('bmp', 'gif', 'jpg', 'jpeg', 'png')))
          $ServeMode = 'inline';
       else
