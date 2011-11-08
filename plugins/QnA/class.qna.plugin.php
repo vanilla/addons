@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0.5b',
+   'Version' => '1.0.6b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -316,8 +316,6 @@ class QnAPlugin extends Gdn_Plugin {
 
       if (strtolower(GetValue('Type', $Discussion)) != 'question')
          return;
-      
-      $Args['CssClass'] .= ' Something here';
    }
 
    public function Base_BeforeDiscussionMeta_Handler($Sender, $Args) {
