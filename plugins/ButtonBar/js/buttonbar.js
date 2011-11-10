@@ -221,7 +221,7 @@ jQuery(document).ready(function($) {
          ButtonBar.BindShortcuts(TextArea);
          
          // Attach events
-         $(ThisButtonBar).find('div').click(function(event){
+         $(ThisButtonBar).find('div').mousedown(function(event){
             var MyButtonBar = $(event.target).closest('.ButtonBar');
             var Button = $(event.target).find('span').closest('div');
             if ($(Button).hasClass('ButtonOff')) return;
