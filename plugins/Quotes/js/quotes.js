@@ -183,6 +183,7 @@ function Gdn_Quotes() {
       jQuery.ajax({
          url: QuotebackURL,
          type: 'GET',
+         dataType: 'json',
          success: jQuery.proxy(this.QuoteResponse,this)
       });
       return true;
@@ -197,7 +198,6 @@ function Gdn_Quotes() {
    }
    
    Gdn_Quotes.prototype.QuoteResponse = function(Data, Status, XHR) {
-      Data = jQuery.parseJSON(Data);
       if (Data && Data.Quote.selector) {
          var ObjectID = Data.Quote.selector;
          this.RemoveSpinner();
