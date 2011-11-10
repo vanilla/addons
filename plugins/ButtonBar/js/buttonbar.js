@@ -157,7 +157,7 @@ $.fn.insertRoundTag = function(tagName, opts, props){
    if (props) {
       var focusing = false;
       for ( var param in props) {
-         if (hasFocused) { strEnd = strEnd + ' ' + param + '="' + props[param] + '"'; continue; }
+         if (hasFocused) {strEnd = strEnd + ' ' + param + '="' + props[param] + '"';continue;}
          
          if (!hasFocused) {
             strStart = strStart + ' ' + param + '="' + props[param];
@@ -250,7 +250,7 @@ jQuery(document).ready(function($) {
       
       BindShortcut: function(TextArea, Operation, Shortcut, ShortcutMode, OpFunction) {
          if (OpFunction == undefined)
-            OpFunction = function(e){ ButtonBar.Perform(TextArea, Operation, e); }
+            OpFunction = function(e){ButtonBar.Perform(TextArea, Operation, e);}
          
          if (ShortcutMode == undefined)
             ShortcutMode = 'keydown';
