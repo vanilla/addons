@@ -8,8 +8,8 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0.6b',
-   'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
+   'Version' => '1.0.7b',
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -348,7 +348,7 @@ class QnAPlugin extends Gdn_Plugin {
             $QnA = FALSE;
       }
       if ($QnA) {
-         echo ' <span class="Tag QnA-Tag-'.$QnA.'"'.$Title.'>'.T("Q&A $Text", $Text).'</span> ';
+         echo ' <span class="Tag QnA-Tag-'.$QnA.'"'.$Title.'>'.T("Q&A $QnA", $Text).'</span> ';
       }
    }
 
