@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['LocaleDeveloper'] = array(
    'Name' => 'Locale Developer',
    'Description' => 'Contains useful functions for locale developers. When you enable this plugin go to its settings page to change your options. This plugin is maintained at http://github.com/vanillaforums/Addons',
-   'Version' => '1.1',
+   'Version' => '1.1.1',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
@@ -20,16 +20,6 @@ $PluginInfo['LocaleDeveloper'] = array(
    'SettingsUrl' => '/dashboard/settings/localedeveloper',
    'SettingsPermission' => 'Garden.Site.Manage',
 );
-
-if (C('Plugins.LocaleDeveloper.CaptureDefinitions')) {
-   // Install the developer locale.
-   $_Locale = new DeveloperLocale(Gdn::Locale()->Current(), C('EnabledApplications'), C('EnabledPlugins'));
-
-   $tmp = Gdn::FactoryOverwrite(TRUE);
-   Gdn::FactoryInstall(Gdn::AliasLocale, 'DeveloperLocale', dirname(__FILE__).DS.'class.developerlocale.php', Gdn::FactorySingleton, $_Locale);
-   Gdn::FactoryOverwrite($tmp);
-   unset($tmp);
-}
 
 class LocaleDeveloperPlugin extends Gdn_Plugin {
    public $LocalePath;
@@ -44,7 +34,6 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
       $this->Form = new Gdn_Form();
       parent::__construct();
    }
-
 
    /**
     * Save the captured definitions.
@@ -94,6 +83,18 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
 
       // Copy the file over the existing one.
       $Result = rename($Path, $FinalPath);
+   }
+   
+   public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
+      if (C('Plugins.LocaleDeveloper.CaptureDefinitions')) {
+         // Install the developer locale.
+         $_Locale = new DeveloperLocale(Gdn::Locale()->Current(), C('EnabledApplications'), C('EnabledPlugins'));
+
+         $tmp = Gdn::FactoryOverwrite(TRUE);
+         Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $_Locale);
+         Gdn::FactoryOverwrite($tmp);
+         unset($tmp);
+      }
    }
 
    /**
