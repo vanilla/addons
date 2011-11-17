@@ -193,6 +193,13 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       $SourceUserID = GetValue('InsertUserID', $Data);
       $Signature = $this->Signatures($Sender, $SourceUserID);
+      
+      $this->EventArguments = array(
+         'UserID'    => $SourceUserID,
+         'Signature' => &$Signature
+      );
+      $this->FireEvent('BeforeDrawSignature');
+      
       if (!is_null($Signature)) {
          $HideImages = $this->UserPreferences('Plugin.Signatures.HideImages', FALSE);
          
