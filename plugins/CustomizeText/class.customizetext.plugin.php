@@ -67,7 +67,7 @@ class CustomizeTextPlugin extends Gdn_Plugin {
          
 			$Definitions = Gdn::Locale()->GetDeveloperDefinitions();
 			$Loop = 0;
-			$Changes = FALSE;
+			$Changed = FALSE;
 			foreach ($Definitions as $Key => $Definition) {
 				// Look for matches
 				$k = strtolower($Key);

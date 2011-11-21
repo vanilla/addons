@@ -59,7 +59,7 @@ class LastEditedPlugin extends Gdn_Plugin {
       $SourceUserID = $Data->InsertUserID;
       $UpdatedUserID = $Data->UpdateUserID;
       
-      $UserData = Gdn::UserModel()->Get($UpdatedUserID);
+      $UserData = Gdn::UserModel()->GetID($UpdatedUserID);
       $Sender->Edited = array(
          'Date'      => Gdn_Format::ToDateTime(Gdn_Format::ToTimestamp($Data->DateUpdated)),
          'User'      => GetValue('Name', $UserData, T('Unknown User'))
