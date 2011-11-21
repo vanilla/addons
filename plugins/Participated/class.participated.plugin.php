@@ -88,7 +88,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
    }
    
    // CONTEXT: DiscussionsController
-   public function DiscussionsController_AfterDiscussionTabs_Handler(&$Sender) {
+   public function DiscussionsController_AfterDiscussionTabs_Handler($Sender) {
       $Count = $this->GetCountParticipated();
       if ($Count > 0) {
          $MyParticipated = T('Participated Discussions');
