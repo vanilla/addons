@@ -92,7 +92,8 @@ class ParticipatedPlugin extends Gdn_Plugin {
       $Count = $this->GetCountParticipated();
       if ($Count > 0) {
          $MyParticipated = T('Participated Discussions');
-         $MyParticipated .= '<span>'.$Count.'</span>';
+         if (C('Vanilla.Discussions.ShowCounts', TRUE))
+            $MyParticipated .= '<span>'.$Count.'</span>';
          echo '<li '.(($Sender->RequestMethod == 'participated') ? ' class="Active"' : '').'>'.Anchor($MyParticipated, '/discussions/participated', 'MyParticipated TabLink').'</li>';
       }
    }
