@@ -65,6 +65,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
          ->Join('Comment c','d.DiscussionID = c.DiscussionID')
          ->Where('c.InsertUserID', $UserID)
          ->GroupBy('c.DiscussionID')
+         ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
    }
