@@ -16,6 +16,12 @@ $PluginInfo['QnA'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
 );
 
+/**
+ * Adds Question & Answer format to Vanilla.
+ * 
+ * You can set Plugins.QnA.UseBigButtons = TRUE in config to separate 'New Discussion'
+ * and 'Ask Question' into "separate" forms each with own big button in Panel.
+ */
 class QnAPlugin extends Gdn_Plugin {
    /// PROPERTIES ///
 
@@ -305,6 +311,11 @@ class QnAPlugin extends Gdn_Plugin {
       if (strcasecmp($Sender->RequestMethod, 'unanswered') == 0) {
          $Sender->SetData('CountDiscussions', FALSE);
       }
+      // Add 'Ask a Question' button if using BigButtons.
+      if (C('Plugins.QnA.UseBigButtons')) {
+         $QuestionModule = new NewQuestionModule($Sender, 'plugins/QnA');
+         $Sender->AddModule($QuestionModule);
+      }
    }
 
     /**
@@ -383,16 +394,19 @@ class QnAPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('qna.js', 'plugins/QnA');
 
       $Form = $Sender->Form;
-      if ($Sender->Form->GetValue('Type') == 'Question') {
+      $QuestionButton = !C('Plugins.QnA.UseBigButtons') || GetValue('Type', $_GET) == 'Question';
+      if ($Sender->Form->GetValue('Type') == 'Question' && $QuestionButton) {
          Gdn::Locale()->SetTranslation('Discussion Title', T('Question Title'));
          Gdn::Locale()->SetTranslation('Post Discussion', T('Ask Question'));
       }
-
-      include $Sender->FetchViewLocation('QnAPost', '', 'plugins/QnA');
+      
+      if (!C('Plugins.QnA.UseBigButtons'))
+         include $Sender->FetchViewLocation('QnAPost', '', 'plugins/QnA');
    }
 
    public function PostController_Render_Before($Sender, $Args) {
       $Form = $Sender->Form; //new Gdn_Form();
+      $QuestionButton = !C('Plugins.QnA.UseBigButtons') || GetValue('Type', $_GET) == 'Question';
       if (!$Form->IsPostBack()) {
          if (!property_exists($Sender, 'Discussion')) {
             $Form->SetValue('Type', 'Question');
@@ -401,8 +415,28 @@ class QnAPlugin extends Gdn_Plugin {
          }
       }
 
-      if ($Form->GetValue('Type') == 'Question') {
+      if ($Form->GetValue('Type') == 'Question' && $QuestionButton) {
          $Sender->SetData('Title', T('Ask a Question'));
+      }
+   }
+   
+   /**
+    * Add 'Ask a Question' button if using BigButtons.
+    */
+   public function CategoriesController_Render_Before($Sender) {
+      if (C('Plugins.QnA.UseBigButtons')) {
+         $QuestionModule = new NewQuestionModule($Sender, 'plugins/QnA');
+         $Sender->AddModule($QuestionModule);
+      }
+   }
+   
+   /**
+    * Add 'Ask a Question' button if using BigButtons.
+    */
+   public function DiscussionController_Render_Before($Sender) {
+      if (C('Plugins.QnA.UseBigButtons')) {
+         $QuestionModule = new NewQuestionModule($Sender, 'plugins/QnA');
+         $Sender->AddModule($QuestionModule);
       }
    }
 }

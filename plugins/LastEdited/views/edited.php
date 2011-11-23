@@ -1,0 +1,1 @@
+<div class="PostEdited"><?php echo sprintf(T('Post edited by %1$s at %2$s'), $this->Edited['User'], $this->Edited['Date']); ?></div>
