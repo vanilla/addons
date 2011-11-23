@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0.7b',
+   'Version' => '1.0.8b',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -92,8 +92,18 @@ class QnAPlugin extends Gdn_Plugin {
    public function Base_CommentOptions_Handler($Sender, $Args) {
       $Discussion = GetValue('Discussion', $Args);
       $Comment = GetValue('Comment', $Args);
+      
+      if (!$Comment)
+         return;
+      
+      if (!$Discussion) {
+         static $DiscussionModel = NULL;
+         if ($DiscussionModel === NULL)
+            $DiscussionModel = new DiscussionModel();
+         $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Comment));
+      }
 
-      if (!$Discussion || !$Comment || strtolower(GetValue('Type', $Discussion)) != 'question')
+      if (!$Discussion || strtolower(GetValue('Type', $Discussion)) != 'question')
          return;
 
       // Check permissions.
@@ -129,7 +139,7 @@ class QnAPlugin extends Gdn_Plugin {
       $QnA = GetValueR('Comment.QnA', $Args);
 
       if ($QnA && ($QnA == 'Accepted' || Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))) {
-         $Title = sprintf(T('%s Answer'), T('Q&A '.$QnA, $QnA));
+         $Title = T("QnA $QnA Answer", "$QnA Answer");
          echo ' <span class="Tag QnA-Box QnA-'.$QnA.'" title="'.htmlspecialchars($Title).'"><span>'.$Title.'</span></span> ';
       }
    }
@@ -269,9 +279,9 @@ class QnAPlugin extends Gdn_Plugin {
       
       $Count = Gdn::Cache()->Get('QnA-UnansweredCount');
       if ($Count === Gdn_Cache::CACHEOP_FAILURE)
-         $Count = '<span class="Popin Count" rel="/discussions/unansweredcount">';
+         $Count = ' <span class="Popin Count" rel="/discussions/unansweredcount">';
       else
-         $Count = '<span class="Count">'.$Count.'</span>';
+         $Count = ' <span class="Count">'.$Count.'</span>';
 
       echo '<li'.$CssClass.'><a class="TabLink QnA-UnansweredQuestions" href="'.Url('/discussions/unanswered').'">'.T('Unanswered Questions', 'Unanswered').$Count.'</span></a></li>';
    }
@@ -310,13 +320,6 @@ class QnAPlugin extends Gdn_Plugin {
       $Sender->SetData('_Value', $Count);
       $Sender->Render('Value', 'Utility', 'Dashboard');
    }
-   
-   public function Base_BeforeDiscussionName_Handler($Sender, $Args) {
-      $Discussion = $Args['Discussion'];
-
-      if (strtolower(GetValue('Type', $Discussion)) != 'question')
-         return;
-   }
 
    public function Base_BeforeDiscussionMeta_Handler($Sender, $Args) {
       $Discussion = $Args['Discussion'];
@@ -336,7 +339,7 @@ class QnAPlugin extends Gdn_Plugin {
          case 'Answered':
             $Text = 'Answered';
             if (GetValue('InsertUserID', $Discussion) == Gdn::Session()->UserID) {
-               $QnA = 'Answered Alert';
+               $QnA = 'Answered';
                $Title = ' title="'.T("Someone's answered your question. You need to accept/reject the answer.").'"';
             }
             break;
