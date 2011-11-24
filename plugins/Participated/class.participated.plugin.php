@@ -90,6 +90,17 @@ class ParticipatedPlugin extends Gdn_Plugin {
    
    // CONTEXT: DiscussionsController
    public function DiscussionsController_AfterDiscussionTabs_Handler($Sender) {
+      $this->AddParticipatedTab($Sender);
+   }
+   
+   public function CategoriesController_AfterDiscussionTabs_Handler($Sender) {
+      $this->AddParticipatedTab($Sender);
+   }
+   
+   /**
+    * Add navigation tab.
+    */
+   public function AddParticipatedTab($Sender) {
       $Count = $this->GetCountParticipated();
       if ($Count > 0) {
          $MyParticipated = T('Participated Discussions');
