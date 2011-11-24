@@ -1,4 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
+/**
+ * Multilingual Plugin
+ * 
+ * @author Matt Lincoln Russell <lincoln@vanillaforums.com>
+ * @copyright 2011 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Addons
+ */
 
 $PluginInfo['Multilingual'] = array(
    'Name' => 'Multilingual',
@@ -10,6 +18,18 @@ $PluginInfo['Multilingual'] = array(
    'AuthorUrl' => 'http://lincolnwebs.com'
 );
 
+/**
+ * Allows multiple locales to work in Vanilla.
+ *
+ * You can trigger an alternate locale by adding 'locale' in the query string,
+ * setting var vanilla_embed_locale in an embedded forum, or selecting one of the 
+ * language links added to the footer. User-selected locale takes precedence.
+ * The selected locale is stored in the session. If it is user-selected AND the
+ * user is logged in, it is stored in UserMeta.
+ *
+ * @example http://example.com/discussions?locale=de-DE
+ * @example <script>var vanilla_embed_locale = 'de-DE';</script>
+ */
 class MultilingualPlugin extends Gdn_Plugin {
    /**
     * Set user's preferred locale. Show alternate locale options in Foot.
