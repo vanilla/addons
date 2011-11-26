@@ -87,16 +87,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
       
       return ($Count instanceof Gdn_Dataset) ? $Count->NumRows() : FALSE;
    }
-   
-   // CONTEXT: DiscussionsController
-   public function DiscussionsController_AfterDiscussionTabs_Handler($Sender) {
-      $this->AddParticipatedTab($Sender);
-   }
-   
-   public function CategoriesController_AfterDiscussionTabs_Handler($Sender) {
-      $this->AddParticipatedTab($Sender);
-   }
-   
+      
    /**
     * Add navigation tab.
     */
@@ -108,6 +99,15 @@ class ParticipatedPlugin extends Gdn_Plugin {
             $MyParticipated .= '<span>'.$Count.'</span>';
          echo '<li '.(($Sender->RequestMethod == 'participated') ? ' class="Active"' : '').'>'.Anchor($MyParticipated, '/discussions/participated', 'MyParticipated TabLink').'</li>';
       }
+   }
+   public function DiscussionsController_AfterDiscussionTabs_Handler($Sender) {
+      $this->AddParticipatedTab($Sender);
+   }
+   public function CategoriesController_AfterDiscussionTabs_Handler($Sender) {
+      $this->AddParticipatedTab($Sender);
+   }
+   public function DraftsController_AfterDiscussionTabs_Handler($Sender) {
+      $this->AddParticipatedTab($Sender);
    }
    
    // CONTEXT: DiscussionsController
