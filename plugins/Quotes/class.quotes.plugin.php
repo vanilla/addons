@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "This plugin allows users to quote each other easily.",
-   'Version' => '1.2.3',
+   'Version' => '1.3',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.10'),
    'RequiredTheme' => FALSE, 
@@ -195,17 +195,10 @@ BLOCKQUOTE;
       }
       
       //$QuoteData = array();
-      if ($Model !== FALSE) {
+      if ($Model) {
          $Data = $Model->GetID($ID);
          $NewFormat = C('Garden.InputFormatter');
          $QuoteFormat = $Data->Format;
-         $QuoteData = array_merge($QuoteData, array(
-            'status'       => 'success',
-            'body'         => $Data->Body,
-            'format'       => C('Garden.InputFormatter'),
-            'authorid'     => $Data->InsertUserID,
-            'authorname'   => $Data->InsertName
-         ));
          
          // Perform transcoding if possible
          $NewBody = $Data->Body;
@@ -218,8 +211,20 @@ BLOCKQUOTE;
                $NewBody = Gdn_Format::Text($NewBody);
             elseif ($QuoteFormat == 'Text' && $NewFormat == 'BBCode')
                $NewBody = Gdn_Format::Text($NewBody);
+            else
+               $NewBody = Gdn_Format::PlainText($NewBody, $QuoteFormat);
+            
+            Gdn::Controller()->InformMessage(sprintf(T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'), $QuoteFormat, $NewFormat));
          }
          $Data->Body = $NewBody;
+         
+         $QuoteData = array_merge($QuoteData, array(
+            'status'       => 'success',
+            'body'         => $Data->Body,
+            'format'       => C('Garden.InputFormatter'),
+            'authorid'     => $Data->InsertUserID,
+            'authorname'   => $Data->InsertName
+         ));
       }
    }
    

@@ -198,6 +198,8 @@ function Gdn_Quotes() {
    }
    
    Gdn_Quotes.prototype.QuoteResponse = function(Data, Status, XHR) {
+      gdn.inform(Data);
+      
       if (Data && Data.Quote.selector) {
          var ObjectID = Data.Quote.selector;
          this.RemoveSpinner();
@@ -212,14 +214,15 @@ function Gdn_Quotes() {
             var Append = '[quote="'+Data.Quote.authorname+'"]'+Data.Quote.body+'[/quote]'+"\n";
             break;
          
+         case 'Markdown':
          case 'Display':
          case 'Text':   // Plain
-            var Append = ' > '+Data.Quote.authorname+" said:\n";
-            Append = Append+' > '+Data.Quote.body+"\n";
+            var Append = '> '+Data.Quote.authorname+" said:\n";
+            Append = Append+'> '+Data.Quote.body.replace(/(\n)/g, "$1> ")+"\n";
             break;
             
          default:
-            var Append = '';
+            var Append = Data.Quote.body;
             return;
       
       }
