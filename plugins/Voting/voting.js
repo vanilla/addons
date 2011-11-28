@@ -82,7 +82,7 @@ jQuery(document).ready(function($) {
                   // Change the Bookmark count
                   count = $(btn).html();
                   count = count.substr(count.lastIndexOf('>')+1);
-                  count = json.State ? ++count : --count;
+                  count = json.State ? ++count : (count ? --count : 0);
                   txt = $(btn).find('span').text();
                   $(btn).html('<span>' + txt + '</span>' + count);
                   $(btn).blur();

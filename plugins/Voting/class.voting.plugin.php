@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Voting'] = array(
    'Name' => 'Voting',
    'Description' => 'Allows users to vote on comments and discussions.',
-   'Version' => '1.1.2b',
+   'Version' => '1.1.3b',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
