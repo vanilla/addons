@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Participated'] = array(
    'Name' => 'Participated Discussions',
    'Description' => "This plugin adds a tab to the main discussions view that displays a list of the logged-in user's participated discussions.",
-   'Version' => '1.0.0',
+   'Version' => '1.1.0',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
@@ -46,9 +46,12 @@ class ParticipatedPlugin extends Gdn_Plugin {
       return $this->CountParticipated;
    }
    
-   // CONTEXT: DiscussionModel
+   /**
+    * Gets list of discussions user has commented on.
+    * 
+    * @return DataSet
+    */
    public function DiscussionModel_GetParticipated_Create($Sender) {
-      
       $UserID = GetValue(0, $Sender->EventArguments);
       $Offset = GetValue(1, $Sender->EventArguments);
       $Limit = GetValue(2, $Sender->EventArguments);
@@ -61,15 +64,28 @@ class ParticipatedPlugin extends Gdn_Plugin {
       $Sender->SQL->Reset();
       $Sender->DiscussionSummaryQuery();
       
-      return $Sender->SQL->Select('d.*')
+      $Data = $Sender->SQL->Select('d.*')
+         ->Select('w.UserID', '', 'WatchUserID')
+         ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
+         ->Select('w.CountComments', '', 'CountCommentWatch')
+         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left')
          ->Join('Comment c','d.DiscussionID = c.DiscussionID')
          ->Where('c.InsertUserID', $UserID)
          ->GroupBy('c.DiscussionID')
          ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
+         
+      $Sender->AddDiscussionColumns($Data);
+      
+      return $Data;
    }
    
+   /**
+    * Gets number of discussions user has commented on.
+    *
+    * @return int
+    */
    public function DiscussionModel_GetCountParticipated_Create($Sender) {
       
       $UserID = GetValue(0, $Sender->EventArguments);
@@ -110,7 +126,9 @@ class ParticipatedPlugin extends Gdn_Plugin {
       $this->AddParticipatedTab($Sender);
    }
    
-   // CONTEXT: DiscussionsController
+   /**
+    * Create paginated list of discussions user has participated in.
+    */
    public function DiscussionsController_Participated_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.SignIn.Allow');
       
@@ -162,9 +180,4 @@ class ParticipatedPlugin extends Gdn_Plugin {
    public function Setup() {
       // Nothing to do here!
    }
-   
-   public function Structure() {
-      // Nothing to do here!
-   }
-         
 }
