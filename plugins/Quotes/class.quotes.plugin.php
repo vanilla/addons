@@ -108,18 +108,18 @@ QUOTE;
       
       if (is_null($ValidateUsernameRegex))
          $ValidateUsernameRegex = sprintf("[%s]+", 
-            C('Garden.User.ValidationRegex',"\d\w_"));
+            C('Garden.User.ValidationRegex',"\d\w_ "));
       
       switch ($Sender->EventArguments['Object']->Format) {
          case 'Html':
-            $Sender->EventArguments['Object']->Body = preg_replace_callback("/(<blockquote rel=\"({$ValidateUsernameRegex})\">)/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
+            $Sender->EventArguments['Object']->Body = preg_replace_callback("/(<blockquote rel=\"([^\"]+)\">)/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
             $Sender->EventArguments['Object']->Body = str_ireplace('</blockquote>','</p></div></blockquote>',$Sender->EventArguments['Object']->Body);
             break;
             
          case 'BBCode':
 			case 'Markdown':
             // BBCode quotes with authors
-            $Sender->EventArguments['Object']->Body = preg_replace_callback("/(\[quote=\"?({$ValidateUsernameRegex})\"?\])/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
+            $Sender->EventArguments['Object']->Body = preg_replace_callback("/(\[quote=\"?([^\"]+)\"?\])/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
             
             // BBCode quotes without authors
             $Sender->EventArguments['Object']->Body = str_ireplace('[quote]','<blockquote class="UserQuote"><div class="QuoteText"><p>',$Sender->EventArguments['Object']->Body);
