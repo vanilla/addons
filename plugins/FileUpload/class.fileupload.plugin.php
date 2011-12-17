@@ -401,8 +401,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       $this->EventArguments['Served'] = &$Served;
       $this->FireEvent('BeforeDownload');
       
-      if (!$Served) {
-         return Gdn_FileSystem::ServeFile($DownloadPath, $Filename, '', $ServeMode);
+      if (!$Served) { 
+         return Gdn_FileSystem::ServeFile($DownloadPath, $Filename, $Media->Type, $ServeMode);
          throw new Exception('File could not be streamed: missing file ('.$DownloadPath.').');
       }
       
