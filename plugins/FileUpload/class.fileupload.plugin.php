@@ -359,6 +359,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $Param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
       $MediaKey = $Type.'/'.$Controller->EventArguments[$RawType]->$Param;
+      echo $MediaKey;
       if (array_key_exists($MediaKey, $MediaList)) {
          $Controller->SetData('CommentMediaList', $MediaList[$MediaKey]);
          $Controller->SetData('GearImage', $this->GetWebResource('images/gear.png'));
@@ -385,7 +386,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (!$Media) return;
       
       $Filename = Gdn::Request()->Filename();
-      if (!$Filename) $Filename = $Media->Name;
+      if (!$Filename || $Filename == 'default') $Filename = $Media->Name;
       
       $DownloadPath = CombinePaths(array(MediaModel::PathUploads(),GetValue('Path', $Media)));
 
@@ -400,7 +401,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       $this->EventArguments['Media'] = $Media;
       $this->EventArguments['Served'] = &$Served;
       $this->FireEvent('BeforeDownload');
-      
+
       if (!$Served) { 
          return Gdn_FileSystem::ServeFile($DownloadPath, $Filename, $Media->Type, $ServeMode);
          throw new Exception('File could not be streamed: missing file ('.$DownloadPath.').');
