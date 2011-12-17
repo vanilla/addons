@@ -359,7 +359,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $Param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
       $MediaKey = $Type.'/'.$Controller->EventArguments[$RawType]->$Param;
-      echo $MediaKey;
+      
       if (array_key_exists($MediaKey, $MediaList)) {
          $Controller->SetData('CommentMediaList', $MediaList[$MediaKey]);
          $Controller->SetData('GearImage', $this->GetWebResource('images/gear.png'));
