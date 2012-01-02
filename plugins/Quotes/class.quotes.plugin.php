@@ -117,10 +117,9 @@ QUOTE;
             break;
             
          case 'BBCode':
-			case 'Markdown':
+         case 'Markdown':
             // BBCode quotes with authors
-            //$Sender->EventArguments['Object']->Body = preg_replace_callback("/(\[quote=\"?([^\"]+)\"?\])/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
-            $Sender->EventArguments['Object']->Body = preg_replace_callback("#(\[quote=[\"']?(.*?)(;[\d]+)?[\"']?\])#usi", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
+            $Sender->EventArguments['Object']->Body = preg_replace_callback("#(\[quote(\s+author)?=[\"']?(.*?)(\s+link.*?)?(;[\d]+)?[\"']?\])#usi", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
 
             // BBCode quotes without authors
             $Sender->EventArguments['Object']->Body = str_ireplace('[quote]','<blockquote class="UserQuote"><div class="QuoteText"><p>',$Sender->EventArguments['Object']->Body);
