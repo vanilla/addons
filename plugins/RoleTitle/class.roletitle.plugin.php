@@ -1,11 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 
 // 0.2 - 2011-09-07 - mosullivan - Added InjectCssClass, Optimized querying.
+// 0.3 - 2011-12-13 - linc - Add class to title span, make injected CSS class Vanilla-like (capitalized, no dashes).
 
 $PluginInfo['RoleTitle'] = array(
    'Name' => 'RoleTitle',
    'Description' => "Adds user's roles under their name in comments and adds related css definitions to the comment containers.",
-   'Version' => '0.2',
+   'Version' => '0.3',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'MobileFriendly' => TRUE,
    'HasLocale' => TRUE,
@@ -16,7 +17,6 @@ $PluginInfo['RoleTitle'] = array(
 );
 
 class RoleTitlePlugin extends Gdn_Plugin {
-   
    /**
     * Inject the roles under the username on comments.
     */
@@ -32,7 +32,7 @@ class RoleTitlePlugin extends Gdn_Plugin {
       if (!$Roles)
          return;
 
-      echo '<span>'.implode(', ', $Roles).'</span> ';
+      echo '<span class="RoleTitle">'.implode(', ', $Roles).'</span> ';
    }
 
    /**
@@ -51,7 +51,7 @@ class RoleTitlePlugin extends Gdn_Plugin {
          return;
       
       foreach ($CssRoles as &$RawRole)
-         $RawRole = 'role-'.str_replace(' ','_',  strtolower(Gdn_Format::Url($RawRole)));
+         $RawRole = 'Role_'.str_replace(' ','_', Gdn_Format::AlphaNumeric($RawRole));
    
       if (count($CssRoles))
          $Sender->EventArguments['CssClass'] .= ' '.implode(' ',$CssRoles);
