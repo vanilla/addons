@@ -102,6 +102,10 @@ class QnAPlugin extends Gdn_Plugin {
       if (!$Comment)
          return;
       
+      $CommentID = GetValue('CommentID', $Comment);
+      if (!is_numeric($CommentID))
+         return;
+      
       if (!$Discussion) {
          static $DiscussionModel = NULL;
          if ($DiscussionModel === NULL)
@@ -124,7 +128,7 @@ class QnAPlugin extends Gdn_Plugin {
          return;
 
       // Write the links.
-      $Query = http_build_query(array('commentid' => GetValue('CommentID', $Comment), 'tkey' => Gdn::Session()->TransientKey()));
+      $Query = http_build_query(array('commentid' => $CommentID, 'tkey' => Gdn::Session()->TransientKey()));
 
       echo ' <span class="MItem">'.Anchor(T('Accept', 'Accept'), '/discussion/qna/accept?'.$Query, array('class' => 'QnA-Yes', 'title' => T('Accept this answer.'))).'</span> '.
          ' <span class="MItem">'.Anchor(T('Reject', 'Reject'), '/discussion/qna/reject?'.$Query, array('class' => 'QnA-No', 'title' => T('Reject this answer.'))).'</span> ';
@@ -300,6 +304,7 @@ class QnAPlugin extends Gdn_Plugin {
       $Sender->View = 'Index';
       $Sender->SetData('_PagerUrl', 'discussions/unanswered/{Page}');
       $Sender->Index(GetValue(0, $Args, 'p1'));
+      $this->InUnanswered = TRUE;
    }
    
    /**
@@ -315,6 +320,16 @@ class QnAPlugin extends Gdn_Plugin {
       if (C('Plugins.QnA.UseBigButtons')) {
          $QuestionModule = new NewQuestionModule($Sender, 'plugins/QnA');
          $Sender->AddModule($QuestionModule);
+      }
+      
+      if (isset($this->InUnanswered)) {
+         // Remove announcements that aren't questions...
+         $Announcements = $Sender->Data('Announcements');
+         foreach ($Announcements as $i => $Row) {
+            if (GetValue('Type', $Row) != 'Questions')
+               unset($Announcements[$i]);
+         }
+         $Sender->SetData('Announcements', array_values($Announcements));
       }
    }
 
