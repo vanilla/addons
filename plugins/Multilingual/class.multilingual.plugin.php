@@ -31,14 +31,21 @@ $PluginInfo['Multilingual'] = array(
  * @example <script>var vanilla_embed_locale = 'de-DE';</script>
  */
 class MultilingualPlugin extends Gdn_Plugin {
+   
    /**
-    * Set user's preferred locale. Show alternate locale options in Foot.
+    * Set user's preferred locale. 
     */
-   public function Base_Render_Before($Sender) {
+   public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
       // Set user preference
       if ($TempLocale = $this->GetAlternateLocale()) {
          Gdn::Locale()->Set($TempLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
       }
+   }
+   
+   /**
+    * Show alternate locale options in Foot.
+    */
+   public function Base_Render_Before($Sender) {
       
       // Get locales
       $LocaleModel = new LocaleModel();
