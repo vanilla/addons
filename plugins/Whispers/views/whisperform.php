@@ -32,10 +32,6 @@
 
       echo '<div class="P">';
 
-      if (Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
-         echo '<span style="float: right">'.Anchor(T('Continue in Private...'), '/discussion/makeconversation?discussionid='.Gdn::Controller()->Data('Discussion.DiscussionID'), '', array('title' => T('Continue this discussion in private.'))).'</span>';
-      }
-
       if ($HasPermission)
          echo $this->Form->CheckBox('Whisper', T('Whisper'));
 
@@ -45,11 +41,10 @@
          echo '<div id="WhisperForm">';
 
          echo '<div class="Info">',
-            T('Whispering will start a private conversation.', 'Whispering will start a private conversation associated with this discussion. You can also continue the whole discussion in private by clicking <b>Continue in Private</b> above.'),
+            T('Whispering will start a private conversation.', 'Whispering will start a private conversation associated with this discussion.'),
             '</div>';
 
          if (count($Conversations) > 0) {
-
             echo '<ul>';
 
             foreach ($Conversations as $Conversation) {
