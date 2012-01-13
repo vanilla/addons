@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "This plugin allows users to quote each other easily.",
-   'Version' => '1.3',
+   'Version' => '1.4',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.10'),
    'RequiredTheme' => FALSE, 
@@ -23,6 +23,11 @@ $PluginInfo['Quotes'] = array(
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
+
+/* Changelog
+1.4 - Use Anchor to generate profile link (Lincoln 2012-01-12)
+
+*/
 
 class QuotesPlugin extends Gdn_Plugin {
    
@@ -138,7 +143,8 @@ QUOTE;
    
    protected function QuoteAuthorCallback($Matches) {
       $Attribution = T('%s said:');
-      $Attribution = sprintf($Attribution, "<a href=\"/profile/{$Matches[2]}\" rel=\"nofollow\">{$Matches[2]}</a>");
+      $Link = Anchor($Matches[2], '/profile/'.$Matches[2], '', array('rel' => 'nofollow'));
+      $Attribution = sprintf($Attribution, $Link);
       return <<<BLOCKQUOTE
       <blockquote class="UserQuote"><div class="QuoteAuthor">{$Attribution}</div><div class="QuoteText"><p>
 BLOCKQUOTE;

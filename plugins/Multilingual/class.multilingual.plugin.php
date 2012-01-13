@@ -11,12 +11,17 @@
 $PluginInfo['Multilingual'] = array(
    'Name' => 'Multilingual',
    'Description' => "Allow user-selectable & queryable locales.",
-   'Version' => '1.0a',
+   'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
+   'MobileFriendly' => TRUE,
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com'
 );
+
+/* Changelog
+   1.0 - Make MobileFriendly //Lincoln 2012-01-13
+*/
 
 /**
  * Allows multiple locales to work in Vanilla.
@@ -31,7 +36,6 @@ $PluginInfo['Multilingual'] = array(
  * @example <script>var vanilla_embed_locale = 'de-DE';</script>
  */
 class MultilingualPlugin extends Gdn_Plugin {
-   
    /**
     * Set user's preferred locale. 
     */
