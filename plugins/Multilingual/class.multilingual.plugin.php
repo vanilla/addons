@@ -50,6 +50,9 @@ class MultilingualPlugin extends Gdn_Plugin {
     * Show alternate locale options in Foot.
     */
    public function Base_Render_Before($Sender) {
+      // Not in Dashboard
+      if ($Sender->MasterView == 'admin')
+         return;
       
       // Get locales
       $LocaleModel = new LocaleModel();
