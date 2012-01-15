@@ -82,7 +82,7 @@ class QuotesPlugin extends Gdn_Plugin {
     * Add 'Quote' option to Discussion.
     */
    public function DiscussionController_AfterDiscussionMeta_Handler($Sender, $Args) {
-      $this->AddQuoteButton($Sender, $Args, 'Discussion');
+      $this->AddQuoteButton($Sender, $Args);
    }
    
    /**
@@ -95,13 +95,13 @@ class QuotesPlugin extends Gdn_Plugin {
    /**
     * Output Quote link.
     */
-   protected function AddQuoteButton($Sender, $Args, $Context = 'Comment') {
+   protected function AddQuoteButton($Sender, $Args) {
       if (!Gdn::Session()->UserID) return;
       
       $Object = !isset($Args['Comment']) ? $Sender->Data['Discussion'] : $Args['Comment'];
       $ObjectID = !isset($Args['Comment']) ? 'Discussion_'.$Sender->Data['Discussion']->DiscussionID : 'Comment_'.$Args['Comment']->CommentID;
       
-      echo Wrap(Anchor(T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE)), 'span', array('class' => 'MItem '.$Context.'Quote'));
+      echo Wrap(Anchor(T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE)), 'span', array('class' => 'MItem CommentQuote'));
    }
    
    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
