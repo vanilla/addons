@@ -12,9 +12,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "This plugin allows users to quote each other easily.",
-   'Version' => '1.4',
+   'Version' => '1.5',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.0.10'),
+   'RequiredApplications' => array('Vanilla' => '2.1a9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
@@ -78,24 +78,30 @@ class QuotesPlugin extends Gdn_Plugin {
       $Sender->AddCssFile($this->GetResource('css/quotes.css', FALSE, FALSE));
    }
    
-   public function DiscussionController_CommentOptions_Handler($Sender) {
-      $this->AddQuoteButton($Sender);
+   /**
+    * Add 'Quote' option to Discussion.
+    */
+   public function DiscussionController_AfterDiscussionMeta_Handler($Sender, $Args) {
+      $this->AddQuoteButton($Sender, $Args, 'Discussion');
    }
    
-   public function PostController_CommentOptions_Handler($Sender) {
-      $this->AddQuoteButton($Sender);
+   /**
+    * Add 'Quote' option to Comments.
+    */
+   public function DiscussionController_InsideCommentMeta_Handler($Sender, $Args) {
+      $this->AddQuoteButton($Sender, $Args);
    }
    
-   protected function AddQuoteButton($Sender) {
+   /**
+    * Output Quote link.
+    */
+   protected function AddQuoteButton($Sender, $Args, $Context = 'Comment') {
       if (!Gdn::Session()->UserID) return;
       
-      $Object = !isset($Sender->EventArguments['Comment']) ? $Sender->Data['Discussion'] : $Sender->EventArguments['Comment'];
-      $ObjectID = !isset($Sender->EventArguments['Comment']) ? 'Discussion_'.$Sender->Data['Discussion']->DiscussionID : 'Comment_'.$Sender->EventArguments['Comment']->CommentID;
-      $QuoteURL = Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE);
-      $QuoteText = T('Quote');
-      echo <<<QUOTE
-      <span class="MItem CommentQuote"><a href="{$QuoteURL}">{$QuoteText}</a></span>
-QUOTE;
+      $Object = !isset($Args['Comment']) ? $Sender->Data['Discussion'] : $Args['Comment'];
+      $ObjectID = !isset($Args['Comment']) ? 'Discussion_'.$Sender->Data['Discussion']->DiscussionID : 'Comment_'.$Args['Comment']->CommentID;
+      
+      echo Wrap(Anchor(T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE)), 'span', array('class' => 'MItem '.$Context.'Quote'));
    }
    
    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
