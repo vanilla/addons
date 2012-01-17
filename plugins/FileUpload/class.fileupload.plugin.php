@@ -225,7 +225,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          $this->CacheAttachedMedia($Sender);
          $Sender->EventArguments['Type'] = 'Discussion';
          $Sender->EventArguments['Discussion'] = $Discussion;
-         $this->AttachUploadsToComment($Sender);
+         $this->AttachUploadsToComment($Sender, 'discussion');
       }
       $this->DrawAttachFile($Sender);
    }
@@ -323,6 +323,10 @@ class FileUploadPlugin extends Gdn_Plugin {
       $this->AttachUploadsToComment($Sender);
    }
    
+   public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
+      $this->AttachUploadsToComment($Sender, 'discussion');
+   }
+   
    /**
     * PostController_AfterCommentBody_Handler function.
     * 
@@ -341,10 +345,11 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @param mixed $Sender
     * @return void
     */
-   protected function AttachUploadsToComment($Controller) {
+   protected function AttachUploadsToComment($Controller, $Type = 'comment') {
       if (!$this->IsEnabled()) return;
       
-      $Type = strtolower($RawType = $Controller->EventArguments['Type']);
+      //$Type = strtolower($RawType = $Controller->EventArguments['Type']);
+      $RawType = ucfirst($Type);
 
       if (StringEndsWith($Controller->RequestMethod, 'Comment', TRUE) && $Type != 'comment') {
          $Type = 'comment';
