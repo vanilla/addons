@@ -1,0 +1,125 @@
+body {
+   background: #242424 url('images/noise-tile.gif') repeat top left;
+   color: white;
+   font-family: Arial;
+   padding-bottom: 50px;
+}
+
+body #Content {
+   width: 850px;
+   margin: 0px auto;
+   border: 0px;
+}
+
+.StopLogo {
+   margin-top: 40px;
+   height: 320px;
+   width: 100%;
+   background: transparent url('images/stop-sopa-logo.png') no-repeat top center;
+}
+
+body #Content h1,
+body #Content h2 {
+   font-size: 48px;
+   color: #ffeb3f;
+   background: none;
+   border: 0px;
+   font-weight: bold;
+   text-align: center;
+   margin: 0px;
+   margin-top: 40px;
+}
+
+p {
+   width: 510px;
+   
+   font-size: 17px;
+   line-height: 22px;
+   font-weight: lighter;
+   text-align: center;
+   margin: 3px auto;
+   color: white;
+}
+
+p a {
+   color: #ff0000;
+   text-decoration: none;
+}
+
+.ActionTable {
+   margin-top: 50px;
+   width: 850px;
+   overflow: hidden;
+   height: 100%;
+}
+
+.ActionTable .ActionLinks {
+   width: 289px;
+   float: left;
+   background: transparent url('images/vert.png') no-repeat top right;
+   padding: 20px 20px 20px 0px;
+   min-height: 300px;
+}
+
+.Flag {
+   overflow: hidden;
+   height: 100%;
+   margin-bottom: 10px;
+}
+
+.Flag .FlagLogo {
+   float: left;
+   width: 97px;
+   height: 51px;
+   margin-right: 21px;
+}
+
+.Flag .FlagLogo.USFlag {
+   background: transparent url('images/usflag.jpg') no-repeat center left;
+}
+
+.Flag .FlagLogo.UNFlag {
+   background: transparent url('images/unflag.jpg') no-repeat center left;
+}
+
+.Flag .FlagText {
+   color: white;
+   font-size: 17px;
+   text-align: left;
+   padding: 5px 0px;
+}
+
+.Flag .FlagText span {
+   display: block;
+   color: #7a7a7a;
+   text-transform: uppercase;
+}
+
+.ActionLinks .Links {
+   margin-bottom: 35px;
+}
+
+.ActionLinks .Links a {
+   color: #ffeb3f;
+   text-transform: uppercase;
+   text-decoration: none;
+   display: block;
+   margin-bottom: 5px;
+}
+.ActionLinks .Links a:hover {
+   color: #fff59c;
+}
+
+.ActionTable .ActionVideo {
+   margin-left: 309px;
+   padding: 20px 0px 20px 20px;
+}
+
+.LearnMore {
+   margin: 0px auto;
+   width: 510px;
+}
+
+.LearnMore p {
+   margin: 10px 0px 15px 0px;
+}
