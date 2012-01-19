@@ -30,7 +30,7 @@ echo $this->Form->Open(), $this->Form->Errors();
    <li>
      <?php
      echo $this->Form->Label('Site Name', 'Name'),
-     '<div class="Info">'.T('Enter a short name for the site.', 'Enter a short name for the site. This is displayed the signin buttons.').'</div>',
+     '<div class="Info">'.T('Enter a short name for the site.', 'Enter a short name for the site. This is displayed on the signin buttons.').'</div>',
       $this->Form->TextBox('Name');
      ?>
    </li>
@@ -51,7 +51,7 @@ echo $this->Form->Open(), $this->Form->Errors();
    <li>
      <?php
      echo $this->Form->Label('Register Url', 'RegisterUrl'),
-     '<div class="Info">'.T('The url that users go to to register for a new account.').'</div>',
+     '<div class="Info">'.T('The url that users use to register for a new account.').'</div>',
       $this->Form->TextBox('RegisterUrl', array('class' => 'InputBox BigInput'));
      ?>
    </li>

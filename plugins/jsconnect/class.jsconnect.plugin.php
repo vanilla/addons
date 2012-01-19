@@ -2,13 +2,14 @@
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @since 1.1.2b Fixed ConnectUrl to examine given url for existing querystring params and concatenate query params appropriately.
  */
 
 // Define the plugin:
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'An SSO plugin that uses json(p) to connect to vanilla, allowing for cross-domain sso.',
-   'Version' => '1.1.1b',
+   'Version' => '1.1.2b',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -104,7 +105,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       if (StringBeginsWith($Query['Target'], '/entry/signin'))
          $Query['Target'] = '/';
       
-      $Result = $Url.'?'.http_build_query($Query);
+      $Result = $Url.(strpos($Url, '?') === FALSE ? '?' : '&').http_build_query($Query);
       if ($Callback)
          $Result .= '&callback=?';
       return $Result;
