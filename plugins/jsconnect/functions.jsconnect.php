@@ -81,7 +81,7 @@ function SignJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = FALSE
          $Data[$Key] = '';
    }
    
-   $String = http_build_query($Data);
+   $String = http_build_query($Data, NULL, '&');
 //   echo "$String\n";
    $Signature = JsHash($String.$Secret, $HashType);
    
