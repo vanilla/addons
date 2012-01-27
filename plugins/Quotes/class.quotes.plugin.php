@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "This plugin allows users to quote each other easily.",
-   'Version' => '1.5',
+   'Version' => '1.5.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1a9'),
    'RequiredTheme' => FALSE, 
@@ -85,10 +85,7 @@ class QuotesPlugin extends Gdn_Plugin {
       $this->AddQuoteButton($Sender, $Args);
    }
    
-   /**
-    * Add 'Quote' option to Comments.
-    */
-   public function DiscussionController_InsideCommentMeta_Handler($Sender, $Args) {
+   public function DiscussionController_CommentOptions_Handler($Sender, $Args) {
       $this->AddQuoteButton($Sender, $Args);
    }
    
