@@ -18,7 +18,7 @@
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions and comments.',
-   'Version' => '1.5.6',
+   'Version' => '1.5.7',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -319,8 +319,11 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @param mixed $Sender
     * @return void
     */
-   public function DiscussionController_AfterCommentBody_Handler($Sender) {
-      $this->AttachUploadsToComment($Sender);
+   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+      if (isset($Args['Type']))
+         $this->AttachUploadsToComment($Sender, strtolower($Args['Type']));
+      else
+         $this->AttachUploadsToComment($Sender);
    }
    
    public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
