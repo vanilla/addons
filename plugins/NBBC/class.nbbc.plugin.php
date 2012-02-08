@@ -1,4 +1,7 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+
+if (!defined('APPLICATION'))
+   exit();
 /*
   Copyright 2008, 2009 Vanilla Forums Inc.
   This file is part of Garden.
@@ -30,13 +33,53 @@ class NBBCPlugin extends Gdn_Plugin {
    }
 
    /// PROPERTIES ///
-
    /// METHODS ///
+
+   function DoImage($bbcode, $action, $name, $default, $params, $content) {
+      if ($action == BBCODE_CHECK)
+         return true;
+      $content = trim($bbcode->UnHTMLEncode(strip_tags($content)));
+      if ($bbcode->IsValidUrl($content, false))
+         return "<img src=\"" . htmlspecialchars($content) . "\" alt=\""
+            . htmlspecialchars(basename($content)) . "\" class=\"bbcode_img\" />";
+      
+      
+//      if (preg_match("/\\.(?:gif|jpeg|jpg|jpe|png)$/i", $content)) {
+//         if (preg_match("/^[a-zA-Z0-9_][^:]+$/", $content)) {
+//            if (!preg_match("/(?:\\/\\.\\.\\/)|(?:^\\.\\.\\/)|(?:^\\/)/", $content)) {
+//               $info = @getimagesize("{$bbcode->local_img_dir}/{$content}");
+//               if ($info[2] == IMAGETYPE_GIF || $info[2] == IMAGETYPE_JPEG || $info[2] == IMAGETYPE_PNG) {
+//                  return "<img src=\""
+//                  . htmlspecialchars("{$bbcode->local_img_url}/{$content}") . "\" alt=\""
+//                  . htmlspecialchars(basename($content)) . "\" width=\""
+//                  . htmlspecialchars($info[0]) . "\" height=\""
+//                  . htmlspecialchars($info[1]) . "\" class=\"bbcode_img\" />";
+//               }
+//            }
+//         } else if ($bbcode->IsValidURL($content, false)) {
+//            return "<img src=\"" . htmlspecialchars($content) . "\" alt=\""
+//            . htmlspecialchars(basename($content)) . "\" class=\"bbcode_img\" />";
+//         }
+//      }
+      return htmlspecialchars($params['_tag']) . htmlspecialchars($content) . htmlspecialchars($params['_endtag']);
+   }
+
+   function DoVideo($bbcode, $action, $name, $default, $params, $content) {
+//      <iframe width="420" height="315" src="http://www.youtube.com/embed/rXoyjQ-ZONs" frameborder="0" allowfullscreen></iframe>
+
+      list($Type, $Code) = explode(';', $default);
+      switch ($Type) {
+         case 'youtube':
+            return '<iframe width="420" height="315" src="http://www.youtube.com/embed/' . $Code . '" frameborder="0" allowfullscreen></iframe>';
+         default:
+            return $content;
+      }
+   }
 
    function DoQuote($bbcode, $action, $name, $default, $params, $content) {
       if ($action == BBCODE_CHECK)
          return true;
-      
+
       if (is_string($default)) {
          $defaultParts = explode(';', $default); // support vbulletin style quoting.
          $Url = array_pop($defaultParts);
@@ -53,14 +96,14 @@ class NBBCPlugin extends Gdn_Plugin {
       if (isset($params['name'])) {
          $username = trim($params['name']);
          $username = html_entity_decode($username, ENT_QUOTES, 'UTF-8');
-         $title = ConcatSep(' ', $title, Anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/'.rawurlencode($username)), T('Quote wrote', 'wrote'));
+         $title = ConcatSep(' ', $title, Anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/' . rawurlencode($username)), T('Quote wrote', 'wrote'));
       }
 
       if (isset($params['date']))
          $title = ConcatSep(' ', $title, T('Quote on', 'on'), htmlspecialchars(trim($params['date'])));
 
       if ($title)
-         $title = $title.':';
+         $title = $title . ':';
 
       if (isset($params['url'])) {
          $url = trim($params['url']);
@@ -76,7 +119,7 @@ class NBBCPlugin extends Gdn_Plugin {
 
       if ($title)
          $title = "<div class=\"QuoteAuthor\">$title</div>";
-      
+
       return "\n<blockquote class=\"UserQuote\">\n"
       . $title . "\n<div class=\"QuoteText\">"
       . $content . "</div>\n</blockquote>\n";
@@ -86,8 +129,9 @@ class NBBCPlugin extends Gdn_Plugin {
       $Result = $this->NBBC()->Parse($String);
       return $Result;
    }
-   
+
    protected $_NBBC = NULL;
+
    public function NBBC() {
       if ($this->_NBBC === NULL) {
          require_once(dirname(__FILE__) . '/nbbc/nbbc.php');
@@ -96,8 +140,7 @@ class NBBCPlugin extends Gdn_Plugin {
          $BBCode->SetAllowAmpersand(TRUE);
 
 
-         $BBCode->AddRule('code',
-         Array(
+         $BBCode->AddRule('code', Array(
              'mode' => BBCODE_MODE_ENHANCED,
              'template' => "\n<pre>{\$_content/v}\n</pre>\n",
              'class' => 'code',
@@ -111,8 +154,7 @@ class NBBCPlugin extends Gdn_Plugin {
              'plain_end' => "\n",
          ));
 
-         $BBCode->AddRule('quote',
-         array('mode' => BBCODE_MODE_CALLBACK,
+         $BBCode->AddRule('quote', array('mode' => BBCODE_MODE_CALLBACK,
              'method' => array($this, "DoQuote"),
              'allow_in' => Array('listitem', 'block', 'columns'),
              'before_tag' => "sns",
@@ -123,26 +165,46 @@ class NBBCPlugin extends Gdn_Plugin {
              'plain_end' => "\n",
          ));
 
-         $BBCode->AddRule('spoiler',
-         Array(
-             'simple_start' => "\n".'<div class="UserSpoiler">
-   <div class="SpoilerTitle">'.T('Spoiler').': </div>
+         $BBCode->AddRule('spoiler', Array(
+             'simple_start' => "\n" . '<div class="UserSpoiler">
+   <div class="SpoilerTitle">' . T('Spoiler') . ': </div>
    <div class="SpoilerReveal"></div>
    <div class="SpoilerText" style="display: none;">',
-   'simple_end' => "</div></div>\n",
-   'allow_in' => Array('listitem', 'block', 'columns'),
-   'before_tag' => "sns",
-   'after_tag' => "sns",
-   'before_endtag' => "sns",
-   'after_endtag' => "sns",
-   'plain_start' => "\n",
-   'plain_end' => "\n"));
+             'simple_end' => "</div></div>\n",
+             'allow_in' => Array('listitem', 'block', 'columns'),
+             'before_tag' => "sns",
+             'after_tag' => "sns",
+             'before_endtag' => "sns",
+             'after_endtag' => "sns",
+             'plain_start' => "\n",
+             'plain_end' => "\n"));
          
-         
+         $BBCode->AddRule('img', array(
+            'mode' => BBCODE_MODE_CALLBACK,
+            'method' => array($this, "DoImage"),
+            'class' => 'image',
+            'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+            'end_tag' => BBCODE_REQUIRED,
+            'content' => BBCODE_REQUIRED,
+            'plain_start' => "[image]",
+            'plain_content' => Array(),
+            ));
+
+         $BBCode->AddRule('video', array('mode' => BBCODE_MODE_CALLBACK,
+             'method' => array($this, "DoVideo"),
+             'allow_in' => Array('listitem', 'block', 'columns'),
+             'before_tag' => "sns",
+             'after_tag' => "sns",
+             'before_endtag' => "sns",
+             'after_endtag' => "sns",
+             'plain_start' => "\n<b>Video:</b>\n",
+             'plain_end' => "\n",
+         ));
+
+
          $this->EventArguments['BBCode'] = $BBCode;
          $this->FireEvent('AfterNBBCSetup');
          $this->_NBBC = $BBCode;
-         
       }
       return $this->_NBBC;
    }
