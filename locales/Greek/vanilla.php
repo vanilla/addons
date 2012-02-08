@@ -1,5 +1,22 @@
 <?php if (!defined('APPLICATION')) exit();
 
+// Added 2012-02-08
+$Definition['Add a Comment'] = 'Προσθήκη Σχόλιου';
+$Definition['Announcement'] = 'Ανακοίνωση';
+$Definition['Change Password'] = 'Αλλαγή Κωδικού';
+$Definition['Closed'] = 'Κλειστό' ;
+$Definition['Dismiss'] = 'Απόρριψη';
+$Definition['Edit Discussion'] = 'Επεξεργασία Συζήτησης';
+$Definition['New Password'] = 'Νέος Κωδικός';
+$Definition['Old Password'] = 'Παλιός Κωδικός';
+$Definition['Pending'] = 'Εκκρεμεί';
+$Definition['Reopen'] = 'Επανάληψη Ανοίγματος';
+$Definition['Save Comment'] = 'Αποθήκευση Σχόλιου';
+$Definition['Send Again'] = 'Επανάληψη Αποστολής';
+$Definition['Uninvite'] = 'Ακύρωση Πρόσκλησης';
+$Definition['Unannounce'] = 'Ακύρωση Ανακοίνωσης';
+//
+
 $Definition['%s and you'] = '%s και εσύ';
 $Definition['%s comment'] = '%s σχόλιο';
 $Definition['%s comments'] = '%s σχόλια';
