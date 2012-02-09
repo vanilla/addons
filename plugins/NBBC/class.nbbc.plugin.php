@@ -65,12 +65,11 @@ class NBBCPlugin extends Gdn_Plugin {
    }
 
    function DoVideo($bbcode, $action, $name, $default, $params, $content) {
-//      <iframe width="420" height="315" src="http://www.youtube.com/embed/rXoyjQ-ZONs" frameborder="0" allowfullscreen></iframe>
 
       list($Type, $Code) = explode(';', $default);
       switch ($Type) {
          case 'youtube':
-            return '<iframe width="420" height="315" src="http://www.youtube.com/embed/' . $Code . '" frameborder="0" allowfullscreen></iframe>';
+            return '<div class="Video P"><iframe width="420" height="315" src="http://www.youtube.com/embed/' . $Code . '" frameborder="0" allowfullscreen></iframe></div>';
          default:
             return $content;
       }
