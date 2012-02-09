@@ -366,7 +366,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (!is_array($MediaList)) return;
       
       $Param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
-      $MediaKey = $Type.'/'.$Controller->EventArguments[$RawType]->$Param;
+      $MediaKey = $Type.'/'.GetValue($Param, GetValue($RawType, $Controller->EventArguments[$RawType]));
       
       if (array_key_exists($MediaKey, $MediaList)) {
          $Controller->SetData('CommentMediaList', $MediaList[$MediaKey]);
