@@ -65,11 +65,11 @@ class NBBCPlugin extends Gdn_Plugin {
    }
 
    function DoVideo($bbcode, $action, $name, $default, $params, $content) {
-
+      list($Width, $Height) = Gdn_Format::GetEmbedSize();
       list($Type, $Code) = explode(';', $default);
       switch ($Type) {
          case 'youtube':
-            return '<div class="Video P"><iframe width="420" height="315" src="http://www.youtube.com/embed/' . $Code . '" frameborder="0" allowfullscreen></iframe></div>';
+            return '<div class="Video P"><iframe width="'.$Width.'" height="'.$Height.'" src="http://www.youtube.com/embed/' . $Code . '" frameborder="0" allowfullscreen></iframe></div>';
          default:
             return $content;
       }
