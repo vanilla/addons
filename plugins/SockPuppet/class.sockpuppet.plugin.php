@@ -102,7 +102,7 @@ class SockPuppetPlugin extends Gdn_Plugin {
     * @param string $Fingerprint 
     */
    protected function SetUserFingerprint($UserID, $Fingerprint) {
-      Gdn::SQL()->Update('User', array('Fingerprint' => $Fingerprint), array('UserID' => $UserID))->Put();
+      Gdn::UserModel()->SetField($UserID, 'Fingerprint', $Fingerprint);
       Gdn::Session()->User->Fingerprint = $Fingerprint;
    }
    
