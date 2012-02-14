@@ -17,7 +17,7 @@
 $PluginInfo['SockPuppet'] = array(
    'Name' => 'Sock Puppet Detector',
    'Description' => "Allows the forum to detect and report on duplicate user accounts.",
-   'Version' => '1',
+   'Version' => '1.1a',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
