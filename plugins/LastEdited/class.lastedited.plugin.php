@@ -12,9 +12,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['LastEdited'] = array(
    'Name' => 'Last Edited',
    'Description' => 'This plugin appends a "post last edited by X at Y" line to the end of edited posts.',
-   'Version' => '1.0.2',
+   'Version' => '1.1',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.0'),
+   'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
@@ -47,11 +47,23 @@ class LastEditedPlugin extends Gdn_Plugin {
    }
    
    protected function DrawEdited(&$Sender) {
-      if (isset($Sender->EventArguments['Discussion']))
-         $Data = $Sender->EventArguments['Discussion'];
-         
-      if (isset($Sender->EventArguments['Comment']))
+      
+      $Discussion = $Sender->Discussion;
+      $PermissionCategoryID = $Discussion->PermissionCategoryID;
+      
+      // Assume discussion
+      $Data = $Discussion;
+      $RecordType = 'discussion';
+      $RecordID = GetValue('DiscussionID', $Data);
+      
+      // But override if comment
+      if (isset($Sender->EventArguments['Comment'])) {
          $Data = $Sender->EventArguments['Comment'];
+         $RecordType = 'comment';
+         $RecordID = GetValue('CommentID', $Data);
+      }
+      
+      $UserCanEdit = Gdn::Session()->CheckPermission('Vanilla.'.ucfirst($RecordType).'.Close', TRUE, 'Category', $PermissionCategoryID);
       
       if (is_null($Data->DateUpdated)) return;
       if ($Data->DateUpdated == $Data->DateInserted) return;
@@ -60,13 +72,17 @@ class LastEditedPlugin extends Gdn_Plugin {
       $UpdatedUserID = $Data->UpdateUserID;
       
       $UserData = Gdn::UserModel()->GetID($UpdatedUserID);
-      $Sender->Edited = array(
-         'Date'      => Gdn_Format::ToDateTime(Gdn_Format::ToTimestamp($Data->DateUpdated)),
-         'User'      => GetValue('Name', $UserData, T('Unknown User'))
+      $Edited = array(
+         'EditUser'     => GetValue('Name', $UserData, T('Unknown User')),
+         'EditDate'     => Gdn_Format::ToDateTime(Gdn_Format::ToTimestamp($Data->DateUpdated)),
+         'EditLogUrl'   => Url("/log/record/{$RecordType}/{$RecordID}")
       );
       
-      $Display = $Sender->FetchView($this->GetView('edited.php'));
-      unset($Sender->Edited);
+      $Format = T('PostEdited.Plain', 'Post edited by {EditUser} at {EditDate}');
+      if ($UserCanEdit)
+         $Format = T('PostEdited.Log', 'Post edited by {EditUser} at {EditDate} (<a href="{EditLogUrl}">log</a>)');
+      
+      $Display = '<div class="PostEdited">'.FormatString($Format, $Edited).'</div>';
       echo $Display;
       
    }
