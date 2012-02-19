@@ -63,7 +63,7 @@ class LastEditedPlugin extends Gdn_Plugin {
          $RecordID = GetValue('CommentID', $Data);
       }
       
-      $UserCanEdit = Gdn::Session()->CheckPermission('Vanilla.'.ucfirst($RecordType).'.Edit', TRUE, 'Category', $PermissionCategoryID);
+      $UserCanEdit = Gdn::Session()->CheckPermission('Vanilla.'.ucfirst($RecordType).'s.Edit', TRUE, 'Category', $PermissionCategoryID);
       
       if (is_null($Data->DateUpdated)) return;
       if ($Data->DateUpdated == $Data->DateInserted) return;
