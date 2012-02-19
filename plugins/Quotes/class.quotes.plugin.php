@@ -107,6 +107,9 @@ class QuotesPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
+      if (!Gdn::Session()->IsValid())
+         return;
+      
       $UserPrefs = Gdn_Format::Unserialize(Gdn::Session()->User->Preferences);
       if (!is_array($UserPrefs))
          $UserPrefs = array();
