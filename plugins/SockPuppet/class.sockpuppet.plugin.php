@@ -77,7 +77,7 @@ class SockPuppetPlugin extends Gdn_Plugin {
 			
          // Set the user and browser to the same fingerprint
 			$FingerprintValue = uniqid();
-			$this->SetUserFingerprint($UserID, $FingerprintValue);
+			$this->SetUserFingerprint(Gdn::Session()->UserID, $FingerprintValue);
 			$this->SetBrowserFingerprint($FingerprintValue);
          
          return;
@@ -138,7 +138,7 @@ class SockPuppetPlugin extends Gdn_Plugin {
    public function Structure() {
       Gdn::Structure()
          ->Table('User')
-			->Column('Fingerprint', 'varchar(50)', null)
+			->Column('Fingerprint', 'varchar(50)', NULL, 'index')
          ->Set();
 	}	
    
