@@ -72,7 +72,7 @@ function Gdn_Quotes() {
          
          if (FoldingLevel == TargetLevel) {
             $(ExamineQuote).addClass('QuoteFolded').hide();
-            $(ExamineQuote).before('<a href="" class="QuoteFolding">&raquo; show previous quotes</a>');
+            $(ExamineQuote).before('<div><a href="" class="QuoteFolding">&raquo; show previous quotes</a></div>');
             return;
          }
          
