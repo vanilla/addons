@@ -74,7 +74,7 @@ class LastEditedPlugin extends Gdn_Plugin {
       $UserData = Gdn::UserModel()->GetID($UpdatedUserID);
       $Edited = array(
          'EditUser'     => GetValue('Name', $UserData, T('Unknown User')),
-         'EditDate'     => Gdn_Format::ToDateTime(Gdn_Format::ToTimestamp($Data->DateUpdated)),
+         'EditDate'     => Gdn_Format::Date($Data->DateUpdated, 'html'),
          'EditLogUrl'   => Url("/log/record/{$RecordType}/{$RecordID}")
       );
       
