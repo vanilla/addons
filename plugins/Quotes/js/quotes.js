@@ -33,16 +33,29 @@ function Gdn_Quotes() {
          Quotes.SetInsertMode('cleditor', this);
       });
       
-      $('.Comment .UserQuote .UserQuote').livequery(function(){
-         if ($(this).closest('.QuoteFolding')) return;
-         $(this).css('display', 'none');
-         $(this).before('<a href="" class="QuoteFolding">&raquo; show previous quotes</a>');
+      $('.Comment .Message').livequery(function(){
+         
+         // Find the closest child quote
+         var PetQuote = $(this).children('.UserQuote');
+         console.log(PetQuote);
+         if (!PetQuote.length) return;
+         console.log('proceeding');
+         
+         $(PetQuote).each(function(oi, el){
+            var FoldQuote = $(el).children('.QuoteText').children('.UserQuote');
+            if (!FoldQuote.length) return;
+            console.log('folding');
+            
+            $(FoldQuote).addClass('QuoteFolded').hide();
+            $(FoldQuote).before('<a href="" class="QuoteFolding">&raquo; show previous quotes</a>');
+         });
       });
       
       $('a.QuoteFolding').livequery('click', function(){
-         var QuoteTarget = $(this).closest('.UserQuote').find('.UserQuote');
+         var QuoteTarget = $(this).closest('.QuoteText').children('.UserQuote');
          QuoteTarget = $(QuoteTarget);
          QuoteTarget.toggle();
+         
          if (QuoteTarget.css('display') != 'none')
             $(this).html('&laquo; hide previous quotes');
          else
