@@ -75,12 +75,17 @@ class LastEditedPlugin extends Gdn_Plugin {
       $Edited = array(
          'EditUser'     => GetValue('Name', $UserData, T('Unknown User')),
          'EditDate'     => Gdn_Format::Date($Data->DateUpdated, 'html'),
-         'EditLogUrl'   => Url("/log/record/{$RecordType}/{$RecordID}")
+         'EditLogUrl'   => Url("/log/record/{$RecordType}/{$RecordID}"),
+         'EditWord'     => 'at'
       );
       
-      $Format = T('PostEdited.Plain', 'Post edited by {EditUser} at {EditDate}');
+      $DateUpdateTime = Gdn_Format::ToTimestamp($Data->DateUpdated);
+      if (date('ymd', $DateUpdateTime) != date('ymd'))
+         $Edited['EditWord'] = 'on';
+      
+      $Format = T('PostEdited.Plain', 'Post edited by {EditUser} {EditWord} {EditDate}');
       if ($UserCanEdit)
-         $Format = T('PostEdited.Log', 'Post edited by {EditUser} at {EditDate} (<a href="{EditLogUrl}">log</a>)');
+         $Format = T('PostEdited.Log', 'Post edited by {EditUser} {EditWord} {EditDate} (<a href="{EditLogUrl}">log</a>)');
       
       $Display = '<div class="PostEdited">'.FormatString($Format, $Edited).'</div>';
       echo $Display;
