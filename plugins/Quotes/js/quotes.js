@@ -34,6 +34,7 @@ function Gdn_Quotes() {
       });
       
       $('.Comment .UserQuote .UserQuote').livequery(function(){
+         if ($(this).closest('.QuoteFolding')) return;
          $(this).css('display', 'none');
          $(this).before('<a href="" class="QuoteFolding">&raquo; show previous quotes</a>');
       });
