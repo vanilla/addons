@@ -32,6 +32,23 @@ function Gdn_Quotes() {
       $('div.cleditorMain').livequery(function(){
          Quotes.SetInsertMode('cleditor', this);
       });
+      
+      $('.Comment .UserQuote .UserQuote').livequery(function(){
+         $(this).css('display', 'none');
+         $(this).before('<a href="" class="QuoteFolding">&raquo; show previous quotes</a>');
+      });
+      
+      $('a.QuoteFolding').livequery('click', function(){
+         var QuoteTarget = $(this).closest('.UserQuote').find('.UserQuote');
+         QuoteTarget = $(QuoteTarget);
+         QuoteTarget.toggle();
+         if (QuoteTarget.css('display') != 'none')
+            $(this).html('&laquo; hide previous quotes');
+         else
+            $(this).html('&raquo; show previous quotes');
+         
+         return false;
+      });
    }
    
    Gdn_Quotes.prototype.SetInsertMode = function(InsertMode, ChangeElement) {
