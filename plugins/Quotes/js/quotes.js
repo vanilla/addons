@@ -33,32 +33,53 @@ function Gdn_Quotes() {
          Quotes.SetInsertMode('cleditor', this);
       });
       
-      $('.Comment .Message').livequery(function(){
-         
-         // Find the closest child quote
-         var PetQuote = $(this).children('.UserQuote');
-         if (!PetQuote.length) return;
-         
-         $(PetQuote).each(function(oi, el){
-            var FoldQuote = $(el).children('.QuoteText').children('.UserQuote');
-            if (!FoldQuote.length) return;
-            
-            $(FoldQuote).addClass('QuoteFolded').hide();
-            $(FoldQuote).before('<a href="" class="QuoteFolding">&raquo; show previous quotes</a>');
-         });
-      });
+      var QuoteFoldingLevel = gdn.definition('QuotesFolding', 1);
       
-      $('a.QuoteFolding').livequery('click', function(){
-         var QuoteTarget = $(this).closest('.QuoteText').children('.UserQuote');
-         QuoteTarget = $(QuoteTarget);
-         QuoteTarget.toggle();
+      if (QuoteFoldingLevel != 'None') {
+         QuoteFoldingLevel = parseInt(QuoteFoldingLevel) + 1;
+         var MaxFoldingLevel = 6;
+         $('.Comment .Message').livequery(function(){
+
+            
+            // Find the closest child quote
+            var PetQuote = $(this).children('.UserQuote');
+            if (!PetQuote.length) return;
+
+            Quotes.ExploreFold(PetQuote, 1, MaxFoldingLevel, QuoteFoldingLevel);
+            
+         });
+
+         $('a.QuoteFolding').livequery('click', function(){
+            var QuoteTarget = $(this).closest('.QuoteText').children('.UserQuote');
+            QuoteTarget = $(QuoteTarget);
+            QuoteTarget.toggle();
+
+            if (QuoteTarget.css('display') != 'none')
+               $(this).html('&laquo; hide previous quotes');
+            else
+               $(this).html('&raquo; show previous quotes');
+
+            return false;
+         });
+      }
+   }
+   
+   Gdn_Quotes.prototype.ExploreFold = function(QuoteTree, FoldingLevel, MaxLevel, TargetLevel) {
+      if (FoldingLevel > MaxLevel || FoldingLevel > TargetLevel) return;
+      var Quotes = this;
+      $(QuoteTree).each(function(i, el){
+         var ExamineQuote = $(el);
          
-         if (QuoteTarget.css('display') != 'none')
-            $(this).html('&laquo; hide previous quotes');
-         else
-            $(this).html('&raquo; show previous quotes');
+         if (FoldingLevel == TargetLevel) {
+            $(ExamineQuote).addClass('QuoteFolded').hide();
+            $(ExamineQuote).before('<a href="" class="QuoteFolding">&raquo; show previous quotes</a>');
+            return;
+         }
          
-         return false;
+         var FoldQuote = $(ExamineQuote).children('.QuoteText').children('.UserQuote');
+         if (!FoldQuote.length) return;
+
+         Quotes.ExploreFold(FoldQuote, FoldingLevel + 1, MaxLevel, TargetLevel);
       });
    }
    
@@ -231,7 +252,7 @@ function Gdn_Quotes() {
       if (Data && Data.Quote.selector) {
          var ObjectID = Data.Quote.selector;
          this.RemoveSpinner();
-      } else { return; }
+      } else {return;}
       
       switch (Data.Quote.format) {
          case 'Html':   // HTML
