@@ -37,14 +37,11 @@ function Gdn_Quotes() {
          
          // Find the closest child quote
          var PetQuote = $(this).children('.UserQuote');
-         console.log(PetQuote);
          if (!PetQuote.length) return;
-         console.log('proceeding');
          
          $(PetQuote).each(function(oi, el){
             var FoldQuote = $(el).children('.QuoteText').children('.UserQuote');
             if (!FoldQuote.length) return;
-            console.log('folding');
             
             $(FoldQuote).addClass('QuoteFolded').hide();
             $(FoldQuote).before('<a href="" class="QuoteFolding">&raquo; show previous quotes</a>');
