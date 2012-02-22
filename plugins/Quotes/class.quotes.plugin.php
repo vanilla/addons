@@ -264,8 +264,9 @@ BLOCKQUOTE;
    }
    
    protected function FormatQuote($Type, $ID, &$QuoteData) {
+      $Type = strtolower($Type);
       $Model = FALSE;
-      switch (strtolower($Type)) {
+      switch ($Type) {
          case 'comment':
             $Model = new CommentModel();
             break;
@@ -307,7 +308,9 @@ BLOCKQUOTE;
             'body'         => $Data->Body,
             'format'       => C('Garden.InputFormatter'),
             'authorid'     => $Data->InsertUserID,
-            'authorname'   => $Data->InsertName
+            'authorname'   => $Data->InsertName,
+            'type'         => $Type,
+            'typeid'       => $ID
          ));
       }
    }
