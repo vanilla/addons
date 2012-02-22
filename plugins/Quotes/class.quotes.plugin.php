@@ -252,7 +252,11 @@ BLOCKQUOTE;
                   $Sender->Form->SetValue('Body', '<blockquote rel="'.$QuoteData['authorname'].'">'.$QuoteData['body']."</blockquote>\n");
                   break;
                case 'BBCode':
-                  $Sender->Form->SetValue('Body', '[quote="'.$QuoteData['authorname'].'"]'.$QuoteData['body']."[/quote]\n");
+                  $QuoteAuthor = $QuoteData['authorname'];
+                  if (GetValue('type', $QuoteData) == 'comment')
+                     $QuoteAuthor .= ";{$QuoteData['typeid']}";
+                     
+                  $Sender->Form->SetValue('Body', '[quote="'.$QuoteAuthor.'"]'.$QuoteData['body']."[/quote]\n");
                   break;
                case 'Display':
                case 'Text':
