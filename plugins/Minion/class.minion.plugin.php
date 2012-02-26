@@ -8,6 +8,7 @@
  * 
  * Changes: 
  *  1.0     Release
+ *  1.0.1   Fix data tracking issues
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -18,7 +19,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks publicly.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -122,7 +123,10 @@ class MinionPlugin extends Gdn_Plugin {
          ->Where('Name', 'Plugin.Minion.FingerprintCheck')
          ->Get();
 
+      $UserStatusData = array();
       while ($UserRow = $UserData->NextRow(DATASET_TYPE_ARRAY)) {
+         $UserData = array();
+         
          $UserID = $UserRow['UserID'];
          $User = Gdn::UserModel()->GetID($UserID);
          if ($User->Banned) continue;
@@ -146,13 +150,13 @@ class MinionPlugin extends Gdn_Plugin {
             }
          }
          
-         $Sender->SetData('ShouldBan', $ShouldBan);
+         $UserData['ShouldBan'] = $ShouldBan;
 
          // If the user triggered a ban
          if ($ShouldBan) {
             
-            $Sender->SetData('BanMatches', array_keys($BanTriggerUsers));
-            $Sender->SetData('BanUser', $User);
+            $UserData['BanMatches'] = array_keys($BanTriggerUsers);
+            $UserData['BanUser'] = $User;
             
             // First, ban them
             Gdn::UserModel()->Ban($UserID, array(
@@ -168,14 +172,14 @@ class MinionPlugin extends Gdn_Plugin {
             
             if ($LastComment) {
                $LastDiscussionID = GetValue('DiscussionID', $LastComment);
-               $Sender->SetData('NotificationDiscussionID', $LastDiscussionID);
+               $UserData['NotificationDiscussionID'] = $LastDiscussionID;
                
                $MinionReportText = T("{Minion Name} DETECTED BANNED ALIAS
 
 USER BANNED
 {Ban Target}");
                $MinionReportText = FormatString($MinionReportText, array(
-                  'Minion Name'  => C('Plugins.Minion.Name'),
+                  'Minion Name'  => C('Plugins.Minion.Name', 'Minion'),
                   'Ban Target'   => $User->Name
                ));
                
@@ -186,12 +190,16 @@ USER BANNED
                ));
 
                $CommentModel->Save2($MinionCommentID, TRUE);
-               $Sender->SetData('NotificationCommentID', $MinionCommentID);
+               $UserData['NotificationCommentID'] = $MinionCommentID;
             }
             
          }
          
+         $UserStatusData[$User->Name] = $UserData;
+         
       }
+      
+      $Sender->SetData('Users', $UserStatusData);
       
       // Delete all flags
       Gdn::UserMetaModel()->SQL->Delete('UserMeta', array(
