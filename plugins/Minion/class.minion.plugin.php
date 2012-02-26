@@ -9,6 +9,7 @@
  * Changes: 
  *  1.0     Release
  *  1.0.1   Fix data tracking issues
+ *  1.0.2   Fix typo bug
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -19,7 +20,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks publicly.",
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -118,13 +119,13 @@ class MinionPlugin extends Gdn_Plugin {
       $Sender->SetData('Minion', $Minion->Name);
       
       // Get all flagged users
-      $UserData = Gdn::UserMetaModel()->SQL->Select('*')
+      $UserMatchData = Gdn::UserMetaModel()->SQL->Select('*')
          ->From('UserMeta')
          ->Where('Name', 'Plugin.Minion.FingerprintCheck')
          ->Get();
 
       $UserStatusData = array();
-      while ($UserRow = $UserData->NextRow(DATASET_TYPE_ARRAY)) {
+      while ($UserRow = $UserMatchData->NextRow(DATASET_TYPE_ARRAY)) {
          $UserData = array();
          
          $UserID = $UserRow['UserID'];
