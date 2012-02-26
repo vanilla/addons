@@ -154,7 +154,7 @@ class MinionPlugin extends Gdn_Plugin {
                
                // We don't touch accounts that were registered prior to a banned user
                // This allows admins to ban alts and leave the original alone
-               if ($RelatedRegistrationTime < $UserRegistrationTime) continue;
+               if ($RelatedRegistrationTime > $UserRegistrationTime) continue;
                
                $RelatedUserName = $RelatedUser['Name'];
                $ShouldBan = TRUE;
