@@ -11,7 +11,7 @@
 $PluginInfo['Multilingual'] = array(
    'Name' => 'Multilingual',
    'Description' => "Allow user-selectable & queryable locales.",
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => "Matt Lincoln Russell",
@@ -21,6 +21,7 @@ $PluginInfo['Multilingual'] = array(
 
 /* Changelog
    1.0 - Make MobileFriendly //Lincoln 2012-01-13
+   1.1 - Move locale setting to later in startup for Embed //Lincoln 2012-02-22
 */
 
 /**
@@ -38,8 +39,10 @@ $PluginInfo['Multilingual'] = array(
 class MultilingualPlugin extends Gdn_Plugin {
    /**
     * Set user's preferred locale. 
+    *
+    * Moved event from AppStart to AfterAnalyzeRequest to allow Embed to set P3P header first.
     */
-   public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
+   public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
       // Set user preference
       if ($TempLocale = $this->GetAlternateLocale()) {
          Gdn::Locale()->Set($TempLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
