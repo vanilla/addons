@@ -11,6 +11,8 @@
  *  1.0.1   Fix data tracking issues
  *  1.0.2   Fix typo bug
  * 
+ *  1.1     Only ban newer accounts
+ * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -133,6 +135,8 @@ class MinionPlugin extends Gdn_Plugin {
          if ($User->Banned) continue;
          
          $UserFingerprint = GetValue('Fingerprint', $User, FALSE);
+         $UserRegistrationDate = $User->DateInserted;
+         $UserRegistrationTime = strtotime($UserRegistrationDate);
 
          // Unknown user fingerprint
          if (empty($UserFingerprint)) continue;
@@ -145,6 +149,13 @@ class MinionPlugin extends Gdn_Plugin {
          $ShouldBan = FALSE; $BanTriggerUsers = array();
          while ($RelatedUser = $RelatedUsers->NextRow(DATASET_TYPE_ARRAY)) {
             if ($RelatedUser['Banned']) {
+               $RelatedRegistrationDate = $RelatedUser['DateInserted'];
+               $RelatedRegistrationTime = strtotime($UserRegistrationDate);
+               
+               // We don't touch accounts that were registered prior to a banned user
+               // This allows admins to ban alts and leave the original alone
+               if ($RelatedRegistrationTime < $UserRegistrationTime) continue;
+               
                $RelatedUserName = $RelatedUser['Name'];
                $ShouldBan = TRUE;
                $BanTriggerUsers[$RelatedUserName] = $RelatedUser;
