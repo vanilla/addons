@@ -9,8 +9,8 @@ if (!defined('APPLICATION'))
 // Define the plugin:
 $PluginInfo['StopForumSpam'] = array(
     'Name' => 'Stop Forum Spam',
-    'Description' => "Integrates the spammer blacklist from stopforumspam.com",
-    'Version' => '1.0.1b',
+    'Description' => "Got spammer problems? This integrates the spammer blacklist from stopforumspam.com to mitigate the issue.",
+    'Version' => '1.0.1',
     'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',

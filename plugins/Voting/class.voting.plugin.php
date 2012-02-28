@@ -11,8 +11,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Voting'] = array(
    'Name' => 'Voting',
-   'Description' => 'Allows users to vote on comments and discussions.',
-   'Version' => '1.1.3b',
+   'Description' => 'Allows users to vote for comments and discussions. Administrators get unlimited votes.',
+   'Version' => '1.1.3',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',

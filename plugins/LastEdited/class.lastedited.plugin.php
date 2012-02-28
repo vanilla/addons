@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['LastEdited'] = array(
    'Name' => 'Last Edited',
-   'Description' => 'This plugin appends a "post last edited by X at Y" line to the end of edited posts.',
+   'Description' => 'Appends "Post edited by [User] at [Time]" to the end of edited posts.',
    'Version' => '1.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1a'),

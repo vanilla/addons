@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
-   'Description' => "This plugin allows users to quote each other easily.",
+   'Description' => "Adds an option to each comment for users to easily quote each other.",
    'Version' => '1.6',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1a9'),

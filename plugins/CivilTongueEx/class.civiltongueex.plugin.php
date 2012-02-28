@@ -3,8 +3,8 @@
 // Define the plugin:
 $PluginInfo['CivilTongueEx'] = array(
    'Name' => 'Civil Tongue Ex',
-   'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
-   'Version' => '1.0b',
+   'Description' => 'A cussing filter for all discussions and comment. You create a blacklist and any matching words will be changed into astericks (****).',
+   'Version' => '1.0',
    'MobileFriendly' => TRUE,
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',

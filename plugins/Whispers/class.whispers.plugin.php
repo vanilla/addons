@@ -7,7 +7,7 @@
 // Define the plugin:
 $PluginInfo['Whispers'] = array(
    'Name' => 'Whispers',
-   'Description' => "This plugin brings back functionality similar to the popular Vanilla 1 whispers.",
+   'Description' => "Users may 'whisper' private comments to each other in the middle of normal discussions. Caution: this can be a confusing feature for some people.",
    'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18a3', 'Conversations' => '2.0.18a3'),
    'Author' => 'Todd Burry',

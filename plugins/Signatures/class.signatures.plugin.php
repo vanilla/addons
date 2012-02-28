@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
-   'Description' => 'This plugin allows users to attach their own signatures to their posts.',
+   'Description' => 'Users may create custom signatures that appear after each of their comments.',
    'Version' => '1.2.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
