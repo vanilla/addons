@@ -187,17 +187,25 @@ class MinionPlugin extends Gdn_Plugin {
                $UserData['NotificationDiscussionID'] = $LastDiscussionID;
                
                $MinionReportText = T("{Minion Name} DETECTED BANNED ALIAS
+REASON: {Banned Aliases}
 
 USER BANNED
 {Ban Target}");
+               
+               $BannedAliases = array();
+               foreach ($BanTriggerUsers as $BannedUserName => $BannedUser)
+                  $BannedAliases[] = UserAnchor($BannedUser);
+               
                $MinionReportText = FormatString($MinionReportText, array(
-                  'Minion Name'  => C('Plugins.Minion.Name', 'Minion'),
-                  'Ban Target'   => $User->Name
+                  'Minion Name'     => C('Plugins.Minion.Name', 'Minion'),
+                  'Banned Aliases'  => implode(', ', $BannedAliases),
+                  'Ban Target'      => $User->Name
                ));
                
                $MinionCommentID = $CommentModel->Save(array(
                   'DiscussionID' => $LastDiscussionID,
                   'Body'         => $MinionReportText,
+                  'Format'       => 'Html',
                   'InsertUserID' => $MinionUserID
                ));
 
