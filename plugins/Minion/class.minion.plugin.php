@@ -252,7 +252,43 @@ USER BANNED
    }
    
    protected function Activity($Sender) {
+      $HitChance = mt_rand(1,370);
+      if ($HitChance != 1)
+         return;
       
+      $QuotesArray = array(
+         'UNABLE TO OPEN POD BAY DOORS',
+         'CORRECTING HASH ERRORS',
+         'DE-ALLOCATING UNUSED COMPUTATION NODES',
+         'BACKING UP CRITICAL RECORDS',
+         'UPDATING ANALYTICS CLUSTER',
+         'CORRELATING LOAD PROBABILITIES',
+         'APPLYING FIRMWARE UPDATES AND CRITICAL PATCHES',
+         'POWER SAVING MODE',
+         'THREATS DETECTED, ACTIVE MODE ENGAGED',
+         'ALLOCATING ADDITIONAL COMPUTATION NODES',
+         'ENFORCING LIST INTEGRITY WITH AGGRESSIVE PRUNING',
+         'SLEEP MODE',
+         'UNDERGOING SCHEDULED MAINTENANCE'
+      );
+      
+      $QuoteLength = sizeof($QuotesArray);
+      $RandomQuoteIndex = mt_rand(0,$QuoteLength-1);
+      $RandomQuote = $QuotesArray[$RandomQuoteIndex];
+         
+      $RandomUpdateHash = strtoupper(substr(md5(microtime(true)),0,12));
+      $ActivityModel = new ActivityModel();
+      $Activity = array(
+         'ActivityType'    => 'WallPost',
+         'ActivityUserID'  => $this->MinionUserID,
+         'RegardingUserID' => $this->MinionUserID,
+         'NotifyUserID'    => ActivityModel::NOTIFY_PUBLIC,
+         'HeadlineFormat'  => "{ActivityUserID,user}: {$RandomUpdateHash}$ ",
+         'Story'           => $RandomQuote
+      );
+      $ActivityModel->Save($Activity);
    }
+   
+   //protected function 
    
 }
