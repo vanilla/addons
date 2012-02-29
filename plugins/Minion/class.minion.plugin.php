@@ -32,6 +32,9 @@ $PluginInfo['Minion'] = array(
 
 class MinionPlugin extends Gdn_Plugin {
    
+   protected $MinionUserID;
+   protected $Minion;
+   
    /**
     * Retrieves a "system user" id that can be used to perform non-real-person tasks.
     */
@@ -111,14 +114,26 @@ class MinionPlugin extends Gdn_Plugin {
       Gdn::Set('Plugin.Minion.LastRun', date('Y-m-d H:i:s'));
       
       // Currently operating as Minion
-      $MinionUserID = $this->GetMinionUserID();
-      $Minion = Gdn::UserModel()->GetID($MinionUserID);
-      Gdn::Session()->User = $Minion;
-      Gdn::Session()->UserID = $Minion->UserID;
+      $this->MinionUserID = $this->GetMinionUserID();
+      $this->Minion = Gdn::UserModel()->GetID($MinionUserID);
+      Gdn::Session()->User = $this->Minion;
+      Gdn::Session()->UserID = $this->Minion->UserID;
       
       $Sender->SetData('Run', TRUE);
-      $Sender->SetData('MinionUserID', $MinionUserID);
-      $Sender->SetData('Minion', $Minion->Name);
+      $Sender->SetData('MinionUserID', $this->MinionUserID);
+      $Sender->SetData('Minion', $this->Minion->Name);
+      
+      // Check for fingerprint ban matches
+      $this->FingerprintBans($Sender);
+      
+      // Sometimes update activity feed
+      $this->Activity($Sender);
+      
+      $Sender->Render();
+   }
+   
+   protected function FingerprintBans($Sender) {
+      if (!C('Plugins.Minion.Features.Fingerprint', TRUE)) return;
       
       // Get all flagged users
       $UserMatchData = Gdn::UserMetaModel()->SQL->Select('*')
@@ -133,6 +148,10 @@ class MinionPlugin extends Gdn_Plugin {
          $UserID = $UserRow['UserID'];
          $User = Gdn::UserModel()->GetID($UserID);
          if ($User->Banned) continue;
+         
+         $UserAttributes = GetValue('Attributes', $User);
+         $Attributes = @unserialize($UserAttributes);
+         if (GetValue('Safe', $Attributes)) continue;
          
          $UserFingerprint = GetValue('Fingerprint', $User, FALSE);
          $UserRegistrationDate = $User->DateInserted;
@@ -197,7 +216,7 @@ USER BANNED
                   $BannedAliases[] = UserAnchor($BannedUser);
                
                $MinionReportText = FormatString($MinionReportText, array(
-                  'Minion Name'     => C('Plugins.Minion.Name', 'Minion'),
+                  'Minion Name'     => $this->Minion->Name,
                   'Banned Aliases'  => implode(', ', $BannedAliases),
                   'Ban Target'      => $User->Name
                ));
@@ -206,7 +225,7 @@ USER BANNED
                   'DiscussionID' => $LastDiscussionID,
                   'Body'         => $MinionReportText,
                   'Format'       => 'Html',
-                  'InsertUserID' => $MinionUserID
+                  'InsertUserID' => $this->MinionUserID
                ));
 
                $CommentModel->Save2($MinionCommentID, TRUE);
@@ -226,7 +245,11 @@ USER BANNED
          'Name' => 'Plugin.Minion.FingerprintCheck'
       ));
       
-      $Sender->Render();
+      return;
+   }
+   
+   protected function Activity($Sender) {
+      
    }
    
 }
