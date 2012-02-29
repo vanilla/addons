@@ -149,8 +149,8 @@ class MinionPlugin extends Gdn_Plugin {
          $ShouldBan = FALSE; $BanTriggerUsers = array();
          while ($RelatedUser = $RelatedUsers->NextRow(DATASET_TYPE_ARRAY)) {
             if ($RelatedUser['Banned']) {
-               $RelatedRegistrationDate = $RelatedUser['DateInserted'];
-               $RelatedRegistrationTime = strtotime($UserRegistrationDate);
+               $RelatedRegistrationDate = GetValue('DateInserted', $RelatedUser);
+               $RelatedRegistrationTime = strtotime($RelatedRegistrationDate);
                
                // We don't touch accounts that were registered prior to a banned user
                // This allows admins to ban alts and leave the original alone
