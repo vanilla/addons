@@ -109,8 +109,8 @@ class MinionPlugin extends Gdn_Plugin {
       
       $Elapsed = time() - $LastMinionTime;
       $ElapsedMinimum = C('Plugins.Minion.MinFrequency', 5*60);
-      //if ($Elapsed < $ElapsedMinimum)
-      //   return $Sender->Render();
+      if ($Elapsed < $ElapsedMinimum)
+         return $Sender->Render();
       
       // Remember when we last ran
       Gdn::Set('Plugin.Minion.LastRun', date('Y-m-d H:i:s'));
