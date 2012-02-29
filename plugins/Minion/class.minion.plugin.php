@@ -150,11 +150,6 @@ class MinionPlugin extends Gdn_Plugin {
          $UserID = $UserRow['UserID'];
          $User = Gdn::UserModel()->GetID($UserID);
          if ($User->Banned) continue;
-
-         $UserSafe = Gdn::UserMetaModel()->GetUserMeta($UserID, "Plugin.Minion.Safe", FALSE);
-         $UserIsSafe = GetValue('Plugin.Minion.Safe', $UserSafe, FALSE);
-         
-         if ($UserIsSafe) return;
          
          $UserFingerprint = GetValue('Fingerprint', $User, FALSE);
          $UserRegistrationDate = $User->DateInserted;
@@ -162,6 +157,11 @@ class MinionPlugin extends Gdn_Plugin {
 
          // Unknown user fingerprint
          if (empty($UserFingerprint)) continue;
+         
+         $UserSafe = Gdn::UserMetaModel()->GetUserMeta($UserID, "Plugin.Minion.Safe", FALSE);
+         $UserIsSafe = GetValue('Plugin.Minion.Safe', $UserSafe, FALSE);
+         
+         if ($UserIsSafe) return;
 
          $RelatedUsers = Gdn::UserModel()->GetWhere(array(
             'Fingerprint'  => $UserFingerprint
