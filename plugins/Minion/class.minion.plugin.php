@@ -115,7 +115,7 @@ class MinionPlugin extends Gdn_Plugin {
       
       // Currently operating as Minion
       $this->MinionUserID = $this->GetMinionUserID();
-      $this->Minion = Gdn::UserModel()->GetID($MinionUserID);
+      $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
       Gdn::Session()->User = $this->Minion;
       Gdn::Session()->UserID = $this->Minion->UserID;
       
