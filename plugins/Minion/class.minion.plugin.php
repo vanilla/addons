@@ -99,6 +99,8 @@ class MinionPlugin extends Gdn_Plugin {
       
       $LastMinionDate = Gdn::Get('Plugin.Minion.LastRun', FALSE);
       $LastMinionTime = $LastMinionDate ? strtotime($LastMinionDate) : 0;
+      if (!$LastMinionDate)
+         Gdn::Set('Plugin.Minion.LastRun', date('Y-m-d H:i:s'));
       
       if (!$LastMinionTime) 
          $LastMinionTime = 0;
@@ -148,10 +150,11 @@ class MinionPlugin extends Gdn_Plugin {
          $UserID = $UserRow['UserID'];
          $User = Gdn::UserModel()->GetID($UserID);
          if ($User->Banned) continue;
+
+         $UserSafe = Gdn::UserMetaModel()->GetUserMeta($UserID, "Plugin.Minion.Safe", FALSE);
+         $UserIsSafe = GetValue('Plugin.Minion.Safe', $UserSafe, FALSE);
          
-         $UserAttributes = GetValue('Attributes', $User);
-         $Attributes = @unserialize($UserAttributes);
-         if (GetValue('Safe', $Attributes)) continue;
+         if ($UserIsSafe) return;
          
          $UserFingerprint = GetValue('Fingerprint', $User, FALSE);
          $UserRegistrationDate = $User->DateInserted;
