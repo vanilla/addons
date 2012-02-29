@@ -109,8 +109,8 @@ class MinionPlugin extends Gdn_Plugin {
       
       $Elapsed = time() - $LastMinionTime;
       $ElapsedMinimum = C('Plugins.Minion.MinFrequency', 5*60);
-      if ($Elapsed < $ElapsedMinimum) 
-         return $Sender->Render();
+      //if ($Elapsed < $ElapsedMinimum)
+      //   return $Sender->Render();
       
       // Remember when we last ran
       Gdn::Set('Plugin.Minion.LastRun', date('Y-m-d H:i:s'));
@@ -158,11 +158,12 @@ class MinionPlugin extends Gdn_Plugin {
          // Unknown user fingerprint
          if (empty($UserFingerprint)) continue;
          
+         // Safe users get skipped
          $UserSafe = Gdn::UserMetaModel()->GetUserMeta($UserID, "Plugin.Minion.Safe", FALSE);
-         $UserIsSafe = GetValue('Plugin.Minion.Safe', $UserSafe, FALSE);
-         
+         $UserIsSafe = (boolean)GetValue('Plugin.Minion.Safe', $UserSafe, FALSE);
          if ($UserIsSafe) return;
 
+         // Find related fingerprinted users
          $RelatedUsers = Gdn::UserModel()->GetWhere(array(
             'Fingerprint'  => $UserFingerprint
          ));
