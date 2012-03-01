@@ -12,6 +12,7 @@
  *  1.0.2   Fix typo bug
  * 
  *  1.1     Only ban newer accounts
+ *  1.2     Prevent people from posting autoplay embeds
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -140,7 +141,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             $MinionReportText = FormatString($MinionReportText, array(
                'Minion Name'     => $this->Minion->Name,
-               'User Target'     => Gdn::Session()->User->Name
+               'User Target'     => UserAnchor(Gdn::Session()->User)
             ));
 
             $MinionCommentID = $ObjectModel->Save(array(
@@ -290,7 +291,7 @@ USER BANNED
                $MinionReportText = FormatString($MinionReportText, array(
                   'Minion Name'     => $this->Minion->Name,
                   'Banned Aliases'  => implode(', ', $BannedAliases),
-                  'Ban Target'      => $User->Name
+                  'Ban Target'      => UserAnchor($User)
                ));
                
                $MinionCommentID = $CommentModel->Save(array(
