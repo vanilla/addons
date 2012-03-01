@@ -125,8 +125,18 @@ class MinionPlugin extends Gdn_Plugin {
       
       $ObjectID = GetValue("{$Type}ID", $Object);
       $ObjectBody = GetValue('Body', $Object);
-      if (preg_match('`(?:https?|ftp)://(www\.)?youtube\.com\/watch\?v=([^&#]+)(#t=([0-9]+))?`', $ObjectBody, $Matches) 
-         || preg_match('`(?:https?)://(www\.)?youtu\.be\/([^&#]+)(#t=([0-9]+))?`', $ObjectBody, $Matches)) {
+      if (preg_match_all('`(?:https?|ftp)://(www\.)?youtube\.com\/watch\?v=([^&#]+)(#t=([0-9]+))?`', $ObjectBody, $Matches) 
+         || preg_match_all('`(?:https?)://(www\.)?youtu\.be\/([^&#]+)(#t=([0-9]+))?`', $ObjectBody, $Matches)) {
+         
+         // Youtube was found. Got autoplay?
+         
+         $MatchURLs = $Matches[0]; $AutoPlay = FALSE;
+         foreach ($MatchURLs as $MatchURL) {
+            if (stristr($MatchURL, 'autoplay=1'))
+               $AutoPlay = TRUE;
+         }
+         
+         if (!$AutoPlay) return;
          
          $ObjectModelName = "{$Type}Model";
          $ObjectModel = new $ObjectModelName();
