@@ -67,7 +67,10 @@ class MinionPlugin extends Gdn_Plugin {
     * @param PostController $Sender 
     */
    public function PostController_AfterCommentSave_Handler($Sender) {
-      $this->CheckFingerprintBan();
+      $this->StartMinion();
+      
+      $this->CheckFingerprintBan($Sender);
+      $this->CheckAutoplay($Sender);
    }
    
    /**
@@ -75,10 +78,23 @@ class MinionPlugin extends Gdn_Plugin {
     * @param PostController $Sender 
     */
    public function PostController_AfterDiscussionSave_Handler($Sender) {
-      $this->CheckFingerprintBan();
+      $this->StartMinion();
+      
+      $this->CheckFingerprintBan($Sender);
+      $this->CheckAutoplay($Sender);
    }
    
-   protected function CheckFingerprintBan() {
+   protected function StartMinion() {
+      // Currently operating as Minion
+      $this->MinionUserID = $this->GetMinionUserID();
+      $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
+   }
+   
+   /**
+    * 
+    * @param PostController $Sender 
+    */
+   protected function CheckFingerprintBan($Sender) {
       if (!Gdn::Session()->IsValid()) return;
       $FlagMeta = $this->GetUserMeta(Gdn::Session()->UserID, "FingerprintCheck", FALSE);
       
@@ -87,6 +103,58 @@ class MinionPlugin extends Gdn_Plugin {
       
       // Flag em'
       $this->SetUserMeta(Gdn::Session()->UserID, "FingerprintCheck", 1);
+   }
+   
+   /**
+    * 
+    * @param PostController $Sender 
+    */
+   protected function CheckAutoplay($Sender) {
+      if (!C('Plugin.Minion.Features.Autoplay', TRUE)) return;
+      
+      // Admins can do whatever they want
+      if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) return;
+      
+      $Object = $Sender->EventArguments['Discussion'];
+      $Type = 'Discussion';
+      if (array_key_exists('Comment', $Sender->EventArguments)) {
+         $Object = $Sender->EventArguments['Comment'];
+         $Type = 'Comment';
+      }
+      
+      $ObjectID = GetValue("{$Type}ID", $Object);
+      $ObjectBody = GetValue('Body', $Object);
+      if (preg_match('`(?:https?|ftp)://(www\.)?youtube\.com\/watch\?v=([^&#]+)(#t=([0-9]+))?`', $ObjectBody, $Matches) 
+         || preg_match('`(?:https?)://(www\.)?youtu\.be\/([^&#]+)(#t=([0-9]+))?`', $ObjectBody, $Matches)) {
+         
+         $ObjectModelName = "{$Type}Model";
+         $ObjectModel = new $ObjectModelName();
+         
+         $ObjectModel->Delete($ObjectID);
+         
+         if ($Type == 'Comment') {
+            $DiscussionID = GetValue('DiscussionID',$Object);
+            $MinionReportText = T("{Minion Name} DETECTED AUTOPLAY ATTEMPT
+{User Target}");
+               
+
+            $MinionReportText = FormatString($MinionReportText, array(
+               'Minion Name'     => $this->Minion->Name,
+               'User Target'     => Gdn::Session()->User->Name
+            ));
+
+            $MinionCommentID = $ObjectModel->Save(array(
+               'DiscussionID' => $DiscussionID,
+               'Body'         => $MinionReportText,
+               'Format'       => 'Html',
+               'InsertUserID' => $this->MinionUserID
+            ));
+
+            $ObjectModel->Save2($MinionCommentID, TRUE);
+         }
+         
+         $Sender->InformMessage("POST REMOVED DUE TO AUTOPLAY VIOLATION");
+      }
    }
    
    /**
