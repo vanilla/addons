@@ -167,12 +167,12 @@ class MinionPlugin extends Gdn_Plugin {
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
       $LastMinionDate = Gdn::Get('Plugin.Minion.LastRun', FALSE);
-      $LastMinionTime = $LastMinionDate ? strtotime($LastMinionDate) : 0;
       if (!$LastMinionDate)
          Gdn::Set('Plugin.Minion.LastRun', date('Y-m-d H:i:s'));
       
+      $LastMinionTime = $LastMinionDate ? strtotime($LastMinionDate) : time();
       if (!$LastMinionTime) 
-         $LastMinionTime = 0;
+         $LastMinionTime = time();
       
       $Sender->SetData('Run', FALSE);
       
@@ -206,6 +206,8 @@ class MinionPlugin extends Gdn_Plugin {
    protected function FingerprintBans($Sender) {
       if (!C('Plugins.Minion.Features.Fingerprint', TRUE)) return;
       
+      $Sender->SetData('FingerprintCheck', TRUE);
+      
       // Get all flagged users
       $UserMatchData = Gdn::UserMetaModel()->SQL->Select('*')
          ->From('UserMeta')
@@ -230,7 +232,7 @@ class MinionPlugin extends Gdn_Plugin {
          // Safe users get skipped
          $UserSafe = Gdn::UserMetaModel()->GetUserMeta($UserID, "Plugin.Minion.Safe", FALSE);
          $UserIsSafe = (boolean)GetValue('Plugin.Minion.Safe', $UserSafe, FALSE);
-         if ($UserIsSafe) return;
+         if ($UserIsSafe) continue;
 
          // Find related fingerprinted users
          $RelatedUsers = Gdn::UserModel()->GetWhere(array(
@@ -322,6 +324,10 @@ USER BANNED
    }
    
    protected function Activity($Sender) {
+      if (!C('Plugins.Minion.Features.Activities', TRUE)) return;
+      
+      $Sender->SetData('ActivityUpdate', TRUE);
+      
       $HitChance = mt_rand(1,370);
       if ($HitChance != 1)
          return;
