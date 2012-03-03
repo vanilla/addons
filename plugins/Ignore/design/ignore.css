@@ -5,6 +5,8 @@
 
 .Profile table.IgnoreList .IgnoreUserPhoto img {
    display: block;
+   height: 40px;
+   width: 40px;
 }
 
 .Profile table.IgnoreList th {
