@@ -260,7 +260,7 @@ class IgnorePlugin extends Gdn_Plugin {
          }
          
       } catch (Exception $Ex) {
-         $Sender->InformMessage(T("Could not find that person!").' '.$Ex->getMessage());
+         $Sender->InformMessage(T("Could not find that person!"));
          $Sender->SetJson('Status', 404);
       }
       
@@ -290,7 +290,7 @@ class IgnorePlugin extends Gdn_Plugin {
       $UserID = GetValue('UserID', $User);
       
       if ($User->Admin) {
-         $Sender->InformMessage(T("You can't do that to {$User->Name}!."));
+         $Sender->InformMessage(T("You can't do that to {$User->Name}!"));
          $Sender->SetJson('Status', 401);
          $Sender->Render('blank', 'utility', 'dashboard');
       }
@@ -316,7 +316,7 @@ class IgnorePlugin extends Gdn_Plugin {
          }
          
       } catch (Exception $Ex) {
-         $Sender->InformMessage(T("Could not find that person!").' '.$Ex->getMessage());
+         $Sender->InformMessage(T("Could not find that person!"));
          $Sender->SetJson('Status', 404);
       }
       
