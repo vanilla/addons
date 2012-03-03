@@ -289,6 +289,12 @@ class IgnorePlugin extends Gdn_Plugin {
       $User = $this->GetUserInfo($UserReference, $Username);
       $UserID = GetValue('UserID', $User);
       
+      if ($User->Admin) {
+         $Sender->InformMessage(T("You can't do that to {$User->Name}!."));
+         $Sender->SetJson('Status', 401);
+         $Sender->Render('blank', 'utility', 'dashboard');
+      }
+      
       $Mode = $Sender->RequestArgs[0];
       
       try {
