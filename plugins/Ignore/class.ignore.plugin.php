@@ -8,6 +8,7 @@
  * 
  * Changes: 
  *  1.0     Initial release
+ *  1.0.1   Fix guest mode bug
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -18,7 +19,7 @@
 // Define the plugin:
 $PluginInfo['Ignore'] = array(
    'Description' => 'This plugin allows users to ignore others, filtering their comments out of discussions.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -399,10 +400,13 @@ class IgnorePlugin extends Gdn_Plugin {
     * Is this user forbidden from using ignore?
     */
    public function IgnoreIsRestricted($UserID = NULL) {
-      if (is_null($UserID) && Gdn::Session()->IsValid())
+      // Guests cant ignore
+      if (!Gdn::Session()->IsValid()) return TRUE;
+      
+      if (is_null($UserID))
          $UserID = Gdn::Session()->UserID;
          
-      if (is_null($UserID)) throw new Exception('No user provided or available');
+      if (is_null($UserID)) return TRUE;
       
       $IgnoreRestricted = $this->GetUserMeta($UserID, 'Plugin.Ignore.Forbidden');
       $IgnoreRestricted = GetValue('Plugin.Ignore.Forbidden', $IgnoreRestricted, FALSE);
