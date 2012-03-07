@@ -9,6 +9,7 @@
  * Changes: 
  *  1.0     Initial release
  *  1.0.1   Fix guest mode bug
+ *  1.0.2   Change Plugin.Ignore.MaxIgnores to Plugins.Ignore.MaxIgnores
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -19,7 +20,7 @@
 // Define the plugin:
 $PluginInfo['Ignore'] = array(
    'Description' => 'This plugin allows users to ignore others, filtering their comments out of discussions.',
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -128,7 +129,7 @@ class IgnorePlugin extends Gdn_Plugin {
       
       $Sender->SetData('IgnoreList', $IgnoredUsers);
       
-      $MaxIgnores = C('Plugin.Ignore.MaxIgnores', 5);
+      $MaxIgnores = C('Plugins.Ignore.MaxIgnores', 5);
       $Sender->SetData('IgnoreLimit', ($Sender->User->Admin) ? 'infinite' : $MaxIgnores);
       
       $IgnoreIsRestricted = $this->IgnoreIsRestricted($UserID);
@@ -390,7 +391,7 @@ class IgnorePlugin extends Gdn_Plugin {
       
       $IgnoredUsers = $this->GetUserMeta(Gdn::Session()->UserID, 'Blocked.User.%');
       $NumIgnoredUsers = sizeof($IgnoredUsers);
-      $MaxIgnores = C('Plugin.Ignore.MaxIgnores', 5);
+      $MaxIgnores = C('Plugins.Ignore.MaxIgnores', 5);
       if ($NumIgnoredUsers >= $MaxIgnores) return self::IGNORE_LIMIT;
       
       return FALSE;
