@@ -8,7 +8,7 @@
 $PluginInfo['Whispers'] = array(
    'Name' => 'Whispers',
    'Description' => "This plugin brings back functionality similar to the popular Vanilla 1 whispers.",
-   'Version' => '1.1',
+   'Version' => '1.1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18a3', 'Conversations' => '2.0.18a3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -366,7 +366,7 @@ class WhispersPlugin extends Gdn_Plugin {
             $Sender->Form->SetFormValue('ConversationID', $WhisperConversationID);
          }
 
-         $Whisper = $Sender->Form->GetFormValue('Whisper');
+         $Whisper = $Sender->Form->GetFormValue('Whisper') && GetIncomingValue('Type') != 'Draft';
          $WhisperTo = trim($Sender->Form->GetFormValue('To'));
          $ConversationID = $Sender->Form->GetFormValue('ConversationID');
 
