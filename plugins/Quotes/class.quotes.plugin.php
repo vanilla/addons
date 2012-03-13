@@ -107,9 +107,7 @@ class QuotesPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-      $UserPrefs = Gdn_Format::Unserialize(Gdn::Session()->User->Preferences);
-      if (!is_array($UserPrefs))
-         $UserPrefs = array();
+      Gdn::Session()->GetPreference('Quotes.Folding', '1');
       
       $QuoteFolding = GetValue('Quotes.Folding', $UserPrefs, '1');
       $Sender->AddDefinition('QuotesFolding', $QuoteFolding);
