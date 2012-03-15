@@ -1,4 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<style>
+   .FileUploadBlock {
+      margin-bottom: 20px;
+   }
+</style>
 <?php
    $ApcAvailable = TRUE;
    if ($ApcAvailable && !ini_get('apc.enabled')) $ApcAvailable = FALSE;
@@ -27,7 +32,10 @@
 <?php
    echo $this->Plugin->Slice('toggle');
 ?>
-
+<!--<h3><?php echo T('Thumbnails'); ?></h3>
+<div class="Wrap">
+   
+</div>-->
 <h3><?php echo T('Permissions'); ?></h3>
 <div class="Info">
    <?php echo T('Define who can upload and manage files on the '.Anchor('Roles & Permissions','/dashboard/role').' page.'); ?>

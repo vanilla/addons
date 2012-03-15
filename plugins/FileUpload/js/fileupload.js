@@ -495,12 +495,11 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             jQuery(FileListing.find('.FileOptions')).append(TrackAll);
             jQuery(FileListing.find('div.UploadProgress')).remove();
             
-				// Add image preview
-				var img = document.createElement('img'),
-               img2 = document.createElement('img');
-				img.src = img2.src = JResponse.MediaResponse.PreviewImageLocation;
-				jQuery(FileListing.find('div.FilePreview')).append(img);
-            jQuery(FileListing.find('div.FileHover')).prepend(img2);
+				// Add image preview.
+            var thumbnailHtml = jQuery.base64Decode(JResponse.MediaResponse.Thumbnail);
+            
+				jQuery(FileListing.find('div.FilePreview')).append(thumbnailHtml);
+            jQuery(FileListing.find('div.FileHover')).prepend(thumbnailHtml);
 
 				// Add "insert image" button
 				if (JResponse.MediaResponse.FinalImageLocation != '') {

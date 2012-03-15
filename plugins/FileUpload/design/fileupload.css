@@ -93,9 +93,12 @@ div.UploadProgress {
 .MessageList .Item:hover { /* ie fix */
    z-index: 100;
 }
-.FilePreview img {
-	display: block;
+.Attachment img {
+   vertical-align: bottom;
 }
+/*.FilePreview img {
+	display: block;
+}*/
 .Attachment:hover {
    z-index: 101;
 }
@@ -120,4 +123,20 @@ div.UploadProgress {
 }
 .FileMeta .FileAttributes, .FileMeta .FileName {
    white-space: nowrap;
+}
+
+.Thumb-Default {
+   position: relative;
+   display: block;
+}
+.Thumb-Extension {
+   position: absolute;
+   display: block;
+   text-align: center;
+   bottom: 0;
+   padding: 4px;
+   text-transform: uppercase;
+   color: #777;
+   line-height: 1.2;
+   font-size: 12px;
 }
