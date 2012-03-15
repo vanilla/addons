@@ -4,12 +4,11 @@
 // 0.3 - 2011-12-13 - linc - Add class to title span, make injected CSS class Vanilla-like (capitalized, no dashes).
 
 $PluginInfo['RoleTitle'] = array(
-   'Name' => 'RoleTitle',
-   'Description' => "Adds user's roles under their name in comments and adds related css definitions to the comment containers.",
+   'Name' => 'Role Titles',
+   'Description' => "Lists user's assigned roles under their name and allows theming by role (adds role-specific CSS classes to comments).",
    'Version' => '0.3',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'MobileFriendly' => TRUE,
-   'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincolnwebs@gmail.com',

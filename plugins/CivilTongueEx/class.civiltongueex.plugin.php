@@ -3,16 +3,17 @@
 // Define the plugin:
 $PluginInfo['CivilTongueEx'] = array(
    'Name' => 'Civil Tongue Ex',
-   'Description' => 'A cussing filter for all discussions and comment. You create a blacklist and any matching words will be changed into astericks (****).',
+   'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
    'Version' => '1.0',
    'MobileFriendly' => TRUE,
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
    'SettingsUrl' => '/dashboard/plugin/tongue',
-	'SettingsPermission' => 'Plugins.CivilTongue.Manage',
-	'RegisterPermissions' => array('Plugins.CivilTongue.Manage')
+	'SettingsPermission' => 'Garden.Moderation.Manage'
 );
+
+// 1.0 - Fix empty pattern when list ends in semi-colon, use non-custom permission (2012-03-12 Lincoln)
 
 class CivilTonguePlugin extends Gdn_Plugin {
    public $Replacement;
@@ -21,21 +22,22 @@ class CivilTonguePlugin extends Gdn_Plugin {
       parent::__construct();
       $this->Replacement = C('Plugins.CivilTongue.Replacement', '');
    }
-
-	
+   
+   /**
+    * Add settings page to Dashboard sidebar menu.
+    */
 	public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Forum', T('Civil Tongue'), 'plugin/tongue', 'Plugins.CivilTongue.Manage');
+      $Menu->AddLink('Forum', T('Censored Words'), 'plugin/tongue', 'Garden.Moderation.Manage');
    }
 
 	public function PluginController_Tongue_Create($Sender, $Args = array()) {
-		$Sender->Permission('Plugins.CivilTongue.Manage');	
+		$Sender->Permission('Garden.Moderation.Manage');	
 		$Sender->Form = new Gdn_Form();
 		$Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
 		$ConfigurationModel->SetField(array('Plugins.CivilTongue.Words', 'Plugins.CivilTongue.Replacement'));
 		$Sender->Form->SetModel($ConfigurationModel);
-		
 		
 		if ($Sender->Form->AuthenticatedPostBack() === FALSE) { 
 			
@@ -131,7 +133,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
          if($Words !== null) {
             $ExplodedWords = explode(';', $Words);
             foreach($ExplodedWords as $Word) {
-               $Patterns[] = '/\b' . preg_quote(ltrim(rtrim($Word))) . '\b/is';
+               if (trim($Word))
+                  $Patterns[] = '/\b' . preg_quote(trim($Word)) . '\b/is';
             }
          }
       }
@@ -142,7 +145,5 @@ class CivilTonguePlugin extends Gdn_Plugin {
    public function Setup() {
       // Set default configuration
 		SaveToConfig('Plugins.CivilTongue.Replacement', '****');
-		
    }
 }
-
