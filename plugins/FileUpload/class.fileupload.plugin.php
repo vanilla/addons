@@ -17,7 +17,7 @@
 
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
-   'Description' => 'This plugin enables file uploads and attachments to discussions and comments.',
+   'Description' => 'Images and files may be attached to discussions and comments.',
    'Version' => '1.5.7',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 

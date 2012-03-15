@@ -260,7 +260,11 @@ function Gdn_Quotes() {
             break;
             
          case 'BBCode':
-            var Append = '[quote="'+Data.Quote.authorname+'"]'+Data.Quote.body+'[/quote]'+"\n";
+            var QuoteAuthor = Data.Quote.authorname;
+            if (Data.Quote.type && Data.Quote.type == 'comment')
+               if (Data.Quote.typeid) QuoteAuthor = QuoteAuthor+";"+Data.Quote.typeid;
+            
+            var Append = '[quote="'+QuoteAuthor+'"]'+Data.Quote.body+'[/quote]'+"\n";
             break;
          
          case 'Markdown':

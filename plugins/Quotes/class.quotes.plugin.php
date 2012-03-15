@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
-   'Description' => "This plugin allows users to quote each other easily.",
+   'Description' => "Adds an option to each comment for users to easily quote each other.",
    'Version' => '1.6',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1a9'),
@@ -107,7 +107,12 @@ class QuotesPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-      Gdn::Session()->GetPreference('Quotes.Folding', '1');
+      if (!Gdn::Session()->IsValid())
+         return;
+      
+      $UserPrefs = Gdn_Format::Unserialize(Gdn::Session()->User->Preferences);
+      if (!is_array($UserPrefs))
+         $UserPrefs = array();
       
       $QuoteFolding = GetValue('Quotes.Folding', $UserPrefs, '1');
       $Sender->AddDefinition('QuotesFolding', $QuoteFolding);
@@ -247,7 +252,11 @@ BLOCKQUOTE;
                   $Sender->Form->SetValue('Body', '<blockquote rel="'.$QuoteData['authorname'].'">'.$QuoteData['body']."</blockquote>\n");
                   break;
                case 'BBCode':
-                  $Sender->Form->SetValue('Body', '[quote="'.$QuoteData['authorname'].'"]'.$QuoteData['body']."[/quote]\n");
+                  $QuoteAuthor = $QuoteData['authorname'];
+                  if (GetValue('type', $QuoteData) == 'comment')
+                     $QuoteAuthor .= ";{$QuoteData['typeid']}";
+                     
+                  $Sender->Form->SetValue('Body', '[quote="'.$QuoteAuthor.'"]'.$QuoteData['body']."[/quote]\n");
                   break;
                case 'Display':
                case 'Text':
@@ -259,8 +268,9 @@ BLOCKQUOTE;
    }
    
    protected function FormatQuote($Type, $ID, &$QuoteData) {
+      $Type = strtolower($Type);
       $Model = FALSE;
-      switch (strtolower($Type)) {
+      switch ($Type) {
          case 'comment':
             $Model = new CommentModel();
             break;
@@ -302,7 +312,9 @@ BLOCKQUOTE;
             'body'         => $Data->Body,
             'format'       => C('Garden.InputFormatter'),
             'authorid'     => $Data->InsertUserID,
-            'authorname'   => $Data->InsertName
+            'authorname'   => $Data->InsertName,
+            'type'         => $Type,
+            'typeid'       => $ID
          ));
       }
    }

@@ -8,7 +8,7 @@
 // Define the plugin:
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
-   'Description' => 'An SSO plugin that uses json(p) to connect to vanilla, allowing for cross-domain sso.',
+   'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
    'Version' => '1.1.3',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'MobileFriendly' => TRUE,

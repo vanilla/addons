@@ -3,7 +3,7 @@
 // Define the plugin:
 $PluginInfo['TouchIcon'] = array(
    'Name' => 'Touch Icon',
-   'Description' => 'Allow admin to upload touch icon for Apple devices.',
+   'Description' => 'Adds option to upload a touch icon for Apple iDevices.',
    'Version' => '1.0',
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
