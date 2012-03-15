@@ -12,8 +12,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['FeedDiscussions'] = array(
    'Name' => 'Feed Discussions',
    'Description' => "Automatically creates new discussions based on content imported from supplied RSS feeds.",
-   'Version' => '0.9.1',
-   'RequiredApplications' => FALSE,
+   'Version' => '1.0',
+   'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
@@ -37,16 +37,13 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       $Menu->AddLink('Forum', T('Feed Discussions'), 'plugin/feeddiscussions', 'Garden.Settings.Manage');
    }
    
-   public function DiscussionsController_AfterInitialize_Handler($Sender) {
+   public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
       if ($this->IsEnabled()) {
          if ($this->CheckFeeds(FALSE))
             $Sender->AddJsFile($this->GetResource('js/feeddiscussions.js', FALSE, FALSE));
-      }
-   }
-   
-   public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-      if ($this->IsEnabled())
+         
          $Sender->AddCssFile($this->GetResource('css/feeddiscussions.css', FALSE, FALSE));
+      }
    }
    
    /**
@@ -78,14 +75,19 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       $NeedToPoll = 0;
       foreach ($this->GetFeeds() as $FeedURL => $FeedData) {
          // Check feed here
-         $LastImport = GetValue('LastImport', $FeedData) == 'never' ? 0 : strtotime(GetValue('LastImport', $FeedData));
+         $LastImport = GetValue('LastImport', $FeedData) == 'never' ? NULL : strtotime(GetValue('LastImport', $FeedData));
+         if (is_null($LastImport))
+            $LastImport = strtotime(GetValue('Added', $FeedData, 0));
+         
          $Historical = (bool)GetValue('Historical', $FeedData, FALSE);
          $Delay = GetValue('Refresh', $FeedData);
          $DelayStr = '+'.str_replace(array(
+            'm',
             'h',
             'd',
             'w'
          ),array(
+            'minutes',
             'hours',
             'days',
             'weeks'
@@ -114,6 +116,8 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       $Sender->SetData('Description', $this->GetPluginKey('Description'));
       $Sender->AddCssFile($this->GetResource('css/feeddiscussions.css',FALSE,FALSE));
       
+      $Categories = CategoryModel::Categories();
+      $Sender->SetData('Categories', $Categories);
       $Sender->SetData('Feeds', $this->GetFeeds());
       
       $Sender->Render($this->GetView('feeddiscussions.php'));
@@ -121,27 +125,39 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
    
    public function Controller_AddFeed($Sender) {
       
+      $Categories = CategoryModel::Categories();
+      $Sender->SetData('Categories', $Categories);
+      
       // Do addfeed stuff here;
       if ($Sender->Form->AuthenticatedPostback()) {
          
          // Grab posted values and merge with defaults
          $FormPostValues = $Sender->Form->FormValues();
          $Defaults = array(
-            'FeedDiscussions.FeedOption.Historical'   => 1,
-            'FeedDiscussions.FeedOption.Refresh'      => '1d'
+            'Historical'   => 1,
+            'Refresh'      => '1d',
+            'Category'     => -1
          );
          $FormPostValues = array_merge($Defaults, $FormPostValues);
          
          try {
-            $FeedURL = GetValue('FeedDiscussions.FeedURL', $FormPostValues, NULL);
+            $FeedURL = GetValue('FeedURL', $FormPostValues, NULL);
             if (empty($FeedURL))
                throw new Exception("You must supply a valid Feed URL");
          
-            if ($this->HaveFeed($FeedURL))
+            if ($this->HaveFeed($FeedURL, FALSE))
                throw new Exception("The Feed URL you supplied is already part of an Active Feed");
+            
+            $FeedCategoryID = GetValue('Category', $FormPostValues);
+            if (!array_key_exists($FeedCategoryID, $Categories))
+               throw new Exception("You need to select a Category");
                
             // Check feed is valid RSS:
-            $FeedRSS = ProxyRequest($FeedURL, FALSE, TRUE);
+            $Pr = new ProxyRequest();
+            $FeedRSS = $Pr->Request(array(
+               'URL' => $FeedURL
+            ));
+            
             if (!$FeedRSS)
                throw new Exception("The Feed URL you supplied is not available");
             
@@ -154,8 +170,10 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                throw new Exception("The Feed URL you supplied is not an RSS stream");
                
             $this->AddFeed($FeedURL, array(
-               'Historical'   => $FormPostValues['FeedDiscussions.FeedOption.Historical'],
-               'Refresh'      => $FormPostValues['FeedDiscussions.FeedOption.Refresh'],
+               'Historical'   => $FormPostValues['Historical'],
+               'Refresh'      => $FormPostValues['Refresh'],
+               'Category'     => $FeedCategoryID,
+               'Added'        => date('Y-m-d H:i:s'),
                'LastImport'   => "never"
             ));
             $Sender->InformMessage(sprintf(T("Feed has been added"),$FeedURL));
@@ -171,13 +189,13 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
    }
    
    public function Controller_DeleteFeed($Sender) {
-      $ChosenFeed = GetValue(1, $Sender->RequestArgs, NULL);
-      if (!is_null($ChosenFeed)) {
-         $FeedURL = self::DecodeFeedKey($ChosenFeed);
-         if ($this->HaveFeed($FeedURL)) {
-            $this->RemoveFeed($FeedURL);
-            $Sender->InformMessage(sprintf(T("Feed has been removed"),$FeedURL));
-         }
+      $FeedKey = GetValue(1, $Sender->RequestArgs, NULL);
+      if (!is_null($FeedKey) && $this->HaveFeed($FeedKey)) {
+         $Feed = $this->GetFeed($FeedKey, TRUE);
+         $FeedURL = $Feed['URL'];
+         
+         $this->RemoveFeed($FeedKey);
+         $Sender->InformMessage(sprintf(T("Feed has been removed"),$FeedURL));
       }
       
       // Redirect('/plugin/feeddiscussions/');
@@ -186,13 +204,23 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
    
    protected function GetFeeds($Raw = FALSE, $Regen = FALSE) {
       if (is_null($this->FeedList) || $Regen) {
-         $FeedArray = C('Plugin.FeedDiscussions.Feeds', array());
+         $FeedArray = $this->GetUserMeta(0, "Feed.%");
+         
+         //die('feeds');
          $this->FeedList = array();
          $this->RawFeedList = array();
          
-         foreach ($FeedArray as $FeedKey => $FeedItem) {
-            $RealFeedURL = self::DecodeFeedKey($FeedKey);
-            $this->RawFeedList[$FeedKey] = $this->FeedList[$RealFeedURL] = $FeedItem;
+         foreach ($FeedArray as $FeedMetaKey => $FeedItem) {
+            $DecodedFeedItem = json_decode($FeedItem, TRUE);
+            $FeedURL = GetValue('URL', $DecodedFeedItem, NULL);
+            $FeedKey = self::EncodeFeedKey($FeedURL);
+            
+            if (is_null($FeedURL)) {
+               //$this->RemoveFeed($FeedKey);
+               continue;
+            }
+            
+            $this->RawFeedList[$FeedKey] = $this->FeedList[$FeedURL] = $DecodedFeedItem;
          }
       }
       
@@ -200,7 +228,11 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
    }
    
    protected function PollFeed($FeedURL, $LastImportDate) {
-      $FeedRSS = ProxyRequest($FeedURL, FALSE, TRUE);
+      $Pr = new ProxyRequest();
+      $FeedRSS = $Pr->Request(array(
+         'URL' => $FeedURL
+      ));
+            
       if (!$FeedRSS) return FALSE;
       
       $RSSData = simplexml_load_string($FeedRSS);
@@ -211,48 +243,100 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       
       if (!array_key_exists('item', $Channel)) return FALSE;
       
+      $Feed = $this->GetFeed($FeedURL, FALSE);
+      
       $DiscussionModel = new DiscussionModel();
       $DiscussionModel->SpamCheck = FALSE;
       
+      $LastPublishDate = GetValue('LastPublishDate', $Feed, date('c'));
+      $LastPublishTime = strtotime($LastPublishDate);
+      
+      echo "last known publish: {$LastPublishDate}\n";
+      echo " time: {$LastPublishTime}\n";
+      echo "\n";
+      
+      $FeedLastPublishTime = 0;
       foreach (GetValue('item', $Channel) as $Item) {
-         $StrPubDate = GetValue('pubDate', $Item, NULL);
-         if (!is_null($StrPubDate)) {
-            $PubDate = strtotime($StrPubDate);
-            
-            // Story is older than last import date. Do not import.
-            if ($PubDate < $LastImportDate) continue;
-         } else {
-            $PubDate = time();
+         $FeedItemGUID = trim((string)GetValue('guid', $Item));
+         $FeedItemID = md5($FeedItemGUID);
+         echo "item: {$FeedItemGUID} - {$FeedItemID}\n";
+         
+         $ItemPubDate = (string)GetValue('pubDate', $Item, NULL);
+         if (is_null($ItemPubDate))
+            $ItemPubTime = time();
+         else
+            $ItemPubTime = strtotime($ItemPubDate);
+         
+         if ($ItemPubTime > $FeedLastPublishTime)
+            $FeedLastPublishTime = $ItemPubTime;
+         
+         echo " published: {$ItemPubDate}\n";
+         echo " time: {$ItemPubTime}\n";
+         if ($ItemPubTime < $LastPublishTime) {
+            echo " old, skipped\n";
+            continue;
          }
          
-         $StoryTitle = array_shift($Trash = explode("\n",GetValue('title', $Item)));
-         $StoryBody = (string)GetValue('description', $Item);
-         $StoryPublished = date("Y-m-d H:i:s", $PubDate);
+         $ExistingDiscussion = $DiscussionModel->GetWhere(array(
+            'ForeignID' => $FeedItemID
+         ));
          
+         if ($ExistingDiscussion && $ExistingDiscussion->NumRows()) {
+            echo " exists, skipped\n";
+            print_r($ExistingDiscussion);
+            continue;
+         }
+         
+         echo " import!\n";
+         
+         $this->EventArguments['Publish'] = TRUE;
+
+         $this->EventArguments['FeedURL'] = $FeedURL;
+         $this->EventArguments['Feed'] = &$Feed;
+         $this->EventArguments['Item'] = &$Item;
+         $this->FireEvent('FeedItem');
+
+         if (!$this->EventArguments['Publish']) continue;
+
+         $StoryTitle = array_shift($Trash = explode("\n",(string)GetValue('title', $Item)));
+         $StoryBody = (string)GetValue('description', $Item);
+         $StoryPublished = date("Y-m-d H:i:s", $ItemPubTime);
+
          $ParsedStoryBody = $StoryBody;
          $ParsedStoryBody = '<div class="AutoFeedDiscussion">'.$ParsedStoryBody.'</div>';
-         
-         // Yahoo RSS Gayness
-         // $ParsedStoryBody = preg_replace_callback('/href="(.*)"/', array($this, 'ReplaceBadURLs'), $ParsedStoryBody);
-         
+
          $DiscussionData = array(
                'Name'            => $StoryTitle,
+               'Format'          => 'Html',
+               'CategoryID'      => $Feed['Category'],
+               'ForeignID'       => substr($FeedItemID, 0, 30),
                'Body'            => $ParsedStoryBody
             );
-            
-         $InsertUserID = $DiscussionModel->SQL->Select('UserID')->From('User')->Where('Admin',1)->Get()->FirstRow()->UserID;
+
+         $Minion = Gdn::PluginManager()->GetPluginInstance('MinionPlugin');
+         $InsertUserID = $Minion->GetMinionUserID();
+
          $DiscussionData[$DiscussionModel->DateInserted] = $StoryPublished;
          $DiscussionData[$DiscussionModel->InsertUserID] = $InsertUserID;
-         
+
          $DiscussionData[$DiscussionModel->DateUpdated] = $StoryPublished;
          $DiscussionData[$DiscussionModel->UpdateUserID] = $InsertUserID;
-         
+
+         $this->EventArguments['FeedDiscussion'] = &$DiscussionData;
+         $this->FireEvent('Publish');
+
+         if (!$this->EventArguments['Publish']) continue;
+
          $InsertID = $DiscussionModel->Save($DiscussionData);
-            
+
          $DiscussionModel->Validation->Results(TRUE);
       }
       
-      $this->UpdateFeed($FeedURL, 'LastImport', date('Y-m-d H:i:s', time()));
+      $FeedKey = self::EncodeFeedKey($FeedURL);
+      $this->UpdateFeed($FeedKey, array(
+         'LastImport'      => date('Y-m-d H:i:s'),
+         'LastPublishDate' => date('c', $FeedLastPublishTime)
+      ));
    }
    
    public function ReplaceBadURLs($Matches) {
@@ -261,38 +345,42 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       return 'href="'.$FixedURL.'"';
    }
    
-   protected function AddFeed($FeedURL, $FeedOptions) {
+   protected function AddFeed($FeedURL, $Feed) {
       $FeedKey = self::EncodeFeedKey($FeedURL);
-      $Feeds = $this->GetFeeds(TRUE);
-      $Feeds[$FeedKey] = $FeedOptions;
-      SaveToConfig('Plugin.FeedDiscussions.Feeds', $Feeds);
+      
+      $Feed['URL'] = $FeedURL;
+      $EncodedFeed = json_encode($Feed);
+      $this->SetUserMeta(0, "Feed.{$FeedKey}", $EncodedFeed);
       
       // regenerate the internal feed list
       $this->GetFeeds(TRUE, TRUE);
    }
    
-   protected function UpdateFeed($FeedURL, $FeedOptionKey, $FeedOptionValue) {
-      $FeedKey = self::EncodeFeedKey($FeedURL);
-      $Feeds = $this->GetFeeds(TRUE);
-      $Feeds[$FeedKey][$FeedOptionKey] = $FeedOptionValue;
-      SaveToConfig('Plugin.FeedDiscussions.Feeds', $Feeds);
+   protected function UpdateFeed($FeedKey, $FeedOptionKey, $FeedOptionValue = NULL) {
+      $Feed = $this->GetFeed($FeedKey);
+      
+      if (!is_array($FeedOptionKey))
+         $FeedOptionKey = array($FeedOptionKey => $FeedOptionValue);
+      
+      $Feed = array_merge($Feed, $FeedOptionKey);
+      
+      $EncodedFeed = json_encode($Feed);
+      $this->SetUserMeta(0, "Feed.{$FeedKey}", $EncodedFeed);
       
       // regenerate the internal feed list
       $this->GetFeeds(TRUE, TRUE);
    }
    
-   protected function RemoveFeed($FeedURL) {
-      $FeedKey = self::EncodeFeedKey($FeedURL);
-      $Feeds = $this->GetFeeds(TRUE);
-      unset($Feeds[$FeedKey]);
-      SaveToConfig('Plugin.FeedDiscussions.Feeds', $Feeds);
+   protected function RemoveFeed($FeedKey, $PreEncoded = TRUE) {
+      $FeedKey = (!$PreEncoded) ? self::EncodeFeedKey($FeedKey) : $FeedKey;
+      $this->SetUserMeta(0, "Feed.{$FeedKey}", NULL);
       
       // regenerate the internal feed list
       $this->GetFeeds(TRUE, TRUE);
    }
    
-   protected function GetFeed($FeedURL, $PreEncoded = FALSE) {
-      $FeedKey = (!$PreEncoded) ? self::EncodeFeedKey($FeedURL) : $FeedURL;
+   protected function GetFeed($FeedKey, $PreEncoded = TRUE) {
+      $FeedKey = (!$PreEncoded) ? self::EncodeFeedKey($FeedKey) : $FeedKey;
       $Feeds = $this->GetFeeds(TRUE);
       
       if (array_key_exists($FeedKey, $Feeds))
@@ -301,20 +389,17 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       return NULL;
    }
    
-   protected function HaveFeed($FeedURL) {
-      $Feeds = $this->GetFeeds();
-      if (array_key_exists($FeedURL, $Feeds)) return TRUE;
+   protected function HaveFeed($FeedKey, $PreEncoded = TRUE) {
+      $FeedKey = (!$PreEncoded) ? self::EncodeFeedKey($FeedKey) : $FeedKey;
+      $Feed = $this->GetFeed($FeedKey);
+      if (!empty($Feed)) return TRUE;
       return FALSE;
    }
    
    public static function EncodeFeedKey($Key) {
-      return str_replace('=','_',base64_encode($Key));
+      return md5($Key);
    }
    
-   public static function DecodeFeedKey($Key) {
-      return base64_decode(str_replace('_','=',$Key));
-   }
-      
    public function Setup() {
       // Nothing to do here!
    }
