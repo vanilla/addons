@@ -22,6 +22,9 @@
       echo $this->Form->Errors();
       
       $Refreshments = array(
+               "1m"  => T("Every Minute"),
+               "5m"  => T("Every 5 Minutes"),
+               "30m" => T("Twice Hourly"),
                "1h"  => T("Hourly"),
                "1d"  => T("Daily"),
                "3d"  => T("Every 3 Days"),
@@ -34,18 +37,23 @@
          <li>
             <div class="Info">Add a new Auto Discussion Feed</div>
          <?php
-            echo $this->Form->Label('Feed URL', 'FeedDiscussions.FeedURL');
-            echo $this->Form->TextBox('FeedDiscussions.FeedURL', array('class' => 'InputBox'));
+            echo $this->Form->Label('Feed URL', 'FeedURL');
+            echo $this->Form->TextBox('FeedURL', array('class' => 'InputBox'));
          ?></li>
          <li><?php
-            echo $this->Form->CheckBox('FeedDiscussions.FeedOption.Historical', T('Import Older Posts'), array('value' => '1'));
+            echo $this->Form->CheckBox('Historical', T('Import Older Posts'), array('value' => '1'));
          ?></li>
                
          <li><?php
-            echo $this->Form->Label('Minimum Polling Frequency', 'FeedDiscussions.FeedOption.Refresh');
-            echo $this->Form->DropDown('FeedDiscussions.FeedOption.Refresh', $Refreshments, array(
+            echo $this->Form->Label('Maximum Polling Frequency', 'Refresh');
+            echo $this->Form->DropDown('Refresh', $Refreshments, array(
                'value'  => "1d"
             ));
+         ?></li>
+         
+         <li><?php
+            echo $this->Form->Label('Target Category', 'Category');
+            echo $this->Form->CategoryDropDown('Category');
          ?></li>
       </ul>
    <?php
@@ -56,14 +64,16 @@
 <h3><?php echo T('Active Feeds'); ?></h3>
 <div class="ActiveFeeds">
 <?php
-   $NumFeeds = count($this->Data['Feeds']);
+   $NumFeeds = count($this->Data('Feeds'));
    if (!$NumFeeds) {
       echo T("You have no active auto feeds at this time.");
    } else {
       echo "<div>".$NumFeeds." ".Plural($NumFeeds,"Active Feed","Active Feeds")."</div>\n";
-      foreach ($this->Data['Feeds'] as $FeedURL => $FeedItem) {
+      foreach ($this->Data('Feeds') as $FeedURL => $FeedItem) {
          $LastUpdate = $FeedItem['LastImport'];
+         $CategoryID = $FeedItem['Category'];
          $Frequency = GetValue($FeedItem['Refresh'], $Refreshments, T('Unknown'));
+         $Category = $this->Data("Categories.{$CategoryID}.Name", 'Root');
 ?>
          <div class="FeedItem">
             <div class="DeleteFeed">
@@ -74,6 +84,7 @@
                <div class="FeedItemInfo">
                   <span>Updated: <?php echo $LastUpdate; ?></span>
                   <span>Refresh: <?php echo $Frequency; ?></span>
+                  <span>Category: <?php echo $Category; ?></span>
                </div>
             </div>
          </div>
