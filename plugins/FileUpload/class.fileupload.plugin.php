@@ -21,7 +21,7 @@
 $PluginInfo['FileUpload'] = array(
    'Description' => 'Images and files may be attached to discussions and comments.',
    'Version' => '1.6',
-   'RequiredApplications' => array('Vanilla' => '2.0.9'),
+   'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
@@ -738,6 +738,9 @@ class FileUploadPlugin extends Gdn_Plugin {
          $SaveFilename = md5(microtime()).'.'.strtolower($Extension);
          $SaveFilename = '/FileUpload/'.substr($SaveFilename, 0, 2).'/'.substr($SaveFilename, 2);
          
+         // Get the image size before doing anything.
+         list($ImageWidth, $ImageHeight) = Gdn_UploadImage::ImageSize($FileTemp, $FileName);
+         
          // Fire event for hooking save location
          $this->EventArguments['Path'] = $FileTemp;
          $Parsed = Gdn_Upload::Parse($SaveFilename);
@@ -760,17 +763,8 @@ class FileUploadPlugin extends Gdn_Plugin {
             $MoveSuccess = @move_uploaded_file($FileTemp, $SavePath);
             if (!$MoveSuccess)
                throw new FileUploadPluginUploadErrorException("Internal error, could not move the file.", 9, $FileName);   
-            
-            // Get the image dimensions (if this is an image).
-            list($ImageWidth, $ImageHeight) = MediaModel::GetImageSize($SavePath);
          } else {
             $SaveFilename = $Parsed['SaveName'];
-            if (isset($Parsed['ImageWidth']) && isset($Parsed['ImageHeight'])) {
-               $ImageWidth = $Parsed['ImageWidth'];
-               $ImageHeight = $Parsed['ImageHeight'];
-            } else {
-               list($ImageWidth, $ImageHeight) = MediaModel::GetImageSize($FileTemp);
-            }
          }
                   
          // Save Media data
