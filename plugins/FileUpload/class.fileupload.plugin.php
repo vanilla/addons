@@ -7,7 +7,9 @@
  * 
  * Changes: 
  *  1.5     Add hooks for API uploading. Add docs. Fix constructor to call parent.
- *  1.5.6   Add hook for discussions/download
+ *  1.5.6   Add hook for discussions/download.
+ *  1.6     Fix the file upload plugin for external storage.
+ *          Add file extensions to the non-image icons.
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -18,8 +20,8 @@
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'Images and files may be attached to discussions and comments.',
-   'Version' => '1.5.7',
-   'RequiredApplications' => array('Vanilla' => '2.0.9'),
+   'Version' => '1.6',
+   'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
@@ -36,16 +38,23 @@ include dirname(__FILE__).'/class.mediamodel.php';
 
 class FileUploadPlugin extends Gdn_Plugin {
    /** @var array */
-   protected $MediaCache;
+   protected $_MediaCache;
 
    /**
     * Permission checks & property prep.
     */
    public function __construct() {
       parent::__construct();
-      $this->MediaCache = array();
+      $this->_MediaCache = NULL;
       $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
+   }
+   
+   public function MediaCache() {
+      if ($this->_MediaCache === NULL) {
+         $this->CacheAttachedMedia(Gdn::Controller());
+      }
+      return $this->_MediaCache;
    }
 
    /**
@@ -222,7 +231,6 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function PostController_BeforeFormButtons_Handler($Sender) {
       if (!is_null($Discussion = GetValue('Discussion',$Sender, NULL))) {
-         $this->CacheAttachedMedia($Sender);
          $Sender->EventArguments['Type'] = 'Discussion';
          $Sender->EventArguments['Discussion'] = $Discussion;
          $this->AttachUploadsToComment($Sender, 'discussion');
@@ -252,30 +260,6 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    /**
-    * DiscussionController_BeforeDiscussionRender_Handler function.
-    * 
-    * @access public
-    * @param mixed $Sender
-    * @return void
-    */
-   public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-      // Cache the list of media. Don't want to do multiple queries!
-      $this->CacheAttachedMedia($Sender);
-   }
-   
-   /**
-    * PostController_BeforeCommentRender_Handler function.
-    * 
-    * @access public
-    * @param mixed $Sender
-    * @return void
-    */
-   public function PostController_BeforeCommentRender_Handler($Sender) {
-      // Cache the list of media. Don't want to do multiple queries!
-      $this->CacheAttachedMedia($Sender);
-   }
-   
-   /**
     * CacheAttachedMedia function.
     * 
     * @access protected
@@ -285,8 +269,11 @@ class FileUploadPlugin extends Gdn_Plugin {
    protected function CacheAttachedMedia($Sender) {
       if (!$this->IsEnabled()) return;
       
-      $Comments = $Sender->Data('CommentData');
+      $Comments = $Sender->Data('Comments');
       $CommentIDList = array();
+      
+//      decho($Comments);
+//      die($Comments);
       
       if ($Comments && $Comments instanceof Gdn_DataSet) {
          $Comments->DataSeek(-1);
@@ -309,7 +296,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          }
       }
             
-      $this->MediaCache = $MediaArray;
+      $this->_MediaCache = $MediaArray;
    }
    
    /**
@@ -362,13 +349,14 @@ class FileUploadPlugin extends Gdn_Plugin {
          $Controller->EventArguments['Comment'] = $Controller->Comment;
       }
 
-      $MediaList = $this->MediaCache;
+      $MediaList = $this->MediaCache();
       if (!is_array($MediaList)) return;
       
       $Param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
-      $MediaKey = $Type.'/'.GetValue($Param, GetValue($RawType, $Controller->EventArguments[$RawType]));
-      
+      $MediaKey = $Type.'/'.GetValue($Param, GetValue($RawType, $Controller->EventArguments));
       if (array_key_exists($MediaKey, $MediaList)) {
+         include_once $Controller->FetchViewLocation('fileupload_functions', '', 'plugins/FileUpload');
+         
          $Controller->SetData('CommentMediaList', $MediaList[$MediaKey]);
          $Controller->SetData('GearImage', $this->GetWebResource('images/gear.png'));
          $Controller->SetData('Garbage', $this->GetWebResource('images/trash.png'));
@@ -487,10 +475,13 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function UtilityController_Thumbnail_Create($Sender, $Args = array()) {
       $MediaID = array_shift($Args);
+      if (!is_numeric($MediaID))
+         array_unshift($Args, $MediaID);
       $SubPath = implode('/', $Args);
       $Name = $SubPath;
+      $Parsed = Gdn_Upload::Parse($Name);
 
-      // Get actual path to the file
+      // Get actual path to the file.
       $Path = Gdn_Upload::CopyLocal($SubPath);
       if (!file_exists($Path))
          throw NotFoundException('File');
@@ -535,24 +526,20 @@ class FileUploadPlugin extends Gdn_Plugin {
          }
       }
 
-      $TargetPath = MediaModel::PathUploads()."/thumbnails/$Name";
-      if (!file_exists(dirname($TargetPath))) {
-         mkdir(dirname($TargetPath), 0777, TRUE);
-      }
-      Gdn_UploadImage::SaveImageAs($Path, $TargetPath, $Height, $Width, $Options);
-      
+      $TargetPath = "thumbnails/{$Parsed['Name']}";
+      $ThumbParsed = Gdn_UploadImage::SaveImageAs($Path, $TargetPath, $Height, $Width, $Options);
       // Cleanup if we're using a scratch copy
-      if ($Path != MediaModel::PathUploads().'/'.$SubPath)
+      if ($ThumbParsed['Type'] != '' || $Path != MediaModel::PathUploads().'/'.$SubPath)
          @unlink($Path);
       
       if (is_numeric($MediaID)) {
          // Save the thumbnail information.
          $Model = new MediaModel();
-         $Media = array('MediaID' => $MediaID, 'ThumbWidth' => $Width, 'ThumbHeight' => $Height, 'ThumbPath' => "/thumbnails/$Name");
+         $Media = array('MediaID' => $MediaID, 'ThumbWidth' => $Width, 'ThumbHeight' => $Height, 'ThumbPath' => $ThumbParsed['SaveName']);
          $Model->Save($Media);
       }
 
-      $Url = MediaModel::Url("/thumbnails/$Name");
+      $Url = $ThumbParsed['Url'];
       Redirect($Url, 301);
 //      Gdn_FileSystem::ServeFile($TargetPath, basename($Path), '', 'inline');
    }
@@ -670,6 +657,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+      include_once $Sender->FetchViewLocation('fileupload_functions', '', 'plugins/FileUpload');
       
       $Sender->FieldName = $FieldName;
       $Sender->ApcKey = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_POST,'APC_UPLOAD_PROGRESS');
@@ -750,15 +738,19 @@ class FileUploadPlugin extends Gdn_Plugin {
          $SaveFilename = md5(microtime()).'.'.strtolower($Extension);
          $SaveFilename = '/FileUpload/'.substr($SaveFilename, 0, 2).'/'.substr($SaveFilename, 2);
          
+         // Get the image size before doing anything.
+         list($ImageWidth, $ImageHeight) = Gdn_UploadImage::ImageSize($FileTemp, $FileName);
+         
          // Fire event for hooking save location
          $this->EventArguments['Path'] = $FileTemp;
          $Parsed = Gdn_Upload::Parse($SaveFilename);
          $this->EventArguments['Parsed'] =& $Parsed;
+         $this->EventArguments['OriginalFilename'] = $FileName;
          $Handled = FALSE;
          $this->EventArguments['Handled'] =& $Handled;
-         $this->FireEvent('UploadSaveAs');
+         $this->FireAs('Gdn_Upload')->FireEvent('SaveAs');
          $SavePath = $Parsed['Name'];
-                  
+         
          if (!$Handled) {
             // Build save location
             $SavePath = MediaModel::PathUploads().$SaveFilename;
@@ -770,11 +762,10 @@ class FileUploadPlugin extends Gdn_Plugin {
             // Move to permanent location
             $MoveSuccess = @move_uploaded_file($FileTemp, $SavePath);
             if (!$MoveSuccess)
-               throw new FileUploadPluginUploadErrorException("Internal error, could not move the file.", 9, $FileName);            
+               throw new FileUploadPluginUploadErrorException("Internal error, could not move the file.", 9, $FileName);   
+         } else {
+            $SaveFilename = $Parsed['SaveName'];
          }
-         
-         // Get the image dimensions (if this is an image).
-         list($ImageWidth, $ImageHeight) = MediaModel::GetImageSize($SavePath);
                   
          // Save Media data
          $Media = array(
@@ -793,18 +784,9 @@ class FileUploadPlugin extends Gdn_Plugin {
                   
          $FinalImageLocation = '';
          $PreviewImageLocation = MediaModel::ThumbnailUrl($Media);
-//         $PreviewImageLocation = Asset('plugins/FileUpload/images/file.png');
-//         if (getimagesize($ScratchFileName)) {
-//            $FinalImageLocation = Asset(
-//               'uploads/'
-//               .FileUploadPlugin::FindLocalMediaFolder($MediaID, Gdn::Session()->UserID, FALSE, TRUE)
-//               .'/'
-//               .$MediaID
-//               .'.'
-//               .GetValue('extension', pathinfo($FileName), '')
-//            );
-//            $PreviewImageLocation = Asset('uploads/FileUpload/scratch/'.$TempFileName);
-//         }
+
+//         
+         
          $MediaResponse = array(
             'Status'             => 'success',
             'MediaID'            => $MediaID,
@@ -812,8 +794,10 @@ class FileUploadPlugin extends Gdn_Plugin {
             'Filesize'           => $FileSize,
             'FormatFilesize'     => Gdn_Format::Bytes($FileSize,1),
             'ProgressKey'        => $Sender->ApcKey ? $Sender->ApcKey : '',
-            'PreviewImageLocation' => Url($PreviewImageLocation),
-            'FinalImageLocation' => Url(MediaModel::Url($Parsed['Name']))
+//            'PreviewImageLocation' => Url($PreviewImageLocation),
+            'Thumbnail' => base64_encode(MediaThumbnail($Media)),
+            'FinalImageLocation' => Url(MediaModel::Url($Media)),
+            'Parsed' => $Parsed
          );
 
       } catch (FileUploadPluginUploadErrorException $e) {

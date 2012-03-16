@@ -187,16 +187,15 @@ class VotingPlugin extends Gdn_Plugin {
 		$Type = GetValue('Type', $Sender->EventArguments, 'Comment');
 		if ($Type == 'Comment' && !GetValue('VoteHeaderWritten', $Sender)) { //$Type != 'Comment' && $AnswerCount > 0) {
 		?>
-		<li>
-			<div class="Tabs DiscussionTabs AnswerTabs">
+		<li class="Item">
+			<div class="VotingSort">
 			<?php
 			echo
 				Wrap($AnswerCount.' '.Plural($AnswerCount, 'Comment', 'Comments'), 'strong');
-				echo ' sorted by 
-				<ul>
-					<li'.(self::CommentSort() == 'popular' ? ' class="Active"' : '').'>'.Anchor('Votes', Url('?Sort=popular', TRUE), '', array('rel' => 'nofollow')).'</li>
-					<li'.(self::CommentSort() == 'date' ? ' class="Active"' : '').'>'.Anchor('Date Added', Url('?Sort=date', TRUE), '', array('rel' => 'nofollow')).'</li>
-				</ul>';
+				echo ' sorted by '
+               .Anchor('Votes', Url('?Sort=popular', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'popular' ? 'Active' : ''))
+               .' '
+               .Anchor('Date Added', Url('?Sort=date', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'date' ? 'Active' : ''));
 			?>
 			</div>
 		</li>
@@ -205,10 +204,10 @@ class VotingPlugin extends Gdn_Plugin {
 		}		
 	}
 
-	public function DiscussionController_BeforeCommentMeta_Handler($Sender) {
+	public function DiscussionController_AfterCommentMeta_Handler($Sender) {
 //		if (!C('Plugins.Voting.Enabled'))
 //			return;
-
+/*
 		echo '<span class="Votes">';
 			$Session = Gdn::Session();
 			$Object = GetValue('Object', $Sender->EventArguments);
@@ -226,7 +225,29 @@ class VotingPlugin extends Gdn_Plugin {
 			echo Wrap(StringIsNullOrEmpty($Object->Score) ? '0' : Gdn_Format::BigNumber($Object->Score));
 			echo Anchor(Wrap(Wrap('Vote Down', 'i'), 'i', array('class' => 'ArrowSprite SpriteDown', 'rel' => 'nofollow')), $VoteDownUrl, 'VoteDown'.$CssClass);
 		echo '</span>';
-	}
+
+ */ 	
+      
+      $Session = Gdn::Session();
+      $Object = GetValue('Object', $Sender->EventArguments);
+      $VoteType = $Sender->EventArguments['Type'] == 'Discussion' ? 'votediscussion' : 'votecomment';
+      $ID = $Sender->EventArguments['Type'] == 'Discussion' ? $Object->DiscussionID : $Object->CommentID;
+      $CssClass = '';
+      $VoteUpUrl = '/discussion/'.$VoteType.'/'.$ID.'/voteup/'.$Session->TransientKey().'/';
+      $VoteDownUrl = '/discussion/'.$VoteType.'/'.$ID.'/votedown/'.$Session->TransientKey().'/';
+      if (!$Session->IsValid()) {
+         $VoteUpUrl = Gdn::Authenticator()->SignInUrl($Sender->SelfUrl);
+         $VoteDownUrl = $VoteUpUrl;
+         $CssClass = ' SignInPopup';
+      }
+
+      echo '<span class="Voter">';
+			echo Anchor(Wrap(Wrap('Vote Up', 'i'), 'i', array('class' => 'ArrowSprite SpriteUp', 'rel' => 'nofollow')), $VoteUpUrl, 'VoteUp'.$CssClass);
+			echo Wrap(StringIsNullOrEmpty($Object->Score) ? '0' : Gdn_Format::BigNumber($Object->Score));
+			echo Anchor(Wrap(Wrap('Vote Down', 'i'), 'i', array('class' => 'ArrowSprite SpriteDown', 'rel' => 'nofollow')), $VoteDownUrl, 'VoteDown'.$CssClass);
+		echo '</span>';
+ }
+
 
    /**
 	 * Add the vote.js file to discussions page, and handle sorting of answers.
@@ -397,16 +418,22 @@ class VotingPlugin extends Gdn_Plugin {
    /**
     * Grab the score field whenever the discussions are queried.
     */
-   public function DiscussionModel_AfterDiscussionSummaryQuery_Handler(&$Sender) {
+   public function DiscussionModel_AfterDiscussionSummaryQuery_Handler($Sender) {
 //		if (!C('Plugins.Voting.Enabled'))
 //			return;
 
       $Sender->SQL->Select('d.Score');
    }
 	
+   public function DiscussionsController_AfterDiscussionFilters_Handler($Sender) {
+		echo '<li class="PopularDiscussions '.($Sender->RequestMethod == 'popular' ? ' Active' : '').'">'
+			.Anchor(Sprite('SpPopularDiscussions').T('Popular'), '/discussions/popular', 'PopularDiscussions')
+		.'</li>';
+   }
+   
 	/**
 	 * Add the "Popular Questions" tab.
-	 */
+    */
 	public function Base_BeforeDiscussionTabs_Handler($Sender) {
 //		if (!C('Plugins.Voting.Enabled'))
 //			return;
@@ -427,6 +454,7 @@ class VotingPlugin extends Gdn_Plugin {
 //		if (!C('Plugins.Voting.Enabled'))
 //			return;
 
+      $Sender->AddModule('DiscussionFilterModule');
       $Sender->Title(T('Popular'));
       $Sender->Head->Title($Sender->Head->Title());
 
