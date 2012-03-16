@@ -1,18 +1,26 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+
+/**
+ * Feed Discussions
+ * 
+ * Automatically creates new discussions based on content imported from supplied RSS feeds.
+ * 
+ * Changes: 
+ *  1.0     Initial release/rewrite
+ *  1.0.1   Minor fixes for logic
+ *  1.0.2   Fix repeat posting bug
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Addons
+ */
 
 // Define the plugin:
 $PluginInfo['FeedDiscussions'] = array(
    'Name' => 'Feed Discussions',
    'Description' => "Automatically creates new discussions based on content imported from supplied RSS feeds.",
-   'Version' => '1.0',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -251,15 +259,10 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       $LastPublishDate = GetValue('LastPublishDate', $Feed, date('c'));
       $LastPublishTime = strtotime($LastPublishDate);
       
-      echo "last known publish: {$LastPublishDate}\n";
-      echo " time: {$LastPublishTime}\n";
-      echo "\n";
-      
       $FeedLastPublishTime = 0;
       foreach (GetValue('item', $Channel) as $Item) {
          $FeedItemGUID = trim((string)GetValue('guid', $Item));
-         $FeedItemID = md5($FeedItemGUID);
-         echo "item: {$FeedItemGUID} - {$FeedItemID}\n";
+         $FeedItemID = substr(md5($FeedItemGUID), 0, 30);
          
          $ItemPubDate = (string)GetValue('pubDate', $Item, NULL);
          if (is_null($ItemPubDate))
@@ -270,24 +273,15 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
          if ($ItemPubTime > $FeedLastPublishTime)
             $FeedLastPublishTime = $ItemPubTime;
          
-         echo " published: {$ItemPubDate}\n";
-         echo " time: {$ItemPubTime}\n";
-         if ($ItemPubTime < $LastPublishTime) {
-            echo " old, skipped\n";
+         if ($ItemPubTime < $LastPublishTime && !$Feed['Historical'])
             continue;
-         }
          
          $ExistingDiscussion = $DiscussionModel->GetWhere(array(
             'ForeignID' => $FeedItemID
          ));
          
-         if ($ExistingDiscussion && $ExistingDiscussion->NumRows()) {
-            echo " exists, skipped\n";
-            print_r($ExistingDiscussion);
+         if ($ExistingDiscussion && $ExistingDiscussion->NumRows())
             continue;
-         }
-         
-         echo " import!\n";
          
          $this->EventArguments['Publish'] = TRUE;
 
