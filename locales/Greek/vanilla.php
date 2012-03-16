@@ -1,5 +1,20 @@
 <?php if (!defined('APPLICATION')) exit();
 
+// Added 2012-03-16
+$Definition['%s new Plural'] = '%s νέα';
+$Definition['Activity.AboutUpdate.ProfileHeadline'] = 'Ο/Η %1$s άλλαξε %6$s το προφίλ του/της.';
+$Definition['Activity.JoinInvite.FullHeadline'] = 'Ο/Η %1$s αποδέχτηκε %4$s πρόταση για να γίνει μέλος.';
+$Definition['Activity.JoinInvite.ProfileHeadline'] = 'Ο/Η %1$s αποδέχτηκε %4$s πρόταση  για να γίνει μέλος.';
+$Definition['Don\'t have an account? %s'] = 'Δεν έχεις λογαριασμό? %s';
+$Definition['Edit My Account'] = 'Επεξεργασία του Λογαριασμού μου ';
+//Όνομα χρήστη: {User.Name}
+$Definition['her'] = 'της';
+$Definition['his'] = 'του';
+$Definition['Joined'] = 'Συνδέθηκε';
+$Definition['Notify me when I earn a badge.'] = 'Ειδοποίησε με όταν κερδίσω ένα Βραβείο.';
+$Definition['Notify me when people mention me.'] = 'Ειδοποίησε με όταν με αναφέρουν.';
+//
+
 // Added 2012-02-08
 $Definition['Add a Comment'] = 'Προσθήκη Σχόλιου';
 $Definition['Announcement'] = 'Ανακοίνωση';
