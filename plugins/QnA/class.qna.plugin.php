@@ -281,6 +281,21 @@ class QnAPlugin extends Gdn_Plugin {
       }
    }
 
+   /* New Html method of adding to discussion filters */
+   public function DiscussionsController_AfterDiscussionFilters_Handler($Sender) {
+      $Count = Gdn::Cache()->Get('QnA-UnansweredCount');
+      if ($Count === Gdn_Cache::CACHEOP_FAILURE)
+         $Count = ' <span class="Aside"><span class="Popin Count" rel="/discussions/unansweredcount"></span>';
+      else
+         $Count = ' <span class="Aside"><span class="Count">'.$Count.'</span></span>';
+
+      echo '<li class="QnA-UnansweredQuestions '.($Sender->RequestMethod == 'unanswered' ? ' Active' : '').'">'
+			.Anchor(Sprite('SpUnansweredQuestions').T('Unanswered'), '/discussions/unanswered', 'UnansweredQuestions')
+         .$Count
+		.'</li>';
+   }
+
+   /* Old Html method of adding to discussion filters */
    public function DiscussionsController_AfterDiscussionTabs_Handler($Sender, $Args) {
       if (StringEndsWith(Gdn::Request()->Path(), '/unanswered', TRUE))
          $CssClass = ' class="Active"';

@@ -97,10 +97,10 @@ jQuery(document).ready(function($) {
    });   
 
    // Handle Vote button clicks   
-   $('.Votes a').live('click', function() {
+   $('.Voter a').live('click', function() {
       if (!$(this).hasClass('SignInPopup')) {
          var btn = this;
-         var parent = $(this).parents('.Votes');
+         var parent = $(this).parents('.Voter');
          var votes = $(parent).find('span');
          $.ajax({
             type: "POST",
