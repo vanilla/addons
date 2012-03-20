@@ -23,6 +23,9 @@ class RoleTitlePlugin extends Gdn_Plugin {
    public function DiscussionController_CommentInfo_Handler($Sender) {
       $this->_AttachTitle($Sender);
    }
+   public function DiscussionController_AfterDiscussionMeta_Handler($Sender) {
+      $this->_AttachTitle($Sender);
+   }
    public function PostController_CommentInfo_Handler($Sender) {
       $this->_AttachTitle($Sender);
    }
@@ -32,7 +35,7 @@ class RoleTitlePlugin extends Gdn_Plugin {
       if (!$Roles)
          return;
 
-      echo '<span class="RoleTitle">'.implode(', ', $Roles).'</span> ';
+      echo '<span class="MItem RoleTitle">'.implode(', ', $Roles).'</span> ';
    }
 
    /**
