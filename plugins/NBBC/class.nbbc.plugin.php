@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('APPLICATION'))
-   exit();
+<?php if (!defined('APPLICATION')) exit();
 /*
   Copyright 2008, 2009 Vanilla Forums Inc.
   This file is part of Garden.
@@ -13,7 +10,7 @@ if (!defined('APPLICATION'))
 
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.0.5b',
+    'Version' => '1.0.6b',
     'RequiredApplications' => array('Vanilla' => '2.0.2a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -26,10 +23,13 @@ $PluginInfo['NBBC'] = array(
 Gdn::FactoryInstall('BBCodeFormatter', 'NBBCPlugin', __FILE__, Gdn::FactorySingleton);
 
 class NBBCPlugin extends Gdn_Plugin {
+   
+   public $Class = 'BBCode';
 
    /// CONSTRUCTOR ///
-   public function __construct() {
+   public function __construct($Class = 'BBCode') {
       parent::__construct();
+      $this->Class = $Class;
    }
 
    /// PROPERTIES ///
@@ -134,7 +134,7 @@ class NBBCPlugin extends Gdn_Plugin {
    public function NBBC() {
       if ($this->_NBBC === NULL) {
          require_once(dirname(__FILE__) . '/nbbc/nbbc.php');
-         $BBCode = new BBCode();
+         $BBCode = new $this->Class();
          $BBCode->smiley_url = Url('/plugins/NBBC/design/smileys');
          $BBCode->SetAllowAmpersand(TRUE);
 
