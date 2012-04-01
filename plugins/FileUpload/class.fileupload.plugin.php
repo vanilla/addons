@@ -279,14 +279,18 @@ class FileUploadPlugin extends Gdn_Plugin {
          $Comments->DataSeek(-1);
          while ($Comment = $Comments->NextRow())
             $CommentIDList[] = $Comment->CommentID;
-      } elseif ($Sender->Discussion) {
+      } elseif (isset($Sender->Discussion) && $Sender->Discussion) {
          $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
       }
       if (isset($Sender->Comment) && isset($Sender->Comment->CommentID)) {
          $CommentIDList[] = $Sender->Comment->CommentID;
       }
       
-      $MediaData = $this->MediaModel()->PreloadDiscussionMedia($Sender->DiscussionID, $CommentIDList);
+      if (count($CommentIDList)) {
+         $MediaData = $this->MediaModel()->PreloadDiscussionMedia($Sender->DiscussionID, $CommentIDList);
+      } else {
+         $MediaData = FALSE;
+      }
 
       $MediaArray = array();
       if ($MediaData !== FALSE) {
