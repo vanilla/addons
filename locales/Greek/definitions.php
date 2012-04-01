@@ -3,8 +3,8 @@
 
 $LocaleInfo['Greek'] = array (
   'Locale' => 'el-GR',
-  'Name' => 'Greek Locale',
-  'Description' => 'Greek language',
+  'Name' => 'Greek',
+  'Description' => 'ελληνικά',
   'Version' => '1.0.1b',
   'Author' => 'Argyris Argyrou',
   'AuthorEmail' => 'argyris@wadja.com',
