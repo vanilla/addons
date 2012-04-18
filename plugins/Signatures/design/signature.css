@@ -1,11 +1,11 @@
 .UserSignature {
-   border-top: 1px solid #595959;
-   padding: 2px 0px;
+   border-top: 1px solid #ddd;
+   border-top: 1px solid rgba(0, 0, 0, 0.1);
+   padding-top: 4px;
    font-size: 11px;
    margin-top: 10px;
 }
 
-.Comment .Message .UserSignature p {
-   padding: 0px;
-   margin: 2px 0px;
+.UserSignature p {
+   margin: 2px 0;
 }
