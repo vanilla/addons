@@ -18,7 +18,7 @@
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions and comments.',
-   'Version' => '1.5.7',
+   'Version' => '1.5.7 p1',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -36,16 +36,23 @@ include dirname(__FILE__).'/class.mediamodel.php';
 
 class FileUploadPlugin extends Gdn_Plugin {
    /** @var array */
-   protected $MediaCache;
+   protected $_MediaCache = NULL;
 
    /**
     * Permission checks & property prep.
     */
    public function __construct() {
       parent::__construct();
-      $this->MediaCache = array();
+      $this->_MediaCache = NULL;
       $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
+   }
+   
+   public function MediaCache() {
+      if ($this->_MediaCache === NULL) {
+         $this->CacheAttachedMedia(Gdn::Controller());
+      }
+      return $this->_MediaCache;
    }
 
    /**
@@ -222,7 +229,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function PostController_BeforeFormButtons_Handler($Sender) {
       if (!is_null($Discussion = GetValue('Discussion',$Sender, NULL))) {
-         $this->CacheAttachedMedia($Sender);
+//         $this->CacheAttachedMedia($Sender);
          $Sender->EventArguments['Type'] = 'Discussion';
          $Sender->EventArguments['Discussion'] = $Discussion;
          $this->AttachUploadsToComment($Sender, 'discussion');
@@ -260,7 +267,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
       // Cache the list of media. Don't want to do multiple queries!
-      $this->CacheAttachedMedia($Sender);
+//      $this->CacheAttachedMedia($Sender);
    }
    
    /**
@@ -272,7 +279,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function PostController_BeforeCommentRender_Handler($Sender) {
       // Cache the list of media. Don't want to do multiple queries!
-      $this->CacheAttachedMedia($Sender);
+//      $this->CacheAttachedMedia($Sender);
    }
    
    /**
@@ -299,7 +306,9 @@ class FileUploadPlugin extends Gdn_Plugin {
          $CommentIDList[] = $Sender->Comment->CommentID;
       }
       
-      $MediaData = $this->MediaModel()->PreloadDiscussionMedia($Sender->DiscussionID, $CommentIDList);
+         $DiscussionID = $Sender->Data('Discussion.DiscussionID');
+         
+         $MediaData = $this->MediaModel()->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
 
       $MediaArray = array();
       if ($MediaData !== FALSE) {
@@ -309,7 +318,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          }
       }
             
-      $this->MediaCache = $MediaArray;
+      $this->_MediaCache = $MediaArray;
    }
    
    /**
@@ -362,7 +371,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          $Controller->EventArguments['Comment'] = $Controller->Comment;
       }
 
-      $MediaList = $this->MediaCache;
+      $MediaList = $this->MediaCache();
       if (!is_array($MediaList)) return;
       
       $Param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
