@@ -88,6 +88,10 @@ class NBBCPlugin extends Gdn_Plugin {
    }
    
    protected $_NBBC = NULL;
+   /**
+    *
+    * @return BBCode 
+    */
    public function NBBC() {
       if ($this->_NBBC === NULL) {
          require_once(dirname(__FILE__) . '/nbbc/nbbc.php');
@@ -138,7 +142,43 @@ class NBBCPlugin extends Gdn_Plugin {
    'plain_start' => "\n",
    'plain_end' => "\n"));
          
+         $BBCode->AddRule('img', array(
+            'mode' => BBCODE_MODE_CALLBACK,
+            'method' => array($this, "DoImage"),
+            'class' => 'image',
+            'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+            'end_tag' => BBCODE_REQUIRED,
+            'content' => BBCODE_REQUIRED,
+            'plain_start' => "[image]",
+            'plain_content' => Array(),
+            ));
          
+         $BBCode->AddRule('snapback', Array(
+             'mode' => BBCODE_MODE_ENHANCED,
+             'template' => ' <a href="'.Url('/discussion/comment/{$_content/v}#Comment_{$_content/v}', TRUE).'" class="SnapBack">»</a> ',
+             'class' => 'code',
+             'allow_in' => Array('listitem', 'block', 'columns'),
+             'content' => BBCODE_VERBATIM,
+             'before_tag' => "sns",
+             'after_tag' => "sn",
+             'before_endtag' => "sn",
+             'after_endtag' => "sns",
+             'plain_start' => "\n<b>Snapback:</b>\n",
+             'plain_end' => "\n",
+         ));
+
+         $BBCode->AddRule('video', array('mode' => BBCODE_MODE_CALLBACK,
+             'method' => array($this, "DoVideo"),
+             'allow_in' => Array('listitem', 'block', 'columns'),
+             'before_tag' => "sns",
+             'after_tag' => "sns",
+             'before_endtag' => "sns",
+             'after_endtag' => "sns",
+             'plain_start' => "\n<b>Video:</b>\n",
+             'plain_end' => "\n",
+         ));
+
+
          $this->EventArguments['BBCode'] = $BBCode;
          $this->FireEvent('AfterNBBCSetup');
          $this->_NBBC = $BBCode;

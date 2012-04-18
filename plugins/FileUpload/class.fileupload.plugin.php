@@ -299,7 +299,9 @@ class FileUploadPlugin extends Gdn_Plugin {
          $CommentIDList[] = $Sender->Comment->CommentID;
       }
       
-      $MediaData = $this->MediaModel()->PreloadDiscussionMedia($Sender->DiscussionID, $CommentIDList);
+         $DiscussionID = $Sender->Data('Discussion.DiscussionID');
+         
+         $MediaData = $this->MediaModel()->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
 
       $MediaArray = array();
       if ($MediaData !== FALSE) {
