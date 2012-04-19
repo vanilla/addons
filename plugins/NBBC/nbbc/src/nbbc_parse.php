@@ -540,7 +540,7 @@
 			$this->smiley_regex = implode("", $regex);
 
 			if ($this->debug)
-				print "<b>Internal_RebuildSmileys:</b> regex: <tt>" . htmlspecialchars($regex) . "</tt><br />\n";
+				print "<b>Internal_RebuildSmileys:</b> regex: <tt>" . htmlspecialchars(print_r($regex, true)) . "</tt><br />\n";
 		}
 
 		// Search through the input for URLs, or things that are URL-like.  We search
