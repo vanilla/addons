@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.2.2',
+   'Version' => '1.2.3',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -47,7 +47,7 @@ class SignaturesPlugin extends Gdn_Plugin {
    public function ProfileController_Signature_Create($Sender) {
       
       $Sender->Permission(array(
-         'Garden.SignIn.Allow',
+         'Garden.Profiles.Edit',
          'Plugins.Signatures.Edit'
       ));
       
@@ -70,7 +70,8 @@ class SignaturesPlugin extends Gdn_Plugin {
          'Plugin.Signatures.Sig'          => NULL,
          'Plugin.Signatures.HideAll'      => NULL,
          'Plugin.Signatures.HideImages'   => NULL,
-         'Plugin.Signatures.HideMobile' => NULL
+         'Plugin.Signatures.HideMobile' => NULL,
+         'Plugin.Signatures.Format' => NULL
       );
       $SigUserID = $ViewingUserID = Gdn::Session()->UserID;
       
@@ -98,8 +99,24 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Values = $Sender->Form->FormValues();
          $FrmValues = array_intersect_key($Values, $ConfigArray);
          if (sizeof($FrmValues)) {
+            
+            if (!GetValue($this->MakeMetaKey('Sig'), $FrmValues)) {
+               // Delete the signature. 
+               $FrmValues[$this->MakeMetaKey('Sig')] = NULL;
+               $FrmValues[$this->MakeMetaKey('Format')] = NULL;
+            }
+            
             foreach ($FrmValues as $UserMetaKey => $UserMetaValue) {
-               $this->SetUserMeta($SigUserID, $this->TrimMetaKey($UserMetaKey), $UserMetaValue);
+               $Key = $this->TrimMetaKey($UserMetaKey);
+               
+               switch ($Key) {
+                  case 'Format':
+                     if (strcasecmp($UserMetaValue, 'Raw') == 0)
+                        $UserMetaValue = NULL; // don't allow raw signatures.
+                  break;
+               }
+               
+               $this->SetUserMeta($SigUserID, $Key, $UserMetaValue);
             }
          }
          
@@ -145,9 +162,20 @@ class SignaturesPlugin extends Gdn_Plugin {
          
          if (sizeof($UserIDList)) {
             $DataSignatures = $this->GetUserMeta(array_keys($UserIDList), 'Sig');
-            if (is_array($DataSignatures))
-               foreach ($DataSignatures as $UserID => $UserSig)
-                  $Signatures[$UserID] = GetValue($this->MakeMetaKey('Sig'), $UserSig);
+            $Formats = (array)$this->GetUserMeta(array_keys($UserIDList), 'Format');
+            
+            if (is_array($DataSignatures)) {
+               foreach ($DataSignatures as $UserID => $UserSig) {
+                  $Sig = GetValue($this->MakeMetaKey('Sig'), $UserSig);
+                  if (isset($Formats[$UserID])) {
+                     $Format = GetValue($this->MakeMetaKey('Format'), $Formats[$UserID], C('Garden.InputFormatter'));
+                  } else {
+                     $Format = C('Garden.InputFormatter');
+                  }
+                  
+                  $Signatures[$UserID] = array($Sig, $Format); 
+               }
+            }
          }
          
       }
@@ -198,7 +226,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          'UserID'    => $SourceUserID,
          'Signature' => &$Signature
       );
-      $this->FireEvent('BeforeDrawSignature');
+//      $this->FireEvent('BeforeDrawSignature');
       
       if (!is_null($Signature)) {
          $HideImages = $this->UserPreferences('Plugin.Signatures.HideImages', FALSE);
@@ -215,10 +243,14 @@ class SignaturesPlugin extends Gdn_Plugin {
          // Don't show empty sigs
          if ($Signature == '') return;
          
-         $Sender->UserSignature = Gdn_Format::Auto($Signature);
-         $Display = $Sender->FetchView($this->GetView('usersig.php'));
-         unset($Sender->UserSignature);
-         echo $Display;
+         if (is_array($Signature)) {
+            $UserSignature = Gdn_Format::To($Signature[0], $Signature[1]);
+         } else {
+            $UserSignature = Gdn_Format::Auto($Signature);
+         }
+         if ($UserSignature) {
+            echo '<div class="UserSignature">'.$UserSignature.'</div>';
+         }
       }
    }
    

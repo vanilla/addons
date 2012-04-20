@@ -188,6 +188,20 @@ class NBBCPlugin extends Gdn_Plugin {
             'plain_start' => "[image]",
             'plain_content' => Array(),
             ));
+         
+         $BBCode->AddRule('snapback', Array(
+             'mode' => BBCODE_MODE_ENHANCED,
+             'template' => ' <a href="'.Url('/discussion/comment/{$_content/v}', TRUE).'" class="SnapBack">»</a> ',
+             'class' => 'code',
+             'allow_in' => Array('listitem', 'block', 'columns'),
+             'content' => BBCODE_VERBATIM,
+             'before_tag' => "sns",
+             'after_tag' => "sn",
+             'before_endtag' => "sn",
+             'after_endtag' => "sns",
+             'plain_start' => "\n<b>Snapback:</b>\n",
+             'plain_end' => "\n",
+         ));
 
          $BBCode->AddRule('video', array('mode' => BBCODE_MODE_CALLBACK,
              'method' => array($this, "DoVideo"),
