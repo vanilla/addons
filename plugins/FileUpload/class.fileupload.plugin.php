@@ -252,11 +252,11 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @param mixed $Sender
     * @return void
     */
-   public function DrawAttachFile($Controller) {
+   public function DrawAttachFile($Sender) {
       if (!$this->IsEnabled()) return;
       if (!$this->CanUpload) return;
       
-      echo $Controller->FetchView($this->GetView('attach_file.php'));
+      echo $Sender->FetchView('attach_file', '', 'plugins/FileUpload');
    }
    
    /**
