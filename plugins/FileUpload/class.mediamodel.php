@@ -40,9 +40,7 @@ class MediaModel extends VanillaModel {
       $Sender->EventArguments = array();
       $Sender->EventArguments['Path'] =& $Path;
       $Sender->EventArguments['Parsed'] = Gdn_Upload::Parse($Path);
-      Gdn::PluginManager()->CallEventHandlers($Sender, 'FileUploadPlugin', 'CopyLocal');
-      
-      //die($Path);
+      Gdn::PluginManager()->CallEventHandlers($Sender, 'Gdn_Upload', 'CopyLocal');
    
       if (!in_array(strtolower(pathinfo($Path, PATHINFO_EXTENSION)), array('gif', 'jpg', 'jpeg', 'png')))
          return array(0, 0);
@@ -169,15 +167,18 @@ class MediaModel extends VanillaModel {
       return $Width;
    }
 
-   public static function ThumbnailUrl($Media) {
+   public static function ThumbnailUrl(&$Media) {
       if (GetValue('ThumbPath', $Media))
          return Gdn_Upload::Url(ltrim(GetValue('ThumbPath', $Media), '/'));
       
       $Width = GetValue('ImageWidth', $Media);
       $Height = GetValue('ImageHeight', $Media);
 
-      if (!$Width || !$Height)
+      if (!$Width || !$Height) {
+         if ($Height = self::ThumbnailHeight())
+            SetValue('ThumbHeight', $Media, $Height);
          return '/plugins/FileUpload/images/file.png';
+      }
 
       $RequiresThumbnail = FALSE;
       if (self::ThumbnailHeight() && $Height > self::ThumbnailHeight())
@@ -199,10 +200,12 @@ class MediaModel extends VanillaModel {
       if ($UseDownloadUrl === NULL)
          $UseDownloadUrl = C('Plugins.FileUpload.UseDownloadUrl');
 
+//      decho($Media);
+      
       if (is_string($Media)) {
          $SubPath = $Media;
          if (method_exists('Gdn_Upload', 'Url'))
-            $Url = Gdn_Upload::Url("/$SubPath");
+            $Url = Gdn_Upload::Url("$SubPath");
          else
             $Url = "/uploads/$SubPath";
       } elseif ($UseDownloadUrl) {
@@ -210,7 +213,7 @@ class MediaModel extends VanillaModel {
       } else {
          $SubPath = ltrim(GetValue('Path', $Media), '/');
          if (method_exists('Gdn_Upload', 'Url'))
-            $Url = Gdn_Upload::Url("/$SubPath");
+            $Url = Gdn_Upload::Url("$SubPath");
          else
             $Url = "/uploads/$SubPath";
       }
