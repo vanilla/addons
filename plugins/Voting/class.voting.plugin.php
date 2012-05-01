@@ -540,11 +540,11 @@ class VotingPlugin extends Gdn_Plugin {
 	/**
 	 * Insert the voting html on comments in a discussion.
 	 */
-	public function PostController_BeforeCommentMeta_Handler($Sender) {
+	public function PostController_AfterCommentMeta_Handler($Sender) {
 //		if (!C('Plugins.Voting.Enabled'))
 //			return;
 
-		$this->DiscussionController_BeforeCommentMeta_Handler($Sender);
+		$this->DiscussionController_AfterCommentMeta_Handler($Sender);
 	}
 
 	/**
