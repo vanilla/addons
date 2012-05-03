@@ -221,6 +221,8 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       $SourceUserID = GetValue('InsertUserID', $Data);
       $Signature = $this->Signatures($Sender, $SourceUserID);
+      if (is_array($Signature))
+         list($Signature, $SigFormat) = $Signature;
       
       $this->EventArguments = array(
          'UserID'    => $SourceUserID,
