@@ -240,6 +240,8 @@ class JsConnectPlugin extends Gdn_Plugin {
       $Form->SetFormValue('Name', GetValue('name', $JsData));
       $Form->SetFormValue('Email', GetValue('email', $JsData));
       $Form->SetFormValue('Photo', GetValue('photourl', $JsData, ''));
+      $Form->SetFormValue('Roles', GetValue('roles', $JsData, ''));
+      
       $Sender->SetData('Verified', TRUE);
    }
 
@@ -369,6 +371,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $this->Settings_AddEdit($Sender, $Args);
             break;
          case 'delete':
+            $this->Settings_Delete($Sender, $Args);
             break;
          default:
             $this->Settings_Index($Sender, $Args);
@@ -427,6 +430,24 @@ class JsConnectPlugin extends Gdn_Plugin {
 
       $Sender->SetData('Title', sprintf(T($client_id ? 'Edit %s' : 'Add %s'), T('Connection')));
       $Sender->Render('Settings_AddEdit', '', 'plugins/jsconnect');
+   }
+   
+   public function Settings_Delete($Sender, $Args) {
+      $client_id = $Sender->Request->Get('client_id');
+      $Provider = self::GetProvider($client_id);
+      
+      $Sender->Form->InputPrefix = FALSE;
+      
+      if ($Sender->Form->IsPostBack()) {
+         if ($Sender->Form->GetFormValue('Yes')) {
+            $Model = new Gdn_AuthenticationProviderModel();
+            $Model->Delete(array('AuthenticationKey' => $client_id));
+         }
+         $Sender->RedirectUrl = '/settings/jsconnect';
+         $Sender->Render('Blank', 'Utility', 'Dashboard');
+      } else {
+         $Sender->Render('ConfirmDelete', '', 'plugins/jsconnect');
+      }
    }
 
    protected function Settings_Index($Sender, $Args) {

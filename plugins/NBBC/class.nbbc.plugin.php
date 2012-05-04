@@ -13,7 +13,7 @@ if (!defined('APPLICATION'))
 
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.0.5b',
+    'Version' => '1.0.6b',
     'RequiredApplications' => array('Vanilla' => '2.0.2a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -26,10 +26,13 @@ $PluginInfo['NBBC'] = array(
 Gdn::FactoryInstall('BBCodeFormatter', 'NBBCPlugin', __FILE__, Gdn::FactorySingleton);
 
 class NBBCPlugin extends Gdn_Plugin {
+   
+   public $Class = 'BBCode';
 
    /// CONSTRUCTOR ///
-   public function __construct() {
+   public function __construct($Class = 'BBCode') {
       parent::__construct();
+      $this->Class = $Class;
    }
 
    /// PROPERTIES ///
@@ -134,7 +137,7 @@ class NBBCPlugin extends Gdn_Plugin {
    public function NBBC() {
       if ($this->_NBBC === NULL) {
          require_once(dirname(__FILE__) . '/nbbc/nbbc.php');
-         $BBCode = new BBCode();
+         $BBCode = new $this->Class();
          $BBCode->smiley_url = Url('/plugins/NBBC/design/smileys');
          $BBCode->SetAllowAmpersand(TRUE);
 
@@ -188,6 +191,20 @@ class NBBCPlugin extends Gdn_Plugin {
             'plain_start' => "[image]",
             'plain_content' => Array(),
             ));
+         
+         $BBCode->AddRule('snapback', Array(
+             'mode' => BBCODE_MODE_ENHANCED,
+             'template' => ' <a href="'.Url('/discussion/comment/{$_content/v}', TRUE).'" class="SnapBack">»</a> ',
+             'class' => 'code',
+             'allow_in' => Array('listitem', 'block', 'columns'),
+             'content' => BBCODE_VERBATIM,
+             'before_tag' => "sns",
+             'after_tag' => "sn",
+             'before_endtag' => "sn",
+             'after_endtag' => "sns",
+             'plain_start' => "\n<b>Snapback:</b>\n",
+             'plain_end' => "\n",
+         ));
 
          $BBCode->AddRule('video', array('mode' => BBCODE_MODE_CALLBACK,
              'method' => array($this, "DoVideo"),
