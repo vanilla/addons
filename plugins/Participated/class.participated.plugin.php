@@ -112,10 +112,22 @@ class ParticipatedPlugin extends Gdn_Plugin {
       if ($Count > 0) {
          $MyParticipated = T('Participated Discussions');
          if (C('Vanilla.Discussions.ShowCounts', TRUE))
-            $MyParticipated .= '<span>'.$Count.'</span>';
+            $MyParticipated .= '<span class="Aside"><span class="Count">'.$Count.'</span></span>';
          echo ' <li '.(($Sender->RequestMethod == 'participated') ? ' class="Active"' : '').'>'.Anchor($MyParticipated, '/discussions/participated', 'MyParticipated TabLink').'</li> ';
       }
    }
+   /* New HTML function to add the Participated tab via filters. */
+   public function DiscussionsController_AfterDiscussionFilters_Handler($Sender) {
+      $this->AddParticipatedTab($Sender);
+   }
+   public function CategoriesController_AfterDiscussionFilters_Handler($Sender) {
+      $this->AddParticipatedTab($Sender);
+   }
+   public function DraftsController_AfterDiscussionFilters_Handler($Sender) {
+      $this->AddParticipatedTab($Sender);
+   }
+
+   /* Old HTML function to add the Participated tab. */
    public function DiscussionsController_AfterDiscussionTabs_Handler($Sender) {
       $this->AddParticipatedTab($Sender);
    }
