@@ -9,7 +9,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-   'Version' => '1.1.3',
+   'Version' => '1.1.4',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -74,7 +74,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
       $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">
          <div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button SignInLink').$RegisterLink.'</div>
-         <div class="JsConnect-Connect"><a class="'.$PopupWindow.' NoMSIE ConnectLink" popupHeight="300" popupWidth="600">'.Img('/applications/dashboard/design/images/usericon.gif', array('class' => 'ProfilePhotoSmall UserPhoto')).
+         <div class="JsConnect-Connect"><a class="'.$PopupWindow.' NoMSIE ConnectLink" popupHeight="300" popupWidth="600">'.Img('http://cdn.vanillaforums.com/images/usericon_50.png', array('class' => 'ProfilePhotoSmall UserPhoto')).
             $ConnectLabel.
          '</a></div>
       </div>';

@@ -483,7 +483,7 @@ var $default_tag_rules = Array(
 ),
 'font' => Array(
 'mode' => BBCODE_MODE_LIBRARY,
-'allow' => Array('_default' => '/^[a-zA-Z0-9._ -]+$/'),
+'allow' => Array('_default' => '/^[a-zA-Z0-9._ ,-]+$/'),
 'method' => 'DoFont',
 'class' => 'inline',
 'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),

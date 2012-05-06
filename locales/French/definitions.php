@@ -3,8 +3,8 @@
 
 $LocaleInfo['French'] = array (
   'Locale' => 'fr-FR',
-  'Name' => 'French Locale - Traduction française',
-  'Description' => 'Traduction française pour Vanilla 2.0.18.1',
+  'Name' => 'French',
+  'Description' => 'française',
   'Version' => '2.0.18.1',
   'Author' => 'Arachnos',
   'AuthorEmail' => 'arachnos@creative-tarentula.net',
