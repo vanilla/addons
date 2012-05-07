@@ -154,7 +154,7 @@ class IgnorePlugin extends Gdn_Plugin {
          $UserIgnored = $this->Ignored($Sender->User->UserID);
          $Label = ($UserIgnored) ? 'Unignore' : 'Ignore';
          $Method = ($UserIgnored) ? 'unset' : 'set';
-         echo ' '.Anchor(T($Label), "/user/ignore/toggle/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Ignore Button').' ';
+         echo ' '.Anchor(T($Label), "/user/ignore/toggle/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Ignore NavButton').' ';
       }
    }
    
