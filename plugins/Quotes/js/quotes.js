@@ -32,6 +32,55 @@ function Gdn_Quotes() {
       $('div.cleditorMain').livequery(function(){
          Quotes.SetInsertMode('cleditor', this);
       });
+      
+      var QuoteFoldingLevel = gdn.definition('QuotesFolding', 1);
+      
+      if (QuoteFoldingLevel != 'None') {
+         QuoteFoldingLevel = parseInt(QuoteFoldingLevel) + 1;
+         var MaxFoldingLevel = 6;
+         $('.Comment .Message').livequery(function(){
+
+            
+            // Find the closest child quote
+            var PetQuote = $(this).children('.UserQuote');
+            if (!PetQuote.length) return;
+
+            Quotes.ExploreFold(PetQuote, 1, MaxFoldingLevel, QuoteFoldingLevel);
+            
+         });
+
+         $('a.QuoteFolding').livequery('click', function(){
+            var QuoteTarget = $(this).closest('.QuoteText').children('.UserQuote');
+            QuoteTarget = $(QuoteTarget);
+            QuoteTarget.toggle();
+
+            if (QuoteTarget.css('display') != 'none')
+               $(this).html('&laquo; hide previous quotes');
+            else
+               $(this).html('&raquo; show previous quotes');
+
+            return false;
+         });
+      }
+   }
+   
+   Gdn_Quotes.prototype.ExploreFold = function(QuoteTree, FoldingLevel, MaxLevel, TargetLevel) {
+      if (FoldingLevel > MaxLevel || FoldingLevel > TargetLevel) return;
+      var Quotes = this;
+      $(QuoteTree).each(function(i, el){
+         var ExamineQuote = $(el);
+         
+         if (FoldingLevel == TargetLevel) {
+            $(ExamineQuote).addClass('QuoteFolded').hide();
+            $(ExamineQuote).before('<div><a href="" class="QuoteFolding">&raquo; show previous quotes</a></div>');
+            return;
+         }
+         
+         var FoldQuote = $(ExamineQuote).children('.QuoteText').children('.UserQuote');
+         if (!FoldQuote.length) return;
+
+         Quotes.ExploreFold(FoldQuote, FoldingLevel + 1, MaxLevel, TargetLevel);
+      });
    }
    
    Gdn_Quotes.prototype.SetInsertMode = function(InsertMode, ChangeElement) {
@@ -203,7 +252,7 @@ function Gdn_Quotes() {
       if (Data && Data.Quote.selector) {
          var ObjectID = Data.Quote.selector;
          this.RemoveSpinner();
-      } else { return; }
+      } else {return;}
       
       switch (Data.Quote.format) {
          case 'Html':   // HTML
@@ -211,7 +260,11 @@ function Gdn_Quotes() {
             break;
             
          case 'BBCode':
-            var Append = '[quote="'+Data.Quote.authorname+'"]'+Data.Quote.body+'[/quote]'+"\n";
+            var QuoteAuthor = Data.Quote.authorname;
+            if (Data.Quote.type && Data.Quote.type == 'comment')
+               if (Data.Quote.typeid) QuoteAuthor = QuoteAuthor+";"+Data.Quote.typeid;
+            
+            var Append = '[quote="'+QuoteAuthor+'"]'+Data.Quote.body+'[/quote]'+"\n";
             break;
          
          case 'Markdown':

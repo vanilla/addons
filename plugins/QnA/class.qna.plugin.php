@@ -7,8 +7,8 @@
 // Define the plugin:
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
-   'Description' => "Allows users to designate a discussion as a question and then accept one or more of the comments as an answer.",
-   'Version' => '1.0.8b',
+   'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
+   'Version' => '1.0.8',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',

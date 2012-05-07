@@ -1,10 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
 
 $PluginInfo['IndexPhotos'] = array(
-   'Name' => 'IndexPhotos',
-   'Description' => "Adds user photos to discussions list.",
+   'Name' => 'Discussion Photos',
+   'Description' => "Displays photo of the user who started each discussion anywhere discussions are listed.",
    'Version' => '1.1',
-   'RequiredApplications' => array('Vanilla' => '2.0.18b4'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RegisterPermissions' => FALSE,
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincolnwebs@gmail.com',

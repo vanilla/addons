@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Reporting'] = array(
    'Name' => 'Community Reporting',
    'Description' => 'Allows users to report comments and discussions for content violations or awesomeness.',
-   'Version' => '1.0.1b',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -31,6 +31,7 @@ class ReportingPlugin extends Gdn_Plugin {
    const BUTTON_TYPE_AWESOME = 'awesome';
 
    public function __construct() {
+      parent::__construct();
       $this->ReportEnabled = C('Plugins.Reporting.ReportEnabled', TRUE);
       $this->AwesomeEnabled = C('Plugins.Reporting.AwesomeEnabled', TRUE);
    }
@@ -131,29 +132,39 @@ class ReportingPlugin extends Gdn_Plugin {
       $ElementAuthor = Gdn::UserModel()->GetID($ElementAuthorID);
       $ElementAuthorName = GetValue('Name', $ElementAuthor);
 
+      $RegardingAction = C('Plugins.Reporting.ReportAction', FALSE);
+      $RegardingActionSupplement = C('Plugins.Reporting.ReportActionSupplement', FALSE);
+      
       $ReportingData = array(
+         'Type'            => 'report',
          'Context'         => $Context,
+         'Element'         => $ReportElement,
          'ElementID'       => $ElementID,
          'ElementTitle'    => $ElementTitle,
          'ElementExcerpt'  => $ElementExcerpt,
          'ElementAuthor'   => $ElementAuthor,
          'URL'             => $URL,
          'UserID'          => $UserID,
-         'UserName'        => $UserName
+         'UserName'        => $UserName,
+         'Action'          => $RegardingAction,
+         'Supplement'      => $RegardingActionSupplement
       );
-
-      $RegardingAction = C('Plugins.Reporting.ReportAction', FALSE);
-      $RegardingActionSupplement = C('Plugins.Reporting.ReportActionSupplement', FALSE);
 
       if ($Sender->Form->AuthenticatedPostBack()) {
          $RegardingTitle = sprintf(T("Reported: '{RegardingTitle}' by %s"), $ElementAuthorName);
+         $ReportingData['Title'] = $RegardingTitle;
+         $ReportingData['Reason'] = $Sender->Form->GetValue('Plugin.Reporting.Reason');
+         
+         $this->EventArguments['Report'] = &$ReportingData;
+         $this->FireEvent('BeforeRegarding');
+         
          $Regarding = Gdn::Regarding()
-            ->That($Context, $ElementID, $ReportElement)
+            ->That($ReportingData['Context'], $ReportingData['ElementID'], $ReportingData['Element'])
             ->ReportIt()
-            ->ForCollaboration($RegardingAction, $RegardingActionSupplement)
-            ->Entitled($RegardingTitle)
-            ->From(Gdn::Session()->UserID)
-            ->Because($Sender->Form->GetValue('Plugin.Reporting.Reason'))
+            ->ForCollaboration($ReportingData['Action'], $ReportingData['Supplement'])
+            ->Entitled($ReportingData['Title'])
+            ->From($ReportingData['UserID'])
+            ->Because($ReportingData['Reason'])
             ->Located(TRUE) // build URL automatically
             ->Commit();
 

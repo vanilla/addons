@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Spoilers'] = array(
    'Name' => 'Spoilers',
-   'Description' => "This plugin allows users to hide sensitive or revealing information behind clickable barriers to prevent accidental spoilers.",
+   'Description' => "Users may prevent accidental spoiler by wrapping text in [spoiler] tags. This requires the text to be clicked in order to read it.",
    'Version' => '1.0b',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,

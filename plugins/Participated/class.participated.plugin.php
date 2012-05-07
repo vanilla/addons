@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Participated'] = array(
    'Name' => 'Participated Discussions',
-   'Description' => "This plugin adds a tab to the main discussions view that displays a list of the logged-in user's participated discussions.",
+   'Description' => "Users may view a list of all discussions they have commented on. This is a more user-friendly version of an 'auto-subscribe' option.",
    'Version' => '1.1.0',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,

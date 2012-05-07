@@ -11,8 +11,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
-   'Description' => "This plugin allows users to quote each other easily.",
-   'Version' => '1.5.1',
+   'Description' => "Adds an option to each comment for users to easily quote each other.",
+   'Version' => '1.6',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1a9'),
    'RequiredTheme' => FALSE, 
@@ -43,6 +43,81 @@ class QuotesPlugin extends Gdn_Plugin {
       $this->RenderQuotes = C('Plugins.Quotes.RenderQuotes',TRUE);
    }
 
+   public function ProfileController_AfterAddSideMenu_Handler($Sender) {
+      if (!Gdn::Session()->CheckPermission('Garden.SignIn.Allow'))
+         return;
+   
+      $SideMenu = $Sender->EventArguments['SideMenu'];
+      $ViewingUserID = Gdn::Session()->UserID;
+      
+      if ($Sender->User->UserID == $ViewingUserID) {
+         $SideMenu->AddLink('Options', T('Quote Settings'), '/profile/quotes', FALSE, array('class' => 'Popup'));
+      } else {
+         $SideMenu->AddLink('Options', T('Quote Settings'), '/profile/quotes/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name), 'Garden.Users.Edit', array('class' => 'Popup'));
+      }
+   }
+   
+   public function ProfileController_Quotes_Create($Sender) {
+      $Sender->Permission('Garden.SignIn.Allow');
+      $Sender->Title("Quotes Settings");
+      
+      $Args = $Sender->RequestArgs;
+      if (sizeof($Args) < 2)
+         $Args = array_merge($Args, array(0,0));
+      elseif (sizeof($Args) > 2)
+         $Args = array_slice($Args, 0, 2);
+      
+      list($UserReference, $Username) = $Args;
+      
+      $Sender->GetUserInfo($UserReference, $Username);
+      $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
+      if (!is_array($UserPrefs))
+         $UserPrefs = array();
+      
+      $UserID = $ViewingUserID = Gdn::Session()->UserID;
+      
+      if ($Sender->User->UserID != $ViewingUserID) {
+         $Sender->Permission('Garden.Users.Edit');
+         $UserID = $Sender->User->UserID;
+      }
+      
+      $Sender->SetData('ForceEditing', ($UserID == Gdn::Session()->UserID) ? FALSE : $Sender->User->Name);
+      $QuoteFolding = GetValue('Quotes.Folding', $UserPrefs, '1');
+      $Sender->Form->SetValue('QuoteFolding', $QuoteFolding);
+      
+      $Sender->SetData('QuoteFoldingOptions', array(
+         'None'   => "Don't ever fold quotes",
+         '1'      => 'One level deep',
+         '2'      => 'Two levels deep',
+         '3'      => 'Three levels deep',
+         '4'      => 'Four levels deep',
+         '5'      => 'Five levels deep'
+      ));
+      
+      // If seeing the form for the first time...
+      if ($Sender->Form->IsPostBack()) {
+         $NewFoldingLevel = $Sender->Form->GetValue('QuoteFolding', '1');
+         if ($NewFoldingLevel != $QuoteFolding) {
+            Gdn::UserModel()->SavePreference($UserID, 'Quotes.Folding', $NewFoldingLevel);
+            $Sender->InformMessage(T("Your changes have been saved."));
+         }
+      }
+
+      $Sender->Render('quotes','','plugins/Quotes');
+   }
+   
+   public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
+      if (!Gdn::Session()->IsValid())
+         return;
+      
+      $UserPrefs = Gdn_Format::Unserialize(Gdn::Session()->User->Preferences);
+      if (!is_array($UserPrefs))
+         $UserPrefs = array();
+      
+      $QuoteFolding = GetValue('Quotes.Folding', $UserPrefs, '1');
+      $Sender->AddDefinition('QuotesFolding', $QuoteFolding);
+   }
+   
    public function PluginController_Quotes_Create($Sender) {
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
@@ -177,7 +252,11 @@ BLOCKQUOTE;
                   $Sender->Form->SetValue('Body', '<blockquote rel="'.$QuoteData['authorname'].'">'.$QuoteData['body']."</blockquote>\n");
                   break;
                case 'BBCode':
-                  $Sender->Form->SetValue('Body', '[quote="'.$QuoteData['authorname'].'"]'.$QuoteData['body']."[/quote]\n");
+                  $QuoteAuthor = $QuoteData['authorname'];
+                  if (GetValue('type', $QuoteData) == 'comment')
+                     $QuoteAuthor .= ";{$QuoteData['typeid']}";
+                     
+                  $Sender->Form->SetValue('Body', '[quote="'.$QuoteAuthor.'"]'.$QuoteData['body']."[/quote]\n");
                   break;
                case 'Display':
                case 'Text':
@@ -189,8 +268,9 @@ BLOCKQUOTE;
    }
    
    protected function FormatQuote($Type, $ID, &$QuoteData) {
+      $Type = strtolower($Type);
       $Model = FALSE;
-      switch (strtolower($Type)) {
+      switch ($Type) {
          case 'comment':
             $Model = new CommentModel();
             break;
@@ -232,7 +312,9 @@ BLOCKQUOTE;
             'body'         => $Data->Body,
             'format'       => C('Garden.InputFormatter'),
             'authorid'     => $Data->InsertUserID,
-            'authorname'   => $Data->InsertName
+            'authorname'   => $Data->InsertName,
+            'type'         => $Type,
+            'typeid'       => $ID
          ));
       }
    }

@@ -10,7 +10,7 @@
 
 $PluginInfo['Multilingual'] = array(
    'Name' => 'Multilingual',
-   'Description' => "Allow user-selectable & queryable locales.",
+   'Description' => "Allows use of multiple languages. Users can select their preferred language via a link in the footer, and administrators may embed their forum in different languages in different places.",
    'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
