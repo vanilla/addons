@@ -17,8 +17,8 @@ $Restricted = $this->Data('IgnoreRestricted');
 <table class="IgnoreList <?php echo ($Restricted) ? 'Restricted' : ''; ?>">
    <thead>
       <tr>
-         <th colspan="2">User</th>
-         <th>Date Ignored</th>
+         <th colspan="2"><?php echo T('User'); ?></th>
+         <th><?php echo T('Date Ignored'); ?></th>
          <th></th>
       </tr>
    </thead>
@@ -47,14 +47,14 @@ $Restricted = $this->Data('IgnoreRestricted');
 $NumIgnoreLimit = $this->Data('IgnoreLimit');
 if ($NumIgnoreLimit != 'infinite'):
    $IgnoreListPercent = round(($NumIgnoredUsers / $NumIgnoreLimit) * 100, 2);
-   echo Wrap(sprintf("Ignore list is <b>%s%%</b> full (<b>%d/%d</b>).", $IgnoreListPercent, $NumIgnoredUsers, $NumIgnoreLimit), 'div');
+   echo Wrap(sprintf(T("Ignore list is <b>%s%%</b> full (<b>%d/%d</b>)."), $IgnoreListPercent, $NumIgnoredUsers, $NumIgnoreLimit), 'div');
 else:
-   echo Wrap("<b>Unlimited</b> list, ignored <b>{$NumIgnoredUsers}</b> ".Plural($NumIgnoredUsers, 'person','people'), 'div');
+   echo Wrap(sprintf(T("<b>Unlimited</b> list, ignored <b>%d</b> %s"), $NumIgnoredUsers, Plural($NumIgnoredUsers, 'person','people')), 'div');
 endif;
 ?>
 
 <?php if ($Restricted): ?>
-   <?php $ReferTo = ($this->Data('ForceEditing') ? sprintf(T("%s is"), $this->Data('ForceEditing')) : "You are"); ?>
+   <?php $ReferTo = ($this->Data('ForceEditing') ? sprintf(T("%s is"), $this->Data('ForceEditing')) : T("You are")); ?>
    <div class="Info">
       <?php echo sprintf(T("%s prohibited from using the ignore feature."),$ReferTo); ?>
       <?php if ($Moderator && $this->Data('ForceEditing', TRUE)):
