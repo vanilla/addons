@@ -1,8 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->Title(T('My Discussions'));
+$this->Title(T('Participated Discussions'));
 include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 $ViewLocation = $this->FetchViewLocation('discussions');
-WriteFilterTabs($this);
+?>
+<h1 class="HomepageTitle"><?php echo T('ParticipatedHomepageTitle', 'Participated Discussions'); ?></h1>
+<?php
 if ($this->DiscussionData->NumRows() > 0) {
 ?>
 <ul class="DataList Discussions Participated">

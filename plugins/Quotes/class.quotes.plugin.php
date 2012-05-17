@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "Adds an option to each comment for users to easily quote each other.",
-   'Version' => '1.6',
+   'Version' => '1.6.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1a9'),
    'RequiredTheme' => FALSE, 
@@ -150,7 +150,7 @@ class QuotesPlugin extends Gdn_Plugin {
    protected function PrepareController($Sender) {
       //if (!$this->RenderQuotes) return;
       $Sender->AddJsFile($this->GetResource('js/quotes.js', FALSE, FALSE));
-      $Sender->AddCssFile($this->GetResource('css/quotes.css', FALSE, FALSE));
+//      $Sender->AddCssFile($this->GetResource('css/quotes.css', FALSE, FALSE));
    }
    
    /**

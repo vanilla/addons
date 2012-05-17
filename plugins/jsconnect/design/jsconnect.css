@@ -1,6 +1,11 @@
+.JsConnect-Container {
+   overflow: hidden;
+   margin: 5px 0;
+}
+
 .JsConnect-Connect {
    line-height: 16px;
-   clear: both;
+/*   clear: both;*/
 }
 
 .JsConnect-Connect .UserPhoto {

@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['ShareThis'] = array(
    'Name' => 'ShareThis',
-   'Description' => 'Adds ShareThis (http://sharethis.com) buttons to the bottom of each comment.',
+   'Description' => 'Adds ShareThis (http://sharethis.com) buttons below discussions.',
    'Version' => '1.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
