@@ -10,6 +10,7 @@
  *  1.0     Initial release
  *  1.0.1   Fix guest mode bug
  *  1.0.2   Change Plugin.Ignore.MaxIgnores to Plugins.Ignore.MaxIgnores
+ *  1.0.3   Fix usage of T() (or lack of usage in some cases)
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -20,7 +21,7 @@
 // Define the plugin:
 $PluginInfo['Ignore'] = array(
    'Description' => 'This plugin allows users to ignore others, filtering their comments out of discussions.',
-   'Version' => '1.0.2',
+   'Version' => '1.0.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -88,21 +89,21 @@ class IgnorePlugin extends Gdn_Plugin {
             
             switch ($AddRestricted) {
                case self::IGNORE_GOD:
-                  throw new Exception("You can't ignore that person.");
+                  throw new Exception(T("You can't ignore that person."));
 
                case self::IGNORE_LIMIT:
-                  throw new Exception("You have reached the maximum number of ignores.");
+                  throw new Exception(T("You have reached the maximum number of ignores."));
 
                case self::IGNORE_RESTRICTED:
-                  throw new Exception("Your ignore privileges have been revoked.");
+                  throw new Exception(T("Your ignore privileges have been revoked."));
 
                case self::IGNORE_SELF:
-                  throw new Exception("You can't put yourself on ignore.");
+                  throw new Exception(T("You can't put yourself on ignore."));
                
                default:
                   $this->AddIgnore($UserID, $AddIgnoreUser->UserID);
                   $Sender->InformMessage(
-                     '<span class="InformSprite Contrast"></span>'.T("{$AddIgnoreUser->Name} is now on ignore."),
+                     '<span class="InformSprite Contrast"></span>'.sprintf(T("%s is now on ignore."), $AddIgnoreUser->Name),
                      'AutoDismiss HasSprite'
                   );
                   $Sender->Form->SetFormValue('AddIgnore', '');
@@ -154,7 +155,7 @@ class IgnorePlugin extends Gdn_Plugin {
          $UserIgnored = $this->Ignored($Sender->User->UserID);
          $Label = ($UserIgnored) ? 'Unignore' : 'Ignore';
          $Method = ($UserIgnored) ? 'unset' : 'set';
-         echo ' '.Anchor(T($Label), "/user/ignore/toggle/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Ignore Button').' ';
+         echo ' '.Anchor(T($Label), "/user/ignore/toggle/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Ignore NavButton').' ';
       }
    }
    
@@ -241,7 +242,7 @@ class IgnorePlugin extends Gdn_Plugin {
                $Sender->SetJson('Rename', T('Unignore'));
                $this->AddIgnore(Gdn::Session()->UserID, $UserID);
                $Sender->InformMessage(
-                  '<span class="InformSprite Contrast"></span>'.T("{$User->Name} is now on ignore."),
+                  '<span class="InformSprite Contrast"></span>'.sprintf(T("%s is now on ignore."), $User->Name),
                   'AutoDismiss HasSprite'
                );
                break;
@@ -250,7 +251,7 @@ class IgnorePlugin extends Gdn_Plugin {
                $Sender->SetJson('Rename', T('Ignore'));
                $this->RemoveIgnore(Gdn::Session()->UserID, $UserID);
                $Sender->InformMessage(
-                  '<span class="InformSprite Brightness"></span>'.T("{$User->Name} is no longer on ignore."),
+                  '<span class="InformSprite Brightness"></span>'.sprintf(T("%s is no longer on ignore."), $User->Name),
                   'AutoDismiss HasSprite'
                );
                break;
@@ -292,7 +293,7 @@ class IgnorePlugin extends Gdn_Plugin {
       $UserID = GetValue('UserID', $User);
       
       if ($User->Admin) {
-         $Sender->InformMessage(T("You can't do that to {$User->Name}!"));
+         $Sender->InformMessage(sprintf(T("You can't do that to %s!", $User->Name)));
          $Sender->SetJson('Status', 401);
          $Sender->Render('blank', 'utility', 'dashboard');
       }

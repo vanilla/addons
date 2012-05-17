@@ -275,7 +275,7 @@ class FileUploadPlugin extends Gdn_Plugin {
 //      decho($Comments);
 //      die($Comments);
       
-      if ($Comments && $Comments instanceof Gdn_DataSet) {
+      if ($Comments instanceof Gdn_DataSet && $Comments->NumRows()) {
          $Comments->DataSeek(-1);
          while ($Comment = $Comments->NextRow())
             $CommentIDList[] = $Comment->CommentID;
@@ -352,7 +352,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             return;
          $Controller->EventArguments['Comment'] = $Controller->Comment;
       }
-
+      
       $MediaList = $this->MediaCache();
       if (!is_array($MediaList)) return;
       

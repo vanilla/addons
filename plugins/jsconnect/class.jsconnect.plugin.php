@@ -240,6 +240,8 @@ class JsConnectPlugin extends Gdn_Plugin {
       $Form->SetFormValue('Name', GetValue('name', $JsData));
       $Form->SetFormValue('Email', GetValue('email', $JsData));
       $Form->SetFormValue('Photo', GetValue('photourl', $JsData, ''));
+      $Form->SetFormValue('Roles', GetValue('roles', $JsData, ''));
+      
       $Sender->SetData('Verified', TRUE);
    }
 

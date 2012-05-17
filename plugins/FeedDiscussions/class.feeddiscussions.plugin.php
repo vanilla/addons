@@ -9,6 +9,7 @@
  *  1.0     Initial release/rewrite
  *  1.0.1   Minor fixes for logic
  *  1.0.2   Fix repeat posting bug
+ *  1.0.3   Change version requirement to 2.0.18.4
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -20,8 +21,8 @@
 $PluginInfo['FeedDiscussions'] = array(
    'Name' => 'Feed Discussions',
    'Description' => "Automatically creates new discussions based on content imported from supplied RSS feeds.",
-   'Version' => '1.0.2',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'Version' => '1.0.3',
+   'RequiredApplications' => array('Vanilla' => '2.0.18.4'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
