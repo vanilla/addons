@@ -6,6 +6,7 @@ $PluginInfo['IndexPhotos'] = array(
    'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RegisterPermissions' => FALSE,
+   'MobileFriendly' => TRUE,
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincolnwebs@gmail.com',
    'AuthorUrl' => 'http://lincolnwebs.com'
