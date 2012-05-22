@@ -201,7 +201,13 @@ class SignaturesPlugin extends Gdn_Plugin {
       $Controller->AddCssFile($this->GetResource('design/signature.css', FALSE, FALSE));
    }
    
+   /** Deprecated in 2.1. */
    public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
+      $this->DrawSignature($Sender);
+   }
+   
+   /** New call for 2.1. */
+   public function DiscussionController_AfterDiscussionBody_Handler(&$Sender) {
       $this->DrawSignature($Sender);
    }
    

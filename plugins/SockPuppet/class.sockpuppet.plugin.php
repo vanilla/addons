@@ -17,7 +17,7 @@
 $PluginInfo['SockPuppet'] = array(
    'Name' => 'Sock Puppet Detector',
    'Description' => "Allows the forum to detect and report on duplicate user accounts.",
-   'Version' => '1.1a',
+   'Version' => '1.0b',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -84,6 +84,18 @@ class SockPuppetPlugin extends Gdn_Plugin {
 		}
    }
    
+   public function FingerprintBanned($Fingerprint, &$SharedUsers) {
+      // Get banned users with the same fingerprint.
+      $Users = Gdn::SQL()->Select('UserID, Name')->GetWhere('User', array('Fingerprint' => $Fingerprint, 'Banned' => TRUE))->ResultArray();
+      
+      if (empty($Users)) {
+         return FALSE;
+      } else {
+         $SharedUsers = $Users;
+         return TRUE;
+      }
+   }
+   
    /**
     * Set the browser tracking cookie
     * 
@@ -104,6 +116,52 @@ class SockPuppetPlugin extends Gdn_Plugin {
    protected function SetUserFingerprint($UserID, $Fingerprint) {
       Gdn::UserModel()->SetField($UserID, 'Fingerprint', $Fingerprint);
       Gdn::Session()->User->Fingerprint = $Fingerprint;
+   }
+   
+   public function UserID() {
+      return C('Plugins.SockPuppet.UserID', NULL);
+   }
+   
+   public function Base_CheckSpam_Handler($Sender, $Args) {
+      // Don't check for spam if another plugin has already determined it is.
+      if ($Sender->EventArguments['IsSpam'])
+         return;
+
+      $RecordType = $Args['RecordType'];
+      $Data =& $Args['Data'];
+      $Options =& $Args['Options'];
+
+      $Result = FALSE;
+      switch ($RecordType) {
+         case 'Registration':
+            $Fingerprint = GetValue(self::COOKIENAME, $_COOKIE, '');
+//            decho($Fingerprint, 'fingerprint');
+            
+            if ($Fingerprint) {
+               $Result = $this->FingerprintBanned($Fingerprint, $Users);
+            }
+            
+//            decho($Result, 'IsSpam');
+//            decho($Users, 'Shared Accounts');
+            
+            if ($Result) {
+               $Users = ConsolidateArrayValuesByKey($Users, 'UserID');
+               $Data['_Meta']['Shared Accounts'] = FormatString('{UserID,User}', array('UserID' => $Users));
+//               decho($Data);
+               
+               $Data['Log_InsertUserID'] = $this->UserID();
+               $Data['RecordIPAddress'] = Gdn::Request()->IpAddress();
+            }
+            
+//            die();
+            break;
+         case 'Comment':
+         case 'Discussion':
+         case 'Activity':
+//            $Result = $this->CheckTest($RecordType, $Data) || $this->CheckStopForumSpam($RecordType, $Data) || $this->CheckAkismet($RecordType, $Data);
+            break;
+      }
+      $Sender->EventArguments['IsSpam'] = $Result;
    }
    
    /**
@@ -140,6 +198,21 @@ class SockPuppetPlugin extends Gdn_Plugin {
          ->Table('User')
 			->Column('Fingerprint', 'varchar(50)', NULL, 'index')
          ->Set();
+      
+      // Get a user for operations.
+      $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'Fingerprint', 'Admin' => 2))->Value('UserID');
+
+      if (!$UserID) {
+         $UserID = Gdn::SQL()->Insert('User', array(
+            'Name' => 'Fingerprint',
+            'Password' => RandomString('20'),
+            'HashMethod' => 'Random',
+            'Email' => 'fingerprint@domain.com',
+            'DateInserted' => Gdn_Format::ToDateTime(),
+            'Admin' => '2'
+         ));
+      }
+      SaveToConfig('Plugins.SockPuppet.UserID', $UserID, array('CheckExisting' => TRUE));
 	}	
    
 }
