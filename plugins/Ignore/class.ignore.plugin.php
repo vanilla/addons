@@ -72,6 +72,7 @@ class IgnorePlugin extends Gdn_Plugin {
       list($UserReference, $Username) = $Args;
       
       $Sender->GetUserInfo($UserReference, $Username);
+      $Sender->_SetBreadcrumbs(T('Ignore List'), '/profile/ignore');
       
       $UserID = $ViewingUserID = Gdn::Session()->UserID;
       if ($Sender->User->UserID != $ViewingUserID) {
