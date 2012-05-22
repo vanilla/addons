@@ -11,6 +11,7 @@ textarea.TextBox { height: 22px; min-height: 22px; width: 600px; }
 ul input.InputBox { width: 600px; }
 #Form_Go { margin: 0 20px !important; }
 .Popular { border: 2px dotted #ccc; border-width: 2px 0; padding: 20px; }
+.Modified { background: #E3FFE6; }
 </style>
 <script type="text/javascript" language="javascript">
 jQuery(document).ready(function($) {
@@ -49,21 +50,31 @@ if ($this->Form->GetValue('Keywords', '') != '') {
 	printf(T('%s matches found.'), $CountMatches);
 	echo '</h3>';
 	echo '<ul>';
-	$Loop = 0;
+   
 	foreach ($this->Matches as $Key => $Definition) {
+      $KeyHash = md5($Key);
+      
+      $DefinitionText = $Definition['def'];
+      $DefinitionModified = (bool)$Definition['mod'];
+      $ElementName = "def_{$KeyHash}";
+      
+      $CSSClass = "TextBox Definition";
+      if ($DefinitionModified)
+         $CSSClass .= " Modified";
+      
 		echo '<li>';
-		echo Wrap(Gdn_Format::Text($Key), 'label', array('for' => 'Form_def_'.$Loop));
-		echo $this->Form->Hidden('code_'.$Loop, array('value' => $Key));
-		$OldCode = $this->Form->GetValue('code_'.$Loop);
-		$NewDef = $this->Form->GetValue('def_'.$Loop);
-		$MultiLine = strlen($Definition) > 100 || strpos($Definition, "\n");
-		if ($OldCode == $Key && $NewDef !== FALSE && $NewDef != $Definition)
-			echo $this->Form->TextBox('def_'.$Loop, array('multiline' => $MultiLine));
-		else
-			echo $this->Form->TextBox('def_'.$Loop, array('value' => $Definition, 'multiline' => $MultiLine));
-			
+		echo Wrap(Gdn_Format::Text($Key), 'label', array('for' => "Form_{$ElementName}"));
+      
+      if ($this->Form->IsMyPostBack()) {
+         $SuppliedDefinition = $this->Form->GetValue($ElementName);
+      
+         // Changed?
+         if ($SuppliedDefinition !== FALSE && $SuppliedDefinition != $DefinitionText)
+            if (!$DefinitionModified) $CSSClass .= " Modified";
+      }
+      
+      echo $this->Form->TextBox($ElementName, array('multiline' => TRUE, 'class' => $CSSClass));
 		echo '</li>';
-		$Loop++;
 	}
 	echo '</ul>';
 	echo $this->Form->Button('Save All');
