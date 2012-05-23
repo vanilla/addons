@@ -40,7 +40,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       if ($Sender->User->UserID == $ViewingUserID) {
          $SideMenu->AddLink('Options', T('Signature Settings'), '/profile/signature', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', T('Signature Settings'), '/profile/signature/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', T('Signature Settings'), UserUrl($Sender->User, '', 'signature'), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
    
@@ -201,7 +201,13 @@ class SignaturesPlugin extends Gdn_Plugin {
       $Controller->AddCssFile($this->GetResource('design/signature.css', FALSE, FALSE));
    }
    
+   /** Deprecated in 2.1. */
    public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
+      $this->DrawSignature($Sender);
+   }
+   
+   /** New call for 2.1. */
+   public function DiscussionController_AfterDiscussionBody_Handler(&$Sender) {
       $this->DrawSignature($Sender);
    }
    

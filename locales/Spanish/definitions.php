@@ -2,7 +2,7 @@
 
 $LocaleInfo['Spanish'] = array (
   'Locale' => 'es-ES',
-  'Name' => 'Spanish Locale',
+  'Name' => 'Spanish',
   'Description' => 'All of the text in a default Vanilla install in Spanish (es-ES).',
   'Version' => '1.21b',
   'Author' => 'Santiago Lozano',

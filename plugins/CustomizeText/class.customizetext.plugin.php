@@ -18,10 +18,10 @@
 $PluginInfo['CustomizeText'] = array(
    'Name' => 'Customize Text',
    'Description' => "Allows administrators to edit the text throughout their forum.",
-   'Version' => '1.1',
+   'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.1a2'),
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
+   'Author' => "Tim Gunter",
+   'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
 	'SettingsUrl' => 'settings/customizetext'
 );
@@ -60,40 +60,91 @@ class CustomizeTextPlugin extends Gdn_Plugin {
 		elseif ($Directive == 'rebuildcomplete')
 			$View = 'rebuildcomplete';
       
-		$Sender->Matches = array();
-		if ($Sender->Form->AuthenticatedPostback()) {
-			// Loop/Save translation changes
-			$Keywords = strtolower($Sender->Form->GetValue('Keywords'));
+      $Method = 'none';
+      
+      if ($Sender->Form->AuthenticatedPostback() && $Sender->Form->GetValue('Go'))
+         $Method = 'search';
+      
+      if ($Sender->Form->AuthenticatedPostback() && $Sender->Form->GetValue('Save_All'))
+         $Method = 'save';
+      
+      $Sender->Matches = array();
+      $Keywords = NULL;
+      switch ($Method) {
+         case 'none':
+            break;
          
-			$Definitions = Gdn::Locale()->GetDeveloperDefinitions();
-			$Loop = 0;
-			$Changed = FALSE;
-			foreach ($Definitions as $Key => $Definition) {
-				// Look for matches
-				$k = strtolower($Key);
-				$d = strtolower($Definition);
-				if ($Keywords == '*' || (strlen($Keywords) > 0 && (strpos($k, $Keywords) !== FALSE || strpos($d, $Keywords) !== FALSE))) {
+         case 'search':
+         case 'save':
+            
+            $Keywords = strtolower($Sender->Form->GetValue('Keywords'));
+            
+            if ($Method == 'search') {
+               $Sender->Form->ClearInputs();
+               $Sender->Form->SetValue('Keywords', $Keywords);
+            }
+            
+            $Definitions = Gdn::Locale()->GetDeveloperDefinitions();
+            $Changed = FALSE;
+            foreach ($Definitions as $Key => $BaseDefinition) {
+               $KeyHash = md5($Key);
+               $ElementName = "def_{$KeyHash}";
+
+               // Look for matches
+               $k = strtolower($Key);
+               $d = strtolower($BaseDefinition);
                
+               // If this key doesn't match, skip it
+               if ($Keywords != '*' && !(strlen($Keywords) > 0 && (strpos($k, $Keywords) !== FALSE || strpos($d, $Keywords) !== FALSE)))
+                  continue;
+               
+               $Modified = FALSE;
+
                // Found a definition, look it up in the real locale first, to see if it has been overridden
-               $RealDefinition = Gdn::Locale()->Translate($Key, $Definition);
-					$Sender->Matches[$Key] = $RealDefinition;
+               $CurrentDefinition = Gdn::Locale()->Translate($Key, FALSE);
+               if ($CurrentDefinition !== FALSE && $CurrentDefinition != $BaseDefinition)
+                  $Modified = TRUE;
+               else
+                  $CurrentDefinition = $BaseDefinition;
+
+               $Sender->Matches[$Key] = array('def' => $CurrentDefinition, 'mod' => $Modified);
+               if ($CurrentDefinition[0] == "\r\n")
+                  $CurrentDefinition = "\r\n{$CurrentDefinition}";
+               else if ($CurrentDefinition[0] == "\r")
+                  $CurrentDefinition = "\r{$CurrentDefinition}";
+               else if ($CurrentDefinition[0] == "\n")
+                  $CurrentDefinition = "\n{$CurrentDefinition}";
                
-					// Save changes in matches
-					$NewDef = $Sender->Form->GetValue('def_'.$Loop);
-					$OldCode = $Sender->Form->GetValue('code_'.$Loop);
-					if ($OldCode == $Key && $NewDef != FALSE && $NewDef != $RealDefinition) {
-						Gdn::Locale()->SetTranslation($Key, $NewDef, TRUE);
-						$Sender->Matches[$Key] = $NewDef;
-                  $Changed = TRUE;
-					}
-					
-					$Loop++;
-				}
-			}
-         if ($Changed) {
-            $Sender->InformMessage("Locale changes have been saved!");
-         }
-		}
+               $Sender->Form->SetValue($ElementName, $CurrentDefinition);
+               
+               if ($Method == 'save') {
+                  $SuppliedDefinition = $Sender->Form->GetValue($ElementName);
+
+                  // Has this field been changed?
+                  if ($SuppliedDefinition != FALSE && $SuppliedDefinition != $CurrentDefinition) {
+
+                     // Changed from what it was, but is it a change from the *base* value?
+                     $SaveDefinition = ($SuppliedDefinition != $BaseDefinition) ? $SuppliedDefinition : NULL;
+                     if (!is_null($SaveDefinition))
+                        $SaveDefinition = str_replace("\r\n", "\n", $SaveDefinition);
+                     
+                     Gdn::Locale()->SetTranslation($Key, $SaveDefinition, array(
+                        'Save'         => TRUE,
+                        'RemoveEmpty'  => TRUE
+                     ));
+                     $Sender->Matches[$Key] = array('def' => $SuppliedDefinition, 'mod' => !is_null($SaveDefinition));
+                     $Changed = TRUE;
+                  }
+               }
+            }
+
+            if ($Changed) {
+               $Sender->InformMessage("Locale changes have been saved!");
+            }
+            
+            break;
+      }
+      
       $Sender->Render($View, '', 'plugins/CustomizeText');
    }
 }
