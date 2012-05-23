@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.2.3',
+   'Version' => '1.2.4',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -227,8 +227,11 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       $SourceUserID = GetValue('InsertUserID', $Data);
       $Signature = $this->Signatures($Sender, $SourceUserID);
+      
       if (is_array($Signature))
          list($Signature, $SigFormat) = $Signature;
+      else
+         $SigFormat = C('Garden.InputFormatter');
       
       $this->EventArguments = array(
          'UserID'    => $SourceUserID,
@@ -251,11 +254,8 @@ class SignaturesPlugin extends Gdn_Plugin {
          // Don't show empty sigs
          if ($Signature == '') return;
          
-         if (is_array($Signature)) {
-            $UserSignature = Gdn_Format::To($Signature[0], $Signature[1]);
-         } else {
-            $UserSignature = Gdn_Format::Auto($Signature);
-         }
+         $UserSignature = Gdn_Format::To($Signature, $SigFormat);
+         
          if ($UserSignature) {
             echo '<div class="UserSignature">'.$UserSignature.'</div>';
          }
