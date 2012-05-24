@@ -1140,7 +1140,7 @@ function IsValidURL($string, $email_too = true) {
 if (preg_match("/^
 (?:https?|ftp):\\/\\/
 (?:
-(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+
+(?:[a-zA-Z0-9](?:[_a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+
 [a-zA-Z0-9]
 (?:[a-zA-Z0-9-]*[a-zA-Z0-9])?
 |

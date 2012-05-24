@@ -10,7 +10,7 @@
 
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.0.6b',
+    'Version' => '1.0.7b',
     'RequiredApplications' => array('Vanilla' => '2.0.2a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -39,6 +39,9 @@ class NBBCPlugin extends Gdn_Plugin {
       if ($action == BBCODE_CHECK)
          return true;
       $content = trim($bbcode->UnHTMLEncode(strip_tags($content)));
+      if (!$content && $default)
+         $content = $default;
+      
       if ($bbcode->IsValidUrl($content, false))
          return "<img src=\"" . htmlspecialchars($content) . "\" alt=\""
             . htmlspecialchars(basename($content)) . "\" class=\"bbcode_img\" />";
