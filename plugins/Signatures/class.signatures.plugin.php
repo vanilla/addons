@@ -254,10 +254,11 @@ class SignaturesPlugin extends Gdn_Plugin {
          // Don't show empty sigs
          if ($Signature == '') return;
          
-         $UserSignature = Gdn_Format::To($Signature, $SigFormat);
+         $UserSignature = Gdn_Format::To($Signature, $SigFormat)."<!-- $SigFormat -->";
+         
          
          if ($UserSignature) {
-            echo '<div class="UserSignature">'.$UserSignature.'</div>';
+            echo '<div class="Signature UserSignature">'.$UserSignature.'</div>';
          }
       }
    }
