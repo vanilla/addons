@@ -216,7 +216,6 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    protected function DrawSignature($Sender) {
-
       if ($this->Hide()) return;
       
       if (isset($Sender->EventArguments['Discussion'])) 
@@ -231,6 +230,9 @@ class SignaturesPlugin extends Gdn_Plugin {
       if (is_array($Signature))
          list($Signature, $SigFormat) = $Signature;
       else
+         $SigFormat = C('Garden.InputFormatter');
+      
+      if (!$SigFormat)
          $SigFormat = C('Garden.InputFormatter');
       
       $this->EventArguments = array(
