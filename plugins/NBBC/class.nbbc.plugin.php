@@ -126,6 +126,27 @@ class NBBCPlugin extends Gdn_Plugin {
       . $title . "\n<div class=\"QuoteText\">"
       . $content . "</div>\n</blockquote>\n";
    }
+   
+   function DoURL($bbcode, $action, $name, $default, $params, $content) {
+      if ($action == BBCODE_CHECK) return true;
+      
+      $url = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
+      
+      if ($bbcode->IsValidURL($url)) {
+         if ($bbcode->debug)
+            print "ISVALIDURL<br />";
+         if ($bbcode->url_targetable !== false && isset($params['target']))
+            $target = " target=\"" . htmlspecialchars($params['target']) . "\"";
+         else 
+            $target = "";
+         
+         if ($bbcode->url_target !== false)
+            if (!($bbcode->url_targetable == 'override' && isset($params['target'])))
+               $target = " target=\"" . htmlspecialchars($bbcode->url_target) . "\"";
+            return '<a href="' . htmlspecialchars($url) . '" rel="nofollow" class="bbcode_url"' . $target . '>' . $content . '</a>';
+      } else 
+         return htmlspecialchars($params['_tag']) . $content . htmlspecialchars($params['_endtag']);
+   }
 
    public function Format($String) {
       $Result = $this->NBBC()->Parse($String);
@@ -217,6 +238,16 @@ class NBBCPlugin extends Gdn_Plugin {
              'plain_end' => "\n",
          ));
 
+         $BBCode->AddRule('url', array(
+            'mode' => BBCODE_MODE_CALLBACK,
+            'method' => array($this, 'DoURL'),
+            'class' => 'link',
+            'allow_in' => Array('listitem', 'block', 'columns', 'inline'),
+            'content' => BBCODE_REQUIRED,
+            'plain_start' => "<a rel=\"nofollow\" href=\"{\$link}\">",
+            'plain_end' => "</a>",
+            'plain_content' => Array('_content', '_default'),
+            'plain_link' => Array('_default', '_content')));
 
          $this->EventArguments['BBCode'] = $BBCode;
          $this->FireEvent('AfterNBBCSetup');
