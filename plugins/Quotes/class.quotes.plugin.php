@@ -20,7 +20,7 @@
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "Adds an option to each comment for users to easily quote each other.",
-   'Version' => '1.6.1',
+   'Version' => '1.6.2',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
@@ -126,20 +126,27 @@ class QuotesPlugin extends Gdn_Plugin {
    }
    
    public function Controller_Getquote($Sender) {
+      $this->DiscussionController_GetQuote_Create($Sender);
+   }
+   
+   public function DiscussionController_GetQuote_Create($Sender, $Selector, $Format = FALSE) {
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+      
+      if (!$Format)
+         $Format = C('Garden.InputFormatter');
 
       $QuoteData = array(
          'status' => 'failed'
       );
-      array_shift($Sender->RequestArgs);
-      if (sizeof($Sender->RequestArgs)) {
-         $QuoteData['selector'] = $Sender->RequestArgs[0];
-         list($Type, $ID) = explode('_',$Sender->RequestArgs[0]);
-         $this->FormatQuote($Type, $ID, $QuoteData);
-      }
+//      array_shift($Sender->RequestArgs);
+//      if (sizeof($Sender->RequestArgs)) {
+         $QuoteData['selector'] = $Selector;
+         list($Type, $ID) = explode('_',$Selector);
+         $this->FormatQuote($Type, $ID, $QuoteData, $Format);
+//      }
       $Sender->SetJson('Quote', $QuoteData);
-      $Sender->Render($this->GetView('getquote.php'));
+      $Sender->Render('GetQuote', '', 'plugins/Quotes');
    }
 
    public function DiscussionController_Render_Before($Sender) {
@@ -270,7 +277,10 @@ BLOCKQUOTE;
       }
    }
    
-   protected function FormatQuote($Type, $ID, &$QuoteData) {
+   protected function FormatQuote($Type, $ID, &$QuoteData, $Format = FALSE) {
+      if (!$Format)
+         $Format = C('Garden.InputFormatter');
+      
       $Type = strtolower($Type);
       $Model = FALSE;
       switch ($Type) {
@@ -289,16 +299,18 @@ BLOCKQUOTE;
       //$QuoteData = array();
       if ($Model) {
          $Data = $Model->GetID($ID);
-         $NewFormat = C('Garden.InputFormatter');
+         $NewFormat = $Format;
+         if ($NewFormat == 'Wysiwyg')
+            $NewFormat = 'Html';
          $QuoteFormat = $Data->Format;
+         if ($QuoteFormat == 'Wysiwyg')
+            $QuoteFormat = 'Html';
          
          // Perform transcoding if possible
          $NewBody = $Data->Body;
          if ($QuoteFormat != $NewFormat) {
-            if ($QuoteFormat == 'BBCode' && $NewFormat == 'Html')
-               $NewBody = Gdn_Format::BBCode($NewBody);
-            elseif ($QuoteFormat == 'Text' && $NewFormat == 'Html')
-               $NewBody = Gdn_Format::Text($NewBody);
+            if ($NewFormat == 'Html')
+               $NewBody = Gdn_Format::To($NewBody, $QuoteFormat);
             elseif ($QuoteFormat == 'Html' && $NewFormat == 'BBCode')
                $NewBody = Gdn_Format::Text($NewBody);
             elseif ($QuoteFormat == 'Text' && $NewFormat == 'BBCode')
@@ -306,14 +318,15 @@ BLOCKQUOTE;
             else
                $NewBody = Gdn_Format::PlainText($NewBody, $QuoteFormat);
             
-            Gdn::Controller()->InformMessage(sprintf(T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'), $QuoteFormat, $NewFormat));
+            if ($NewFormat != 'Html')
+               Gdn::Controller()->InformMessage(sprintf(T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'), $QuoteFormat, $NewFormat));
          }
          $Data->Body = $NewBody;
          
          $QuoteData = array_merge($QuoteData, array(
             'status'       => 'success',
             'body'         => $Data->Body,
-            'format'       => C('Garden.InputFormatter'),
+            'format'       => $Format,
             'authorid'     => $Data->InsertUserID,
             'authorname'   => $Data->InsertName,
             'type'         => $Type,

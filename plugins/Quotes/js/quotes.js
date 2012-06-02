@@ -145,16 +145,16 @@ function Gdn_Quotes() {
                }               
             }
 */
-				var webRoot = gdn.definition('WebRoot', '');
-            var ss = document.createElement("link");
-            ss.type = "text/css";
-            ss.rel = "stylesheet";
-            ss.href = gdn.combinePaths(webRoot, '/plugins/Quotes/css/cleditor.css');
-            
-            if (document.all)
-            	FrameDocument.createStyleSheet(ss.href);
-            else
-            	FrameDocument.getElementsByTagName("head")[0].appendChild(ss);
+//				var webRoot = gdn.definition('WebRoot', '');
+//            var ss = document.createElement("link");
+//            ss.type = "text/css";
+//            ss.rel = "stylesheet";
+//            ss.href = gdn.combinePaths(webRoot, '/plugins/Quotes/css/cleditor.css');
+//            
+//            if (document.all)
+//            	FrameDocument.createStyleSheet(ss.href);
+//            else
+//            	FrameDocument.getElementsByTagName("head")[0].appendChild(ss);
 
          break;
          
@@ -228,9 +228,10 @@ function Gdn_Quotes() {
       if (!QuotedElement) return false;
       
       this.AddSpinner();
-      var QuotebackURL = gdn.url('plugin/quotes/getquote/'+ObjectID);
+      var QuotebackURL = gdn.url('/discussion/getquote/'+ObjectID);
       jQuery.ajax({
          url: QuotebackURL,
+         data: { format: $('#Form_Format').val() },
          type: 'GET',
          dataType: 'json',
          success: jQuery.proxy(this.QuoteResponse,this)
@@ -255,8 +256,9 @@ function Gdn_Quotes() {
       } else {return;}
       
       switch (Data.Quote.format) {
+         case 'Wysiwyg':
          case 'Html':   // HTML
-            var Append = '<blockquote rel="'+Data.Quote.authorname+'">'+Data.Quote.body+'</blockquote>'+"\n";
+            var Append = '<blockquote class="Quote" rel="'+Data.Quote.authorname+'">'+Data.Quote.body+'</blockquote>'+"\n";
             break;
             
          case 'BBCode':
@@ -276,7 +278,7 @@ function Gdn_Quotes() {
             
          default:
             var Append = Data.Quote.body;
-            return;
+            break;
       
       }
       
