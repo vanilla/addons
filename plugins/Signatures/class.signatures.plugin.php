@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.2.4',
+   'Version' => '1.2.5',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -93,11 +93,18 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       // If seeing the form for the first time...
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+         $Data = $ConfigurationModel->Data;
+         $Data['Body'] = GetValue('Plugin.Signatures.Sig', $Data);
+         $Data['Format'] = GetValue('Plugin.Signatures.Format', $Data);
+         
          // Apply the config settings to the form.
-         $Sender->Form->SetData($ConfigurationModel->Data);
+         $Sender->Form->SetData($Data);
       } else {
          $Values = $Sender->Form->FormValues();
+         $Values['Plugin.Signatures.Sig'] = GetValue('Body', $Values, NULL);
+         $Values['Plugin.Signatures.Format'] = GetValue('Format', $Values, NULL);
          $FrmValues = array_intersect_key($Values, $ConfigArray);
+         
          if (sizeof($FrmValues)) {
             
             if (!GetValue($this->MakeMetaKey('Sig'), $FrmValues)) {
@@ -108,6 +115,7 @@ class SignaturesPlugin extends Gdn_Plugin {
             
             foreach ($FrmValues as $UserMetaKey => $UserMetaValue) {
                $Key = $this->TrimMetaKey($UserMetaKey);
+               
                
                switch ($Key) {
                   case 'Format':
