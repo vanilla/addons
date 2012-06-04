@@ -307,9 +307,16 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                'ForeignID'       => substr($FeedItemID, 0, 30),
                'Body'            => $ParsedStoryBody
             );
-
-         $InsertUserID = Gdn::UserModel()->GetSystemUserID();
-
+         
+         // Post as Minion (if one exists) or the system user
+         if (class_exists('MinionPlugin')) {
+            $Minion = Gdn::PluginManager()->GetPluginInstance('MinionPlugin');
+            $InsertUserID = $Minion->GetMinionUserID();
+         }
+         else {
+            $InsertUserID = Gdn::UserModel()->GetSystemUserID();
+         }
+         
          $DiscussionData[$DiscussionModel->DateInserted] = $StoryPublished;
          $DiscussionData[$DiscussionModel->InsertUserID] = $InsertUserID;
 
