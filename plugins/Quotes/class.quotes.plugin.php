@@ -20,7 +20,7 @@
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "Adds an option to each comment for users to easily quote each other.",
-   'Version' => '1.6.2',
+   'Version' => '1.6.3',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
@@ -205,11 +205,11 @@ class QuotesPlugin extends Gdn_Plugin {
       
       switch ($Sender->EventArguments['Object']->Format) {
          case 'Html':
-            $Sender->EventArguments['Object']->Body = preg_replace_callback("/(<blockquote rel=\"([^\"]+)\">)/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
+         case 'Wysiwyg':
+            $Sender->EventArguments['Object']->Body = preg_replace_callback("/(<blockquote\s+(?:class=\"(?:User)?Quote\")?\s+rel=\"([^\"]+)\">)/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
             $Sender->EventArguments['Object']->Body = str_ireplace('</blockquote>','</p></div></blockquote>',$Sender->EventArguments['Object']->Body);
             break;
             
-         case 'BBCode':
          case 'Markdown':
             // BBCode quotes with authors
             $Sender->EventArguments['Object']->Body = preg_replace_callback("#(\[quote(\s+author)?=[\"']?(.*?)(\s+link.*?)?(;[\d]+)?[\"']?\])#usi", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
