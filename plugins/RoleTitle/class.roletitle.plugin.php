@@ -19,15 +19,20 @@ class RoleTitlePlugin extends Gdn_Plugin {
    /**
     * Inject the roles under the username on comments.
     */
-   public function DiscussionController_CommentInfo_Handler($Sender) {
+//   public function DiscussionController_CommentInfo_Handler($Sender) {
+//      $this->_AttachTitle($Sender);
+//   }
+//   public function DiscussionController_AfterDiscussionMeta_Handler($Sender) {
+//      $this->_AttachTitle($Sender);
+//   }
+//   public function PostController_CommentInfo_Handler($Sender) {
+//      $this->_AttachTitle($Sender);
+//   }
+   
+   public function DiscussionController_AuthorInfo_Handler($Sender) {
       $this->_AttachTitle($Sender);
    }
-   public function DiscussionController_AfterDiscussionMeta_Handler($Sender) {
-      $this->_AttachTitle($Sender);
-   }
-   public function PostController_CommentInfo_Handler($Sender) {
-      $this->_AttachTitle($Sender);
-   }
+   
    private function _AttachTitle($Sender) {
       $Object = GetValue('Object', $Sender->EventArguments);
       $Roles = $Object ? GetValue('Roles', $Object, array()) : FALSE;
