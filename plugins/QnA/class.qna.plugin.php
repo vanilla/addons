@@ -187,6 +187,28 @@ class QnAPlugin extends Gdn_Plugin {
          $Sender->SQL->Set('QnA', 'Answered');
       }
    }
+   
+   public function DiscussionController_BeforeDiscussionRender_Handler($Sender, $Args) {
+      if (strcasecmp($Sender->Data('Discussion.QnA'), 'Accepted') != 0)
+         return;
+      
+      // Find the accepted answer(s) to the question.
+      $CommentModel = new CommentModel();
+      $Answers = $CommentModel->GetWhere(array('DiscussionID' => $Sender->Data('Discussion.DiscussionID'), 'Qna' => 'Accepted'))->Result();
+      
+      $Sender->SetData('Answers', $Answers);
+   }
+   
+   /**
+    *
+    * @param DiscussionController $Sender
+    * @param type $Args
+    * @return type 
+    */
+   public function DiscussionController_AfterDiscussion_Handler($Sender, $Args) {
+      if ($Sender->Data('Answers'))
+         include $Sender->FetchViewLocation('Answers', '', 'plugins/QnA');
+   }
 
    /**
     *
@@ -252,7 +274,6 @@ class QnAPlugin extends Gdn_Plugin {
             );
          }
       }
-
       Redirect("/discussion/comment/{$Comment['CommentID']}#Comment_{$Comment['CommentID']}");
    }
 
