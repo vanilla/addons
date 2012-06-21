@@ -154,7 +154,10 @@ class NBBCPlugin extends Gdn_Plugin {
    }
 
    protected $_NBBC = NULL;
-
+   /**
+    *
+    * @return BBCode 
+    */
    public function NBBC() {
       if ($this->_NBBC === NULL) {
          require_once(dirname(__FILE__) . '/nbbc/nbbc.php');
@@ -215,7 +218,7 @@ class NBBCPlugin extends Gdn_Plugin {
          
          $BBCode->AddRule('snapback', Array(
              'mode' => BBCODE_MODE_ENHANCED,
-             'template' => ' <a href="'.Url('/discussion/comment/{$_content/v}', TRUE).'" class="SnapBack">»</a> ',
+             'template' => ' <a href="'.Url('/discussion/comment/{$_content/v}#Comment_{$_content/v}', TRUE).'" class="SnapBack">»</a> ',
              'class' => 'code',
              'allow_in' => Array('listitem', 'block', 'columns'),
              'content' => BBCODE_VERBATIM,

@@ -287,7 +287,9 @@ class FileUploadPlugin extends Gdn_Plugin {
       }
       
       if (count($CommentIDList)) {
-         $MediaData = $this->MediaModel()->PreloadDiscussionMedia($Sender->DiscussionID, $CommentIDList);
+         $DiscussionID = $Sender->Data('Discussion.DiscussionID');
+         
+         $MediaData = $this->MediaModel()->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
       } else {
          $MediaData = FALSE;
       }
