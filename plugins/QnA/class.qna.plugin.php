@@ -469,4 +469,13 @@ class QnAPlugin extends Gdn_Plugin {
          $Sender->AddModule($QuestionModule);
       }
    }
+   
+   
+   /** 
+    * Add the "new question" button after the new discussion button. 
+    */
+   public function Base_BeforeNewDiscussionButton_Handler($Sender) {
+      $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
+      $NewDiscussionModule->AddButton(T('New Question'), 'post/discussion?Type=Question');
+   }   
 }
