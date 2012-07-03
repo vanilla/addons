@@ -38,6 +38,10 @@ class LastEditedPlugin extends Gdn_Plugin {
       $Sender->AddCssFile($this->GetResource('design/lastedited.css', FALSE, FALSE));
    }
    
+   public function DiscussionController_AfterDiscussionBody_Handler(&$Sender) {
+      $this->DrawEdited($Sender);
+   }
+   
    public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
       $this->DrawEdited($Sender);
    }
@@ -48,16 +52,21 @@ class LastEditedPlugin extends Gdn_Plugin {
    
    protected function DrawEdited(&$Sender) {
       
-      $Discussion = $Sender->Discussion;
-      $PermissionCategoryID = $Discussion->PermissionCategoryID;
+      $Record = $Sender->Data('Discussion');
+      if (!$Record)
+         $Record = $Sender->Data('Record');
       
-      // Assume discussion
-      $Data = $Discussion;
+      if (!$Record)
+         return;
+
+      $PermissionCategoryID = GetValue('PermissionCategoryID', $Record);
+      
+      $Data = $Record;
       $RecordType = 'discussion';
       $RecordID = GetValue('DiscussionID', $Data);
       
       // But override if comment
-      if (isset($Sender->EventArguments['Comment'])) {
+      if (isset($Sender->EventArguments['Comment']) || GetValue('RecordType', $Record) == 'comment') {
          $Data = $Sender->EventArguments['Comment'];
          $RecordType = 'comment';
          $RecordID = GetValue('CommentID', $Data);
