@@ -438,7 +438,7 @@ class QnAPlugin extends Gdn_Plugin {
     */
    public function Base_BeforeNewDiscussionButton_Handler($Sender) {
       $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
-      $NewDiscussionModule->AddButton(T('New Question'), 'post/question');
+      $NewDiscussionModule->AddButton(T('Ask a Question'), 'post/question');
    }
    
    /** 
