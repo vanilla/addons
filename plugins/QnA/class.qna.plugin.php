@@ -413,44 +413,6 @@ class QnAPlugin extends Gdn_Plugin {
    }
 
    /**
-    * @param Gdn_Controller $Sender
-    * @param array $Args
-    */
-   public function PostController_BeforeFormInputs_Handler($Sender, $Args) {
-      $Sender->AddDefinition('QuestionTitle', T('Question Title'));
-      $Sender->AddDefinition('DiscussionTitle', T('Discussion Title'));
-      $Sender->AddDefinition('QuestionButton', T('Ask Question'));
-      $Sender->AddDefinition('DiscussionButton', T('Post Discussion'));
-      $Sender->AddJsFile('qna.js', 'plugins/QnA');
-
-      $Form = $Sender->Form;
-      $QuestionButton = !C('Plugins.QnA.UseBigButtons') || GetValue('Type', $_GET) == 'Question';
-      if ($Sender->Form->GetValue('Type') == 'Question' && $QuestionButton) {
-         Gdn::Locale()->SetTranslation('Discussion Title', T('Question Title'));
-         Gdn::Locale()->SetTranslation('Post Discussion', T('Ask Question'));
-      }
-      
-      if (!C('Plugins.QnA.UseBigButtons'))
-         include $Sender->FetchViewLocation('QnAPost', '', 'plugins/QnA');
-   }
-
-   public function PostController_Render_Before($Sender, $Args) {
-      $Form = $Sender->Form; //new Gdn_Form();
-      $QuestionButton = !C('Plugins.QnA.UseBigButtons') || GetValue('Type', $_GET) == 'Question';
-      if (!$Form->IsPostBack()) {
-         if (!property_exists($Sender, 'Discussion')) {
-            $Form->SetValue('Type', 'Question');
-         } elseif (!$Form->GetValue('Type')) {
-            $Form->SetValue('Type', 'Discussion');
-         }
-      }
-
-      if ($Form->GetValue('Type') == 'Question' && $QuestionButton) {
-         $Sender->SetData('Title', T('Ask a Question'));
-      }
-   }
-   
-   /**
     * Add 'Ask a Question' button if using BigButtons.
     */
    public function CategoriesController_Render_Before($Sender) {
@@ -472,10 +434,40 @@ class QnAPlugin extends Gdn_Plugin {
    
    
    /** 
-    * Add the "new question" button after the new discussion button. 
+    * Add the "new question" option to the new discussion button group dropdown.
     */
    public function Base_BeforeNewDiscussionButton_Handler($Sender) {
       $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
-      $NewDiscussionModule->AddButton(T('New Question'), 'post/discussion?Type=Question');
-   }   
+      $NewDiscussionModule->AddButton(T('New Question'), 'post/question');
+   }
+   
+   /** 
+    * Add the question form to vanilla's post page.
+    */
+   public function PostController_AfterForms_Handler($Sender) {
+      $Forms = $Sender->Data('Forms');
+      $Forms[] = array('Name' => 'Question', 'Label' => Sprite('SpQuestion').T('Ask a Question'), 'Url' => 'post/question');
+		$Sender->SetData('Forms', $Forms);
+   }
+   
+   /** 
+    * Create the new question method on post controller.
+    */
+   public function PostController_Question_Create($Sender) {
+      // Create & call PostController->Discussion()
+      $Sender->View = PATH_PLUGINS.'/QnA/views/post.php';
+      $Sender->Discussion(GetValue(0, $Sender->RequestArgs, ''));
+   }
+   
+   /** 
+    * Override the PostController->Discussion() method before render to use our view instead.
+    */
+   public function PostController_BeforeDiscussionRender_Handler($Sender) {
+      // Override if we are looking at the question url.
+      if ($Sender->RequestMethod == 'question') {
+         $Sender->Form->AddHidden('Type', 'Question');
+         $Sender->Title(T('Ask a Question'));
+         $Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/question')));
+      }
+   }
 }
