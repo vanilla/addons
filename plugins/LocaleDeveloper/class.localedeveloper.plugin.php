@@ -53,36 +53,63 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
          // Load the existing definitions.
          $Locale->Load($Path);
       }
+      
+      // Load the core definitions.
+      if (file_exists($this->LocalePath.'/captured_site_core.php')) {
+         $Definition = array();
+         include $this->LocalePath.'/captured_site_core.php';
+         $Core = $Definition;
+      } else {
+         $Core = array();
+      }
+      
+      // Load the admin definitions.
+      if (file_exists($this->LocalePath.'/captured_dash_core.php')) {
+         $Definition = array();
+         include $this->LocalePath.'/captured_dash_core.php';
+         $Admin = $Definition;
+      } else {
+         $Admin = array();
+      }
 
       // Load the ignore file.
       $Definition = array();
       include dirname(__FILE__).'/ignore.php';
       $Ignore = $Definition;
       $Definition = array();
-
-      // Figure out whether this as admin or regular page.
-      if (ArrayHasValue($Sender->CssFiles(), 'admin.css')) {
-         $FinalPath = $this->LocalePath.'/captured_admin.php';
-      } else {
-         $FinalPath = $this->LocalePath.'/captured.php';
-      }
       
+      $CapturedDefinitions = $Locale->CapturedDefinitions();
+      
+//      decho ($CapturedDefinitions);
+//      die();
+      
+      foreach ($CapturedDefinitions as $Prefix => $Definition) {
+         $FinalPath = $this->LocalePath."/captured_$Prefix.php";
 
-      // Load the definitions that have already been captured.
-      if (file_exists($FinalPath)) {
-         include $FinalPath;
+         // Load the definitions that have already been captured.
+         if (file_exists($FinalPath)) {
+            include $FinalPath;
+         }
+         $Definition = array_diff_key($Definition, $Ignore);
+         
+         // Strip core definitions from the file.
+         if ($Prefix != 'site_core') {
+            $Definition = array_diff_key($Definition, $Core);
+            
+            if ($Prefix != 'dash_core') {
+               $Definition = array_diff_key($Definition, $Admin);
+            }
+         }
+
+         // Save the current definitions.
+         $fp = fopen($Path, 'wb');
+         fwrite($fp, $this->GetFileHeader());
+         LocaleModel::WriteDefinitions($fp, $Definition);
+         fclose($fp);
+
+         // Copy the file over the existing one.
+         $Result = rename($Path, $FinalPath);
       }
-      $Definition = array_merge($Definition, $Locale->CapturedDefinitions());
-      $Definition = array_diff_key($Definition, $Ignore);
-
-      // Save the current definitions.
-      $fp = fopen($Path, 'wb');
-      fwrite($fp, $this->GetFileHeader());
-      LocaleModel::WriteDefinitions($fp, $Definition);
-      fclose($fp);
-
-      // Copy the file over the existing one.
-      $Result = rename($Path, $FinalPath);
    }
    
    public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
