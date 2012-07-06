@@ -1,0 +1,61 @@
+html {
+   direction: rtl;
+}
+
+caption, th, td {
+   text-align: inherit;
+}
+
+#Panel .PanelInfo li {
+   text-align: inherit;
+}
+
+#Panel .FilterMenu .Aside, .PanelInfo .Aside {
+   float: left;
+}
+
+.UserBox .PhotoWrap, .MeBox .PhotoWrap {
+   float: right;
+   margin-right: 0;
+   margin-left: 5px;
+}
+
+.ControlOptions, .Options {
+   float: left;
+}
+
+.Block .PhotoWrap {
+   float: right;
+   margin: 0 0 0 5px;
+}
+
+.Author .PhotoWrap {
+   margin: 0 0 4px 10px;
+   float: right;
+}
+
+.ProfileOptions {
+   float: left;
+}
+
+.PhotoWrapSmall {
+   margin-right: 0;
+   margin-left: 5px;
+}
+
+.PopList .Item.Title a {
+   float: left;
+}
+
+.EmotifyDropdown {
+   left: -7px;
+   right: inherit;
+}
+
+.Pager {
+   direction: ltr;
+}
+
+time {
+   unicode-bidi: embed;
+}
