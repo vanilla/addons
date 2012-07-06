@@ -156,7 +156,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          if ($this->Hide()) return $Signatures;
       
          $Discussion = $Sender->Data('Discussion');
-         $Comments = $Sender->Data('CommentData');
+         $Comments = $Sender->Data('Comments');
          $UserIDList = array();
          
          if ($Discussion)
