@@ -78,12 +78,13 @@ class RoleTitlePlugin extends Gdn_Plugin {
 		if (property_exists($Sender, 'Discussion')) {
 			$JoinDiscussion = array($Sender->Discussion);
 			RoleModel::SetUserRoles($JoinDiscussion, 'InsertUserID');
-			RoleModel::SetUserRoles($Sender->CommentData->Result(), 'InsertUserID');
+         $Comments = $Sender->Data('Comments');
+			RoleModel::SetUserRoles($Comments->Result(), 'InsertUserID');
 		}
    }
-   public function PostController_Render_Before($Sender) {
-		if (property_exists($Sender, 'CommentData') && is_object($Sender->CommentData))
-			RoleModel::SetUserRoles($Sender->CommentData->Result(), 'InsertUserID');
-	}
+//   public function PostController_Render_Before($Sender) {
+//		if (property_exists($Sender, 'CommentData') && is_object($Sender->CommentData))
+//			RoleModel::SetUserRoles($Sender->CommentData->Result(), 'InsertUserID');
+//	}
    
 }
