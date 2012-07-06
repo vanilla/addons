@@ -10,8 +10,8 @@
             <div class="FileHover">
                <div class="FileMeta">
                   <div>
-                     <span class="FileName"><?php echo T('FileName'); ?></span>
-                     <span class="FileSize"><?php echo T('FileSize'); ?></span>
+                     <span class="FileName"><?php echo T('Filename'); ?></span>
+                     <span class="FileSize"><?php echo T('File Size'); ?></span>
                   </div>
                   <span class="FileOptions"></span>
                   <a class="InsertImage Hidden"><?php echo T('Insert Image'); ?></a>
