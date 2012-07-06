@@ -183,6 +183,8 @@ class QuotesPlugin extends Gdn_Plugin {
       $Object = !isset($Args['Comment']) ? $Sender->Data['Discussion'] : $Args['Comment'];
       $ObjectID = !isset($Args['Comment']) ? 'Discussion_'.$Sender->Data['Discussion']->DiscussionID : 'Comment_'.$Args['Comment']->CommentID;
       
+      $Reply = T('Reply'); // help capture translation.
+      
       echo Wrap(Anchor(T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE)), 'span', array('class' => 'MItem CommentQuote'));
    }
    
