@@ -213,9 +213,7 @@ class SignaturesPlugin extends Gdn_Plugin {
    public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
       if ($this->Disabled)
          return;
-   
-   /** New call for 2.1. */
-   public function DiscussionController_AfterDiscussionBody_Handler(&$Sender) {
+      
       $this->DrawSignature($Sender);
    }
    
