@@ -83,6 +83,7 @@ class FileUploadPlugin extends Gdn_Plugin {
    public function PluginController_FileUpload_Create($Sender) {
       $Sender->Title('FileUpload');
       $Sender->AddSideMenu('plugin/fileupload');
+      Gdn_Theme::Section('Dashboard');
       $Sender->Form = new Gdn_Form();
       
       $this->EnableSlicing($Sender);
