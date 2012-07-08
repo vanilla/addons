@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 $PluginInfo['MeAction'] = array(
-   'Description' => 'Gives special formatting to IRC-style /me actions.',
+   'Description' => 'Allows IRC-style /me actions in the middle of comments as long as they appear at start of a new line.',
    'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
