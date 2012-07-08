@@ -1,4 +1,6 @@
-.MeAction {
+.Message .AuthorAction {
    font-weight: bold;
-   font-style: oblique;
+}
+.Message .AuthorAction:before {
+   content: '* ';
 }
