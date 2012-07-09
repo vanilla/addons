@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2><?php echo T('Signature Settings'); ?></h2>
+<h2 class="H"><?php echo T('Signature Settings'); ?></h2>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
@@ -32,4 +32,4 @@ echo $this->Form->Errors();
       $this->FireEvent('EditMySignatureAfter');
    ?>
 </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->Close('Save', '', array('class' => 'Button Success'));

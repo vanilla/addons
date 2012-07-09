@@ -16,4 +16,4 @@ echo $this->Form->Errors();
       ?>
    </li>
 </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->Close('Save', '', array('class' => 'Button Success'));
