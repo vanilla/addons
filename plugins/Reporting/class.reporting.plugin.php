@@ -304,7 +304,7 @@ class ReportingPlugin extends Gdn_Plugin {
       $ButtonTitle = T(ucfirst($ButtonType));
       $ContainerCSS = $ButtonTitle.'Post';
       $EncodedURL = str_replace('=','-',base64_encode($URL));
-      $Sender->Options .= '<span class="'.$ContainerCSS.'">'.Anchor($ButtonTitle, "plugin/reporting/{$ButtonType}/{$Context}/{$ElementID}/{$EncodedURL}", 'ReportContent Popup') . '</span>';
+      $Sender->EventArguments['CommentOptions'][$ButtonTitle] = array('Label' => $ButtonTitle, 'Url' => "plugin/reporting/{$ButtonType}/{$Context}/{$ElementID}/{$EncodedURL}", $ContainerCSS.' ReportContent Popup');
       $Sender->AddCssFile('reporting.css', 'plugins/Reporting');
    }
 
