@@ -39,9 +39,9 @@ class SignaturesPlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', T('Signature Settings'), '/profile/signature', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpSignatures').T('Signature Settings'), '/profile/signature', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', T('Signature Settings'), UserUrl($Sender->User, '', 'signature'), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpSignatures').T('Signature Settings'), UserUrl($Sender->User, '', 'signature'), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
    
