@@ -54,9 +54,9 @@ class QuotesPlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', T('Quote Settings'), '/profile/quotes', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpQuote').T('Quote Settings'), '/profile/quotes', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', T('Quote Settings'), UserUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpQuote').T('Quote Settings'), UserUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
    
@@ -166,11 +166,7 @@ class QuotesPlugin extends Gdn_Plugin {
    /**
     * Add 'Quote' option to Discussion.
     */
-   public function DiscussionController_AfterDiscussionMeta_Handler($Sender, $Args) {
-      $this->AddQuoteButton($Sender, $Args);
-   }
-   
-   public function DiscussionController_CommentOptions_Handler($Sender, $Args) {
+   public function Base_AfterReactions_Handler($Sender, $Args) {
       $this->AddQuoteButton($Sender, $Args);
    }
    
@@ -179,13 +175,17 @@ class QuotesPlugin extends Gdn_Plugin {
     */
    protected function AddQuoteButton($Sender, $Args) {
       if (!Gdn::Session()->UserID) return;
-      
-      $Object = !isset($Args['Comment']) ? $Sender->Data['Discussion'] : $Args['Comment'];
-      $ObjectID = !isset($Args['Comment']) ? 'Discussion_'.$Sender->Data['Discussion']->DiscussionID : 'Comment_'.$Args['Comment']->CommentID;
+      if (isset($Args['Comment'])) {
+         $Object = $Args['Comment'];
+         $ObjectID = 'Comment_'.$Args['Comment']->CommentID;
+      } else if (isset($Args['Discussion'])) {
+         $Object = $Args['Discussion'];
+         $ObjectID = 'Discussion_'.$Sender->Data['Discussion']->DiscussionID;
+      } else return;
       
       $Reply = T('Reply'); // help capture translation.
-      
-      echo Wrap(Anchor(T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE)), 'span', array('class' => 'MItem CommentQuote'));
+      echo Bullet();
+      echo Anchor(Sprite('ReactQuote', 'ReactSprite').T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE), 'React Quote');
    }
    
    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
