@@ -32,4 +32,4 @@ echo $this->Form->Errors();
       $this->FireEvent('EditMySignatureAfter');
    ?>
 </ul>
-<?php echo $this->Form->Close('Save', '', array('class' => 'Button Success'));
+<?php echo $this->Form->Close('Save', '', array('class' => 'Button Primary'));
