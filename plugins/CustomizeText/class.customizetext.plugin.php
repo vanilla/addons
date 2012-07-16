@@ -49,9 +49,11 @@ class CustomizeTextPlugin extends Gdn_Plugin {
 	 */
    public function SettingsController_CustomizeText_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
-      $Sender->Title('Customize Text');
+      
       $Sender->AddSideMenu('settings/customizetext');
 		$Sender->AddJsFile('/js/library/jquery.autogrow.js');
+      
+      $Sender->Title('Customize Text');
 
 		$Directive = GetValue(0, $Sender->RequestArgs, '');
 		$View = 'customizetext';
@@ -62,13 +64,14 @@ class CustomizeTextPlugin extends Gdn_Plugin {
       
       $Method = 'none';
       
-      if ($Sender->Form->AuthenticatedPostback() && $Sender->Form->GetValue('Go'))
+      if ($Sender->Form->IsPostback()) {
          $Method = 'search';
       
-      if ($Sender->Form->AuthenticatedPostback() && $Sender->Form->GetValue('Save_All'))
-         $Method = 'save';
+         if ($Sender->Form->GetValue('Save_All'))
+            $Method = 'save';
+      }
       
-      $Sender->Matches = array();
+      $Matches = array();
       $Keywords = NULL;
       switch ($Method) {
          case 'none':
@@ -81,10 +84,13 @@ class CustomizeTextPlugin extends Gdn_Plugin {
             
             if ($Method == 'search') {
                $Sender->Form->ClearInputs();
-               $Sender->Form->SetValue('Keywords', $Keywords);
+               $Sender->Form->SetFormValue('Keywords', $Keywords);
             }
             
             $Definitions = Gdn::Locale()->GetDeveloperDefinitions();
+            $CountDefinitions = sizeof($Definitions);
+            $Sender->SetData('CountDefinitions', $CountDefinitions);
+            
             $Changed = FALSE;
             foreach ($Definitions as $Key => $BaseDefinition) {
                $KeyHash = md5($Key);
@@ -107,15 +113,13 @@ class CustomizeTextPlugin extends Gdn_Plugin {
                else
                   $CurrentDefinition = $BaseDefinition;
 
-               $Sender->Matches[$Key] = array('def' => $CurrentDefinition, 'mod' => $Modified);
+               $Matches[$Key] = array('def' => $CurrentDefinition, 'mod' => $Modified);
                if ($CurrentDefinition[0] == "\r\n")
                   $CurrentDefinition = "\r\n{$CurrentDefinition}";
                else if ($CurrentDefinition[0] == "\r")
                   $CurrentDefinition = "\r{$CurrentDefinition}";
                else if ($CurrentDefinition[0] == "\n")
                   $CurrentDefinition = "\n{$CurrentDefinition}";
-               
-               $Sender->Form->SetValue($ElementName, $CurrentDefinition);
                
                if ($Method == 'save') {
                   $SuppliedDefinition = $Sender->Form->GetValue($ElementName);
@@ -125,17 +129,21 @@ class CustomizeTextPlugin extends Gdn_Plugin {
 
                      // Changed from what it was, but is it a change from the *base* value?
                      $SaveDefinition = ($SuppliedDefinition != $BaseDefinition) ? $SuppliedDefinition : NULL;
-                     if (!is_null($SaveDefinition))
+                     if (!is_null($SaveDefinition)) {
+                        $CurrentDefinition = $SaveDefinition;
                         $SaveDefinition = str_replace("\r\n", "\n", $SaveDefinition);
+                     }
                      
                      Gdn::Locale()->SetTranslation($Key, $SaveDefinition, array(
                         'Save'         => TRUE,
                         'RemoveEmpty'  => TRUE
                      ));
-                     $Sender->Matches[$Key] = array('def' => $SuppliedDefinition, 'mod' => !is_null($SaveDefinition));
+                     $Matches[$Key] = array('def' => $SuppliedDefinition, 'mod' => !is_null($SaveDefinition));
                      $Changed = TRUE;
                   }
                }
+               
+               $Sender->Form->SetFormValue($ElementName, $CurrentDefinition);
             }
 
             if ($Changed) {
@@ -144,6 +152,10 @@ class CustomizeTextPlugin extends Gdn_Plugin {
             
             break;
       }
+      
+      $Sender->SetData('Matches', $Matches);
+      $CountMatches = sizeof($Matches);
+      $Sender->SetData('CountMatches', $CountMatches);
       
       $Sender->Render($View, '', 'plugins/CustomizeText');
    }

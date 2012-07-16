@@ -1,17 +1,12 @@
-<?php if (!defined('APPLICATION')) exit();
-// Loop the currently loaded locale definitions looking for matches
-$Locale = Gdn::Locale();
-$Definitions = $Locale->GetDeveloperDefinitions();
-$CountDefinitions = count($Definitions);
-$CountMatches = count($this->Matches);
-echo $this->Form->Open();
-?>
+<?php if (!defined('APPLICATION')) exit();?>
+
+<?php echo $this->Form->Open(); ?>
 <style type="text/css">
-textarea.TextBox { height: 22px; min-height: 22px; width: 600px; }
-ul input.InputBox { width: 600px; }
-#Form_Go { margin: 0 20px !important; }
-.Popular { border: 2px dotted #ccc; border-width: 2px 0; padding: 20px; }
-.Modified { background: #E3FFE6; }
+   textarea.TextBox { height: 22px; min-height: 22px; width: 600px; }
+   ul input.InputBox { width: 600px; }
+   #Form_Go { margin: 0 20px !important; }
+   .Popular { border: 2px dotted #ccc; border-width: 2px 0; padding: 20px; }
+   .Modified { background: #E3FFE6; }
 </style>
 <script type="text/javascript" language="javascript">
 jQuery(document).ready(function($) {
@@ -26,12 +21,13 @@ jQuery(document).ready(function($) {
 	});
 });
 </script>
+
 <h1>Customize Text</h1>
 <div class="Info">
    <?php
       echo $this->Form->Errors();
       echo 'Search for the text you want to customize. Partial searches work. For example: "disc" will return "discussion" and "all discussions", etc. ';
-		echo 'There are currently '.Wrap($CountDefinitions, 'strong').' definitions available for editing. ';
+		echo 'There are currently '.Wrap($this->Data('CountDefinitions'), 'strong').' definitions available for editing. ';
 		echo Anchor('Find More', '/settings/customizetext/rebuild', 'SmallButton');
 	?>
 </div>
@@ -47,11 +43,11 @@ jQuery(document).ready(function($) {
 <?php
 if ($this->Form->GetValue('Keywords', '') != '') {
 	echo '<h3>';
-	printf(T('%s matches found.'), $CountMatches);
+	printf(T("%s matches found for '%s'."), $this->Data('CountMatches'), $this->Form->GetValue('Keywords'));
 	echo '</h3>';
 	echo '<ul>';
    
-	foreach ($this->Matches as $Key => $Definition) {
+	foreach ($this->Data('Matches') as $Key => $Definition) {
       $KeyHash = md5($Key);
       
       $DefinitionText = $Definition['def'];
@@ -65,7 +61,7 @@ if ($this->Form->GetValue('Keywords', '') != '') {
 		echo '<li>';
 		echo Wrap(Gdn_Format::Text($Key), 'label', array('for' => "Form_{$ElementName}"));
       
-      if ($this->Form->IsMyPostBack()) {
+      if ($this->Form->IsPostBack()) {
          $SuppliedDefinition = $this->Form->GetValue($ElementName);
       
          // Changed?
