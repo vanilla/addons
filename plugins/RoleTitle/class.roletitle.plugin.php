@@ -93,10 +93,13 @@ class RoleTitlePlugin extends Gdn_Plugin {
          }
 		}
    }
-//   public function PostController_Render_Before($Sender) {
-//		if (property_exists($Sender, 'CommentData') && is_object($Sender->CommentData))
-//			RoleModel::SetUserRoles($Sender->CommentData->Result(), 'InsertUserID');
-//	}
+
+   public function PostController_Render_Before($Sender) {
+      $Data = $Sender->Data('Comments');
+		if (is_object($Data))
+			RoleModel::SetUserRoles($Data->Result(), 'InsertUserID');
+	}
+
    // Add it to the comment form
    public function Base_BeforeCommentForm_Handler($Sender) {
       $CssClass = GetValue('FormCssClass', $Sender->EventArguments, '');
