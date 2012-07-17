@@ -9,6 +9,7 @@
  * Changes: 
  *  1.0     Initial release
  *  1.6.1   Overhaul
+ *  1.6.4   Moved button to reactions area & changed js accordingly.
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -20,7 +21,7 @@
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "Adds an option to each comment for users to easily quote each other.",
-   'Version' => '1.6.3',
+   'Version' => '1.6.4',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
