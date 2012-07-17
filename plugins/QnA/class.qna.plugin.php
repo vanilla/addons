@@ -95,7 +95,8 @@ class QnAPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     * @param array $Args
     */
-   public function Base_CommentOptions_Handler($Sender, $Args) {
+   public function Base_AfterReactions_Handler($Sender, $Args) {
+   // public function Base_CommentOptions_Handler($Sender, $Args) {
       $Discussion = GetValue('Discussion', $Args);
       $Comment = GetValue('Comment', $Args);
       
@@ -128,10 +129,13 @@ class QnAPlugin extends Gdn_Plugin {
          return;
 
       // Write the links.
-      $Query = http_build_query(array('commentid' => $CommentID, 'tkey' => Gdn::Session()->TransientKey()));
+      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
+      if ($Types)
+         echo Bullet();
 
-      echo ' <span class="MItem">'.Anchor(T('Accept', 'Accept'), '/discussion/qna/accept?'.$Query, array('class' => 'QnA-Yes', 'title' => T('Accept this answer.'))).'</span> '.
-         ' <span class="MItem">'.Anchor(T('Reject', 'Reject'), '/discussion/qna/reject?'.$Query, array('class' => 'QnA-No', 'title' => T('Reject this answer.'))).'</span> ';
+      $Query = http_build_query(array('commentid' => $CommentID, 'tkey' => Gdn::Session()->TransientKey()));
+      echo Anchor(Sprite('ReactAccept', 'ReactSprite').T('Accept', 'Accept'), '/discussion/qna/accept?'.$Query, array('class' => 'React QnA-Yes', 'title' => T('Accept this answer.')));
+      echo Anchor(Sprite('ReactReject', 'ReactSprite').T('Reject', 'Reject'), '/discussion/qna/reject?'.$Query, array('class' => 'React QnA-No', 'title' => T('Reject this answer.')));
 
       static $InformMessage = TRUE;
 
