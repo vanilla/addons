@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.0.8',
+   'Version' => '1.0.9',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -95,55 +95,55 @@ class QnAPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     * @param array $Args
     */
-   public function Base_AfterReactions_Handler($Sender, $Args) {
-   // public function Base_CommentOptions_Handler($Sender, $Args) {
-      $Discussion = GetValue('Discussion', $Args);
-      $Comment = GetValue('Comment', $Args);
-      
-      if (!$Comment)
-         return;
-      
-      $CommentID = GetValue('CommentID', $Comment);
-      if (!is_numeric($CommentID))
-         return;
-      
-      if (!$Discussion) {
-         static $DiscussionModel = NULL;
-         if ($DiscussionModel === NULL)
-            $DiscussionModel = new DiscussionModel();
-         $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Comment));
-      }
-
-      if (!$Discussion || strtolower(GetValue('Type', $Discussion)) != 'question')
-         return;
-
-      // Check permissions.
-      $CanAccept = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
-      $CanAccept |= Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && Gdn::Session()->UserID != GetValue('InsertUserID', $Comment);
-      
-      if (!$CanAccept)
-         return;
-
-      $QnA = GetValue('QnA', $Comment);
-      if ($QnA)
-         return;
-
-      // Write the links.
-      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
-      if ($Types)
-         echo Bullet();
-
-      $Query = http_build_query(array('commentid' => $CommentID, 'tkey' => Gdn::Session()->TransientKey()));
-      echo Anchor(Sprite('ReactAccept', 'ReactSprite').T('Accept', 'Accept'), '/discussion/qna/accept?'.$Query, array('class' => 'React QnA-Yes', 'title' => T('Accept this answer.')));
-      echo Anchor(Sprite('ReactReject', 'ReactSprite').T('Reject', 'Reject'), '/discussion/qna/reject?'.$Query, array('class' => 'React QnA-No', 'title' => T('Reject this answer.')));
-
-      static $InformMessage = TRUE;
-
-      if ($InformMessage && Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && in_array(GetValue('QnA', $Discussion), array('', 'Answered'))) {
-         $Sender->InformMessage(T('Click accept or reject beside an answer.'), 'Dismissable');
-         $InformMessage = FALSE;
-      }
-   }
+//   public function Base_AfterReactions_Handler($Sender, $Args) {
+//   // public function Base_CommentOptions_Handler($Sender, $Args) {
+//      $Discussion = GetValue('Discussion', $Args);
+//      $Comment = GetValue('Comment', $Args);
+//      
+//      if (!$Comment)
+//         return;
+//      
+//      $CommentID = GetValue('CommentID', $Comment);
+//      if (!is_numeric($CommentID))
+//         return;
+//      
+//      if (!$Discussion) {
+//         static $DiscussionModel = NULL;
+//         if ($DiscussionModel === NULL)
+//            $DiscussionModel = new DiscussionModel();
+//         $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Comment));
+//      }
+//
+//      if (!$Discussion || strtolower(GetValue('Type', $Discussion)) != 'question')
+//         return;
+//
+//      // Check permissions.
+//      $CanAccept = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+//      $CanAccept |= Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && Gdn::Session()->UserID != GetValue('InsertUserID', $Comment);
+//      
+//      if (!$CanAccept)
+//         return;
+//
+//      $QnA = GetValue('QnA', $Comment);
+//      if ($QnA)
+//         return;
+//
+//      // Write the links.
+//      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
+//      if ($Types)
+//         echo Bullet();
+//
+//      $Query = http_build_query(array('commentid' => $CommentID, 'tkey' => Gdn::Session()->TransientKey()));
+//      echo Anchor(Sprite('ReactAccept', 'ReactSprite').T('Accept', 'Accept'), '/discussion/qna/accept?'.$Query, array('class' => 'React QnA-Yes', 'title' => T('Accept this answer.')));
+//      echo Anchor(Sprite('ReactReject', 'ReactSprite').T('Reject', 'Reject'), '/discussion/qna/reject?'.$Query, array('class' => 'React QnA-No', 'title' => T('Reject this answer.')));
+//
+//      static $InformMessage = TRUE;
+//
+//      if ($InformMessage && Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && in_array(GetValue('QnA', $Discussion), array('', 'Answered'))) {
+//         $Sender->InformMessage(T('Click accept or reject beside an answer.'), 'Dismissable');
+//         $InformMessage = FALSE;
+//      }
+//   }
 
    public function Base_CommentInfo_Handler($Sender, $Args) {
       $Type = GetValue('Type', $Args);
@@ -201,6 +201,77 @@ class QnAPlugin extends Gdn_Plugin {
       $Answers = $CommentModel->GetWhere(array('DiscussionID' => $Sender->Data('Discussion.DiscussionID'), 'Qna' => 'Accepted'))->Result();
       
       $Sender->SetData('Answers', $Answers);
+   }
+   
+   /**
+    * Write the accept/reject buttons.
+    * @staticvar null $DiscussionModel
+    * @staticvar boolean $InformMessage
+    * @param type $Sender
+    * @param type $Args
+    * @return type 
+    */
+   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+      $Discussion = GetValue('Discussion', $Args);
+      $Comment = GetValue('Comment', $Args);
+      
+      if (!$Comment)
+         return;
+      
+      $CommentID = GetValue('CommentID', $Comment);
+      if (!is_numeric($CommentID))
+         return;
+      
+      if (!$Discussion) {
+         static $DiscussionModel = NULL;
+         if ($DiscussionModel === NULL)
+            $DiscussionModel = new DiscussionModel();
+         $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Comment));
+      }
+
+      if (!$Discussion || strtolower(GetValue('Type', $Discussion)) != 'question')
+         return;
+
+      // Check permissions.
+      $CanAccept = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+      $CanAccept |= Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && Gdn::Session()->UserID != GetValue('InsertUserID', $Comment);
+      
+      if (!$CanAccept)
+         return;
+
+      $QnA = GetValue('QnA', $Comment);
+      if ($QnA)
+         return;
+
+      // Write the links.
+      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
+      if ($Types)
+         echo Bullet();
+
+      $Query = http_build_query(array('commentid' => $CommentID, 'tkey' => Gdn::Session()->TransientKey()));
+      
+      echo '<div class="ActionBlock QnA-Feedback">';
+      
+//      echo '<span class="FeedbackLabel">'.T('Feedback').'</span>';
+      
+      echo '<span class="DidThisAnswer">'.T('Did this answer the question?').'</span> ';
+
+      echo '<span class="QnA-YesNo">';
+      
+      echo Anchor(T('Yes'), '/discussion/qna/accept?'.$Query, array('class' => 'React QnA-Yes', 'title' => T('Accept this answer.')));
+      echo ' '.Bullet().' ';
+      echo Anchor(T('No'), '/discussion/qna/reject?'.$Query, array('class' => 'React QnA-No', 'title' => T('Reject this answer.')));
+
+      echo '</span>';
+      
+      echo '</div>';
+      
+//      static $InformMessage = TRUE;
+//
+//      if ($InformMessage && Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && in_array(GetValue('QnA', $Discussion), array('', 'Answered'))) {
+//         $Sender->InformMessage(T('Click accept or reject beside an answer.'), 'Dismissable');
+//         $InformMessage = FALSE;
+//      }
    }
    
    /**
