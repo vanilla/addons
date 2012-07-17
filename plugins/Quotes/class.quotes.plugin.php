@@ -180,11 +180,14 @@ class QuotesPlugin extends Gdn_Plugin {
          $ObjectID = 'Comment_'.$Args['Comment']->CommentID;
       } else if (isset($Args['Discussion'])) {
          $Object = $Args['Discussion'];
-         $ObjectID = 'Discussion_'.$Sender->Data['Discussion']->DiscussionID;
+         $ObjectID = 'Discussion_'.$Args['Discussion']->DiscussionID;
       } else return;
       
       $Reply = T('Reply'); // help capture translation.
-      echo Bullet();
+      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
+      if ($Types)
+         echo Bullet();
+      
       echo Anchor(Sprite('ReactQuote', 'ReactSprite').T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE), 'React Quote');
    }
    
