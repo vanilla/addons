@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.0.9',
+   'Version' => '1.0.10',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -244,9 +244,9 @@ class QnAPlugin extends Gdn_Plugin {
          return;
 
       // Write the links.
-      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
-      if ($Types)
-         echo Bullet();
+//      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
+//      if ($Types)
+//         echo Bullet();
 
       $Query = http_build_query(array('commentid' => $CommentID, 'tkey' => Gdn::Session()->TransientKey()));
       
