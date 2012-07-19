@@ -234,6 +234,11 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Data = $Sender->EventArguments['Comment'];
       
       $SourceUserID = GetValue('InsertUserID', $Data);
+      $User = Gdn::UserModel()->GetID($SourceUserID, DATASET_TYPE_ARRAY);
+      if (GetValue('HideSignature', $User, FALSE))
+         return;
+      
+      
       $Signature = $this->Signatures($Sender, $SourceUserID);
       
       if (is_array($Signature))
