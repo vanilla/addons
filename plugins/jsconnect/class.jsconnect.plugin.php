@@ -9,7 +9,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-   'Version' => '1.1.5',
+   'Version' => '1.1.6',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -51,6 +51,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
       $ConnectQuery = array('client_id' => $Provider['AuthenticationKey'], 'Target' => $Target);
       $Data['Target'] = urlencode(Url('entry/jsconnect', TRUE).'?'.  http_build_query($ConnectQuery));
+      $Data['Redirect'] = $Data['Target'];
 
       $SignInUrl = FormatString(GetValue('SignInUrl', $Provider, ''), $Data);
       $RegisterUrl = FormatString(GetValue('RegisterUrl', $Provider, ''), $Data);
