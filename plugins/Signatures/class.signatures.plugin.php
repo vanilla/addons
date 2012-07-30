@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.2.5',
+   'Version' => '1.3',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -21,7 +21,9 @@ $PluginInfo['Signatures'] = array(
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
-   'MobileFriendly' => FALSE
+   'MobileFriendly' => FALSE,
+   'SettingsUrl' => '/settings/signatures',
+   'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
 class SignaturesPlugin extends Gdn_Plugin {
@@ -194,11 +196,13 @@ class SignaturesPlugin extends Gdn_Plugin {
       return $Signatures;
    }
    
-   public function DiscussionController_Render_Before(&$Sender) {
+   public function DiscussionController_Render_Before($Sender) {
+      
+      
       $this->PrepareController($Sender);
    }
    
-   public function PostController_Render_Before(&$Sender) {
+   public function PostController_Render_Before($Sender) {
       $this->PrepareController($Sender);
    }
    
@@ -210,7 +214,7 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    /** Deprecated in 2.1. */
-   public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
+   public function DiscussionController_AfterCommentBody_Handler($Sender) {
       if ($this->Disabled)
          return;
       
@@ -218,7 +222,7 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    /** New call for 2.1. */
-   public function DiscussionController_AfterDiscussionBody_Handler(&$Sender) {
+   public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
       if ($this->Disabled)
          return;
       $this->DrawSignature($Sender);
@@ -280,8 +284,16 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    protected function Hide() {
+      if ($this->Disabled)
+         return TRUE;
       
-      if ($this->UserPreferences('Plugin.Signatures.HideAll', FALSE))
+      if (!Gdn::Session()->IsValid() && C('Plugins.Signatures.HideGuest'))
+         return TRUE;
+      
+      if (strcasecmp(Gdn::Controller()->RequestMethod, 'embed') == 0 && C('Plugin.Signatures.HideEmbed', TRUE))
+         return TRUE;
+      
+      if ($this->UserPreferences('Plugins.Signatures.HideAll', FALSE))
          return TRUE;
       
       if (IsMobile() && $this->UserPreferences('Plugin.Signatures.HideMobile', FALSE))
@@ -311,5 +323,21 @@ class SignaturesPlugin extends Gdn_Plugin {
    public function Structure() {
       // Nothing to do here!
    }
-         
+   
+   
+   public function SettingsController_Signatures_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+
+      $Conf = new ConfigurationModule($Sender);
+      $Conf->Initialize(array(
+          'Plugins.Signatures.HideGuest' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures for guests'),
+          'Plugins.Signatures.HideEmbed' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => TRUE)
+      ));
+
+      $Sender->AddSideMenu();
+      $Sender->SetData('Title', sprintf(T('%s Settings'), T('Signature')));
+      $Sender->ConfigurationModule = $Conf;
+      $Conf->RenderAll();
+//      $Sender->Render('Settings', '', 'plugins/AmazonS3');
+   }
 }
