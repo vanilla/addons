@@ -463,8 +463,6 @@ class VotingPlugin extends Gdn_Plugin {
       // Get rid of announcements from this view
       if ($Sender->Head) {
          $Sender->AddJsFile('discussions.js');
-         $Sender->AddJsFile('bookmark.js');
-         $Sender->AddJsFile('options.js');
          $Sender->Head->AddRss($Sender->SelfUrl.'/feed.rss', $Sender->Head->Title());
       }
       if (!is_numeric($Offset) || $Offset < 0)
