@@ -329,6 +329,40 @@ BLOCKQUOTE;
          }
          $Data->Body = $NewBody;
          
+         // Format the quote according to the format.
+         switch ($Format) {
+            case 'Html':   // HTML
+               $Quote = '<blockquote class="Quote" rel="'.htmlspecialchars($Data->InsertName).'">'.$Data->Body.'</blockquote>'."\n";
+               break;
+            
+            case 'BBCode':
+               $Author = htmlspecialchars($Data->InsertName);
+               if ($ID)
+                  $IDString = ';'.htmlspecialchars($ID);
+               
+               $QuoteBody = $Data->Body;
+               
+               // TODO: Strip inner quotes...
+//                  $QuoteBody = trim(preg_replace('`(\[quote.*/quote\])`si', '', $QuoteBody));
+               
+               $Quote = <<<BQ
+[quote="{$Author}{$IDString}"]{$QuoteBody}[/quote]
+
+BQ;
+               break;
+
+            case 'Markdown':
+            case 'Display':
+            case 'Text':
+               $QuoteBody = $Data->Body;
+               
+               // Strip inner quotes and mentions...
+               $QuoteBody = self::_StripMarkdownQuotes($QuoteBody);
+               $QuoteBody = self::_StripMentions($QuoteBody);
+               
+               $Quote = '> '.sprintf(T('%s said:'), '@'.$Data->InsertName)."\n\n".
+                  '> '.str_replace("\n", "\n> ", $QuoteBody).
+                  "\n\n";
          $QuoteData = array_merge($QuoteData, array(
             'status'       => 'success',
             'body'         => $Data->Body,
