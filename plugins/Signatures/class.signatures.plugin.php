@@ -25,6 +25,7 @@ $PluginInfo['Signatures'] = array(
 );
 
 class SignaturesPlugin extends Gdn_Plugin {
+   public $Disabled = FALSE;
    
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
       if (!Gdn::Session()->CheckPermission(array(
@@ -38,14 +39,13 @@ class SignaturesPlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', T('Signature Settings'), '/profile/signature', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpSignatures').T('Signature Settings'), '/profile/signature', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', T('Signature Settings'), UserUrl($Sender->User, '', 'signature'), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpSignatures').T('Signature Settings'), UserUrl($Sender->User, '', 'signature'), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
    
    public function ProfileController_Signature_Create($Sender) {
-      
       $Sender->Permission(array(
          'Garden.Profiles.Edit',
          'Plugins.Signatures.Edit'
@@ -156,7 +156,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          if ($this->Hide()) return $Signatures;
       
          $Discussion = $Sender->Data('Discussion');
-         $Comments = $Sender->Data('CommentData');
+         $Comments = $Sender->Data('Comments');
          $UserIDList = array();
          
          if ($Discussion)
@@ -211,18 +211,19 @@ class SignaturesPlugin extends Gdn_Plugin {
    
    /** Deprecated in 2.1. */
    public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
+      if ($this->Disabled)
+         return;
+      
       $this->DrawSignature($Sender);
    }
    
    /** New call for 2.1. */
    public function DiscussionController_AfterDiscussionBody_Handler(&$Sender) {
+      if ($this->Disabled)
+         return;
       $this->DrawSignature($Sender);
    }
-   
-   public function PostController_AfterCommentBody_Handler(&$Sender) {
-      $this->DrawSignature($Sender);
-   }
-   
+      
    protected function DrawSignature($Sender) {
       if ($this->Hide()) return;
       
@@ -233,6 +234,11 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Data = $Sender->EventArguments['Comment'];
       
       $SourceUserID = GetValue('InsertUserID', $Data);
+      $User = Gdn::UserModel()->GetID($SourceUserID, DATASET_TYPE_ARRAY);
+      if (GetValue('HideSignature', $User, FALSE))
+         return;
+      
+      
       $Signature = $this->Signatures($Sender, $SourceUserID);
       
       if (is_array($Signature))

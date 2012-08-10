@@ -9,6 +9,7 @@
  * Changes: 
  *  1.0     Initial release
  *  1.6.1   Overhaul
+ *  1.6.4   Moved button to reactions area & changed js accordingly.
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -20,7 +21,7 @@
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "Adds an option to each comment for users to easily quote each other.",
-   'Version' => '1.6.3',
+   'Version' => '1.6.4',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
@@ -54,9 +55,9 @@ class QuotesPlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', T('Quote Settings'), '/profile/quotes', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpQuote').T('Quote Settings'), '/profile/quotes', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', T('Quote Settings'), UserUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpQuote').T('Quote Settings'), UserUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
    
@@ -166,11 +167,7 @@ class QuotesPlugin extends Gdn_Plugin {
    /**
     * Add 'Quote' option to Discussion.
     */
-   public function DiscussionController_AfterDiscussionMeta_Handler($Sender, $Args) {
-      $this->AddQuoteButton($Sender, $Args);
-   }
-   
-   public function DiscussionController_CommentOptions_Handler($Sender, $Args) {
+   public function Base_AfterReactions_Handler($Sender, $Args) {
       $this->AddQuoteButton($Sender, $Args);
    }
    
@@ -179,11 +176,20 @@ class QuotesPlugin extends Gdn_Plugin {
     */
    protected function AddQuoteButton($Sender, $Args) {
       if (!Gdn::Session()->UserID) return;
+      if (isset($Args['Comment'])) {
+         $Object = $Args['Comment'];
+         $ObjectID = 'Comment_'.$Args['Comment']->CommentID;
+      } else if (isset($Args['Discussion'])) {
+         $Object = $Args['Discussion'];
+         $ObjectID = 'Discussion_'.$Args['Discussion']->DiscussionID;
+      } else return;
       
-      $Object = !isset($Args['Comment']) ? $Sender->Data['Discussion'] : $Args['Comment'];
-      $ObjectID = !isset($Args['Comment']) ? 'Discussion_'.$Sender->Data['Discussion']->DiscussionID : 'Comment_'.$Args['Comment']->CommentID;
+      $Reply = T('Reply'); // help capture translation.
+      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
+      if ($Types)
+         echo Bullet();
       
-      echo Wrap(Anchor(T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE)), 'span', array('class' => 'MItem CommentQuote'));
+      echo Anchor(Sprite('ReactQuote', 'ReactSprite').T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE), 'React Quote');
    }
    
    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
@@ -323,6 +329,40 @@ BLOCKQUOTE;
          }
          $Data->Body = $NewBody;
          
+         // Format the quote according to the format.
+         switch ($Format) {
+            case 'Html':   // HTML
+               $Quote = '<blockquote class="Quote" rel="'.htmlspecialchars($Data->InsertName).'">'.$Data->Body.'</blockquote>'."\n";
+               break;
+            
+            case 'BBCode':
+               $Author = htmlspecialchars($Data->InsertName);
+               if ($ID)
+                  $IDString = ';'.htmlspecialchars($ID);
+               
+               $QuoteBody = $Data->Body;
+               
+               // TODO: Strip inner quotes...
+//                  $QuoteBody = trim(preg_replace('`(\[quote.*/quote\])`si', '', $QuoteBody));
+               
+               $Quote = <<<BQ
+[quote="{$Author}{$IDString}"]{$QuoteBody}[/quote]
+
+BQ;
+               break;
+
+            case 'Markdown':
+            case 'Display':
+            case 'Text':
+               $QuoteBody = $Data->Body;
+               
+               // Strip inner quotes and mentions...
+               $QuoteBody = self::_StripMarkdownQuotes($QuoteBody);
+               $QuoteBody = self::_StripMentions($QuoteBody);
+               
+               $Quote = '> '.sprintf(T('%s said:'), '@'.$Data->InsertName)."\n\n".
+                  '> '.str_replace("\n", "\n> ", $QuoteBody).
+                  "\n\n";
          $QuoteData = array_merge($QuoteData, array(
             'status'       => 'success',
             'body'         => $Data->Body,

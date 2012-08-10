@@ -7,7 +7,7 @@ function Gdn_Quotes() {
    Gdn_Quotes.prototype.Prepare = function() {
    
       // Attach quote event to each Quote button, and return false to prevent link follow
-      $('span.CommentQuote a').livequery('click', jQuery.proxy(function(event){
+      $('a.React.Quote').livequery('click', jQuery.proxy(function(event){
          var QuoteLink = $(event.target);
          var ObjectID = QuoteLink.attr('href').split('/').pop();
          this.Quote(ObjectID, QuoteLink);
@@ -286,8 +286,12 @@ function Gdn_Quotes() {
    }
    
    Gdn_Quotes.prototype.ApplyQuoteText = function(QuoteText) {
-      QuoteText = QuoteText+"\n";
       var Editor = this.GetEditor();
+      
+      // First try and throw an event.
+      var r = jQuery(Editor).trigger('appendHtml', QuoteText + "<br />");
+      
+      QuoteText = QuoteText+"\n";
       Editor.val(Editor.val() + QuoteText);
       
       switch (this.InsertMode) {

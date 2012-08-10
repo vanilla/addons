@@ -256,10 +256,17 @@ class ReportingPlugin extends Gdn_Plugin {
    /*
     * UI injection
     */
-
-   public function Base_CommentOptions_Handler($Sender) {
-      // You can't report or 'awesome' your own posts
-      // if (GetValue('InsertUserID', $Sender->EventArguments['Object']) == GDN::Session()->UserID) return;
+   
+   /**
+    * Create 'Infraction' link for comments in a discussion.
+    * 
+    * Clickable for those who can give infractions, otherwise just a UI marker
+    * for regular users.
+    */
+   public function DiscussionController_AfterReactions_Handler($Sender) {
+      $Context = $Sender->EventArguments['Type'];
+      $Text = FALSE;
+      $Style = array();
       
       $Context = strtolower($Sender->EventArguments['Type']);
 
@@ -267,6 +274,9 @@ class ReportingPlugin extends Gdn_Plugin {
          $this->OutputButton(self::BUTTON_TYPE_REPORT, $Context, $Sender);
       if ($this->AwesomeEnabled)
          $this->OutputButton(self::BUTTON_TYPE_AWESOME, $Context, $Sender);
+      
+      if ($this->ReportEnabled || $this->AwesomeEnabled)
+         $Sender->AddCssFile('reporting.css', 'plugins/Reporting');
    }
 
    protected function OutputButton($ButtonType, $Context, $Sender) {
@@ -304,8 +314,14 @@ class ReportingPlugin extends Gdn_Plugin {
       $ButtonTitle = T(ucfirst($ButtonType));
       $ContainerCSS = $ButtonTitle.'Post';
       $EncodedURL = str_replace('=','-',base64_encode($URL));
-      $Sender->Options .= '<span class="'.$ContainerCSS.'">'.Anchor($ButtonTitle, "plugin/reporting/{$ButtonType}/{$Context}/{$ElementID}/{$EncodedURL}", 'ReportContent Popup') . '</span>';
-      $Sender->AddCssFile('reporting.css', 'plugins/Reporting');
+      $EventUrl = "plugin/reporting/{$ButtonType}/{$Context}/{$ElementID}/{$EncodedURL}";
+      
+      //$Sender->EventArguments['CommentOptions'][$ButtonTitle] = array('Label' => $ButtonTitle, 'Url' => "plugin/reporting/{$ButtonType}/{$Context}/{$ElementID}/{$EncodedURL}", $ContainerCSS.' ReportContent Popup');
+      
+      $SpriteType = "React".ucfirst($ButtonType);
+      $Text = Anchor(Sprite($SpriteType, 'ReactSprite').$ButtonTitle, $EventUrl, "React {$ContainerCSS} Popup");
+      echo Bullet();
+      echo $Text;
    }
 
    /*

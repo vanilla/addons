@@ -53,3 +53,5 @@ $Definition['%1$s sent you a %8$s.'] = '%1$s sent you a %8$s.';
 
 $Definition['‹'] = '‹';
 $Definition['›'] = '›';
+$Definition['«'] = '«';
+$Definition['»'] = '»';

@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2><?php echo T('Signature Settings'); ?></h2>
+<h2 class="H"><?php echo T('Signature Settings'); ?></h2>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
@@ -24,6 +24,7 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->Label('Signature Code', 'Plugin.Signatures.Sig');
          echo $this->Form->BodyBox('Body');
+         echo T('You can use HTML in your signature.', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your signature.');
 //         echo Wrap($this->Form->TextBox('Plugin.Signatures.Sig', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
       ?>
    </li>
@@ -32,4 +33,4 @@ echo $this->Form->Errors();
       $this->FireEvent('EditMySignatureAfter');
    ?>
 </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->Close('Save', '', array('class' => 'Button Primary'));

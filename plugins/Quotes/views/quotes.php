@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h2><?php echo $this->Data('Title'); ?></h2>
+<h2 class="H"><?php echo $this->Data('Title'); ?></h2>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
@@ -16,4 +16,4 @@ echo $this->Form->Errors();
       ?>
    </li>
 </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->Close('Save', '', array('class' => 'Button Primary'));

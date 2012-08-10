@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.0.8',
+   'Version' => '1.1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -95,51 +95,55 @@ class QnAPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     * @param array $Args
     */
-   public function Base_CommentOptions_Handler($Sender, $Args) {
-      $Discussion = GetValue('Discussion', $Args);
-      $Comment = GetValue('Comment', $Args);
-      
-      if (!$Comment)
-         return;
-      
-      $CommentID = GetValue('CommentID', $Comment);
-      if (!is_numeric($CommentID))
-         return;
-      
-      if (!$Discussion) {
-         static $DiscussionModel = NULL;
-         if ($DiscussionModel === NULL)
-            $DiscussionModel = new DiscussionModel();
-         $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Comment));
-      }
-
-      if (!$Discussion || strtolower(GetValue('Type', $Discussion)) != 'question')
-         return;
-
-      // Check permissions.
-      $CanAccept = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
-      $CanAccept |= Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && Gdn::Session()->UserID != GetValue('InsertUserID', $Comment);
-      
-      if (!$CanAccept)
-         return;
-
-      $QnA = GetValue('QnA', $Comment);
-      if ($QnA)
-         return;
-
-      // Write the links.
-      $Query = http_build_query(array('commentid' => $CommentID, 'tkey' => Gdn::Session()->TransientKey()));
-
-      echo ' <span class="MItem">'.Anchor(T('Accept', 'Accept'), '/discussion/qna/accept?'.$Query, array('class' => 'QnA-Yes', 'title' => T('Accept this answer.'))).'</span> '.
-         ' <span class="MItem">'.Anchor(T('Reject', 'Reject'), '/discussion/qna/reject?'.$Query, array('class' => 'QnA-No', 'title' => T('Reject this answer.'))).'</span> ';
-
-      static $InformMessage = TRUE;
-
-      if ($InformMessage && Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && in_array(GetValue('QnA', $Discussion), array('', 'Answered'))) {
-         $Sender->InformMessage(T('Click accept or reject beside an answer.'), 'Dismissable');
-         $InformMessage = FALSE;
-      }
-   }
+//   public function Base_AfterReactions_Handler($Sender, $Args) {
+//   // public function Base_CommentOptions_Handler($Sender, $Args) {
+//      $Discussion = GetValue('Discussion', $Args);
+//      $Comment = GetValue('Comment', $Args);
+//      
+//      if (!$Comment)
+//         return;
+//      
+//      $CommentID = GetValue('CommentID', $Comment);
+//      if (!is_numeric($CommentID))
+//         return;
+//      
+//      if (!$Discussion) {
+//         static $DiscussionModel = NULL;
+//         if ($DiscussionModel === NULL)
+//            $DiscussionModel = new DiscussionModel();
+//         $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Comment));
+//      }
+//
+//      if (!$Discussion || strtolower(GetValue('Type', $Discussion)) != 'question')
+//         return;
+//
+//      // Check permissions.
+//      $CanAccept = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+//      $CanAccept |= Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && Gdn::Session()->UserID != GetValue('InsertUserID', $Comment);
+//      
+//      if (!$CanAccept)
+//         return;
+//
+//      $QnA = GetValue('QnA', $Comment);
+//      if ($QnA)
+//         return;
+//
+//      // Write the links.
+//      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
+//      if ($Types)
+//         echo Bullet();
+//
+//      $Query = http_build_query(array('commentid' => $CommentID, 'tkey' => Gdn::Session()->TransientKey()));
+//      echo Anchor(Sprite('ReactAccept', 'ReactSprite').T('Accept', 'Accept'), '/discussion/qna/accept?'.$Query, array('class' => 'React QnA-Yes', 'title' => T('Accept this answer.')));
+//      echo Anchor(Sprite('ReactReject', 'ReactSprite').T('Reject', 'Reject'), '/discussion/qna/reject?'.$Query, array('class' => 'React QnA-No', 'title' => T('Reject this answer.')));
+//
+//      static $InformMessage = TRUE;
+//
+//      if ($InformMessage && Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && in_array(GetValue('QnA', $Discussion), array('', 'Answered'))) {
+//         $Sender->InformMessage(T('Click accept or reject beside an answer.'), 'Dismissable');
+//         $InformMessage = FALSE;
+//      }
+//   }
 
    public function Base_CommentInfo_Handler($Sender, $Args) {
       $Type = GetValue('Type', $Args);
@@ -186,6 +190,99 @@ class QnAPlugin extends Gdn_Plugin {
       if (strtolower($Discussion['Type']) == 'question' && !$Discussion['Sink'] && !in_array($Discussion['QnA'], array('Answered', 'Accepted')) && $Discussion['InsertUserID'] != Gdn::Session()->UserID) {
          $Sender->SQL->Set('QnA', 'Answered');
       }
+   }
+   
+   public function DiscussionController_BeforeDiscussionRender_Handler($Sender, $Args) {
+      if (strcasecmp($Sender->Data('Discussion.QnA'), 'Accepted') != 0)
+         return;
+      
+      // Find the accepted answer(s) to the question.
+      $CommentModel = new CommentModel();
+      $Answers = $CommentModel->GetWhere(array('DiscussionID' => $Sender->Data('Discussion.DiscussionID'), 'Qna' => 'Accepted'))->Result();
+      
+      $Sender->SetData('Answers', $Answers);
+   }
+   
+   /**
+    * Write the accept/reject buttons.
+    * @staticvar null $DiscussionModel
+    * @staticvar boolean $InformMessage
+    * @param type $Sender
+    * @param type $Args
+    * @return type 
+    */
+   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+      $Discussion = $Sender->Data('Discussion');
+      $Comment = GetValue('Comment', $Args);
+      
+      if (!$Comment)
+         return;
+      
+      $CommentID = GetValue('CommentID', $Comment);
+      if (!is_numeric($CommentID))
+         return;
+      
+      if (!$Discussion) {
+         static $DiscussionModel = NULL;
+         if ($DiscussionModel === NULL)
+            $DiscussionModel = new DiscussionModel();
+         $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Comment));
+      }
+
+      if (!$Discussion || strtolower(GetValue('Type', $Discussion)) != 'question')
+         return;
+
+      // Check permissions.
+      $CanAccept = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+      $CanAccept |= Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && Gdn::Session()->UserID != GetValue('InsertUserID', $Comment);
+      
+      if (!$CanAccept)
+         return;
+
+      $QnA = GetValue('QnA', $Comment);
+      if ($QnA)
+         return;
+
+      // Write the links.
+//      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
+//      if ($Types)
+//         echo Bullet();
+
+      $Query = http_build_query(array('commentid' => $CommentID, 'tkey' => Gdn::Session()->TransientKey()));
+      
+      echo '<div class="ActionBlock QnA-Feedback">';
+      
+//      echo '<span class="FeedbackLabel">'.T('Feedback').'</span>';
+      
+      echo '<span class="DidThisAnswer">'.T('Did this answer the question?').'</span> ';
+
+      echo '<span class="QnA-YesNo">';
+      
+      echo Anchor(T('Yes'), '/discussion/qna/accept?'.$Query, array('class' => 'React QnA-Yes', 'title' => T('Accept this answer.')));
+      echo ' '.Bullet().' ';
+      echo Anchor(T('No'), '/discussion/qna/reject?'.$Query, array('class' => 'React QnA-No', 'title' => T('Reject this answer.')));
+
+      echo '</span>';
+      
+      echo '</div>';
+      
+//      static $InformMessage = TRUE;
+//
+//      if ($InformMessage && Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && in_array(GetValue('QnA', $Discussion), array('', 'Answered'))) {
+//         $Sender->InformMessage(T('Click accept or reject beside an answer.'), 'Dismissable');
+//         $InformMessage = FALSE;
+//      }
+   }
+   
+   /**
+    *
+    * @param DiscussionController $Sender
+    * @param type $Args
+    * @return type 
+    */
+   public function DiscussionController_AfterDiscussion_Handler($Sender, $Args) {
+      if ($Sender->Data('Answers'))
+         include $Sender->FetchViewLocation('Answers', '', 'plugins/QnA');
    }
 
    /**
@@ -252,7 +349,6 @@ class QnAPlugin extends Gdn_Plugin {
             );
          }
       }
-
       Redirect("/discussion/comment/{$Comment['CommentID']}#Comment_{$Comment['CommentID']}");
    }
 
@@ -413,44 +509,6 @@ class QnAPlugin extends Gdn_Plugin {
    }
 
    /**
-    * @param Gdn_Controller $Sender
-    * @param array $Args
-    */
-   public function PostController_BeforeFormInputs_Handler($Sender, $Args) {
-      $Sender->AddDefinition('QuestionTitle', T('Question Title'));
-      $Sender->AddDefinition('DiscussionTitle', T('Discussion Title'));
-      $Sender->AddDefinition('QuestionButton', T('Ask Question'));
-      $Sender->AddDefinition('DiscussionButton', T('Post Discussion'));
-      $Sender->AddJsFile('qna.js', 'plugins/QnA');
-
-      $Form = $Sender->Form;
-      $QuestionButton = !C('Plugins.QnA.UseBigButtons') || GetValue('Type', $_GET) == 'Question';
-      if ($Sender->Form->GetValue('Type') == 'Question' && $QuestionButton) {
-         Gdn::Locale()->SetTranslation('Discussion Title', T('Question Title'));
-         Gdn::Locale()->SetTranslation('Post Discussion', T('Ask Question'));
-      }
-      
-      if (!C('Plugins.QnA.UseBigButtons'))
-         include $Sender->FetchViewLocation('QnAPost', '', 'plugins/QnA');
-   }
-
-   public function PostController_Render_Before($Sender, $Args) {
-      $Form = $Sender->Form; //new Gdn_Form();
-      $QuestionButton = !C('Plugins.QnA.UseBigButtons') || GetValue('Type', $_GET) == 'Question';
-      if (!$Form->IsPostBack()) {
-         if (!property_exists($Sender, 'Discussion')) {
-            $Form->SetValue('Type', 'Question');
-         } elseif (!$Form->GetValue('Type')) {
-            $Form->SetValue('Type', 'Discussion');
-         }
-      }
-
-      if ($Form->GetValue('Type') == 'Question' && $QuestionButton) {
-         $Sender->SetData('Title', T('Ask a Question'));
-      }
-   }
-   
-   /**
     * Add 'Ask a Question' button if using BigButtons.
     */
    public function CategoriesController_Render_Before($Sender) {
@@ -467,6 +525,45 @@ class QnAPlugin extends Gdn_Plugin {
       if (C('Plugins.QnA.UseBigButtons')) {
          $QuestionModule = new NewQuestionModule($Sender, 'plugins/QnA');
          $Sender->AddModule($QuestionModule);
+      }
+   }
+   
+   
+   /** 
+    * Add the "new question" option to the new discussion button group dropdown.
+    */
+   public function Base_BeforeNewDiscussionButton_Handler($Sender) {
+      $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
+      $NewDiscussionModule->AddButton(T('Ask a Question'), 'post/question');
+   }
+   
+   /** 
+    * Add the question form to vanilla's post page.
+    */
+   public function PostController_AfterForms_Handler($Sender) {
+      $Forms = $Sender->Data('Forms');
+      $Forms[] = array('Name' => 'Question', 'Label' => Sprite('SpQuestion').T('Ask a Question'), 'Url' => 'post/question');
+		$Sender->SetData('Forms', $Forms);
+   }
+   
+   /** 
+    * Create the new question method on post controller.
+    */
+   public function PostController_Question_Create($Sender) {
+      // Create & call PostController->Discussion()
+      $Sender->View = PATH_PLUGINS.'/QnA/views/post.php';
+      $Sender->Discussion(GetValue(0, $Sender->RequestArgs, ''));
+   }
+   
+   /** 
+    * Override the PostController->Discussion() method before render to use our view instead.
+    */
+   public function PostController_BeforeDiscussionRender_Handler($Sender) {
+      // Override if we are looking at the question url.
+      if ($Sender->RequestMethod == 'question') {
+         $Sender->Form->AddHidden('Type', 'Question');
+         $Sender->Title(T('Ask a Question'));
+         $Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/question')));
       }
    }
 }

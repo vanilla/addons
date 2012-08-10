@@ -87,6 +87,7 @@ class FileUploadPlugin extends Gdn_Plugin {
    public function PluginController_FileUpload_Create($Sender) {
       $Sender->Title('FileUpload');
       $Sender->AddSideMenu('plugin/fileupload');
+      Gdn_Theme::Section('Dashboard');
       $Sender->Form = new Gdn_Form();
       
       $this->EnableSlicing($Sender);
@@ -287,7 +288,9 @@ class FileUploadPlugin extends Gdn_Plugin {
       }
       
       if (count($CommentIDList)) {
-         $MediaData = $this->MediaModel()->PreloadDiscussionMedia($Sender->DiscussionID, $CommentIDList);
+         $DiscussionID = $Sender->Data('Discussion.DiscussionID');
+         
+         $MediaData = $this->MediaModel()->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
       } else {
          $MediaData = FALSE;
       }
