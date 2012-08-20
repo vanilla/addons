@@ -30,7 +30,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
          echo $this->Form->BodyBox('Body', array('Table' => 'Discussion'));
 		echo '</div>';
       echo '<div class="Buttons">';
-      echo $this->Form->Button((property_exists($this, 'Discussion')) ? 'Save' : 'Ask Question', array('class' => 'Button Success DiscussionButton'));
+      echo $this->Form->Button((property_exists($this, 'Discussion')) ? 'Save' : 'Ask Question', array('class' => 'Primary Button Success DiscussionButton'));
       if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || (property_exists($this, 'Draft') && is_object($this->Draft))) {
          echo $this->Form->Button('Save Draft', array('class' => 'Button Warning DraftButton'));
       }
