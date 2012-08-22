@@ -193,9 +193,9 @@ class VotingPlugin extends Gdn_Plugin {
 			echo
 				Wrap($AnswerCount.' '.Plural($AnswerCount, 'Comment', 'Comments'), 'strong');
 				echo ' sorted by '
-               .Anchor('Votes', Url('?Sort=popular', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'popular' ? 'Active' : ''))
+               .Anchor('Votes', Url(DiscussionUrl($Sender->Discussion).'?Sort=popular', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'popular' ? 'Active' : ''))
                .' '
-               .Anchor('Date Added', Url('?Sort=date', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'date' ? 'Active' : ''));
+               .Anchor('Date Added', Url(DiscussionUrl($Sender->Discussion).'?Sort=date', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'date' ? 'Active' : ''));
 			?>
 			</div>
 		</li>
