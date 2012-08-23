@@ -1,11 +1,6 @@
 <?php
 
-
-
-/**Added to the end of the page's title if you aren't on the first page of a discussion.
- * Ex. Hello World - Page 2 - Vanilla Forums***/
 $Definition[' - Page %s'] = 'דפים %s';
-
 $Definition[' You should '] = 'אתה צריך';
 $Definition[' now.'] = 'עכשיו';
 
@@ -202,7 +197,6 @@ $Definition['By uploading a file you certify that you have the right to distribu
 
 $Definition['Casual'] = 'מקרי';
 $Definition['CategoriesShowFollowed'] = 'הראה רק את הקטגוריות הנעקבות';
-$Definition['Categories'] = 'הקטגוריות';
 $Definition['CategoriesShowUnfollowed'] = 'הראה קטגוריות מוסתרות';
 $Definition['CategoriesViewingAll'] = 'אתה כרגע מביט בכל הקטגוריות';
 $Definition['CategoriesViewingFollowed'] = 'אתה כרגע מביט רק בקטגוריות שאתה עוקב אחריהם';
@@ -259,10 +253,10 @@ $Definition['Dashboard Home'] = 'בית מרכז השליטה';
 $Definition['Dashboard Summaries'] = 'סיכומי מרכז השליטה';
 $Definition['Date'] = 'תאריך';
 $Definition['Date Added'] = 'תאריך הוסף';
-$Definition['Date.DefaultDateTimeFormat'] = '%c';
+$Definition['Date.DefaultDateTimeFormat'] = '%B %e, %Y %l:%M%p';
 $Definition['Date.DefaultDayFormat'] = '%B %e';
 $Definition['Date.DefaultFormat'] = '%B %e, %Y';
-$Definition['Date.DefaultTimeFormat'] = '%X';
+$Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
 $Definition['Date.DefaultYearFormat'] = '%B %Y';
 $Definition['Define Thumbnail'] = 'לחץ וגרור לאורך התמונה להגדיר את התמונה המזערית שלך';
 $Definition['Delete %s'] = 'מחק %s\';';
@@ -273,7 +267,6 @@ $Definition['Delete User Forever'] = 'מחק משתמש לנצח';
 $Definition['Delete the user and all of the user\'s content. This will cause discussions to be disjointed, appearing as though people are responding to content that is not there. This is a great option for removing spammer content.'] = 'מחק את המשתמש ואת כל התוכן של המשתמש. זה יגרום לשיחה להראות קטועה, כאילו אנשים מגיבים לתוכן שלא שם. זוהי אופציה מצוינת להסיר תוכן של ספאמר.';
 $Definition['Did this answer the question?'] = 'האם זה ענה על השאלה?';
 $Definition['Disagree'] = 'לא מסכים';
-$Definition['Discussions'] = 'אחרונים';
 $Definition['Discussion Title'] = 'כותרת השאלה';
 $Definition['Discussions Page'] = 'עמוד דיונים';
 $Definition['Dislike'] = 'לא אוהב';
@@ -962,7 +955,7 @@ $Definition['[Deleted User]'] = '[משתמש מחוק]';
 
 $Definition['administrators'] = 'אדמיניסטרוטורים';
 $Definition['answer'] = 'בשובה';
-$Definition['at'] = 'at';
+$Definition['at'] = 'ב';
 $Definition['available'] = 'פנוי';
 
 $Definition['bookmarked discussion'] = 'תחרות שמורה במועדפים';
@@ -976,7 +969,7 @@ $Definition['conversation'] = 'שיחה';
 $Definition['customize your profile now'] = 'התאם אישית את הפרופיל שלך עכשיו';
 
 $Definition['days'] = 'ימים';
-$Definition['dot'] = 'dot';
+$Definition['dot'] = 'נקודה';
 
 $Definition['everyone'] = 'כולם';
 
@@ -1018,7 +1011,7 @@ $Definition['they'] = 'הם';
 
 $Definition['unavailable'] = 'לא פנוי';
 
-$Definition['via %s'] = '%s דרך';
+$Definition['via %s'] = 'דרך  %s\';';
 
 $Definition['wall'] = 'קיר';
 $Definition['weeks'] = 'שבוע אתה';
@@ -1028,28 +1021,4 @@ $Definition['your'] = 'שלך';
 
 $Definition['↳ No results for \'%s\''] = '↳ No results for \'%s\'';
 $Definition['↳ Search results for \'%s\''] = '↳ Search results for \'%s\'';
-$Definition['↳ Show All'] = 'הצג הכל';
-
-$Definition['Categories'] = 'הקטגוריות';
-$Definition['Discussion'] = 'דיון';
-$Definition['Discussions'] = 'אחרונים';
-$Definition['Category'] = 'קטגוריה';
-$Definition['Comments'] = 'תגובות';
-$Definition['Cancel'] = 'לבטל';
-$Definition['Close'] = 'לנעול';
-$Definition['Announce'] = 'להכריז';
-$Definition['Everything'] = 'הכל';
-$Definition['%s view'] = '%s צפיות';
-$Definition['%s views'] = '%s צפיות';
-$Definition['Edit'] = 'לערוך';
-$Definition['Sink'] = 'להוריד';
-$Definition['Inbox'] = 'דואר נכנס';
-$Definition['All %s'] = '%s כל';
-$Definition['Messages'] = 'הודעות';
-$Definition['Sign Out'] = 'התנתק';
-$Definition['Dashboard'] = 'לוח מחוונים';
-$Definition['Spam Queue'] = 'ספאם תור';
-$Definition['Moderation Queue'] = 'התמתנות תור';
-$Definition['Applicants'] = 'מועמדים';
-$Definition['Delete'] = 'למחוק';
-$Definition['Don\'t announce.'] = 'לא מודיעים.';
+$Definition['↳ Show All'] = 'הצג הכל ';
