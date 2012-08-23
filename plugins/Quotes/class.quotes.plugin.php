@@ -20,7 +20,7 @@
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.6.4',
+   'Version' => '1.6.5',
     'MobileFriendly' => TRUE,
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'RequiredTheme' => FALSE,
@@ -212,11 +212,13 @@ class QuotesPlugin extends Gdn_Plugin {
 
       switch ($Sender->EventArguments['Object']->Format) {
          case 'Html':
-         case 'Wysiwyg':
             $Sender->EventArguments['Object']->Body = preg_replace_callback("/(<blockquote\s+(?:class=\"(?:User)?Quote\")?\s+rel=\"([^\"]+)\">)/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
             $Sender->EventArguments['Object']->Body = str_ireplace('</blockquote>', '</p></div></blockquote>', $Sender->EventArguments['Object']->Body);
             break;
-
+//         case 'Wysiwyg':
+//            $Sender->EventArguments['Object']->Body = preg_replace_callback("/(<blockquote\s+(?:class=\"(?:User)?Quote\")?\s+rel=\"([^\"]+)\">)/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
+//            $Sender->EventArguments['Object']->Body = str_ireplace('</blockquote>','</p></div></blockquote>',$Sender->EventArguments['Object']->Body);
+//            break;
          case 'Markdown':
             // BBCode quotes with authors
             $Sender->EventArguments['Object']->Body = preg_replace_callback("#(\[quote(\s+author)?=[\"']?(.*?)(\s+link.*?)?(;[\d]+)?[\"']?\])#usi", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
@@ -317,7 +319,7 @@ BLOCKQUOTE;
          // Perform transcoding if possible
          $NewBody = $Data->Body;
          if ($QuoteFormat != $NewFormat) {
-            if ($NewFormat == 'Html')
+            if (in_array($NewFormat, array('Html', 'Wysiwyg')))
                $NewBody = Gdn_Format::To($NewBody, $QuoteFormat);
             elseif ($QuoteFormat == 'Html' && $NewFormat == 'BBCode')
                $NewBody = Gdn_Format::Text($NewBody);
@@ -326,7 +328,7 @@ BLOCKQUOTE;
             else
                $NewBody = Gdn_Format::PlainText($NewBody, $QuoteFormat);
 
-            if ($NewFormat != 'Html')
+            if (!in_array($NewFormat, array('Html', 'Wysiwyg')))
                Gdn::Controller()->InformMessage(sprintf(T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'), $QuoteFormat, $NewFormat));
          }
          $Data->Body = $NewBody;
@@ -334,19 +336,19 @@ BLOCKQUOTE;
          // Format the quote according to the format.
          switch ($Format) {
             case 'Html':   // HTML
-               $Quote = '<blockquote class="Quote" rel="' . htmlspecialchars($Data->InsertName) . '">' . $Data->Body . '</blockquote>' . "\n";
+               $Quote = '<blockquote class="Quote" rel="'.htmlspecialchars($Data->InsertName).'">'.$Data->Body.'</blockquote>'."\n";
                break;
-
+            
             case 'BBCode':
                $Author = htmlspecialchars($Data->InsertName);
                if ($ID)
-                  $IDString = ';' . htmlspecialchars($ID);
-
+                  $IDString = ';'.htmlspecialchars($ID);
+               
                $QuoteBody = $Data->Body;
-
+               
                // TODO: Strip inner quotes...
 //                  $QuoteBody = trim(preg_replace('`(\[quote.*/quote\])`si', '', $QuoteBody));
-
+               
                $Quote = <<<BQ
 [quote="{$Author}{$IDString}"]{$QuoteBody}[/quote]
 
@@ -357,14 +359,14 @@ BQ;
             case 'Display':
             case 'Text':
                $QuoteBody = $Data->Body;
-
+               
                // Strip inner quotes and mentions...
                $QuoteBody = self::_StripMarkdownQuotes($QuoteBody);
                $QuoteBody = self::_StripMentions($QuoteBody);
-
-               $Quote = '> ' . sprintf(T('%s said:'), '@' . $Data->InsertName) . "\n\n" .
-               '> ' . str_replace("\n", "\n> ", $QuoteBody) .
-               "\n\n";
+               
+               $Quote = '> '.sprintf(T('%s said:'), '@'.$Data->InsertName)."\n".
+                  '> '.str_replace("\n", "\n> ", $QuoteBody);
+               
                break;
             case 'Wysiwyg':
                $Attribution = sprintf(T('%s said:'), UserAnchor($Data, NULL, array('Px' => 'Insert')));
@@ -380,12 +382,13 @@ BQ;
 </blockquote>
 
 BLOCKQUOTE;
-
-               break;
+                  
+                  break;
          }
+         
          $QuoteData = array_merge($QuoteData, array(
              'status' => 'success',
-             'body' => $Data->Body,
+            'body'         => $Quote,
              'format' => $Format,
              'authorid' => $Data->InsertUserID,
              'authorname' => $Data->InsertName,
@@ -397,6 +400,31 @@ BLOCKQUOTE;
 
    public function Setup() {
       SaveToConfig('Garden.Html.SafeStyles', FALSE);
+   }
+   
+   protected static function _StripMarkdownQuotes($Text) {
+      $Text = preg_replace('/
+			  (								# Wrap whole match in $1
+				(?>
+				  ^[ ]*>[ ]?			# ">" at the start of a line
+					.+\n					# rest of the first line
+				  (.+\n)*					# subsequent consecutive lines
+				  \n*						# blanks
+				)+
+			  )
+			/xm', '', $Text);
+      
+      return $Text;
+   }
+   
+   protected static function _StripMentions($Text) {
+      $Text = preg_replace(
+            '/(^|[\s,\.>])@(\w{1,50})\b/i',
+            '$1$2',
+            $Text
+         );
+      
+      return $Text;
    }
 
    public function OnDisable() {

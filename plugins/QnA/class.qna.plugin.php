@@ -157,6 +157,33 @@ class QnAPlugin extends Gdn_Plugin {
          echo ' <span class="Tag QnA-Box QnA-'.$QnA.'" title="'.htmlspecialchars($Title).'"><span>'.$Title.'</span></span> ';
       }
    }
+   
+   public function DiscussionController_CommentOptions_Handler($Sender, $Args) {
+      $Comment = $Args['Comment'];
+      if (!$Comment)
+         return;
+      $Discussion = Gdn::Controller()->Data('Discussion');
+      
+      if (GetValue('Type', $Discussion) != 'Question')
+         return;
+      
+      if (!Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID))
+         return;
+      
+      $Args['CommentOptions']['QnA'] = array('Label' => T('Q&A').'...', 'Url' => '/discussion/qnaoptions?commentid='.$Comment->CommentID, 'Class' => 'Popup');
+   }
+   
+   public function Base_DiscussionOptions_Handler($Sender, $Args) {
+      $Discussion = $Args['Discussion'];
+      if (!Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID))
+         return;
+      
+      if (isset($Args['DiscussionOptions'])) {
+         $Args['DiscussionOptions']['QnA'] = array('Label' => T('Q&A').'...', 'Url' => '/discussion/qnaoptions?discussionid='.$Discussion->DiscussionID, 'Class' => 'Popup');
+      } elseif (isset($Sender->Options)) {
+         $Sender->Options .= '<li>'.Anchor(T('Q&A').'...', '/discussion/qnaoptions?discussionid='.$Discussion->DiscussionID, 'Popup QnAOptions') . '</li>';
+      }
+   }
 
    public function CommentModel_BeforeNotification_Handler($Sender, $Args) {
       $ActivityModel = $Args['ActivityModel'];
@@ -284,6 +311,7 @@ class QnAPlugin extends Gdn_Plugin {
       if ($Sender->Data('Answers'))
          include $Sender->FetchViewLocation('Answers', '', 'plugins/QnA');
    }
+   
 
    /**
     *
@@ -350,6 +378,127 @@ class QnAPlugin extends Gdn_Plugin {
          }
       }
       Redirect("/discussion/comment/{$Comment['CommentID']}#Comment_{$Comment['CommentID']}");
+   }
+   
+   public function DiscussionController_QnAOptions_Create($Sender, $DiscussionID = '', $CommentID = '') {
+      if ($DiscussionID)
+         $this->_DiscussionOptions($Sender, $DiscussionID);
+      elseif ($CommentID)
+         $this->_CommentOptions($Sender, $CommentID);
+      
+   }
+   
+   public function RecalculateDiscussionQnA($Discussion) {
+      // Find comments in this discussion with a QnA value.
+      $Set = array();
+      
+      $Row = Gdn::SQL()->GetWhere('Comment',
+         array('DiscussionID' => GetValue('DiscussionID', $Discussion), 'QnA is not null' => ''), 'QnA, DateAccepted', 'asc', 1)->FirstRow(DATASET_TYPE_ARRAY);
+         
+      if (!$Row) {
+         if (GetValue('CountComments', $Discussion) > 0)
+            $Set['QnA'] = 'Unanswered';
+         else
+            $Set['QnA'] = 'Answered';
+         
+         $Set['DateAccepted'] = NULL;
+         $Set['DateOfAnswer'] = NULL;
+      } elseif ($Row['QnA'] == 'Accepted') {
+         $Set['QnA'] = 'Accepted';
+         $Set['DateAccepted'] = $Row['DateAccepted'];
+         $Set['DateOfAnswer'] = $Row['DateInserted'];
+      } elseif ($Row['QnA'] == 'Rejected') {
+         $Set['QnA'] = 'Rejected';
+         $Set['DateAccepted'] = NULL;
+         $Set['DateOfAnswer'] = NULL;
+      }
+      
+      Gdn::Controller()->DiscussionModel->SetField(GetValue('DiscussionID', $Discussion), $Set);
+   }
+   
+   public function _CommentOptions($Sender, $CommentID) {
+      $Sender->Form = new Gdn_Form();
+      
+      $Comment = $Sender->CommentModel->GetID($CommentID);
+      
+      if (!$Comment)
+         throw NotFoundException('Comment');
+      
+      $Discussion = $Sender->DiscussionModel->GetID(GetValue('DiscussionID', $Comment));
+      
+      $Sender->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', GetValue('PermissionCategoryID', $Discussion));
+      
+      if ($Sender->Form->IsPostBack()) {
+         $QnA = $Sender->Form->GetFormValue('QnA');
+         if (!$QnA)
+            $QnA = NULL;
+         
+         $CurrentQnA = GetValue('QnA', $Comment);
+         
+         
+//         ->Column('DateAccepted', 'datetime', TRUE)
+//         ->Column('AcceptedUserID', 'int', TRUE)
+         
+         if ($CurrentQnA != $QnA) {
+            $Set = array('QnA' => $QnA);
+            
+            if ($QnA == 'Accepted') {
+               $Set['DateAccepted'] = Gdn_Format::ToDateTime();
+               $Set['AcceptedUserID'] = Gdn::Session()->UserID;
+            } else {
+               $Set['DateAccepted'] = NULL;
+               $Set['AcceptedUserID'] = NULL;
+            }
+            
+            $Sender->CommentModel->SetField($CommentID, $Set);
+            $Sender->Form->SetValidationResults($Sender->CommentModel->ValidationResults());
+         }
+         
+         // Recalculate the Q&A status of the discussion.
+         $this->RecalculateDiscussionQnA($Discussion);
+         
+         Gdn::Controller()->JsonTarget('', '', 'Refresh');
+      } else {
+         $Sender->Form->SetData($Comment);
+      }
+      
+      $Sender->SetData('Comment', $Comment);
+      $Sender->SetData('Discussion', $Discussion);
+      $Sender->SetData('_QnAs', array('Accepted' => T('Yes'), 'Rejected' => T('No'), '' => T("Don't know")));
+      $Sender->SetData('Title', T('Q&A Options'));
+      $Sender->Render('CommentOptions', '', 'plugins/QnA');
+   }
+   
+   protected function _DiscussionOptions($Sender, $DiscussionID) {
+      $Sender->Form = new Gdn_Form();
+      
+      $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
+      
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      
+      
+      // Both '' and 'Discussion' denote a discussion type of discussion.
+      if (!GetValue('Type', $Discussion))
+         SetValue('Type', $Discussion, 'Discussion');
+      
+      if ($Sender->Form->IsPostBack()) {
+         $Sender->DiscussionModel->SetField($DiscussionID, 'Type', $Sender->Form->GetFormValue('Type'));
+//         $Form = new Gdn_Form();
+         $Sender->Form->SetValidationResults($Sender->DiscussionModel->ValidationResults());
+         
+//         if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL || $Redirect)
+//            $Sender->RedirectUrl = Gdn::Controller()->Request->PathAndQuery();
+         Gdn::Controller()->JsonTarget('', '', 'Refresh');
+      } else {
+         $Sender->Form->SetData($Discussion);
+      }
+      
+      $Sender->SetData('Discussion', $Discussion);
+      $Sender->SetData('_Types', array('Question' => T('Question'), 'Discussion' => T('Discussion')));
+      $Sender->SetData('Title', T('Q&A Options'));
+      $Sender->Render('DiscussionOptions', '', 'plugins/QnA');
    }
 
    public function DiscussionModel_BeforeGet_Handler($Sender, $Args) {
@@ -525,6 +674,10 @@ class QnAPlugin extends Gdn_Plugin {
       if (C('Plugins.QnA.UseBigButtons')) {
          $QuestionModule = new NewQuestionModule($Sender, 'plugins/QnA');
          $Sender->AddModule($QuestionModule);
+      }
+      
+      if ($Sender->Data('Discussion.Type') == 'Question') {
+         $Sender->SetData('_CommentsHeader', T('Answers'));
       }
    }
    

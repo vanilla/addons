@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Spoilers'] = array(
    'Name' => 'Spoilers',
    'Description' => "Users may prevent accidental spoiler by wrapping text in [spoiler] tags. This requires the text to be clicked in order to read it.",
-   'Version' => '1.0b',
+   'Version' => '1.0.1b',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
@@ -57,6 +57,10 @@ class SpoilersPlugin extends Gdn_Plugin {
       if (!$this->RenderSpoilers) return;
       
       $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
+      
+      // Fix a wysiwyg but where spoilers
+      $FormatBody = preg_replace('`<div>\s*(\[/?spoiler\])\s*</div>`', '$1', $FormatBody);
+      
       $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
       $FormatBody = str_ireplace('[/spoiler]','</div></div>',$FormatBody);
    }

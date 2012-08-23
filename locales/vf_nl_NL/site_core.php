@@ -260,8 +260,8 @@ $Definition['My Preferences'] = 'Mijn Voorkeuren';
 
 $Definition['Name Unavailable'] = 'Naam niet beschikbaar';
 $Definition['New Conversation'] = 'Start een Nieuw Gesprek';
-$Definition['New Discussion'] = 'Start een Nieuwe Discussie';
-$Definition['New Message'] = 'Start een Nieuw Gesprek';
+$Definition['New Discussion'] = 'Nieuwe Discussie';
+$Definition['New Message'] = 'Nieuw Gesprek';
 $Definition['New Password'] = 'Nieuw Wachtwoord';
 $Definition['No discussions were found.'] = 'Er zijn geen discussies gevonden';
 $Definition['Not Authorized (401)'] = 'Niet Toegestaan (401)';
@@ -314,6 +314,7 @@ $Definition['Private Note for Moderators'] = 'Privé Opmerking voor Moderators';
 $Definition['Question Title'] = 'Discussie Titel';
 
 $Definition['Recent Activity'] = 'Recente Activiteiten';
+$Definition['Recent Discussions'] = 'Recente Discussies';
 $Definition['Recipients'] = 'Ontvangers';
 $Definition['Register'] = 'Lidmaatschap Aanvragen';
 $Definition['Register with %s'] = 'Lidmaatschap Aanvragen';
@@ -339,8 +340,8 @@ $Definition['Sign In with OpenID'] = 'Inloggen met OpenID';
 $Definition['Sign In with Twitter'] = 'Inloggen met Twitter';
 $Definition['Sign Up'] = 'Aanvragen';
 $Definition['Start Conversation'] = 'Start Gesprek';
-$Definition['Start a New Conversation'] = 'Start een Nieuw Gesprek';
-$Definition['Start a New Discussion'] = 'Start een Nieuwe Discussie';
+$Definition['Start a New Conversation'] = 'Nieuw Gesprek';
+$Definition['Start a New Discussion'] = 'Nieuwe Discussie';
 $Definition['Start your First Discussion'] = 'Start je eerste Discussie';
 $Definition['Started by %1$s'] = 'Gestart door %1$s';
 
