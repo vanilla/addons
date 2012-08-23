@@ -66,7 +66,7 @@ $Definition['<General Error>'] = '<一般错误>';
 $Definition['<strong>%1$s</strong> (%2$s) %3$s'] = '<strong>%1$s</strong> (%2$s) %3$s';
 
 $Definition['A fatal error occurred while processing the request.<br />The server returned the following response: %s'] = '处理请求时发生致命错误。服务器返回如下内容： %s';
-$Definition['About'] = '%1$s 被添加至 %2$s %3$s 小组。';
+$Definition['About'] = '关于';
 $Definition['Abuse'] = '滥用';
 $Definition['Accept'] = '采纳';
 $Definition['Accept this answer.'] = '采纳为最佳答案。';
@@ -119,7 +119,7 @@ $Definition['Add Badge'] = '添加徽章';
 $Definition['Add Comment'] = '添加回复';
 $Definition['Add Cost'] = '添加金钱';
 $Definition['Add Image'] = '添加图片';
-$Definition['Add Message'] = '写消息';
+$Definition['Add Message'] = '发送站内信';
 $Definition['Add People to this Conversation'] = '添加联系人到本次对话';
 $Definition['Add Route'] = '添加路径';
 $Definition['Add a Comment'] = '添加一条回复';
@@ -281,9 +281,7 @@ $Definition['Email Unavailable'] = '该地址已被占用';
 $Definition['Email sent from the application will be addressed from the following name and address'] = '应用程序将会按照以下的名字和地址发送电子邮件。';
 $Definition['Email visible to other users'] = '电子邮件地址公开';
 $Definition['Email/Username'] = 'Email/用户名';
-$Definition['EmailConfirmEmail'] = '您好！
-
-请您确认您的帐户邮箱。账户邮箱将作为您重置密码，收取提醒消息等一系列的功能的前提，请确认邮箱的正确性。
+$Definition['EmailConfirmEmail'] = '请您确认您的帐户邮箱。账户邮箱将作为您重置密码，收取提醒消息等一系列的功能的前提，请确认邮箱的正确性。
 
 请点击下面的链接进行确认: {/entry/emailconfirm,url,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
 $Definition['EmailFooter'] = '
@@ -338,13 +336,15 @@ $Definition['EmailWelcomeConnect'] = 'You have successfully connected to {Title}
   Connected With: {ProviderName}
 
 You can access the site at {/,exurl,domain}.';
-$Definition['EmailWelcomeRegister'] = '您好，{User.Name}
-    恭喜您成功注册了账号 {Title}。以下是您的注册信息：
+$Definition['EmailWelcomeRegister'] = '恭喜您成功注册了账号 {Title}。以下是您的注册信息：
     
     用户名：{User.Name}
     邮件：{User.Email}
 
 您可以用过 {/,url,domain} 访问站点。';
+$Definition['EmbeddedDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
+<p>{Excerpt}</p>
+<p><a href="{Url}">阅读全文</a></p><div class="ClearFix"></div></div>';
 $Definition['EmbeddedNoBodyFormat'] = '{Url}';
 $Definition['EmbededDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
 <p>{Excerpt}</p>
@@ -522,7 +522,7 @@ $Definition['NoBadgesEarned'] = '现在任何一分钟；';
 $Definition['Not Authorized (401)'] = '没有权限 (401)';
 $Definition['Not Found (404)'] = '没有找到 (404)';
 $Definition['Not Verified'] = '没有验证';
-$Definition['Not much happening here, yet.'] = '没有多少动态。';
+$Definition['Not much happening here, yet.'] = '暂无动态。';
 $Definition['Notification'] = '通知';
 $Definition['Notification Preferences'] = '通知设置';
 $Definition['Notifications'] = '通知';
@@ -667,7 +667,7 @@ $Definition['Second Anniversary'] = '两周年';
 $Definition['Sections'] = '选项';
 $Definition['Security Check'] = '验证码';
 $Definition['Select an image on your computer (2mb max)'] = '在您的计算机中选择一张图片 (最大2MB)';
-$Definition['Send Message'] = '发送消息';
+$Definition['Send Message'] = '发送站内信';
 $Definition['Set a New Warning Level'] = '设置新的警告水平';
 $Definition['Setting'] = '设置';
 $Definition['Seventh Anniversary'] = '七周年';

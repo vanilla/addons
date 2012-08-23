@@ -544,6 +544,7 @@ $Definition['Notes'] = '备注';
 $Definition['Notify me when people comment on a discussion.'] = '当有人评论一个帖子时通知我';
 $Definition['Notify me when people comment on my addons.'] = '当有人评论我的扩展时通知我。';
 $Definition['Notify me when people start new discussions.'] = '当有人发布新话题时通知我。';
+$Definition['NotifyApplicant'] = '当有人申请成员资格时通知我。';
 $Definition['Null Date'] = '-';
 $Definition['Number of blocked registrations'] = '已阻止的注册数。';
 
@@ -646,6 +647,7 @@ $Definition['Search'] = '搜索';
 $Definition['Search by user or role.'] = '按用户名搜索，或输入角色查看所有相应用户。';
 $Definition['Search for users by name or enter the name of a role to see all users with that role.'] = '按用户名搜索，或输入角色查看所有相应用户。';
 $Definition['Select'] = '选择';
+$Definition['Select a %s'] = '选择一个 %s';
 $Definition['Select the file to import'] = '选择要导入的文件';
 $Definition['Select the import source'] = '选择导入源文件';
 $Definition['Select the location of the pocket.'] = '选择口袋位置';

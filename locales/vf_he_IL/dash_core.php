@@ -357,6 +357,9 @@ $Definition['Every 1 minute'] = 'כל דקה ';
 $Definition['Every 10 seconds'] = 'כל 10 שניות';
 $Definition['Every 30 seconds'] = 'כל 30 שניות';
 $Definition['Every 5 minutes'] = 'כל 5 דקות';
+$Definition['Every 5 seconds'] = 'כל 5 שניות';
+$Definition['Every Page'] = 'כל עמוד';
+$Definition['Every edit or deletion is recorded here. Use &lsquo;Restore&rsquo; to undo any change.'] = 'כל עריכה או מחיקה נשמרת כאן. השתמש ב- &lsquo;Restore&rsquo; על מנת לבטל כל שינוי.';
 
 $Definition['Getting Started with Vanilla'] = 'איך להתחיל עם Vanilla';
 $Definition['Give Badge'] = 'תן סימול';
