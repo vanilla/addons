@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('APPLICATION'))
-   exit();
+<?php if (!defined('APPLICATION')) exit();
 
 /**
  * Quotes Plugin
@@ -23,7 +20,7 @@ if (!defined('APPLICATION'))
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-   'Version' => '1.6.5',
+    'Version' => '1.6.5',
     'MobileFriendly' => TRUE,
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'RequiredTheme' => FALSE,
@@ -367,9 +364,9 @@ BQ;
                $QuoteBody = self::_StripMarkdownQuotes($QuoteBody);
                $QuoteBody = self::_StripMentions($QuoteBody);
 
-               $Quote = '> '.sprintf(T('%s said:'), '@'.$Data->InsertName)."\n".
-                  '> '.str_replace("\n", "\n> ", $QuoteBody);
-               
+               $Quote = '> ' . sprintf(T('%s said:'), '@' . $Data->InsertName) . "\n" .
+               '> ' . str_replace("\n", "\n> ", $QuoteBody);
+
                break;
             case 'Wysiwyg':
                $Attribution = sprintf(T('%s said:'), UserAnchor($Data, NULL, array('Px' => 'Insert')));
@@ -385,20 +382,19 @@ BQ;
 </blockquote>
 
 BLOCKQUOTE;
-                  
-                  break;
+
+               break;
          }
-         
-               $QuoteData = array_merge($QuoteData, array(
+
+         $QuoteData = array_merge($QuoteData, array(
              'status' => 'success',
-            'body'         => $Quote,
+             'body' => $Quote,
              'format' => $Format,
              'authorid' => $Data->InsertUserID,
              'authorname' => $Data->InsertName,
              'type' => $Type,
              'typeid' => $ID
-               ));
-         }
+         ));
       }
    }
 
@@ -417,17 +413,15 @@ BLOCKQUOTE;
 				)+
 			  )
 			/xm', '', $Text);
-      
+
       return $Text;
    }
-   
+
    protected static function _StripMentions($Text) {
       $Text = preg_replace(
-            '/(^|[\s,\.>])@(\w{1,50})\b/i',
-            '$1$2',
-            $Text
-         );
-      
+      '/(^|[\s,\.>])@(\w{1,50})\b/i', '$1$2', $Text
+      );
+
       return $Text;
    }
 
