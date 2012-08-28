@@ -50,6 +50,10 @@ class FileUploadPlugin extends Gdn_Plugin {
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
    }
    
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('fileupload.css', 'plugins/FileUpload');
+   }
+   
    public function MediaCache() {
       if ($this->_MediaCache === NULL) {
          $this->CacheAttachedMedia(Gdn::Controller());
@@ -113,9 +117,6 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    public function Controller_Index($Sender) {
-      $Sender->AddCssFile('fileupload.css', 'plugins/FileUpload');
-      $Sender->AddCssFile('admin.css');
-      
       $Sender->Render('FileUpload', '', 'plugins/FileUpload');
    }
    
@@ -208,7 +209,6 @@ class FileUploadPlugin extends Gdn_Plugin {
    protected function PrepareController($Controller) {
       if (!$this->IsEnabled()) return;
       
-      $Controller->AddCssFile('fileupload.css', 'plugins/FileUpload');
       $Controller->AddJsFile('fileupload.js', 'plugins/FileUpload');
       $Controller->AddDefinition('apcavailable',self::ApcAvailable());
       $Controller->AddDefinition('uploaderuniq',uniqid(''));
@@ -230,7 +230,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @see FileUploadPlugin::DrawAttachFile
     * @return void
     */
-   public function PostController_BeforeFormButtons_Handler($Sender) {
+   public function PostController_AfterDiscussionFormOptions_Handler($Sender) {
       if (!is_null($Discussion = GetValue('Discussion',$Sender, NULL))) {
          $Sender->EventArguments['Type'] = 'Discussion';
          $Sender->EventArguments['Discussion'] = $Discussion;
@@ -942,7 +942,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          ->Column('Size', 'int(11)')
          ->Column('ImageWidth', 'usmallint', NULL)
          ->Column('ImageHeight', 'usmallint', NULL)
-         ->Column('StorageMethod', 'varchar(24)')
+         ->Column('StorageMethod', 'varchar(24)', 'local')
          ->Column('Path', 'varchar(255)')
          
          ->Column('ThumbWidth', 'usmallint', NULL)
