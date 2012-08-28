@@ -1,7 +1,7 @@
 <?php
 
 $Definition['%1$s Version %2$s'] = '%1$s Версия %2$s';
-$Definition['%s Connect'] = '%s Connect';
+$Definition['%1$s on %2$s'] = '%1$s on %2$s';
 $Definition['%s user(s) found.'] = 'намерени %s потребител/я.';
 
 $Definition['(YYYY-mm-dd)'] = '(YYYY-mm-dd)';
@@ -14,17 +14,15 @@ $Definition['2 weeks after being sent'] = '2 седмици след изпра�
 $Definition['A url-friendly version of the category name for better SEO.'] = 'A url-friendly version of the category name for better SEO.';
 $Definition['Accepted'] = 'Прието';
 $Definition['Action'] = 'Действие';
-$Definition['Add'] = 'Добавяне';
 $Definition['Add Info &amp; Create Account'] = 'Добавяне на информация &amp; Създаване на акаунт';
+$Definition['Add Message'] = 'Добавяне на съобщение';
 $Definition['Add User'] = 'Добавяне на потребител';
 $Definition['Addons'] = 'Добавки';
 $Definition['Administrator'] = 'Администратор';
 $Definition['Advanced'] = 'Разширени';
 $Definition['Advanced Forum Settings'] = 'Разширени настройки на форума';
-$Definition['Announce'] = 'Залепи';
 $Definition['Appearance'] = 'Външен вид';
 $Definition['Applicant'] = 'Кандидат';
-$Definition['Applicants'] = 'Кандидати';
 $Definition['Application'] = 'Приложение';
 $Definition['Application ID'] = 'ID на приложението';
 $Definition['Application Secret'] = 'Таен ключ на приложението';
@@ -33,30 +31,21 @@ $Definition['Applications'] = 'Приложения';
 $Definition['Apply'] = 'Прилагане';
 $Definition['Approve'] = 'Одобряване';
 $Definition['Archive Discussions'] = 'Архивиране на дискусии';
-$Definition['Are you sure you want to do that?'] = 'Сигурни ли сте?';
 $Definition['Authentication'] = 'Authentication';
 
-$Definition['Banned'] = 'Блокиран';
 $Definition['Banner'] = 'Банер';
 $Definition['Banner Logo'] = 'Лого';
 $Definition['Banner Title'] = 'Съдържание на текстовия банер';
 
-$Definition['Cancel'] = 'Отказ';
-$Definition['Categories'] = 'Категории';
-$Definition['Category'] = 'Категория';
 $Definition['Category Url:'] = 'Url на категорията:';
 $Definition['Change the way that new users register with the site.'] = 'Променете начина на регистрация за нови потребители.';
 $Definition['Check all permissions that apply for each role'] = 'Check all permissions that apply for each role';
+$Definition['Check all roles that apply to this user:'] = 'Check all roles that apply to this user:';
 $Definition['Choose a locale pack'] = 'Изберете езиков пакет';
 $Definition['Choose and configure your forum\'s authentication scheme.'] = 'Choose and configure your forum\'s authentication scheme.';
 $Definition['Choose who can send out invitations to new members:'] = 'Изберете кой може да изпраща покани към нови членове:';
-$Definition['Close'] = 'Затваряне';
-$Definition['Comments'] = 'Коментари';
 $Definition['Comments per Page'] = 'Коментара на страница';
 $Definition['Configure an Authenticator'] = 'Configure an Authenticator';
-$Definition['Confirm'] = 'Потвърждаване';
-$Definition['Confirm Email'] = 'Потвърждаване на адреса за електронна поща';
-$Definition['Connect'] = 'Свързване';
 $Definition['Consumer Key'] = 'Потребителски ключ';
 $Definition['Consumer Secret'] = 'Потребителска тайна';
 $Definition['Conversation Messages'] = 'Conversation Messages';
@@ -65,23 +54,18 @@ $Definition['Copy'] = 'Копиране';
 $Definition['Current Authenticator'] = 'Current Authenticator';
 $Definition['Current Theme'] = 'Тази тема се използва в момента';
 
-$Definition['Dashboard'] = 'Табло';
 $Definition['Decline'] = 'Отказ';
-$Definition['Delete'] = 'Изтриване';
-$Definition['Delete Account'] = 'Изтриване на акаунта';
 $Definition['Description'] = 'Описание';
 $Definition['Disable'] = 'Изключване';
 $Definition['Disable Google Sign In'] = 'Изключване на вписването с Google';
 $Definition['Disable OpenID'] = 'Изключване на вписването с OpenID';
 $Definition['Discussion & Comment Editing'] = 'Редактиране на дискусии и коментари';
-$Definition['Discussions'] = 'Дискусии';
 $Definition['Discussions per Page'] = 'Дискусии на страниця';
 
-$Definition['Edit'] = 'Редактиране';
 $Definition['Edit Category'] = 'Редактиране на категория';
-$Definition['Edit Preferences'] = 'Промяна на настройките';
 $Definition['Edit User'] = 'Редактиране на потребител';
 $Definition['EditContentTimeout.Notes'] = 'Бележка: Ако потребител е в роля, която му позволява да редактира съдържание, то правата избрани тук ще бъдат игнорирани и вместо тях ще бъдат приложени правата на съответната група.';
+$Definition['Email visible to other users'] = 'E-mail адресът е видим за други потребители';
 $Definition['Enable'] = 'Включване';
 $Definition['Enable OpenID'] = 'Включване на вписването с OpenID';
 $Definition['Enter the email address of the person you would like to invite:'] = 'Въведете адреса за електронна поща на човека, който искате да поканите:';
@@ -98,6 +82,7 @@ $Definition['Garden.Import.Description'] = 'Използвайте тази ст
 $Definition['Garden.Import.InputInstructions'] = 'Въведете адреса за електронна поща и паролата на Админ потребителя от данните, които се импортират.';
 $Definition['Garden.Import.Overwrite.Description'] = 'Внимание: Всички данни в този форум ще бъдат презаписани.';
 $Definition['Generate'] = 'Генериране';
+$Definition['Generate Password'] = 'Генериране на парола';
 $Definition['Get More Themes'] = 'Изтеглете още теми';
 $Definition['Google Sign In Settings'] = 'Настройки на вписването с Google';
 $Definition['Guest'] = 'Гост';
@@ -105,7 +90,6 @@ $Definition['Guest'] = 'Гост';
 $Definition['Homepage'] = 'Начална страница';
 
 $Definition['Import'] = 'Импорт';
-$Definition['Inbox'] = 'Входяща кутия';
 $Definition['Information'] = 'Информация';
 $Definition['Invitation Code'] = 'Код на поканата';
 $Definition['Invitations can be sent from users\' profile pages.'] = 'Когато използвате регистриране чрез пакана, потребителите ще получат допълнителна връзка в профила си, наречена <a href="%s" class="Popup">Моите покани</a>.';
@@ -137,14 +121,11 @@ $Definition['Manage Users'] = 'Управление н потребителит�
 $Definition['Manage your Plugins'] = 'Управлявайте Вашите разширения';
 $Definition['Max Comment Length'] = 'Максимална дължина на коментар';
 $Definition['Member'] = 'Член';
-$Definition['Message'] = 'Съобщение';
-$Definition['Messages'] = 'Съобщения';
 $Definition['Messages can appear anywhere in your application.'] = 'Съобщенията могат да се показват навсякъде във форума. Може да ги използвате за да уведомите потребителите за новини или предстоящи събития. Използвайте тази страница да подредите Вашите съобщения, като ги завлачвате вна желаното от Вас място.';
 $Definition['Method'] = 'Метод';
 $Definition['Moderator'] = 'Модератор';
 $Definition['My Invitations'] = 'Моите покани';
 
-$Definition['Name'] = 'Име';
 $Definition['New comments in the last day'] = 'Нови коментари за последния ден';
 $Definition['New comments in the last week'] = 'Нови коментари за последната седмица';
 $Definition['New conversations in the last day'] = 'Нови разговори за последния ден';
@@ -159,8 +140,6 @@ $Definition['New users in the last day'] = 'Нови потребители за
 $Definition['New users in the last week'] = 'Нови потребители за последната седмица';
 $Definition['None'] = 'Няма';
 
-$Definition['OK'] = 'ОК';
-$Definition['Okay'] = 'Ок';
 $Definition['On'] = 'On';
 $Definition['Only Allow Each User To Post'] = 'Разреши на всеки потребител да публикува само';
 $Definition['Or Spamblock For'] = 'или Spamblock за';
@@ -171,23 +150,23 @@ $Definition['Page'] = 'Страница';
 $Definition['Panel Box'] = 'Кутия';
 $Definition['Password Options'] = 'Опции на паролите';
 $Definition['Please choose an authenticator to configure.'] = 'Please choose an authenticator to configure.';
-$Definition['Please wait while you are redirected. If you are not redirected, click <a href="%s">here</a>.'] = 'Моля изчакайте да бъдете пренасочени. Ако не бъдете пренасочени, натиснете<a href="%s">тук</a>.';
 $Definition['Plugin'] = 'Разширение';
 $Definition['PluginHelp'] = 'Разширенията Ви позволяват да добавяте функционалност към форума.<br />След като добавите разширение към Вашата %s папка, можете да го включите или изключите от тук.';
 $Definition['Plugins'] = 'Разширения';
+$Definition['Position'] = 'Позиция';
 $Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'Предотвратяване на спама във форума чрез ограничаване на броя на дискусии и коментари, които потребителите могат да публикуват в рамките на определен период от време..';
 $Definition['Private Key'] = 'Частен ключ';
-$Definition['Profile Picture'] = 'Снимка на профила';
 $Definition['Public Key'] = 'Публичен ключ';
 
 $Definition['Recently Active Users'] = 'Последно активни потребители';
-$Definition['Redirecting...'] = 'Пренасочване...';
 $Definition['Refresh Comments'] = 'Обновяване на коментарите';
 $Definition['Registration'] = 'Регистрация';
 $Definition['Remove'] = 'Премахване';
 $Definition['Remove Banner Logo'] = 'Премахване на логото';
 $Definition['Requires: '] = 'Изисква: ';
+$Definition['Reset Password'] = 'Възстановяване на парола';
 $Definition['Reset password and send email notification to user'] = 'Възстановяване на паролата и изпращае(не на e-mail на потребителя';
+$Definition['Reveal Password'] = 'Показване на парола';
 $Definition['Role'] = 'Роля';
 $Definition['Roles & Permissions'] = 'Роли & Права';
 $Definition['Roles determine user\'s permissions.'] = 'Всеки потребител на форума е прикачен към поне една роля. Ролите се използват да се определят правата на потребителите.';
@@ -201,15 +180,9 @@ $Definition['SMTP Password'] = 'SMTP парола';
 $Definition['SMTP Port'] = 'SMTP порт';
 $Definition['SMTP Security'] = 'SMTP сигурност';
 $Definition['SMTP User'] = 'SMTP потребител';
-$Definition['Save'] = 'Запазване';
-$Definition['Search'] = 'Търсене';
 $Definition['Select the file to import'] = 'Изберете файл';
 $Definition['Send %s a Message'] = 'Изпратете съобщение на %s';
 $Definition['Sent To'] = 'Изпратено до';
-$Definition['Settings'] = 'Настройки';
-$Definition['Sign Out'] = 'Изход';
-$Definition['Sink'] = 'Sink';
-$Definition['Spam'] = 'Спам';
 $Definition['Status'] = 'Статус';
 
 $Definition['Temporary (302)'] = 'Temporary (302)';
@@ -223,8 +196,8 @@ $Definition['Themes'] = 'Теми';
 $Definition['There are currently no applicants.'] = 'В момента няма кандидати.';
 $Definition['This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.'] = 'Това разширение позволява на потребителите да влизат във форума с техния OpenID. <b> След като включите това разширение, уверете се че сте разрешили вписването чрез Open ID в настройките на форума</b>.';
 $Definition['This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.'] = 'Това разширение позволява на потребителите да влизат във форума с техния Google акаунт. <b>След като включите това разширение, уверете се че сте разрешили вписването чрез Google в настройките на форума</b>.';
-$Definition['Transport error: %s'] = 'Възникна фатална грешка при изпълнение на заявката.<br />Сървърът върна следния отговор: %s';
 $Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connect позволява на потребителите да влизат във форума с техния Twitter акаунт.<b> Трябва да регистрирате Twitter приложение за правилното функциониране на това приложение.</b>';
+$Definition['Type'] = 'Тип';
 
 $Definition['Unlimited'] = 'Неограничено';
 $Definition['Use an SMTP server to send email'] = 'Използване на SMTP сървър за изпращане на електронна поща';
@@ -233,11 +206,11 @@ $Definition['User'] = 'Потребител';
 $Definition['User Registration Settings'] = 'Настройки на регистрацията на потребители';
 $Definition['Users'] = 'Потребители';
 
+$Definition['ValidateInteger'] = '%s не е валиден низ.';
 $Definition['Vanilla.Archive.Description'] = 'Може да изберете да архивирате дискусии по-стари от определена дата. Архивираните дискусии се затварят и не е възможно публикуването на нови мнения.';
 $Definition['Version'] = 'Версия';
 $Definition['Version %s'] = 'Версия %s';
 $Definition['View'] = 'Преглед';
-$Definition['Visit Site'] = 'Посетете форума';
 
 $Definition['Warning'] = 'Внимание';
 $Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = 'Vanilla ще се опита да използва пощенския сървър по подразбиране. Ако искате да използвате отделен SMTP сървър, може да го настроите тук.';
@@ -245,7 +218,6 @@ $Definition['What\'s the Buzz?'] = 'Какво ново?';
 $Definition['Why do you want to join?'] = 'Защо искате да се присъедините?';
 $Definition['Within'] = 'в';
 
-$Definition['You are connected as %s through %s.'] = 'Свързани сте като %s чрез %s.';
 $Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'Ако по някаква причина се окажете заключени извън форума, винаги можете да влезете с оригиналните e-mail и парола Vanilla email and password  <a href="%1$s">%1$s</a>';
 $Definition['You can place files in your /uploads folder.'] = 'Ако вашият файл е твърде голям,да hf качите директно към тази страница можете да го поставите в папката /uploads. Уверете се, че името на файла започва с думата <b>export</b> и завършва с <b>.txt, .gz</b>.';
 $Definition['You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'] = 'You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.';
