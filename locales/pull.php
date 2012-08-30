@@ -1,9 +1,12 @@
+#!/opt/local/bin/php
 <?php
 error_reporting(E_ALL); //E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
 
 header('Content-Type: text/plain; charset=utf8');
+
+
 
 $locales = array(
     'en-CA' => array('tx' => 'en_CA', 'name' => 'English'),
@@ -53,6 +56,9 @@ function main($argv, $argc) {
       copyLocale($code);
       echo "done.\n";
    }
+   
+   // Save the translations to the database.
+   saveLocales();
 }
 
 function copyLocale($code) {
@@ -69,12 +75,14 @@ function copyLocale($code) {
    if (!file_exists($folder))
       mkdir($folder, 0777, TRUE);
    
+   $version = gmdate('Y.m.d');
+   
    // Create the info array.
    $infoArray = array(
        'Locale' => $code,
        'Name' => $info['name'].' Transifex',
        'Description' => "{$info['name']} language translations for Vanilla. Help contribute to this translation by going to its translation site <a href=\"https://www.transifex.com/projects/p/vanilla/language/$tx/\">here</a>.",
-       'Version' => '1.0',
+       'Version' => $version,
        'Author' => 'Vanilla Community',
        'AuthorUrl' => "https://www.transifex.com/projects/p/vanilla/language/$tx/"
    );
@@ -127,6 +135,141 @@ function getValue($key, $array, $default = null) {
 
 function notEmpty($str) {
    return !empty($str);
+}
+
+function query($sql, $params = array()) {
+   foreach ($params as $key => $value) {
+      $sql = str_replace(':'.$key, "'".mysql_real_escape_string($value)."'", $sql);
+   }
+   $r = mysql_query($sql);
+   if (!$r) {
+      trigger_error("Error in:\n$sql\n\n".mysql_error(), E_USER_ERROR);
+      return $r;
+   }
+   
+   if (preg_match('`^\s*insert\s`', $sql))
+      $r = mysql_insert_id();
+   
+   return $r;
+}
+
+function dbDate($timestamp = null) {
+   if (!$timestamp)
+      $timestamp = time();
+   
+   return gmdate('Y-m-d G:i:s', $timestamp);
+}
+
+function saveLocales() {
+   global $locales;
+   
+   // Copy all of the locales.
+   foreach ($locales as $code => $info) {
+      if ($code == 'en-CA')
+         continue;
+      
+      echo "Saving $code...";
+      
+      $result = saveLocaleToDb($code);
+      
+      echo "inserted: {$result['inserted']}, updated: {$result['updated']}, equal: {$result['equal']}, skipped: {$result['skipped']}.\n";
+   }
+}
+
+function saveLocaleToDb($locale) {
+   $result = array('inserted' => 0, 'updated' => 0, 'equal' => 0, 'skipped' => 0);
+   $filenames = array('dash_core.php', 'site_core.php');
+   
+   // First load all of the strings from the db.
+   mysql_connect('127.0.0.1', 'root');
+   mysql_select_db('_t1');
+   query('set names utf8');
+   
+   $sql = "select
+      c.CodeID, 
+      c.Name,
+      t.TranslationID,
+      t.Locale,
+      t.Translation
+   from GDN_LocaleCode c
+   left join GDN_LocaleTranslation t
+      on c.CodeID = t.CodeID and t.Locale = :Locale";
+   
+   $strings = array();
+   $r = query($sql, array('Locale' => $locale));
+   while ($row = mysql_fetch_assoc($r)) {
+      $strings[$row['Name']] = $row;
+   }
+   
+   // Load the strings from the files.
+   $slug = str_replace('-', '_', $locale);
+   foreach ($filenames as $filename) {
+      $path = dirname(__FILE__)."/vf_{$slug}/$filename";
+      if (!file_exists($path)) {
+         echo "Path $path does not exist.\n";
+         continue;
+      }
+      
+      
+      $Definition = array();
+      include $path;
+      
+      foreach ($Definition as $code => $string) {
+         // Make sure the code is even in the db.
+         if (!isset($strings[$code])) {
+            $result['skipped']++;
+            continue;
+         }
+         
+         $row =& $strings[$code];
+         
+         // Check to see if the string has changed.
+         if ($row['Translation'] == $string) {
+            $result['equal']++;
+            continue;
+         }
+         
+         $now = dbDate();
+         
+         if ($row['TranslationID']) {
+            $r = query("update GDN_LocaleTranslation
+               set Translation = :Translation,
+                  DateUpdated = :DateUpdated
+               where TranslationID = :TranslationID",
+               array('TranslationID' => $row['TranslationID'], 'Translation' => $string, 'DateUpdated' => $now));
+            if ($r)
+               $result['updated']++;
+         } else {
+            $translationID = query('insert GDN_LocaleTranslation (
+                  CodeID,
+                  Locale,
+                  Translation,
+                  DateInserted,
+                  InsertUserID)
+               values (
+                  :CodeID,
+                  :Locale,
+                  :Translation,
+                  :DateInserted,
+                  :InsertUserID)',
+               array (
+                   'CodeID' => $row['CodeID'],
+                   'Locale' => $locale,
+                   'Translation' => $string,
+                   'DateInserted' => $now,
+                   'InsertUserID' => 1));
+            if ($r) {
+               $result['inserted']++;
+               $row['TranslationID'] = $r;
+               $row['Translation'] = $string;
+            }
+         }
+         
+         $row['Translation'] = $string;
+      }
+   }
+   
+   return $result;
 }
 
 main($argv, $argc);
