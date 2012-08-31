@@ -6,28 +6,26 @@ $Definition['%s user(s) will be affected by this action.'] = '%s ng??i d';
 $Definition['<strong>Categories</strong> allow you to organize your discussions. Categories can only contain discussions.'] = 'C';
 $Definition['<strong>Heads Up!</strong> Moving discussions into a replacement category can result in discussions vanishing (or appearing) if the replacement category has different permissions than the category being deleted.'] = '<strong>Heads Up!</strong> Chuy?n c';
 
+$Definition['[%s] Invitation'] = '[%s] Th? m?i';
+$Definition['[%s] Password Reset'] = 'M?t kh?u [%s] ??t l?i';
+
 $Definition['Above Main Content'] = 'Tr';
 $Definition['Add Category'] = 'Th';
-$Definition['Add Message'] = 'Th';
 $Definition['Add Role'] = 'Add v? tr';
 $Definition['Add User'] = 'Th';
 $Definition['Addons'] = ' Addons';
 $Definition['Advanced'] = 'C?i ti?n';
 $Definition['All Dashboard Pages'] = 'T?t c? c';
-$Definition['All Forum Pages'] = 'T?t c? c';
 $Definition['All discussions in this category will be permanently deleted.'] = 'T?t c? c';
-$Definition['Allow'] = 'Cho ph';
+$Definition['All Forum Pages'] = 'T?t c? c';
 $Definition['Allow users to dismiss this message'] = 'Cho ph';
 $Definition['Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'] = 'M?c d';
 $Definition['Appearance'] = 'C';
 $Definition['Applications'] = '?ng d?ng';
-$Definition['Apply'] = 'Apply';
-$Definition['Approval'] = '???c ph';
 $Definition['Approve'] = 'Ph';
 $Definition['Archive Discussions'] = 'L?u tr? th?o lu?n';
 $Definition['Authentication'] = 'Ch?ng th?c';
 
-$Definition['Banner'] = 'Banner';
 $Definition['Banner Logo'] = 'Logo Banner';
 $Definition['Banner Title'] = 'Ti';
 $Definition['Basic'] = 'C? b?n';
@@ -36,11 +34,12 @@ $Definition['Category Url:'] = 'Url danh m?c:';
 $Definition['Change the way that new users register with the site.'] = 'Thay ??i c';
 $Definition['Check all permissions that apply for each role'] = 'Ki?m tra t?t c? c';
 $Definition['Check all permissions that apply to this role:'] = 'Ki?m tra t?t c? c';
-$Definition['Check all roles that apply to this user:'] = 'Ki?m tra t?t c? c';
 $Definition['Choose a role that orphaned users will be assigned to:'] = 'Ch?n m?t vi tr? cho ng??i d';
 $Definition['Choose and configure your forum\'s authentication scheme.'] = 'Ch?n v';
 $Definition['Choose who can send out invitations to new members:'] = 'Ch?n ng??i c';
-$Definition['Click a tag name to edit. Click x to remove.'] = 'Click a tag name to edit. Click x to remove.';
+
+$Definition['comment(s)'] = 'b';
+
 $Definition['Comments Page'] = 'Trang b';
 $Definition['Comments per Page'] = 'S? b';
 $Definition['Configure an Authenticator'] = 'C?u h';
@@ -57,15 +56,18 @@ $Definition['Disable'] = 'V';
 $Definition['Disable Content Flagging'] = 'V';
 $Definition['Disabled'] = 'V';
 $Definition['Discussion & Comment Editing'] = 'Ch?nh s?a th?o lu?n v';
-$Definition['Discussions Page'] = 'Trang th?o lu?n';
+
+$Definition['discussion(s)'] = 'th?o lu';
+
 $Definition['Discussions per Page'] = 'S? th?o lu?n tr';
 $Definition['Don\'t use Categories'] = 'C';
+
+$Definition['edit'] = 's?a';
 
 $Definition['Edit Category'] = 'S?a danh m?c';
 $Definition['Edit Message'] = 'S?a tin nh?n';
 $Definition['Edit Role'] = 'S?a v? tr';
 $Definition['Edit User'] = 'S?a ng??i d';
-$Definition['Email visible to other users'] = 'Kh';
 $Definition['Enable'] = 'K';
 $Definition['Enable this message'] = 'H?u d?ng t';
 $Definition['Enabled'] = 'H?u d?ng';
@@ -77,10 +79,7 @@ $Definition['Existing members send invitations to new members.'] = 'T?n t?i ng??
 
 $Definition['First Visit'] = 'L?n ??ng nh?p ??u ti';
 $Definition['Forum Settings'] = 'C?u h';
-$Definition['Frequency'] = 'Frequency';
 
-$Definition['Generate'] = 'Generate';
-$Definition['Generate Password'] = 'M?t kh?u ch';
 $Definition['Get More Plugins'] = 'T?i v? plugin';
 $Definition['Get More Themes'] = 'T?i giao di?n m?i';
 
@@ -111,6 +110,9 @@ $Definition['Manage Users'] = 'Qu?n l';
 $Definition['Max Comment Length'] = '?? d';
 $Definition['Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'] = 'Tin nh?n xu?t hi?n tr';
 $Definition['Method'] = 'Ph??ng th?c';
+
+$Definition['minute(s)'] = 'ph';
+
 $Definition['Move discussions in this category to a replacement category.'] = 'Chuy?n c';
 $Definition['My Invitations'] = 'Th? m?i c?a t';
 
@@ -136,16 +138,11 @@ $Definition['Panel Box'] = 'H?p';
 $Definition['Password Options'] = 'T';
 $Definition['Pending'] = 'Chu?n b?...';
 $Definition['Please choose an authenticator to configure.'] = 'Ch?n m?t ng??i ch?ng th?c ?? c?u h';
-$Definition['Plugin'] = 'Plugin';
 $Definition['Plugins'] = ' Plugins';
-$Definition['Plugins.Tagging.Enabled'] = 'Plugins.Tagging.Enabled';
-$Definition['Position'] = 'V? tr';
 $Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'Ng?n ch?n spam tr';
 $Definition['Private Key'] = 'Key ri';
-$Definition['Profile Page'] = 'Trang h? s?';
 $Definition['Public Key'] = 'Key c?ng ??ng';
 
-$Definition['Rate of refresh'] = 'Rate of refresh';
 $Definition['Recently Active Users'] = 'Ng??i d';
 $Definition['Refresh Comments'] = 'T?i l?i b';
 $Definition['Register for Membership'] = '??ng k';
@@ -154,40 +151,36 @@ $Definition['Registration is currently closed.'] = 'Ph?n ??ng k';
 $Definition['Remove'] = 'X';
 $Definition['Replacement Category'] = 'Danh m?c thay th?';
 $Definition['Replacement Role'] = 'Thay th? v? tr';
-$Definition['Reset Password'] = '??t l?i m?t kh?u';
 $Definition['Reset password and send email notification to user'] = '??t l?i m?t kh?u v';
 $Definition['Reveal Password'] = 'C';
 $Definition['Role'] = 'V? tr';
 $Definition['Role Name'] = 'T';
 $Definition['Roles & Permissions'] = 'V? tr';
 
-$Definition['SMTP Host'] = 'SMTP Host';
-$Definition['SMTP Password'] = 'M?t kh?u SMTP';
-$Definition['SMTP Port'] = 'C?ng SMTP';
-$Definition['SMTP Security'] = 'B?o m?t SMTP';
-$Definition['SMTP User'] = 'SMTP User';
 $Definition['Search for users by name or enter the name of a role to see all users with that role.'] = 'T';
+
+$Definition['seconds'] = 'gi';
+
 $Definition['Send %s a Message'] = 'G?i cho %s 1 tin nh?n';
 $Definition['Send Again'] = 'G?i l?i';
 $Definition['Sent To'] = 'G?i t?i';
-$Definition['SignIn'] = '??ng nh?p';
+$Definition['SMTP Password'] = 'M?t kh?u SMTP';
+$Definition['SMTP Port'] = 'C?ng SMTP';
+$Definition['SMTP Security'] = 'B?o m?t SMTP';
 $Definition['Status'] = 'Tr?ng th';
 
-$Definition['Tagging'] = 'Tagging';
 $Definition['The banner logo appears at the top of your forum.'] = 'Logo banner xu?t hi?n tr';
 $Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'Ti';
 $Definition['The following content has been flagged by users for moderator review.'] = 'Nh?ng n?i dung sau ?';
 $Definition['The invitation was removed successfully.'] = 'Th? m?i c?a b?n ?';
-$Definition['The invitation was sent successfully.'] = 'Th? m?i ???c g?i th';
 $Definition['ThemeHelp'] = 'Tr? gi';
 $Definition['Themes'] = 'Giao di?n';
 $Definition['There are no items awaiting moderation at this time.'] = 'Kh';
-$Definition['This show the plugin on only selected discussion pages'] = 'This show the plugin on only selected discussion pages';
 $Definition['This will show the panel on every page.'] = 'C';
 
 $Definition['Uninvite'] = 'Kh';
-$Definition['Use Categories'] = 'C';
 $Definition['Use an SMTP server to send email'] = 'Use an SMTP server to send email.';
+$Definition['Use Categories'] = 'C';
 $Definition['Use categories to organize discussions'] = 'D';
 $Definition['User Registration Settings'] = 'C';
 $Definition['Users'] = 'Ng??i d';
@@ -195,26 +188,9 @@ $Definition['Users'] = 'Ng??i d';
 $Definition['View'] = 'Xem';
 
 $Definition['Warning'] = 'C?nh b';
-$Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = 'We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.';
 $Definition['Welcome to Vanilla!'] = 'Ch';
-$Definition['What\'s the Buzz?'] = 'What\'s the Buzz?';
 $Definition['Where should the plugin be shown?'] = 'N?i s? g?n v';
 $Definition['Within'] = 'Trong';
 
 $Definition['You cannot remove an invitation that has been accepted.'] = 'B?n kh';
 $Definition['You have %s invitations left for this month.'] = 'B?n c';
-$Definition['You must be authenticated in order to use this form.'] = 'B?n ph?i ???c ch?ng th?c ?? s? d?ng trong form n';
-
-$Definition['[%s] Invitation'] = '[%s] Th? m?i';
-$Definition['[%s] Password Reset'] = 'M?t kh?u [%s] ??t l?i';
-$Definition['[%s] Password Reset Request'] = 'M?t kh?u [%s] ???c y';
-
-$Definition['comment(s)'] = 'b';
-
-$Definition['discussion(s)'] = 'th?o lu';
-
-$Definition['edit'] = 's?a';
-
-$Definition['minute(s)'] = 'ph';
-
-$Definition['seconds'] = 'gi';

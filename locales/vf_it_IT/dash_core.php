@@ -1,12 +1,9 @@
 <?php
 
 $Definition['%1$s Version %2$s'] = '%1$s Versione %2$s';
-$Definition['%1$s on %2$s'] = '%1$s il %2$s';
 $Definition['%s item in queue'] = 'oggetto in coda';
 $Definition['%s user(s) found.'] = '%s utente(i) trovato(i).';
 $Definition['%s user(s) will be affected by this action.'] = '%s Utenti verranno coinvolti con questa azione.';
-
-$Definition['(YYYY-mm-dd)'] = '(YYYY-mm-dd)';
 
 $Definition['1 month after being sent'] = '1 mese dopo l\'invio';
 $Definition['1 week after being sent'] = '1 settimana dopo l\'invio';
@@ -17,12 +14,17 @@ $Definition['<strong>Categories</strong>'] = 'Categorie';
 $Definition['<strong>Categories</strong> allow you to organize your discussions. Categories can only contain discussions.'] = 'Le <strong>Categorie</strong> ti permettono di organizzare le discussioni. Le ategorie possono contenere solo discussioni.';
 $Definition['<strong>Heads Up!</strong> Deleting a role can result in users not having access to the application.'] = '<strong>Attenzione!</strong> La rimozione di questo ruolo potrebbe causare problemi di accesso o iscrizione a molti utenti';
 
+$Definition['[%s] Invitation'] = '[%s] Invito';
+$Definition['[%s] Password Reset'] = '[%s] Password resettata';
+$Definition['[%s] Password Reset Request'] = '[%s] Richiesta di Reset Password';
+
+$Definition['_Locale'] = 'Locale';
+
 $Definition['A url-friendly version of the category name for better SEO.'] = 'Una versione url-friendly del nome categoria per una migliore SEO.';
 $Definition['Accepted'] = 'Accettato';
 $Definition['Action'] = 'Azione';
 $Definition['Add Category'] = 'Aggiungi Categoria';
 $Definition['Add Info &amp; Create Account'] = 'Aggiungi Info &amp; Crea Account';
-$Definition['Add Message'] = 'Aggiungi Avviso';
 $Definition['Add Role'] = 'Aggiungi Ruolo';
 $Definition['Add User'] = 'Aggiungi Utente';
 $Definition['Addons'] = 'Addon';
@@ -33,7 +35,6 @@ $Definition['All'] = 'Tutti';
 $Definition['All %1$s'] = 'Tutti %1$s';
 $Definition['All discussions in this category will be permanently deleted.'] = 'Tutte le discussioni in questa categoria verranno eliminate permanentemente.';
 $Definition['All of the user content will be replaced with a message stating the user has been deleted.'] = 'Tutti i contenuti dell\'utente verranno sostituiti da un messaggio in cui viene comunicata la sua cancellazione.';
-$Definition['Allow'] = 'Permetti';
 $Definition['Allow users to dismiss this message'] = 'Autorizza utenti a non accettare il messaggio';
 $Definition['Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'] = 'Invito creato correttamente, ma non è stato possibile inviare l\' email per il seguente motivo: %s';
 $Definition['Appearance'] = 'Aspetto';
@@ -57,7 +58,6 @@ $Definition['Authors can edit for 5 minutes after posting'] = 'L\'autore puo\' m
 $Definition['Authors cannot edit their posts'] = 'L\'autore non puo\' modificare i propri messaggi';
 
 $Definition['Back to all users'] = 'Torna alla lista utenti';
-$Definition['Banner'] = 'Banner';
 $Definition['Banner Logo'] = 'Logo Banner';
 $Definition['Banner Title'] = 'Titolo Banner';
 $Definition['Browse for a new banner logo if you would like to change it:'] = 'Carica un nuovo logo banner dal tuo PC:';
@@ -69,17 +69,18 @@ $Definition['Category Url:'] = 'Url Categoria:';
 $Definition['Change the way that new users register with the site.'] = 'Modifica il modo in cui gli utenti si registrano sul sito.';
 $Definition['Check all permissions that apply for each role'] = 'Controlla tutti i permessi dei relativi ruoli';
 $Definition['Check all permissions that apply to this role:'] = 'Scegli i permessi da applicare a questo ruolo:';
-$Definition['Check all roles that apply to this user:'] = 'Controlla tutti i permessi legati a questo utente:';
 $Definition['Choose a locale pack'] = 'Seleziona un "locale pack"';
 $Definition['Choose a role that orphaned users will be assigned to:'] = 'Scegli un ruolo da assegnare a questi utenti:';
 $Definition['Choose and configure your forum\'s authentication scheme.'] = 'Scegli e configura lo schema di autenticazione del tuo forum.';
 $Definition['Choose how to handle all of the content associated with the user account for %s (comments, messages, etc).'] = 'Scegli come gestire i contenuti relativi all\'utente %s (commenti, messaggi, etc).';
 $Definition['Choose who can send out invitations to new members:'] = 'Scegli chi puo\' inviare inviti ai nuovi membri:';
 $Definition['Click a tag name to edit. Click x to remove.'] = 'Clicca sul nome tag da editare. Premi X per rimuoverlo.';
+
+$Definition['comment(s)'] = 'commento(i)';
+
+$Definition['Comments Page'] = 'Pagina dei Commenti';
 $Definition['Comments per Page'] = 'Commenti per Pagina';
 $Definition['Configure an Authenticator'] = 'Configura Autenticazione';
-$Definition['Consumer Key'] = 'Consumer Key';
-$Definition['Consumer Secret'] = 'Consumer Secret';
 $Definition['Content Flagging'] = 'Segnalazione Contenuti';
 $Definition['Conversation Messages'] = 'Messaggi Conversazione';
 $Definition['Conversations'] = 'Conversazioni';
@@ -98,14 +99,18 @@ $Definition['Disable Google Sign In'] = 'Disabilita Login Google';
 $Definition['Disable OpenID'] = 'Disabilita OpenID';
 $Definition['Disable Signatures'] = 'Disabilita Firme';
 $Definition['Discussion & Comment Editing'] = 'Discussioni e Commenti';
+
+$Definition['discussion(s)'] = 'discussione(i)';
+
 $Definition['Discussions per Page'] = 'Discussioni per Pagina';
 $Definition['Don\'t Refresh'] = 'Non aggiornare';
 $Definition['Don\'t use Categories'] = 'Non usare Categorie';
 
+$Definition['edit'] = 'modifica';
+
 $Definition['Edit Category'] = 'Modifica Categoria';
 $Definition['Edit User'] = 'Modifica Utente';
 $Definition['EditContentTimeout.Notes'] = 'Nota: Se un utente ha i permessi per editare i contenuti, questi permessi saranno superiori ai valori selezionati qui.';
-$Definition['Email visible to other users'] = 'Il tuo indirizzo email è visibile a tutti.';
 $Definition['Enable'] = 'Abilita';
 $Definition['Enable OpenID'] = 'Abilita OpenID';
 $Definition['Enable this message'] = 'Attiva questo messaggio';
@@ -130,11 +135,10 @@ $Definition['Garden.Import.Description'] = 'Usa questa pagina per importare dati
 $Definition['Garden.Import.InputInstructions'] = 'Inserisci email e password dell\'admin dei dati importati.';
 $Definition['Garden.Import.Overwrite.Description'] = 'Attenzione: Tutti i dati di questo forum verranno sovrascritti.';
 $Definition['Generate'] = 'Genera';
-$Definition['Generate Password'] = 'Genera Password';
 $Definition['Get More Applications'] = 'Scarica altre Applicazioni';
+$Definition['Get more information on creating custom routes'] = 'Ottieni maggiori informazioni sulla creazione di percorsi.';
 $Definition['Get More Plugins'] = 'Scarica altri Plugin';
 $Definition['Get More Themes'] = 'Scarica altri Temi';
-$Definition['Get more information on creating custom routes'] = 'Ottieni maggiori informazioni sulla creazione di percorsi.';
 $Definition['Google Sign In Settings'] = 'Impostazioni Login Google';
 $Definition['Guest'] = 'Visitatore';
 
@@ -150,15 +154,11 @@ $Definition['Invitations will expire'] = 'Gli Inviti scadranno';
 $Definition['Invited by'] = 'Invitato da';
 $Definition['It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size.'] = 'E\' sempre una buona idea impostare un numero minimo di caratteri necessari per lasciare un commento.';
 
-$Definition['Key Type'] = 'Key Type';
-$Definition['Key Value'] = 'Key Value';
-
 $Definition['Last Visit'] = 'Ultima Visita';
 $Definition['Locale Key (Folder)'] = 'Locale Key (Cartella)';
 $Definition['Locale Name'] = 'Nome Locale';
 $Definition['Locales'] = 'Locali';
 $Definition['Locales are in your %s folder.'] = 'Le Locali permettono di impostare altre lingue sul tuo sito. Una volta che una locale viene aggiunta alla tua cartella %s, puoi abilitarla o disabilitarla da qui.';
-$Definition['Location'] = 'Location';
 
 $Definition['Manage'] = 'Gestisci';
 $Definition['Manage Applicants'] = 'Gestisci Applicanti';
@@ -177,10 +177,16 @@ $Definition['Member'] = 'Utente';
 $Definition['Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'] = 'Gli avvisi compariranno in tutte le pagine del tuo forum, per questo sono molto utili per avvisare i tuoi utenti di novità nel forum.';
 $Definition['Messages can appear anywhere in your application.'] = 'Gli Avvisi possono apparire ovunque nella tua applicazione, e possono essere usati per informare gli utenti di news ed eventi. Usa guesta pagina per riorganizzare i tuoi messaggi, trascinandoli su o giu.';
 $Definition['Method'] = 'Metodo';
+
+$Definition['minute(s)'] = 'minuto(i)';
+
 $Definition['Moderator'] = 'Moderatore';
 $Definition['My Invitations'] = 'Miei Inviti';
 
 $Definition['Need More Help?'] = 'Hai bisogno di aiuto?';
+
+$Definition['never'] = 'mai';
+
 $Definition['New comments in the last day'] = 'Nuovi commenti ieri';
 $Definition['New comments in the last week'] = 'Nuovi commenti la scorsa settimana';
 $Definition['New conversations in the last day'] = 'Nuove conversazioni (ieri)';
@@ -202,18 +208,12 @@ $Definition['Other Themes'] = 'Altri Temi';
 $Definition['Outgoing Email'] = 'Email in Uscita';
 
 $Definition['Page'] = 'Pagina';
-$Definition['Panel Box'] = 'Panel Box';
 $Definition['Password Options'] = 'Opzioni Password';
 $Definition['Pending'] = 'In attesa';
 $Definition['Please choose an authenticator to configure.'] = 'Scegli un sistema di autenticazione da configurare';
-$Definition['Plugin'] = 'Plugin';
 $Definition['PluginHelp'] = 'I Plugin ti permettono di aggiungere funzionalita\' al tuo sito.<br />Una volta che un plugin viene aggiunto alla cartella %s, puoi abilitarlo o disabilitarlo da qui.';
 $Definition['Plugins'] = 'Plugin';
-$Definition['Position'] = 'Posizione';
 $Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'Previeni lo spam sul forum limitando il numero di discussioni &amp; commenti che gli utenti possono inserire in un determinato periodo di tempo.';
-$Definition['Private Key'] = 'Private Key';
-$Definition['Profiles'] = 'Profili';
-$Definition['Public Key'] = 'Public Key';
 
 $Definition['Quick-Start Guide to Creating Themes for Vanilla'] = 'Guida rapida alla realizzazione di temi per Vanilla';
 
@@ -227,7 +227,6 @@ $Definition['Remove Banner Logo'] = 'Rimuovi Logo Banner';
 $Definition['Replacement Role'] = 'Ruolo di sostituzione';
 $Definition['Reported'] = 'Segnalato';
 $Definition['Requires: '] = 'Richiede: ';
-$Definition['Reset Password'] = 'Reset Password';
 $Definition['Reset password and send email notification to user'] = 'Resetta la password ed invia una notifica via email all\'utente';
 $Definition['Reveal Password'] = 'Mostra Password';
 $Definition['Role'] = 'Ruolo';
@@ -239,30 +238,26 @@ $Definition['Route Expression'] = 'Espressione Percorso';
 $Definition['Routes'] = 'Percorsi';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = 'I percorsi possono essere usati per reindirizzare gli utenti verso varie parti del sito a seconda dell\' url.';
 
-$Definition['SMTP Host'] = 'SMTP Host';
-$Definition['SMTP Password'] = 'SMTP Password';
-$Definition['SMTP Port'] = 'SMTP Port';
-$Definition['SMTP Security'] = 'SMTP Security';
-$Definition['SMTP User'] = 'SMTP User';
 $Definition['Search for users by name or enter the name of a role to see all users with that role.'] = 'Cerca utenti per nome o visualizzali tutti in base al ruolo.';
+
+$Definition['seconds'] = 'secondi';
+
 $Definition['Select the file to import'] = 'Seleziona il file da importare';
 $Definition['Send %s a Message'] = 'Invia un messaggio a %s';
 $Definition['Send Again'] = 'Re-Invia';
 $Definition['Sent To'] = 'Invia a';
-$Definition['SignIn'] = 'Login';
-$Definition['Signatures'] = 'Firme';
 $Definition['Status'] = 'Stato';
 
 $Definition['Temporary (302)'] = 'Temporaneo (302)';
 $Definition['Thank You!'] = 'Grazie!';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = 'L\'Autenticatore %s non possiede opzioni di configurazione standard.';
-$Definition['The Password Authenticator does not have any custom configuration options. '] = 'Il sistema di autenticazione via password non prevede alcun dato da configurare';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = 'L\'addon non puo\' essere abilitato perche\' genera un errore fatale: <pre>%s</pre>';
 $Definition['The banner logo appears at the top of your forum.'] = 'Il banner apparirà nella parte superiore del forum';
 $Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'Il banner, se caricato, apparità nell\'angolo superiore sinistro di ogni pagina.';
 $Definition['The following content has been flagged by users for moderator review.'] = 'I seguenti contenuti sono stati segnalati dagli utenti';
 $Definition['The invitation was removed successfully.'] = 'L\'invito è stato rimosso correttamente';
 $Definition['The invitation was sent successfully.'] = 'L\'invito è stato inviato correttamente';
+$Definition['The Password Authenticator does not have any custom configuration options. '] = 'Il sistema di autenticazione via password non prevede alcun dato da configurare';
 $Definition['ThemeHelp'] = 'Guida ai Temi';
 $Definition['Themes'] = 'Temi';
 $Definition['Theming Overview'] = 'Cosa sono i Temi?';
@@ -271,7 +266,6 @@ $Definition['There are no items awaiting moderation at this time.'] = 'Al moment
 $Definition['This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.'] = 'Questo plugin permette agli utenti di accedere con OpenID. <b>Assicurati di gestire il plugin dalle Impostazioni dopo averlo attivato, per abilitare il Login con OpenID</b>.';
 $Definition['This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.'] = 'Questo plugin permette agli utenti di accedere con il proprio account Google. <b>Assicurati di gestire il plugin dalle Impostazioni dopo averlo attivato, per abilitare il Login con Google</b>.';
 $Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connect permette agli utenti di accedere con il proprio account Twitter. <b>Affinche\' il plugin funzioni, devi registrare la tua applicazione su Twitter.</b>';
-$Definition['Type'] = 'Tipo';
 
 $Definition['Uninvite'] = 'Annulla Invito';
 $Definition['Unlimited'] = 'Illimitato';
@@ -281,10 +275,12 @@ $Definition['User'] = 'Utente';
 $Definition['User Registration Settings'] = 'Impostazioni Registrazione Utente';
 $Definition['Users'] = 'Utenti';
 
-$Definition['ValidateInteger'] = '%s non e\' un valore intero valido.';
 $Definition['Vanilla.Archive.Description'] = 'Puoi decidere di archiviare le discussioni antecedenti ad una certa data. Le discussioni archiviate sono chiuse a tutti gli effetti, non permettendo nuovi post.';
 $Definition['Version'] = 'Versione';
 $Definition['Version %s'] = 'Versione %s';
+
+$Definition['version %s'] = 'versione %s';
+
 $Definition['View'] = 'Guarda';
 
 $Definition['Warning'] = 'Attenzione';
@@ -307,23 +303,3 @@ $Definition['You cannot remove an invitation that has been accepted.'] = 'Non pu
 $Definition['You have %s invitations left for this month.'] = 'Hai ancora %s inviti per questo mese';
 $Definition['You must be authenticated in order to use this form.'] = 'Attenzione - E\' necessario essere autenticati per poter utilizzare la form utilizzata.';
 $Definition['Your application will be reviewed by an administrator. You will be notified by email if your application is approved.'] = 'La tua registrazione verra\' supervisionata da un amministratore. Verrai notificato via email appena la tua registrazione verra\' approvata.';
-
-$Definition['[%s] Invitation'] = '[%s] Invito';
-$Definition['[%s] Password Reset'] = '[%s] Password resettata';
-$Definition['[%s] Password Reset Request'] = '[%s] Richiesta di Reset Password';
-
-$Definition['_Locale'] = 'Locale';
-
-$Definition['comment(s)'] = 'commento(i)';
-
-$Definition['discussion(s)'] = 'discussione(i)';
-
-$Definition['edit'] = 'modifica';
-
-$Definition['minute(s)'] = 'minuto(i)';
-
-$Definition['never'] = 'mai';
-
-$Definition['seconds'] = 'secondi';
-
-$Definition['version %s'] = 'versione %s';

@@ -1,29 +1,25 @@
 <?php
 
 $Definition['%1$s Version %2$s'] = '%1$s Versie %2$s';
-$Definition['%1$s on %2$s'] = '%1$s op %2$s';
 $Definition['%s user(s) found.'] = '%s gebruiker(s) gevonden.';
-
-$Definition['(YYYY-mm-dd)'] = '(YYYY-mm-dd)';
 
 $Definition['1 month after being sent'] = '1 maand na verzending';
 $Definition['1 week after being sent'] = '1 week na verzending';
 
 $Definition['2 weeks after being sent'] = '2 weken na verzending';
 
+$Definition['_Locale'] = 'Locale';
+
 $Definition['A url-friendly version of the category name for better SEO.'] = 'Een url-vriendelijke versie van de categorie naam voor betere SEO.';
 $Definition['Accepted'] = 'Aanvaard';
 $Definition['Action'] = 'Actie';
 $Definition['Add Category'] = 'Voeg Categorie Toe';
 $Definition['Add Info &amp; Create Account'] = 'Voeg Info toe &amp; Creër Account';
-$Definition['Add Message'] = 'Voeg Bericht toe';
 $Definition['Add Role'] = 'Voeg een Rol toe';
 $Definition['Add User'] = 'Voeg Gebruiker toe';
-$Definition['Addons'] = 'Addons';
-$Definition['Administrator'] = 'Administrator';
+$Definition['AddonProblems'] = 'sdsfd';
 $Definition['Advanced'] = 'Geavanceerd';
 $Definition['Advanced Forum Settings'] = 'Geavanceerde Forum Instellingen';
-$Definition['Allow'] = 'Toestaan';
 $Definition['Appearance'] = 'Uiterlijk';
 $Definition['Applicant'] = 'Aanvrager';
 $Definition['Application'] = 'Applicatie';
@@ -44,42 +40,48 @@ $Definition['Authors can edit for 30 minutes after posting'] = 'Auteurs kunnen g
 $Definition['Authors can edit for 5 minutes after posting'] = 'Auteurs kunnen gedurende 5 minuten hun eigen berichten wijzigen';
 $Definition['Authors cannot edit their posts'] = 'Auteurs kunnen hun eigen berichten niet wijzigen';
 
-$Definition['Banner'] = 'Banner';
-$Definition['Banner Logo'] = 'Banner Logo';
 $Definition['Banner Title'] = 'Banner Titel';
 
 $Definition['Category Url:'] = 'Categorie Url:';
 $Definition['Change the way that new users register with the site.'] = 'Verander de manier waarop nieuwe gebruikers zich kunnen registreren op de site.';
 $Definition['Check all permissions that apply for each role'] = 'Controleer alle rechten die gelden voor elke rol';
 $Definition['Check all permissions that apply to this role:'] = 'Selecteer alle machtigingen die gelden voor deze rol:';
-$Definition['Check all roles that apply to this user:'] = 'Controleer alle rollen die van toepassing zijn op deze gebruiker:';
 $Definition['Choose a locale pack'] = 'Kies een locale pack';
 $Definition['Choose and configure your forum\'s authentication scheme.'] = 'Kies en configureer het authenticatieschema van je forum.';
 $Definition['Choose who can send out invitations to new members:'] = 'Geef aan wie uitnodigingen kan versturen voor nieuwe leden:';
+
+$Definition['comment(s)'] = 'reactie(s)';
+
 $Definition['Comments per Page'] = 'Reacties per Pagina';
 $Definition['Configure an Authenticator'] = 'Configureer een Verificator';
 $Definition['Consumer Key'] = 'Gebruikerssleutel';
 $Definition['Consumer Secret'] = 'Gebruikers Geheim';
 $Definition['Conversation Messages'] = 'Gesprek Berichten';
 $Definition['Conversations'] = 'Gesprekken';
+$Definition['Conversations Setup'] = 'Hey you!!!';
 $Definition['Copy'] = 'Kopiëren';
 $Definition['Current Authenticator'] = 'Huidige Verificator';
 $Definition['Current Theme'] = 'Huidige Thema';
 
 $Definition['Decline'] = 'Afslaan';
+$Definition['Deleting category...'] = 'erlffds';
 $Definition['Description'] = 'Beschrijving';
 $Definition['Disable'] = 'Uitschakelen';
 $Definition['Disable Google Sign In'] = 'Uitschakelen Google Sign In';
 $Definition['Disable OpenID'] = 'Uitschakelen OpenID';
 $Definition['Discussion & Comment Editing'] = 'Discussie & Reactie Bewerken';
+
+$Definition['discussion(s)'] = 'discussie(s)';
+
 $Definition['Discussions per Page'] = 'Discussies per Pagina';
 $Definition['Don\'t Refresh'] = 'Niet opnieuw laden';
 $Definition['Don\'t use Categories'] = 'Gebruik geen Categorieën';
 
+$Definition['edit'] = 'bewerk';
+
 $Definition['Edit Category'] = 'Bewerk Categorie';
 $Definition['Edit User'] = 'Bewerk Gebruiker';
 $Definition['EditContentTimeout.Notes'] = 'Opmerking: Als een gebruiker een rol bezit die bevoegdheden heeft tot het bewerken van de inhoud, dan zullen deze bevoegdheden elke hier geselecteerde waarde overschrijven.';
-$Definition['Email visible to other users'] = 'E-mail zichtbaar voor andere gebruikers';
 $Definition['Enable'] = 'Inschakelen';
 $Definition['Enable OpenID'] = 'Inschakelen OpenID';
 $Definition['Enter the email address of the person you would like to invite:'] = 'Voer het e-mailadres in van de persoon die je wilt uitnodigen:';
@@ -100,11 +102,10 @@ $Definition['Garden.Import.Description'] = 'Gebruik deze pagina om gegevens van 
 $Definition['Garden.Import.InputInstructions'] = 'Voer het e-mailadres en het wachtwoord in van de admin gebruiker van de te importeren gegevens.';
 $Definition['Garden.Import.Overwrite.Description'] = 'Waarschuwing: Alle gegevens van dit forum zullen worden overschreven.';
 $Definition['Generate'] = 'Genereer';
-$Definition['Generate Password'] = 'Genereer Wachtwoord';
 $Definition['Get More Applications'] = 'Meer Applicaties...';
+$Definition['Get more information on creating custom routes'] = '<br/>Meer informatie over het maken van aangepaste routes';
 $Definition['Get More Plugins'] = 'Meer Plugins...';
 $Definition['Get More Themes'] = 'Haal meer Thema\'s op';
-$Definition['Get more information on creating custom routes'] = '<br/>Meer informatie over het maken van aangepaste routes';
 $Definition['Google Sign In Settings'] = 'Google Sign In Instellingen';
 $Definition['Guest'] = 'Gast';
 
@@ -117,13 +118,9 @@ $Definition['Invitations will expire'] = 'Uitnodigingen zullen aflopen';
 $Definition['Invited by'] = 'Uitgenodigd door';
 $Definition['It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size.'] = 'Het is een goed idee om het maximum aantal tekens in een reactie tot een redelijke omvang te houden.';
 
-$Definition['Key Type'] = 'Key Type';
-$Definition['Key Value'] = 'Key Value';
-
 $Definition['Last Visit'] = 'Laatste Bezoek';
 $Definition['Locale Key (Folder)'] = 'Locale Key (Map)';
 $Definition['Locale Name'] = 'Locale Naam';
-$Definition['Locales'] = 'Locales';
 $Definition['Locales are in your %s folder.'] = 'Locales maken het mogelijk om andere talen op je site te ondersteunen. Zodra een locale is toegevoegd aan de map %s , kan je die op deze pagina in- of uitschakelen.';
 $Definition['Location'] = 'Locatie';
 
@@ -143,8 +140,12 @@ $Definition['Max Comment Length'] = 'Max Reactie Lengte';
 $Definition['Member'] = 'Lid';
 $Definition['Messages can appear anywhere in your application.'] = 'Berichten kunnen overal in de applicatie verschijnen en kunnen worden ingezet om je gebruikers te informeren over nieuws en evenementen. Gebruik deze pagina om de berichten te ordenen door ze omhoog of omlaag te verslepen.';
 $Definition['Method'] = 'Methode';
-$Definition['Moderator'] = 'Moderator';
+
+$Definition['minute(s)'] = 'minu(u)t(en)';
+
 $Definition['My Invitations'] = 'Mijn Uitnodigingen';
+
+$Definition['never'] = 'nooit';
 
 $Definition['New comments in the last day'] = 'Nieuwe reacties in de afgelopen dag';
 $Definition['New comments in the last week'] = 'Nieuwe reacties in de afgelopen week';
@@ -167,45 +168,34 @@ $Definition['Other Themes'] = 'Andere Thema\'s';
 $Definition['Outgoing Email'] = 'Uitgaande E-mail';
 
 $Definition['Page'] = 'Pagina';
-$Definition['Panel Box'] = 'Panel Box';
 $Definition['Password Options'] = 'Wachtwoord Opties';
 $Definition['Pending'] = 'Uitstaand';
 $Definition['Please choose an authenticator to configure.'] = 'Kies een verificator om te configureren.';
-$Definition['Plugin'] = 'Plugin';
 $Definition['PluginHelp'] = 'Met Plugins kan je functionaliteit aan je site toevoegen.<br />Zodra een plugin is toegevoegd aan de map %s, kan je die op deze pagina in- of uitschakelen.';
-$Definition['Plugins'] = 'Plugins';
-$Definition['Position'] = 'Positie';
-$Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.';
-$Definition['Private Key'] = 'Private Key';
-$Definition['Public Key'] = 'Public Key';
 
 $Definition['Recently Active Users'] = 'Recente Actieve Gebruikers';
 $Definition['Refresh Comments'] = 'Laad Reacties opnieuw';
 $Definition['Registration'] = 'Registratie';
 $Definition['Remove'] = 'Verwijder';
 $Definition['Requires: '] = 'Vereist: ';
-$Definition['Reset Password'] = 'Reset Wachtwoord';
 $Definition['Reset password and send email notification to user'] = 'Reset Wachtwoord en stuur een e-mail notificatie naar de gebruiker';
 $Definition['Reveal Password'] = 'Onthul Wachtwoord';
 $Definition['Role'] = 'Rol';
 $Definition['Role Name'] = 'Rol Naam';
 $Definition['Roles & Permissions'] = 'Rollen & Rechten';
 $Definition['Roles determine user\'s permissions.'] = 'Elke gebruiker van je site is ten minste één rol toegewezen. Rollen worden gebruikt om te bepalen wat gebruikers mogen doen.';
-$Definition['Route'] = 'Route';
-$Definition['Route Expression'] = 'Route Expression';
-$Definition['Routes'] = 'Routes';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = 'Routes kunnen worden gebruikt om gebruikers, op basis van de url, te leiden naar verschillende delen van je site.';
 
-$Definition['SMTP Host'] = 'SMTP Host';
-$Definition['SMTP Password'] = 'SMTP Wachtwoord';
-$Definition['SMTP Port'] = 'SMTP Poort';
-$Definition['SMTP Security'] = 'SMTP Beveiliging';
-$Definition['SMTP User'] = 'SMTP Gebruiker';
+$Definition['seconds'] = 'seconden';
+
 $Definition['Select the file to import'] = 'Selecteer het te importeren bestand';
 $Definition['Send %s a Message'] = 'Stuur %s een Bericht';
 $Definition['Send Again'] = 'Stuur Opnieuw';
 $Definition['Sent To'] = 'Verstuurd naar';
-$Definition['Status'] = 'Status';
+$Definition['SMTP Password'] = 'SMTP Wachtwoord';
+$Definition['SMTP Port'] = 'SMTP Poort';
+$Definition['SMTP Security'] = 'SMTP Beveiliging';
+$Definition['SMTP User'] = 'SMTP Gebruiker';
 
 $Definition['Temporary (302)'] = 'Tijdelijk (302)';
 $Definition['Thank You!'] = 'Bedankt!';
@@ -219,7 +209,6 @@ $Definition['There are currently no applicants.'] = 'Er zijn momenteel geen aanv
 $Definition['This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.'] = 'Deze plugin maakt het gebruikers mogelijk om in te loggen met OpenID. <b>Zorg ervoor dat je op instellingen klikt na het inschakelen van deze plugin om met OpenID te kunnen inloggen.</b>.';
 $Definition['This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.'] = 'Deze plugin maakt het gebruikers mogelijk om in te loggen met hun Google accounts. <b>Zorg ervoor dat je op instellingen klikt na het inschakelen van deze plugin om met Google te kunnen inloggen.</b>.';
 $Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connect maakt het gebruikers mogelijk om in te loggen met hun Twitter account. <b>Om deze plugin te kunnen gebruiken moet je applicatie bij Twitter geregistreerd worden.</b>';
-$Definition['Type'] = 'Type';
 
 $Definition['Uninvite'] = 'Intrekken';
 $Definition['Unlimited'] = 'Onbeperkt';
@@ -229,15 +218,16 @@ $Definition['User'] = 'Gebruiker';
 $Definition['User Registration Settings'] = 'Gebruiker registratie-instellingen';
 $Definition['Users'] = 'Gebruikers';
 
-$Definition['ValidateInteger'] = '%s is geen geldige integer.';
 $Definition['Vanilla.Archive.Description'] = 'You can choose to archive forum discussions older than a certain date. Archived discussions are effectively closed, allowing no new posts.';
 $Definition['Version'] = 'Versie';
 $Definition['Version %s'] = 'Versie %s';
+
+$Definition['version %s'] = 'Versie %s';
+
 $Definition['View'] = 'Bekijk';
 
 $Definition['Warning'] = 'Waarschuwing';
 $Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = 'Wij zullen standaard proberen om de lokale mailserver te gebruiken om mail te versturen. Als je een andere SMTP mailserver wilt gebruiken, dan kan je deze hieronder configureren.';
-$Definition['What\'s the Buzz?'] = 'What\'s the Buzz?';
 $Definition['Why do you want to join?'] = 'Waarom wil jij je aansluiten?';
 $Definition['Within'] = 'Binnen';
 
@@ -249,19 +239,3 @@ $Definition['You can place files in your /uploads folder.'] = 'Als je bestand te
 $Definition['You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'] = 'Je kunt de %1$s plugin niet uitschakelen, omdat de %2$s plugin er van afhankelijk is.';
 $Definition['You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'] = 'Je kunt de OpenID plugin niet uitschakelen, omdat de GoogleSignIn plugin er van afhankelijk is.';
 $Definition['Your application will be reviewed by an administrator. You will be notified by email if your application is approved.'] = 'Je aanvraag zal worden beoordeeld door een beheerder. Als je aavraag is goedgekeurd, zul je  op de hoogte worden gesteld via een e-mail ';
-
-$Definition['_Locale'] = 'Locale';
-
-$Definition['comment(s)'] = 'reactie(s)';
-
-$Definition['discussion(s)'] = 'discussie(s)';
-
-$Definition['edit'] = 'bewerk';
-
-$Definition['minute(s)'] = 'minu(u)t(en)';
-
-$Definition['never'] = 'nooit';
-
-$Definition['seconds'] = 'seconden';
-
-$Definition['version %s'] = 'Versie %s';

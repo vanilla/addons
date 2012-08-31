@@ -4,7 +4,7 @@
   'Locale' => 'ko-KR',
   'Name' => 'Korean Transifex',
   'Description' => 'Korean language translations for Vanilla. Help contribute to this translation by going to its translation site <a href="https://www.transifex.com/projects/p/vanilla/language/ko_KR/">here</a>.',
-  'Version' => '1.0',
+  'Version' => '2012.08.31',
   'Author' => 'Vanilla Community',
   'AuthorUrl' => 'https://www.transifex.com/projects/p/vanilla/language/ko_KR/',
 );

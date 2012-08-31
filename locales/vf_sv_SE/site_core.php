@@ -12,8 +12,6 @@ $Definition['%1$s was removed from the %2$s %3$s.'] = '%1$s ble fjernet fra %2$s
 $Definition['%1$s wrote on %4$s %5$s.'] = '%1$s skrev på %5$s %4$s.';
 $Definition['%3$s approved %2$s membership application.'] = '%3$s godkände medlemskap för %2$s.';
 $Definition['%3$s created an account for %1$s.'] = '%3$s skapade ett konto åt %1$s.';
-$Definition['%s New'] = '%s Ny';
-$Definition['%s New Plural'] = '%s Nya';
 $Definition['%s and you'] = '%s og deg';
 $Definition['%s comment'] = '%s kommentar';
 $Definition['%s comments'] = '%s kommentarer. ';
@@ -21,17 +19,23 @@ $Definition['%s discussion'] = '%s diskussion';
 $Definition['%s discussions'] = '%s diskussioner';
 $Definition['%s message'] = '%s meddelande';
 $Definition['%s messages'] = '%s meddelanden';
+$Definition['%s New'] = '%s Ny';
 $Definition['%s new'] = '%s ny';
+$Definition['%s New Plural'] = '%s Nya';
+
+$Definition['[%s] Welcome Aboard!'] = 'Välkommen ombord [%s]!';
 
 $Definition['A fatal error occurred while processing the request.<br />The server returned the following response: %s'] = 'Ett fel uppstod medan din förfrågan behandlades.<br> Servern gav följande svar: - %s';
 $Definition['About'] = 'Om';
 $Definition['Activity'] = 'Aktivitet';
 $Definition['Add'] = 'Lägg till';
 $Definition['Add Comment'] = 'Lägg till kommentar';
+$Definition['Add Message'] = 'Lägg till meddelande';
 $Definition['Add People to this Conversation'] = 'Lägg till personer till denna konversation';
 $Definition['All Categories'] = 'Alla kategorier';
 $Definition['All Conversations'] = 'Alla konversationer';
 $Definition['All Discussions'] = 'Alla diskussioner';
+$Definition['Allow'] = 'Tillåt';
 $Definition['Allow other members to see your email?'] = 'Tillåt andra medlemmar att se din e-post?';
 $Definition['An invitation has already been sent to the email you entered.'] = 'En inbjudan har redan skickats till den här e-postadressen.';
 $Definition['Announce'] = 'Tillkännage';
@@ -61,6 +65,7 @@ $Definition['Change My Password'] = 'Ändra mitt lösenord';
 $Definition['Change My Picture'] = 'Ändra min bild';
 $Definition['Change Password'] = 'Ändra lösenord';
 $Definition['Change Picture'] = 'Ändra bild';
+$Definition['Check all roles that apply to this user:'] = 'Välj alla roller som gäller denna användare:';
 $Definition['Child Categories:'] = 'Underkategorier:';
 $Definition['Clear'] = 'Rensa';
 $Definition['Clear Conversation History'] = 'Rensa konversationens historik';
@@ -92,6 +97,7 @@ $Definition['Edit My Account'] = 'Redigera mitt konto';
 $Definition['Edit My Thumbnail'] = 'Ändra min ikon';
 $Definition['Email'] = 'E-post';
 $Definition['Email Notifications'] = 'E-postnotiser';
+$Definition['Email visible to other users'] = 'E-postadress synlig för andra användare';
 $Definition['Email/Username'] = 'e-post/användarnamn';
 $Definition['Enter your Email address'] = 'Skriv din e-postadress';
 $Definition['ErrorBadInvitationCode'] = 'Fel: Ogiltig inbjudningskod.';
@@ -106,6 +112,11 @@ $Definition['Go'] = 'Sök';
 $Definition['GuestModule.Message'] = 'For å engasjere deg på denne siden, klikk på en av disse knappene:';
 
 $Definition['Hang on a sec while we sign you out.'] = 'Vänta några sekunder medan du loggas ut.';
+
+$Definition['he'] = 'han';
+$Definition['her'] = 'hennes';
+$Definition['his'] = 'hans';
+
 $Definition['Howdy, Stranger!'] = 'Välkommen!';
 
 $Definition['I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'] = 'Jag accepterar <a id="TermsOfService" class="Popup" target="terms" href="%s">användarvillkoren.</a>';
@@ -150,13 +161,14 @@ $Definition['Notify me when people write on my wall.'] = 'Skicka notis när någ
 $Definition['Okay'] = 'Okej';
 $Definition['Old Password'] = 'Gammalt lösenord';
 $Definition['Options'] = 'Alternativ';
+
+$Definition['or'] = 'eller';
+
 $Definition['Or you can...'] = 'Eller logga in med...';
-$Definition['Original'] = 'Original';
 
 $Definition['Page Not Found'] = 'Sidan kunde inte hittas.';
 $Definition['Password'] = 'Lösenord';
 $Definition['Passwords don\'t match'] = 'Lösenorden stämmer inte överens med varandra.';
-$Definition['Permalink'] = 'Permalink';
 $Definition['Popular'] = 'Populär';
 $Definition['Post Comment'] = 'Skicka kommentar';
 $Definition['Post Discussion'] = 'Skicka diskussion';
@@ -170,6 +182,7 @@ $Definition['Remove My Picture'] = 'Ta bort min bild';
 $Definition['Remove Picture'] = 'Ta bort bild';
 $Definition['Reopen'] = 'Återöppna';
 $Definition['Request a new password →'] = 'Be om nytt lösenord →';
+$Definition['Reset Password'] = 'Återställ lösenord';
 $Definition['Roles'] = 'Roller';
 
 $Definition['Save'] = 'Spara';
@@ -182,13 +195,20 @@ $Definition['Select an image on your computer (2mb max)'] = 'Välj en bild från
 $Definition['Send Message'] = 'Skicka meddelande';
 $Definition['Settings'] = 'Inställningar';
 $Definition['Share'] = 'Dela';
+
+$Definition['she'] = 'henne';
+
 $Definition['Sign In'] = 'Logga in';
 $Definition['Sign Out'] = 'Logga ut';
+$Definition['SignIn'] = 'Logga in';
 $Definition['Sink'] = 'Sänk';
 $Definition['Sink this discussion'] = 'Sänk denna diskussion';
-$Definition['Start Conversation'] = 'Starta konversation';
+
+$Definition['somebody'] = 'någon';
+
 $Definition['Start a New Conversation'] = 'Starta en ny konversation';
 $Definition['Start a New Discussion'] = 'Skapa en ny tråd';
+$Definition['Start Conversation'] = 'Starta konversation';
 $Definition['Started by %1$s'] = 'Startad av %1$s';
 
 $Definition['Terms of Service'] = 'Användarvillkor';
@@ -212,12 +232,17 @@ $Definition['Visit Site'] = '← Besök sidan';
 $Definition['Visits'] = 'Antal besök';
 $Definition['Votes'] = 'Röster';
 
+$Definition['wall'] = 'vägg';
+
 $Definition['Want to take part in this discussion? Click one of these:'] = 'Vill du delta i den här diskussionen? Klicka på en av följande:';
-$Definition['Write Comment'] = 'kommentera';
 $Definition['Write a comment'] = 'Skriv en kommentar';
+$Definition['Write Comment'] = 'kommentera';
 $Definition['Write something about yourself...'] = 'Skriv något om dig själv...';
 
 $Definition['You'] = 'Du';
+
+$Definition['you'] = 'du';
+
 $Definition['You do not have any bookmarks.'] = 'Du har inga bokmärken.';
 $Definition['You do not have any conversations.'] = 'Du har inga konversationer';
 $Definition['You do not have any drafts.'] = 'Du har inga utkast.';
@@ -226,6 +251,9 @@ $Definition['You do not have enough invitations left.'] = 'Du har inte tillräck
 $Definition['You have not started any discussions.'] = 'Du har inte startat några diskussioner.';
 $Definition['You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. You must wait at least %3$s seconds before attempting to post again.'] = 'Du har skickat %1$s gånger inom %2$s sekunder... Ett spamfilter stoppar just nu ditt konto. Vänta %3$s sekunder innan du skickar igen.';
 $Definition['You must agree to the terms of service.'] = 'Du måste acceptera användarvillkoren.';
+
+$Definition['your'] = 'din';
+
 $Definition['Your changes have been saved successfully.'] = 'Dina ändringar har sparats med lyckat resultat.';
 $Definition['Your changes have been saved.'] = 'Dina ändringar har sparats.';
 $Definition['Your invitation has been sent.'] = 'Din inbjudan har skickats.';
@@ -233,19 +261,3 @@ $Definition['Your old password was incorrect.'] = 'Ditt gamla lösenord var ogil
 $Definition['Your password has been changed.'] = 'Ditt lösenord har ändrats.';
 $Definition['Your picture has been removed.'] = 'Din bild har tagits bort.';
 $Definition['Your preferences have been saved.'] = 'Dina inställningar har sparats.';
-
-$Definition['[%s] Welcome Aboard!'] = 'Välkommen ombord [%s]!';
-
-$Definition['he'] = 'han';
-$Definition['her'] = 'hennes';
-$Definition['his'] = 'hans';
-
-$Definition['or'] = 'eller';
-
-$Definition['she'] = 'henne';
-$Definition['somebody'] = 'någon';
-
-$Definition['wall'] = 'vägg';
-
-$Definition['you'] = 'du';
-$Definition['your'] = 'din';

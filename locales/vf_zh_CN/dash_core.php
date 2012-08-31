@@ -1,25 +1,21 @@
 <?php
 
-$Definition['%1$s Version %2$s'] = '%1$s Version %2$s';
-$Definition['%1$s on %2$s'] = '%1$s on %2$s';
 $Definition['%s user(s) found.'] = '共%s位用户';
 
-$Definition['(YYYY-mm-dd)'] = '(YYYY-mm-dd)';
+$Definition['[%s] Confirm Your Email Address'] = '[%s] 请确认你的邮箱地址';
+$Definition['[%s] Invitation'] = '[%s]邀请';
+$Definition['[%s] Password Reset'] = '[%s]重设密码';
+$Definition['[%s] Password Reset Request'] = '[%s]重设密码请求';
 
-$Definition['1 month after being sent'] = '1 month after being sent';
-$Definition['1 week after being sent'] = '1 week after being sent';
-
-$Definition['2 weeks after being sent'] = '2 weeks after being sent';
+$Definition['_Locale'] = '本地化';
 
 $Definition['A message has been sent to your email address with password reset instructions.'] = '重置密码信息已经发送到您的邮箱，请您注意查收！';
-$Definition['A url-friendly version of the category name for better SEO.'] = 'A url-friendly version of the category name for better SEO.';
 $Definition['Above Main Content'] = '在主内容以上';
 $Definition['Accepted'] = '接受';
 $Definition['Action'] = '操作';
 $Definition['Add Category'] = '添加版块';
 $Definition['Add Info &amp; Create Account'] = '起个昵称吧';
 $Definition['Add Item'] = '添加屏蔽项';
-$Definition['Add Message'] = '写消息';
 $Definition['Add User'] = '添加用户';
 $Definition['Added By'] = '添加人';
 $Definition['AddonProblems'] = '加载项问题<h2>Probleme?</h2><p>Läuft etwas schief mit einem Add-On? Wen dem so ist kannst du bestimmte Bereich deines Forums wahrscheinlich nicht nutzen. Deaktiviere sie manuell hier:</p>%s';
@@ -27,6 +23,7 @@ $Definition['Addons'] = '加载项';
 $Definition['Administrator'] = '管理员';
 $Definition['Advanced'] = '高级';
 $Definition['Advanced Forum Settings'] = '高级论坛设置';
+$Definition['AdvancedNotifications'] = '高级通知';
 $Definition['All'] = '全选';
 $Definition['All Forum Pages'] = '所有论坛讨论区页面';
 $Definition['All Pages'] = '所有页面（*）';
@@ -36,7 +33,6 @@ $Definition['Appearance'] = '外观';
 $Definition['Applicant'] = '申请者';
 $Definition['Application'] = '应用';
 $Definition['Application ID'] = '应用 ID';
-$Definition['Application Secret'] = 'Application Secret';
 $Definition['ApplicationHelp'] = '应用帮助。 您可以添加更多应用功能。<br />应用功能被加入到文件夹 %s,您可以在这里激活或关闭它';
 $Definition['Applications'] = '应用';
 $Definition['Apply'] = '启用';
@@ -57,25 +53,19 @@ $Definition['Categories &amp; Discussions'] = '版块 & 帖子';
 $Definition['Category Page Layout'] = '版块展示方式';
 $Definition['Category Url:'] = '分类 Url:';
 $Definition['Change the way that new users register with the site.'] = '选择新用户注册方式';
-$Definition['Check all permissions that apply for each role'] = 'Check all permissions that apply for each role';
-$Definition['Check all roles that apply to this user:'] = '查看此用户的所有权限:';
 $Definition['Choose a locale pack'] = '选择一个本地化包';
-$Definition['Choose and configure your forum\'s authentication scheme.'] = 'Choose and configure your forum\'s authentication scheme.';
-$Definition['Choose who can send out invitations to new members:'] = 'Choose who can send out invitations to new members:';
+
+$Definition['comment(s)'] = '评论';
+
 $Definition['Comments Page'] = '评论页';
 $Definition['Comments per Page'] = '每页的评论';
-$Definition['Configure an Authenticator'] = 'Configure an Authenticator';
-$Definition['Consumer Key'] = 'Consumer Key';
-$Definition['Consumer Secret'] = 'Consumer Secret';
 $Definition['Content Flagging'] = '内容标记';
 $Definition['Conversation Messages'] = '对话消息';
 $Definition['Conversations'] = '对话';
 $Definition['Copy'] = '复制';
 $Definition['Could not instantiate mail function.'] = '邮件服务异常，请联系管理员';
-$Definition['Current Authenticator'] = 'Current Authenticator';
 $Definition['Current Theme'] = '正在使用的模板';
 
-$Definition['Decline'] = 'Decline';
 $Definition['Deleted'] = '页面不存在';
 $Definition['Description'] = '描述';
 $Definition['Disable'] = '关闭';
@@ -84,9 +74,13 @@ $Definition['Disable OpenID'] = '禁用 OpenID';
 $Definition['Disable Signatures'] = '关闭个性签名';
 $Definition['Disabled'] = '关闭';
 $Definition['Discussion & Comment Editing'] = '讨论 & 评论编辑';
-$Definition['Discussions Page'] = '帖子页';
+
+$Definition['discussion(s)'] = '帖子';
+
 $Definition['Discussions per Page'] = '每页帖子';
 $Definition['Don\'t use Categories'] = '停用版块';
+
+$Definition['edit'] = '编辑';
 
 $Definition['Edit Category'] = '编辑分类';
 $Definition['Edit Message'] = '编辑消息';
@@ -94,7 +88,6 @@ $Definition['Edit User'] = '编辑用户';
 $Definition['Edit/Delete Log'] = '编辑/删除 日志';
 $Definition['EditContentTimeout.Notes'] = 'Note: If a user is in a role that has permission to edit content, those permissions will override any value selected here.';
 $Definition['Email Confirmation Role'] = '邮箱确认角色';
-$Definition['Email visible to other users'] = '电子邮件地址公开';
 $Definition['Enable'] = '启用';
 $Definition['Enable OpenID'] = '启用 OpenID';
 $Definition['Enable this message'] = '激活消息';
@@ -113,13 +106,12 @@ $Definition['Flood Control'] = '流量控制';
 $Definition['Forum Settings'] = '论坛设置';
 $Definition['Frequency'] = '频率';
 
+$Definition['Garden'] = '花园';
 $Definition['Garden.Import.Description'] = 'Use this page to import data from another forum that was exported using Vanilla\'s exporter. For more information <a href="%s">see our importing documentation</a>.';
 $Definition['Garden.Import.InputInstructions'] = 'Enter the email and password of the admin user from the data being imported.';
 $Definition['Garden.Import.Overwrite.Description'] = 'Warning: All data in this forum will be overwritten.';
 $Definition['Generate'] = '生成';
-$Definition['Generate Password'] = '生成密码';
 $Definition['Get More Themes'] = '从vanilla官方获取模板';
-$Definition['Google Sign In Settings'] = 'Google Sign In Settings';
 $Definition['Guest'] = '访客';
 
 $Definition['Homepage'] = '首页';
@@ -132,13 +124,11 @@ $Definition['Invitations can be sent from users\' profile pages.'] = 'When you u
 $Definition['Invitations per month'] = '每月邀请数';
 $Definition['Invitations will expire'] = '邀请过期';
 $Definition['Invited by'] = '邀请';
-$Definition['It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size.'] = 'It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size.';
 
 $Definition['Key Type'] = 'Captcha 密钥类型';
 $Definition['Key Value'] = 'Captcha 密钥值';
 
 $Definition['Last Visit'] = '上次访问';
-$Definition['Locale Key (Folder)'] = 'Locale Key (Folder)';
 $Definition['Locale Name'] = '语言名称';
 $Definition['Locales'] = '国际化';
 $Definition['Locales are in your %s folder.'] = 'Locales allow you to support other languages on your site. Once an locale has been added to your %s folder, you can enable or disable it here.';
@@ -161,8 +151,14 @@ $Definition['Member'] = '成员';
 $Definition['Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'] = '消息可以出现在应用程序中的任何位置。消息可以用来告诉用户新闻和事件。使用本页,通过拖放它们上升或下降来重组你的消息';
 $Definition['Messages can appear anywhere in your application.'] = '消息系统用来在应用的各个地方展示通知，可以用来向用户发布通知和新闻，例如重大更新，重大事件的发生等，在这里，你可以方便的管理你的消息';
 $Definition['Method'] = '注册方式';
+
+$Definition['minute(s)'] = '分钟';
+
+$Definition['Mixed Layout'] = '混合布局';
 $Definition['Moderator'] = '板主';
 $Definition['My Invitations'] = '我的邀请';
+
+$Definition['never'] = '绝不';
 
 $Definition['New comments in the last day'] = '昨天的新帖子';
 $Definition['New comments in the last week'] = '上周的新帖子';
@@ -192,17 +188,12 @@ $Definition['Page'] = '页';
 $Definition['Panel Box'] = '面板箱';
 $Definition['Password Options'] = '密码选项';
 $Definition['Pending'] = '待定';
+$Definition['Permission.Category'] = '板块权限';
 $Definition['Permissions'] = '权限管理';
-$Definition['Please choose an authenticator to configure.'] = 'Please choose an authenticator to configure.';
 $Definition['Plugin'] = '插件';
 $Definition['PluginHelp'] = 'vanilla提供了一个强大的插件系统，能够帮您增加一些有用的功能，例如增加投票，美化模板等等，vanilla默认有很多插件，如果你想好获得更多的插件，请点击这里 <a href="http://vanillaforums.org/addons">获取插件</a> ，从官网获取';
 $Definition['Plugins'] = '插件';
 $Definition['Pockets'] = '口袋（自定义HTML块）';
-$Definition['Position'] = '位置';
-$Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.';
-$Definition['Private Key'] = 'Private Key';
-$Definition['Profile Page'] = '资料页';
-$Definition['Public Key'] = 'Public Key';
 
 $Definition['Rate of refresh'] = '间隔时间';
 $Definition['Recently Active Users'] = '近期活跃的用户';
@@ -212,7 +203,6 @@ $Definition['Registration'] = '注册';
 $Definition['Registration is currently closed.'] = '注册通道目前关闭。';
 $Definition['Remove'] = '删除';
 $Definition['Requires: '] = '需求: ';
-$Definition['Reset Password'] = '重设密码';
 $Definition['Reset my password'] = '重置我的密码';
 $Definition['Reset password and send email notification to user'] = '重设密码并向用户发送提醒邮件';
 $Definition['Reveal Password'] = '显示密码';
@@ -224,28 +214,27 @@ $Definition['Route Expression'] = '路径展示';
 $Definition['Routes'] = '路径';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = '路径会根据URL将用户转接到网站的不同端口';
 
-$Definition['SMTP Host'] = 'SMTP 主机';
-$Definition['SMTP Password'] = 'SMTP 密码';
-$Definition['SMTP Port'] = 'SMTP 端口';
-$Definition['SMTP Security'] = 'SMTP 安全';
-$Definition['SMTP User'] = 'SMTP 用户';
 $Definition['Saved'] = '保存';
-$Definition['Select the file to import'] = 'Select the file to import';
+
+$Definition['seconds'] = '秒';
+
 $Definition['Send %s a Message'] = '向%s发送消息';
 $Definition['Send Again'] = '再次发送';
 $Definition['Sent To'] = '发送给';
 $Definition['Show Pocket Locations'] = '显示可自定义HTML块及其位置';
 $Definition['Sign in'] = '登录';
-$Definition['Signatures'] = '签名';
+$Definition['Site Description'] = '站点描述';
+$Definition['SMTP Host'] = 'SMTP 主机';
+$Definition['SMTP Password'] = 'SMTP 密码';
+$Definition['SMTP Port'] = 'SMTP 端口';
+$Definition['SMTP Security'] = 'SMTP 安全';
+$Definition['SMTP User'] = 'SMTP 用户';
 $Definition['Statistics'] = '统计';
 $Definition['Status'] = '状态';
 $Definition['Stop Forum Spam Settings'] = '防灌水设置';
 
-$Definition['Tagging'] = '标签';
 $Definition['Temporary (302)'] = '临时移动 (302)';
 $Definition['Thank You!'] = '谢谢!';
-$Definition['The %s Authenticator does not have any custom configuration options.'] = 'The %s Authenticator does not have any custom configuration options.';
-$Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = 'The addon could not be enabled because it generated a fatal error: <pre>%s</pre>';
 $Definition['The banner logo appears at the top of your forum.'] = '站点LOGO将显示在论坛顶部';
 $Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = '站点名将显示在导航栏的最左边，如果用户上传了站点LOGO，那么将用LOGO代替';
 $Definition['The content you were looking for has been deleted.'] = '你所访问的页面不在家，全家都去火星了';
@@ -254,17 +243,12 @@ $Definition['The invitation was removed successfully.'] = '邀请已成功删除
 $Definition['The invitation was sent successfully.'] = '邀请发送成功';
 $Definition['ThemeHelp'] = '和wordpress类似，vanilla也提供了强大的模板功能，你可以从官网下载模板文件，然后解压到 %s 文件夹，在后台你就能够看到模板选项，点击启用即可完成美化.';
 $Definition['Themes'] = '模板';
-$Definition['There are currently no applicants.'] = 'There are currently no applicants.';
-$Definition['This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.'] = 'This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.';
-$Definition['This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.'] = 'This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.';
 $Definition['This plugin enables uploading files and attaching them to discussions and comments.'] = '这个插件能够提供文件上传的功能，帖子内容和评论中都可以嵌入附件';
 $Definition['Turn OFF'] = '关闭插件';
 $Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connect allows users to sign in using their Twitter account. <b>You must register your application with Twitter for this plugin to work.</b>';
-$Definition['Type'] = '类型';
 
 $Definition['Uninvite'] = '未邀请';
 $Definition['Unlimited'] = '无限制';
-$Definition['UrlCode'] = 'URL代码';
 $Definition['Use an SMTP server to send email'] = '使用STMP服务器发送邮件';
 $Definition['Use the content at this url as your homepage.'] = '默认首页，当用户访问 <strong>%s</strong>时，默认展现的页面，vanilla默认使用 "All Discussions" 页作为默认首页，你可以根据你的喜好来设置你的默认首页。';
 $Definition['User'] = '用户';
@@ -272,9 +256,11 @@ $Definition['User Registration Settings'] = '用户注册设置';
 $Definition['Users'] = '用户';
 $Definition['Users will be assigned to this role until they\'ve confirmed their email addresses.'] = '新注册的用户将被设置为此角色，直到他们激活（收到确认信）';
 
-$Definition['ValidateInteger'] = '整数验证';
 $Definition['Vanilla.Archive.Description'] = 'You can choose to archive forum discussions older than a certain date. Archived discussions are effectively closed, allowing no new posts.';
 $Definition['Version'] = '版本';
+
+$Definition['version %s'] = '版本 %s';
+
 $Definition['Version %s'] = '版本 %s';
 $Definition['View'] = '察看';
 
@@ -292,30 +278,6 @@ $Definition['You can place files in your /uploads folder.'] = 'If your file is t
 			large to upload directly to this page you can place it in your /uploads
 					folder. Make sure the filename begins with the word <b>export</b> and ends
 							with one of <b>.txt, .gz</b>.';
-$Definition['You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'] = 'You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.';
-$Definition['You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'] = 'You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.';
 $Definition['You cannot remove an invitation that has been accepted.'] = '已被接受的邀请不能删除';
 $Definition['You have %s invitations left for this month.'] = '本月您还有  %s 个邀请名额，快去邀请您的好友加入吧';
 $Definition['You must be authenticated in order to use this form.'] = '您必须经过验证才可以使用此表';
-$Definition['Your application will be reviewed by an administrator. You will be notified by email if your application is approved.'] = 'Your application will be reviewed by an administrator. You will be notified by email if your application is approved.';
-
-$Definition['[%s] Confirm Your Email Address'] = '[%s] 请确认你的邮箱地址';
-$Definition['[%s] Invitation'] = '[%s]邀请';
-$Definition['[%s] Password Reset'] = '[%s]重设密码';
-$Definition['[%s] Password Reset Request'] = '[%s]重设密码请求';
-
-$Definition['_Locale'] = '本地化';
-
-$Definition['comment(s)'] = '评论';
-
-$Definition['discussion(s)'] = '帖子';
-
-$Definition['edit'] = '编辑';
-
-$Definition['minute(s)'] = '分钟';
-
-$Definition['never'] = '绝不';
-
-$Definition['seconds'] = '秒';
-
-$Definition['version %s'] = '版本 %s';

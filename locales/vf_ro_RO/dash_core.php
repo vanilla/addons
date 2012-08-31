@@ -2,7 +2,6 @@
 
 $Definition['Accepted'] = 'Acceptat';
 $Definition['Add Info &amp; Create Account'] = 'Adauga informatii &amp; Creaza cont';
-$Definition['Add Message'] = 'Adauga mesaj';
 $Definition['Apply'] = 'Aplica';
 
 $Definition['Conversations'] = 'Conversatii';
@@ -21,8 +20,6 @@ $Definition['Sent To'] = 'Expediat catre';
 $Definition['Status'] = 'Starea';
 
 $Definition['Thank You!'] = 'Va multumim!';
-
-$Definition['ValidateInteger'] = '%s nu este un numar intreg valid.';
 
 $Definition['Who\'s Online Settings'] = 'Setari vizibilitate';
 $Definition['Why do you want to join?'] = 'De ce vrei sa te alaturi?';

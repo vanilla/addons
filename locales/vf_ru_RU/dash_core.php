@@ -1,10 +1,7 @@
 <?php
 
 $Definition['%1$s Version %2$s'] = '%1$s Версия %2$s';
-$Definition['%1$s on %2$s'] = '%1$s на %2$s';
 $Definition['%s user(s) found.'] = '%s пользователь(ей) найден(о).';
-
-$Definition['(YYYY-mm-dd)'] = '(YYYY-mm-dd)';
 
 $Definition['1 month after being sent'] = 'Месяц после отправки';
 $Definition['1 week after being sent'] = 'Неделю после отправки';
@@ -13,9 +10,10 @@ $Definition['2 weeks after being sent'] = 'Две недели после отп
 
 $Definition['<strong>Heads Up!</strong> Moving discussions into a replacement category can result in discussions vanishing (or appearing) if the replacement category has different permissions than the category being deleted.'] = '<strong>Внимание!</strong> Перемещение темы в другую категорию может привести к её исчезновению, если заменяемая категория имеет другие права';
 
+$Definition['_Locale'] = 'Язык';
+
 $Definition['A message has been sent to your email address with password reset instructions.'] = 'На ваш email выслано письмо с инструкцией по смене пароля';
 $Definition['A url-friendly version of the category name for better SEO.'] = 'Url-версия названия категории для улучшения SEO.';
-$Definition['API Status'] = 'API статус';
 $Definition['About Vanilla Statistics'] = 'Про этот плагин';
 $Definition['About.DisableStatistics'] = 'Если вам по каким-то причинам необходимо отключить этот плагин, отредактируйте файл config.php, добавив (или изменив) строку<p> <code>$Configuration[\'Garden\'][\'Analytics\'][\'Enabled\'] = FALSE;</code></p>';
 $Definition['About.VanillaStatistics'] = 'Это очень важный плагин, отправляющий статистику использования вашего форума на сервера Vanillaforums.org. Для того чтобы авторы Vanilla могли сделать движок форума еще лучше. Мы просим Вас не отключать отправку статистических данных';
@@ -24,7 +22,6 @@ $Definition['Action'] = 'Действия';
 $Definition['Add Category'] = 'Добавить категорию';
 $Definition['Add Info &amp; Create Account'] = 'Добавить информацию &amp; Создать аккаунт';
 $Definition['Add Item'] = 'Добавить запись';
-$Definition['Add Message'] = 'Добавить сообщение';
 $Definition['Add Role'] = 'Добавить новую группу';
 $Definition['Add User'] = 'Добавить пользователя';
 $Definition['Added By'] = 'Добавил';
@@ -36,11 +33,11 @@ $Definition['Advanced Forum Settings'] = 'Продвинутые установ�
 $Definition['Advanced Options'] = 'Расширенные опции';
 $Definition['All'] = 'Все';
 $Definition['All %1$s'] = 'Все %1$s';
-$Definition['All Forum Pages'] = 'На всех страницах форума';
 $Definition['All discussions in this category will be permanently deleted.'] = 'Все темы в этой категории будут удалены.';
+$Definition['All Forum Pages'] = 'На всех страницах форума';
 $Definition['All of the user content will be replaced with a message stating the user has been deleted.'] = 'Все сообщения пользователя будут заменены сообщением о том, что этот пользователь был удален.';
-$Definition['Allow'] = 'Одобрить';
 $Definition['Allow users to dismiss this message'] = 'Разрешить пользователям скрывать это сообщение';
+$Definition['API Status'] = 'API статус';
 $Definition['Appearance'] = 'Внешний вид';
 $Definition['Applicant'] = 'Кандидат';
 $Definition['Applicant Role'] = 'Выберите группу для новых кандидатов';
@@ -92,7 +89,6 @@ $Definition['Change your banner'] = 'Установи собственное л�
 $Definition['Changing the Discussions Menu Link'] = 'Обсуждение настройки контекстного меню';
 $Definition['Check all permissions that apply for each role'] = 'Проверьте права доступа, которые применяются в каждой группе.';
 $Definition['Check all permissions that apply to this role:'] = 'Проверьте права доступа, которые относятся к этой группе:';
-$Definition['Check all roles that apply to this user:'] = 'Проверьте все группы, в которых может состоять этот пользователь:';
 $Definition['Choose a locale pack'] = 'Выберите локализацию';
 $Definition['Choose and configure your forum\'s authentication scheme.'] = 'Выберите и настройте схему авторизации на форуме';
 $Definition['Choose how to handle all of the content associated with the user account for %s (comments, messages, etc).'] = 'Как обрабатывать содержимое для %s ? (отзывы, уведомления, и т.д.).';
@@ -100,6 +96,10 @@ $Definition['Choose who can send out invitations to new members:'] = 'Укажи
 $Definition['Click a tag name to edit. Click x to remove.'] = 'Кликните на имя тэга для редактирования. Кликните на x для удаления.';
 $Definition['Click here to apply it.'] = 'Кликните здесь для подтверждения';
 $Definition['Click here to carry on to your dashboard'] = 'Нажмите для перехода к панели управления сайтом';
+
+$Definition['comment(s)'] = 'отзыв(ов)';
+
+$Definition['Comments Page'] = 'Страниц комментариев';
 $Definition['Comments per Page'] = 'Отзывов на странице';
 $Definition['Configure an Authenticator'] = 'Настройки аутентификации';
 $Definition['Configure how nested categories are displayed to users.'] = 'Настройте количество вложенных категорий, видимых пользователям';
@@ -128,7 +128,6 @@ $Definition['Define your forum homepage, upload your logo, and more...'] = 'Ты
 $Definition['Delete Category'] = 'Удалить категорию';
 $Definition['Delete Forever'] = 'Удалить навсегда';
 $Definition['Delete User'] = 'Удалить пользователя';
-$Definition['Delete User Forever'] = 'Удалить пользователя навсегда';
 $Definition['Delete User: %s'] = 'Удалить пользователя: %s';
 $Definition['Deleting category...'] = 'Удаление категории...';
 $Definition['Description'] = 'Описание';
@@ -142,12 +141,17 @@ $Definition['Disabled'] = 'Выключено';
 $Definition['Disabled %1$s'] = 'Неактивные %1$s';
 $Definition['Discussion & Comment Editing'] = 'Редактирование Тем и Отзывов';
 $Definition['Discussion categories are used to help your users organize their discussions in a way that is meaningful for your community.'] = 'Категории помогают упростить навигацию по форуму, а также разбить темы на группы. Например, темы про мотоциклы нужно отнести в категорию "мото", а про автомобили — в категорию "авто"';
+
+$Definition['discussion(s)'] = 'Тем';
+
 $Definition['Discussions per Page'] = 'Тем на странице';
 $Definition['Display root categories as headings.'] = 'Показывать главные категории как заголовки.';
 $Definition['Do not display the categories in the side panel.'] = 'Не показывать список категорий в сайдбаре.';
 $Definition['Don\'t Refresh'] = 'Не обновлять';
 $Definition['Don\'t use Categories'] = 'Не использовать категории';
 $Definition['Drag and drop the categories below to sort and nest them.'] = 'Схватите и перетащите категорию для сортировки в списке.';
+
+$Definition['edit'] = 'редактировать';
 
 $Definition['Edit Category'] = 'Редактировать категорию';
 $Definition['Edit Message'] = 'Редактировать сообщение';
@@ -157,7 +161,6 @@ $Definition['Edit User'] = 'Редактировать пользователя'
 $Definition['Edit/Delete Log'] = 'Лог редактирования';
 $Definition['EditContentTimeout.Notes'] = 'Примечание: Если в группе пользователя стоят настройки, разрешающие редактирование в любое время - им будет отдано предпочтение';
 $Definition['Email Confirmation Role'] = 'Подтверждение прав по email';
-$Definition['Email visible to other users'] = 'Email виден другим пользователям';
 $Definition['Embed your community forum into your website to increase engagement...'] = 'Добавь форум на свой сайт, для повышения количества участников';
 $Definition['Embed your forum in your web site'] = 'Добавление форума на ваш сайт';
 $Definition['Enable'] = 'Включить';
@@ -185,7 +188,6 @@ $Definition['Flood Control'] = 'Антиспам';
 $Definition['Forum Settings'] = 'Настройки форума';
 $Definition['Frequency'] = 'Частота обновлений';
 
-$Definition['Garden'] = 'Garden';
 $Definition['Garden.Import.Description'] = 'Эта страница служит для импорта данных из другого форума, который был экспортирован с помощью виджета экспорта Vanilla. Дополнительную информацию вы можете получить в <a href="%s">документации</a>.';
 $Definition['Garden.Import.InputInstructions'] = 'Email и пароль администратора для источника импорта.';
 $Definition['Garden.Import.Overwrite.Description'] = 'Внимание! Все данные в этом форуме будут перезаписаны.';
@@ -195,11 +197,10 @@ $Definition['Garden.StatisticsLocal.Resolve'] = 'Если Вы уверены, �
 $Definition['Garden.StatisticsReadonly.Explain'] = 'Ваш config.php имеет атрибуты "только для чтения". Поэтому форум не сможет автоматически регистрировать InstallationID и InstallationSecret.';
 $Definition['Garden.StatisticsReadonly.Resolve'] = 'Для решения возникшей проблемы, назначьте атрибуты 777 вашему файлу conf/config.php.';
 $Definition['Generate'] = 'Генерировать';
-$Definition['Generate Password'] = 'Генерировать пароль';
 $Definition['Get More Applications'] = 'Новые приложения';
+$Definition['Get more information on creating custom routes'] = 'Читайте более подробную информацию о перенаправлениях.';
 $Definition['Get More Plugins'] = 'Новые плагины';
 $Definition['Get More Themes'] = 'Новые темы';
-$Definition['Get more information on creating custom routes'] = 'Читайте более подробную информацию о перенаправлениях.';
 $Definition['Getting Started with Vanilla'] = 'Добро пожаловать в мир Vanilla!';
 $Definition['Google Sign In Settings'] = 'Настройки авторизации Google';
 $Definition['Guest'] = 'Гость';
@@ -257,8 +258,8 @@ $Definition['Manage Roles & Permissions'] = 'Управление группам
 $Definition['Manage Routes'] = 'Управление перенаправлениями';
 $Definition['Manage Spam'] = 'Управление спамом';
 $Definition['Manage Themes'] = 'Управление темами';
-$Definition['Manage Users'] = 'Управление пользователями';
 $Definition['Manage users'] = 'Управляй пользователями';
+$Definition['Manage Users'] = 'Управление пользователями';
 $Definition['Manage your Plugins'] = 'Управление вашими плагинами';
 $Definition['Managing Categories'] = 'Управление категориями';
 $Definition['Max Comment Length'] = 'Максимальное количество символов в отзыве:';
@@ -267,11 +268,17 @@ $Definition['Member'] = 'Участник';
 $Definition['Member roles'] = 'Отметить все группы, которые применяются к новым или подтвержденным пользователям.';
 $Definition['Messages can appear anywhere in your application.'] = 'Сообщения могут быть отображены в любом месте сайта пользователя.<br>Например, это может быть использовано для информирования о новостях.<br>На этой странице можно управлять ими с помощью перетаскивания.';
 $Definition['Method'] = 'Способ';
+
+$Definition['minute(s)'] = 'Минут(ы)';
+
 $Definition['Moderator'] = 'Модератор';
 $Definition['Move discussions in this category to a replacement category.'] = 'Переместите обсжудение в эту категорию для её замены.';
 $Definition['My Invitations'] = 'Мои инвайты';
 
 $Definition['Need More Help?'] = 'Нужна помощь?';
+
+$Definition['never'] = 'никогда';
+
 $Definition['New comments in the last day'] = 'Новых комментариев за сутки';
 $Definition['New comments in the last week'] = 'Новых комментариев за 7 дней';
 $Definition['New conversations in the last day'] = 'Новых разговоров за сутки';
@@ -285,7 +292,6 @@ $Definition['New users are reviewed and approved by an administrator (that\'s yo
 $Definition['New users fill out a simple form and are granted access immediately.'] = 'Новые пользователи регистрируются и получают доступ к созданию тем сразу.';
 $Definition['New users in the last day'] = 'Новых пользователей за сутки';
 $Definition['New users in the last week'] = 'Новых пользователей за неделю';
-$Definition['No'] = 'Нет';
 $Definition['No Items Selected'] = 'Ничего не выбрано';
 $Definition['No results for %s.'] = 'По запросу "<b>%s</b>" ничего не найдено.';
 $Definition['None'] = 'Нет';
@@ -306,22 +312,19 @@ $Definition['Panel Box'] = 'Панель уведомлений';
 $Definition['Password Options'] = 'Настройки пароля';
 $Definition['Pending'] = 'В ожидании';
 $Definition['Permission.Category'] = 'Категория';
-$Definition['Please Confirm'] = 'Подтвердите пожалуйста';
 $Definition['Please choose an authenticator to configure.'] = 'Выберите плагин аутентификации для настройки';
+$Definition['Please Confirm'] = 'Подтвердите пожалуйста';
 $Definition['Plugin'] = 'Плагин';
 $Definition['Plugin.Enabled'] = 'Включены';
 $Definition['PluginHelp'] = 'Плагины позволяют изменять функциональность вашего сайта<br />Для установки плагина поместите его в папку %s и затем активируйте на этой странице';
 $Definition['Plugins'] = 'Плагины';
 $Definition['Plugins.Tagging.Enabled'] = 'Плагин "Теги" Включен';
-$Definition['Position'] = 'Позиция';
 $Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'Избегайте спама и флуда на форуме, путем ограничения количества новых обсужедний и комментариев в единицу времени.';
 $Definition['Private Key'] = 'Приватный ключ';
-$Definition['Profiles'] = 'Профили';
 $Definition['Public Key'] = 'Публичный ключ';
 
 $Definition['Quick-Start Guide to Creating Themes for Vanilla'] = 'Краткое руководство по созданию тем для Vanill\'ы';
 
-$Definition['Rate of refresh'] = 'Rate of refresh';
 $Definition['Recent News'] = 'Последние новости';
 $Definition['Recently Active Users'] = 'Последние активные пользователи';
 $Definition['Refresh Comments'] = 'Обновить отзывы';
@@ -332,7 +335,6 @@ $Definition['Replacement Category'] = 'Замена категории';
 $Definition['Require users to confirm their email addresses (recommended)'] = 'Запрашивать у пользователей подтверждение по email (рекомендуется)';
 $Definition['Requires: '] = 'Необходимо: ';
 $Definition['Rescan'] = 'Сканировать';
-$Definition['Reset Password'] = 'Сбросить пароль';
 $Definition['Reset my password'] = 'Сбросить мой пароль';
 $Definition['Reset password and send email notification to user'] = 'Сбросить пароль и отправить пользователю на почту сообщение об этом';
 $Definition['Restore'] = 'Восстановить';
@@ -347,29 +349,30 @@ $Definition['Routes'] = 'Перенаправления';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = 'Перенаправления могут быть использованы для автоматической переадресации пользователей на различные части вашего сайта в зависимости от URL.';
 $Definition['Run structure & data scripts'] = 'Запустить обновление структуры и скриптов';
 
-$Definition['SMTP Host'] = 'SMTP сервер';
-$Definition['SMTP Password'] = 'SMTP Пароль';
-$Definition['SMTP Port'] = 'SMTP Порт';
-$Definition['SMTP Security'] = 'Протокол безопасности SMTP';
-$Definition['SMTP User'] = 'SMTP Пользователь';
 $Definition['Saved'] = 'Сохранено.';
 $Definition['Search by user or role.'] = 'Поиск по имени пользователя или группе';
+
+$Definition['seconds'] = 'секунд';
+
 $Definition['Select the file to import'] = 'Выберите файл для импорта';
 $Definition['Select the import source'] = 'Выберите файл для импорта данных';
 $Definition['Send %s a Message'] = 'Отправить %s сообщение';
 $Definition['Send Again'] = 'Повторно отправить';
 $Definition['Send Invitations!'] = 'Послать приглашение!';
 $Definition['Sent To'] = 'Отправить';
-$Definition['SignIn'] = 'Вход';
+$Definition['SMTP Host'] = 'SMTP сервер';
+$Definition['SMTP Password'] = 'SMTP Пароль';
+$Definition['SMTP Port'] = 'SMTP Порт';
+$Definition['SMTP Security'] = 'Протокол безопасности SMTP';
+$Definition['SMTP User'] = 'SMTP Пользователь';
+
+$Definition['starting your first discussion'] = 'иконку';
+
 $Definition['Statistics'] = 'Статистика';
 $Definition['Status'] = 'Статус';
 
-$Definition['Tagging'] = 'Тэгирование';
-$Definition['Temporary (302)'] = 'Temporary (302)';
 $Definition['Thank You!'] = 'Спасибо!';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = 'Плагин %s не использует индивидуальные настройки';
-$Definition['The Vanilla 2 Exporter'] = 'Экспорт в Vanilla 2';
-$Definition['The Vanilla Statistics plugin turns your forum\'s dashboard into an analytics reporting tool'] = 'Плагин статистики в панели управления Vanilla показывает графики активности на форуме, основываясь на данных, записаных движком форума. Вы можете получить исчерпывающую информацию об этом плагине в его <a href="http://vanillaforums.org/docs/vanillastatistics">документации</a>.';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = 'Аддон не может быть активирован потому, что он выдает фатальную ошибку: <pre>%s</pre>';
 $Definition['The banner logo appears at the top of your forum.'] = 'Логотип отображается на всех страницах и заменяет название форума на загруженное изображение.';
 $Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'Название сайта отображается на каждой странице в левом верхнем углу (в зависимости от выбранной темы оформления), а также в заголовках страниц.<br><br>Кроме того, вы можете загрузить логотип, вместо названия сайта.';
@@ -379,16 +382,18 @@ $Definition['The homepage was saved successfully.'] = 'Страница была
 $Definition['The user and all related content has been deleted.'] = 'Пользователь и вся информация, которая была с ним связана, удалены.';
 $Definition['The user content will be completely deleted.'] = 'Контент пользователя будет полностью удалён';
 $Definition['The user has been deleted.'] = 'Пользователь был удален.';
+$Definition['The Vanilla 2 Exporter'] = 'Экспорт в Vanilla 2';
+$Definition['The Vanilla Statistics plugin turns your forum\'s dashboard into an analytics reporting tool'] = 'Плагин статистики в панели управления Vanilla показывает графики активности на форуме, основываясь на данных, записаных движком форума. Вы можете получить исчерпывающую информацию об этом плагине в его <a href="http://vanillaforums.org/docs/vanillastatistics">документации</a>.';
 $Definition['ThemeHelp'] = 'Темы позволяют изменить внешний вид вашего сайта.<br />Загрузите папку с темой сюда: %s и активируйте её на этой странице.';
 $Definition['Themes'] = 'Темы оформления';
 $Definition['Theming Overview'] = 'Информация о темах';
 $Definition['There are currently no applicants.'] = 'В настоящее время нет пользователей ожидающих одобрения участия на форуме.';
 $Definition['There are no database structure changes required. There may, however, be data changes.'] = 'Никаких изменений в структуре базы данных не требуется. Однако, изменения уже могли быть сделаны.';
 $Definition['There are no items awaiting moderation at this time.'] = 'В настоящее время нет новых сообщений для модерации.';
-$Definition['This Database'] = 'Эту базу данных';
 $Definition['This action cannot be undone.'] = 'Это действие не может быть отменено.';
 $Definition['This category has custom permissions.'] = 'Эта категория содержит особые права.';
 $Definition['This category is archived.'] = 'Эта категория находится в архиве.';
+$Definition['This Database'] = 'Эту базу данных';
 $Definition['This is the administrative dashboard for your new community. Check out the configuration options to the left: from here you can configure how your community works. <b>Only users in the "Administrator" role can see this part of your community.</b>'] = 'Это административная панель Вашего нового сообщества. В левой части панели Вы можете настроить параметры конфигурации. <b>Сделать это могут только пользователи с привилегиями "Администратора".</b>';
 $Definition['This plugin allows users to sign in with OpenID. <b>Make sure you click Settings after enabling this plugin to enable OpenID signin</b>.'] = 'Этот плагин позволяет пользователю войти на сайт с помощью OpenID. <b>После активации перейдите в настройки чтобы включить вход по OpenID</b>.';
 $Definition['This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.'] = 'Этот плагин позволяет пользователю войти на сайт с помощью Google. <b>После активации перейдите в настройки чтобы включить вход с помощью Google аккаунта.</b>.';
@@ -397,13 +402,11 @@ $Definition['This will show the panel on every page.'] = 'Эта опция бу
 $Definition['To embed your Vanilla community forum into a remote web application, use the forum embed code or one of the forum embed plugins below.'] = 'Для интеграции вашего форума на другие сайты, используйте код вставки форума или вставьте его с помощью плагинов описаных ниже.';
 $Definition['Try Again'] = 'Повторите';
 $Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Подключение через Twitter позволяет пользователю войти на форум с помощью twitter аккаунта. <b>Необходима активация приложения на сайте Twitter\'a чтобы плагин работал правильно.</b>';
-$Definition['Type'] = 'Тип';
 
 $Definition['Uninvite'] = 'Отменить приглашение';
 $Definition['Unlimited'] = 'Не ограничено';
-$Definition['UrlCode'] = 'Код ссылки';
-$Definition['Use Categories'] = 'Использовать категории';
 $Definition['Use an SMTP server to send email'] = 'Использовать SMTP-сервер для отправки писем';
+$Definition['Use Categories'] = 'Использовать категории';
 $Definition['Use categories to organize discussions'] = 'Использовать категории для организации общения';
 $Definition['Use the content at this url as your homepage.'] = 'Главная страница, которую посетители будут видеть, заходя по адресу <b>%s</b>. По умолчанию показываются "Все темы", но вы можете использовать всё, что захотите. Вот несколько популярных вариантов: ';
 $Definition['User'] = 'Пользователь';
@@ -413,14 +416,15 @@ $Definition['User Registration Settings'] = 'Настройки регистра
 $Definition['Users'] = 'Пользователи';
 $Definition['Users will be assigned to this role until they\'ve confirmed their email addresses.'] = 'Пользователи будут отнесены к этой группе, когда подтвердят свой email';
 
-$Definition['ValidateInteger'] = '%s - не целое число (целое число).';
-$Definition['Vanilla'] = 'Vanilla';
-$Definition['Vanilla Statistics are currently disabled'] = 'Модуль статистики отключен';
 $Definition['Vanilla is installed!'] = 'Форум Vanilla установлен!';
+$Definition['Vanilla Statistics are currently disabled'] = 'Модуль статистики отключен';
 $Definition['Vanilla.Archive.Description'] = 'Вы можете выбрать архивацию тем на форуме старше определенной даты. Архивированные темы практически закрываются, что не позволяет добавить в них новые посты.';
 $Definition['Vanilla.Categories.MaxDisplayDepth'] = 'Сколько уровней вложенности отображать в категориях: %1$s';
 $Definition['Verified!'] = 'Проверен!';
 $Definition['Version'] = 'Версия';
+
+$Definition['version %s'] = 'версия %s';
+
 $Definition['Version %s'] = 'Версия %s';
 $Definition['Version %s Installer'] = 'Версия %s';
 $Definition['View'] = 'Просмотр';
@@ -439,7 +443,6 @@ $Definition['Why do you want to join?'] = 'Почему вы хотите зар
 $Definition['Within'] = 'В пределах';
 $Definition['WordPress Plugin'] = 'Плагин для WordPress';
 
-$Definition['Yes'] = 'Да';
 $Definition['Yes, the following information can be changed later.'] = 'Информация, расположенная ниже, впоследствии может быть изменена.';
 $Definition['You are previewing the %s theme.'] = 'Вы просматриваете тему %s';
 $Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'Вы всегда можете использовать пароль на <a href="%1$s">%1$s</a>.';
@@ -455,20 +458,3 @@ $Definition['You must specify an admin username.'] = 'Вы не ввели им�
 $Definition['Your application will be reviewed by an administrator. You will be notified by email if your application is approved.'] = 'Спасибо. Ваша заявка будет рассмотрена администратором. Вы будете уведомлены по электронной почте, если ваша заявка будет одобрена.';
 $Definition['Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'] = 'Неправильно установлены права для файла конфигурации. PHP должен иметь возможность чтения и записи в файл: <code>%s</code>';
 $Definition['Your default locale won\'t display properly'] = 'Ваше местоположение по умолчанию не отображается правильно. Пожалуйста, выберите его: %s.';
-
-$Definition['_Locale'] = 'Язык';
-
-$Definition['comment(s)'] = 'отзыв(ов)';
-
-$Definition['discussion(s)'] = 'Тем';
-
-$Definition['edit'] = 'редактировать';
-
-$Definition['minute(s)'] = 'Минут(ы)';
-
-$Definition['never'] = 'никогда';
-
-$Definition['seconds'] = 'секунд';
-$Definition['starting your first discussion'] = 'иконку';
-
-$Definition['version %s'] = 'версия %s';

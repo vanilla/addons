@@ -1,23 +1,22 @@
 <?php
 
-$Definition['%1$s Version %2$s'] = '%1$s Version %2$s';
-$Definition['%1$s on %2$s'] = '%1$s on %2$s';
 $Definition['%s of %s'] = '%s / %s';
 $Definition['%s unavailable'] = 'その%sは利用できません。';
 $Definition['%s user(s) found.'] = '%s 人のユーザーが見つかりました。';
-
-$Definition['(YYYY-mm-dd)'] = '(YYYY-mm-dd)';
 
 $Definition['1 month after being sent'] = '送信一ヶ月後';
 $Definition['1 week after being sent'] = '送信一週間後';
 
 $Definition['2 weeks after being sent'] = '送信二週間後';
 
+$Definition['[%s] Invitation'] = '[%s] 招待状';
+
+$Definition['_Locale'] = 'ロケール';
+
 $Definition['A message has been sent to your email address with password reset instructions.'] = 'パスワードのリセット方法を案内するメッセージを、あなたのメールアドレス宛てに送信しました。';
 $Definition['A url-friendly version of the category name for better SEO.'] = 'SEO に適したカテゴリ名の URL フレンドリー バージョン';
 $Definition['Action'] = 'アクション';
 $Definition['Add Category'] = 'カテゴリを追加';
-$Definition['Add Message'] = 'メッセージを追加';
 $Definition['Add Role'] = 'ロールを追加';
 $Definition['Add User'] = 'ユーザーを追加';
 $Definition['Adding & Editing Categories'] = 'カテゴリの追加と編集 (英語)';
@@ -27,14 +26,11 @@ $Definition['Advanced'] = '高度な設定';
 $Definition['Advanced Forum Settings'] = '高度なフォーラム設定';
 $Definition['All'] = 'すべて';
 $Definition['All %1$s'] = 'すべて %1$s';
-$Definition['Allow'] = '許可';
 $Definition['Allow users to dismiss this message'] = 'このメッセージを閉じることをユーザーに許可する';
 $Definition['Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'] = '招待状の作成は成功しましたが、メールの送信に失敗しました。サーバのエラー報告は次の通りです: %s';
 $Definition['Appearance'] = '外観';
 $Definition['Applicant'] = '申請者';
 $Definition['Application'] = 'アプリケーション';
-$Definition['Application ID'] = 'Application ID';
-$Definition['Application Secret'] = 'Application Secret';
 $Definition['ApplicationHelp'] = '「アプリケーション」は、このサイトに規模が大きめの拡張機能を追加します。<br />%s フォルダに追加されたアプリケーションを、ここで有効化または無効化できます。';
 $Definition['Applications'] = 'アプリケーション';
 $Definition['Approval'] = '承認制';
@@ -66,15 +62,15 @@ $Definition['Change the way that new users register with the site.'] = '新規�
 $Definition['Changing the Discussions Menu Link'] = 'ディスカッション メニュー リンクの変更 (英語)';
 $Definition['Check all permissions that apply for each role'] = '以下のロールに適用する権限すべてにチェックを入れてください';
 $Definition['Check all permissions that apply to this role:'] = '以下のロールに適用する権限すべてにチェックを入れてください:';
-$Definition['Check all roles that apply to this user:'] = 'このユーザーに適用するロールにすべてチェックを入れてください:';
 $Definition['Choose and configure your forum\'s authentication scheme.'] = 'フォーラムの認証スキームを選んで設定してください。';
 $Definition['Choose who can send out invitations to new members:'] = '誰が新しいメンバーに招待状を送信できるか、設定してください:';
+
+$Definition['comment(s)'] = '件のコメント';
+
 $Definition['Comments per Page'] = '1 ページに表示する最大コメント数';
 $Definition['Configure an Authenticator'] = '設定する認証方式';
 $Definition['Configure how nested categories are displayed to users.'] = 'ネストされたカテゴリをどのように表示するか、設定してください。';
 $Definition['Configuring Vanilla\'s Homepage'] = 'Vanilla のホーム画面設定 (英語)';
-$Definition['Consumer Key'] = 'Consumer Key';
-$Definition['Consumer Secret'] = 'Consumer Secret';
 $Definition['Continue'] = '続行';
 $Definition['Conversation Messages'] = '会話のメッセージ数';
 $Definition['Could not instantiate mail function.'] = 'メールを送信できません。サーバ側の設定に問題があります。';
@@ -93,6 +89,9 @@ $Definition['Disable OpenID'] = 'OpenID を無効化';
 $Definition['Disabled'] = '無効';
 $Definition['Disabled %1$s'] = '無効 %1$s';
 $Definition['Discussion & Comment Editing'] = 'ディスカッション & コメント編集';
+
+$Definition['discussion(s)'] = '件のディスカッション';
+
 $Definition['Discussions per Page'] = '1 ページに表示する最大ディスカッション数';
 $Definition['Display root categories as headings.'] = 'ルート カテゴリを見出しとして表示する。';
 $Definition['Do not display the categories in the side panel.'] = 'カテゴリ一覧をサイドパネルに表示しない。';
@@ -100,11 +99,12 @@ $Definition['Don\'t Refresh'] = 'しない';
 $Definition['Don\'t use Categories'] = 'カテゴリを使用しない';
 $Definition['Drag and drop the categories below to sort and nest them.'] = 'カテゴリを並べ替えたりネストするには、この下のカテゴリをドラッグ &amp; ドロップしてください。';
 
+$Definition['edit'] = '編集';
+
 $Definition['Edit Category'] = 'カテゴリを編集';
 $Definition['Edit Role'] = 'ロールを編集';
 $Definition['Edit User'] = 'ユーザーを編集';
 $Definition['EditContentTimeout.Notes'] = '註: ユーザーが内容を編集できるロールに属している場合は、ここで選択する値よりもロールの設定の方が優先されます。';
-$Definition['Email visible to other users'] = '他のメンバーにメールアドレスを公開する';
 $Definition['Enable'] = '有効化';
 $Definition['Enable OpenID'] = 'OpenID を有効化';
 $Definition['Enable this message'] = 'このメッセージを有効化する';
@@ -131,11 +131,10 @@ $Definition['Garden.Import.Complete.Description'] = 'インポートに成功し
 $Definition['Garden.Import.Description'] = 'このページを使用して、Vanilla のエクスポート機能を使用してエクスポートされた別のフォーラムからのデータをインポートしてください。 詳しくは<a href="%s">インポートについて (英語)</a> を参照してください。';
 $Definition['Garden.Import.InputInstructions'] = 'インポートされるデータの管理者ユーザーのメールアドレスとパスワードを入力してください。';
 $Definition['Garden.Import.Overwrite.Description'] = '警告: このフォーラムのすべてのデータが上書きされます。';
-$Definition['Generate Password'] = 'パスワードを生成';
 $Definition['Get More Applications'] = '他のアプリケーション';
+$Definition['Get more information on creating custom routes'] = '独自のルートを作成するなら、詳しくはこちら';
 $Definition['Get More Plugins'] = '他のプラグイン';
 $Definition['Get More Themes'] = '他のテーマ';
-$Definition['Get more information on creating custom routes'] = '独自のルートを作成するなら、詳しくはこちら';
 $Definition['Google Sign In Settings'] = 'Google ログイン 設定';
 $Definition['Guest'] = 'ゲスト';
 
@@ -181,9 +180,15 @@ $Definition['Max Comment Length'] = 'コメント最大文字数';
 $Definition['Member'] = 'メンバー';
 $Definition['Messages can appear anywhere in your application.'] = 'メッセージはサイトのどこにでも表示でき、ユーザーにニュースやイベントを通知するために使われます。このページでメッセージをドラッグすると、順番を入れ替えることができます。';
 $Definition['Method'] = '方法';
+
+$Definition['minute(s)'] = '分間';
+
 $Definition['Moderator'] = 'モデレータ';
 
 $Definition['Need More Help?'] = '参考情報';
+
+$Definition['never'] = 'なし (無期限)';
+
 $Definition['New comments in the last day'] = '過去一日間の新規コメント数';
 $Definition['New comments in the last week'] = '過去一週間の新規コメント数';
 $Definition['New conversations in the last day'] = '過去一日間の新規会話数';
@@ -212,10 +217,8 @@ $Definition['Please choose an authenticator to configure.'] = '設定したい�
 $Definition['Plugin'] = 'プラグイン';
 $Definition['PluginHelp'] = '「プラグイン」は、このサイトの機能を拡張します。<br />%s フォルダに追加されたプラグインを、ここで有効化または無効化できます。';
 $Definition['Plugins'] = 'プラグイン';
-$Definition['Position'] = '表示位置';
 $Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'スパムを防ぐため、ユーザーが一定時間内に作成できるディスカッションおよび投稿できるコメントの数を制限できます。';
 $Definition['Private Key'] = 'プライベート キー';
-$Definition['Profiles'] = 'プロフィール';
 $Definition['Public Key'] = '公開キー';
 
 $Definition['Quick-Start Guide to Creating Themes for Vanilla'] = 'テーマ作成のためのクイック スタート ガイド (英語)';
@@ -226,7 +229,6 @@ $Definition['Refresh Comments'] = 'コメントの自動更新';
 $Definition['Registration'] = '登録';
 $Definition['Remove'] = '削除';
 $Definition['Requires: '] = '動作要件: ';
-$Definition['Reset Password'] = 'パスワードのリセット';
 $Definition['Reset my password'] = 'パスワードのリセット';
 $Definition['Reset password and send email notification to user'] = 'パスワードをリセットして、ユーザーにメールで通知';
 $Definition['Reveal Password'] = 'パスワードを表示';
@@ -239,20 +241,21 @@ $Definition['Route Expression'] = 'ルート式';
 $Definition['Routes'] = 'ルート';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = 'ルートは URL に基づきユーザーを適切なページへリダイレクトするために使用されます。';
 
+$Definition['Saved'] = '変更を保存しました。';
+$Definition['Search by user or role.'] = 'ユーザー名またはロール (管理者:<input type="text" value="Administrator" size="13" onclick="this.select()" />, 申請者:<input type="text" value="Applicant" size="9" onclick="this.select()" />, 利用禁止:<input type="text" value="Banned" size="6" onclick="this.select()" />, ゲスト:<input type="text" value="Guest" size="5" onclick="this.select()" />, メンバー:<input type="text" value="Member" size="7" onclick="this.select()" />, モデレータ:<input type="text" value="Moderator" size="10" onclick="this.select()" />, メール確認待ち:<input type="text" value="Confirm Email" size="15" onclick="this.select()" />) で検索します。';
+
+$Definition['seconds'] = '秒間';
+
+$Definition['Select the file to import'] = 'インポートするファイルを選択してください';
 $Definition['SMTP Host'] = 'SMTP サーバー';
 $Definition['SMTP Password'] = 'SMTP パスワード';
 $Definition['SMTP Port'] = 'SMTP ポート';
 $Definition['SMTP Security'] = 'SMTP セキュリティ';
 $Definition['SMTP User'] = 'SMTP ユーザー';
-$Definition['Saved'] = '変更を保存しました。';
-$Definition['Search by user or role.'] = 'ユーザー名またはロール (管理者:<input type="text" value="Administrator" size="13" onclick="this.select()" />, 申請者:<input type="text" value="Applicant" size="9" onclick="this.select()" />, 利用禁止:<input type="text" value="Banned" size="6" onclick="this.select()" />, ゲスト:<input type="text" value="Guest" size="5" onclick="this.select()" />, メンバー:<input type="text" value="Member" size="7" onclick="this.select()" />, モデレータ:<input type="text" value="Moderator" size="10" onclick="this.select()" />, メール確認待ち:<input type="text" value="Confirm Email" size="15" onclick="this.select()" />) で検索します。';
-$Definition['Select the file to import'] = 'インポートするファイルを選択してください';
-$Definition['SignIn'] = 'ログイン';
 
 $Definition['Temporary (302)'] = '一時的 (302)';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = 'ユーザー認証方式 %s には設定オプションがありません。';
 $Definition['The %s table is not in the correct format.'] = '%s テーブルの形式が不正です。';
-$Definition['The Vanilla 2 Exporter'] = 'Vanilla Porter プラグイン (英語)';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = '致命的なエラーが発生したため、アドオンを有効にすることができませんでした: <pre>%s</pre>';
 $Definition['The banner logo appears at the top of your forum.'] = 'タイトルロゴはヘッダの左上に表示されます。タイトル文字列と置き換えます。';
 $Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'タイトルはヘッダの左上に表示されます。タイトルロゴ画像をアップロードすると、タイトル文字列と置き換えます。';
@@ -262,6 +265,7 @@ $Definition['The import file does not contain any data.'] = 'インポートフ�
 $Definition['The import file is not in the correct format.'] = 'インポート ファイルの形式が不正です。';
 $Definition['The route was saved successfully.'] = 'ルートが保存されました。';
 $Definition['The user table was not in the import file.'] = 'ユーザーテーブルはインポートファイルに含まれていませんでした。';
+$Definition['The Vanilla 2 Exporter'] = 'Vanilla Porter プラグイン (英語)';
 $Definition['Theme Options'] = 'テーマ オプション';
 $Definition['ThemeHelp'] = '「テーマ」はサイトのデザインを変更します。<br />%s フォルダに追加されたテーマを、ここで有効化できます。';
 $Definition['Themes'] = 'テーマ';
@@ -275,7 +279,6 @@ $Definition['This plugin allows users to sign in with their Google accounts. <b>
 $Definition['This theme has additional options.'] = 'このテーマは %s ページでオプションを設定できます。';
 $Definition['Try Again'] = '再試行';
 $Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connect を使うと、Twitter アカウントでログインできます。<b>このプラグインを使うには、Twitter にアプリケーションを登録する必要があります。</b>';
-$Definition['Type'] = 'タイプ';
 
 $Definition['Unlimited'] = '無制限';
 $Definition['Use an SMTP server to send email'] = 'メールの送信に SMTP サーバを使用';
@@ -289,6 +292,9 @@ $Definition['Vanilla Export: %s, Source: %s'] = 'Vanilla エクスポート: %s,
 $Definition['Vanilla.Archive.Description'] = '特定の日付より古いディスカッションをアーカイブ化できます。アーカイブ化されたディスカッションは事実上 閉じられ、新しいコメントを受け付けなくなります。';
 $Definition['Vanilla.Categories.MaxDisplayDepth'] = 'ネストされたカテゴリが次の条件に合致する場合は、カンマ区切りのリストとして表示されます: %1$s';
 $Definition['Version'] = 'バージョン';
+
+$Definition['version %s'] = 'バージョン %s';
+
 $Definition['Version %s'] = 'バージョン %s';
 $Definition['View'] = '表示';
 $Definition['View Page'] = 'ページを表示';
@@ -314,21 +320,3 @@ $Definition['You must specify an admin password.'] = '管理者のパスワー�
 $Definition['You must specify an admin username.'] = '管理者のユーザー名は省略できません。';
 $Definition['Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'] = '設定ファイルに適切なパーミッションが設定されていません。PHP はこのファイルを読み書きする必要があります: <code>%s</code>';
 $Definition['Your default locale won\'t display properly'] = '既定のロケールは、下記にて有効化されるまで正しく表示されません。%s を有効化してください。';
-
-$Definition['[%s] Invitation'] = '[%s] 招待状';
-
-$Definition['_Locale'] = 'ロケール';
-
-$Definition['comment(s)'] = '件のコメント';
-
-$Definition['discussion(s)'] = '件のディスカッション';
-
-$Definition['edit'] = '編集';
-
-$Definition['minute(s)'] = '分間';
-
-$Definition['never'] = 'なし (無期限)';
-
-$Definition['seconds'] = '秒間';
-
-$Definition['version %s'] = 'バージョン %s';

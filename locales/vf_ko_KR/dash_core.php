@@ -1,22 +1,19 @@
 <?php
 
 $Definition['%1$s Version %2$s'] = '%1$s 버전 %2$s';
-$Definition['%1$s on %2$s'] = '%1$s on %2$s';
 $Definition['%s user(s) found.'] = '%s명의 회원이 있습니다.';
-
-$Definition['(YYYY-mm-dd)'] = '(YYYY-mm-dd)';
 
 $Definition['1 month after being sent'] = '발송 후 1개월 경과';
 $Definition['1 week after being sent'] = '발송 후 1 주 경과';
 
 $Definition['2 weeks after being sent'] = '발송 후 2 주 경과';
 
-$Definition['A url-friendly version of the category name for better SEO.'] = 'A url-friendly version of the category name for better SEO.';
+$Definition['_Locale'] = '현지화';
+
 $Definition['Accepted'] = '등록되었습니다';
 $Definition['Action'] = '활동';
 $Definition['Add Category'] = '카테고리 추가';
 $Definition['Add Info &amp; Create Account'] = '정보 입력 &amp; 계정 만들기';
-$Definition['Add Message'] = '메세지 작성';
 $Definition['Add Role'] = '역할 추가하기';
 $Definition['Add User'] = '사용자 추가';
 $Definition['Addons'] = '추가 기능';
@@ -25,9 +22,6 @@ $Definition['Advanced'] = '고급';
 $Definition['Advanced Forum Settings'] = '고급 포럼 설정';
 $Definition['Appearance'] = '디자인';
 $Definition['Applicant'] = '가입 승인 대기자';
-$Definition['Application'] = 'Application';
-$Definition['Application ID'] = 'Application ID';
-$Definition['Application Secret'] = 'Application Secret';
 $Definition['ApplicationHelp'] = '어플리케이션을 사용하여 포럼에 대량의 기능을 쉽게 추가할 수 있습니다.<br />
 사용하기 원하는 어플리케이션을 다음의 경로에 추가한 후 목록에서 활성화 하여 사용합니다: %s';
 $Definition['Applications'] = '어플리케이션';
@@ -45,16 +39,15 @@ $Definition['Category Page Layout'] = '카테고리 페이지 레이아웃';
 $Definition['Category Url:'] = '카테고리 주소';
 $Definition['Change the way that new users register with the site.'] = '새로운 사용자가 사이트에 등록하는 방식을 변경합니다.';
 $Definition['Check all permissions that apply for each role'] = '각 역할에 할당된 모든 사용 권한을 확인';
-$Definition['Check all roles that apply to this user:'] = '이 유저가 가진 모든 역할 보기:';
 $Definition['Choose a locale pack'] = '현지화 페키지 선택';
 $Definition['Choose and configure your forum\'s authentication scheme.'] = '포럼의 인증 체계를 선택하고 구성합니다.';
 $Definition['Choose who can send out invitations to new members:'] = '신규회원에게 초대장을 보낼 수 있는 회원을 선택해 주십시오:';
+
+$Definition['comment(s)'] = '개 이상의 댓글을';
+
 $Definition['Comments per Page'] = '페이지당 댓글 수';
 $Definition['Configure an Authenticator'] = '인증 방식 설정';
 $Definition['Configure how nested categories are displayed to users.'] = '중첩 카테고리가 어떻게 보여질지 설정합니다.';
-$Definition['Consumer Key'] = 'Consumer Key';
-$Definition['Consumer Secret'] = 'Consumer Secret';
-$Definition['Conversation Messages'] = 'Conversation Messages';
 $Definition['Conversations'] = '대화';
 $Definition['Copy'] = '복사';
 $Definition['Current Authenticator'] = '사용중인 인증 방식';
@@ -67,6 +60,9 @@ $Definition['Disable'] = '사용 안 함';
 $Definition['Disable Google Sign In'] = '구글 계정으로 로그인 사용 안 함';
 $Definition['Disable OpenID'] = 'OpenID 사용 안 함';
 $Definition['Discussion & Comment Editing'] = '글 & 댓글 수정';
+
+$Definition['discussion(s)'] = '개 이상의 게시글을';
+
 $Definition['Discussions per Page'] = '페이지당 글 수';
 $Definition['Display root categories as headings.'] = '루트 카테고리를 헤딩으로 표시.';
 $Definition['Do not display the categories in the side panel.'] = '사이드바에 카테고리를 표시하지 않음.';
@@ -74,11 +70,12 @@ $Definition['Don\'t embed your forum admin dashboard (pop it out to full-screen)
 $Definition['Don\'t use Categories'] = '카테고리를 사용하지 않음';
 $Definition['Drag &amp; drop the categories to sort and nest them.'] = '드래그 앤 드롭으로 카테고리의 순서 및 서브 카테고리를 설정하세요.';
 
+$Definition['edit'] = '수정';
+
 $Definition['Edit Category'] = '카테고리 수정';
 $Definition['Edit User'] = '사용자 수정';
 $Definition['EditContentTimeout.Notes'] = '참고 : 내용을 수정할 수있는 권한을 가진 회원(운영자 등)이 있다면 현재 선택된 모든 권한보다 우선적인 권한을 가집니다.
 ';
-$Definition['Email visible to other users'] = '회원들에게 이메일 공개';
 $Definition['Enable'] = '사용';
 $Definition['Enable OpenID'] = 'OpenID 활성화';
 $Definition['Enter the email address of the person you would like to invite:'] = '초대하고 싶은 사람의 이메일 주소를 입력하세요 :';
@@ -97,7 +94,6 @@ $Definition['Garden.Import.Description'] = '다른 포럼에서 익스포트한 
 $Definition['Garden.Import.InputInstructions'] = '임포트를 원하는 데이타의 어드민 이메일 주소와 패스워드를 입력하십시오.';
 $Definition['Garden.Import.Overwrite.Description'] = '경고: 이 포럼에 있는 모든 데이터를 새로 덮어 씁니다.';
 $Definition['Generate'] = '생성';
-$Definition['Generate Password'] = '패스워드 생성';
 $Definition['Get more information on creating custom routes'] = '사용자 지정 라우팅 경로에 대한 정보';
 $Definition['Google Sign In Settings'] = '구글 계정 로그인 설정';
 $Definition['Guest'] = '손님';
@@ -114,11 +110,7 @@ $Definition['Invitations will expire'] = '초대 기간 만료';
 $Definition['Invited by'] = '다음의 사용자가 당신을 초대하였습니다';
 $Definition['It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size.'] = '댓글의 길이를 제한하면 글의 길이를 일정하게 유지할 수 있습니다.';
 
-$Definition['Key Type'] = 'Key Type';
-$Definition['Key Value'] = 'Key Value';
-
 $Definition['Last Visit'] = '최근 방문한 날짜';
-$Definition['Locale Key (Folder)'] = 'Locale Key (Folder)';
 $Definition['Locale Name'] = '언어 이름';
 $Definition['Locales'] = '언어 설정';
 $Definition['Locales are in your %s folder.'] = '현지화 기능으로 포럼을 여러가지 다른 언어로 사용할 수 있습니다.
@@ -143,25 +135,17 @@ $Definition['Messages can appear anywhere in your application.'] = '메시지는
 
 <br />메세지 작성 후 목록에서 순서를 변경할 수 있습니다.';
 $Definition['Method'] = '방법';
+
+$Definition['minute(s)'] = '분 동안 게시 불가.';
+
 $Definition['Moderator'] = '운영자';
 $Definition['Moderators have permission to edit most content.'] = '운영자는 포럼의 대부분의 내용을 수정할 수있는 권한을 가지고 있습니다.';
 $Definition['My Invitations'] = '초대하기';
 
-$Definition['New comments in the last day'] = 'New comments in the last day';
-$Definition['New comments in the last week'] = 'New comments in the last week';
-$Definition['New conversations in the last day'] = 'New conversations in the last day';
-$Definition['New conversations in the last week'] = 'New conversations in the last week';
-$Definition['New discussions in the last day'] = 'New discussions in the last day';
-$Definition['New discussions in the last week'] = 'New discussions in the last week';
-$Definition['New messages in the last day'] = 'New messages in the last day';
-$Definition['New messages in the last week'] = 'New messages in the last week';
 $Definition['New users are reviewed and approved by an administrator (that\'s you!).'] = '가입신청 후 관리자에 의해 검토 및 승인 (후훗 바로 당신이죠).';
 $Definition['New users fill out a simple form and are granted access immediately.'] = '가입신청 폼을 작성 후 바로 사이트 이용가능 .';
-$Definition['New users in the last day'] = 'New users in the last day';
-$Definition['New users in the last week'] = 'New users in the last week';
 $Definition['None'] = '없음';
 
-$Definition['On'] = 'On';
 $Definition['Only Allow Each User To Post'] = '회원별 게시글 제한사항';
 $Definition['Or Spamblock For'] = '초과할 경우';
 $Definition['Organize Categories'] = '카테고리 설정';
@@ -176,18 +160,13 @@ $Definition['Please choose an authenticator to configure.'] = '설정하기 원�
 $Definition['Plugin'] = '플러그인';
 $Definition['PluginHelp'] = '플러그인을 사용하여 포럼에 여러가지 기능을 추가할 수 있습니다.<br />원하는 플러그인을 다음 경로에 추가한 후 아래 목록에서 버튼을 눌러 활성화 합니다. %s';
 $Definition['Plugins'] = '플러그인';
-$Definition['Position'] = '포지션';
 $Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = '회원 게시글 및 댓글에 제한을 두어 스팸을 방지합니다.';
-$Definition['Private Key'] = 'Private Key';
-$Definition['Public Key'] = 'Public Key';
 
 $Definition['Recent News'] = '새로운 뉴스';
 $Definition['Recently Active Users'] = '사용자 최신 활동내역';
 $Definition['Refresh Comments'] = '새로고침';
 $Definition['Registration'] = '사용자 등록 설정';
 $Definition['Remove'] = '삭제';
-$Definition['Requires: '] = 'Requires: ';
-$Definition['Reset Password'] = '패스워드 리셋';
 $Definition['Reset password and send email notification to user'] = '패스워드를 재설정하고 사용자에게 이메일 통지를 보냅니다.';
 $Definition['Reveal Password'] = '패스워드 보이기';
 $Definition['Role'] = '역할(Role)';
@@ -206,21 +185,15 @@ $Definition['Roles determine user\'s permissions.'] = '포럼의 모든 회원�
 </ul>
 ';
 $Definition['Route'] = '라우팅 경로';
-$Definition['Route Expression'] = 'Route Expression';
 $Definition['Routes'] = '라우팅 경로 설정';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = '라우팅 경로는 URL에 따라 사용자를 리디렉션하는데 사용할 수 있습니다.';
 
-$Definition['SMTP Host'] = 'SMTP Host';
-$Definition['SMTP Password'] = 'SMTP Password';
-$Definition['SMTP Port'] = 'SMTP Port';
-$Definition['SMTP Security'] = 'SMTP Security';
-$Definition['SMTP User'] = 'SMTP User';
+$Definition['seconds'] = '초 이내에 게시 불가.';
+
 $Definition['Select the file to import'] = '임포트를 원하는 파일을 선택하세요';
 $Definition['Send %s a Message'] = '%s님에게 메세지를 보냅니다';
-$Definition['Sent To'] = 'Sent To';
 $Definition['Status'] = '상태';
 
-$Definition['Temporary (302)'] = 'Temporary (302)';
 $Definition['Thank You!'] = '감사합니다!';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = '%s 인증에 대한 사용자 정의 옵션이 없습니다.';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = '치명적인 오류가 발생하여 활성화 되지 않았습니다: <pre>%s</pre>';
@@ -233,7 +206,6 @@ $Definition['This plugin allows users to sign in with OpenID. <b>Make sure you c
 $Definition['This plugin allows users to sign in with their Google accounts. <b>Make sure you click Settings after enabling this plugin to enable Google signin</b>.'] = '플러그인을 이용하면 사용자가 Google 계정을 사용하여 로그인 할 수 있습니다. <b>Google signin의 올바른 작동을 위해 활성화 후 설정버튼을 눌러 세부 설정을 완료 하십시요.</b>.';
 $Definition['To embed your Vanilla community forum into a remote web application, use the forum embed code or one of the forum embed plugins below.'] = '포럼의 소스코드, 또는 플러그인을 사용하여 원격 웹 응용 프로그램에 포럼을 삽입할 수 있습니다.';
 $Definition['Twitter Connect allows users to sign in using their Twitter account.'] = '트위터 컨넥트 기능을 이용하여 사용자가 자신의 트위터 계정을 사용하여 로그인할 수 있습니다. <b>이 플러그인을 사용하려면 Twitter에서 응용 프로그램을 등록해야합니다.</b>';
-$Definition['Type'] = '유형';
 
 $Definition['Unlimited'] = '무제한';
 $Definition['Use an SMTP server to send email'] = 'SMPT 서버를 사용하여 이메일 발송';
@@ -242,16 +214,17 @@ $Definition['User'] = '사용자';
 $Definition['User Registration Settings'] = '사용자 등록 설정';
 $Definition['Users'] = '사용자';
 
-$Definition['ValidateInteger'] = '%s은(는) 유효한 정수가 아닙니다.';
 $Definition['Vanilla.Archive.Description'] = '다음의 기간보다 오래된 글타레는 보관 모드로 전환할 수 있습니다. 보관 모드가 된 글을 수정이 불가능합니다.';
 $Definition['Version'] = '버전';
+
+$Definition['version %s'] = '버전 %s';
+
 $Definition['Version %s'] = '버전 %s';
 $Definition['View'] = '보기';
 
 $Definition['Warning'] = '경고';
 $Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = '기본적으로 로컬 서버를 통해 이메일을 발송합니다. 별도의 SMTP 메일서버를 구성하려면 아래의 옵션을 사용하십시오.';
 $Definition['Welcome to your Dashboard'] = '대시보드에 오신 것을 환영합니다';
-$Definition['What\'s the Buzz?'] = 'What\'s the Buzz?';
 $Definition['Where is your Community Forum?'] = '포럼의 경로 설정';
 $Definition['Why do you want to join?'] = '가입을 원하는 이유는 무엇입니까?';
 $Definition['Within'] = '시간';
@@ -262,19 +235,3 @@ $Definition['You can place files in your /uploads folder.'] = '이 페이지에 
 $Definition['You cannot disable the %1$s plugin because the %2$s plugin requires it in order to function.'] = '플러그인을 해제할 수 없습니다. %2$s이 올바르게 작동하기 위해 %1$s 플러그인이 필요합니다.';
 $Definition['You cannot disable the OpenID plugin because the GoogleSignIn plugin requires it in order to function.'] = '플러그인을 해제할 수 없습니다. Google SignIn이 올바르게 작동하기 위해 Open ID 플러그인이 필요합니다.';
 $Definition['Your application will be reviewed by an administrator. You will be notified by email if your application is approved.'] = '등록 신청이 접수되었습니다. 신청서는 관리자에 의해 검토되며 승인되는 즉시 이메일로 통보됩니다.';
-
-$Definition['_Locale'] = '현지화';
-
-$Definition['comment(s)'] = '개 이상의 댓글을';
-
-$Definition['discussion(s)'] = '개 이상의 게시글을';
-
-$Definition['edit'] = '수정';
-
-$Definition['minute(s)'] = '분 동안 게시 불가.';
-
-$Definition['never'] = 'never';
-
-$Definition['seconds'] = '초 이내에 게시 불가.';
-
-$Definition['version %s'] = '버전 %s';

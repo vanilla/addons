@@ -3,7 +3,6 @@
 $Definition['%s user(s) found.'] = 'พบ %s คน.';
 
 $Definition['Add Category'] = 'เพิ่มหมวดหมู่';
-$Definition['Add Message'] = 'เพิ่มข้อความใหม่';
 $Definition['Add Role'] = 'เพิ่มยศ';
 $Definition['Add User'] = 'เพิ่มผู้ใช้';
 $Definition['Advanced'] = 'ขั้นสูง';
@@ -21,6 +20,9 @@ $Definition['Banner Title'] = 'ไตเติ้ล';
 $Definition['Below Sidebar'] = 'อยู่ด้านล่างแถบด้านข้าง';
 
 $Definition['Category Page Layout'] = 'เค้าโครงหมวดหมู่';
+
+$Definition['comment(s)'] = 'ความคิดเห็น';
+
 $Definition['Comments per Page'] = 'จำนวนความคิดเห็นแต่ละหน้า';
 $Definition['Current Theme'] = 'ธีมปัจจุบัน';
 
@@ -28,6 +30,9 @@ $Definition['Description'] = 'คำอธิบาย';
 $Definition['Did You Know?'] = 'คุณรู้หรือไม่?';
 $Definition['Disabled'] = 'ปิดใช้งาน';
 $Definition['Discussion & Comment Editing'] = 'แก้ไข กระทู้ & ความคิดเห็น';
+
+$Definition['discussion(s)'] = 'กระทู้';
+
 $Definition['Discussions per Page'] = 'จำนวนกระทู้แต่ละหน้า';
 $Definition['Display root categories as headings.'] = 'แสดง root categories เป็นส่วนหัว.';
 $Definition['Do not display the categories in the side panel.'] = 'ไม่แสดงหมวดหมู่ไว้ด้านข้าง';
@@ -35,7 +40,6 @@ $Definition['Don\'t use Categories'] = 'ไม่ใช้หมวดหมู�
 
 $Definition['Edit Role'] = 'แก้ไขยศ';
 $Definition['Edit User'] = 'แก้ไขผู้ใช้งาน';
-$Definition['Email visible to other users'] = 'แสดงอีเมล์สู่สาธารณะ';
 $Definition['Enable this message'] = 'เปิดใช้งานข้อความนี้';
 $Definition['Enabled'] = 'เปิดใช้งาน';
 
@@ -62,6 +66,8 @@ $Definition['Manage Themes'] = 'จัดการธีม';
 $Definition['Manage Users'] = 'จัดการผู้ใช้งาน';
 $Definition['Max Comment Length'] = 'ความยาวตัวอักษรในการแสดงความคิดเห็นสูงสุด';
 
+$Definition['minute(s)'] = 'นาที';
+
 $Definition['Need More Help?'] = 'ต้องการความช่วยเหลือเพิ่มเติม?';
 
 $Definition['Only Allow Each User To Post'] = 'อนุญาตให้ผู้ใช้แต่ละครโพสต์ได้';
@@ -73,15 +79,15 @@ $Definition['Outgoing Email'] = 'อีเมล์ระบบ';
 $Definition['Page'] = 'หน้า';
 $Definition['Plugin'] = 'ปลั๊กอิน';
 $Definition['Plugins'] = 'ปลั๊กอิน';
-$Definition['Position'] = 'ตำแหน่ง';
 
 $Definition['Recent News'] = 'ข่าวล่าสุด';
 $Definition['Refresh Comments'] = 'รีเฟซความคิดเห็น';
 $Definition['Registration'] = 'การลงทะเบียน';
-$Definition['Reset Password'] = 'รีเซ็ตรหัสผ่าน';
 $Definition['Reset password and send email notification to user'] = 'รีเซ็ตรหัสผ่านและส่งการแจ้งเตือนอีเมลไปยังผู้ใช้';
 $Definition['Role Name'] = 'ชื่อยศ';
 $Definition['Roles & Permissions'] = 'ยศ & การอนุญาต';
+
+$Definition['seconds'] = 'วินาที';
 
 $Definition['The banner logo appears at the top of your forum.'] = 'โลโก้แบนเนอร์จะปรากฎด้านบนของฟอรั่มของคุณ';
 $Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'ชื่อไตเติ้ลจะปรากฎอยู่ด้านซ้ายของทุกหน้า, ถ้าอัพโหลดโลโก้แบนเนอร์ โลโก้แบนเนอร์ก็จะมาแทนที่ตรงนั้น';
@@ -92,11 +98,3 @@ $Definition['User Registration Settings'] = 'ตั้งค่าการล�
 $Definition['Users'] = 'ผู้ใช้งาน';
 
 $Definition['Within'] = 'ในช่วง';
-
-$Definition['comment(s)'] = 'ความคิดเห็น';
-
-$Definition['discussion(s)'] = 'กระทู้';
-
-$Definition['minute(s)'] = 'นาที';
-
-$Definition['seconds'] = 'วินาที';
