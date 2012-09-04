@@ -12,11 +12,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Pockets'] = array(
    'Name' => 'Pockets',
    'Description' => 'Administrators may add raw HTML to various places on the site. This plugin is very powerful, but can easily break your site if you make a mistake.',
-   'Version' => '1.0.7',
+   'Version' => '1.1',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
-   'RequiredApplications' => array('Vanilla' => '2.0.2a'),
+   'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RegisterPermissions' => array('Plugins.Pockets.Manage'),
    'SettingsUrl' => '/settings/pockets',
    'SettingsPermission' => 'Plugins.Pockets.Manage',

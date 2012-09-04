@@ -9,7 +9,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-   'Version' => '1.1.4',
+   'Version' => '1.1.6',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -51,6 +51,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
       $ConnectQuery = array('client_id' => $Provider['AuthenticationKey'], 'Target' => $Target);
       $Data['Target'] = urlencode(Url('entry/jsconnect', TRUE).'?'.  http_build_query($ConnectQuery));
+      $Data['Redirect'] = $Data['Target'];
 
       $SignInUrl = FormatString(GetValue('SignInUrl', $Provider, ''), $Data);
       $RegisterUrl = FormatString(GetValue('RegisterUrl', $Provider, ''), $Data);
@@ -69,7 +70,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       if (GetValue('NoConnectLabel', $Options)) {
          $ConnectLabel = '';
       } else {
-         $ConnectLabel = '<span class="Username"></span><div class="ConnectLabel">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div>';
+         $ConnectLabel = '<span class="Username"></span><div class="ConnectLabel TextColor">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div>';
       }
 
       $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">
@@ -210,8 +211,10 @@ class JsConnectPlugin extends Gdn_Plugin {
       include_once dirname(__FILE__).'/functions.jsconnect.php';
       
       $Form = $Sender->Form;
-      parse_str($Form->GetFormValue('JsConnect'), $JsData);
-
+      
+      $JsConnect = $Form->GetFormValue('JsConnect', $Form->GetFormValue('Form/JsConnect'));
+      parse_str($JsConnect, $JsData);
+      
       // Make sure the data is valid.
       $client_id = GetValue('client_id', $JsData, GetValue('clientid', $JsData, $Sender->Request->Get('client_id'), TRUE), TRUE);
       $Signature = GetValue('signature', $JsData, FALSE, TRUE);

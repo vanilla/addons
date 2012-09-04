@@ -255,34 +255,7 @@ function Gdn_Quotes() {
          this.RemoveSpinner();
       } else {return;}
       
-      switch (Data.Quote.format) {
-         case 'Wysiwyg':
-         case 'Html':   // HTML
-            var Append = '<blockquote class="Quote" rel="'+Data.Quote.authorname+'">'+Data.Quote.body+'</blockquote>'+"\n";
-            break;
-            
-         case 'BBCode':
-            var QuoteAuthor = Data.Quote.authorname;
-            if (Data.Quote.type && Data.Quote.type == 'comment')
-               if (Data.Quote.typeid) QuoteAuthor = QuoteAuthor+";"+Data.Quote.typeid;
-            
-            var Append = '[quote="'+QuoteAuthor+'"]'+Data.Quote.body+'[/quote]'+"\n";
-            break;
-         
-         case 'Markdown':
-         case 'Display':
-         case 'Text':   // Plain
-            var Append = '> '+Data.Quote.authorname+" said:\n";
-            Append = Append+'> '+Data.Quote.body.replace(/(\n)/g, "$1> ")+"\n";
-            break;
-            
-         default:
-            var Append = Data.Quote.body;
-            break;
-      
-      }
-      
-      this.ApplyQuoteText(Append);
+      this.ApplyQuoteText(Data.Quote.body);
    }
    
    Gdn_Quotes.prototype.ApplyQuoteText = function(QuoteText) {
