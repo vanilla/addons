@@ -519,7 +519,7 @@ $Definition['MyBadgesModuleTitle'] = 'Mis Insignias ';
 
 $Definition['Name Unavailable'] = 'Nombre no disponible';
 $Definition['New Conversation'] = 'Iniciar Nueva Conversación';
-$Definition['New Discussion'] = 'Iniciar Nueva Discusión';
+$Definition['New Discussion'] = 'Nueva Discusión';
 $Definition['New Message'] = 'Iniciar Nueva Conversación';
 $Definition['New Password'] = 'Nueva Contraseña';
 $Definition['New Poll'] = 'Nueva Encuesta';
@@ -722,7 +722,7 @@ $Definition['Spoiler'] = 'Spoiler';
 $Definition['Start'] = 'Inicio';
 $Definition['Start Conversation'] = 'Iniciar Conversación';
 $Definition['Start a New Conversation'] = 'Iniciar Nueva Conversación';
-$Definition['Start a New Discussion'] = 'Iniciar Nueva Discusión';
+$Definition['Start a New Discussion'] = 'Nueva Discusión';
 $Definition['Start your First Discussion'] = 'Comienza tu primera Discusión';
 $Definition['Started By'] = 'Iniciado Por';
 $Definition['Started by %1$s'] = 'Iniciado por %1$s';
