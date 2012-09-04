@@ -75,7 +75,7 @@ class LastEditedPlugin extends Gdn_Plugin {
       $UserCanEdit = Gdn::Session()->CheckPermission('Vanilla.'.ucfirst($RecordType).'s.Edit', TRUE, 'Category', $PermissionCategoryID);
       
       if (is_null($Data->DateUpdated)) return;
-      if ($Data->DateUpdated == $Data->DateInserted) return;
+      if (Gdn_Format::ToTimestamp($Data->DateUpdated) <= Gdn_Format::ToTimestamp($Data->DateInserted)) return;
       
       $SourceUserID = $Data->InsertUserID;
       $UpdatedUserID = $Data->UpdateUserID;
