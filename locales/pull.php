@@ -6,7 +6,9 @@ ini_set('track_errors', 1);
 
 header('Content-Type: text/plain; charset=utf8');
 
-
+mysql_connect('127.0.0.1', 'root');
+mysql_select_db('_t1');
+mysql_query('set names utf8');
 
 $locales = array(
     'en-CA' => array('tx' => 'en_CA', 'name' => 'English'),
@@ -19,7 +21,7 @@ $locales = array(
     'el-GR' => array('tx' => 'el_GR', 'name' => 'Greek'),
     'es-ES' => array('tx' => 'es_ES', 'name' => 'Spanish'),
     'fa-IR' => array('tx' => 'fa_IR', 'name' => 'Persian (Iran)'),
-    'fi-FL' => array('tx' => 'fi_FL', 'name' => 'Finnish'),
+    'fi-FL' => array('tx' => 'fi', 'name' => 'Finnish'),
     'fr-FR' => array('tx' => 'fr_FR', 'name' => 'French'),
     'he_IL' => array('tx' => 'he_IL', 'name' => 'Hebrew'),
     'hu-HU' => array('tx' => 'hu', 'name' => 'Hungarian'),
@@ -41,27 +43,46 @@ function main($argv, $argc) {
    global $locales;
    
    $pull = in_array('nopull', $argv) ? false : true;
-   
+   $copy = in_array('nocopy', $argv) ? false : true;
+   $save = in_array('nosave', $argv) ? false : true;
    
    if ($pull) {
       // Pull files from the transifex folder and copy the locales here.
       chdir('/www/tx/vanilla');
-      $r = shell_exec("tx pull -f --mode=translator");
+      $r = shell_exec("tx pull -f");
       echo $r;
    }
    
-   // Copy all of the locales.
-   foreach ($locales as $code => $info) {
-      echo "Copying $code...";
-      copyLocale($code);
-      echo "done.\n";
+   if ($copy) {
+      // Copy all of the locales.
+      foreach ($locales as $code => $info) {
+         echo "Copying $code...";
+         copyLocaleToAddons($code);
+         echo "done.\n";
+      }
    }
    
-   // Save the translations to the database.
-   saveLocales();
+   if ($save) {
+      // Save the translations to the database.
+      saveLocales();
+   }
+   
+   // Re-generate the definitions from the database.
+   generateFilesFromDb();
+   
+   // Copy the locales back to transifex.
+   if (in_array('push', $argv)) {
+      foreach ($locales as $code => $info) {
+         echo "Copying $code back to transifex folder...";
+         copyLocaleToTx($code);
+         echo "done.\n";
+      }
+   }
+      
+   // Push the files the addons site.
 }
 
-function copyLocale($code) {
+function copyLocaleToAddons($code) {
    global $locales;
    
    $info = $locales[$code];
@@ -91,7 +112,7 @@ function copyLocale($code) {
    file_put_contents("$folder/definitions.php", $infoString);
    
    // Copy the transifex definitions.
-   $resources = array('site_core', 'dash_core');
+   $resources = array('site_core', 'dash_core', 'archive_core');
    $txFolder = ($tx == 'en_CA' ? 'source' : 'translations');
    foreach ($resources as $resource) {
       $source = "/www/tx/vanilla/$txFolder/vanilla.$resource/$tx.php";
@@ -103,20 +124,66 @@ function copyLocale($code) {
    }
 }
 
+function copyLocaleToTx($local) {
+   global $locales;
+   
+   $info = $locales[$local];
+   $tx = $info['tx'];
+   $slug = str_replace('-', '_', $local);
+   
+   $resources = array('site_core', 'dash_core', 'archive_core');
+   $txFolder = ($tx == 'en_CA' ? 'source' : 'translations');
+   
+   foreach ($resources as $resource) {
+      $source = dirname(__FILE__)."/vf_{$slug}/$resource.php";
+      $dest = "/www/tx/vanilla/$txFolder/vanilla.$resource/{$tx}.php";
+      
+//      echo "source: $source\ndest: $dest\n\n";
+      
+      if (file_exists($source)) {
+         if (!file_exists(dirname($dest)))
+            mkdir(dirname($dest), 0777, true);
+         
+         copy($source, $dest);
+      }
+   }
+}
+
 function formatDefs($source, $dest) {
    $Definition = array();
    require $source;
    
    // Clear out all of the blank definitions.
-   $Definition = array_filter($Definition, 'notEmpty');
+   $Definition = removeBadTranslations($Definition);
    
-   $fp = fopen($dest, 'wb');
+   saveDefs($Definition, $dest);
+}
+
+function removeBadTranslations($arr) {
+   $result = array();
+   
+   foreach ($arr as $k => $v) {
+      if (!$v)
+         continue;
+      if ($k == $v)
+         continue;
+      if (strpos($v, '???') !== false)
+         continue;
+      $result[$k] = $v;
+   }
+   return $result;
+}
+
+function saveDefs(&$defs, $path) {
+   uksort($defs, 'strcasecmp');
+   
+   $fp = fopen($path, 'wb');
    
    fwrite($fp, "<?php\n");
    
    $last = '';
    
-   foreach ($Definition as $Key => $Value) {
+   foreach ($defs as $Key => $Value) {
       $curr = substr($Key, 0, 1);
       
       if ($curr !== $last)
@@ -127,6 +194,80 @@ function formatDefs($source, $dest) {
       $last = $curr;
    }
    fclose($fp);
+}
+
+function generateFilesFromDb() {
+   global $locales;
+   
+   $files = array('site', 'dash', 'archive');
+   
+   foreach ($locales as $code => $info) {
+      $slug = str_replace('-', '_', $code);
+      
+      echo "Generating $code from db...";
+      
+      foreach ($files as $file) {
+         echo $file.' ';
+         $path = dirname(__FILE__)."/vf_{$slug}/{$file}_core.php";
+         
+         generateFileFromDb($code, $path, $file);
+      }
+      echo "done.\n";
+   }
+}
+
+function generateFileFromDb($locale, $path, $type) {
+   switch ($type) {
+      case 'dash':
+         $Dashboard = 1;
+         $Active = 1;
+         break;
+      case 'site':
+         $Dashboard = 0;
+         $Active = 1;
+         break;
+      case 'archive':
+         $Dashboard = null;
+         $Active = 2;
+         break;
+   }
+   
+   // Load the stuff from the db.
+   $sql = "select
+      c.Name,
+      t.Translation
+   from GDN_LocaleCode c
+   join GDN_LocaleTranslation t
+      on c.CodeID = t.CodeID and t.Locale = :Locale
+   where c.Active = :Active";
+   
+   if ($Dashboard !== null)
+      $sql .= ' and c.Dashboard = :Dashboard';
+   
+   $r = query($sql, array('Locale' => $locale, 'Dashboard' => $Dashboard, 'Active' => $Active));
+   $defs = array();
+   while ($row = mysql_fetch_assoc($r)) {
+      if (!$row['Name'])
+         continue;
+      
+      $translation = $row['Translation'];
+      if ($locale == 'en-CA') {
+         if (!$translation)
+            $translation = $row['Name'];
+      } else {
+         if (!$translation)
+            continue;
+         if ($translation == $row['Name'])
+            continue;
+         if (strpos($translation, '???') !== false)
+            continue;
+      }
+      
+      $defs[$row['Name']] = $row['Translation'];
+   }
+   
+   // Save the definitions to the file.
+   saveDefs($defs, $path);
 }
 
 function getValue($key, $array, $default = null) {
@@ -141,6 +282,9 @@ function query($sql, $params = array()) {
    foreach ($params as $key => $value) {
       $sql = str_replace(':'.$key, "'".mysql_real_escape_string($value)."'", $sql);
    }
+   
+//   echo "$sql\n";
+   
    $r = mysql_query($sql);
    if (!$r) {
       trigger_error("Error in:\n$sql\n\n".mysql_error(), E_USER_ERROR);
@@ -181,10 +325,6 @@ function saveLocaleToDb($locale) {
    $filenames = array('dash_core.php', 'site_core.php');
    
    // First load all of the strings from the db.
-   mysql_connect('127.0.0.1', 'root');
-   mysql_select_db('_t1');
-   query('set names utf8');
-   
    $sql = "select
       c.CodeID, 
       c.Name,
