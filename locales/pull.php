@@ -203,6 +203,7 @@ function generateFilesFromDb() {
    
    foreach ($locales as $code => $info) {
       $slug = str_replace('-', '_', $code);
+      $badDefs = array();
       
       echo "Generating $code from db...";
       
@@ -210,13 +211,29 @@ function generateFilesFromDb() {
          echo $file.' ';
          $path = dirname(__FILE__)."/vf_{$slug}/{$file}_core.php";
          
-         generateFileFromDb($code, $path, $file);
+         generateFileFromDb($code, $path, $file, $badDefs);
       }
+      
+      // Save the bad defs to a file too.
+      if (!empty($badDefs)) {
+         $path = dirname(__FILE__)."/vf_{$slug}/bad_defs.php";
+         saveDefs($badDefs, $path);
+      }
+      
       echo "done.\n";
    }
 }
 
-function generateFileFromDb($locale, $path, $type) {
+function loadTranslationsFromDb($locale, $type, &$badDefs = null) {
+   if (!is_array($badDefs))
+      $badDefs = array();
+   
+   // Keep a copy of the en-CA translation for comparison.
+   static $enDefs = array();
+   if (!isset($enDefs[$type]) && $locale != 'en-CA') {
+      $enDefs[$type] = loadTranslationsFromDb('en-CA', $type);
+   }
+   
    switch ($type) {
       case 'dash':
          $Dashboard = 1;
@@ -250,21 +267,38 @@ function generateFileFromDb($locale, $path, $type) {
       if (!$row['Name'])
          continue;
       
+      $name = $row['Name'];
+      
       $translation = $row['Translation'];
       if ($locale == 'en-CA') {
          if (!$translation)
-            $translation = $row['Name'];
+            $translation = $name;
       } else {
          if (!$translation)
             continue;
-         if ($translation == $row['Name'])
+         if ($translation == $name)
             continue;
+         
+         if (isset($enDefs[$type][$name]) && $translation == $enDefs[$type][$name]) {
+            $badDefs[$name] = $translation;
+         }
+         
          if (strpos($translation, '???') !== false)
             continue;
       }
       
-      $defs[$row['Name']] = $row['Translation'];
+      $defs[$name] = $row['Translation'];
    }
+   
+   if ($locale == 'en-CA' && !isset($enDefs[$type])) {
+      $enDefs[$type] = $defs;
+   }
+   
+   return $defs;
+}
+
+function generateFileFromDb($locale, $path, $type, &$badDefs) {
+   $defs = loadTranslationsFromDb($locale, $type, $badDefs);
    
    // Save the definitions to the file.
    saveDefs($defs, $path);
