@@ -1,16 +1,51 @@
 <?php
 
+$Definition['%1$s Version %2$s'] = '%1$s Phiên bản %2$s';
+$Definition['%1$s version %2$s is available.'] = '%1$s phiên bản %2$s hiện có.';
+$Definition['%s is not a valid email address'] = '%s là email không hợp lệ';
+$Definition['%s level'] = '%s cấp độ';
+$Definition['%s levels'] = '%s các cấp độ';
+$Definition['%s of %s'] = '%s của %s';
+$Definition['%s posts'] = '%s bài viết';
+$Definition['%s site(s) found.'] = '%s trang được tìm thấy.';
+$Definition['%s sources(s) found.'] = '%s nguồn được tìm thấy.';
+$Definition['%s times'] = '%s lần';
+$Definition['%s unavailable'] = '%s không có giá trị';
 $Definition['%s user(s) found.'] = '%s ng??i d';
 $Definition['%s user(s) will be affected by this action.'] = '%s ng??i d';
+$Definition['%s years.'] = '%s năm.';
 
+$Definition['(more)'] = '(xem thêm)';
+$Definition['(YYYY-mm-dd)'] = '(năm-tháng-ngày)';
+
+$Definition['1 day'] = '1 ngày';
+$Definition['1 hour'] = '1 giờ';
+$Definition['1 month'] = '1 tháng';
+$Definition['1 month after being sent'] = 'đã gửi được 1 tháng';
+$Definition['1 week'] = '1 tuần';
+$Definition['1 week after being sent'] = 'đã gửi được 1 tuần';
+$Definition['15 minutes'] = '15 phút';
+
+$Definition['2 weeks after being sent'] = 'đã gửi được 2 tuần';
+
+$Definition['4 hours'] = '4 giờ';
+
+$Definition['5 minutes'] = '5 phút';
+
+$Definition['<strong>Categories</strong>'] = '<strong>Danh mục</strong>';
 $Definition['<strong>Categories</strong> allow you to organize your discussions. Categories can only contain discussions.'] = 'C';
 $Definition['<strong>Heads Up!</strong> Moving discussions into a replacement category can result in discussions vanishing (or appearing) if the replacement category has different permissions than the category being deleted.'] = '<strong>Heads Up!</strong> Chuy?n c';
 
 $Definition['[%s] Invitation'] = '[%s] Th? m?i';
 $Definition['[%s] Password Reset'] = 'M?t kh?u [%s] ??t l?i';
 
+$Definition['About Vanilla Statistics'] = 'Thống kê tình trạng Vanilla';
 $Definition['Above Main Content'] = 'Tr';
+$Definition['Accepted'] = 'Đã được chấp nhận';
+$Definition['Account Sync Failed'] = 'Tài khoản không được đồng bộ';
+$Definition['Action'] = 'Hành động';
 $Definition['Add Category'] = 'Th';
+$Definition['Add Connection'] = 'Thêm kết nối';
 $Definition['Add Role'] = 'Add v? tr';
 $Definition['Add User'] = 'Th';
 $Definition['Addons'] = ' Addons';
@@ -20,12 +55,14 @@ $Definition['All discussions in this category will be permanently deleted.'] = '
 $Definition['All Forum Pages'] = 'T?t c? c';
 $Definition['Allow users to dismiss this message'] = 'Cho ph';
 $Definition['Although the invitation was created successfully, the email failed to send. The server reported the following error: %s'] = 'M?c d';
+$Definition['API Status'] = 'Tình trạng API';
 $Definition['Appearance'] = 'C';
 $Definition['Applications'] = '?ng d?ng';
 $Definition['Approve'] = 'Ph';
 $Definition['Archive Discussions'] = 'L?u tr? th?o lu?n';
 $Definition['Authentication'] = 'Ch?ng th?c';
 
+$Definition['Badge Name'] = 'T';
 $Definition['Banner Logo'] = 'Logo Banner';
 $Definition['Banner Title'] = 'Ti';
 $Definition['Basic'] = 'C? b?n';
@@ -71,6 +108,7 @@ $Definition['Edit User'] = 'S?a ng??i d';
 $Definition['Enable'] = 'K';
 $Definition['Enable this message'] = 'H?u d?ng t';
 $Definition['Enabled'] = 'H?u d?ng';
+$Definition['Enabled: The pocket will be displayed.'] = 'H?u d?ng';
 $Definition['Enter the email address of the person you would like to invite:'] = 'Nh?p ??a ch? email c?a ng??i b?n mu?n m?i:';
 $Definition['Every Page'] = 'M?i trang';
 $Definition['Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.'] = 'M?i ng??i d';
@@ -109,6 +147,7 @@ $Definition['Manage Themes'] = 'Qu?n l';
 $Definition['Manage Users'] = 'Qu?n l';
 $Definition['Max Comment Length'] = '?? d';
 $Definition['Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'] = 'Tin nh?n xu?t hi?n tr';
+$Definition['Messages can appear anywhere in your application.'] = 'Tin nh?n xu?t hi?n tr';
 $Definition['Method'] = 'Ph??ng th?c';
 
 $Definition['minute(s)'] = 'ph';
@@ -137,6 +176,7 @@ $Definition['Page'] = 'Trang';
 $Definition['Panel Box'] = 'H?p';
 $Definition['Password Options'] = 'T';
 $Definition['Pending'] = 'Chu?n b?...';
+$Definition['Permission.Category'] = 'Danh m?c';
 $Definition['Please choose an authenticator to configure.'] = 'Ch?n m?t ng??i ch?ng th?c ?? c?u h';
 $Definition['Plugins'] = ' Plugins';
 $Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'Ng?n ch?n spam tr';
@@ -156,7 +196,10 @@ $Definition['Reveal Password'] = 'C';
 $Definition['Role'] = 'V? tr';
 $Definition['Role Name'] = 'T';
 $Definition['Roles & Permissions'] = 'V? tr';
+$Definition['Roles determine user\'s permissions.'] = 'M?i ng??i d';
 
+$Definition['SaveLocalePack'] = 'L?u';
+$Definition['Search by user or role.'] = 'T';
 $Definition['Search for users by name or enter the name of a role to see all users with that role.'] = 'T';
 
 $Definition['seconds'] = 'gi';
@@ -169,6 +212,7 @@ $Definition['SMTP Port'] = 'C?ng SMTP';
 $Definition['SMTP Security'] = 'B?o m?t SMTP';
 $Definition['Status'] = 'Tr?ng th';
 
+$Definition['Test Mode: The pocket will only be displayed for pocket administrators.'] = 'Test Mode';
 $Definition['The banner logo appears at the top of your forum.'] = 'Logo banner xu?t hi?n tr';
 $Definition['The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'] = 'Ti';
 $Definition['The following content has been flagged by users for moderator review.'] = 'Nh?ng n?i dung sau ?';
@@ -182,6 +226,7 @@ $Definition['Uninvite'] = 'Kh';
 $Definition['Use an SMTP server to send email'] = 'Use an SMTP server to send email.';
 $Definition['Use Categories'] = 'C';
 $Definition['Use categories to organize discussions'] = 'D';
+$Definition['User Count'] = 'Ng??i d';
 $Definition['User Registration Settings'] = 'C';
 $Definition['Users'] = 'Ng??i d';
 

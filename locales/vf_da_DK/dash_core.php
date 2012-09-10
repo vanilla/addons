@@ -1,5 +1,7 @@
 <?php
 
+$Definition['%1$s "%2$s" not found.'] = '%1$s "%2$s" ikke fundet.';
+$Definition['%s Settings'] = '%s Indstillinger';
 $Definition['%s user(s) found.'] = '%s brugere fundet.';
 
 $Definition['1 month after being sent'] = '1 mÂned efter at blive sendt';
@@ -7,11 +9,10 @@ $Definition['1 week after being sent'] = '1 uge efter at blive sendt';
 
 $Definition['2 weeks after being sent'] = '2 uger efter at blive sendt';
 
-$Definition['_Locale'] = 'Locale';
-
 $Definition['A url-friendly version of the category name for better SEO.'] = 'En url-version af kategori navnet for bedre SEO.';
 $Definition['Accepted'] = 'Accepteret';
 $Definition['Action'] = 'Handling';
+$Definition['Add %s'] = 'Tilføj %s';
 $Definition['Add Category'] = 'sfdfs';
 $Definition['Add Info &amp; Create Account'] = 'Tilf¯j Info &amp; Lav Bruger';
 $Definition['Add User'] = 'Tilf¯j Bruger';
@@ -19,6 +20,7 @@ $Definition['AddonProblems'] = 'ffsfsdlksdlfnsd';
 $Definition['Addons'] = 'Tilf¯jelser';
 $Definition['Advanced'] = 'Avanceret';
 $Definition['Advanced Forum Settings'] = 'Avancerede Forum Indstillinger';
+$Definition['All %1$s'] = 'Alle %1$s';
 $Definition['Appearance'] = 'Udseende';
 $Definition['Applicant'] = 'Ans¯ger';
 $Definition['Application'] = 'Ands¯gning';
@@ -31,7 +33,12 @@ $Definition['Approve'] = 'Godkend';
 $Definition['Archive Discussions'] = 'Arkiver Diskussioner';
 $Definition['Authentication'] = 'Autentificering';
 
+$Definition['Badge Name'] = 'Navn';
 $Definition['Banner Title'] = 'Banner Titel';
+
+$Definition['by %s'] = 'af %s';
+
+$Definition['By %s'] = 'Af %s';
 
 $Definition['Category Url:'] = 'Kategori Url:';
 $Definition['Change the way that new users register with the site.'] = 'Lav om pÂ mÂden som nye brugere registrere pÂ.';
@@ -65,11 +72,13 @@ $Definition['Discussions per Page'] = 'Diskussioner per Side';
 
 $Definition['edit'] = 'rediger';
 
+$Definition['Edit %s'] = 'Rediger %s';
 $Definition['Edit Category'] = 'Rediger Kategori';
 $Definition['Edit User'] = 'Rediger Bruger';
 $Definition['EditContentTimeout.Notes'] = 'Note: Vis en bruger har en rolle som kan lave om pÂ indhold, De tilladelser vil lave om pÂ de vÊrdier her.';
 $Definition['Enable'] = 'Aktiver';
 $Definition['Enable OpenID'] = 'Aktiver OpenID';
+$Definition['Enabled: The pocket will be displayed.'] = 'Enabled';
 $Definition['Enter the email address of the person you would like to invite:'] = 'Indtast email adressen for personen du vil invitere:';
 $Definition['Existing members send invitations to new members.'] = 'Eksisterende medlemer sender invitationer til nye medlemmer.';
 
@@ -85,6 +94,7 @@ $Definition['Generate'] = 'Generer';
 $Definition['Google Sign In Settings'] = 'Google Sign In Indstillinger';
 $Definition['Guest'] = 'GÊst';
 
+$Definition['If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin\'s configuration screen.'] = 'ProxyConnect.RimBlurb';
 $Definition['Import'] = 'Importer';
 $Definition['Invitation Code'] = 'Invitations Kode';
 $Definition['Invitations can be sent from users\' profile pages.'] = 'NÂr du bruger registrer med invitation brugere vil have et link kaldet <a href="%s" class="Popup">Mine Invitationer</a> pÂ deres profil.';
@@ -147,6 +157,7 @@ $Definition['Outgoing Email'] = 'UdgÂende Email';
 $Definition['Page'] = 'Side';
 $Definition['Panel Box'] = 'Panel Boks';
 $Definition['Password Options'] = 'Kodeords Indstillinger';
+$Definition['Permission.Category'] = 'Kategori';
 $Definition['Please choose an authenticator to configure.'] = 'VÊlg venligst et godkendelsesskema at konfigurere.';
 $Definition['PluginHelp'] = 'Plugins giver dig mulighed for at tilf¯je funktionalitet til  dit websted.<br />NÂr et plugin er blevet tilf¯jet til din %s mappe, kan du  aktivere eller deaktivere  det her.';
 $Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'Forhindrer spam pÂ dit forum ved at begrÊnse antallet af diskussioner &amp; kommentarer, som brugerne kan skrive inden for en given periode.';
@@ -168,6 +179,9 @@ $Definition['Route Expression'] = 'Rute Udtryk';
 $Definition['Routes'] = 'Ruter';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = 'Ruter kan blive brugt til at f¯re brugere hen til forskellige steder pÂ siden.';
 
+$Definition['Saved'] = 'Dine Êndringer er gemt.';
+$Definition['SaveLocalePack'] = 'Gem';
+
 $Definition['seconds'] = 'sekunder';
 
 $Definition['Select the file to import'] = 'VÊlg en fil at importere';
@@ -178,6 +192,7 @@ $Definition['SMTP Security'] = 'SMTP Sikkerhed';
 $Definition['SMTP User'] = 'SMTP Bruger';
 
 $Definition['Temporary (302)'] = 'Midlertidig (302)';
+$Definition['Test Mode: The pocket will only be displayed for pocket administrators.'] = 'Test Mode';
 $Definition['Thank You!'] = 'Tak!';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = '%s Godkendelsesskema har ikke nogen brugerdefineret konfigurationsmuligheder.';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = 'tilf¯jelsen kunne ikke blive aktiveret fordi den genererede en fejl: <pre>%s</pre>';
@@ -192,6 +207,7 @@ $Definition['Twitter Connect allows users to sign in using their Twitter account
 
 $Definition['Unlimited'] = 'UbegrÊnset';
 $Definition['User'] = 'Bruger';
+$Definition['User Count'] = 'Brugere';
 $Definition['User Registration Settings'] = 'Bruger Registreringsindstillinger';
 $Definition['Users'] = 'Brugere';
 

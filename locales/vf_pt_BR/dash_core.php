@@ -136,7 +136,6 @@ $Definition['Badge cannot be deleted.'] = 'Distintivo não pôde ser deletado.';
 $Definition['Badge deleted.'] = 'Distintivo deletado.';
 $Definition['Badge Name'] = 'Nome';
 $Definition['BadgeRecipientsHeading'] = 'Destinatários mais recentes';
-$Definition['Ban Item'] = 'Item';
 $Definition['Ban List'] = 'Lista de Banidos';
 $Definition['Ban Type'] = 'Tipo';
 $Definition['Banner Logo'] = 'Logotipo do Banner';
@@ -152,10 +151,10 @@ $Definition['Blocked'] = 'Bloquear';
 $Definition['Blog Comments'] = 'Comentários do Blog';
 $Definition['Browse Addons'] = 'Navegar pelos Complementos';
 $Definition['Browse for a new banner logo if you would like to change it:'] = 'Navegue por um novo logotipo de banner caso deseje alterá-lo:';
-$Definition['By %s'] = 'Por %s';
 
 $Definition['by %s'] = 'por %s';
 
+$Definition['By %s'] = 'Por %s';
 $Definition['By clicking the button below, you will be deleting the user account for %s forever.'] = 'Ao clicar no botão abaixo, você deletará a conta de %s permanentemente.';
 
 $Definition['Cannot build profile information if user is not defined.'] = 'Não é possível construir um perfil se o usuário não é definido.';
@@ -241,7 +240,6 @@ $Definition['Default %s Permissions'] = 'Permissões %s Padrão';
 $Definition['Default Category Permissions'] = 'Categorias de Permissões Padrão';
 $Definition['Default Locale'] = 'Linguagem Padrão';
 $Definition['Default Roles'] = 'Cargos Padrão';
-$Definition['Define who can upload files on the Roles & Permissions page.'] = 'Define who can upload and manage files on the <a href="%s">Roles & Permissions</a> page.';
 $Definition['Define your forum homepage'] = 'Defina sua página inicial';
 $Definition['Define your forum homepage, upload your logo, and more...'] = 'Defina a sua página inicial, o seu logo e muito mais...';
 $Definition['Delete Badge'] = 'Deletar Distintivo';
@@ -368,8 +366,6 @@ $Definition['Garden.Import.Continue.Description'] = 'Parece que você está no m
 $Definition['Garden.Import.Description'] = 'Utilize esta página para importar conteúdo exportado pelo Vanilla Porter. Para mais informações <a href="%s">veja a nossa importante documentação</a>.';
 $Definition['Garden.Import.InputInstructions'] = 'Entre o email e senha do administrador que está importando estes dados.';
 $Definition['Garden.Import.Merge'] = 'Mescle com este fórum.';
-$Definition['Garden.Import.Merge.Description'] = 'This will merge all of the user and discussion data from the import into this forum.
-<b>Warning: If you merge the same data twice you will get duplicate discussions.</b>';
 $Definition['Garden.Import.Overwrite'] = 'Sobcrescreva este fórum.';
 $Definition['Garden.Import.Overwrite.Description'] = 'Aviso: todo o conteúdo no seu fórum será sobrescrito.';
 $Definition['Garden.StatisticsDisabled'] = 'Você desabilitou as Estatísticas do Vanilla em seu arquivo de configuração.';
@@ -545,9 +541,10 @@ $Definition['Other Themes'] = 'Outros Temas';
 $Definition['Other Tutorials'] = 'Outros Tutoriais';
 $Definition['Outgoing Email'] = 'Caixa de Saída';
 
+$Definition['Page'] = 'Página';
+
 $Definition['page'] = 'página';
 
-$Definition['Page'] = 'Página';
 $Definition['Panel Box'] = 'Caixa do Painel';
 $Definition['Password Options'] = 'Opções de Senha';
 $Definition['Pending'] = 'Pendente';
@@ -568,7 +565,6 @@ $Definition['Private Key'] = 'Chave Privada';
 $Definition['Provider'] = 'Provedor';
 $Definition['Proxy Connect'] = 'Conexão Proxy';
 $Definition['Proxy Connect Test'] = 'Teste de Conexão Proxy';
-$Definition['ProxyConnect.RimBlurb'] = 'If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin\'s configuration screen.';
 $Definition['Public Key'] = 'Chave Pública';
 
 $Definition['Quick-Start Guide to Creating Themes for Vanilla'] = 'Guia de Início Rápido para Criar Temas para o Vanilla';
@@ -817,8 +813,6 @@ $Definition['View Page'] = 'Ver Página';
 $Definition['Warning'] = 'Aviso';
 $Definition['Warning: All of your data will be lost. Once you delete, there is absolutely no recovery of any kind.'] = 'Aviso: Todos os seus dados serão perdidos. Uma vez que você deletar, não existe nenhum tipo de recuperação.';
 $Definition['Warning: deleting is permanent'] = 'AVISO: itens deletados são removidos desta lista e não podem ser resgatados.';
-$Definition['Warning: Loading tables can be slow.'] = '<b>Warning</b>: Your server configuration does not support fast data loading.
-If you are importing a very large file (ex. over 200,000 comments) you might want to consider changing your configuration. Click <a href="http://vanillaforums.com/porter">here</a> for more information.';
 $Definition['We only accept urls that begin with http:// or https://'] = 'Nós só aceitamos URL que comecem com http:// ou https://';
 $Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = 'Por padrão, nos tentaremos utilizar o servidor de email local para enviar mensagens. Se você deseja utilizar um servidor SMTP diferente, poderá configurá-lo abaixo.';
 $Definition['Welcome to Vanilla!'] = 'Bem-vindo ao Vanilla!';

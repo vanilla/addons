@@ -27,8 +27,8 @@ $Definition['%s Agrees'] = '%s Egyetért';
 $Definition['%s and you'] = '%s és te';
 $Definition['%s Awesomes'] = '%s Szuper';
 $Definition['%s changed %s\'s permissions.'] = '%s megváltoztatta %s\'s jogosultságait.';
-$Definition['%s Comment'] = '%s Komment';
 $Definition['%s comment'] = '%s hozzászólás';
+$Definition['%s Comment'] = '%s Komment';
 $Definition['%s comments'] = '%s hozzászólás';
 $Definition['%s Comments'] = '%s Komment';
 $Definition['%s deleted this conversation.'] = '%s törölte a beszélgetést.';
@@ -45,8 +45,8 @@ $Definition['%s message'] = 'üzenet %s';
 $Definition['%s messages'] = 'üzenetek %s';
 $Definition['%s new'] = '%s új';
 $Definition['%s New'] = '%s Új';
-$Definition['%s new plural'] = '%s új';
 $Definition['%s New Plural'] = '%s Új';
+$Definition['%s new plural'] = '%s új';
 $Definition['%s Not Found'] = '%s nem található';
 $Definition['%s Point'] = '%s pont';
 $Definition['%s point'] = '%s pont';
@@ -134,8 +134,8 @@ $Definition['answer'] = 'válasz';
 
 $Definition['Answers'] = 'Válaszok';
 $Definition['Apply Changes'] = 'Változások mentése';
-$Definition['Apply for membership'] = 'Regisztrálok';
 $Definition['Apply for Membership'] = 'Regisztrálok';
+$Definition['Apply for membership'] = 'Regisztrálok';
 $Definition['Are you ABSOLUTELY sure you want to take this action?'] = 'TELJESEN biztos vagy benne?';
 $Definition['Are you sure you want to delete this %s?'] = 'Biztosan törölni akarod ezt: %s?';
 $Definition['Are you sure you want to do that?'] = 'Biztos ezt akarod csinálni?';
@@ -177,9 +177,11 @@ $Definition['bookmarked discussion'] = 'könyvjelzőzött vetélytárs';
 
 $Definition['Bookmarked Discussions'] = 'Könyvjelzővel ellátott beszélgetések';
 $Definition['Bookmarks'] = 'Könyvjelzők';
-$Definition['By'] = 'Általa:';
 
 $Definition['by'] = 'általa:';
+
+$Definition['By'] = 'Általa:';
+
 $Definition['by Date'] = 'dátum szerint';
 
 $Definition['By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'] = 'Az általad feltöltött kép nem sértheti más felhasználók jogait és nem szegheti meg a szabályzatot.';
@@ -232,22 +234,12 @@ $Definition['Completely delete the warning.'] = 'Teljesen töröld a figyelmezte
 $Definition['Confirm'] = 'Elfogad';
 $Definition['Confirm Email'] = 'Email elfogadás';
 $Definition['Confirm Password'] = 'Jelszó újra';
-$Definition['ConnectAccountExists'] = 'You already have an account here.';
 $Definition['ConnectChooseName'] = 'Válassz nevet, ami az oldalon majd azonosít!';
-$Definition['ConnectCreateAccount'] = 'Add Info &amp; Create Account';
-$Definition['ConnectExistingPassword'] = 'Enter your existing account password.';
-$Definition['ConnectLeaveBlank'] = 'Leave blank unless connecting to an exising account.';
 $Definition['ConnectName'] = 'Bejelentkezési név:';
-$Definition['ConnectRegisteredName'] = 'Your registered username: <strong>%s</strong>';
 $Definition['Create One.'] = 'Hozz létre!';
 
 $Definition['Date'] = 'Dátum';
 $Definition['Date Added'] = 'Hozzáadva';
-$Definition['Date.DefaultDateTimeFormat'] = '%B %e, %Y %l:%M%p';
-$Definition['Date.DefaultDayFormat'] = '%B %e';
-$Definition['Date.DefaultFormat'] = '%B %e, %Y';
-$Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
-$Definition['Date.DefaultYearFormat'] = '%B %Y';
 
 $Definition['days'] = 'nap';
 
@@ -269,7 +261,6 @@ $Definition['Disqus'] = 'Megbeszél';
 $Definition['Do you want to expire or delete this warning?'] = 'Törölni akarod ezt a figyelmeztetést?';
 $Definition['Don\'t have an account? %s'] = 'Nincs még fiókod? %s';
 $Definition['Draft saved at %s'] = 'Piszkozat mentve: %s';
-$Definition['Draft.Delete'] = '×';
 $Definition['Drag around and resize the square below to define your thumbnail icon.'] = 'A kocka méretánek beállításával megszabhatod, hogy mennyi látszódjon az Avatarodon.';
 
 $Definition['Earned'] = 'Kapott';
@@ -287,15 +278,12 @@ $Definition['Eighth Anniversary'] = 'Nyolcadik évforduló';
 $Definition['Email Notifications'] = 'Email értesítés';
 $Definition['Email Or Username'] = 'Email vagy felhasználó név';
 $Definition['Email sent from the application will be addressed from the following name and address'] = 'Az alkalmazás ezen a néven és címen küld emailt';
-$Definition['Email Source'] = 'Email';
 $Definition['Email Unavailable'] = 'Nincs email cím';
 $Definition['Email visible to other users'] = 'Az emailed láthatatlana  többi felhasználó számára.';
 $Definition['Email/Username'] = 'Email/login név';
 $Definition['EmailConfirmEmail'] = 'Meg kell erősítened az email címed, mielőtt folytathatnád. Kattints erre a linkre: {/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
 $Definition['EmailFooter'] = '
 Legyen szép napod!';
-$Definition['EmailHeader'] = 'Hello {User.Name}!
-';
 $Definition['EmailInvitation'] = 'Hello!
 
 %1$smeghívott ide: %2$s. Ha csatlakoznál, kattints erre a linkre:
@@ -317,48 +305,15 @@ $Definition['EmailPassword'] = '%2$s visszaállította a jelszavad itt: %3$s. Í
   Email: %6$s
   Jelszó: %5$s
   Url: %4$s';
-$Definition['EmailStoryNotification'] = '%1$s
-
-%3$s
-
----
-Follow the link below to check it out:
-%2$s
-
-Have a great day!';
-$Definition['EmailWelcome'] = '%2$s has created an account for you at %3$s. Your login credentials are:
-
-  Email: %6$s
-  Password: %5$s
-  Url: %4$s';
-$Definition['EmailWelcomeConnect'] = 'You have successfully connected to {Title}. Here is your information:
-
-  Username: {User.Name}
-  Connected With: {ProviderName}
-
-You can access the site at {/,exurl,domain}.';
 $Definition['EmailWelcomeRegister'] = 'Sikeresen regisztráltál itt: {Title}. Részletek:
 
   Felhasználó név: {User.Name}
   Email: {User.Email}
 
 Kattints ide a fórum eléréséhez: {/,exurl,domain}.';
-$Definition['EmbeddedDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
-<p>{Excerpt}</p>
-<p><a href="{Url}">Read the full story here</a></p><div class="ClearFix"></div></div>';
-$Definition['EmbeddedNoBodyFormat'] = '{Url}';
-$Definition['EmbededDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
-<p>{Excerpt}</p>
-<p><a href="{Url}">Read the full story here</a></p><div class="ClearFix"></div></div>';
 $Definition['Enter your Email address'] = 'Add meg az email címed';
 $Definition['Enter your Email address or username'] = 'Írd be az email címed, vagy felhasználó neved!';
 $Definition['ErrorBadInvitationCode'] = 'Hiba: Helytelen meghivási kód!';
-$Definition['ErrorCredentials'] = 'Sorry, no account could be found related to the email/username and password you entered.';
-$Definition['ErrorPermission'] = 'Sorry, permission denied.';
-$Definition['ErrorPluginDisableRequired'] = 'You cannot disable the {0} plugin because the {1} plugin requires it in order to function.';
-$Definition['ErrorPluginEnableRequired'] = 'This plugin requires that the {0} plugin be enabled before it can be enabled itself.';
-$Definition['ErrorPluginVersionMatch'] = 'The enabled {0} plugin (version {1}) failed to meet the version requirements ({2}).';
-$Definition['ErrorRecordNotFound'] = 'The requested record could not be found.';
 $Definition['ErrorTermsOfService'] = 'A szabályzatot el kell fogadnod!';
 
 $Definition['everyone'] = 'mindenki';
@@ -373,13 +328,10 @@ $Definition['Forgot your password?'] = 'Elfelejtetted a jelszavad?';
 $Definition['Forgot?'] = 'Elfelejtetted?';
 $Definition['Format his'] = 'övé';
 $Definition['Format their'] = 'ő';
-$Definition['Format You'] = 'te';
 $Definition['Format you'] = 'Te';
+$Definition['Format You'] = 'te';
 $Definition['Format Your'] = 'te';
 
-$Definition['Garden.Email.SupportAddress'] = 'Support email';
-$Definition['Garden.Email.SupportName'] = 'Support name';
-$Definition['Garden.Registration.DefaultRoles'] = 'default role';
 $Definition['Garden.Title'] = 'Banner/fejléc szöveg';
 $Definition['Gender'] = 'Neme:';
 $Definition['General'] = 'Általános';
@@ -390,15 +342,7 @@ $Definition['Hang on a sec while we sign you out.'] = 'Kérem várjon míg kijel
 
 $Definition['he'] = 'ő';
 
-$Definition['HeadlineFormat.Badge'] = '{ActivityUserID,You} earned the <a href="{Url,html}">{Data.Name,text}</a> badge.';
-$Definition['HeadlineFormat.Ban'] = '{RegardingUserID,You} banned {ActivityUserID,you}.';
-$Definition['HeadlineFormat.Comment'] = '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>';
-$Definition['HeadlineFormat.Discussion'] = '{ActivityUserID,user} Started a new discussion. <a href="{Url,html}">{Data.Name,text}</a>';
-$Definition['HeadlineFormat.Mention'] = '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>';
-$Definition['HeadlineFormat.PictureChange.ForUser'] = '{RegardingUserID,You} changed the profile picture for {ActivityUserID,user}.';
 $Definition['HeadlineFormat.Registration'] = '{ActivityUserID,You} beléptél.';
-$Definition['HeadlineFormat.Unban'] = '{RegardingUserID,You} unbanned {ActivityUserID,you}.';
-$Definition['HeadlineFormat.Warning'] = '{ActivityUserID,You} warned {RegardingUserID,you}.';
 
 $Definition['her'] = 'övé';
 
@@ -419,9 +363,7 @@ $Definition['in'] = 'itt:';
 $Definition['In this Conversation'] = 'Ebben a társalgásban';
 $Definition['Insert Image'] = 'Kép beszúrása';
 $Definition['Internal'] = 'Belső';
-$Definition['Invalid password.'] = 'The password you entered was incorrect. Remember that passwords are case-sensitive.';
 $Definition['Invite'] = 'Meghív';
-$Definition['InviteErrorPermission'] = 'Sorry, permission denied.';
 $Definition['It looks like you\'re new here. If you want to get involved, click one of these buttons!'] = 'Úgy tűnik, hogy új vagy itt! Ha csaatlakozni akarsz, klikkelj valamelyik gombra.';
 
 $Definition['Joined'] = 'Csatlakozott';
@@ -431,11 +373,9 @@ $Definition['Keep me signed in'] = 'Maradjon bejelentkezve';
 $Definition['Last Active'] = 'Utolsó látogatás';
 $Definition['Last IP'] = 'Utolsó IP';
 $Definition['Leave a Comment'] = 'Hagyj üzenetet!';
-$Definition['Locale'] = 'en-CA';
 
 $Definition['Male'] = 'Férfi';
 $Definition['Mark Read'] = 'Olvasottá tesz';
-$Definition['Marking as spam cannot be undone.'] = 'Marking something as SPAM will cause it to be deleted forever. Deleting is a good way to keep your forum clean.';
 
 $Definition['message'] = 'üzenet';
 
@@ -444,14 +384,12 @@ $Definition['Moderator Activity'] = 'Moderátori aktivitás';
 
 $Definition['moderators'] = 'moderátorok';
 
-$Definition['MoneyFormat2'] = '$%7.2f';
 $Definition['Most recent by %1$s'] = 'Legújabb üzenet %1$s által';
 $Definition['Most recent: %1$s by %2$s'] = '. Legújabb üzenet: %1$s Írta: %2$s ';
 $Definition['My Bookmarks'] = 'Könyvjelzőim';
 $Definition['My Discussions'] = 'Saját beszélgetés';
 $Definition['My Drafts'] = 'Piszkozataim';
 $Definition['My Preferences'] = 'Saját beállítások';
-$Definition['MyBadgesModuleTitle'] = 'My Badges';
 
 $Definition['Name'] = 'Név';
 $Definition['Name Unavailable'] = 'A név nem engedélyezett.';
@@ -464,7 +402,6 @@ $Definition['New Message'] = 'Új társalgás';
 $Definition['New Password'] = 'Új jelszó';
 $Definition['No discussions were found.'] = 'Beszélgetés nem található.';
 $Definition['No results for \'%s\''] = 'Nincs találat erre: \'%s\'';
-$Definition['NoBadgesEarned'] = 'Any minute now&hellip;';
 $Definition['Not Authorized (401)'] = 'Nincs jogosultság (401)';
 $Definition['Not Found (404)'] = 'Nem található (404)';
 $Definition['Not much happening here, yet.'] = 'Nem sok minden történt itt.';
@@ -479,11 +416,9 @@ $Definition['Notify me when people mention me in comments.'] = 'Értesítsenek h
 $Definition['Notify me when people mention me.'] = 'Kérek értesítést, ha megemlítenek.';
 $Definition['Notify me when people reply to my wall comments.'] = 'Értesítsenek ha valaki hozzászólt az üzenőfalamhoz';
 $Definition['Notify me when people write on my wall.'] = 'Értesítsenek ha valaki írt az üzenőfalamra';
-$Definition['Null Date'] = '-';
 
 $Definition['Okay'] = 'Rendben';
 $Definition['Old Password'] = 'Régi jelszó';
-$Definition['OldPassword'] = 'Old password';
 $Definition['Only show followed categories'] = 'Csak a követett kategóriákat mutassa';
 $Definition['Options'] = 'Beállítás';
 
@@ -493,22 +428,11 @@ $Definition['Or you can...'] = 'Vagy tudsz...';
 $Definition['Original'] = 'Eredeti';
 
 $Definition['Page Not Found'] = 'Lap nem található';
-$Definition['PageDetailsMessage'] = '%1$s to %2$s';
-$Definition['PageDetailsMessageFull'] = '%1$s to %2$s of %3$s';
-$Definition['ParticipatedHomepageTitle'] = 'Participated Discussions';
 $Definition['Password'] = 'Jelszó';
-$Definition['PasswordRequest'] = 'Someone has requested to reset your password at %2$s. To reset your password, follow this link:
-
-  %3$s
-
-If you did not make this request, disregard this email.';
 $Definition['Passwords don\'t match'] = 'Figyelem - a jelszavak nem egyeznek!';
 $Definition['Permalink'] = 'Címzettnek beállít';
 $Definition['PermissionErrorMessage'] = 'Nincs jogosultságod ehhez.';
 $Definition['PermissionErrorTitle'] = 'Jogosultsági probléma';
-$Definition['PermissionRequired.Garden.Moderation.Manage'] = 'You need to be a moderator to do that.';
-$Definition['PermissionRequired.Garden.Settings.Manage'] = 'You need to be an administrator to do that.';
-$Definition['PermissionRequired.Javascript'] = 'You need to enable javascript to do that.';
 $Definition['Picture'] = 'Kép';
 $Definition['Poll'] = 'Szavazás';
 $Definition['Popular'] = 'Legnézettebb';
@@ -516,34 +440,19 @@ $Definition['Popular Tags'] = 'Gyakori cimkék';
 $Definition['Popup'] = 'Felugró';
 $Definition['Post Comment'] = 'Hozzászólás küldése';
 $Definition['Post Discussion'] = 'Beszélgetés küldése';
-$Definition['Posts.Plural: %s'] = 'Posts: %s';
-$Definition['Posts.Singular: %s'] = 'Posts: %s';
 $Definition['Powered by %s'] = 'Realizzato con %s';
-$Definition['PreferenceBadgeEmail'] = 'Notify me when I earn a badge.';
-$Definition['PreferenceBadgePopup'] = 'Notify me when I earn a badge.';
 $Definition['Preview'] = 'Előlnézet';
 $Definition['Private Note for Moderators'] = 'Privát üzenet a moderátoroknak';
 $Definition['Profile'] = 'Profil';
-$Definition['ProfileFieldsCustomDescription'] = 'Use these fields to create custom profile information. You can enter things like "Relationship Status", "Skype", or "Favorite Dinosaur". Be creative!';
 
-$Definition['Q&A Accepted'] = 'Answered ✓';
-$Definition['Q&A Answered'] = 'Answered';
-$Definition['Q&A Question'] = 'Question';
-$Definition['QnA Accepted Answer'] = 'Answer ✓';
-$Definition['QnA Rejected Answer'] = 'Rejected Answer';
 $Definition['Question Title'] = 'Beszélgetés címe';
 $Definition['Quote'] = 'Idéz';
 $Definition['Quote Folding'] = 'Idézet összecsukás';
-$Definition['Quote on'] = 'on';
 $Definition['Quote Settings'] = 'Idézet beállítások';
-$Definition['Quote wrote'] = 'wrote';
 
-$Definition['Ranks.ActivityFormat'] = '{ActivityUserID,user} {ActivityUserID,plural,was,were} promoted to {Data.Name,plaintext}.';
-$Definition['Ranks.NotificationFormat'] = 'Congratulations! You\'ve been promoted to {Data.Name,plaintext}.';
 $Definition['Recent Activity'] = 'Jelenlegi aktivitás';
 $Definition['Recent Discussions'] = 'Legfrissebb beszélgetések';
 $Definition['Recipients'] = 'Címzett';
-$Definition['RecipientUserID'] = 'recipient';
 $Definition['Refetch Page'] = 'Oldal újrabetöltése';
 $Definition['Register'] = 'Regisztrálj';
 $Definition['Register IP'] = 'Regisztrálási IP';
@@ -556,14 +465,12 @@ $Definition['Reply'] = 'Válasz';
 $Definition['Request a new password'] = 'Új jelszó kérése';
 $Definition['Request a new password →'] = 'Új jelszó kérése →';
 $Definition['Reset Password'] = 'Jelszó csere';
-$Definition['RoleID'] = 'role';
 $Definition['Roles'] = 'Csoportok';
 
 $Definition['Save'] = 'Mentés';
 $Definition['Save Draft'] = 'Piszkozat mentése';
 $Definition['Save Preferences'] = 'Beállítások mentése';
 $Definition['Search'] = 'Keres';
-$Definition['Search for a tag.'] = 'Search for all or part of a tag.';
 $Definition['Search results for \'%s\''] = 'Keresés erre: \'%s\'';
 $Definition['SearchBoxPlaceHolder'] = 'Keres';
 $Definition['Select an image on your computer (2mb max)'] = 'Válassz egy képet a számítógépedről (max. 2MB).';
@@ -577,7 +484,6 @@ $Definition['Share'] = 'Megosztás';
 $Definition['she'] = 'ő';
 
 $Definition['Sign In'] = 'Bejelentkezés';
-$Definition['Sign In or Register to Comment.'] = '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.';
 $Definition['Sign In with Facebook'] = 'Belépés Facebookkal';
 $Definition['Sign Up'] = 'Feliratkozás';
 $Definition['Signature Code'] = 'Aláírás';
@@ -624,7 +530,6 @@ $Definition['The email you entered in use by another member.'] = 'Ez az email c�
 $Definition['The email you have entered is already related to an existing account.'] = 'Ez az email cím már használatban van a fórumon.';
 $Definition['The name you entered is already in use by another member.'] = 'Ez a felhasznlónév már használatban van.';
 $Definition['The page you were looking for could not be found.'] = 'A keresett oldal nem található.';
-$Definition['The quote had to be converted from %s to %s.'] = 'The quote had to be converted from %s to %s. Some formatting may have been lost.';
 $Definition['The reCAPTCHA value was not entered correctly. Please try again.'] = 'Figyelem - reCAPTCHA értéke nem megfelelő. Kérlek próbáld újra.';
 
 $Definition['their'] = 'ők';
@@ -638,7 +543,6 @@ $Definition['Transport error: %s'] = 'Figyelem, a lekérés közben hiba csúszo
 $Definition['Type'] = 'Típus';
 
 $Definition['Unannounce'] = 'Kiemelés törlése';
-$Definition['Unanswered Questions'] = 'Unanswered';
 $Definition['Unbookmark'] = 'Könyvlejző levétele';
 $Definition['Unfollow'] = 'Ne kövesd!';
 $Definition['Unknown'] = 'Ismeretlen';
@@ -646,35 +550,13 @@ $Definition['Unsink'] = 'Kivétel a kukából';
 $Definition['Unspecified'] = 'Nem meghatározott';
 $Definition['Upload'] = 'Feltöltés';
 $Definition['Uploading...'] = 'Feltöltés...';
-$Definition['UrlCode'] = 'Url code';
-$Definition['User not found.'] = 'Sorry, no account could be found related to the email/username you entered.';
 $Definition['Username'] = 'Bejelentkezési név:';
 $Definition['Username can only contain letters, numbers, and underscores.'] = 'A felhasználónév csak betüket, számokat és _ (alávonást) tartalmazhat!';
 $Definition['Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.'] = 'A felhasználónév betűket, számokat, aláhúzást tartalmazhat és minimum 3, maximum 20 hosszú lehet.';
 $Definition['UsernameError'] = 'A felhasználónév betűket, számokat, aláhúzást tartalmazhat és minimum 3, maximum 20 hosszú lehet.';
 
-$Definition['ValidateBanned'] = 'That %s is not allowed.';
-$Definition['ValidateBoolean'] = '%s is not a valid boolean.';
-$Definition['ValidateConnection'] = 'The connection parameters you specified failed to open a connection to the database. The database reported the following error: <code>%s</code>';
-$Definition['ValidateDate'] = '%s is not a valid date.';
-$Definition['ValidateDecimal'] = '%s is not a valid decimal.';
-$Definition['ValidateEmail'] = '%s does not appear to be valid.';
-$Definition['ValidateEnum'] = '%s is not valid.';
-$Definition['ValidateFormat'] = 'You are not allowed to post raw html.';
-$Definition['ValidateInteger'] = '%s is not a valid integer.';
-$Definition['ValidateIntegerArray'] = '%s must be a comma-delimited list of numbers.';
-$Definition['ValidateLength'] = '%1$s is %2$s characters too long.';
 $Definition['ValidateMatch'] = 'A %s mezők nem egyeznek meg.';
-$Definition['ValidateOneOrMoreArrayItemRequired'] = 'You must select at least one %s.';
-$Definition['ValidateRegex'] = '%s does not appear to be in the correct format.';
 $Definition['ValidateRequired'] = '%sszükséges.';
-$Definition['ValidateRequiredArray'] = 'You must select at least one %s.';
-$Definition['ValidateTag'] = 'Tags cannot contain spaces.';
-$Definition['ValidateTime'] = '%s is not a valid time.';
-$Definition['ValidateTimestamp'] = '%s is not a valid timestamp.';
-$Definition['ValidateUrlStringRelaxed'] = '%s can not contain slashes, quotes or tag characters.';
-$Definition['ValidateUsername'] = 'Usernames must be 3-20 characters and consist of letters, numbers, and underscores.';
-$Definition['ValidateVersion'] = 'The %s field is not a valid version number. See the php version_compare() function for examples of valid version numbers.';
 $Definition['Verified'] = 'Ellenőrizve';
 
 $Definition['via %s'] = '%s által';
@@ -688,8 +570,6 @@ $Definition['wall'] = 'fal';
 
 $Definition['Want to take part in this discussion? Click one of these:'] = 'Rész akarsz venni ebben a beszélgetésben? Akkor klikkelj valamelyikre:';
 $Definition['Warnings'] = 'Figyelmeztetések';
-$Definition['WarningTitleFormat'] = '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s points}.';
-$Definition['WarningTitleFormat.Notice'] = '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s points} (just a notice).';
 $Definition['Welcome Aboard!'] = 'Üdv köztünk!';
 $Definition['Who\'s Online'] = 'Ki van jelen';
 $Definition['Whos Online'] = 'Ki van jelen';
@@ -702,9 +582,7 @@ $Definition['you'] = 'Te';
 $Definition['You'] = 'Te';
 $Definition['You are currently only viewing categories that you follow.'] = 'Csak a követett kategóriákat látod.';
 $Definition['You are currently viewing all categories.'] = 'Minden kategóriát látsz';
-$Definition['You can either ask a question or start a discussion.'] = 'You can either ask a question or start a discussion. Choose what you want to do below.';
 $Definition['You can follow individual categories and be notified of all posts within them.'] = 'Egyes kategóriákat követhetsz, és értesítést kapsz a beszélgetéseikról.';
-$Definition['You can use HTML in your signature.'] = 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your signature.';
 $Definition['You do not have any bookmarks.'] = 'Nincs könyvjelződ';
 $Definition['You do not have any conversations.'] = 'Nincs semmilyen társalgásod folyamatban.';
 $Definition['You do not have any drafts.'] = 'Nincs piszkozatod';
@@ -717,8 +595,6 @@ Figyelem - %1$s alkalommal küldtél tartalmas %2$s másodperc alatt. A rendszer
 $Definition['You haven\'t read this yet.'] = 'Még nem olvastad ezt.';
 $Definition['You must agree to the terms of service.'] = 'A szabályzatot el kell fogadnod!';
 $Definition['You need to confirm your email address.'] = 'Meg kell erősítened az email címed. Kattints <a href="{/entry/emailconfirmrequest,url}">erre a linkre</a> a megerősítő email újraküldéséhez.';
-$Definition['You were added to a conversation.'] = '{InsertUserID,user} added {NotifyUserID,you} to a <a href="{Url,htmlencode}">conversation</a>.';
-$Definition['YouEarnedBadge'] = 'You earned this badge';
 
 $Definition['your'] = 'Tied';
 
@@ -730,4 +606,3 @@ $Definition['Your old password was incorrect.'] = 'A régi jelszavad nem helyes.
 $Definition['Your password has been changed.'] = 'A jelszavad sikeresen megváltozott.';
 $Definition['Your picture has been removed.'] = 'A képed el lett távolítva.';
 $Definition['Your preferences have been saved.'] = 'A beállításokat elmentettük';
-$Definition['Your request has been sent.'] = 'Your request has been sent. Check your email for further instructions.';

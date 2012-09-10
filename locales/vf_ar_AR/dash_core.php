@@ -50,39 +50,13 @@ $Definition['Browse for a new banner logo if you would like to change it:'] = 'L
 
 $Definition['Comments Page'] = 'صفحة التعليقات';
 $Definition['Condition Type'] = 'نوع';
-$Definition['Confirm email addresses'] = 'Require users to confirm their email addresses (recommended)';
-
-$Definition['Define who can upload files on the Roles & Permissions page.'] = 'Define who can upload and manage files on the <a href="%s">Roles & Permissions</a> page.';
-
-$Definition['Garden.Import.Complete.Description'] = 'You have successfully completed an import.
-   Click <b>Finished</b> when you are ready.';
-$Definition['Garden.Import.Continue.Description'] = 'It appears as though you are in the middle of an import.
-   Please choose one of the following options.';
-$Definition['Garden.Import.Merge.Description'] = 'This will merge all of the user and discussion data from the import into this forum.
-<b>Warning: If you merge the same data twice you will get duplicate discussions.</b>';
 
 $Definition['Mixed Layout'] = 'تخطيط مختلط';
-
-$Definition['Operation By'] = 'By';
-
-$Definition['ProxyConnect.RimBlurb'] = 'If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin\'s configuration screen.';
 
 $Definition['Reveal Password'] = 'كشف كلمة المرور';
 
 $Definition['Site Description'] = 'وصف الموقع';
 
-$Definition['Test Mode'] = 'Test Mode: The pocket will only be displayed for pocket administrators.';
 $Definition['Test Mode: The pocket will only be displayed for pocket administrators.'] = 'Test Mode';
 
 $Definition['Use an SMTP server to send email'] = 'Use an SMTP server to send email.';
-$Definition['UserDeletionPrompt'] = 'Choose how to handle all of the content associated with the user account for %s (comments, messages, etc).';
-
-$Definition['Warning: Loading tables can be slow.'] = '<b>Warning</b>: Your server configuration does not support fast data loading.
-If you are importing a very large file (ex. over 200,000 comments) you might want to consider changing your configuration. Click <a href="http://vanillaforums.com/porter">here</a> for more information.';
-$Definition['Wordpress Source'] = 'Wordpress';
-
-$Definition['You can place files in your /uploads folder.'] = 'If your file is too
-		large to upload directly to this page you can place it in your /uploads
-		folder. Make sure the filename begins with the word <b>export</b> and ends
-		with one of <b>.txt, .gz</b>.';
-$Definition['Your default locale won\'t display properly'] = 'Your default locale won\'t display properly until it is enabled below. Please enable the following: %s.';

@@ -24,8 +24,8 @@ $Definition['%s and you'] = '%s و شما';
 $Definition['%s changed %s\'s permissions.'] = '%s پروانه‌های %s را تغییر داد.';
 $Definition['%s comment'] = '%s دیدگاه';
 $Definition['%s Comment'] = '%s دیدگاه';
-$Definition['%s Comments'] = '%s دیدگاه';
 $Definition['%s comments'] = '%s دیدگاه';
+$Definition['%s Comments'] = '%s دیدگاه';
 $Definition['%s deleted this conversation.'] = '%s این گفت‌وگو را پاک کرده است.';
 $Definition['%s discussion'] = '%s جستار';
 $Definition['%s discussions'] = '%s جستار';
@@ -36,8 +36,8 @@ $Definition['%s mentioned %s in a %s.'] = '%s از %s در یک %s نام برد
 $Definition['%s message'] = '%s پیام';
 $Definition['%s messages'] = 'تعداد پیام‌ها : %s';
 $Definition['%s new'] = 'تازه: %s مورد';
-$Definition['%s new plural'] = 'تازه: %s مورد';
 $Definition['%s New Plural'] = '%s دیدگاه تازه';
+$Definition['%s new plural'] = 'تازه: %s مورد';
 $Definition['%s Not Found'] = '%s یافت نشد.';
 $Definition['%s said'] = '%s گفت';
 $Definition['%s said:'] = '%s گفت:';
@@ -75,7 +75,6 @@ $Definition['Activity.Join.FullHeadline'] = '%1$s به انجمن پیوست.';
 $Definition['Activity.Join.ProfileHeadline'] = '%1$s به انجمن پیوست.';
 $Definition['Activity.PictureChange.FullHeadline'] = '%1$s تصویر نمایه‌ی %6$s را تغییر داد.';
 $Definition['Activity.PictureChange.ProfileHeadline'] = '%1$s تصویر نمایه‌ی %6$s را تغییر داد.';
-$Definition['Activity.QuestionAnswer.FullHeadline'] = '%1$s answered %4$s %8$s.';
 $Definition['Add'] = 'افزودن';
 $Definition['Add a Comment'] = 'دیدگاهی بنویسید';
 $Definition['Add a Message'] = 'پیام بگذارید.';
@@ -151,9 +150,6 @@ $Definition['Best Of...'] = 'بهترینِ...';
 $Definition['Blank Message'] = 'پیام تهی';
 $Definition['Body'] = 'متن';
 $Definition['Bookmark'] = 'نشان‌دارها';
-
-$Definition['bookmarked discussion'] = 'bookmarked competition';
-
 $Definition['Bookmarked Discussions'] = 'جستارهای نشان شده';
 $Definition['Bookmarks'] = 'چوب‌الف‌ها';
 
@@ -184,10 +180,10 @@ $Definition['Child Categories:'] = 'زیردسته‌ها:';
 $Definition['Choose a name to identify yourself on the site.'] = 'یک نام را برای شناسایی خودتان در وب‌گاه انتخاب کنید.';
 $Definition['Choose the main discussion into which all comments will be merged:'] = 'جستار اصلی را که همه‌ی دیدگاه‌ها در آن درهم آمیخته خواهند شد، گزینش کنید:';
 $Definition['Choose whether you want to ask a question or start a discussion.'] = 'انتخاب کنید که می‌خواهید سوال کنید یا یک بحث را شروع کنید.';
-$Definition['Clear'] = 'پاک کردن';
 
 $Definition['clear'] = 'پاک‌کردن';
 
+$Definition['Clear'] = 'پاک کردن';
 $Definition['Clear Conversation History'] = 'پاک‌کردن حافظهٔ گفت‌وگو';
 $Definition['Click <a href="%s">here</a> to go back to the discussion.'] = '<a href="%s">اینجا</a> را بفشارید تا به جستار بازگردید.';
 $Definition['Click accept or reject beside an answer.'] = 'روی پذیرفتن یا نپذیرفتن کنار یک سوال کلیک کنید.';
@@ -202,7 +198,6 @@ $Definition['comment'] = 'دیدگاه';
 
 $Definition['Comment'] = 'دیدگاه';
 $Definition['Comment by %s'] = 'فرستنده‌ی دیدگاه: %s';
-$Definition['Comment in'] = 'in';
 $Definition['Commenting not allowed.'] = 'دیدگاه‌نویسی بسته شده است!';
 $Definition['Comments'] = 'دیدگاه‌ها';
 $Definition['Confirm'] = 'تأیید';
@@ -236,11 +231,6 @@ $Definition['Dashboard Home'] = 'خانهٔ پیش‌خوان';
 $Definition['Dashboard Summaries'] = 'خلاصه‌های پیش‌خوان';
 $Definition['Date'] = 'تاریخ';
 $Definition['Date Added'] = 'تاریخ افزوده‌شدن';
-$Definition['Date.DefaultDateTimeFormat'] = '%B %e, %Y %l:%M%p';
-$Definition['Date.DefaultDayFormat'] = '%B %e';
-$Definition['Date.DefaultFormat'] = '%B %e, %Y';
-$Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
-$Definition['Date.DefaultYearFormat'] = '%B %Y';
 $Definition['Define Thumbnail'] = 'برای مشخص‌کردن تصویر بندانگشتی‌تان، اطراف تصویر را کلیک کنید و بکشید.';
 $Definition['Delete'] = 'پاک';
 $Definition['Delete %s'] = 'پاک کردن %s';
@@ -256,7 +246,6 @@ $Definition['Dismiss'] = 'نادیده بگیر';
 $Definition['Do you want to expire or delete this warning?'] = 'آیا می‌خواهید این هشدار را پایان دهید یا پاک کنید؟';
 $Definition['Don\'t have an account? %s'] = 'شناسه‌ی کاربری ندارید؟ %s';
 $Definition['Draft saved at %s'] = 'پیش‌نویس،‌ در ساعت %s اندوخته شد.';
-$Definition['Draft.Delete'] = '×';
 $Definition['Drag around and resize the square below to define your thumbnail icon.'] = 'بخشی از تصویر را با موشواره گزینش کنید تا تصویر بندانگشتی شما در انجمن‌ باشد.';
 
 $Definition['Edit'] = 'ویرایش ';
@@ -333,13 +322,6 @@ $Definition['EmailWelcomeRegister'] = '
 <br>
 نشانی دسترسی به انجمن: {/,exurl,domain}.
 ';
-$Definition['EmbeddedDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
-<p>{Excerpt}</p>
-<p><a href="{Url}">Read the full story here</a></p><div class="ClearFix"></div></div>';
-$Definition['EmbeddedNoBodyFormat'] = '{Url}';
-$Definition['EmbededDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
-<p>{Excerpt}</p>
-<p><a href="{Url}">Read the full story here</a></p><div class="ClearFix"></div></div>';
 $Definition['English'] = 'انگلیسی';
 $Definition['Enter your Email address'] = 'نشانی رایانامه‌تان را وارد کنید';
 $Definition['Enter your email address'] = 'نشانی رایانامه‌تان را وارد کنید';
@@ -365,16 +347,14 @@ $Definition['Feedback'] = 'بازخورد';
 $Definition['Female'] = 'زن';
 $Definition['Fifth Anniversary'] = 'پنجمین سالگرد';
 $Definition['File Size'] = 'اندازهٔ پرونده';
-$Definition['Filename'] = 'نام پرونده';
 $Definition['FileName'] = 'نام پرونده';
+$Definition['Filename'] = 'نام پرونده';
 $Definition['Flag'] = ' پرچم';
 $Definition['Follow'] = 'دنبال کردن';
 $Definition['Forgot?'] = '<br>فراموش کرده‌اید؟';
 $Definition['Format his'] = 'خودش';
-$Definition['Format their'] = 'their';
 $Definition['Format You'] = 'شما';
 $Definition['Format you'] = 'شما';
-$Definition['Format Your'] = 'Your';
 $Definition['Fourth Anniversary'] = 'چهارمین سالگرد';
 $Definition['Friends'] = 'دوستان';
 
@@ -396,13 +376,8 @@ $Definition['Hang on a sec while we sign you out.'] = 'اندکی شکیبا ب�
 $Definition['he'] = 'او';
 
 $Definition['HeadlineFormat.Badge'] = '{ActivityUserID,You} نشان <a href="{Url,html}">{Data.Name,text}</a> را دریافت کرد.';
-$Definition['HeadlineFormat.Ban'] = '{RegardingUserID,You} banned {ActivityUserID,you}.';
 $Definition['HeadlineFormat.Comment'] = '{ActivityUserID,user} در مورد <a href="{Url,html}">{Data.Name,text}</a> نظر داد.';
-$Definition['HeadlineFormat.Discussion'] = '{ActivityUserID,user} Started a new discussion. <a href="{Url,html}">{Data.Name,text}</a>';
 $Definition['HeadlineFormat.Mention'] = '{ActivityUserID,user} به شما در <a href="{Url,html}">{Data.Name,text}</a> اشاره کرد.';
-$Definition['HeadlineFormat.PictureChange.ForUser'] = '{RegardingUserID,You} changed the profile picture for {ActivityUserID,user}.';
-$Definition['HeadlineFormat.Registration'] = '{ActivityUserID,You} joined.';
-$Definition['HeadlineFormat.Unban'] = '{RegardingUserID,You} unbanned {ActivityUserID,you}.';
 $Definition['HeadlineFormat.Warning'] = '{ActivityUserID,You} به {RegardingUserID,you} هشدار داد.';
 
 $Definition['her'] = 'خودش';
@@ -430,9 +405,10 @@ $Definition['Invite'] = 'فراخواندن';
 $Definition['InviteErrorPermission'] = 'متأسفیم، پروانه‌ی دسترسی ندارید.';
 $Definition['IP Address'] = 'نشانی IP';
 $Definition['It looks like you\'re new here. If you want to get involved, click one of these buttons!'] = 'به نظر می‌رسد که شما این‌جا تازه‌واردید. اگر می‌خواهید که شما هم مشارکت کنید، روی یکی از این دکمه‌ها کلیک کنید!';
-$Definition['Item'] = 'محروم';
 
 $Definition['item'] = 'جستار';
+
+$Definition['Item'] = 'محروم';
 
 $Definition['Jail'] = 'بازداشت';
 $Definition['Jailed users have reduced abilities.'] = 'کاربران بازداشت‌شده، توانایی کم‌تری دارند.';
@@ -464,13 +440,12 @@ $Definition['Make this poll anonymous (user votes are not made public).'] = 'ا�
 $Definition['Male'] = 'مرد';
 $Definition['Mark All Viewed'] = 'همه را خوانده شده بگیر';
 $Definition['Mark Read'] = 'خواندم';
-$Definition['Marking as spam cannot be undone.'] = 'Marking something as SPAM will cause it to be deleted forever. Deleting is a good way to keep your forum clean.';
 $Definition['Merge'] = 'درهم‌آمیزی';
 $Definition['Merge Discussions'] = 'درهم‌آمیزی جستارها';
-$Definition['Message'] = 'پیام';
 
 $Definition['message'] = 'پیام';
 
+$Definition['Message'] = 'پیام';
 $Definition['Messages'] = 'پیام‌ها';
 
 $Definition['minutes'] = 'دقیقه';
@@ -479,9 +454,6 @@ $Definition['Moderation'] = 'برقراری نظم';
 $Definition['Moderation Queue'] = 'برقراری نظم در صف‌ها';
 
 $Definition['moderators'] = 'ناظم‌ها';
-
-$Definition['MoneyFormat2'] = '$%7.2f';
-
 $Definition['months'] = 'ماه';
 
 $Definition['More'] = 'بیش‌تر';
@@ -521,7 +493,6 @@ $Definition['No discussions were found.'] = 'هیچ جستاری یافت نشد
 $Definition['No items tagged with %s.'] = 'هیچ موردی با %s برچسب نخورده است.';
 $Definition['No results for \'%s\''] = 'نتیجه‌ای برای <b>%s</b> یافت نشد :(';
 $Definition['No Roles'] = 'نقشی وجود ندارد.';
-$Definition['NoBadgesEarned'] = 'Any minute now&hellip;';
 $Definition['Not Authorized (401)'] = 'Not Authorized; 401';
 $Definition['Not Found (404)'] = 'Not Found; 404';
 $Definition['Not much happening here, yet.'] = 'از رویداد تازه خبری نیست :(';
@@ -538,7 +509,6 @@ $Definition['Notify me when people mention me in comments.'] = 'وقتی در د
 $Definition['Notify me when people mention me.'] = 'هنگامی که دیگران از من نام می‌برند، مرا آگاه کن.';
 $Definition['Notify me when people reply to my wall comments.'] = 'وقتی به دیوارنوشته‌های من پاسخی داده می‌شود، مرا آگاه کن.';
 $Definition['Notify me when people write on my wall.'] = 'وقتی روی دیوار من متنی نوشته می‌شود، مرا آگاه کن.';
-$Definition['Null Date'] = '-';
 
 $Definition['OK'] = 'تأیید';
 $Definition['Okay'] = 'بله';
@@ -559,7 +529,6 @@ $Definition['Original'] = 'تصویر نخستین';
 $Definition['Page Not Found'] = 'برگه‌ای یافت نشد.';
 $Definition['PageDetailsMessage'] = '%1$s به %2$s';
 $Definition['PageDetailsMessageFull'] = '%1$s به %2$s از %3$s';
-$Definition['ParticipatedHomepageTitle'] = 'Participated Discussions';
 $Definition['Password'] = 'گذرواژه';
 $Definition['PasswordRequest'] = '
 درخواستی برای بازیابی گذرواژه‌ی شما در %2$s، دریافت شده است. برای بازیابی گذرواژه‌تان، پیوند زیر را دنبال کنید:<br>%3$s<br>اگر شما این درخواست را نداده‌اید، این رایانامه را نادیده بگیرید.
@@ -569,9 +538,6 @@ $Definition['Permalink'] = 'پیوند پایا';
 $Definition['Permanent (301)'] = 'Permanent; 301';
 $Definition['PermissionErrorMessage'] = 'شما پروانه‌ای برای دسترسی به این بخش ندارید.';
 $Definition['PermissionErrorTitle'] = 'مشکل پروانه';
-$Definition['PermissionRequired.Garden.Moderation.Manage'] = 'You need to be a moderator to do that.';
-$Definition['PermissionRequired.Garden.Settings.Manage'] = 'You need to be an administrator to do that.';
-$Definition['PermissionRequired.Javascript'] = 'You need to enable javascript to do that.';
 $Definition['Picture'] = 'تصویر';
 $Definition['Please wait while you are redirected. If you are not redirected, click <a href="%s">here</a>.'] = 'لطفا چشم به‌راه بمانید تا هنگامی که redirect شوید. چنان‌چه redirect نمی‌شوید، <a href="%s">اینجا</a> را بفشارید.';
 $Definition['Poll'] = 'نظرسنجی';
@@ -591,8 +557,6 @@ $Definition['Posts.Singular: %s'] = 'ارسال‌ها: %s';
 $Definition['Posts: %s'] = 'ارسال‌ها: %s';
 $Definition['Powered by %s'] = 'برگرفته از نیروی %s';
 $Definition['Powered by Vanilla'] = 'توان گرفته از وانیلا';
-$Definition['PreferenceBadgeEmail'] = 'Notify me when I earn a badge.';
-$Definition['PreferenceBadgePopup'] = 'Notify me when I earn a badge.';
 $Definition['Preview'] = 'پیش‌نمایش';
 $Definition['Previous'] = 'برگه‌ی پیشین';
 $Definition['Privacy Settings'] = 'تنظیمات خصوصی';
@@ -602,24 +566,17 @@ $Definition['Proceed'] = 'دسته را پاک کن';
 $Definition['Profile'] = 'نمایه';
 $Definition['Profile Page'] = 'برگه‌ی رخ‌نما';
 $Definition['Profile Picture'] = 'تصویر نمایه';
-$Definition['ProfileFieldsCustomDescription'] = 'Use these fields to create custom profile information. You can enter things like "Relationship Status", "Skype", or "Favorite Dinosaur". Be creative!';
 $Definition['Profiles'] = 'رخ‌نماها';
 $Definition['Public'] = 'عمومی';
 
 $Definition['Q&A Accepted'] = 'جواب‌داده‌شده: ✓';
 $Definition['Q&A Answered'] = 'جواب‌داده‌شده';
 $Definition['Q&A Question'] = 'سوال';
-$Definition['QnA Accepted Answer'] = 'Answer ✓';
-$Definition['QnA Rejected Answer'] = 'Rejected Answer';
 $Definition['Question'] = 'سوال';
 $Definition['Question Title'] = 'عنوان سوال';
 $Definition['Quote'] = 'نقل‌قول';
-$Definition['Quote on'] = 'on';
 $Definition['Quote Settings'] = 'تنظیمات نقل‌قول';
-$Definition['Quote wrote'] = 'wrote';
 
-$Definition['Ranks.ActivityFormat'] = '{ActivityUserID,user} {ActivityUserID,plural,was,were} promoted to {Data.Name,plaintext}.';
-$Definition['Ranks.NotificationFormat'] = 'Congratulations! You\'ve been promoted to {Data.Name,plaintext}.';
 $Definition['Reactions'] = 'واکنش‌ها';
 $Definition['Real Name'] = 'نام واقعی';
 $Definition['Reason'] = 'توضیح';
@@ -627,7 +584,6 @@ $Definition['Recent Activity'] = 'فعالیت‌های تازه';
 $Definition['Recent Admin Activity'] = 'فعالیت اخیر مدیر';
 $Definition['Recent Discussions'] = 'جستارهای تازه';
 $Definition['Recipients'] = 'دریافت کنندگان';
-$Definition['RecipientUserID'] = 'recipient';
 $Definition['Refetch Page'] = 'دوباره‌گرفتن صفحه';
 $Definition['Register'] = 'نام‌نویسی';
 $Definition['Register IP'] = 'IP ثبت‌نام';
@@ -696,10 +652,10 @@ $Definition['Sign In with Facebook'] = 'ورود با فیس‌بوک';
 $Definition['Sign In with Google'] = 'ورود با گوگل';
 $Definition['Sign In with OpenID'] = 'ورود با OpenID';
 $Definition['Sign In with Twitter'] = 'ورود از توئیتر';
-$Definition['Sign Out'] = 'برون‌رفت';
 
 $Definition['sign out'] = 'بله، مرا بیرون ببر.';
 
+$Definition['Sign Out'] = 'برون‌رفت';
 $Definition['Sign Up'] = 'ثبت‌نام';
 $Definition['Sign-In URL'] = 'نشانی اینترنتی ورود';
 $Definition['Sign-Out URL'] = 'نشانی اینترنتی خروج';
@@ -759,7 +715,6 @@ $Definition['The conversation has been cleared.'] = 'گفت‌وگو پاک شد
 $Definition['The file failed to upload.'] = 'بارگذاری پرونده با شکست روبرو شد.';
 $Definition['The name you entered is already in use by another member.'] = 'نامی که وارد کردید، از سوی کاربر دیگری استفاده می‌شود.';
 $Definition['The page you were looking for could not be found.'] = 'برگه‌ای که در پی آن بودید، یافت نشد.';
-$Definition['The quote had to be converted from %s to %s.'] = 'The quote had to be converted from %s to %s. Some formatting may have been lost.';
 $Definition['The reCAPTCHA value was not entered correctly. Please try again.'] = 'کد reCAPTCHA را نادرست وارد کرده‌اید، لطفاً دوباره تلاش کنید.';
 $Definition['The response was not in the correct format.'] = 'پاسخی که دریافت شد، قالب درستی نداشت.';
 $Definition['The uploaded file was too big (max %s).'] = '<br>پرونده‌ی بارگذاری شده بسیار بزرگ بود (بیشنه %s)';
@@ -782,7 +737,6 @@ $Definition['Thumbnail'] = 'تصویر بندانگشتی';
 $Definition['Title'] = 'سرنویس';
 $Definition['To send another confirmation email click <a href="%s">here</a>.'] = 'برای فرستادن یک رایانه‌ی فعال‌سازی دیگر، <a href="%s">اینجا</a> را بفشارید.';
 $Definition['To use reCAPTCHA you must get an API key from %s'] = 'برای به‌کارگیری reCAPTCHA شما باید یک API key از تارنمای زیر بگیرید:<br>%s';
-$Definition['Transport error: %s'] = 'A fatal error occurred while processing the request.<br />The server returned the following response: %s';
 $Definition['Twitter Settings'] = 'تنظیمات توئیتر';
 $Definition['Type'] = 'گونه‌';
 
@@ -800,12 +754,10 @@ $Definition['Upload'] = 'بارگیری';
 $Definition['Uploading...'] = 'در حال بارگیری...';
 $Definition['UrlCode'] = 'نشانی';
 $Definition['Use My Current Password'] = 'گذرواژه‌ی کنونی‌ام را استفاده کن';
-$Definition['User not found.'] = 'Sorry, no account could be found related to the email/username you entered.';
 $Definition['Username'] = 'نام کاربری';
 $Definition['Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.'] = 'نام کاربری تنها می‌تواند حرف‌ها، عددها و زیرخط [_] را در بر بگیرد. هم‌چنین نام کاربری باید بین 3 تا 20 نویسه داشته باشد.';
 $Definition['UsernameError'] = 'نام کاربری تنها می‌تواند حرف‌ها، عددها و زیرخط [_] را در بر بگیرد. هم‌چنین نام کاربری باید بین 3 تا 20 نویسه داشته باشد.';
 
-$Definition['ValidateBanned'] = 'That %s is not allowed.';
 $Definition['ValidateBoolean'] = 'داده‌ی %s یک ارزش بولی (Boolean) نادرست است';
 $Definition['ValidateConnection'] = 'پارامترهای ارتباطی‌ای که مشخص کردید در ایجاد ارتباط با پایگاه داده شکست خوردند. پایگاه داده خطای زیر را گزارش کرد:<br><code>%s</code>';
 $Definition['ValidateDate'] = 'داده‌ی %s یک تاریخ نادرست است.';
@@ -814,7 +766,6 @@ $Definition['ValidateEmail'] = 'به‌نظر می‌رسد که %s نادرست
 $Definition['ValidateEnum'] = '%s نادرست است.';
 $Definition['ValidateFormat'] = 'پروانه‌ی فرستادن کدهای خام html را ندارید.';
 $Definition['ValidateInteger'] = 'داده‌ی %s یک عدد صحیح (Integr) نادرست است.';
-$Definition['ValidateIntegerArray'] = '%s must be a comma-delimited list of numbers.';
 $Definition['ValidateLength'] = 'تعداد نویسه‌های %1$s، %2$s تا بیش از حد مجاز است.';
 $Definition['ValidateMatch'] = '%s‌ها هم‌خوانی ندارند.';
 $Definition['ValidateMinimumAge'] = 'سال‌های زندگی شما برای عضویت در این انجمن هنوز کوتاه است!';
@@ -844,7 +795,6 @@ $Definition['wall'] = 'دیوار';
 $Definition['Want to take part in this discussion? Click one of these:'] = 'آیا مایلید در این جستار همکاری کنید؟ یکی از گزینه‌ها را بفشارید:';
 $Definition['Warnings'] = 'هشدارها';
 $Definition['WarningTitleFormat'] = '{InsertUserID,User} به {WarnUserID,User} به‌خاطر {Points,plural,%s points} هشدار داد.';
-$Definition['WarningTitleFormat.Notice'] = '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s points} (just a notice).';
 $Definition['Website'] = 'تارنما';
 
 $Definition['weeks'] = 'هفته‌ها';
@@ -859,10 +809,10 @@ $Definition['Write Comment'] = 'نوشتن دیدگاه';
 $Definition['Write something about yourself...'] = 'درباره خود بنویسید...';
 
 $Definition['Yes'] = 'بله';
+$Definition['You'] = 'کاربر';
 
 $Definition['you'] = 'شما';
 
-$Definition['You'] = 'کاربر';
 $Definition['You already have an account here.'] = 'شما از قبل یک حساب این‌جا دارید.';
 $Definition['You are about to ban {User.UserID,user}.'] = 'شما دارید {User.UserID,user} را بازداشت می‌کنید.';
 $Definition['You are about to unban {User.UserID,user}.'] = 'شما دارید {User.UserID,user} را از بازداشت کنار می‌گذارید.';
@@ -873,7 +823,6 @@ $Definition['You are currently viewing all categories.'] = 'شما درحال‌
 $Definition['You are editing %s\'s signature'] = 'شما در حال ویرایش امضای %s هستید';
 $Definition['You can either ask a question or start a discussion.'] = 'شما می‌توانید سوال کنید یا یک بحث را شروع کنید. در زیر کاری را که می‌خواهید انجام دهید، مشخص کنید.';
 $Definition['You can only specify up to %s tags.'] = 'شما فقط می‌توانید تا %s برچسب را مشخص کنید.';
-$Definition['You can use HTML in your signature.'] = 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your signature.';
 $Definition['You do not have any bookmarks.'] = 'شما هیچ جستار نشان‌داری ندارید.';
 $Definition['You do not have any conversations.'] = 'شما هیچ گفت‌وگویی ندارید.';
 $Definition['You do not have any drafts.'] = 'شما هیچ پیش‌نویسی ندارید.';
