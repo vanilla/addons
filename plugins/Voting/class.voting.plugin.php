@@ -192,7 +192,7 @@ class VotingPlugin extends Gdn_Plugin {
 			$Sender->EventArguments['CssClass'] .= ' Hidden';
 
 			echo "<li class=\"Item Voting\">";
-			echo Wrap(T(sprintf('Comment #%d hidden due its low score.', $Comment->CommentID)),
+			echo Wrap(T(sprintf('Comment #%d was hidden due its low score.', $Comment->CommentID)),
 								'span',
 								array('class' => 'HiddenCommentNote',));
 			echo Wrap(T('Show Comment'),
