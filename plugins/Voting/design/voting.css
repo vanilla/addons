@@ -153,7 +153,7 @@ ul.MessageList div.Meta span.Votes span {
 	/* color: #000; */
 	font-weight: bold;
 	font-size: 18px;
-	line-height: 1.2;	
+	line-height: 1.2;
 }
 .Voter span {
    font-size: 13px;
@@ -186,7 +186,7 @@ span.Votes a.VoteDown {
 span.Votes a:hover {
 	background: #013B76;
 	color: #fff;
-	text-shadow: 0 0px 5px #fff;	
+	text-shadow: 0 0px 5px #fff;
 }
 */
 
@@ -232,4 +232,16 @@ div.AnswerTabs strong {
 div.AnswerTabs ul {
 	display: inline-block;
 	margin: 0 10px;
+}
+
+/* Styles for elements related to hidden comments */
+.Voting .ShowComment,
+.Voting .HideComment {
+	cursor: pointer;
+	margin-left: 0.5em;
+	border-bottom: 1px dotted gray;
+}
+
+.Voting .HiddenCommentNote {
+	font-weight: bold;
 }
