@@ -140,6 +140,8 @@ class SignaturesPlugin extends Gdn_Plugin {
       static $UserSigData = NULL;
       if (is_null($UserSigData)) {
          $UserSigData = $this->GetUserMeta(Gdn::Session()->UserID, '%');
+         
+//         decho($UserSigData);
       }
       
       if (!is_null($SigKey))
@@ -197,8 +199,6 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_Render_Before($Sender) {
-      
-      
       $this->PrepareController($Sender);
    }
    
@@ -293,7 +293,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       if (strcasecmp(Gdn::Controller()->RequestMethod, 'embed') == 0 && C('Plugin.Signatures.HideEmbed', TRUE))
          return TRUE;
       
-      if ($this->UserPreferences('Plugins.Signatures.HideAll', FALSE))
+      if ($this->UserPreferences('Plugin.Signatures.HideAll', FALSE))
          return TRUE;
       
       if (IsMobile() && $this->UserPreferences('Plugin.Signatures.HideMobile', FALSE))
