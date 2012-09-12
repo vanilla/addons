@@ -291,7 +291,7 @@ class QnAPlugin extends Gdn_Plugin {
       echo '<span class="QnA-YesNo">';
 
       echo Anchor(T('Yes'), '/discussion/qna/accept?'.$Query, array('class' => 'React QnA-Yes', 'title' => T('Accept this answer.')));
-      echo ' '.Bullet().' ';
+      //echo ' '.Bullet().' ';
       echo Anchor(T('No'), '/discussion/qna/reject?'.$Query, array('class' => 'React QnA-No', 'title' => T('Reject this answer.')));
 
       echo '</span>';
