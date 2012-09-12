@@ -1,6 +1,5 @@
 jQuery(document).ready(function($) {
-   
-   // Handle Vote button clicks   
+   // Handle Vote button clicks
    $('div.VotesBox a').live('click', function() {
       var btn = this;
       var parent = $(this).parents('.Bookmarks');
@@ -40,9 +39,9 @@ jQuery(document).ready(function($) {
          }
       });
       return false;
-   });   
+   });
 
-   // Handle follow button clicks   
+   // Handle follow button clicks
    $('div.FollowsBox a').live('click', function() {
       var btn = this;
       var parent = $(this).parents('.Bookmarks');
@@ -70,7 +69,7 @@ jQuery(document).ready(function($) {
             } else {
                // Otherwise just change the class & title on the anchor
                $(btn).attr('title', json.AnchorTitle);
-               
+
                if ($(btn).hasClass('Bookmark')) {
                   $(btn).attr('class', 'Bookmark');
                   $(btn).attr('title', 'Follow');
@@ -94,9 +93,9 @@ jQuery(document).ready(function($) {
          }
       });
       return false;
-   });   
+   });
 
-   // Handle Vote button clicks   
+   // Handle Vote button clicks
    $('.Voter a').live('click', function() {
       if (!$(this).hasClass('SignInPopup')) {
          var btn = this;
@@ -122,4 +121,21 @@ jQuery(document).ready(function($) {
       }
    });
 
+	 // Show a comment hidden because pf its low score
+	 $('.ShowComment').live('click', function() {
+		var CommentID = $(this).attr('for');
+		$('#' + CommentID).removeClass('Hidden');
+		$('#Hide' + CommentID).removeClass('Hidden');
+		$(this).addClass('Hidden');
+		return false;
+	 });
+
+	 // Hide a comment previously shown by clicking on "Show Comment"
+	 $('.HideComment').live('click', function() {
+		var CommentID = $(this).attr('for');
+		$('#' + CommentID).addClass('Hidden');
+		$('#Show' + CommentID).removeClass('Hidden');
+		$(this).addClass('Hidden');
+		return false;
+	 });
 });

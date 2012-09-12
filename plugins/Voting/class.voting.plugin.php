@@ -35,7 +35,8 @@ class VotingPlugin extends Gdn_Plugin {
       $Conf = new ConfigurationModule($Sender);
 		$Conf->Initialize(array(
 			'Plugins.Voting.ModThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => -10, 'Description' => 'The vote that will flag a post for moderation.'),
-			'Plugins.Voting.ModThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => -20, 'Description' => 'The vote that will remove a post to the moderation queue.')
+			'Plugins.Voting.HideLowScoreComments' => array('Type' => 'int', 'Control' => 'CheckBox', 'Default' => 1, 'Description' => 'Hide Comments whose Score gets below the above value.'),
+			'Plugins.Voting.ModThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => -20, 'Description' => 'The vote that will remove a post to the moderation queue.'),
 		));
 
      $Sender->AddSideMenu('dashboard/settings/voting');
@@ -47,7 +48,7 @@ class VotingPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
       if (Gdn::Session()->ValidateTransientKey(GetValue(0, $Sender->RequestArgs)))
          SaveToConfig('Plugins.Voting.Enabled', C('Plugins.Voting.Enabled') ? FALSE : TRUE);
-         
+
       Redirect('settings/voting');
    }
 
@@ -57,7 +58,7 @@ class VotingPlugin extends Gdn_Plugin {
    public function AddJsCss($Sender) {
 //		if (!C('Plugins.Voting.Enabled'))
 //			return;
-		
+
       $Sender->AddCSSFile('voting.css', 'plugins/Voting');
 		$Sender->AddJSFile('plugins/Voting/voting.js');
    }
@@ -81,21 +82,21 @@ class VotingPlugin extends Gdn_Plugin {
 		$Css = 'StatBox AnswersBox';
 		if ($Discussion->CountComments > 1)
 			$Css .= ' HasAnswersBox';
-			
+
 		$CountVotes = 0;
 		if (is_numeric($Discussion->Score)) // && $Discussion->Score > 0)
 			$CountVotes = $Discussion->Score;
-			
+
 		if (!is_numeric($Discussion->CountBookmarks))
 			$Discussion->CountBookmarks = 0;
-			
+
 		echo Wrap(
 			// Anchor(
 			Wrap(T('Comments')) . Gdn_Format::BigNumber($Discussion->CountComments)
 			// ,'/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
 			// )
 			, 'div', array('class' => $Css));
-		
+
 		// Views
 		echo Wrap(
 			// Anchor(
@@ -103,7 +104,7 @@ class VotingPlugin extends Gdn_Plugin {
 			// , '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
 			// )
 			, 'div', array('class' => 'StatBox ViewsBox'));
-	
+
 		// Follows
 		$Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
 		if ($Session->IsValid()) {
@@ -116,7 +117,7 @@ class VotingPlugin extends Gdn_Plugin {
 		} else {
 			echo Wrap(Wrap(T('Follows')) . $Discussion->CountBookmarks, 'div', array('class' => 'StatBox FollowsBox'));
 		}
-	
+
 		// Votes
 		if ($Session->IsValid()) {
 			echo Wrap(Anchor(
@@ -158,7 +159,7 @@ class VotingPlugin extends Gdn_Plugin {
 
       if (self::$_CommentSort)
          return self::$_CommentSort;
-      
+
       $Sort = GetIncomingValue('Sort', '');
       if (Gdn::Session()->IsValid()) {
          if ($Sort == '') {
@@ -177,6 +178,38 @@ class VotingPlugin extends Gdn_Plugin {
    }
 
 	/**
+	 * Hides comments having a low score, and exposes two labels that allow the
+	 * User to display them, if he likes.
+	 *
+	 * @param Sender The Sender that issued the request.
+	 * @return void.
+	 */
+	protected function HideLowScoreComment($Sender) {
+		$Comment = GetValue('Object', $Sender->EventArguments);
+
+		//var_dump($Comment);
+		if(intval($Comment->Score) <= C('Plugins.Voting.ModThreshold1')) {
+			$Sender->EventArguments['CssClass'] .= ' Hidden';
+
+			echo "<li class=\"Item Voting\">";
+			echo Wrap(T(sprintf('Comment #%d hidden due its low score.', $Comment->CommentID)),
+								'span',
+								array('class' => 'HiddenCommentNote',));
+			echo Wrap(T('Show Comment'),
+								'label',
+								array('id' => sprintf('ShowComment_%d', $Comment->CommentID),
+											'class' => 'ShowComment',
+											'for' => sprintf('Comment_%d', $Comment->CommentID),));
+			echo Wrap(T('Hide Comment'),
+								'label',
+								array('id' => sprintf('HideComment_%d', $Comment->CommentID),
+											'class' => 'HideComment Hidden',
+											'for' => sprintf('Comment_%d', $Comment->CommentID),));
+			echo "</li>";
+		}
+	}
+
+	/**
 	 * Insert sorting tabs after first comment.
 	 */
 	public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
@@ -186,22 +219,27 @@ class VotingPlugin extends Gdn_Plugin {
 		$AnswerCount = $Sender->Discussion->CountComments - 1;
 		$Type = GetValue('Type', $Sender->EventArguments, 'Comment');
 		if ($Type == 'Comment' && !GetValue('VoteHeaderWritten', $Sender)) { //$Type != 'Comment' && $AnswerCount > 0) {
-		?>
-		<li class="Item">
-			<div class="VotingSort">
-			<?php
-			echo
-				Wrap($AnswerCount.' '.Plural($AnswerCount, 'Comment', 'Comments'), 'strong');
-				echo ' sorted by '
-               .Anchor('Votes', Url('?Sort=popular', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'popular' ? 'Active' : ''))
-               .' '
-               .Anchor('Date Added', Url('?Sort=date', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'date' ? 'Active' : ''));
 			?>
-			</div>
-		</li>
+			<li class="Item">
+				<div class="VotingSort">
+				<?php
+				echo
+					Wrap($AnswerCount.' '.Plural($AnswerCount, 'Comment', 'Comments'), 'strong');
+					echo ' sorted by '
+								 .Anchor('Votes', Url('?Sort=popular', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'popular' ? 'Active' : ''))
+								 .' '
+								 .Anchor('Date Added', Url('?Sort=date', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'date' ? 'Active' : ''));
+				?>
+				</div>
+			</li>
 		<?php
-      $Sender->VoteHeaderWritten = TRUE;
-		}		
+			$Sender->VoteHeaderWritten = TRUE;
+		}
+
+		if(GetValue('Type', $Sender->EventArguments) == 'Comment' &&
+			 C('Plugins.Voting.HideLowScoreComments', 0) == 1) {
+			$this->HideLowScoreComment($Sender);
+		}
 	}
 
 	public function DiscussionController_AfterCommentMeta_Handler($Sender) {
@@ -226,8 +264,8 @@ class VotingPlugin extends Gdn_Plugin {
 			echo Anchor(Wrap(Wrap('Vote Down', 'i'), 'i', array('class' => 'ArrowSprite SpriteDown', 'rel' => 'nofollow')), $VoteDownUrl, 'VoteDown'.$CssClass);
 		echo '</span>';
 
- */ 	
-      
+ */
+
       $Session = Gdn::Session();
       $Object = GetValue('Object', $Sender->EventArguments);
       $VoteType = $Sender->EventArguments['Type'] == 'Discussion' ? 'votediscussion' : 'votecomment';
@@ -258,8 +296,8 @@ class VotingPlugin extends Gdn_Plugin {
 
       $this->AddJsCss($Sender);
    }
-   
-   
+
+
    /**
     * Increment/decrement comment scores
     */
@@ -283,14 +321,14 @@ class VotingPlugin extends Gdn_Plugin {
          // Only allow users to vote up or down by 1.
          if (!$AllowVote)
             $AllowVote = $FinalVote > -2 && $FinalVote < 2;
-         
+
          if ($AllowVote)
             $Total = $CommentModel->SetUserScore($CommentID, $Session->UserID, $FinalVote);
-         
+
          // Move the comment into or out of moderation.
          if (class_exists('LogModel')) {
             $Moderate = FALSE;
-            
+
             if ($Total <= C('Plugins.Voting.ModThreshold1', -10)) {
                $LogOptions = array('GroupBy' => array('RecordID'));
                // Get the comment row.
@@ -315,7 +353,7 @@ class VotingPlugin extends Gdn_Plugin {
             if ($Total <= C('Plugins.Voting.ModThreshold2', -20)) {
                // Remove the comment.
                $CommentModel->Delete($CommentID, array('Log' => 'Moderate'));
-               
+
                $Sender->InformMessage(sprintf(T('The %s has been removed for moderation.'), T('comment')));
             } elseif ($Moderate) {
                $Sender->InformMessage(sprintf(T('The %s has been flagged for moderation.'), T('comment')));
@@ -355,14 +393,14 @@ class VotingPlugin extends Gdn_Plugin {
             $NewUserVote = -1;
          else
             $NewUserVote = $OldUserVote == 1 ? -1 : 1;
-         
+
          $FinalVote = intval($OldUserVote) + intval($NewUserVote);
          // Allow admins to vote unlimited.
          $AllowVote = $Session->CheckPermission('Garden.Moderation.Manage');
          // Only allow users to vote up or down by 1.
          if (!$AllowVote)
             $AllowVote = $FinalVote > -2 && $FinalVote < 2;
-         
+
          if ($AllowVote) {
             $Total = $DiscussionModel->SetUserScore($DiscussionID, $Session->UserID, $FinalVote);
          } else {
@@ -370,11 +408,11 @@ class VotingPlugin extends Gdn_Plugin {
 				$Total = GetValue('Score', $Discussion, 0);
 				$FinalVote = $OldUserVote;
 			}
-         
+
          // Move the comment into or out of moderation.
          if (class_exists('LogModel')) {
             $Moderate = FALSE;
-            
+
             if ($Total <= C('Plugins.Voting.ModThreshold1', -10)) {
                $LogOptions = array('GroupBy' => array('RecordID'));
                // Get the comment row.
@@ -402,7 +440,7 @@ class VotingPlugin extends Gdn_Plugin {
             if ($Total <= C('Plugins.Voting.ModThreshold2', -20)) {
                // Remove the comment.
                $DiscussionModel->Delete($DiscussionID, array('Log' => 'Moderate'));
-               
+
                $Sender->InformMessage(sprintf(T('The %s has been removed for moderation.'), T('discussion')));
             } elseif ($Moderate) {
                $Sender->InformMessage(sprintf(T('The %s has been flagged for moderation.'), T('discussion')));
@@ -424,13 +462,13 @@ class VotingPlugin extends Gdn_Plugin {
 
       $Sender->SQL->Select('d.Score');
    }
-	
+
    public function DiscussionsController_AfterDiscussionFilters_Handler($Sender) {
 		echo '<li class="PopularDiscussions '.($Sender->RequestMethod == 'popular' ? ' Active' : '').'">'
 			.Anchor(Sprite('SpPopularDiscussions').T('Popular'), '/discussions/popular', 'PopularDiscussions')
 		.'</li>';
    }
-   
+
 	/**
 	 * Add the "Popular Questions" tab.
     */
@@ -469,7 +507,7 @@ class VotingPlugin extends Gdn_Plugin {
       }
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;
-      
+
       // Add Modules
       $Sender->AddModule('NewDiscussionModule');
       $BookmarkedModule = new BookmarkedModule($Sender);
@@ -498,14 +536,14 @@ class VotingPlugin extends Gdn_Plugin {
          $CountDiscussions,
          'discussions/popular/%1$s'
       );
-      
+
       // Deliver json data if necessary
       if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL) {
          $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
          $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
          $Sender->View = 'discussions';
       }
-      
+
       // Set a definition of the user's current timezone from the db. jQuery
       // will pick this up, compare to the browser, and update the user's
       // timezone if necessary.
@@ -514,12 +552,12 @@ class VotingPlugin extends Gdn_Plugin {
          $ClientHour = $CurrentUser->HourOffset + date('G', time());
          $Sender->AddDefinition('SetClientHour', $ClientHour);
       }
-      
+
       // Render the controller
       $Sender->View = 'index';
       $Sender->Render();
    }
-	
+
 	/**
 	 * If turning off scoring, make the forum go back to the traditional "jump
 	 * to what I last read" functionality.
@@ -527,7 +565,7 @@ class VotingPlugin extends Gdn_Plugin {
    public function OnDisable() {
 		SaveToConfig('Vanilla.Comments.AutoOffset', TRUE);
    }
-	
+
    /**
    * Don't let the users access the category management screens.
    public function SettingsController_Render_Before(&$Sender) {
@@ -570,11 +608,11 @@ class VotingPlugin extends Gdn_Plugin {
    public function Setup() {
       // Add some fields to the database
       $Structure = Gdn::Structure();
-      
+
       // "Unanswered" or "Answered"
       $Structure->Table('Discussion')
          ->Column('State', 'varchar(30)', TRUE)
-         ->Set(FALSE, FALSE); 
+         ->Set(FALSE, FALSE);
 
 //    SaveToConfig('Vanilla.Categories.Use', FALSE);
 //      SaveToConfig('Vanilla.Comments.AutoOffset', FALSE);
