@@ -8,3 +8,4 @@ _notes
 .settings
 .buildpath
 .komodoproject
+*.komodoproject
