@@ -9,6 +9,6 @@ $LocaleInfo['French'] = array (
   'Author' => 'Arachnos',
   'AuthorEmail' => 'arachnos@creative-tarentula.net',
   'AuthorUrl' => 'http://www.creative-tarentula.net',
-  'License' => 'Creative Commons - CC BY-SA 2.0',
+  'License' => 'Creative Commons - CC BY-SA 2.0'
 );
 
