@@ -32,7 +32,7 @@ $PluginInfo['CloudflareSupport'] = array(
 
 class CloudflareSupportPlugin extends Gdn_Plugin {
 
-   const CLOUDFLARE_SOURCE_IPS = array(
+   protected $CloudflareSourceIPs = array(
       "204.93.240.0/24",
       "204.93.177.0/24",
       "199.27.128.0/21",
@@ -52,7 +52,7 @@ class CloudflareSupportPlugin extends Gdn_Plugin {
 
       $RemoteAddress = Gdn::Request()->RemoteAddress();
       $CloudflareRequest = FALSE;
-      foreach (self::CLOUDFLARE_SOURCE_IPS as $CloudflareIPRange) {
+      foreach ($this->CloudflareSourceIPs as $CloudflareIPRange) {
 
          // Not a cloudflare origin server
          if (!ip_in_range($RemoteAddress, $CloudflareIPRange))
