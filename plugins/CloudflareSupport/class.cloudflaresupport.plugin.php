@@ -18,7 +18,7 @@
 // Define the plugin:
 $PluginInfo['CloudflareSupport'] = array(
    'Description' => 'This plugin modifies the Request object to work with Cloudflare.',
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -32,11 +32,38 @@ $PluginInfo['CloudflareSupport'] = array(
 
 class CloudflareSupportPlugin extends Gdn_Plugin {
    
+   const CLOUDFLARE_SOURCE_IPS = array(
+       "204.93.240.0/24", 
+       "204.93.177.0/24", 
+       "199.27.128.0/21", 
+       "173.245.48.0/20", 
+       "103.22.200.0/22", 
+       "141.101.64.0/18", 
+       "108.162.192.0/18",
+       "190.93.240.0/20");
+   
    public function __construct() {
+      parent::__construct();
       
-      $CloudflareSourceIP = GetValue('HTTP_CF_CONNECTING_IP', $_SERVER, NULL);
-      if (!is_null($CloudflareSourceIP))
-         $this->RequestAddress($CloudflareSourceIP);
+      // If cloudflare isn't telling us a client IP, bust outta here!
+      $CloudflareClientIP = GetValue('HTTP_CF_CONNECTING_IP', $_SERVER, NULL);
+      if (is_null($CloudflareClientIP)) return;
+      
+      $RemoteAddress = Gdn::Request()->RemoteAddress();
+      $CloudflareRequest = FALSE;
+		foreach (self::CLOUDFLARE_SOURCE_IPS as $CloudflareIPRange) {
+         
+         // Not a cloudflare origin server
+		   if (!ip_in_range($RemoteAddress, $CloudflareIPRange)) continue;
+         
+         Gdn::Request()->RemoteAddress($CloudflareClientIP);
+         $CloudflareRequest = TRUE;
+			break;
+      }
+
+		// Let people know that the CF plugin is turned on.
+		if ($CloudflareRequest && !headers_sent())
+		   header("X-CF-Powered-By: CF-Vanilla v".$this->GetPluginKey('Version'));
       
    }
    
