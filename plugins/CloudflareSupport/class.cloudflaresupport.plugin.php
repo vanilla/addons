@@ -32,6 +32,7 @@ $PluginInfo['CloudflareSupport'] = array(
 
 class CloudflareSupportPlugin extends Gdn_Plugin {
 
+   // CloudFlare IP ranges listed at https://www.cloudflare.com/ips
    protected $CloudflareSourceIPs = array(
       "204.93.240.0/24",
       "204.93.177.0/24",
@@ -40,7 +41,8 @@ class CloudflareSupportPlugin extends Gdn_Plugin {
       "103.22.200.0/22",
       "141.101.64.0/18",
       "108.162.192.0/18",
-      "190.93.240.0/20");
+      "190.93.240.0/20",
+      "188.114.96.0/20");
 
    public function __construct() {
       parent::__construct();
