@@ -8,6 +8,7 @@
  *
  * Changes:
  *  1.0     Initial release
+ *  1.2     Fix bad method call
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -18,7 +19,7 @@
 // Define the plugin:
 $PluginInfo['CloudflareSupport'] = array(
    'Description' => 'This plugin modifies the Request object to work with Cloudflare.',
-   'Version' => '1.1',
+   'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -60,7 +61,7 @@ class CloudflareSupportPlugin extends Gdn_Plugin {
          if (!ip_in_range($RemoteAddress, $CloudflareIPRange))
             continue;
 
-         Gdn::Request()->RemoteAddress($CloudflareClientIP);
+         Gdn::Request()->RequestAddress($CloudflareClientIP);
          $CloudflareRequest = TRUE;
          break;
       }
