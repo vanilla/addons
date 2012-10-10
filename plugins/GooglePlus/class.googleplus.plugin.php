@@ -23,7 +23,6 @@ class GooglePlusPlugin extends Gdn_Plugin {
    const ProviderKey = 'GooglePlus';
    const APIUrl = 'https://www.googleapis.com/oauth2/v1';
    
-   
    /// Methods ///
    
    protected $_AccessToken = NULL;
@@ -134,6 +133,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
     * Add 'Google+' option to the row.
     */
    public function Base_AfterReactions_Handler($Sender, $Args) {
+      echo Gdn_Theme::BulletItem('Share');
 //      if ($this->AccessToken()) {
 //         $Url = Url("post/twitter/{$Args['RecordType']}?id={$Args['RecordID']}", TRUE);
 //         $CssClass = 'ReactButton Hijack';
@@ -146,13 +146,16 @@ class GooglePlusPlugin extends Gdn_Plugin {
    }
    
    public function Base_GetConnections_Handler($Sender, $Args) {
+      $Profile = GetValueR('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
+      
       $Sender->Data['Connections'][self::ProviderKey] = array(
          'Icon' => '/plugins/GooglePlus/design/gplus_icon-64.png',
          'Name' => 'Google+',
          'ProviderKey' => self::ProviderKey,
          'ConnectUrl' => $this->AuthorizeUri(array('r' => 'profile', 'uid' => Gdn::Session()->UserID)),
          'Profile' => array(
-            'Name' => GetValueR('User.Attributes.'.self::ProviderKey.'.Profile.name', $Args)
+            'Name' => GetValue('name', $Profile),
+            'Photo' => GetValue('picture', $Profile)
             )
        );
    }

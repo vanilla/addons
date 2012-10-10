@@ -54,9 +54,9 @@ class QuotesPlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
 
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', Sprite('SpQuote') . T('Quote Settings'), '/profile/quotes', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpQuote').' '.T('Quote Settings'), '/profile/quotes', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', Sprite('SpQuote') . T('Quote Settings'), UserUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpQuote').' '.T('Quote Settings'), UserUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
 
@@ -166,7 +166,8 @@ class QuotesPlugin extends Gdn_Plugin {
    /**
     * Add 'Quote' option to Discussion.
     */
-   public function Base_AfterReactions_Handler($Sender, $Args) {
+   public function Base_AfterFlag_Handler($Sender, $Args) {
+      echo Gdn_Theme::BulletItem('Flags');
       $this->AddQuoteButton($Sender, $Args);
    }
 
@@ -186,11 +187,8 @@ class QuotesPlugin extends Gdn_Plugin {
          return;
 
       $Reply = T('Reply'); // help capture translation.
-      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
-      if ($Types)
-         echo Bullet();
 
-      echo Anchor(Sprite('ReactQuote', 'ReactSprite') . T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}", TRUE), 'React Quote');
+      echo Anchor(Sprite('ReactQuote', 'ReactSprite').' '.T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}", TRUE), 'ReactButton Quote Visible').' ';
    }
 
    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {

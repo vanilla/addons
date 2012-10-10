@@ -535,8 +535,7 @@ class QnAPlugin extends Gdn_Plugin {
          $Count = ' <span class="Aside"><span class="Count">'.$Count.'</span></span>';
 
       echo '<li class="QnA-UnansweredQuestions '.($Sender->RequestMethod == 'unanswered' ? ' Active' : '').'">'
-			.Anchor(Sprite('SpUnansweredQuestions').T('Unanswered'), '/discussions/unanswered', 'UnansweredQuestions')
-         .$Count
+			.Anchor(Sprite('SpUnansweredQuestions').' '.T('Unanswered').$Count, '/discussions/unanswered', 'UnansweredQuestions')
 		.'</li>';
    }
 
