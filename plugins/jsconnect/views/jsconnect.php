@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div style="margin-top: 25%">
+<div class="jsConnect-Connecting" style="margin-top: 25%">
    <h1 style="text-align: center;"><?php echo $this->Data('Title'); ?></h1>
    <?php
    echo $this->Form->Open(), $this->Form->Errors();
