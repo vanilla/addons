@@ -42,7 +42,7 @@ class FacebookIDPlugin extends Gdn_Plugin {
 
       $UserID = GetValue('InsertUserID',$Sender->EventArguments['Object'],'0');
       $FacebookID = GetValue($UserID, $this->FacebookIDs, T('n/a'));
-      echo '<span>'.T('Facebook ID').': '.$FacebookID.'</span>';
+      echo '<span>'.T('Facebook ID').': '.$FacebookID.'</span> ';
    }
    
    /**
