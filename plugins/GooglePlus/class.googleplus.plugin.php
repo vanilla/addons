@@ -16,6 +16,7 @@ $PluginInfo['GooglePlus'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
    'SettingsUrl' => '/dashboard/settings/googleplus',
    'SettingsPermission' => 'Garden.Settings.Manage',
+   'SocialConnect' => TRUE
 );
 
 class GooglePlusPlugin extends Gdn_Plugin {
@@ -27,16 +28,6 @@ class GooglePlusPlugin extends Gdn_Plugin {
    /// Methods ///
    
    protected $_AccessToken = NULL;
-   
-   /**
-	 * Adds social link to dashboard
-	 * 
-	 * @param object $Sender DashboardController.
-	 */
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-      $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Social', T('Google+'), 'dashboard/settings/googleplus', 'Garden.Settings.Manage');
-   }
    
    public function AccessToken($NewValue = FALSE) {
       if ($NewValue !== FALSE)
@@ -157,7 +148,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
    
    public function Base_GetConnections_Handler($Sender, $Args) {
       $Sender->Data['Connections'][self::ProviderKey] = array(
-         'Icon' => '/plugins/GooglePlus/design/gplus_icon-64.png',
+         'Icon' => $this->GetWebResource('design/gplus_icon-64.png'),
          'Name' => 'Google+',
          'ProviderKey' => self::ProviderKey,
          'ConnectUrl' => $this->AuthorizeUri(array('r' => 'profile', 'uid' => Gdn::Session()->UserID)),
