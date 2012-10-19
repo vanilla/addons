@@ -54,9 +54,9 @@ class QuotesPlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
 
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', Sprite('SpQuote') . T('Quote Settings'), '/profile/quotes', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpQuote').' '.T('Quote Settings'), '/profile/quotes', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', Sprite('SpQuote') . T('Quote Settings'), UserUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpQuote').' '.T('Quote Settings'), UserUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
 
