@@ -427,7 +427,7 @@ class VotingPlugin extends Gdn_Plugin {
 	
    public function DiscussionsController_AfterDiscussionFilters_Handler($Sender) {
 		echo '<li class="PopularDiscussions '.($Sender->RequestMethod == 'popular' ? ' Active' : '').'">'
-			.Anchor(Sprite('SpPopularDiscussions').T('Popular'), '/discussions/popular', 'PopularDiscussions')
+			.Anchor(Sprite('SpPopularDiscussions').' '.T('Popular'), '/discussions/popular', 'PopularDiscussions')
 		.'</li>';
    }
    
