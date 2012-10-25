@@ -152,7 +152,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
          $CssClass = 'ReactButton PopupWindow';
 //      }
       
-      echo Anchor(Sprite('ReactGooglePlus', 'ReactSprite'), $Url, $CssClass);
+      echo ' '.Anchor(Sprite('ReactGooglePlus', 'ReactSprite'), $Url, $CssClass).' ';
    }
    
    public function Base_GetConnections_Handler($Sender, $Args) {
