@@ -7,15 +7,18 @@
 // Define the plugin:
 $PluginInfo['GooglePlus'] = array(
    'Name' => 'Google+',
-   'Description' => 'Adds Google+ integration into Vanilla.',
-   'Version' => '1.0a',
+   'Description' => 'Users may sign into your site using their Google Plus account.',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'SettingsUrl' => '/dashboard/settings/googleplus',
+   'SettingsUrl' => '/dashboard/social/googleplus',
    'SettingsPermission' => 'Garden.Settings.Manage',
+   'Hidden' => TRUE,
+   'SocialConnect' => TRUE,
+   'RequiresRegistration' => FALSE
 );
 
 class GooglePlusPlugin extends Gdn_Plugin {
@@ -26,16 +29,6 @@ class GooglePlusPlugin extends Gdn_Plugin {
    /// Methods ///
    
    protected $_AccessToken = NULL;
-   
-   /**
-	 * Adds social link to dashboard
-	 * 
-	 * @param object $Sender DashboardController.
-	 */
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-      $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Social', T('Google+'), 'dashboard/settings/googleplus', 'Garden.Settings.Manage');
-   }
    
    public function AccessToken($NewValue = FALSE) {
       if ($NewValue !== FALSE)
@@ -89,6 +82,11 @@ class GooglePlusPlugin extends Gdn_Plugin {
       $Data = self::Curl($Url, 'POST', $Post);
       $AccessToken = $Data['access_token'];
       return $AccessToken;
+   }
+   
+   public function IsConfigured() {
+      $Result = C('Plugins.Twitter.ConsumerKey') && C('Plugins.Twitter.Secret');
+      return $Result;
    }
    
    public static function Curl($Url, $Method = 'GET', $Data = array()) {
@@ -159,7 +157,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
       $Profile = GetValueR('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
       
       $Sender->Data['Connections'][self::ProviderKey] = array(
-         'Icon' => '/plugins/GooglePlus/design/gplus_icon-64.png',
+         'Icon' => $this->GetWebResource('icon.png'),
          'Name' => 'Google+',
          'ProviderKey' => self::ProviderKey,
          'ConnectUrl' => $this->AuthorizeUri(array('r' => 'profile', 'uid' => Gdn::Session()->UserID)),
@@ -254,7 +252,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
       $Sender->Render('Blank', 'Utility', 'Dashboard');
    }
    
-   public function SettingsController_GooglePlus_Create($Sender, $Args) {
+   public function SocialController_GooglePlus_Create($Sender, $Args) {
       $Sender->Permission('Garden.Settings.Manage');
 
       $Conf = new ConfigurationModule($Sender);
@@ -263,7 +261,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
           'Plugins.GooglePlus.Secret'
       ));
 
-      $Sender->AddSideMenu();
+      $Sender->AddSideMenu('dashboard/social');
       $Sender->SetData('Title', sprintf(T('%s Settings'), 'Google+'));
       $Sender->ConfigurationModule = $Conf;
       $Conf->RenderAll();
