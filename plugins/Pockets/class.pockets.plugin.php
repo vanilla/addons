@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Pockets'] = array(
    'Name' => 'Pockets',
    'Description' => 'Administrators may add raw HTML to various places on the site. This plugin is very powerful, but can easily break your site if you make a mistake.',
-   'Version' => '1.0.7',
+   'Version' => '1.1',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
@@ -331,6 +331,9 @@ class PocketsPlugin extends Gdn_Plugin {
    }
 
    public function ProcessPockets($Sender, $Location, $CountHint = NULL) {
+      if (Gdn::Controller()->Data('_NoMessages'))
+         return;
+      
       // Since plugins can't currently maintain their state we have to stash it in the Gdn object.
       $this->_LoadState();
       

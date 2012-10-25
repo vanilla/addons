@@ -39,8 +39,6 @@ $Definition['[%s] Confirm Your Email Address'] = '[%s] Confirma Tu Dirección de
 $Definition['[%s] Invitation'] = '[%s] Invitación ';
 $Definition['[%s] Password Reset'] = '[%s] Restablecer Contraseña ';
 
-$Definition['_Locale'] = 'Locale';
-
 $Definition['a Badge'] = 'una Insignia ';
 $Definition['a full year.'] = 'un año completo.';
 
@@ -188,7 +186,6 @@ $Definition['Decline'] = 'Declinar';
 $Definition['Default Category Permissions'] = 'Permisos de Categorías predeterminados ';
 $Definition['Default Locale'] = 'Región predeterminada';
 $Definition['Default Roles'] = 'Roles predeterminados';
-$Definition['Define who can upload files on the Roles & Permissions page.'] = 'Define who can upload and manage files on the <a href="%s">Roles & Permissions</a> page.';
 $Definition['Delete Badge'] = 'Borrar Medalla';
 $Definition['Delete Category'] = 'Borrar Categoría';
 $Definition['Delete Content'] = 'Borrar Contenido';
@@ -276,12 +273,8 @@ $Definition['Frequency'] = 'Frecuencia ';
 $Definition['Garden'] = 'Jardín';
 $Definition['Garden.Import.Complete.Description'] = 'Has completado exitosamente una importación
 Clic <b> Terminado>/> cuando estés listo. ';
-$Definition['Garden.Import.Continue.Description'] = 'It appears as though you are in the middle of an import.
-   Please choose one of the following options.';
 $Definition['Garden.Import.Description'] = 'Utilice esta página para importar datos de otro foro que se ha exportado utilizando el exportador de vainilla. <a href="%s">Para obtener más information ver nuestra documentación de importación</a>.';
 $Definition['Garden.Import.InputInstructions'] = 'Introduce el email y la contraseña del usuario administrador de los datos que se importan';
-$Definition['Garden.Import.Merge.Description'] = 'This will merge all of the user and discussion data from the import into this forum.
-<b>Warning: If you merge the same data twice you will get duplicate discussions.</b>';
 $Definition['Garden.Import.Overwrite'] = 'Sobrescribe este foro. ';
 $Definition['Garden.Import.Overwrite.Description'] = 'Advertencia: Todos los datos de este foro se sobreescribirán.';
 $Definition['Garden.StatisticsDisabled'] = 'Usted ha deshabilitado específicamente Estadísticas Vanilla en su archivo de configuración.';
@@ -302,8 +295,6 @@ $Definition['Guest roles'] = 'Mira todos los roles que deberían ser aplicados a
 
 $Definition['HeadlineFormat.AddUser'] = '{ActivityUserID,user} agregada una cuenta para {RegardingUserID,user}.';
 $Definition['HeadlineFormat.PictureChange'] = '{RegardingUserID,You} cambiada {ActivityUserID,your} la imagen de perfil.';
-$Definition['HeadlineFormat.Status'] = '{ActivityUserID,user}';
-$Definition['HeadlineFormat.WallPost'] = '{RegardingUserID,you} &rarr; {ActivityUserID,you}';
 $Definition['Help &amp; Tutorials'] = 'Ayuda &amp; Tutoriales ';
 $Definition['Here\'s how to get started'] = 'Aquí está cómo empezar';
 $Definition['Here\'s how to get started:'] = 'Aquí está cómo empezar:';
@@ -358,12 +349,12 @@ $Definition['Manage Roles & Permissions'] = 'Gestionar Roles & Permisos';
 $Definition['Manage Routes'] = 'Gestionar Rutas';
 $Definition['Manage Spam'] = 'Gestionar Spam';
 $Definition['Manage Themes'] = 'Gestionar Temas';
-$Definition['Manage Users'] = 'Gestionar Usuarios';
 $Definition['Manage users'] = 'Gestión de Usuarios';
+$Definition['Manage Users'] = 'Gestionar Usuarios';
 $Definition['Manage your Plugins'] = 'Gestionar tus Plugins';
 $Definition['Managing Categories'] = 'Gestionar Categorías ';
-$Definition['Marking things as not spam will put them back in your forum.'] = 'Marcar cosas como no spam las pondrá de nuevo en tu foro. ';
 $Definition['Marking things as NOT spam will put them back in your forum.'] = 'Marcar cosas como NO spam las pondrá de nuevo en tu foro. ';
+$Definition['Marking things as not spam will put them back in your forum.'] = 'Marcar cosas como no spam las pondrá de nuevo en tu foro. ';
 $Definition['Max Comment Length'] = 'Longitud Máxima de Comentario';
 $Definition['Member'] = 'Miembro';
 $Definition['Member roles'] = 'Mira todos los roles que deberían ser aplicados a los usuarios nuevos o aprobados. ';
@@ -421,9 +412,10 @@ $Definition['Other Themes'] = 'Otros temas';
 $Definition['Other Tutorials'] = 'Otros Tutoriales ';
 $Definition['Outgoing Email'] = 'Correo Saliente';
 
+$Definition['Page'] = 'Página';
+
 $Definition['page'] = 'página';
 
-$Definition['Page'] = 'Página';
 $Definition['Password Options'] = 'Opciones de Contraseña';
 $Definition['Pending'] = 'Pendiente';
 $Definition['Permission'] = 'Permiso';
@@ -437,7 +429,6 @@ $Definition['Prevent spam on your forum by limiting the number of discussions &a
 $Definition['Provider'] = 'Proveedor';
 $Definition['Proxy Connect'] = 'Conexión Proxy';
 $Definition['Proxy Connect Test'] = 'Prueba de Conexión Proxy';
-$Definition['ProxyConnect.RimBlurb'] = 'If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin\'s configuration screen.';
 $Definition['ProxyConnect.TestIntro'] = 'Esta interfaz le permitirá probar la configuración y asegúrese de que 
 ProxyConnect este funcionando.';
 
@@ -518,7 +509,6 @@ $Definition['Success'] = 'Éxito ';
 $Definition['System'] = 'Sistema';
 
 $Definition['Test'] = 'Prueba';
-$Definition['Test Mode'] = 'Test Mode: The pocket will only be displayed for pocket administrators.';
 $Definition['Test Mode: The pocket will only be displayed for pocket administrators.'] = 'Test Mode';
 $Definition['Test URL'] = 'Prueba URL';
 $Definition['Testing'] = 'Probando';
@@ -592,7 +582,6 @@ $Definition['User Count'] = 'Usuarios';
 $Definition['User Deleted'] = 'Usuario Eliminado';
 $Definition['User Registration Settings'] = 'Configuración de Registro de Usuario';
 $Definition['UserDelete'] = 'Eliminar el contenido de usuario';
-$Definition['UserDeletionPrompt'] = 'Choose how to handle all of the content associated with the user account for %s (comments, messages, etc).';
 $Definition['UserKeep'] = 'Mantener el contenido del usuario';
 $Definition['UserKeepMessage'] = 'Eliminar al usuario pero mantener el contenido del usuario';
 $Definition['Users'] = 'Usuarios';
@@ -604,10 +593,10 @@ $Definition['Vanilla is installed!'] = '¡Vanilla está instalado!';
 $Definition['Vanilla.Archive.Description'] = 'Puedes elegir archivar discusiones del foro que sean más antiguas que una determinada fecha. Las discusiones archivadas son cerradas, no permitiéndose nuevos envíos.';
 $Definition['Verified!'] = '¡Verificado!';
 $Definition['Version'] = 'Versión';
-$Definition['Version %s'] = 'Versión %s';
 
 $Definition['version %s'] = 'versión %s';
 
+$Definition['Version %s'] = 'Versión %s';
 $Definition['Video tutorial on advanced settings'] = 'Video tutorial en configuración avanzada ';
 $Definition['Video tutorial on managing categories'] = 'Video Turorial para gestionar las categorías. ';
 $Definition['Video tutorial on user registration'] = 'Video Tutorial para el registro de usuarios. ';
@@ -616,8 +605,6 @@ $Definition['View'] = 'Ver';
 $Definition['Warning'] = 'Advertencia';
 $Definition['Warning: All of your data will be lost. Once you delete, there is absolutely no recovery of any kind.'] = 'Advertencia: Toda tu información será eliminada. Una vez que lo elimines, no hay posibilidad de recuperar la información. ';
 $Definition['Warning: deleting is permanent'] = 'ADVERTENCIA: items eliminados son eliminados de la lista y no pueden recuperarse. ';
-$Definition['Warning: Loading tables can be slow.'] = '<b>Warning</b>: Your server configuration does not support fast data loading.
-If you are importing a very large file (ex. over 200,000 comments) you might want to consider changing your configuration. Click <a href="http://vanillaforums.com/porter">here</a> for more information.';
 $Definition['We only accept urls that begin with http:// or https://'] = 'Solo aceptamos URLs que inicien con http:// o httpps://';
 $Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = 'Vamos a tratar de utilizar por defecto el servidor de correo local para enviar correo electrónico. Si quieres utilizar un servidor de correo SMTP separado, puedes configurarlo debajo.';
 $Definition['Welcome to Vanilla!'] = '¡Bienvenido a Vanilla!';
@@ -626,7 +613,6 @@ $Definition['What\'s the Buzz?'] = '¿Qué es el Buzz?';
 $Definition['Who\'s Online Settings'] = 'Configuración de Quien esta en linea';
 $Definition['Why do you want to join?'] = '¿Por qué quieres entrar?';
 $Definition['Within'] = 'Dentro de';
-$Definition['Wordpress Source'] = 'Wordpress';
 
 $Definition['Yes, the following information can be changed later.'] = 'Si, la siguiente información puede ser modificada después. ';
 $Definition['You are connected as %s.'] = 'Estas conectado como %s.';
@@ -649,5 +635,4 @@ $Definition['You must specify an admin username.'] = 'Debes especificar un nombr
 $Definition['You need to configure ProxyConnect'] = 'Necesitas configurar ProxyConnect';
 $Definition['Your application will be reviewed by an administrator. You will be notified by email if your application is approved.'] = 'Su solicitud será revisada por un administrador. Si su solicitud es aprobada se le avisará por correo .';
 $Definition['Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'] = 'Tu configuración de archivos no tiene los permisos correctos. PHP necesita leer y escribir en este archivo: <code>%s</code>';
-$Definition['Your default locale won\'t display properly'] = 'Your default locale won\'t display properly until it is enabled below. Please enable the following: %s.';
 $Definition['Your invitations were sent successfully.'] = 'Tus invitaciones fueron enviadas con éxito. ';

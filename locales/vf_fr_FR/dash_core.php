@@ -106,7 +106,6 @@ $Definition['ApplicationHelp'] = 'Les applications vous permettent d\'ajouter de
 Une fois qu\'une application a été ajoutée à votre dossier %s, vous pouvez l\'activer ou la désactiver ici.';
 $Definition['Applied by Administrator'] = 'Appliqué par l\'Administrateur';
 $Definition['Applied Manually'] = 'Appliqué manuellement';
-$Definition['Applied On'] = 'Date';
 $Definition['Apply'] = 'Appliquer';
 $Definition['Approval'] = 'Approbation';
 $Definition['Approve'] = 'Accepter';
@@ -158,10 +157,10 @@ $Definition['Blocked'] = 'Bloqués';
 $Definition['Blog Comments'] = 'Commentaires du blog';
 $Definition['Browse Addons'] = 'Naviguer parmi les extensions';
 $Definition['Browse for a new banner logo if you would like to change it:'] = 'Téléchargez un nouveau logo si vous souhaitez en changer :';
+$Definition['By %s'] = 'Par %s';
 
 $Definition['by %s'] = 'par %s';
 
-$Definition['By %s'] = 'Par %s';
 $Definition['By clicking the button below, you will be deleting the user account for %s forever.'] = 'En cliquant le bouton ci-dessous, vous supprimez définitivement le compte utilisateur de %s.';
 
 $Definition['Cannot build profile information if user is not defined.'] = 'Impossible de générer les informations du profil si l\'utilisateur n\'est pas défini.';
@@ -211,7 +210,6 @@ $Definition['Comments Page'] = 'Les Pages de Commentaires';
 $Definition['Comments per Page'] = 'Commentaires par Page';
 $Definition['Condition Expression'] = 'Valeur';
 $Definition['Condition Field'] = 'Champ';
-$Definition['Condition Type'] = 'Type';
 $Definition['Configure an Authenticator'] = 'Configurer une méthode d\'authentification';
 $Definition['Configure how nested categories are displayed to users.'] = 'Configurez la façon dont les catégories imbriquées sont affichées aux utilisateurs.';
 $Definition['Configuring Vanilla\'s Homepage'] = 'Configurer la Page d\'accueil de la Communauté Vanilla';
@@ -248,10 +246,10 @@ $Definition['Database Structure Upgrades'] = 'Mises à jour de la structure de l
 $Definition['Debug Information'] = 'Informations de Débogage';
 $Definition['Debugger'] = 'Console d\'erreurs';
 $Definition['Decline'] = 'Décliner';
-$Definition['Default'] = 'Défault';
 
 $Definition['default'] = 'défault';
 
+$Definition['Default'] = 'Défault';
 $Definition['Default  Category'] = 'Défault|Catégorie';
 $Definition['Default %s Permissions'] = 'Droits d\'accès de %s par défaut';
 $Definition['Default Category Permissions'] = 'Autorisations des Catégories par défaut';
@@ -422,8 +420,6 @@ $Definition['Hash Algorithm'] = 'algorithme de hachage';
 $Definition['HeadlineFormat.AddUser'] = '{ActivityUserID,user} a ajouté un compte pour {RegardingUserID,user}.';
 $Definition['HeadlineFormat.PictureChange'] = '{RegardingUserID,You} a modifié {ActivityUserID,your} photo de profil.';
 $Definition['HeadlineFormat.RegistrationApproval'] = '{ActivityUserID,user} a approuvé les applications pour {RegardingUserID,user}.';
-$Definition['HeadlineFormat.Status'] = '{ActivityUserID,user}';
-$Definition['HeadlineFormat.WallPost'] = '{RegardingUserID,you} &rarr; {ActivityUserID,you}';
 $Definition['Heads up!'] = 'Hey, faîtes gaffe !';
 $Definition['Heads Up! This is a special role that does not allow active sessions. For this reason, the permission options have been limited to "view" permissions.'] = 'Attention ! Ceci est un statut particulier qui n\'autorise pas de sessions actives. Pour cette raison, les options d\'autorisation ont été limitées à la seule fonction "visualisation".';
 $Definition['Help &amp; Tutorials'] = 'Aide &amp; tutoriels';
@@ -915,7 +911,6 @@ $Definition['Who\'s Online Settings'] = 'Paramètres "qui est en ligne"';
 $Definition['Why do you want to join?'] = 'Pourquoi voulez-vous vous inscrire ?';
 $Definition['Within'] = 'Dans l\'intervalle de';
 $Definition['WordPress Plugin'] = 'Extension WordPress';
-$Definition['Wordpress Source'] = 'Wordpress';
 
 $Definition['Yes, the following information can be changed later.'] = 'Oui, l\'information suivante pourra être changée ultérieurement.';
 $Definition['You are connected as %s.'] = 'Vous êtes connecté sous l\'identifiant %s.';

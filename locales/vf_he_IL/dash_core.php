@@ -40,15 +40,9 @@ $Definition['<strong>Categories</strong> allow you to organize your discussions.
 $Definition['<strong>Heads Up!</strong> Deleting a role can result in users not having access to the application.'] = '<strong>זהירות!</strong> מחיקת תפקיד עלולה למנוע מהמשתמש גישה לתוכנה.';
 $Definition['<strong>Heads Up!</strong> Moving discussions into a replacement category can result in discussions vanishing (or appearing) if the replacement category has different permissions than the category being deleted.'] = '<strong>זהירות!</strong> הזזת דיונים לקטגוריה חלופית עלולה לגרום להעילמותם (או הופעתם) של דיונים אם לקטגוריה החדשה יש הרשאות שונות משל זו המקורית.';
 
-$Definition['_Locale'] = 'Locale';
-
 $Definition['A message has been sent to your email address with password reset instructions.'] = 'הודעה נשלחה לכתובת הדוא"ל של עם הנחיות לאיפוס הסיסמה.';
 $Definition['A url-friendly version of the category name for better SEO.'] = 'גירסה קצרה יותר של הקטגוריה ב-URL שיאפשר SEO מיטבי.';
 $Definition['About Vanilla Statistics'] = 'לגבי הסטטיסטיקות של Vanilla';
-$Definition['About.DisableStatistics'] = 'If you must disable this data reporting for some business reason, you can do so by adding the following line to your installation\'s configuration file: <code>$Configuration[\'Garden\'][\'Analytics\'][\'Enabled\'] = FALSE;</code>';
-$Definition['About.VanillaStatistics'] = 'It is vitally important to the life of this free, open-source software that we accurately measure the reach and effectiveness of Vanilla. We ask that you please do not disable the reporting of this data.';
-$Definition['AboutCommentEmbedding'] = 'Vanilla can be used as a drop-in replacement for your blog\'s native commenting system. As a matter of fact, it can be used to add comments to any page on the web.';
-$Definition['AboutEmbedding'] = 'Embedding allows all or part of your community to be embedded into other applications & web pages.';
 $Definition['Above Main Content'] = 'מעל לתוכן הראשי';
 $Definition['Accepted'] = 'מאושר';
 $Definition['Access your community forum by clicking the "Visit Site" link on the top-left of this page, or by '] = 'ניתן לגשת לפורום הקהילה על ידי לחיצה על כפתור \'בקר באתר\' מפינה השמאלית העליונה בעמוד זה, או על ידי';
@@ -67,7 +61,6 @@ $Definition['Add Role'] = 'הוסף תפקיד';
 $Definition['Add User'] = 'הוסף משתמש';
 $Definition['Added By'] = 'הוסף על ידי';
 $Definition['Adding & Editing Categories'] = 'הוספת ועריכת קטגוריות';
-$Definition['AddonProblems'] = '<h2>Problems?</h2><p>If something goes wrong with an addon and you can\'t use your site, you can disable them manually by editing:</p>%s';
 $Definition['Addons'] = 'תוספים';
 $Definition['Administrator'] = 'אדמינים';
 $Definition['Advanced'] = 'מתקדם';
@@ -92,12 +85,9 @@ $Definition['Although the invitation was created successfully, the email failed 
 $Definition['API Status'] = 'סטטוס ה-API';
 $Definition['Appearance'] = 'הופעה';
 $Definition['Applicant'] = 'מועמד';
-$Definition['Applicant Role'] = 'Select the role that should be applied for new applicants. This only applies if you have the <b>approval</b> registration method.';
 $Definition['Application'] = 'מועמדות';
 $Definition['Application Secret'] = 'שאלה סודית';
-$Definition['ApplicationHelp'] = 'Applications allow you to add large groups of functionality to your site.<br />Once an application has been added to your %s folder, you can enable or disable it here.';
 $Definition['Applications'] = 'תוכנות';
-$Definition['Applied On'] = 'Date';
 $Definition['Apply'] = 'יישם';
 $Definition['Approval'] = 'אישור';
 $Definition['Approve'] = 'אשר';
@@ -129,11 +119,7 @@ $Definition['Back to all users'] = 'חזרה לכל המשתמשים';
 $Definition['Back to Mobile Site'] = 'חזרה לאתר הסלולרי';
 $Definition['Badge cannot be deleted.'] = 'סמל זה לא יכול להמחק';
 $Definition['Badge deleted.'] = 'הסמל נמחק.';
-$Definition['Badge Name'] = 'Name';
-$Definition['BadgeRecipientsHeading'] = 'Most recent recipients';
-$Definition['Ban Item'] = 'Item';
 $Definition['Ban List'] = 'רשימת החסומים';
-$Definition['Ban Type'] = 'Type';
 $Definition['Banner'] = 'באנר';
 $Definition['Banner Logo'] = 'לוגו באנר';
 $Definition['Banner Title'] = 'כותרת לבאנר';
@@ -155,15 +141,11 @@ $Definition['Cannot build profile information if user is not defined.'] = 'לא 
 $Definition['Capture definitions throughout the site. You must visit the pages in the site in order for the definitions to be captured. The captured definitions will be put in the <code>captured.php</code> and <code>captured_admin.php</code>.'] = 'קבל הגדרות חדשות בכל רחבי האתר. עליך לבקר את בדפים של האתר על מנת שהגדרות חדשות יתווספו. ההגדרות החדשות יהיו תחת
 <code>captured.php</code> and <code>captured_admin.php</code>.';
 $Definition['Categories &amp; Discussions'] = 'קטגוריות &amp;  דיונים';
-$Definition['Categories are used to help organize discussions.'] = 'Categories are used to help organize discussions. Drag &amp; drop the categories to sort and nest them.';
-$Definition['Categories are used to organize discussions.'] = '<strong>Categories</strong> allow you to organize your discussions.';
 $Definition['Categories Layout'] = 'עיצוב הקטגוריות';
 $Definition['Category Page Layout'] = 'עיצוב עמוד הקטגוריות';
 $Definition['Category Url:'] = 'קישור לקטגוריה:';
 $Definition['Censored Words'] = 'מילים מצונזרות';
 $Definition['Change Log'] = 'לוג שינויים';
-$Definition['Change tables to InnoDB'] = 'Change tables to InnoDB (see help)';
-$Definition['Change the look of All Categories'] = 'You can change the look of the <b>All Categories</b> page <a href="%s">here</a>.';
 $Definition['Change the way that new users register with the site.'] = 'שנה את הדרך בה משתמשים חדשים נרשמים לאתר';
 $Definition['Change the way your community works with plugins. We\'ve bundled popular plugins with the software, and there are more available online.'] = 'שנה את הדרך בה הקהילה עובדת עם תוספים. התוספים הנפוצים ביותר מגיעים עם התוכנה, ותוספים נוספים זמינים ברשת.';
 $Definition['Change your banner'] = 'שנה את הבאנר שלך';
@@ -173,12 +155,10 @@ $Definition['Check all permissions that apply to this role:'] = 'סמן את כ�
 $Definition['Check all roles that should be applied to new/approved users:'] = 'סמן את כל התפקידים התקפים למשתמשים החדשים / המאושרים:';
 $Definition['Check out my new community!'] = 'בדוק את הקהילה החדשה שלי!';
 $Definition['Check out the full list of video tutorials here.'] = 'בדוק את הרשימה המלאה של סרטוני ההדרכה כאן.';
-$Definition['Check out these tutorials to get started using Vanilla'] = 'Vanilla is the simplest, most powerful community platform in the world. It\'s super-duper easy to use. Start with this introductory video and continue with the steps below. Enjoy!';
 $Definition['Choose a locale pack'] = 'בחר בחבילת הלוקאליזציה הזו.';
 $Definition['Choose a role that orphaned users will be assigned to:'] = 'בחר בתפקיד שכל המשתמשים חסר התפקיד יקבלו.';
 $Definition['Choose and configure your forum\'s authentication scheme.'] = 'בחר ושנה את סכמת האותנטיקציה של הפורום שלך.';
 $Definition['Choose how to handle all of the content associated with the user account for %s (comments, messages, etc).'] = 'בחר כיצד לנהל את כל התוכן המשוייך לחשבון המשתמש של %s (הערות, הודעות וכו\')';
-$Definition['Choose md5 if you\'re not sure what to choose.'] = 'You can select a custom hash algorithm to sign your requests. The hash algorithm must also be used in your client library. Choose md5 if you\'re not sure what to choose.';
 $Definition['Choose the preferred layout for the categories page.'] = 'בחר בעיצוב המועדף עליך לדף הקטגוריות.';
 $Definition['Choose the preferred layout for the discussions page.'] = 'בחר בעיצוב המועדף עליך לדף הדיונים.';
 $Definition['Choose who can send out invitations to new members:'] = 'בחר מי יכול לשלוח הזמנות למשתמשים חדשים:';
@@ -192,14 +172,10 @@ $Definition['Comment Settings'] = 'הגדרות תגובות';
 $Definition['Comments Page'] = 'עמוד תגובות';
 $Definition['Comments per Page'] = 'תגובות לעמוד';
 $Definition['Condition'] = 'מצב';
-$Definition['Condition Expression'] = 'Value';
-$Definition['Condition Field'] = 'Field';
-$Definition['Condition Type'] = 'Type';
 $Definition['Conditions'] = 'תנאים';
 $Definition['Configure an Authenticator'] = 'הגדר \'מאשרר\'';
 $Definition['Configure how nested categories are displayed to users.'] = 'הגדר כיצד תת-קטגוריות מוצגות למשתמשים';
 $Definition['Configuring Vanilla\'s Homepage'] = 'הגדרות של דף הבית של Vanilla';
-$Definition['Confirm email addresses'] = 'Require users to confirm their email addresses (recommended)';
 $Definition['Consumer Key'] = 'מפתח צרכן';
 $Definition['Consumer Secret'] = 'סוג צרכן';
 $Definition['Content flagged as spam is stored here for moderator review.'] = 'תוכן זה סומן כזבל וממתין לאישור של מודרטור';
@@ -221,7 +197,6 @@ $Definition['Create & organize discussion categories and manage your users.'] = 
 $Definition['Create & organize discussion categories, manage your users, and more...'] = 'צור וארגן קטגוריות לדיונים שונים, נהל את המשתמשים שלך, ועוד...';
 $Definition['Create a localization CSV'] = 'צור ערכת לוקאליזציה ב-CSV';
 $Definition['Created new badge'] = 'צור סמל חדש';
-$Definition['CreateFile'] = 'Create';
 $Definition['Current Authenticator'] = 'המאשרר הנוכחי';
 $Definition['Current File:'] = 'הקובץ הנוכחי:';
 $Definition['Current Theme'] = 'ערכת הצבעים הנוכחית';
@@ -234,7 +209,6 @@ $Definition['Default %s Permissions'] = 'הרשאות %s ברירת מחדל';
 $Definition['Default Category Permissions'] = 'הרשאות ברירת מחדל לקטגוריה';
 $Definition['Default Locale'] = 'ברירת המחדל ללוקאליזציה';
 $Definition['Default Roles'] = 'ברירת המחדל לתפקידים';
-$Definition['Define who can upload files on the Roles & Permissions page.'] = 'Define who can upload and manage files on the <a href="%s">Roles & Permissions</a> page.';
 $Definition['Define your forum homepage'] = 'הגדרת הדף הראשי של הפורום';
 $Definition['Define your forum homepage, upload your logo, and more...'] = 'הגדרת הדף הראשי של הפורום, העלאת הלוגו שלך, ועוד...';
 $Definition['Delete Badge'] = 'מחק סמל';
@@ -247,7 +221,6 @@ $Definition['Delete User: %s'] = 'מחק משתמש: %s';
 $Definition['Deleted'] = 'נמחק';
 $Definition['Deleting a role can result in users not having access to the application.'] = 'מחיקת תפקיד עלולה למנוע גישה מהמשתמשים לתוכנה';
 $Definition['Deleting category...'] = 'מוחק קטגוריה...';
-$Definition['Deleting forever cannot be undone.'] = 'Deleting is a good way to keep your forum clean.';
 $Definition['Deleting role...'] = 'מוחק תפקיד...';
 $Definition['Description'] = 'תיאור';
 $Definition['Did You Know?'] = 'הידעת?';
@@ -274,7 +247,6 @@ $Definition['Don\'t Refresh'] = 'אל תרענן';
 $Definition['Don\'t use Categories'] = 'אל תשתמש בקטגוריות';
 $Definition['Download Locale List'] = 'הורד את רשימת הלוקאליזציות';
 $Definition['Download Locale Pack'] = 'הורד את חבילת הלוקאליזציה';
-$Definition['DownloadLocalePack'] = 'Download';
 $Definition['Drag &amp; drop the categories to sort and nest them.'] = 'גרור את הקטגוריות למיקום חדש על מנת לסדר אותן';
 $Definition['Drag and drop the categories below to sort and nest them.'] = 'גרור את הקטגוריות המופיעות מטה על מנת לסדר אותן';
 
@@ -287,7 +259,6 @@ $Definition['Edit Role'] = 'ערוך תפקיד';
 $Definition['Edit Route'] = 'ערוך מסלול';
 $Definition['Edit User'] = 'ערוך משתמש';
 $Definition['Edit/Delete Log'] = 'ערוך / מחק לוג';
-$Definition['EditContentTimeout.Notes'] = 'If a user is in a role that has permission to edit content, those permissions will override this.';
 $Definition['Email Confirmation Role'] = 'תקפיד אישור דואר אלקטרוני';
 $Definition['Embed Comments'] = 'הטמעת הערות';
 $Definition['Embed Forum'] = 'הטמעת פורום';
@@ -301,7 +272,6 @@ $Definition['Embedding is currently DISABLED.'] = 'הטמעה מנוטרלת.';
 $Definition['Embedding is currently ENABLED.'] = 'הטמעה מאופשרת.';
 $Definition['Enable'] = 'אפשר';
 $Definition['Enable admin checkboxes on discussions and comments.'] = 'אפשר לאדמין לסמן דיונים והערות.';
-$Definition['Enable embedding to use blog comments.'] = 'In order for this to work, you will need to enable embedding.';
 $Definition['Enable OpenID'] = 'אפשר OpenID';
 $Definition['Enable this message'] = 'אפשר הודעה זו.';
 $Definition['Enable/Disable'] = 'אפשר / נטרל';
@@ -311,8 +281,6 @@ $Definition['Enabled: The pocket will be displayed.'] = 'מאופשר: הכיס 
 $Definition['Enabling a Locale Pack'] = 'מאפשר חבילת לוקאליזציה';
 $Definition['Encourage your friends to join your new community!'] = 'עודד את חבריך להצטרף לקהילה החדשה שלך!';
 $Definition['Enter a comma-delimited list of indexes, starting at 1.'] = 'הכנס רשימה של אינדקסים מופרדים בפסיקים, המתחילים ב-1.';
-$Definition['Enter a descriptive name.'] = 'Enter a descriptive name for the pocket. This name will not show up anywhere except when managing your pockets here so it is only used to help you remember the pocket.';
-$Definition['Enter a short name for the site.'] = 'Enter a short name for the site. This is displayed on the signin buttons.';
 $Definition['Enter numbers starting at 1.'] = 'הכנס מספרים, התחל ב-1.';
 $Definition['Enter the address of your Wordpress Blog and we\'ll take it from there.'] = 'הכנס את כתובת בלוג ה-Wordpress שלך, ואנחנו כבר נעשה את השאר.';
 $Definition['Enter the connection settings for your sphinx server below.'] = 'הכנס את נתוני הקישור לשרת ה-Sphinx שלך מטה.';
@@ -328,26 +296,7 @@ $Definition['Every edit or deletion is recorded here. Use &lsquo;Restore&rsquo; 
 $Definition['Every Page'] = 'כל עמוד';
 $Definition['Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.'] = 'לכל משתמש באתר יש לפחות תפקיד אחד מוגדר. התפקידים מאפשרים להגדיר מה מותר ואסור לכל משתמש לעשות.';
 
-$Definition['Facebook Connect allows users to sign in using their Facebook account.'] = 'Facebook Connect allows users to sign in using their Facebook account. <b>You must register your application with Facebook for this plugin to work.</b>';
-$Definition['FaviconBrowse'] = 'Browse for a new favicon if you would like to change it:';
-$Definition['FaviconDescription'] = 'Your site\'s favicon appears in your browser\'s title bar. It will be scaled to 16x16 pixels.';
-
 $Definition['Garden'] = 'גן';
-$Definition['Garden.Import.Complete.Description'] = 'You have successfully completed an import.
-   Click <b>Finished</b> when you are ready.';
-$Definition['Garden.Import.Continue.Description'] = 'It appears as though you are in the middle of an import.
-   Please choose one of the following options.';
-$Definition['Garden.Import.InputInstructions'] = 'Enter the email and password of the admin user from the data being imported.';
-$Definition['Garden.Import.Merge'] = 'Merge with this forum.';
-$Definition['Garden.Import.Merge.Description'] = 'This will merge all of the user and discussion data from the import into this forum.
-<b>Warning: If you merge the same data twice you will get duplicate discussions.</b>';
-$Definition['Garden.Import.Overwrite'] = 'Overwrite this forum.';
-$Definition['Garden.Import.Overwrite.Description'] = 'Warning: All data in this forum will be overwritten.';
-$Definition['Garden.StatisticsDisabled'] = 'You have specifically disabled Vanilla Statistics in your configuration file.';
-$Definition['Garden.StatisticsLocal.Explain'] = 'This forum appears to be running in a test environment, or is otherwise reporting a private IP. By default, forums running on private IPs are not tracked.';
-$Definition['Garden.StatisticsLocal.Resolve'] = 'If you\'re sure your forum is accessible from the internet you can force it to report statistics here:';
-$Definition['Garden.StatisticsReadonly.Explain'] = 'Your config.php file appears to be read-only. This means that Vanilla will be unable to automatically register your forum\'s InstallationID and InstallationSecret.';
-$Definition['Garden.StatisticsReadonly.Resolve'] = 'To solve this problem, assign file mode 777 to your conf/config.php file.';
 $Definition['Getting Started with Vanilla'] = 'איך להתחיל עם Vanilla';
 $Definition['Give an Badge'] = 'תן סימול';
 $Definition['Give me a new account'] = 'תן לי חשבון חדש';
@@ -355,13 +304,7 @@ $Definition['Given Indexes'] = 'אינדקסים';
 $Definition['Gold Plus'] = 'זהב פלוס';
 $Definition['Google Sign In Settings'] = 'אפשרות חיבור עם Google Sign In';
 $Definition['Guest'] = 'אורח';
-$Definition['Guest roles'] = 'Check all roles that should be applied to guests.';
 
-$Definition['HeadlineFormat.AddUser'] = '{ActivityUserID,user} added an account for {RegardingUserID,user}.';
-$Definition['HeadlineFormat.PictureChange'] = '{RegardingUserID,You} changed {ActivityUserID,your} profile picture.';
-$Definition['HeadlineFormat.RegistrationApproval'] = '{ActivityUserID,user} approved the applications for {RegardingUserID,user}.';
-$Definition['HeadlineFormat.Status'] = '{ActivityUserID,user}';
-$Definition['HeadlineFormat.WallPost'] = '{RegardingUserID,you} &rarr; {ActivityUserID,you}';
 $Definition['Heads up!'] = 'זהירות!';
 $Definition['Heads Up! This is a special role that does not allow active sessions. For this reason, the permission options have been limited to "view" permissions.'] = 'זהירות! זהו תפקיד מיוחד שאינו מאפשר פעילות. מסיבה זו, ההרשאות של תפקיד זה מוגלות ל\'צפייה\' בלבד.';
 $Definition['Help &amp; Tutorials'] = 'עזרה &amp; הדרכה';
@@ -404,20 +347,12 @@ $Definition['Introducing Vanilla Reactions and Badges'] = 'ועכשיו - תגו
 $Definition['Invalid category for deletion.'] = 'קטגוריה לא תקינה למחיקה';
 $Definition['Invitation'] = 'הזמנה';
 $Definition['Invitation Code'] = 'קוד הזמנה';
-$Definition['Invitations can be sent from users\' profile pages.'] = 'When you use registration by invitation users will have a link called <a href="%s" class="Popup">My Invitations</a> on their profile pages.';
 $Definition['Invitations per month'] = 'הזמנות לחודש';
 $Definition['Invitations will expire'] = 'תוקפן של ההזמנות יפוג';
 $Definition['Invited by'] = 'הוזמן על ידי';
 
-$Definition['Locales are in your %s folder.'] = 'Locales allow you to support other languages on your site. Once a locale has been added to your %s folder, you can enable or disable it here.';
-$Definition['LogoBrowse'] = 'Browse for a new banner logo if you would like to change it:';
-$Definition['LogoDescription'] = 'The banner logo appears at the top of your site. Some themes may not display this logo.';
-
-$Definition['Make sure you click View Page'] = 'Make sure you click <a href="%s">View Page</a> to see what your categories page looks like after saving.';
 $Definition['Member'] = 'חבר';
-$Definition['Member roles'] = 'Check all roles that should be applied to new/approved users.';
 $Definition['Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'] = 'הודעות יכולות להופיע בכל מקום בתוך התוכנה שלך, ויכולות לשמש על מנת להודיע למשתמשים על אירועים או חדשות. השתמש בעמוד זה על מנת לארגן את ההודעות שלך על ידי גרירתם ממקום למקום.';
-$Definition['Messages can appear anywhere in your application.'] = 'Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.';
 $Definition['Method'] = 'שיטה';
 $Definition['Mixed Layout'] = 'פריסה מעורבת';
 $Definition['Moderate'] = 'ערוך';
@@ -445,33 +380,18 @@ $Definition['New users are reviewed and approved by an administrator (that\'s yo
 $Definition['New users fill out a simple form and are granted access immediately.'] = 'משתמשים חדשים ממלאים טופס פשוט ומקבלים גישה מיד לאחר מכן.';
 $Definition['New users in the last day'] = 'משתמשים חדשים מהיום האחרון';
 $Definition['New users in the last week'] = 'משתמשים חדשים מהשבוע האחרון';
-$Definition['NewApplicantEmail'] = 'New applicant:';
 $Definition['No Change'] = 'אין שינוי';
 $Definition['No costs yet.'] = 'אין עלויות עדיין.';
 $Definition['No Items Selected'] = 'לא נבחרו פריטים';
-$Definition['No results for %s.'] = 'No results for <b>%s</b>.';
 $Definition['None'] = 'כלום';
 $Definition['Not Spam'] = 'לא ספאם';
 $Definition['Notes'] = 'הערות';
 $Definition['Notify me when people comment on a discussion.'] = 'תודיע לי כשמשתמשים מגיבים על דיון.';
 $Definition['Notify me when people comment on my addons.'] = 'תודיע לי כשמשתמשים מגיבים על התוספים שלי.';
 $Definition['Notify me when people start new discussions.'] = 'תודיע לי כשמשתמשים מתחילים דיון חדש.';
-$Definition['NotifyApplicant'] = 'Notify me when anyone applies for membership.';
 $Definition['Number of blocked registrations'] = 'מספר ההרשמות שנחסמו';
 
-$Definition['Operation By'] = 'By';
-
 $Definition['Permission.Category'] = 'קטגורית.הרשאות';
-$Definition['PluginHelp'] = 'Plugins allow you to add functionality to your site.<br />Once a plugin has been added to your %s folder, you can enable or disable it here.';
-$Definition['Pockets.BetweenDiscussions.Description'] = 'The pocket is displayed between each discussion on the main discussion list. Since discussions are usually in &lt;li&gt;..&lt;/li&gt; tags, you\'ll need to wrap your pocket in those tags too.';
-$Definition['ProxyConnect.NoAuthenticate'] = 'It doesn\'t seem like we were 
-               able to retrieve a logged-in session from the AuthenticateURL you 
-               specified. Please make sure you are logged in to your remote application 
-               before performing this test.';
-$Definition['ProxyConnect.RimBlurb'] = 'If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin\'s configuration screen.';
-$Definition['ProxyConnect.TestIntro'] = 'This interface will allow you to test your configuration and ensure that 
-   ProxyConnect is working.';
-$Definition['ProxyConnect.TestSettings'] = 'Once you have configured ProxyConnect below, <b>and saved your changes</b>, you can test your new settings by pressing \'Test ProxyConnect Settings\'';
 
 $Definition['Re-Register API Key'] = 'רשום מחדש את ה-API Key';
 $Definition['Reaction'] = 'תגובה';
@@ -482,7 +402,6 @@ $Definition['Realtime progress bars: %s'] = 'התקדמות בזמן אמת: %s'
 $Definition['Recalculate Counts'] = 'חשב מחדש את המספרים';
 $Definition['Recent News'] = 'חדשות מהזמן האחרון';
 $Definition['Recently Active Users'] = 'משתמשים פעילים מהזמן האחרון';
-$Definition['Record Content'] = 'Content';
 $Definition['Refresh Comments'] = 'רענן הערות';
 $Definition['Register for Membership'] = 'הרשם כחבר';
 $Definition['Registration'] = 'הרשמה';
@@ -506,72 +425,18 @@ $Definition['Reset password and send email notification to user'] = 'אפס את
 $Definition['Resetting the password for %s.'] = 'מאפס סיסמה עבור %s.';
 $Definition['Restart'] = 'התחל מתחדש';
 $Definition['Restore'] = 'שחזר';
-$Definition['Restoring your selection removes the items from this list.'] = 'When you restore, the items are removed from this list and put back into the site.';
 $Definition['Reveal Password'] = 'גלה סיסמה';
 $Definition['Role'] = 'תפקיד';
 $Definition['Role Name'] = 'שם התפקיד';
 $Definition['Role to Grant'] = 'התפקיד שיינתן';
 $Definition['Roles & Permissions'] = 'תפקידים & הרשאות';
-$Definition['Roles determine user\'s permissions.'] = 'Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.';
 $Definition['Route'] = 'נתיב';
 $Definition['Route Expression'] = 'שם הנתיב';
 $Definition['Routes'] = 'נתיבים';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = 'נתיבים יכולים לשמש לניתוב המשתמים לחלקים שונים של האתר, בהתאם ל-URL.';
 $Definition['Run structure & data scripts'] = 'הרץ סקריפטים של מבנה ונתונים';
 
-$Definition['Saved'] = 'Your changes have been saved.';
-$Definition['SaveLocalePack'] = 'Save';
-$Definition['Search by user or role.'] = 'Search for users by name or enter the name of a role to see all users with that role.';
-$Definition['Show all possible pocket locations.'] = 'Turn this option on to show all possible pocket locations. Turning on this option will only show the locations to users that can manage pockets.';
-$Definition['SignedOut'] = 'You are signed out.';
 $Definition['Site Description'] = 'תיאור אתר';
-$Definition['Spend a little time thinking about how you describe your site here.'] = 'Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.';
 
-$Definition['Test Mode'] = 'Test Mode: The pocket will only be displayed for pocket administrators.';
-$Definition['TextEnterEmails'] = 'Type email addresses separated by commas here';
-$Definition['The banner title appears on your site\'s banner and in your browser\'s title bar.'] = 'The banner title appears on your site\'s banner and in your browser\'s title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may also hide this title.';
-$Definition['The banner title appears on your site\'s banner and in your browswer\'s title bar.'] = 'The banner title appears on your site\'s banner and in your browswer\'s title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may also hide this title.';
-$Definition['The basic registration form requires that new users copy text from a "Captcha" image to help prevent spam.'] = '<strong>The basic registration form requires</strong> that new users copy text from a "Captcha" image to keep spammers out of the site. You need an account at <a href="http://recaptcha.net/">recaptcha.net</a>. Signing up is FREE and easy. Once you have signed up, come back here and enter the following settings:';
-$Definition['The client ID uniqely identifies the site.'] = 'The client ID uniqely identifies the site. You can generate a new ID with the button at the bottom of this page.';
-$Definition['The Disqus plugin allows users to sign in using their Disqus account.'] = 'The Disqus plugin allows users to sign in using their Disqus account. <b>You must register your application with Disqus for this plugin to work.</b>';
-$Definition['The homepage title is displayed on your home page.'] = 'The homepage title is displayed on your home page. Pick a title that you would want to see appear in search engines.';
-$Definition['The secret secures the sign in process.'] = 'The secret secures the sign in process. Do <b>NOT</b> give the secret out to anyone.';
-$Definition['The site description usually appears in search engines.'] = 'The site description usually appears in search engines. You should try having a description that is 100–150 characters long.';
-$Definition['The text of the pocket.'] = 'Enter the text of the pocket. This will be output exactly as you type it so make sure that you enter valid HTML.';
-$Definition['The Vanilla Statistics plugin turns your forum\'s dashboard into an analytics reporting tool'] = 'Vanilla Statistics turns your forum\'s dashboard into an analytics reporting tool, allowing you to review activity on your forum over specific time periods. You can <a href="http://vanillaforums.org/docs/vanillastatistics">read more about Vanilla Statistics</a> in our documentation.';
-$Definition['ThemeHelp'] = 'Themes allow you to change the look &amp; feel of your site.<br />Once a theme has been added to your %s folder, you can enable it here.';
-$Definition['This option shows/hides the locations where pockets can go.'] = 'This option shows/hides the locations where pockets can go, but only for users that have permission to add/edit pockets. Try showing the locations and then visit your site.';
-$Definition['This theme has additional options.'] = 'This theme has additional options on the %s page.';
-$Definition['This theme has customizable text.'] = 'This theme has text that you can customize.';
-$Definition['Twitter Connect allows users to sign in using their Twitter account.'] = 'Twitter Connect allows users to sign in using their Twitter account. <b>You must register your application with Twitter for this plugin to work.</b>';
-
-$Definition['Use delta indexes'] = 'Use delta indexes (recommended for massive sites)';
-$Definition['Use the content at this url as your homepage.'] = 'Choose the page people should see when they visit: <strong style="white-space: nowrap;">%s</strong>';
-$Definition['Use the plugin for WordPress or our universal code for any other platform'] = 'Use the WordPress plugin to set up Vanilla Comments on your blog, or use the universal code to set up Vanilla Comments on any other platform.';
 $Definition['Use these fields to create custom profile information. You can enter things like "Relationship Status", "Skype", or "Favorite Dinosaur". Be creative!'] = 'השתמש בשדות אלה כדי ליצור פרופיל מותאם אישית מידע. ניתן להזין דברים כמו "מצב מערכת יחסים", "סקייפ", או "דינוזאור מועדף". היו יצירתיים!';
-$Definition['User Count'] = 'Users';
-$Definition['UserDelete'] = 'Remove User Content';
-$Definition['UserDeleteMessage'] = 'Delete the user and completely remove all of the user\'s content. This may cause discussions to be disjointed. Best option for removing spam.';
 $Definition['UserDeletionPrompt'] = 'בחר כיצד לנהל את כל התוכן המשוייך לחשבון המשתמש של %s (הערות, הודעות וכו\')';
-$Definition['UserKeep'] = 'Keep User Content';
-$Definition['UserKeepMessage'] = 'Delete the user but keep the user\'s content.';
-$Definition['UserWipe'] = 'Blank User Content';
-$Definition['UserWipeMessage'] = 'Delete the user and replace all of the user\'s content with a message stating the user has been deleted. This gives a visual cue that there is missing information.';
-
-$Definition['Vanilla.Archive.Description'] = 'You can choose to archive forum discussions older than a certain date. Archived discussions are effectively closed, allowing no new posts.';
-$Definition['Vanilla.Categories.MaxDisplayDepth'] = 'Place nested categories in a comma-delimited list when they are %1$s';
-
-$Definition['Warning: deleting is permanent'] = 'WARNING: deleted items are removed from this list and cannot be brought back.';
-$Definition['Warning: Loading tables can be slow.'] = '<b>Warning</b>: Your server configuration does not support fast data loading.
-If you are importing a very large file (ex. over 200,000 comments) you might want to consider changing your configuration. Click <a href="http://vanillaforums.com/porter">here</a> for more information.';
-$Definition['Warning: This is for advanced users.'] = '<b>Warning</b>: This is for advanced users and requires that you make additional changes to your web server. This is usually only available if you have dedicated or vps hosting. Do not attempt this if you do not know what you are doing.';
-$Definition['Wordpress Source'] = 'Wordpress';
-
-$Definition['You can also ban the users that posted the spam and delete all of their posts.'] = 'Check the box next to the user that posted the spam to also ban them and delete all of their posts. <b>Only do this if you are sure these are spammers.</b>';
-$Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'If you are ever locked out of your forum you can always log in using your original Vanilla email and password at <a href="%1$s">%1$s</a>';
-$Definition['You can make the categories page your homepage.'] = 'You can make your categories page your homepage <a href="%s">here</a>.';
-$Definition['You can place files in your /uploads folder.'] = 'If your file is too
-		large to upload directly to this page you can place it in your /uploads
-		folder. Make sure the filename begins with the word <b>export</b> and ends
-		with one of <b>.txt, .gz</b>.';
-$Definition['Your default locale won\'t display properly'] = 'Your default locale won\'t display properly until it is enabled below. Please enable the following: %s.';

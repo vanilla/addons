@@ -30,6 +30,8 @@ $Definition['Approve'] = '승인';
 $Definition['Archive Discussions'] = '글타레 보관하기';
 $Definition['Authentication'] = '인증';
 
+$Definition['Badge Name'] = '이름';
+$Definition['Ban Type'] = '유형';
 $Definition['Banner'] = '배너';
 $Definition['Banner Logo'] = '배너 로고';
 $Definition['Banner Title'] = '배너 이름';
@@ -46,6 +48,7 @@ $Definition['Choose who can send out invitations to new members:'] = '신규회�
 $Definition['comment(s)'] = '개 이상의 댓글을';
 
 $Definition['Comments per Page'] = '페이지당 댓글 수';
+$Definition['Condition Type'] = '유형';
 $Definition['Configure an Authenticator'] = '인증 방식 설정';
 $Definition['Configure how nested categories are displayed to users.'] = '중첩 카테고리가 어떻게 보여질지 설정합니다.';
 $Definition['Conversations'] = '대화';
@@ -78,6 +81,7 @@ $Definition['EditContentTimeout.Notes'] = '참고 : 내용을 수정할 수있�
 ';
 $Definition['Enable'] = '사용';
 $Definition['Enable OpenID'] = 'OpenID 활성화';
+$Definition['Enabled: The pocket will be displayed.'] = 'Enabled';
 $Definition['Enter the email address of the person you would like to invite:'] = '초대하고 싶은 사람의 이메일 주소를 입력하세요 :';
 $Definition['Enter the url to the page you would like to use as your homepage'] = '포럼의 홈페이지로 사용하기를 원하는 URL을 입력하세요';
 $Definition['Exclude archived discussions from the discussions list'] = '보관 처리된 글을 글목록에서 표시하지 않기.';
@@ -155,6 +159,7 @@ $Definition['Outgoing Email'] = '이메일 설정';
 $Definition['Page'] = '페이지';
 $Definition['Panel Box'] = '패널 박스';
 $Definition['Password Options'] = '패스워드 옵션';
+$Definition['Permission.Category'] = '카테고리';
 $Definition['Place nested categories in a comma-delimited list when they are'] = '다음의 조건에서 쉽표로 목록을 구분합니다:';
 $Definition['Please choose an authenticator to configure.'] = '설정하기 원하는 인증 방식을 선택하세요.';
 $Definition['Plugin'] = '플러그인';
@@ -188,12 +193,16 @@ $Definition['Route'] = '라우팅 경로';
 $Definition['Routes'] = '라우팅 경로 설정';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = '라우팅 경로는 URL에 따라 사용자를 리디렉션하는데 사용할 수 있습니다.';
 
+$Definition['Saved'] = '변경되었습니다.';
+$Definition['SaveLocalePack'] = '저장';
+
 $Definition['seconds'] = '초 이내에 게시 불가.';
 
 $Definition['Select the file to import'] = '임포트를 원하는 파일을 선택하세요';
 $Definition['Send %s a Message'] = '%s님에게 메세지를 보냅니다';
 $Definition['Status'] = '상태';
 
+$Definition['Test Mode: The pocket will only be displayed for pocket administrators.'] = 'Test Mode';
 $Definition['Thank You!'] = '감사합니다!';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = '%s 인증에 대한 사용자 정의 옵션이 없습니다.';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = '치명적인 오류가 발생하여 활성화 되지 않았습니다: <pre>%s</pre>';
@@ -211,15 +220,16 @@ $Definition['Unlimited'] = '무제한';
 $Definition['Use an SMTP server to send email'] = 'SMPT 서버를 사용하여 이메일 발송';
 $Definition['Use categories to organize discussions'] = '카테고리를 사용하여 글타레를 정리합니다';
 $Definition['User'] = '사용자';
+$Definition['User Count'] = '사용자';
 $Definition['User Registration Settings'] = '사용자 등록 설정';
 $Definition['Users'] = '사용자';
 
 $Definition['Vanilla.Archive.Description'] = '다음의 기간보다 오래된 글타레는 보관 모드로 전환할 수 있습니다. 보관 모드가 된 글을 수정이 불가능합니다.';
 $Definition['Version'] = '버전';
+$Definition['Version %s'] = '버전 %s';
 
 $Definition['version %s'] = '버전 %s';
 
-$Definition['Version %s'] = '버전 %s';
 $Definition['View'] = '보기';
 
 $Definition['Warning'] = '경고';

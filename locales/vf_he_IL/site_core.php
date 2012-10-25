@@ -29,8 +29,8 @@ $Definition['%s Awesomes'] = '%s אדירים';
 $Definition['%s changed %s\'s permissions.'] = '%s שינה את ההרשאות של %s';
 $Definition['%s Comment'] = '%s תגובה';
 $Definition['%s comment'] = '%s תגובה';
-$Definition['%s Comments'] = '%s תגובות';
 $Definition['%s comments'] = '%s תגובות';
+$Definition['%s Comments'] = '%s תגובות';
 $Definition['%s Connect'] = '%s מחובר';
 $Definition['%s deleted this conversation.'] = '%s מחק את השיחה הזאת';
 $Definition['%s discussion'] = '%s דיון';
@@ -45,11 +45,11 @@ $Definition['%s message'] = '%s הודעה';
 $Definition['%s messages'] = '%s הודעות';
 $Definition['%s new'] = '%s חדש';
 $Definition['%s New'] = '%s חדש';
-$Definition['%s New Plural'] = '%s חדשים';
 $Definition['%s new plural'] = '%s חדש';
+$Definition['%s New Plural'] = '%s חדשים';
 $Definition['%s Not Found'] = '%s לא נמצא';
-$Definition['%s point'] = '%s נקודה';
 $Definition['%s Point'] = '%s נקודה';
+$Definition['%s point'] = '%s נקודה';
 $Definition['%s Points'] = '%s נקודות';
 $Definition['%s said'] = '%s אמר';
 $Definition['%s said:'] = '%s אמר:';
@@ -167,8 +167,8 @@ $Definition['answer'] = 'בשובה';
 $Definition['Answers'] = 'תשובות';
 $Definition['Applicants'] = 'מועמדים';
 $Definition['Apply Changes'] = 'החל שינויים';
-$Definition['Apply for Membership'] = 'הרשם';
 $Definition['Apply for membership'] = 'הגש בקשה לחברות';
+$Definition['Apply for Membership'] = 'הרשם';
 $Definition['Are you ABSOLUTELY sure you want to take this action?'] = 'אתה בטוח במאה אחוז שאתה רוצה לעשות את הפעולה הזאת?';
 $Definition['Are you sure you want to delete this %s?'] = 'אתה בטוח שאתה רוצה למחוק את זה %s?';
 $Definition['Are you sure you want to do that?'] = 'האם אתה בטוח שזה מה שאתה רוצה לעשות?';
@@ -244,10 +244,10 @@ $Definition['Child Categories:'] = 'קטגוריות ילדים';
 $Definition['Choose a name to identify yourself on the site.'] = 'בחר שם לזהות אותך באתר';
 $Definition['Choose the main discussion into which all comments will be merged:'] = 'בחר את הדיון הראשי שלתוכויתמזגו כל התגובות';
 $Definition['Choose whether you want to ask a question or start a discussion.'] = 'בחר האם אתה רוצה לשאול שאלה או להתחיל דיון';
-$Definition['Clear'] = 'נקה';
 
 $Definition['clear'] = 'נקה';
 
+$Definition['Clear'] = 'נקה';
 $Definition['Clear Conversation History'] = 'נקה את היסטורית השיחה';
 $Definition['Click <a href="%s">here</a> to go back to the discussion.'] = 'לחזור לדיון.
  <a href="%s">click</a> ';
@@ -260,10 +260,10 @@ $Definition['Close'] = 'לנעול';
 $Definition['Close this discussion'] = 'סגור את הדיון הזה';
 $Definition['Closed'] = 'סגור';
 $Definition['Combo Breaker'] = 'שובר קומבו';
-$Definition['Comment'] = 'הגב';
 
 $Definition['comment'] = 'תגובה';
 
+$Definition['Comment'] = 'הגב';
 $Definition['Comment As ...'] = 'הגב כ...';
 $Definition['Comment in'] = 'ב';
 $Definition['Commenting as %1$s (%2$s)'] = 'בהתייחסו כמו  <%1$s <span class="SignOutWrap">(%2$s)</span ';
@@ -275,15 +275,9 @@ $Definition['Confirm'] = 'אשר';
 $Definition['Confirm Email'] = 'אשר דוא"ל';
 $Definition['Confirm Password'] = 'וודא סיסמה';
 $Definition['Connect'] = 'חבר';
-$Definition['ConnectAccountExists'] = 'You already have an account here.';
-$Definition['ConnectChooseName'] = 'Choose a name to identify yourself on the site.';
-$Definition['ConnectCreateAccount'] = 'Add Info &amp; Create Account';
-$Definition['ConnectExistingPassword'] = 'Enter your existing account password.';
 $Definition['Connecting...'] = 'מתחבר...';
 $Definition['Connection'] = 'חיבור';
-$Definition['ConnectLeaveBlank'] = 'Leave blank unless connecting to an exising account.';
 $Definition['ConnectName'] = 'שם משתמש';
-$Definition['ConnectRegisteredName'] = 'Your registered username: <strong>%s</strong>';
 
 $Definition['conversation'] = 'שיחה';
 
@@ -306,11 +300,6 @@ $Definition['Dashboard Home'] = 'בית מרכז השליטה';
 $Definition['Dashboard Summaries'] = 'סיכומי מרכז השליטה';
 $Definition['Date'] = 'תאריך';
 $Definition['Date Added'] = 'תאריך הוסף';
-$Definition['Date.DefaultDateTimeFormat'] = '%B %e, %Y %l:%M%p';
-$Definition['Date.DefaultDayFormat'] = '%B %e';
-$Definition['Date.DefaultFormat'] = '%B %e, %Y';
-$Definition['Date.DefaultTimeFormat'] = '%l:%M%p';
-$Definition['Date.DefaultYearFormat'] = '%B %Y';
 
 $Definition['days'] = 'ימים';
 
@@ -375,37 +364,11 @@ $Definition['EmailMembershipApproved'] = 'שלום לך %1$s ⏎
 אתה אושרו לחברות. היכנס עכשיו בקישור הבא: ⏎
 
 %2$s';
-$Definition['EmailNotification'] = '%1$s
-
-Follow the link below to check it out:
-%2$s
-
-Have a great day!';
 $Definition['EmailPassword'] = '%2$s יש לאפס את הסיסמה שלך ב %3$s . אישורי הכניסה שלך נמצאים כעת: ⏎
 ⏎
    דוא"ל: %6$s ⏎
    סיסמה:%5$s ⏎
    כתובת:%4$s';
-$Definition['EmailStoryNotification'] = '%1$s
-
-%3$s
-
----
-Follow the link below to check it out:
-%2$s
-
-Have a great day!';
-$Definition['EmailWelcome'] = '%2$s has created an account for you at %3$s. Your login credentials are:
-
-  Email: %6$s
-  Password: %5$s
-  Url: %4$s';
-$Definition['EmailWelcomeConnect'] = 'You have successfully connected to {Title}. Here is your information:
-
-  Username: {User.Name}
-  Connected With: {ProviderName}
-
-You can access the site at {/,exurl,domain}.';
 $Definition['EmailWelcomeRegister'] = 'נרשמת בהצלחה לחשבון ב {Title}. הנה הפרטים שלך: ⏎
 ⏎
    שם משתמש: {} User.Name ⏎
@@ -415,13 +378,9 @@ $Definition['EmailWelcomeRegister'] = 'נרשמת בהצלחה לחשבון ב {
 $Definition['EmbeddedDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
 <p>{Excerpt}</p>
 <p><a href="{Url}">Read the full story here</a></p><div class="ClearFix"></div></div>';
-$Definition['EmbeddedNoBodyFormat'] = '{Url}';
-$Definition['EmbededDiscussionFormat'] = '<div class="EmbeddedContent">{Image}<strong>{Title}</strong>
-<p>{Excerpt}</p>
-<p><a href="{Url}">Read the full story here</a></p><div class="ClearFix"></div></div>';
 $Definition['English'] = 'אנגלית';
-$Definition['Enter your Email address'] = 'הזן את כתובת הדוא"ל שלך ';
 $Definition['Enter your email address'] = 'הזן את כתובת הדוא"ל שלך';
+$Definition['Enter your Email address'] = 'הזן את כתובת הדוא"ל שלך ';
 $Definition['Enter your Email address or username'] = 'הכנס את כתובת הדוא"ל שלך או שם משתמש';
 $Definition['Enter Your OpenID Url'] = 'הזן את כתובת הזיהוי הפתוח';
 $Definition['Erase User Content'] = 'מחק את תוכן המשתמש';
@@ -462,13 +421,12 @@ $Definition['Forgot your password?'] = 'שכחת את הסיסמה שלך?';
 $Definition['Forgot?'] = 'שכחת?';
 $Definition['Format his'] = 'שלו';
 $Definition['Format their'] = 'שלהם';
-$Definition['Format You'] = 'אתה';
 $Definition['Format you'] = 'אתה';
+$Definition['Format You'] = 'אתה';
 $Definition['Format Your'] = 'שלך';
 $Definition['Fourth Anniversary'] = 'יום שנה רביעי';
 $Definition['Friends'] = 'חברים';
 
-$Definition['Garden.Email.SupportAddress'] = 'Support email';
 $Definition['Garden.Email.SupportName'] = 'שם תמיכה';
 $Definition['Garden.Registration.DefaultRoles'] = 'תפקיד ברירת מחדל';
 $Definition['Garden.Title'] = 'כותרת הבאנר';
@@ -487,12 +445,7 @@ $Definition['Hang on a sec while we sign you out.'] = 'חכה רק רגע בזמ
 
 $Definition['he'] = 'הוא';
 
-$Definition['HeadlineFormat.Badge'] = '{ActivityUserID,You} earned the <a href="{Url,html}">{Data.Name,text}</a> badge.';
-$Definition['HeadlineFormat.Ban'] = '{RegardingUserID,You} banned {ActivityUserID,you}.';
-$Definition['HeadlineFormat.Comment'] = '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>';
 $Definition['HeadlineFormat.Discussion'] = '{ActivityUserID,user} <a href="{Url,html}">{Data.Name,text}</a>';
-$Definition['HeadlineFormat.Mention'] = '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>';
-$Definition['HeadlineFormat.PictureChange.ForUser'] = '{RegardingUserID,You} changed the profile picture for {ActivityUserID,user}.';
 $Definition['HeadlineFormat.Registration'] = '{פעילותשםמשתמש,אתה} הצטרף';
 $Definition['HeadlineFormat.Unban'] = '{לגבישםמשתמש,אתה} כבר לא נאסר {פעילותשםמשתמש,אתה}';
 $Definition['HeadlineFormat.Warning'] = '{פעילותשםמשתמש,אתה} הוזהר {לגבישםמשתמש,אתה}';
@@ -534,9 +487,10 @@ $Definition['Invite'] = 'הזמן';
 $Definition['InviteErrorPermission'] = 'סליחה, הרשאה נדחתה';
 $Definition['IP Address'] = 'כתובת IP';
 $Definition['It looks like you\'re new here. If you want to get involved, click one of these buttons!'] = 'זה נראה שאתה חדש כאן. אם אתה רוצה להיות מעורב, לחץ על אחד מהכפתורים האלה!';
-$Definition['Item'] = 'מוצר';
 
 $Definition['item'] = 'פריט';
+
+$Definition['Item'] = 'מוצר';
 
 $Definition['Jail'] = 'כלא';
 $Definition['Jailed users have reduced abilities.'] = 'למשתמשים כלואים יש יכולות מופחתות';
@@ -554,8 +508,8 @@ $Definition['Last IP'] = 'IP אחרון';
 $Definition['Latest %1$s'] = '%1$s אחרון';
 $Definition['Latest Post'] = 'פוסט אחרון';
 $Definition['Leaders'] = 'מובילים';
-$Definition['Leave a comment'] = 'השאר תגובה';
 $Definition['Leave a Comment'] = 'השאר תגובה';
+$Definition['Leave a comment'] = 'השאר תגובה';
 $Definition['Leave blank unless connecting to an exising account.'] = 'השאר ריק אלא אם אתה מתחבר לחשבון קיים';
 $Definition['Leave Comments'] = 'השאר תגובות';
 $Definition['Length'] = 'אורך';
@@ -576,10 +530,10 @@ $Definition['markallviewed'] = 'סמן-כולם-נראו';
 $Definition['Marking as spam cannot be undone.'] = 'לסמן משהו כספאם יגרום לזה להמחק לנצח. מחיקה היא דרך טובה לשמור על הפורום שלך נקי.';
 $Definition['Merge'] = 'מזג';
 $Definition['Merge Discussions'] = 'מזג דיונים';
+$Definition['Message'] = 'הודעה';
 
 $Definition['message'] = 'הודעה';
 
-$Definition['Message'] = 'הודעה';
 $Definition['Messages'] = 'הודעות';
 
 $Definition['minutes'] = 'דקות';
@@ -587,12 +541,9 @@ $Definition['minutes'] = 'דקות';
 $Definition['Moderation'] = 'עריכה';
 $Definition['Moderation Queue'] = 'התמתנות תור';
 $Definition['Moderator Activity'] = 'פעילות מנחה';
+$Definition['Moderators'] = 'מנחים';
 
 $Definition['moderators'] = 'מנחים';
-
-$Definition['Moderators'] = 'מנחים';
-$Definition['MoneyFormat2'] = '$%7.2f';
-
 $Definition['months'] = 'חודשים';
 
 $Definition['More'] = 'עוד';
@@ -649,7 +600,6 @@ $Definition['Notify me when people mention me in comments.'] = 'התראה או�
 $Definition['Notify me when people mention me.'] = 'התראה אותי כשאנשים מזכירים אותי';
 $Definition['Notify me when people reply to my wall comments.'] = 'התראה אותי כשאנשים מגיבים לתגובות הקיר שלי';
 $Definition['Notify me when people write on my wall.'] = 'התראה אותי כשאנשים כותבים על הקיר שלי';
-$Definition['Null Date'] = '-';
 
 $Definition['Off Topic'] = 'לא בנושא';
 $Definition['OK'] = 'אוקיי';
@@ -714,8 +664,6 @@ $Definition['Posts.Singular: %s'] = 'פוסטים: %s\';';
 $Definition['Posts: %s'] = 'פוסטים: %s';
 $Definition['Powered by %s'] = 'מופעל על ידי %s';
 $Definition['Powered by Vanilla'] = 'מופעל על ידי וניל';
-$Definition['PreferenceBadgeEmail'] = 'Notify me when I earn a badge.';
-$Definition['PreferenceBadgePopup'] = 'Notify me when I earn a badge.';
 $Definition['Preview'] = 'קדימון';
 $Definition['Previous'] = 'קודם';
 $Definition['Privacy Settings'] = 'הגדרות פרטיות';
@@ -747,8 +695,6 @@ $Definition['Quote on'] = 'על';
 $Definition['Quote Settings'] = 'הגדרות ציטוט';
 $Definition['Quote wrote'] = 'כתב';
 
-$Definition['Ranks.ActivityFormat'] = '{ActivityUserID,user} {ActivityUserID,plural,was,were} promoted to {Data.Name,plaintext}.';
-$Definition['Ranks.NotificationFormat'] = 'Congratulations! You\'ve been promoted to {Data.Name,plaintext}.';
 $Definition['Reactions'] = 'תגובות';
 $Definition['Real Name'] = 'שם אמיתי';
 $Definition['Reason'] = 'סיבה';
@@ -820,7 +766,6 @@ $Definition['she'] = 'היא';
 $Definition['Show unfollowed categories'] = 'הראה קטגוריות לא נעקבות';
 $Definition['Shown only on mobile'] = 'הראה רק על הנייד';
 $Definition['Sign In'] = 'התחבר';
-$Definition['Sign In or Register to Comment.'] = '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.';
 $Definition['Sign in to vote!'] = 'התחבר להצביע!';
 $Definition['Sign In with %s'] = 'התחבר עם %s';
 $Definition['Sign In with Disqus'] = 'התחבר עם דיסקוס';
@@ -828,10 +773,10 @@ $Definition['Sign In with Facebook'] = 'התחבר עם פייסבוק';
 $Definition['Sign In with Google'] = 'התחבר עם גוגל';
 $Definition['Sign In with OpenID'] = 'התחבר עם OpenID';
 $Definition['Sign In with Twitter'] = 'התחבר עם טוויטר';
+$Definition['Sign Out'] = 'התנתק';
 
 $Definition['sign out'] = 'התנתק';
 
-$Definition['Sign Out'] = 'התנתק';
 $Definition['Sign Up'] = 'הרשם';
 $Definition['Sign-In URL'] = 'כתובת התחברות';
 $Definition['Sign-Out URL'] = 'כתובת התנתקות';
@@ -952,7 +897,6 @@ $Definition['This Week\'s Leaders'] = 'המובילים של השבוע הזה';
 $Definition['Thumbnail'] = 'תמונה מזערית';
 $Definition['Title'] = 'כותרת';
 $Definition['To use reCAPTCHA you must get an API key from %s'] = 'כדי להשתמש ב reCAPTCHA אתה צריך להשיג מפתח API מ %s';
-$Definition['Transport error: %s'] = 'A fatal error occurred while processing the request.<br />The server returned the following response: %s';
 $Definition['Troll'] = 'טרול';
 $Definition['Turn ON'] = 'הדלק';
 $Definition['Twitter'] = 'טוויטר';
@@ -1038,8 +982,6 @@ $Definition['wall'] = 'קיר';
 $Definition['Want to take part in this discussion? Click one of these:'] = 'רוצה להשתתף הדיון הזה? לחץ על אחד מאלה';
 $Definition['Warn'] = 'הזהר';
 $Definition['Warnings'] = 'אזהרות';
-$Definition['WarningTitleFormat'] = '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s points}.';
-$Definition['WarningTitleFormat.Notice'] = '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s points} (just a notice).';
 $Definition['Website'] = 'אתר';
 
 $Definition['weeks'] = 'שבוע אתה';
@@ -1054,10 +996,10 @@ $Definition['Write Comment'] = 'כתוב תגובה';
 $Definition['Write something about yourself...'] = 'כתוב משהו על עצמך...';
 
 $Definition['Yes'] = 'כן';
-$Definition['You'] = 'אתה';
 
 $Definition['you'] = 'אתה';
 
+$Definition['You'] = 'אתה';
 $Definition['You already have an account here.'] = 'יש לך כבר חשבון כאן';
 $Definition['You are connected through %2$s.'] = 'אתה מחובר דרך %2$s.';
 $Definition['You are currently only viewing categories that you follow.'] = 'אתה כרגע רואה רק את הקטגוריות שאתה עוקב אחריהם';
@@ -1066,7 +1008,6 @@ $Definition['You are editing %s\'s signature'] = 'אתה עורך את החתי�
 $Definition['You can either ask a question or start a discussion.'] = 'אתה יכול לשאול שאלה או להתחיל דיון. בחר את מה שאתה רוצה מתחת.';
 $Definition['You can follow individual categories and be notified of all posts within them.'] = 'את יכול לעקוב אחרי קטגוריות אינדיבידואליות ולקבל התראות לגבי כל הפוסטים בתוכם';
 $Definition['You can only specify up to %s tags.'] = 'אתה יכול לציין רק עד %s תגים';
-$Definition['You can use HTML in your signature.'] = 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your signature.';
 $Definition['You cannot edit the thumbnail of an externally linked profile picture.'] = 'אתה לא יכול לערוך את התמונה המזערית של תמונת פרופיל מקישור חיצוני';
 $Definition['You do not have any bookmarks.'] = 'אין לך אף מועדפים';
 $Definition['You do not have any conversations.'] = 'אין לך אף שיחות';
@@ -1087,7 +1028,6 @@ $Definition['You must agree to the terms of service.'] = 'אתה חייב להס
 $Definition['You need to confirm your email address.'] = 'אתה צריך לאשר את כתובת הדוא"ל שלך.
  <a href="{/entry/emailconfirmrequest,url}">here</a>';
 $Definition['You need to sign in before you can do this.'] = 'אתה צריך להתחבר לפני שתוכל לעשות את זה.';
-$Definition['You were added to a conversation.'] = '{InsertUserID,user} added {NotifyUserID,you} to a <a href="{Url,htmlencode}">conversation</a>.';
 $Definition['YouEarnedBadge'] = 'הרווחת את התג הזה';
 
 $Definition['your'] = 'שלך';

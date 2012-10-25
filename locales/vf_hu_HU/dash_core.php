@@ -19,11 +19,14 @@ Habát a meghívás sikeresen el lett küldve, az email elküldése közben hiba
 $Definition['Appearance'] = 'Megjelenés';
 $Definition['Applicant'] = 'Kérelmező';
 $Definition['Applications'] = 'Programok';
+$Definition['Applied On'] = 'Dátum';
 $Definition['Apply'] = 'Alkalmazz';
 $Definition['Approval'] = 'Beleegyezéses típus';
 $Definition['Approve'] = 'Jóváhagy';
 $Definition['Authentication'] = 'Hitelesítés';
 
+$Definition['Badge Name'] = 'Név';
+$Definition['Ban Type'] = 'Típus';
 $Definition['Banner'] = 'Banner/fejléc';
 $Definition['Banner Logo'] = 'Banner/fejléc Logó';
 $Definition['Banner Title'] = 'Banner/fejléc szöveg';
@@ -34,6 +37,7 @@ $Definition['Change the way that new users register with the site.'] = 'Itt megv
 $Definition['Check all permissions that apply to this role:'] = 'Néz meg minden jogosultságot ehhez a feladathoz:';
 $Definition['Comments Page'] = 'Kommentek lap';
 $Definition['Comments per Page'] = 'Hozzászólás per oldal';
+$Definition['Condition Type'] = 'Típus';
 $Definition['Configure an Authenticator'] = 'Hitelesítési mód beállítása';
 $Definition['Conversations'] = 'Társalgás';
 $Definition['Current Authenticator'] = 'Jelenlegi hitelesítési mód';
@@ -50,6 +54,7 @@ $Definition['Edit User'] = 'Felhasználó módosítása';
 $Definition['Enable'] = 'Engedélyez';
 $Definition['Enable this message'] = 'Üzenet engedélyezése';
 $Definition['Enabled'] = 'Engedélyezett';
+$Definition['Enabled: The pocket will be displayed.'] = 'Engedélyezett';
 $Definition['Enter the email address of the person you would like to invite:'] = 'írd be annak az embernek az email címét akit meg akarsz hívni.';
 $Definition['Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.'] = 'Minden felhasználónak megvan a maga csoportja. Ezeket az Adminisztrációs felületen keresztül tudod követni..';
 $Definition['Existing members send invitations to new members.'] = 'Az új felhasználó egy meglévő felhasználó meghívója által tud regisztrálni a fórumra.';
@@ -87,6 +92,7 @@ $Definition['Manage Themes'] = 'Témák kezelése';
 $Definition['Manage Users'] = 'Felhasználók kezelése';
 $Definition['Member'] = 'Tag';
 $Definition['Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'] = 'Az üzenetek bárhol megjelenítheted a fórumban. Ezzel a módszerrel értesíteni tudod a felhasználókat az új hírekről és eseményekről. Az üzenetek újraszervezését az üzenet lefele illetve felfele való mozgatással érheted el. ';
+$Definition['Messages can appear anywhere in your application.'] = 'Az üzenetek bárhol megjelenítheted a fórumban. Ezzel a módszerrel értesíteni tudod a felhasználókat az új hírekről és eseményekről. Az üzenetek újraszervezését az üzenet lefele illetve felfele való mozgatással érheted el. ';
 $Definition['Method'] = 'Eljárás';
 $Definition['Moderator'] = 'Moderátor';
 $Definition['My Invitations'] = 'Saját meghívásaim';
@@ -108,6 +114,7 @@ $Definition['Outgoing Email'] = 'Kimenő Email';
 
 $Definition['Password Options'] = 'Jelszó beállítása';
 $Definition['Pending'] = 'Függőben';
+$Definition['Permission.Category'] = 'Kategória';
 $Definition['Please choose an authenticator to configure.'] = 'Kérlek válassz egy hitelesítési módot';
 $Definition['Plugins'] = 'Bővítmények';
 $Definition['Private Key'] = 'Privát kulcs';
@@ -121,9 +128,12 @@ $Definition['Registration is currently closed.'] = 'Figyelem - A regisztráció 
 $Definition['Remove'] = 'Eltávolítás';
 $Definition['Reset password and send email notification to user'] = 'Jelszó csere és aktivációs email küldése';
 $Definition['Roles & Permissions'] = 'Csoportok és Jogosultságok';
+$Definition['Roles determine user\'s permissions.'] = 'Minden felhasználónak megvan a maga csoportja. Ezeket az Adminisztrációs felületen keresztül tudod követni..';
 $Definition['Route'] = 'Út';
 $Definition['Routes'] = 'Utak';
 
+$Definition['Saved'] = 'A változásokat elmentettük';
+$Definition['SaveLocalePack'] = 'Mentés';
 $Definition['Select the file to import'] = 'Válaszd ki a fájlt a feltöltéshez';
 $Definition['Send %s a Message'] = 'Üzenet küldése %s -nak/nek';
 $Definition['Send Again'] = 'Újra küldés';
@@ -139,6 +149,7 @@ $Definition['ThemeHelp'] = 'Téma segítség';
 $Definition['Themes'] = 'Téma';
 
 $Definition['Uninvite'] = 'Meghívó visszavonása';
+$Definition['User Count'] = 'Felhasználók';
 $Definition['User Registration Settings'] = 'Felhasználó Regisztrációs Beállításai';
 $Definition['Users'] = 'Felhasználók';
 

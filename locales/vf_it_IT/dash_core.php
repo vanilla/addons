@@ -40,8 +40,6 @@ $Definition['[%s] Invitation'] = '[%s] Invito';
 $Definition['[%s] Password Reset'] = '[%s] Password resettata';
 $Definition['[%s] Password Reset Request'] = '[%s] Richiesta di Reset Password';
 
-$Definition['_Locale'] = 'Locale';
-
 $Definition['A message has been sent to your email address with password reset instructions.'] = 'E\' stato inviato un messaggio al tuo indirizzo email con istruzioni per l\'azzeramento della password';
 $Definition['A url-friendly version of the category name for better SEO.'] = 'Una versione url-friendly del nome categoria per una migliore SEO.';
 $Definition['About Vanilla Statistics'] = 'Riguardo Vanilla Statistics';
@@ -148,7 +146,6 @@ $Definition['Condition Field'] = 'Campo';
 $Definition['Condition Type'] = 'Tipo';
 $Definition['Conditions'] = 'Condizioni';
 $Definition['Configure an Authenticator'] = 'Configura Autenticazione';
-$Definition['Confirm email addresses'] = 'Require users to confirm their email addresses (recommended)';
 $Definition['Content Flagging'] = 'Segnalazione Contenuti';
 $Definition['Conversation Messages'] = 'Messaggi Conversazione';
 $Definition['Conversations'] = 'Conversazioni';
@@ -160,7 +157,6 @@ $Definition['Current Authenticator'] = 'Attuale sistema di autenticazione';
 $Definition['Current Theme'] = 'Tema attuale';
 
 $Definition['Decline'] = 'Rifiuta';
-$Definition['Define who can upload files on the Roles & Permissions page.'] = 'Define who can upload and manage files on the <a href="%s">Roles & Permissions</a> page.';
 $Definition['Delete Role'] = 'Rimuovi Ruolo';
 $Definition['Delete User: %s'] = 'Rimuovi utente: %s';
 $Definition['Deleting a role can result in users not having access to the application.'] = 'cancellando un Ruolo si potrebbe bloccare l\'accesso o l\'iscrizione a molti utenti!';
@@ -177,7 +173,6 @@ $Definition['discussion(s)'] = 'discussione(i)';
 $Definition['Discussions per Page'] = 'Discussioni per Pagina';
 $Definition['Don\'t Refresh'] = 'Non aggiornare';
 $Definition['Don\'t use Categories'] = 'Non usare Categorie';
-$Definition['DownloadLocalePack'] = 'Download';
 
 $Definition['edit'] = 'modifica';
 
@@ -209,14 +204,8 @@ $Definition['First Visit'] = 'Prima Visita';
 $Definition['Forum Settings'] = 'Impostazioni Forum';
 $Definition['Frequency'] = 'Frequenza';
 
-$Definition['Garden.Import.Complete.Description'] = 'You have successfully completed an import.
-   Click <b>Finished</b> when you are ready.';
-$Definition['Garden.Import.Continue.Description'] = 'It appears as though you are in the middle of an import.
-   Please choose one of the following options.';
 $Definition['Garden.Import.Description'] = 'Usa questa pagina per importare dati provenienti da un altro forum esportati con il Vanilla exporter. Per maggiori informazioni <a href="%s">visualizza i nostri documenti relativi all\'importazione</a>.';
 $Definition['Garden.Import.InputInstructions'] = 'Inserisci email e password dell\'admin dei dati importati.';
-$Definition['Garden.Import.Merge.Description'] = 'This will merge all of the user and discussion data from the import into this forum.
-<b>Warning: If you merge the same data twice you will get duplicate discussions.</b>';
 $Definition['Garden.Import.Overwrite'] = 'Sovrascrivi questo forum.';
 $Definition['Garden.Import.Overwrite.Description'] = 'Attenzione: Tutti i dati di questo forum verranno sovrascritti.';
 $Definition['Generate'] = 'Genera';
@@ -314,7 +303,6 @@ $Definition['PluginHelp'] = 'I Plugin ti permettono di aggiungere funzionalita\'
 $Definition['Plugins'] = 'Plugin';
 $Definition['Points'] = 'Punti';
 $Definition['Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'] = 'Previeni lo spam sul forum limitando il numero di discussioni &amp; commenti che gli utenti possono inserire in un determinato periodo di tempo.';
-$Definition['ProxyConnect.RimBlurb'] = 'If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin\'s configuration screen.';
 
 $Definition['Quick-Start Guide to Creating Themes for Vanilla'] = 'Guida rapida alla realizzazione di temi per Vanilla';
 
@@ -355,7 +343,6 @@ $Definition['Sent To'] = 'Invia a';
 $Definition['Status'] = 'Stato';
 
 $Definition['Temporary (302)'] = 'Temporaneo (302)';
-$Definition['Test Mode'] = 'Test Mode: The pocket will only be displayed for pocket administrators.';
 $Definition['Test Mode: The pocket will only be displayed for pocket administrators.'] = 'Test Mode';
 $Definition['Thank You!'] = 'Grazie!';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = 'L\'Autenticatore %s non possiede opzioni di configurazione standard.';
@@ -387,15 +374,13 @@ $Definition['Users'] = 'Utenti';
 
 $Definition['Vanilla.Archive.Description'] = 'Puoi decidere di archiviare le discussioni antecedenti ad una certa data. Le discussioni archiviate sono chiuse a tutti gli effetti, non permettendo nuovi post.';
 $Definition['Version'] = 'Versione';
+$Definition['Version %s'] = 'Versione %s';
 
 $Definition['version %s'] = 'versione %s';
 
-$Definition['Version %s'] = 'Versione %s';
 $Definition['View'] = 'Guarda';
 
 $Definition['Warning'] = 'Attenzione';
-$Definition['Warning: Loading tables can be slow.'] = '<b>Warning</b>: Your server configuration does not support fast data loading.
-If you are importing a very large file (ex. over 200,000 comments) you might want to consider changing your configuration. Click <a href="http://vanillaforums.com/porter">here</a> for more information.';
 $Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = 'Di default utilizziamo il mail server locale per inviare le email. Se vuoi utilizzare un mail server SMTP separato, puoi configurarlo qui.';
 $Definition['Welcome to Vanilla!'] = 'Benvenuto';
 $Definition['Welcome to your Dashboard'] = 'Benvenuto nella tua Dashboard';
@@ -403,7 +388,6 @@ $Definition['What\'s the Buzz?'] = 'Pannello di Controllo';
 $Definition['Where is your Community Forum?'] = 'Dov\'e\' la tua Community?';
 $Definition['Why do you want to join?'] = 'Perche\' vuoi unirti??';
 $Definition['Within'] = 'Ogni';
-$Definition['Wordpress Source'] = 'Wordpress';
 
 $Definition['You can always use your password at<a href="%1$s">%1$s</a>.'] = 'Se ti capita di rimanere fuori dal tuo forum, puoi sempre accedere utilizzando email e password Vanilla originali su <a href="%1$s">%1$s</a>';
 $Definition['You can place files in your /uploads folder.'] = 'Se il file e\' troppo
@@ -416,4 +400,3 @@ $Definition['You cannot remove an invitation that has been accepted.'] = 'Non pu
 $Definition['You have %s invitations left for this month.'] = 'Hai ancora %s inviti per questo mese';
 $Definition['You must be authenticated in order to use this form.'] = 'Attenzione - E\' necessario essere autenticati per poter utilizzare la form utilizzata.';
 $Definition['Your application will be reviewed by an administrator. You will be notified by email if your application is approved.'] = 'La tua registrazione verra\' supervisionata da un amministratore. Verrai notificato via email appena la tua registrazione verra\' approvata.';
-$Definition['Your default locale won\'t display properly'] = 'Your default locale won\'t display properly until it is enabled below. Please enable the following: %s.';

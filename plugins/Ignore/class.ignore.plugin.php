@@ -48,9 +48,9 @@ class IgnorePlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', T('Ignore List'), '/profile/ignore', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpIgnoreList').' '.T('Ignore List'), '/profile/ignore', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', T('Ignore List'), "/profile/ignore/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpIgnoreList').' '.T('Ignore List'), "/profile/ignore/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
    

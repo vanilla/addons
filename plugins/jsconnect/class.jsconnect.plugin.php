@@ -70,7 +70,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       if (GetValue('NoConnectLabel', $Options)) {
          $ConnectLabel = '';
       } else {
-         $ConnectLabel = '<span class="Username"></span><div class="ConnectLabel">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div>';
+         $ConnectLabel = '<span class="Username"></span><div class="ConnectLabel TextColor">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div>';
       }
 
       $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">

@@ -29,6 +29,8 @@ $Definition['Apply'] = 'Прилагане';
 $Definition['Approve'] = 'Одобряване';
 $Definition['Archive Discussions'] = 'Архивиране на дискусии';
 
+$Definition['Badge Name'] = 'Име';
+$Definition['Ban Type'] = 'Тип';
 $Definition['Banner'] = 'Банер';
 $Definition['Banner Logo'] = 'Лого';
 $Definition['Banner Title'] = 'Съдържание на текстовия банер';
@@ -41,6 +43,7 @@ $Definition['Choose who can send out invitations to new members:'] = 'Избер
 $Definition['comment(s)'] = 'коментар(а)';
 
 $Definition['Comments per Page'] = 'Коментара на страница';
+$Definition['Condition Type'] = 'Тип';
 $Definition['Consumer Key'] = 'Потребителски ключ';
 $Definition['Consumer Secret'] = 'Потребителска тайна';
 $Definition['Conversations'] = 'Разговори';
@@ -65,6 +68,7 @@ $Definition['Edit User'] = 'Редактиране на потребител';
 $Definition['EditContentTimeout.Notes'] = 'Бележка: Ако потребител е в роля, която му позволява да редактира съдържание, то правата избрани тук ще бъдат игнорирани и вместо тях ще бъдат приложени правата на съответната група.';
 $Definition['Enable'] = 'Включване';
 $Definition['Enable OpenID'] = 'Включване на вписването с OpenID';
+$Definition['Enabled: The pocket will be displayed.'] = 'Enabled';
 $Definition['Enter the email address of the person you would like to invite:'] = 'Въведете адреса за електронна поща на човека, който искате да поканите:';
 $Definition['Every Page'] = 'Всяка страница';
 $Definition['Exclude archived discussions from the discussions list'] = 'Изключване на архивираните дискусии от списъка с дискусии';
@@ -85,6 +89,7 @@ $Definition['Guest'] = 'Гост';
 
 $Definition['Homepage'] = 'Начална страница';
 
+$Definition['If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin\'s configuration screen.'] = 'ProxyConnect.RimBlurb';
 $Definition['Import'] = 'Импорт';
 $Definition['Information'] = 'Информация';
 $Definition['Invitation Code'] = 'Код на поканата';
@@ -145,6 +150,7 @@ $Definition['Outgoing Email'] = 'Изходящ адрес за електрон
 $Definition['Page'] = 'Страница';
 $Definition['Panel Box'] = 'Кутия';
 $Definition['Password Options'] = 'Опции на паролите';
+$Definition['Permission.Category'] = 'Категория';
 $Definition['Plugin'] = 'Разширение';
 $Definition['PluginHelp'] = 'Разширенията Ви позволяват да добавяте функционалност към форума.<br />След като добавите разширение към Вашата %s папка, можете да го включите или изключите от тук.';
 $Definition['Plugins'] = 'Разширения';
@@ -167,6 +173,8 @@ $Definition['Route'] = 'Маршрут';
 $Definition['Routes'] = 'Маршрути';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = 'Маршрутите могат да се използват за пренасочване на потребителите към различни части на форума в зависимост от URL адреса.';
 
+$Definition['SaveLocalePack'] = 'Запазване';
+
 $Definition['seconds'] = 'секунди';
 
 $Definition['Select the file to import'] = 'Изберете файл';
@@ -179,6 +187,7 @@ $Definition['SMTP Security'] = 'SMTP сигурност';
 $Definition['SMTP User'] = 'SMTP потребител';
 $Definition['Status'] = 'Статус';
 
+$Definition['Test Mode: The pocket will only be displayed for pocket administrators.'] = 'Test Mode';
 $Definition['Thank You!'] = 'Благодаря!';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = 'Разширението не може да бъде включено, понеже генерира фатална грешка: <pre>%s</pre>';
 $Definition['The banner logo appears at the top of your forum.'] = 'Банерът на форума се показва в началото на всяка страница.';
@@ -194,6 +203,7 @@ $Definition['Unlimited'] = 'Неограничено';
 $Definition['Use an SMTP server to send email'] = 'Използване на SMTP сървър за изпращане на електронна поща';
 $Definition['Use categories to organize discussions'] = 'Използване на категории за организиране на дискусиите';
 $Definition['User'] = 'Потребител';
+$Definition['User Count'] = 'Потребители';
 $Definition['User Registration Settings'] = 'Настройки на регистрацията на потребители';
 $Definition['Users'] = 'Потребители';
 

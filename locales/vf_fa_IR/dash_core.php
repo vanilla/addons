@@ -58,6 +58,7 @@ $Definition['Activity item not found.'] = 'آیتم فعالیت‌ها یافت
 $Definition['Add %s'] = 'افزودن %s';
 $Definition['Add Category'] = 'افزودن دسته ';
 $Definition['Add Connection'] = 'افزودن اتصال';
+$Definition['Add Info &amp; Create Account'] = 'افزودن اطلاعات و ساختن شناسه‌ی کاربری';
 $Definition['Add Item'] = 'افزودن';
 $Definition['Add Role'] = 'افزودن نقش';
 $Definition['Add User'] = 'افزودن کاربر ';
@@ -137,10 +138,10 @@ $Definition['Blocked'] = 'قفل شده';
 $Definition['Blog Comments'] = 'دیدگاه‌های وب‌لاگ';
 $Definition['Browse Addons'] = 'افزونه‌های مرورگر';
 $Definition['Browse for a new banner logo if you would like to change it:'] = 'اگر مایل به تغییر لوگوی سردر انجمن‌تان هستید، یک لوگوی تازه انتخاب کنید:';
-$Definition['By %s'] = 'نویسنده: %s';
 
 $Definition['by %s'] = 'از سوی %s';
 
+$Definition['By %s'] = 'نویسنده: %s';
 $Definition['By clicking the button below, you will be deleting the user account for %s forever.'] = 'با کلیک بر روی دکمه‌ی زیر،‌ شناسه‌ی کاربر را برای همیشه پاک خواهید کرد.';
 
 $Definition['Cannot build profile information if user is not defined.'] = 'اگر کاربری مشخص نشده باشد، نمی‌توانید داده‌های رخ‌نما را بسازید.';
@@ -279,6 +280,7 @@ $Definition['Enable this message'] = 'به کارگیری این پیام (رو�
 $Definition['Enable/Disable'] = 'فعال‌کردن/غیرفعال‌کردن';
 $Definition['Enabled'] = 'روشن';
 $Definition['Enabled %1$s'] = 'روشن %1$s';
+$Definition['Enabled: The pocket will be displayed.'] = 'روشن';
 $Definition['Enabling a Locale Pack'] = 'به کارگیری یک بسته‌ی زبان';
 $Definition['Encourage your friends to join your new community!'] = 'دوستان‌تان را تشویق کنید تا به اجتماع جدید شما بپیوندند.';
 $Definition['Enter a short name for the site.'] = 'یک نام کوتاه را برای وب‌گاه انتخاب کنید. این نام روی دکمه‌های ورود نشان داده خواهد شد.';
@@ -292,6 +294,7 @@ $Definition['Every 30 seconds'] = 'هر 30 ثانیه';
 $Definition['Every 5 minutes'] = 'هر 5 دقیقه';
 $Definition['Every 5 seconds'] = 'هر 5 ثانیه';
 $Definition['Every Page'] = 'تمام صفحه‌ها';
+$Definition['Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.'] = 'هر کاربر در انجمن شما دست‌کم یک نقش دارد. نقش‌ها آن‌چه را که کاربر اجازه دارد انجام دهد، تعیین می‌کنند.';
 $Definition['Everything is ok.'] = 'همه چیز درست است.';
 $Definition['Exclude archived discussions from the discussions list'] = 'بیرون نگه داشتن جستارهای بایگانی شده از لیست جستارها';
 $Definition['Existing members send invitations to new members.'] = 'کاربران کنونی به کاربران تازه فراخوانه می‌فرستند.';
@@ -384,6 +387,7 @@ $Definition['Locale Name'] = 'نام زبان';
 $Definition['Locales'] = 'زبان‌ها';
 $Definition['Locales are in your %s folder.'] = 'هنگامی‌که یک زبان تازه در شاخه‌ی <span dir="ltr">%s</span> قرار می‌دهید، می‌توانید آن را از این برگه به کار بگیرید یا از کار بیاندازید.';
 $Definition['Location'] = 'مکان پیام(‌ها)';
+$Definition['LogoBrowse'] = 'اگر مایل به تغییر لوگوی سردر انجمن‌تان هستید، یک لوگوی تازه انتخاب کنید:';
 
 $Definition['Maintenance Mode'] = 'پیام انجمن:';
 $Definition['Make sure to use a forum theme that meshes well with the look and feel of the remote site.'] = 'مطمئن شوید که از پوسته‌ای استفاده می‌کنید که که با تارنمای remote شما هماهنگی مناسب را دارد.';
@@ -408,6 +412,7 @@ $Definition['Max Comment Length'] = 'بیشینه‌ی شمار نویسه‌ه�
 $Definition['Media'] = 'رسانه';
 $Definition['Member'] = 'عضو (Member)';
 $Definition['Member roles'] = 'نقش‌هایی را که باید برای کاربران تازه یا تأیید شده به کار روند، برگزینید.';
+$Definition['Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'] = 'پیام‌ها می‌توانند در هر جایی از انجمن شما نمایش داده شوند و برای آگاه‌سازی کاربرانتان از خبرها و رویدادها مورد استفاده قرار گیرند. برای ساماندهی پیام‌هایتان در این برگه، آن‌ها را به بالا یا پایین بکشید.';
 $Definition['Messages can appear anywhere in your application.'] = 'پیام‌ها می‌توانند در هر جایی از انجمن شما نمایش داده شوند و برای آگاه‌سازی کاربرانتان از خبرها و رویدادها مورد استفاده قرار گیرند. برای ساماندهی پیام‌هایتان در این برگه، آن‌ها را به بالا یا پایین بکشید.';
 $Definition['Method'] = 'روش';
 
@@ -465,6 +470,7 @@ $Definition['Panel Box'] = 'قاب';
 $Definition['Password Options'] = 'گزینه‌های گذرواژه';
 $Definition['Pending'] = 'نامشخص';
 $Definition['Permission'] = 'اجازهٔ دسترسی';
+$Definition['Permission.Category'] = 'دسته';
 $Definition['Please choose an authenticator to configure.'] = 'لطفاً یک اعتبارسنج را برای پیکربندی انتخاب کنید.';
 $Definition['Please Confirm'] = 'لطفاً تأیید کنید.';
 $Definition['Plugin'] = 'ابزارک';
@@ -519,6 +525,7 @@ $Definition['Run structure & data scripts'] = 'اجرای اسکریپت‌ها�
 $Definition['Saved'] = 'تغییرات شما اندوخته شد.';
 $Definition['SaveLocalePack'] = 'ذخیره';
 $Definition['Search by user or role.'] = '<b>شیوه‌های جست‌وجو</b>:<br> 1. جست‌وجوی کاربر از روی «نام»<br>2. جست‌وجوی کاربر از روی رایانامه‌اش<br>3. جست‌وجوی کاربر از روی آخرین IP ثبت شده برای وی<br>4. جستجوی کاربران از روی «نقش»؛ نام یک «نقش» را وارد کنید تا همه‌ی کاربرانی که آن نقش را دارند، بیابید.';
+$Definition['Search for users by name or enter the name of a role to see all users with that role.'] = '<b>شیوه‌های جست‌وجو</b>:<br> 1. جست‌وجوی کاربر از روی «نام»<br>2. جست‌وجوی کاربر از روی رایانامه‌اش<br>3. جست‌وجوی کاربر از روی آخرین IP ثبت شده برای وی<br>4. جستجوی کاربران از روی «نقش»؛ نام یک «نقش» را وارد کنید تا همه‌ی کاربرانی که آن نقش را دارند، بیابید.';
 
 $Definition['seconds'] = 'ثانیه';
 

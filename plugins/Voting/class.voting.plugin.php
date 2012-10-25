@@ -193,9 +193,9 @@ class VotingPlugin extends Gdn_Plugin {
 			echo
 				Wrap($AnswerCount.' '.Plural($AnswerCount, 'Comment', 'Comments'), 'strong');
 				echo ' sorted by '
-               .Anchor('Votes', Url('?Sort=popular', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'popular' ? 'Active' : ''))
+               .Anchor('Votes', Url(DiscussionUrl($Sender->Discussion).'?Sort=popular', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'popular' ? 'Active' : ''))
                .' '
-               .Anchor('Date Added', Url('?Sort=date', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'date' ? 'Active' : ''));
+               .Anchor('Date Added', Url(DiscussionUrl($Sender->Discussion).'?Sort=date', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'date' ? 'Active' : ''));
 			?>
 			</div>
 		</li>
@@ -427,7 +427,7 @@ class VotingPlugin extends Gdn_Plugin {
 	
    public function DiscussionsController_AfterDiscussionFilters_Handler($Sender) {
 		echo '<li class="PopularDiscussions '.($Sender->RequestMethod == 'popular' ? ' Active' : '').'">'
-			.Anchor(Sprite('SpPopularDiscussions').T('Popular'), '/discussions/popular', 'PopularDiscussions')
+			.Anchor(Sprite('SpPopularDiscussions').' '.T('Popular'), '/discussions/popular', 'PopularDiscussions')
 		.'</li>';
    }
    
@@ -463,8 +463,6 @@ class VotingPlugin extends Gdn_Plugin {
       // Get rid of announcements from this view
       if ($Sender->Head) {
          $Sender->AddJsFile('discussions.js');
-         $Sender->AddJsFile('bookmark.js');
-         $Sender->AddJsFile('options.js');
          $Sender->Head->AddRss($Sender->SelfUrl.'/feed.rss', $Sender->Head->Title());
       }
       if (!is_numeric($Offset) || $Offset < 0)

@@ -47,10 +47,12 @@ $Definition['Authors can edit for 30 minutes after posting'] = '投稿者は投�
 $Definition['Authors can edit for 5 minutes after posting'] = '投稿者は投稿後 5 分以内なら編集できます';
 $Definition['Authors cannot edit their posts'] = '投稿者は自分の投稿を編集できません';
 
+$Definition['Badge Name'] = '名前';
 $Definition['Banner'] = 'サイトのタイトル';
 $Definition['Banner Logo'] = 'タイトルロゴ';
 $Definition['Banner Title'] = 'タイトル';
 $Definition['Basic'] = '基本';
+$Definition['Browse for a new banner logo if you would like to change it:'] = 'LogoBrowse';
 $Definition['By %s'] = '作成者: %s';
 
 $Definition['Categories &amp; Discussions'] = 'カテゴリ &amp; ディスカッション';
@@ -68,6 +70,7 @@ $Definition['Choose who can send out invitations to new members:'] = '誰が新�
 $Definition['comment(s)'] = '件のコメント';
 
 $Definition['Comments per Page'] = '1 ページに表示する最大コメント数';
+$Definition['Condition Type'] = 'タイプ';
 $Definition['Configure an Authenticator'] = '設定する認証方式';
 $Definition['Configure how nested categories are displayed to users.'] = 'ネストされたカテゴリをどのように表示するか、設定してください。';
 $Definition['Configuring Vanilla\'s Homepage'] = 'Vanilla のホーム画面設定 (英語)';
@@ -110,6 +113,7 @@ $Definition['Enable OpenID'] = 'OpenID を有効化';
 $Definition['Enable this message'] = 'このメッセージを有効化する';
 $Definition['Enabled'] = '有効';
 $Definition['Enabled %1$s'] = '有効 %1$s';
+$Definition['Enabled: The pocket will be displayed.'] = '有効';
 $Definition['Enabling a Locale Pack'] = 'ロケールパックを有効化する(英語)';
 $Definition['Enter the url to the page you would like to use as your homepage:'] = 'ホーム画面に設定したいページの URL を入力してください:';
 $Definition['Every 1 minute'] = '1分間隔';
@@ -213,6 +217,7 @@ $Definition['Outgoing Email'] = 'メール送信';
 $Definition['Page'] = '表示対象';
 $Definition['Panel Box'] = 'パネル ボックス';
 $Definition['Password Options'] = 'パスワード オプション';
+$Definition['Permission.Category'] = 'カテゴリ';
 $Definition['Please choose an authenticator to configure.'] = '設定したい認証方式を選んでください。';
 $Definition['Plugin'] = 'プラグイン';
 $Definition['PluginHelp'] = '「プラグイン」は、このサイトの機能を拡張します。<br />%s フォルダに追加されたプラグインを、ここで有効化または無効化できます。';
@@ -242,6 +247,7 @@ $Definition['Routes'] = 'ルート';
 $Definition['Routes can be used to redirect users to various parts of your site depending on the url.'] = 'ルートは URL に基づきユーザーを適切なページへリダイレクトするために使用されます。';
 
 $Definition['Saved'] = '変更を保存しました。';
+$Definition['SaveLocalePack'] = '保存';
 $Definition['Search by user or role.'] = 'ユーザー名またはロール (管理者:<input type="text" value="Administrator" size="13" onclick="this.select()" />, 申請者:<input type="text" value="Applicant" size="9" onclick="this.select()" />, 利用禁止:<input type="text" value="Banned" size="6" onclick="this.select()" />, ゲスト:<input type="text" value="Guest" size="5" onclick="this.select()" />, メンバー:<input type="text" value="Member" size="7" onclick="this.select()" />, モデレータ:<input type="text" value="Moderator" size="10" onclick="this.select()" />, メール確認待ち:<input type="text" value="Confirm Email" size="15" onclick="this.select()" />) で検索します。';
 
 $Definition['seconds'] = '秒間';
@@ -254,6 +260,7 @@ $Definition['SMTP Security'] = 'SMTP セキュリティ';
 $Definition['SMTP User'] = 'SMTP ユーザー';
 
 $Definition['Temporary (302)'] = '一時的 (302)';
+$Definition['Test Mode: The pocket will only be displayed for pocket administrators.'] = 'Test Mode';
 $Definition['The %s Authenticator does not have any custom configuration options.'] = 'ユーザー認証方式 %s には設定オプションがありません。';
 $Definition['The %s table is not in the correct format.'] = '%s テーブルの形式が不正です。';
 $Definition['The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'] = '致命的なエラーが発生したため、アドオンを有効にすることができませんでした: <pre>%s</pre>';
@@ -285,6 +292,7 @@ $Definition['Use an SMTP server to send email'] = 'メールの送信に SMTP �
 $Definition['Use categories to organize discussions'] = 'ディスカッションを整理するためカテゴリを使用する';
 $Definition['Use the content at this url as your homepage.'] = '"ホーム画面" は <strong>%s</strong> にアクセスしたときに表示されます。既定では "すべてのディスカッション" がホーム画面になっていますが、この設定は自由に変更できます。以下は代表的なオプションです:';
 $Definition['User'] = 'ユーザー';
+$Definition['User Count'] = 'ユーザー';
 $Definition['User Registration Settings'] = 'ユーザー登録設定';
 $Definition['Users'] = 'ユーザー';
 
