@@ -3,7 +3,7 @@
 $PluginInfo['MessageLink'] = array(
    'Name' => 'Message Link',
    'Description' => "Adds a link to message the author of each discussion and comment.",
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18', 'Conversations' => '2.0.18'),
    'Author' => "Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
@@ -14,7 +14,7 @@ class MessageLinkPlugin extends Gdn_Plugin {
    /**
     * Add 'Send Message' option to Discussion.
     */
-   public function Base_AfterReactions_Handler($Sender, $Args) {
+   public function Base_AfterFlag_Handler($Sender, $Args) {
       $this->AddSendMessageButton($Sender, $Args);
    }
    
@@ -31,10 +31,6 @@ class MessageLinkPlugin extends Gdn_Plugin {
          $ObjectID = 'Discussion_'.$Args['Discussion']->DiscussionID;
       } else return;
       
-      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
-      if ($Types)
-         echo Bullet();
-      
-      echo Anchor(Sprite('ReactSendMessage', 'ReactSprite').T('Send Message'), Url("/messages/add/{$Object->InsertName}",TRUE), 'React SendMessage');
+      echo Anchor(Sprite('ReactMessage', 'ReactSprite').T('Send Message'), Url("/messages/add/{$Object->InsertName}",TRUE), 'ReactButton Visible SendMessage').' ';
    }
 }
