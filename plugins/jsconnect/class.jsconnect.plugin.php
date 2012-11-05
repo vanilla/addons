@@ -74,7 +74,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       }
 
       $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">
-         <div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button SignInLink').$RegisterLink.'</div>
+         <div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button Primary SignInLink').$RegisterLink.'</div>
          <div class="JsConnect-Connect"><a class="'.$PopupWindow.' NoMSIE ConnectLink" popupHeight="300" popupWidth="600">'.Img('http://cdn.vanillaforums.com/images/usericon_50.png', array('class' => 'ProfilePhotoSmall UserPhoto')).
             $ConnectLabel.
          '</a></div>

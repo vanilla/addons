@@ -20,7 +20,7 @@
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.6.5',
+    'Version' => '1.6.6',
     'MobileFriendly' => TRUE,
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'RequiredTheme' => FALSE,
@@ -166,7 +166,8 @@ class QuotesPlugin extends Gdn_Plugin {
    /**
     * Add 'Quote' option to Discussion.
     */
-   public function Base_AfterReactions_Handler($Sender, $Args) {
+   public function Base_AfterFlag_Handler($Sender, $Args) {
+      echo Gdn_Theme::BulletItem('Flags');
       $this->AddQuoteButton($Sender, $Args);
    }
 
@@ -186,11 +187,8 @@ class QuotesPlugin extends Gdn_Plugin {
          return;
 
       $Reply = T('Reply'); // help capture translation.
-      $Types = GetValue('ReactionTypes', $Sender->EventArguments);
-      if ($Types)
-         echo Bullet();
 
-      echo Anchor(Sprite('ReactQuote', 'ReactSprite') . T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}", TRUE), 'React Quote');
+      echo Anchor(Sprite('ReactQuote', 'ReactSprite').' '.T('Quote'), Url("post/quote/{$Object->DiscussionID}/{$ObjectID}", TRUE), 'ReactButton Quote Visible').' ';
    }
 
    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {

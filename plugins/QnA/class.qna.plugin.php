@@ -532,7 +532,7 @@ class QnAPlugin extends Gdn_Plugin {
    }
 
    /* New Html method of adding to discussion filters */
-   public function DiscussionsController_AfterDiscussionFilters_Handler($Sender) {
+   public function Base_AfterDiscussionFilters_Handler($Sender) {
       $Count = Gdn::Cache()->Get('QnA-UnansweredCount');
       if ($Count === Gdn_Cache::CACHEOP_FAILURE)
          $Count = ' <span class="Aside"><span class="Popin Count" rel="/discussions/unansweredcount"></span>';

@@ -25,7 +25,10 @@ class FacebookIDPlugin extends Gdn_Plugin {
          echo '<dt class="Value">'.T('Facebook ID').'</dt><dd>'.$FacebookID.'</dd>';
       }
    }
-
+   
+   /**
+    * Show FacebookID on comments.
+    */
    public function Base_CommentInfo_Handler($Sender, $Args) {
       if (!Gdn::Session()->CheckPermission('Plugins.FacebookID.View'))
          return;
@@ -39,7 +42,14 @@ class FacebookIDPlugin extends Gdn_Plugin {
 
       $UserID = GetValue('InsertUserID',$Sender->EventArguments['Object'],'0');
       $FacebookID = GetValue($UserID, $this->FacebookIDs, T('n/a'));
-      echo '<span>'.T('Facebook ID').': '.$FacebookID.'</span>';
+      echo '<span>'.T('Facebook ID').': '.$FacebookID.'</span> ';
+   }
+   
+   /**
+    * Show FacebookID on discussions (OP).
+    */
+   public function Base_DiscussionInfo_Handler($Sender, $Args) {
+      $this->Base_CommentInfo_Handler($Sender, $Args);
    }
 
    /**
