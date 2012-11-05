@@ -105,7 +105,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
    }
       
    /**
-    * Add navigation tab.
+    * Add navigation tab (DEPRECATED).
     */
    public function AddParticipatedTab($Sender) {
       $Count = $this->GetCountParticipated();
@@ -124,6 +124,19 @@ class ParticipatedPlugin extends Gdn_Plugin {
    }
    public function DraftsController_AfterDiscussionTabs_Handler($Sender) {
       $this->AddParticipatedTab($Sender);
+   }
+   
+   /**
+    * New navigation menu item.
+    *
+    * @since 2.1
+    */
+   public function Base_AfterDiscussionFilters_Handler($Sender) {
+      // Participated
+      $CssClass = 'Participated';
+      if (strtolower(Gdn::Controller()->ControllerName) == 'discussionscontroller' && strtolower(Gdn::Controller()->RequestMethod) == 'participated')
+         $CssClass .= ' Active';
+      echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpParticipated').T('Participated'), '/discussions/participated').'</li>';
    }
    
    /**
@@ -169,10 +182,9 @@ class ParticipatedPlugin extends Gdn_Plugin {
       
       // Add modules
       $Sender->AddModule('NewDiscussionModule');
+      $Sender->AddModule('DiscussionFilterModule');
       $Sender->AddModule('CategoriesModule');
-      $BookmarkedModule = new BookmarkedModule($Sender);
-      $BookmarkedModule->GetData();
-      $Sender->AddModule($BookmarkedModule);
+      $Sender->AddModule('BookmarkedModule');
       
       $Sender->Render($this->GetView('participated.php'));
    }
