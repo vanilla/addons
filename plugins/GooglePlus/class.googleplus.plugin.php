@@ -31,6 +31,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
    protected $_AccessToken = NULL;
    
    public function AccessToken($NewValue = FALSE) {
+      if (!$this->IsConfigured()) 
+         return FALSE;
+      
       if ($NewValue !== FALSE)
          $this->_AccessToken = $NewValue;
       
@@ -85,8 +88,16 @@ class GooglePlusPlugin extends Gdn_Plugin {
    }
    
    public function IsConfigured() {
-      $Result = C('Plugins.Twitter.ConsumerKey') && C('Plugins.Twitter.Secret');
+      $Result = C('Plugins.GooglePlus.ConsumerKey') && C('Plugins.GooglePlus.Secret');
       return $Result;
+   }
+   
+   public function SocialSharing() {
+      return C('Plugins.GooglePlus.SocialSharing', TRUE);
+   }
+   
+   public function SocialReactions() {
+      return C('Plugins.GooglePlus.SocialReactions', TRUE);
    }
    
    public static function Curl($Url, $Method = 'GET', $Data = array()) {
@@ -254,7 +265,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
       $Conf = new ConfigurationModule($Sender);
       $Conf->Initialize(array(
           'Plugins.GooglePlus.ClientID',
-          'Plugins.GooglePlus.Secret'
+          'Plugins.GooglePlus.Secret',
+          'Plugins.GooglePlus.SocialReactions'  => $this->SocialReactions(),
+          'Plugins.GooglePlus.SocialSharing'    => $this->SocialSharing()
       ));
 
       $Sender->AddSideMenu('dashboard/social');
