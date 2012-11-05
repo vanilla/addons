@@ -50,6 +50,11 @@ class QnAPlugin extends Gdn_Plugin {
          ->Column('DateAccepted', 'datetime', TRUE)
          ->Column('AcceptedUserID', 'int', TRUE)
          ->Set();
+      
+      Gdn::Structure()
+         ->Table('User')
+         ->Column('CountAcceptedAnswers', 'int', TRUE)
+         ->Set();
 
       Gdn::SQL()->Replace(
          'ActivityType',
