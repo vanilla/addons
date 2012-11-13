@@ -69,7 +69,7 @@ class QnAPlugin extends Gdn_Plugin {
       
       Gdn::Structure()
          ->Table('User')
-         ->Column('CountAcceptedAnswers', 'int', 0)
+         ->Column('CountAcceptedAnswers', 'int', '0')
          ->Set();
 
       Gdn::SQL()->Replace(
