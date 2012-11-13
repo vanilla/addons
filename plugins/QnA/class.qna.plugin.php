@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.1.1',
+   'Version' => '1.1.3',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -24,8 +24,24 @@ $PluginInfo['QnA'] = array(
  */
 class QnAPlugin extends Gdn_Plugin {
    /// PROPERTIES ///
+   
+   protected $Reactions = FALSE;
+   protected $Badges = FALSE;
 
    /// METHODS ///
+   
+   public function __construct() {
+      parent::__construct();
+      
+      if (Gdn::PluginManager()->CheckPlugin('Reactions') && C('Plugins.QnA.Reactions', TRUE)) {
+         $this->Reactions = TRUE;
+      }
+      
+      if (Gdn::ApplicationManager()->CheckApplication('Reputation') && C('Plugins.QnA.Badges', TRUE)) {
+         $this->Badges = TRUE;
+      }
+      
+   }
 
    public function Setup() {
       $this->Structure();
@@ -49,6 +65,11 @@ class QnAPlugin extends Gdn_Plugin {
          ->Column('QnA', array('Accepted', 'Rejected'), NULL)
          ->Column('DateAccepted', 'datetime', TRUE)
          ->Column('AcceptedUserID', 'int', TRUE)
+         ->Set();
+      
+      Gdn::Structure()
+         ->Table('User')
+         ->Column('CountAcceptedAnswers', 'int', 0)
          ->Set();
 
       Gdn::SQL()->Replace(
@@ -76,6 +97,100 @@ class QnAPlugin extends Gdn_Plugin {
             ->Where('c.QnA', 'Accepted')
             ->Where('c.DateAccepted', NULL)
             ->Put();
+      }
+      
+      // Define 'Accept' reaction
+      if ($this->Reactions) {
+         $Rm = new ReactionModel();
+         
+         // AcceptAnswer
+         $Rm->DefineReactionType(array('UrlCode' => 'AcceptAnswer', 'Name' => 'Accept Answer', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Curation.Manage', 'Hidden' => 1,
+            'Description' => "When someone correctly answers a question, they are rewarded with this reaction."));
+      }
+      
+      // Define 'Answer' badges
+      if ($this->Badges) {
+         $BadgeModel = new BadgeModel();
+
+         // Answer Counts
+         $BadgeModel->Define(array(
+             'Name' => 'First Answer',
+             'Slug' => 'answer',
+             'Type' => 'UserCount',
+             'Body' => 'Answering questions is a great way to show your support for a community!',
+             'Photo' => 'http://badges.vni.la/100/answer.png',
+             'Points' => 2,
+             'Attributes' => array('Column' => 'CountAcceptedAnswers'),
+             'Threshold' => 1,
+             'Class' => 'Answerer',
+             'Level' => 1,
+             'CanDelete' => 0
+         ));
+         $BadgeModel->Define(array(
+             'Name' => '5 Answers',
+             'Slug' => 'answer-5',
+             'Type' => 'UserCount',
+             'Body' => 'Your willingness to share knowledge has definitely been noticed.',
+             'Photo' => 'http://badges.vni.la/100/answer-2.png',
+             'Points' => 3,
+             'Attributes' => array('Column' => 'CountAcceptedAnswers'),
+             'Threshold' => 5,
+             'Class' => 'Answerer',
+             'Level' => 2,
+             'CanDelete' => 0
+         ));
+         $BadgeModel->Define(array(
+             'Name' => '25 Answers',
+             'Slug' => 'answer-25',
+             'Type' => 'UserCount',
+             'Body' => 'Looks like you&rsquo;re starting to make a name for yourself as someone who knows the score!',
+             'Photo' => 'http://badges.vni.la/100/answer-3.png',
+             'Points' => 5,
+             'Attributes' => array('Column' => 'CountAcceptedAnswers'),
+             'Threshold' => 25,
+             'Class' => 'Answerer',
+             'Level' => 3,
+             'CanDelete' => 0
+         ));
+         $BadgeModel->Define(array(
+             'Name' => '50 Answers',
+             'Slug' => 'answer-50',
+             'Type' => 'UserCount',
+             'Body' => 'Why use Google when we could just ask you?',
+             'Photo' => 'http://badges.vni.la/100/answer-4.png',
+             'Points' => 10,
+             'Attributes' => array('Column' => 'CountAcceptedAnswers'),
+             'Threshold' => 50,
+             'Class' => 'Answerer',
+             'Level' => 4,
+             'CanDelete' => 0
+         ));
+         $BadgeModel->Define(array(
+             'Name' => '100 Answers',
+             'Slug' => 'answer-100',
+             'Type' => 'UserCount',
+             'Body' => 'Admit it, you read Wikipedia in your spare time.',
+             'Photo' => 'http://badges.vni.la/100/answer-5.png',
+             'Points' => 15,
+             'Attributes' => array('Column' => 'CountAcceptedAnswers'),
+             'Threshold' => 100,
+             'Class' => 'Answerer',
+             'Level' => 5,
+             'CanDelete' => 0
+         ));
+         $BadgeModel->Define(array(
+             'Name' => '250 Answers',
+             'Slug' => 'answer-250',
+             'Type' => 'UserCount',
+             'Body' => 'Is there *anything* you don&rsquo;t know?',
+             'Photo' => 'http://badges.vni.la/100/answer-6.png',
+             'Points' => 20,
+             'Attributes' => array('Column' => 'CountComments'),
+             'Threshold' => 250,
+             'Class' => 'Answerer',
+             'Level' => 6,
+             'CanDelete' => 0
+         ));
       }
    }
 
@@ -364,6 +479,52 @@ class QnAPlugin extends Gdn_Plugin {
                'Discussion', 
                $DiscussionSet, 
                array('DiscussionID' => $Comment['DiscussionID']));
+         
+         // Determine QnA change
+         if ($Comment['QnA'] != $QnA) {
+
+            $Change = 0;
+            switch ($QnA) {
+               case 'Rejected':
+                  $Change = -1;
+                  if ($Comment['QnA'] != 'Accepted') $Change = 0;
+                  break;
+
+               case 'Accepted':
+                  $Change = 1;
+                  break;
+
+               default:
+                  if ($Comment['QnA'] == 'Rejected') $Change = 0;
+                  if ($Comment['QnA'] == 'Accepted') $Change = -1;
+                  break;
+            }
+
+         }
+
+         // Apply change effects
+         if ($Change) {
+
+            // Update the user
+            $UserID = GetValue('InsertUserID', $Comment);
+            $User = Gdn::UserModel()->GetID($UserID);
+            $AcceptedAnswers = GetValue('CountAcceptedAnswers', $User, NULL);
+
+            if (!is_null($AcceptedAnswers)) {
+               $AcceptedAnswers += $Change;
+               $AcceptedAnswers = $AcceptedAnswers >= 0 ? $AcceptedAnswers : 0;
+               Gdn::UserModel()->SetField($UserID, 'CountAcceptedAnswers', $AcceptedAnswers);
+            }
+
+            // Update reactions
+            if ($this->Reactions) {
+               include_once(Gdn::Controller()->FetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
+               $Rm = new ReactionModel();
+
+               // If there's change, reactions will take care of it
+               $Rm->React('Comment', $Comment['CommentID'], 'AcceptAnswer');
+            }
+         }
 
          // Record the activity.
          if ($QnA == 'Accepted') {
@@ -419,7 +580,7 @@ class QnAPlugin extends Gdn_Plugin {
    public function _CommentOptions($Sender, $CommentID) {
       $Sender->Form = new Gdn_Form();
       
-      $Comment = $Sender->CommentModel->GetID($CommentID);
+      $Comment = $Sender->CommentModel->GetID($CommentID, DATASET_TYPE_ARRAY);
       
       if (!$Comment)
          throw NotFoundException('Comment');
@@ -434,7 +595,6 @@ class QnAPlugin extends Gdn_Plugin {
             $QnA = NULL;
          
          $CurrentQnA = GetValue('QnA', $Comment);
-         
          
 //         ->Column('DateAccepted', 'datetime', TRUE)
 //         ->Column('AcceptedUserID', 'int', TRUE)
@@ -452,6 +612,53 @@ class QnAPlugin extends Gdn_Plugin {
             
             $Sender->CommentModel->SetField($CommentID, $Set);
             $Sender->Form->SetValidationResults($Sender->CommentModel->ValidationResults());
+            
+            // Determine QnA change
+            if ($Comment['QnA'] != $QnA) {
+
+               $Change = 0;
+               switch ($QnA) {
+                  case 'Rejected':
+                     $Change = -1;
+                     if ($Comment['QnA'] != 'Accepted') $Change = 0;
+                     break;
+
+                  case 'Accepted':
+                     $Change = 1;
+                     break;
+
+                  default:
+                     if ($Comment['QnA'] == 'Rejected') $Change = 0;
+                     if ($Comment['QnA'] == 'Accepted') $Change = -1;
+                     break;
+               }
+
+            }
+            
+            // Apply change effects
+            if ($Change) {
+               
+               // Update the user
+               $UserID = GetValue('InsertUserID', $Comment);
+               $User = Gdn::UserModel()->GetID($UserID);
+               $AcceptedAnswers = GetValue('CountAcceptedAnswers', $User, NULL);
+
+               if (!is_null($AcceptedAnswers)) {
+                  $AcceptedAnswers += $Change;
+                  $AcceptedAnswers = $AcceptedAnswers >= 0 ? $AcceptedAnswers : 0;
+                  Gdn::UserModel()->SetField($UserID, 'CountAcceptedAnswers', $AcceptedAnswers);
+               }
+               
+               // Update reactions
+               if ($this->Reactions) {
+                  include_once(Gdn::Controller()->FetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
+                  $Rm = new ReactionModel();
+                  
+                  // If there's change, reactions will take care of it
+                  $Rm->React('Comment', $Comment['CommentID'], 'AcceptAnswer');
+               }
+            }
+            
          }
          
          // Recalculate the Q&A status of the discussion.
