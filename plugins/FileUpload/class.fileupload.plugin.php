@@ -414,16 +414,16 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    /**
-    * PostController_AfterCommentSave_Handler function.
+    * Attach files to a comment during save.
     * 
     * @access public
-    * @param mixed $Sender
-    * @return void
+    * @param object $Sender
+    * @param array $Args
     */
-   public function PostController_AfterCommentSave_Handler($Sender) {
-      if (!$Sender->EventArguments['Comment']) return;
+   public function PostController_AfterCommentSave_Handler($Sender, $Args) {
+      if (!$Args['Comment']) return;
       
-      $CommentID = $Sender->EventArguments['Comment']->CommentID;
+      $CommentID = $Args['Comment']->CommentID;
       $AttachedFilesData = Gdn::Request()->GetValue('AttachedUploads');
       $AllFilesData = Gdn::Request()->GetValue('AllUploads');
       
@@ -431,20 +431,41 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    /**
-    * PostController_AfterDiscussionSave_Handler function.
+    * Attach files to a discussion during save.
     * 
     * @access public
-    * @param mixed $Sender
-    * @return void
+    * @param object $Sender
+    * @param array $Args
     */
-   public function PostController_AfterDiscussionSave_Handler($Sender) {
-      if (!$Sender->EventArguments['Discussion']) return;
+   public function PostController_AfterDiscussionSave_Handler($Sender, $Args) {
+      if (!$Args['Discussion']) return;
       
-      $DiscussionID = $Sender->EventArguments['Discussion']->DiscussionID;
+      $DiscussionID = $Args['Discussion']->DiscussionID;
       $AttachedFilesData = Gdn::Request()->GetValue('AttachedUploads');
       $AllFilesData = Gdn::Request()->GetValue('AllUploads');
       
       $this->AttachAllFiles($AttachedFilesData, $AllFilesData, $DiscussionID, 'discussion');
+   }
+   
+   /**
+    * Attach files to a log entry; used when content is sent to moderation queue.
+    * 
+    * @access public
+    * @param object $Sender
+    * @param array $Args
+    */
+   public function LogModel_AfterInsert_Handler($Sender, $Args) {
+      // Only trigger if logging unapproved discussion or comment
+      $Type = GetValue('RecordType', GetValue('Log', $Args));
+      if (!in_array($Type, array('discussion', 'comment'))) 
+         return;
+      
+      // Attach file to the log entry
+      $LogID = GetValue('LogID', $Args);
+      $AttachedFilesData = Gdn::Request()->GetValue('AttachedUploads');
+      $AllFilesData = Gdn::Request()->GetValue('AllUploads');
+      
+      $this->AttachAllFiles($AttachedFilesData, $AllFilesData, $LogID, 'log');
    }
    
    /**
