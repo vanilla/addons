@@ -10,6 +10,7 @@
  *  1.5.6   Add hook for discussions/download.
  *  1.6     Fix the file upload plugin for external storage.
  *          Add file extensions to the non-image icons.
+ *  1.7     Add support for discussions and comments placed in moderation queue (Lincoln, Nov 2012)
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -20,7 +21,7 @@
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'Images and files may be attached to discussions and comments.',
-   'Version' => '1.6.1',
+   'Version' => '1.7.0',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -424,6 +425,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (!$Args['Comment']) return;
       
       $CommentID = $Args['Comment']->CommentID;
+      if (!$CommentID) return;
+      
       $AttachedFilesData = Gdn::Request()->GetValue('AttachedUploads');
       $AllFilesData = Gdn::Request()->GetValue('AllUploads');
       
@@ -441,6 +444,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (!$Args['Discussion']) return;
       
       $DiscussionID = $Args['Discussion']->DiscussionID;
+      if (!$DiscussionID) return;
+      
       $AttachedFilesData = Gdn::Request()->GetValue('AttachedUploads');
       $AllFilesData = Gdn::Request()->GetValue('AllUploads');
       
@@ -448,16 +453,19 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Attach files to a log entry; used when content is sent to moderation queue.
+    * Attach files to a log entry; used when new content is sent to moderation queue.
     * 
     * @access public
     * @param object $Sender
     * @param array $Args
     */
-   public function LogModel_AfterInsert_Handler($Sender, $Args) {
+   public function LogModel_AfterInsert_Handler($Sender, $Args) {      
       // Only trigger if logging unapproved discussion or comment
-      $Type = GetValue('RecordType', GetValue('Log', $Args));
-      if (!in_array($Type, array('discussion', 'comment'))) 
+      $Log = GetValue('Log', $Args);
+      $Type = strtolower(GetValue('RecordType', $Log));
+      $Operation = GetValue('Operation', $Log);
+      //die($Type.'|'.$Operation);
+      if (!in_array($Type, array('discussion', 'comment')) || $Operation != 'Pending') 
          return;
       
       // Attach file to the log entry
@@ -466,6 +474,27 @@ class FileUploadPlugin extends Gdn_Plugin {
       $AllFilesData = Gdn::Request()->GetValue('AllUploads');
       
       $this->AttachAllFiles($AttachedFilesData, $AllFilesData, $LogID, 'log');
+   }
+   
+   /**
+    * Attach files to record created by restoring a log entry.
+    * 
+    * This happens when a discussion or comment is approved.
+    * 
+    * @access public
+    * @param object $Sender
+    * @param array $Args
+    */
+   public function LogModel_AfterRestore_Handler($Sender, $Args) {
+      $Log = GetValue('Log', $Args);
+      
+      // Only trigger if restoring discussion or comment
+      $Type = strtolower(GetValue('RecordType', $Log));
+      if (!in_array($Type, array('discussion', 'comment')))
+         return;
+      
+      // Reassign media records from log entry to newly inserted content
+      $this->MediaModel()->Reassign(GetValue('LogID', $Log), 'log', GetValue('InsertID', $Args), $Type);
    }
    
    /**
@@ -573,13 +602,13 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    /**
-    * AttachFile function.
+    * Attach a file to a foreign table and ID.
     * 
     * @access protected
-    * @param mixed $FileID
-    * @param mixed $ForeignID
-    * @param mixed $ForeignType
-    * @return void
+    * @param int $FileID
+    * @param int $ForeignID
+    * @param string $ForeignType Lowercase.
+    * @return bool Whether attach was successful.
     */
    protected function AttachFile($FileID, $ForeignID, $ForeignType) {
       $Media = $this->MediaModel()->GetID($FileID);
