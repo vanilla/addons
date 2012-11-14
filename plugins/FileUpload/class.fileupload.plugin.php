@@ -464,7 +464,6 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Log = GetValue('Log', $Args);
       $Type = strtolower(GetValue('RecordType', $Log));
       $Operation = GetValue('Operation', $Log);
-      //die($Type.'|'.$Operation);
       if (!in_array($Type, array('discussion', 'comment')) || $Operation != 'Pending') 
          return;
       
