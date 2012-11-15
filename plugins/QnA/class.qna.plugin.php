@@ -110,6 +110,8 @@ class QnAPlugin extends Gdn_Plugin {
                'Description' => "When someone correctly answers a question, they are rewarded with this reaction."));
             
          }
+         
+         Gdn::Structure()->Reset();
       }
       
       // Define 'Answer' badges
