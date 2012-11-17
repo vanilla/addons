@@ -79,13 +79,13 @@ class FileUploadPlugin extends Gdn_Plugin {
    /**
     * Adds "Media" menu option to the Forum menu on the dashboard.
     */
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+   /*public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Forum', 'Forum');
       $Menu->AddLink('Forum', 'Media', 'plugin/fileupload', 'Garden.Settings.Manage');
-   }
+   }*/
    
-   public function PluginController_FileUpload_Create($Sender) {
+   /*public function PluginController_FileUpload_Create($Sender) {
       $Sender->Title('FileUpload');
       $Sender->AddSideMenu('plugin/fileupload');
       Gdn_Theme::Section('Dashboard');
@@ -93,7 +93,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $this->EnableSlicing($Sender);
       $this->Dispatch($Sender, $Sender->RequestArgs);
-   }
+   }*/
    
    public function Controller_Toggle($Sender) {
       $FileUploadStatus = Gdn::Config('Plugins.FileUpload.Enabled', FALSE);
