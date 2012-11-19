@@ -30,11 +30,13 @@ class IndexPhotosPlugin extends Gdn_Plugin {
    /**
     * Add OP name to start of discussion meta.
     */
-   public function DiscussionsController_AfterDiscussionLabels_Handler($Sender) {
-      echo '<span class="MItem DiscussionAuthor">'.UserAnchor($Sender->EventArguments['FirstUser']).'</span>';
+   public function DiscussionsController_AfterDiscussionLabels_Handler($Sender, $Args) {
+      if (GetValue('FirstUser', $Args))
+         echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
    }
-   public function CategoriesController_AfterDiscussionLabels_Handler($Sender) {
-      echo '<span class="MItem DiscussionAuthor">'.UserAnchor($Sender->EventArguments['FirstUser']).'</span>';
+   public function CategoriesController_AfterDiscussionLabels_Handler($Sender, $Args) {
+      if (GetValue('FirstUser', $Args))
+         echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
    }
 
    /**
