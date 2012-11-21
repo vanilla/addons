@@ -6,7 +6,7 @@ Installing sass
 
 1. Install sass with `sudo gem install sass`.
 2. Install compass with `sudo gem install compass`.
-3. Create a symlink to that points /Library/Ruby/Site/sass to this misc/sass directory.
+3. Create a symlink to that points /Library/Ruby/Site/sass to this addons/sass directory.
 
 
 Initializing a theme's design folder with compass.
