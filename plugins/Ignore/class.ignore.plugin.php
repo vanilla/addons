@@ -266,8 +266,8 @@ class IgnorePlugin extends Gdn_Plugin {
    }
    
    public function ProfileController_Render_Before($Sender) {
-      $Sender->AddJsFile($this->GetResource('js/ignore.js', FALSE, FALSE));
-      $Sender->AddCssFile($this->GetResource('design/ignore.css', FALSE, FALSE));
+      $Sender->AddJsFile('ignore.js', 'plugins/Ignore');
+      $Sender->AddCssFile('ignore.css', 'plugins/Ignore');
    }
    
    /**
@@ -286,8 +286,8 @@ class IgnorePlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-      $Sender->AddJsFile($this->GetResource('js/ignore.js', FALSE, FALSE));
-      $Sender->AddCssFile($this->GetResource('design/ignore.css', FALSE, FALSE));
+      $Sender->AddJsFile('ignore.js', 'plugins/Ignore');
+      $Sender->AddCssFile('ignore.css', 'plugins/Ignore');
    }
    
    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {

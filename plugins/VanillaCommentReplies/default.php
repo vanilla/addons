@@ -39,8 +39,8 @@ class VanillaCommentRepliesPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
-      $Sender->AddJsFile('/plugins/VanillaCommentReplies/replies.js');
-      $Sender->AddCssFile('/plugins/VanillaCommentReplies/style.css');
+      $Sender->AddJsFile('replies.js', 'plugins/VanillaCommentReplies');
+      $Sender->AddCssFile('style.css', 'plugins/VanillaCommentReplies');
       $this->ReplyModel = Gdn::Factory('ReplyModel');
       $RequestMethod = strtolower($Sender->RequestMethod);
       if (in_array($RequestMethod, array('index', 'comment'))) {

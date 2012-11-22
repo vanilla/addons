@@ -59,7 +59,7 @@ class VotingPlugin extends Gdn_Plugin {
 //			return;
 		
       $Sender->AddCSSFile('voting.css', 'plugins/Voting');
-		$Sender->AddJSFile('plugins/Voting/voting.js');
+		$Sender->AddJSFile('voting.js', 'plugins/Voting');
    }
 	public function DiscussionsController_Render_Before($Sender) {
 		$this->AddJsCss($Sender);

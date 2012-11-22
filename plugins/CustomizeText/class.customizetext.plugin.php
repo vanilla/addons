@@ -51,7 +51,7 @@ class CustomizeTextPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
       
       $Sender->AddSideMenu('settings/customizetext');
-		$Sender->AddJsFile('/js/library/jquery.autogrow.js');
+		$Sender->AddJsFile('jquery.autogrow.js');
       
       $Sender->Title('Customize Text');
 

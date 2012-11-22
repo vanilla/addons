@@ -81,8 +81,8 @@ class Vanoogle extends Gdn_Plugin {
         	'type' => 'text/javascript',
         	'id' => C("Plugins.Vanoogle.CSE")
         ));
-		$Sender->AddCssFile($this->GetResource('design/vanoogle.css', FALSE, FALSE));
-		$Sender->AddJsFile($this->GetResource('js/vanoogle.js', FALSE, FALSE));
+		$Sender->AddCssFile('vanoogle.css', 'plugins/Vanoogle');
+		$Sender->AddJsFile('vanoogle.js', 'plugins/Vanoogle');
 	}
 	
 	/**

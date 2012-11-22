@@ -309,7 +309,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       // Short circuit if not needed
       if ($this->Hide()) return;
       
-      $Controller->AddCssFile($this->GetResource('design/signature.css', FALSE, FALSE));
+      $Controller->AddCssFile('signature.css', 'plugins/Signature');
    }
    
    /** Deprecated in 2.1. */

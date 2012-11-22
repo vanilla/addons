@@ -159,8 +159,7 @@ class QuotesPlugin extends Gdn_Plugin {
 
    protected function PrepareController($Sender) {
       //if (!$this->RenderQuotes) return;
-      $Sender->AddJsFile($this->GetResource('js/quotes.js', FALSE, FALSE));
-//      $Sender->AddCssFile($this->GetResource('css/quotes.css', FALSE, FALSE));
+      $Sender->AddJsFile('quotes.js', 'plugins/Quotes');
    }
 
    /**
