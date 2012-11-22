@@ -9,6 +9,7 @@
  * Changes: 
  *  1.0     Initial release
  *  1.4     Add SimpleAPI hooks
+ *  1.4.1   Allow self-API access
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -19,7 +20,7 @@
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.4',
+   'Version' => '1.4.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -182,11 +183,13 @@ class SignaturesPlugin extends Gdn_Plugin {
     */
    
    public function Controller_Modify($Sender) {
-      $Sender->Permission('Garden.Users.Edit');
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
       $UserID = Gdn::Request()->Get('UserID');
+      if ($UserID != Gdn::Session()->UserID)
+         $Sender->Permission('Garden.Users.Edit');
+      
       $User = Gdn::UserModel()->GetID($UserID);
       if (!$User)
          throw new Exception("No such user '{$UserID}'", 404);

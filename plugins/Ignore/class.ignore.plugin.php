@@ -12,6 +12,7 @@
  *  1.0.2   Change Plugin.Ignore.MaxIgnores to Plugins.Ignore.MaxIgnores
  *  1.0.3   Fix usage of T() (or lack of usage in some cases)
  *  1.1     Add SimpleAPI hooks
+ *  1.1.1   Allow self-API access
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -21,7 +22,7 @@
 
 $PluginInfo['Ignore'] = array(
    'Description' => 'This plugin allows users to ignore others, filtering their comments out of discussions.',
-   'Version' => '1.1',
+   'Version' => '1.1.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -174,7 +175,6 @@ class IgnorePlugin extends Gdn_Plugin {
     */
    
    public function Controller_Add($Sender) {
-      $Sender->Permission('Garden.Users.Edit');
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
@@ -182,6 +182,9 @@ class IgnorePlugin extends Gdn_Plugin {
          throw new Exception(405);
       
       $UserID = Gdn::Request()->Get('UserID');
+      if ($UserID != Gdn::Session()->UserID)
+         $Sender->Permission('Garden.Users.Edit');
+      
       $User = Gdn::UserModel()->GetID($UserID);
       if (!$User)
          throw new Exception("No such user '{$UserID}'", 404);
@@ -216,11 +219,13 @@ class IgnorePlugin extends Gdn_Plugin {
    }
    
    public function Controller_Remove($Sender) {
-      $Sender->Permission('Garden.Users.Edit');
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
       $UserID = Gdn::Request()->Get('UserID');
+      if ($UserID != Gdn::Session()->UserID)
+         $Sender->Permission('Garden.Users.Edit');
+      
       $User = Gdn::UserModel()->GetID($UserID);
       if (!$User)
          throw new Exception("No such user '{$UserID}'", 404);
@@ -237,11 +242,13 @@ class IgnorePlugin extends Gdn_Plugin {
    }
    
    public function Controller_Restrict($Sender) {
-      $Sender->Permission('Garden.Users.Edit');
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
       $UserID = Gdn::Request()->Get('UserID');
+      if ($UserID != Gdn::Session()->UserID)
+         $Sender->Permission('Garden.Users.Edit');
+      
       $User = Gdn::UserModel()->GetID($UserID);
       if (!$User)
          throw new Exception("No such user '{$UserID}'", 404);
