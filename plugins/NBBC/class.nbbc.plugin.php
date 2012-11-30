@@ -10,7 +10,7 @@
 
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.0.8b',
+    'Version' => '1.0.9b',
     'RequiredApplications' => array('Vanilla' => '2.0.2a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -120,7 +120,14 @@ EOT;
       if (isset($params['name'])) {
          $username = trim($params['name']);
          $username = html_entity_decode($username, ENT_QUOTES, 'UTF-8');
-         $title = ConcatSep(' ', $title, Anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/' . rawurlencode($username)), T('Quote wrote', 'wrote'));
+         
+         $User = Gdn::UserModel()->GetByUsername($username);
+         if ($User)
+            $UserAnchor = UserAnchor($User);
+         else
+            $UserAnchor = Anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/' . rawurlencode($username));
+         
+         $title = ConcatSep(' ', $title, $UserAnchor, T('Quote wrote', 'wrote'));
       }
 
       if (isset($params['date']))
