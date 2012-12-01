@@ -19,7 +19,6 @@
  * @package Addons
  */
 
-// Define the plugin:
 $PluginInfo['Ignore'] = array(
    'Description' => 'This plugin allows users to ignore others, filtering their comments out of discussions.',
    'Version' => '1.1',
