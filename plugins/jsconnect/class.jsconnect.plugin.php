@@ -9,7 +9,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-   'Version' => '1.1.6',
+   'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -236,16 +236,31 @@ class JsConnectPlugin extends Gdn_Plugin {
             throw new Gdn_UserException(T("Signature invalid."), 400);
       }
 
-      $Form->AddHidden('JsConnect', $JsData);
-      $Form->SetFormValue('UniqueID', GetValue('uniqueid', $JsData));
+      
+      
+      // Map all of the standard jsConnect data.
+      $Map = array('uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'roles' => 'Roles');
+      foreach ($Map as $Key => $Value) {
+         $Form->SetFormValue($Value, GetValue($Key, $JsData, ''));
+      }
+      
+      // Now add any extended information that jsConnect might have sent.
+      $ExtData = array_diff_key($JsData, $Map);
+      
+      if (class_exists('SimpleAPIPlugin')) {
+         SimpleAPIPlugin::TranslatePost($ExtData);
+      }
+      
+      foreach ($ExtData as $Key => $Value) {
+         $Form->SetFormValue($Key, $Value);
+      }
+      
       $Form->SetFormValue('Provider', $client_id);
       $Form->SetFormValue('ProviderName', GetValue('Name', $Provider, ''));
-      $Form->SetFormValue('Name', GetValue('name', $JsData));
-      $Form->SetFormValue('Email', GetValue('email', $JsData));
-      $Form->SetFormValue('Photo', GetValue('photourl', $JsData, ''));
-      $Form->SetFormValue('Roles', GetValue('roles', $JsData, ''));
+      $Form->AddHidden('JsConnect', $JsData);
       
       $Sender->SetData('Verified', TRUE);
+      $Sender->SetData('Trusted', TRUE); // this is a trusted connection.
    }
 
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
