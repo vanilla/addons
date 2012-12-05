@@ -85,7 +85,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Menu->AddLink('Forum', 'Media', 'plugin/fileupload', 'Garden.Settings.Manage');
    }*/
    
-   /*public function PluginController_FileUpload_Create($Sender) {
+   public function PluginController_FileUpload_Create($Sender) {
       $Sender->Title('FileUpload');
       $Sender->AddSideMenu('plugin/fileupload');
       Gdn_Theme::Section('Dashboard');
@@ -93,9 +93,9 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $this->EnableSlicing($Sender);
       $this->Dispatch($Sender, $Sender->RequestArgs);
-   }*/
+   }
    
-   public function Controller_Toggle($Sender) {
+   /*public function Controller_Toggle($Sender) {
       $FileUploadStatus = Gdn::Config('Plugins.FileUpload.Enabled', FALSE);
 
       $Validation = new Gdn_Validation();
@@ -115,11 +115,11 @@ class FileUploadPlugin extends Gdn_Plugin {
          'FileUploadStatus'  => $FileUploadStatus
       ));
       $Sender->Render($this->GetView('toggle.php'));
-   }
+   }*/
    
-   public function Controller_Index($Sender) {
+   /*public function Controller_Index($Sender) {
       $Sender->Render('FileUpload', '', 'plugins/FileUpload');
-   }
+   }*/
    
    public function Controller_Delete($Sender) {
       list($Action, $MediaID) = $Sender->RequestArgs;
@@ -132,9 +132,11 @@ class FileUploadPlugin extends Gdn_Plugin {
       );
       
       $Media = $this->MediaModel()->GetID($MediaID);
-      
+      $ForeignTable = GetValue('ForeignTable', $Media);
+      $Permission = FALSE;
+
       // Get the category so we can figure out whether or not the user has permission to delete.
-      if (GetValue('ForeignTable', $Media) == 'discussion') {
+      if ($ForeignTable == 'discussion') {
          $PermissionCategoryID = Gdn::SQL()
             ->Select('c.PermissionCategoryID')
             ->From('Discussion d')
@@ -142,7 +144,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             ->Where('d.DiscussionID', GetValue('ForeignID', $Media))
             ->Get()->Value('PermissionCategoryID');
          $Permission = 'Vanilla.Discussions.Edit';
-      } else {
+      } elseif ($ForeignTable == 'comment') {
          $PermissionCategoryID = Gdn::SQL()
             ->Select('c.PermissionCategoryID')
             ->From('Comment cm')
