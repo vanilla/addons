@@ -9,7 +9,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
