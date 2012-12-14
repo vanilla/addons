@@ -248,7 +248,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       $ExtData = array_diff_key($JsData, $Map);
       
       if (class_exists('SimpleAPIPlugin')) {
-         SimpleAPIPlugin::TranslatePost($ExtData);
+         SimpleAPIPlugin::TranslatePost($ExtData, FALSE);
       }
       
       foreach ($ExtData as $Key => $Value) {
