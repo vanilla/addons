@@ -27,7 +27,10 @@ $PluginInfo['FileUpload'] = array(
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
    'MobileFriendly' => TRUE,
-   'RegisterPermissions' => array('Plugins.Attachments.Upload.Allow','Plugins.Attachments.Download.Allow'),
+   'RegisterPermissions' => array(
+      'Plugins.Attachments.Upload.Allow' => 'Garden.Profiles.Edit',
+      'Plugins.Attachments.Download.Allow' => 'Garden.Profiles.Edit'
+   ),
    //'SettingsUrl' => '/dashboard/plugin/fileupload',
    //'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Tim Gunter",
