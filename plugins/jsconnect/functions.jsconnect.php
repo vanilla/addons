@@ -103,12 +103,14 @@ function SignJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = FALSE
  * @since 1.1b
  */
 function JsHash($String, $Secure = TRUE) {
+   if ($Secure === TRUE)
+      $Secure = 'md5';
+   
    switch ($Secure) {
       case 'sha1':
          return sha1($String);
          break;
       case 'md5':
-      case TRUE:
       case FALSE:
          return md5($String);
       default:
