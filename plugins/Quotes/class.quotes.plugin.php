@@ -263,25 +263,8 @@ BLOCKQUOTE;
              'status' => 'failed'
          );
          $this->FormatQuote($Type, $ID, $QuoteData);
-
-         if ($QuoteData['status'] == 'success') {
-            switch ($QuoteData['format']) {
-               case 'Html':
-                  $Sender->Form->SetValue('Body', '<blockquote rel="' . $QuoteData['authorname'] . '">' . $QuoteData['body'] . "</blockquote>\n");
-                  break;
-               case 'BBCode':
-                  $QuoteAuthor = $QuoteData['authorname'];
-                  if (GetValue('type', $QuoteData) == 'comment')
-                     $QuoteAuthor .= ";{$QuoteData['typeid']}";
-
-                  $Sender->Form->SetValue('Body', '[quote="' . $QuoteAuthor . '"]' . $QuoteData['body'] . "[/quote]\n");
-                  break;
-               case 'Display':
-               case 'Text':
-               default:
-                  $Sender->Form->SetValue('Body', '> ' . $QuoteData['authorname'] . "\n> {$QuoteData['body']}\n");
-            }
-         }
+         if ($QuoteData['status'] == 'success')
+            $Sender->Form->SetValue('Body', "{$QuoteData['body']}\n");
       }
    }
 
