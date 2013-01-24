@@ -10,6 +10,7 @@
  *  1.0.1   Minor fixes for logic
  *  1.0.2   Fix repeat posting bug
  *  1.0.3   Change version requirement to 2.0.18.4
+ *  1.1.1   Fire 'Published' event after publication
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -329,7 +330,12 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
          if (!$this->EventArguments['Publish']) continue;
 
          $InsertID = $DiscussionModel->Save($DiscussionData);
-
+         
+         $this->EventArguments['DiscussionID'] = $InsertID;
+         $this->EventArguments['Vaidation'] = $DiscussionModel->Validation;
+         $this->FireEvent('Published');
+         
+         // Reset discussion validation
          $DiscussionModel->Validation->Results(TRUE);
       }
       
