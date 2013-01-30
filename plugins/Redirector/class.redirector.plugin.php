@@ -14,8 +14,8 @@
 // Define the plugin:
 $PluginInfo['Redirector'] = array(
    'Name' => 'Forum Redirector',
-   'Description' => "Adds 301 redirects for Vanilla from common forum platforms.",
-   'Version' => '1.0b',
+   'Description' => "Adds 301 redirects for Vanilla from common forum platforms. This redirector redirects urls from IPB, phpBB, punBB, smf, vBulletin, and Xenforo",
+   'Version' => '1.0.1b',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -25,11 +25,20 @@ $PluginInfo['Redirector'] = array(
 class RedirectorPlugin extends Gdn_Plugin {
    public static $Files = array(
       'forum' => array('RedirectorPlugin', 'forum_Filter'),
+      'forums' => array( // xenforo cateogry
+         '_arg0' => array('CategoryID', 'Filter' => array('RedirectorPlugin', 'XenforoID')),
+         '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'GetNumber'))
+         ),
       'forumdisplay.php' => array( // vBulletin category
          'f' => 'CategoryID',
          'page' => 'Page',
          '_arg0' => array('CategoryID', 'Filter' => array('RedirectorPlugin', 'RemoveID')),
          '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'GetNumber'))
+         ),
+      'index.php' => array( // smf
+         'board' => array('CategoryID', 'Filter' => array('RedirectorPlugin', 'SmfOffset')),
+         'topic' => array('DiscussionID', 'Filter' => array('RedirectorPlugin', 'SmfOffset')),
+         'action' => array('_', 'Filter' => array('RedirectorPlugin', 'SmfAction'))
          ),
       'member.php' => array( // vBulletin user
          'u' => 'UserID',
@@ -37,6 +46,9 @@ class RedirectorPlugin extends Gdn_Plugin {
          ),
       'memberlist.php' => array( // phpBB user
          'u' => 'UserID'
+         ),
+      'members' => array( // xenforo profile
+         '_arg0' => array('UserID', 'Filter' => array('RedirectorPlugin', 'XenforoID'))
          ),
       'post' => array( // punbb comment
          '_arg0' => 'CommentID'
@@ -49,6 +61,10 @@ class RedirectorPlugin extends Gdn_Plugin {
          'p' => 'CommentID',
          'page' => 'Page',
          '_arg0' => array('DiscussionID', 'Filter' => array('RedirectorPlugin', 'RemoveID')),
+         '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'GetNumber'))
+         ),
+      'threads' => array( // xenforo discussion
+         '_arg0' => array('DiscussionID', 'Filter' => array('RedirectorPlugin', 'XenforoID')),
          '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'GetNumber'))
          ),
       'topic' => array('RedirectorPlugin', 'topic_Filter'),
@@ -81,17 +97,29 @@ class RedirectorPlugin extends Gdn_Plugin {
       $Filename = '';
       while(count($Parts) > 0) {
          $V = array_pop($Parts);
-         if (preg_match('`.*\..*`', $V)) {
+         if (preg_match('`.*\.php`', $V)) {
             $Filename = $V;
             break;
          }
          
          array_unshift($After, $V);
       }
+      if ($Filename == 'index.php') {
+         // Some site have an index.php?the/path.
+         $TryPath = GetValue(0, array_keys($Get));
+         if (!$Get[$TryPath]) {
+            $After = array_merge(explode('/', $TryPath));
+            $Filename = '';
+         }
+      }
       
       if (!$Filename) {
          // There was no filename, so we can try the first folder as the filename.
-         $Filename = array_shift($After);
+         while (count($After) > 0) {
+            $Filename = array_shift($After);
+            if (isset(self::$Files[$Filename]))
+               break;
+         }
       }
       
       // Add the after parts to the array.
@@ -137,15 +165,22 @@ class RedirectorPlugin extends Gdn_Plugin {
             // Call the filter function to change the value.
             $R = call_user_func($Opts['Filter'], $Value, $Opts[0]);
             if (is_array($R)) {
-               // The filter can change the column name too.
-               $Opts[0] = $R[0];
-               $Value = $R[1];
+               if (isset($R[0])) {
+                  // The filter can change the column name too.
+                  $Opts[0] = $R[0];
+                  $Value = $R[1];
+               } else {
+                  // The filter can return return other variables too.
+                  $Vars = array_merge($Vars, $R);
+                  $Value = NULL;
+               }
             } else {
                $Value = $R;
             }
          }
          
-         $Vars[$Opts[0]] = $Value;
+         if ($Value !== NULL)
+            $Vars[$Opts[0]] = $Value;
       }
       
       Trace($Vars, 'Translated Arguments');
@@ -233,6 +268,24 @@ class RedirectorPlugin extends Gdn_Plugin {
       return NULL;
    }
    
+   public static function SmfAction($Value) {
+      if (preg_match('`(\w+);(\w+)=(\d+)`', $Value, $M)) {
+         switch (strtolower($M[1])) {
+            case 'profile':
+               return array('UserID', $M[3]);
+         }
+      }
+   }
+   
+   public static function SmfOffset($Value, $Key) {
+      if (preg_match('`(\d+)\.(\d+)`', $Value, $M)) {
+         return array($Key => $M[1], 'Offset' => $M[2]);
+      }
+      if (preg_match('`\d+\.msg(\d+)`', $Value, $M)) {
+         return array('CommentID' => $M[1]);
+      }
+   }
+   
    public static function topic_Filter($Get) {
       if (GetValue('_arg2', $Get) == 'page') {
          // This is a punbb style topic.
@@ -248,5 +301,11 @@ class RedirectorPlugin extends Gdn_Plugin {
             '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'IPBPageNumber'))
             );
       }
+   }
+   
+   public static function XenforoID($Value) {
+      if (preg_match('`(\d+)$`', $Value, $Matches))
+         return $Matches[1];
+      return $Value;
    }
 }
