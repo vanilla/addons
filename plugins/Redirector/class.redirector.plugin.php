@@ -109,6 +109,7 @@ class RedirectorPlugin extends Gdn_Plugin {
          $TryPath = GetValue(0, array_keys($Get));
          if (!$Get[$TryPath]) {
             $After = array_merge(explode('/', $TryPath));
+            unset($Get[$TryPath]);
             $Filename = '';
          }
       }
@@ -190,23 +191,40 @@ class RedirectorPlugin extends Gdn_Plugin {
       $Result = FALSE;
       if (isset($Vars['CommentID'])) {
          Trace("Looking up comment {$Vars['CommentID']}.");
+         
          $CommentModel = new CommentModel();
          $Comment = $CommentModel->GetID($Vars['CommentID']);
          if ($Comment)
             $Result = CommentUrl($Comment, '//');
       } elseif (isset($Vars['DiscussionID'])) {
          Trace("Looking up discussion {$Vars['DiscussionID']}.");
+         
+         
          $DiscussionModel = new DiscussionModel();
-         $Discussion = $DiscussionModel->GetID($Vars['DiscussionID']);
+         $DiscussionID = $Vars['DiscussionID'];
+         $Discussion = FALSE;
+         
+         if (is_numeric($DiscussionID)) {
+            $Discussion = $DiscussionModel->GetID($Vars['DiscussionID']);
+         } else {
+            // This is a slug style discussion ID. Let's see if there is a UrlCode column in the discussion table.
+            $DiscussionModel->DefineSchema();
+            if ($DiscussionModel->Schema->FieldExists('Discussion', 'UrlCode')) {
+               $Discussion = $DiscussionModel->GetWhere(array('UrlCode' => $DiscussionID))->FirstRow();
+            }
+         }
+         
          if ($Discussion)
             $Result = DiscussionUrl($Discussion, self::PageNumber($Vars, 'Vanilla.Comments.PerPage'), '//');
       } elseif (isset($Vars['UserID'])) {
          Trace("Looking up user {$Vars['UserID']}.");
+         
          $User = Gdn::UserModel()->GetID($Vars['UserID']);
          if ($User)
             $Result = Url(UserUrl($User), '//');
       } elseif (isset($Vars['CategoryID'])) {
          Trace("Looking up category {$Vars['CategoryID']}.");
+         
          $Category = CategoryModel::Categories($Vars['CategoryID']);
          if ($Category)
             $Result = CategoryUrl($Category, self::PageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
@@ -222,6 +240,11 @@ class RedirectorPlugin extends Gdn_Plugin {
             '_arg0' => 'CategoryID',
             '_arg3' => 'Page'
             );
+      } elseif (GetValue('_arg1', $Get) == 'page') {
+         // This is a bbPress style forum.
+         return array(
+            '_arg0' => 'CategoryID',
+            '_arg2' => 'Page');
       } else {
          // This is an ipb style topic.
          return array(
@@ -293,6 +316,11 @@ class RedirectorPlugin extends Gdn_Plugin {
             '_arg0' => 'DiscussionID',
             '_arg3' => 'Page'
             );
+      } elseif (GetValue('_arg1', $Get) == 'page') {
+         // This is a bbPress style topc.
+         return array(
+            '_arg0' => 'DiscussionID',
+            '_arg2' => 'Page');
       } else {
          // This is an ipb style topic.
          return array(
