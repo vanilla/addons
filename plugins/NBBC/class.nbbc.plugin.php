@@ -177,8 +177,8 @@ EOT;
          return htmlspecialchars($params['_tag']) . $content . htmlspecialchars($params['_endtag']);
    }
 
-   public function Format($String) {
-      $Result = $this->NBBC()->Parse($String);
+   public function Format($Result) {
+      $Result = $this->NBBC()->Parse($Result);
       return $Result;
    }
    
