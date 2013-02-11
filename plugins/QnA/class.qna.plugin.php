@@ -341,6 +341,9 @@ class QnAPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender, $Args) {
+      if ($Sender->Data('Discussion.QnA'))
+         $Sender->CssClass .= ' Question';
+      
       if (strcasecmp($Sender->Data('Discussion.QnA'), 'Accepted') != 0)
          return;
       
