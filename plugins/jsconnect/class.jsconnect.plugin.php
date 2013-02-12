@@ -239,9 +239,13 @@ class JsConnectPlugin extends Gdn_Plugin {
       
       
       // Map all of the standard jsConnect data.
-      $Map = array('uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'roles' => 'Roles');
+      $Map = array('uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo');
       foreach ($Map as $Key => $Value) {
          $Form->SetFormValue($Value, GetValue($Key, $JsData, ''));
+      }
+      
+      if (isset($JsData['roles'])) {
+         $Form->SetFormValue('Roles', $JsData['roles']);
       }
       
       // Now add any extended information that jsConnect might have sent.
