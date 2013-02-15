@@ -56,6 +56,11 @@ echo $this->Form->Open(), $this->Form->Errors();
      ?>
    </li>
    <li>
+      <?php
+         echo $this->Form->CheckBox('Trusted', 'This is trusted connection and can sync roles & permissions.');
+      ?>
+   </li>
+   <li>
       <h2>Advanced</h2>
    </li>
    <li>

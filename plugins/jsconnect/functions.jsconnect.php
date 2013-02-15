@@ -121,3 +121,23 @@ function JsHash($String, $Secure = TRUE) {
 function JsTimestamp() {
    return time();
 }
+
+/**
+ * Generate an SSO string suitible for passing in the url for embedded SSO.
+ * 
+ * @param array $User The user to sso.
+ * @param string $ClientID Your client ID.
+ * @param string $Secret Your secret.
+ * @return string
+ */
+function JsSSOString($User, $ClientID, $Secret) {
+   if (!isset($User['client_id']))
+      $User['client_id'] = $ClientID;
+   
+   $String = base64_encode(json_encode($User));
+   $Timestamp = time();
+   $Hash = hash_hmac('sha1', "$String $Timestamp", $Secret);
+   
+   $Result = "$String $Hash $Timestamp hmacsha1";
+   return $Result;
+}

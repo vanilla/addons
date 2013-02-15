@@ -264,7 +264,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       $Form->AddHidden('JsConnect', $JsData);
       
       $Sender->SetData('Verified', TRUE);
-      $Sender->SetData('Trusted', TRUE); // this is a trusted connection.
+      $Sender->SetData('Trusted', GetValue('Trusted', $Provider, TRUE)); // this is a trusted connection.
    }
 
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
@@ -431,7 +431,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $Values = ArrayTranslate($Values, array('Name', 'AuthenticationKey', 'URL', 'AssociationSecret', 'AuthenticateUrl', 'SignInUrl', 'RegisterUrl'));
             $Values['AuthenticationSchemeAlias'] = 'jsconnect';
             $Values['AssociationHashMethod'] = 'md5';
-            $Values['Attributes'] = serialize(array('HashType' => $Form->GetFormValue('HashType'), 'TestMode' => $Form->GetFormValue('TestMode')));
+            $Values['Attributes'] = serialize(array('HashType' => $Form->GetFormValue('HashType'), 'TestMode' => $Form->GetFormValue('TestMode'), 'Trusted' => $Form->GetFormValue('Trusted', 0)));
 
             if ($Form->ErrorCount() == 0) {
                if ($client_id) {
@@ -446,8 +446,11 @@ class JsConnectPlugin extends Gdn_Plugin {
       } else {
          if ($client_id) {
             $Provider = self::GetProvider($client_id);
-            $Form->SetData($Provider);
+            TouchValue('Trusted', $Provider, 1);
+         } else {
+            $Provider = array();
          }
+         $Form->SetData($Provider);
       }
 
       $Sender->SetData('Title', sprintf(T($client_id ? 'Edit %s' : 'Add %s'), T('Connection')));
