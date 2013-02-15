@@ -30,6 +30,10 @@ class SpoilersPlugin extends Gdn_Plugin {
       // Whether to handle drawing quotes or leave it up to some other plugin
       $this->RenderSpoilers = C('Plugins.Spoilers.RenderSpoilers',TRUE);
    }
+   
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('spoilers.css', 'plugins/Spoilers');
+   }
 
    public function DiscussionController_Render_Before(&$Sender) {
       $this->PrepareController($Sender);
@@ -42,8 +46,8 @@ class SpoilersPlugin extends Gdn_Plugin {
    protected function PrepareController(&$Sender) {
       //if (!$this->RenderSpoilers) return;
       $Sender->AddJsFile('spoilers.js', 'plugins/Spoilers');
-      $Sender->AddCssFile('spoilers.css', 'plugins/Spoilers');
    }
+   
    
    public function DiscussionController_AfterCommentFormat_Handler(&$Sender) {
       $this->RenderSpoilers($Sender);
