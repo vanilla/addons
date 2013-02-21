@@ -31,7 +31,7 @@ $(document).ready(function() {
    var expando = function(dontSave) {
       var $this = $(this);
       var $container = $this.closest('div');
-      var $item = $('h2, h4', $container).next();
+      var $item = $('h2', $container).next();
       var id = $container.attr('id');
       
       if ($container.hasClass('Expando-Collapsed')) {
@@ -61,7 +61,7 @@ $(document).ready(function() {
       var isCollapsed = collapsed.indexOf(id) >= 0;
       if (isCollapsed) {
          $(this).addClass('Expando-Collapsed');
-         $('h2, h4', $(this)).next().hide();
+         $('h2', $(this)).next().hide();
       }
    });
    
