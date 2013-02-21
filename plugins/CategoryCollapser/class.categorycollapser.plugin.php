@@ -4,7 +4,7 @@
 $PluginInfo['CategoryCollapser'] = array(
    'Name' => 'Category Collapser',
    'Description' => 'Allows categories to be collapsed and expanded. Requires using category table view and displaying root categories as headings.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'Author' => "Vanilla Forums",
    'AuthorUrl' => 'http://vanillaforums.com',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
