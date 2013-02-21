@@ -56,7 +56,7 @@ $(document).ready(function() {
    // Add collapserts to category groups.
    $('.CategoryGroup, #WhosOnline').each(function() {
       var id = $(this).attr('id');
-      $('h2, h4', this).append(' <span class="Expando" rel="'+id+'">+</span>');
+      $('h2', this).append(' <span class="Expando" rel="'+id+'">+</span>');
       
       var isCollapsed = collapsed.indexOf(id) >= 0;
       if (isCollapsed) {
