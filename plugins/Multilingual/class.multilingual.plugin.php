@@ -50,6 +50,14 @@ class MultilingualPlugin extends Gdn_Plugin {
    }
    
    /**
+    * Build footer link to change locale.
+    */
+   public function BuildLocaleLink($Name, $UrlCode) {
+      $Url = 'profile/setlocale/'.$UrlCode.'/'.Gdn::Session()->TransientKey();
+      return Wrap(Anchor(ucwords($Name), $Url), 'span', array('class' => 'LocaleOption'));
+   }
+   
+   /**
     * Show alternate locale options in Foot.
     */
    public function Base_Render_Before($Sender) {
@@ -60,18 +68,24 @@ class MultilingualPlugin extends Gdn_Plugin {
       // Get locales
       $LocaleModel = new LocaleModel();
       $Options = $LocaleModel->EnabledLocalePacks();
-      $Options['English'] = 'en-CA'; // Hackily include the default
-      
+      $Locales = $LocaleModel->AvailableLocalePacks();
+            
       // Build & add links
       $Links = T('Change language').': ';
-      foreach ($Options as $LocaleName => $Code) {
-         $Links .= Wrap(Anchor(ucwords($LocaleName), 'profile/setlocale/'.$Code.'/'.Gdn::Session()->TransientKey()), 'span', array('class' => 'LocaleOption'));
+      foreach ($Options as $Slug => $Code) {
+         $LocaleInfo = GetValue($Slug, $Locales);
+         $LocaleName = str_replace(' Transifex', '' , GetValue('Name', $LocaleInfo)); // No 'Transifex' in names, pls.
+         $Links .= $this->BuildLocaleLink($LocaleName, $Code);
       }
-      $Links = Wrap($Links, 'div', array('class' => 'LocaleOptions'));
-      $Sender->AddAsset('Foot', $Links);
+      
+      // Hackily add English option
+      $Links .= $this->BuildLocaleLink('English', 'en-CA');
+      
+      $LocaleLinks = Wrap($Links, 'div', array('class' => 'LocaleOptions'));
+      $Sender->AddAsset('Foot', $LocaleLinks);
       
       // Add a simple style
-      $Sender->AddAsset('Head', '<style>.LocaleOption { padding-right: 7px; } .Dashboard .LocaleOptions { display: none; }</style>');
+      $Sender->AddAsset('Head', '<style>.LocaleOption { padding-left: 10px; } .Dashboard .LocaleOptions { display: none; }</style>');
    }
    
    /**

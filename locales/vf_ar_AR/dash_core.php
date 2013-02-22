@@ -1,9 +1,7 @@
 <?php
 
-$Definition['%1$s %2$s'] = '%1$s %2$s';
 $Definition['%1$s Version %2$s'] = '%1$s إصدار %2$s';
 $Definition['%1$s version %2$s is available.'] = '%1$s الإصدار %2$s متوفر.';
-$Definition['%s Connect'] = '%s إتصال';
 $Definition['%s is not a valid email address'] = '%s ليس بريدا إلكترونيا سليما';
 $Definition['%s item in queue'] = '%s عنصر في قائمة الإنتظار';
 $Definition['%s level'] = '%s مستوى';
@@ -16,7 +14,6 @@ $Definition['%s times'] = '%s مرات';
 $Definition['%s unavailable'] = '%s غير متوفر';
 $Definition['%s years.'] = '%s سنوات.';
 
-$Definition['(YYYY-mm-dd)'] = '(YYYY-mm-dd)';
 $Definition['(less)'] = '(أقل)';
 $Definition['(more)'] = '(أكثر)';
 
@@ -47,20 +44,19 @@ $Definition['Add %s'] = 'اضافه %s';
 $Definition['Add Connection'] = 'إضافة اتصال';
 $Definition['Add Info &amp; Create Account'] = 'إضافة معلومات &amp; إنشاء حساب';
 $Definition['Add Item'] = 'أضف عنصرا';
+$Definition['AdvancedNotifications'] = 'إخطارات متقدمة';
 
-$Definition['Click a tag name to edit. Click x to remove.'] = 'Click a tag name to edit. Click x to remove.';
+$Definition['Browse for a new banner logo if you would like to change it:'] = 'LogoBrowse';
 
-$Definition['None'] = 'None';
+$Definition['Comments Page'] = 'صفحة التعليقات';
+$Definition['Condition Type'] = 'نوع';
 
-$Definition['On'] = 'On';
+$Definition['Mixed Layout'] = 'تخطيط مختلط';
 
-$Definition['Plugins.Tagging.Enabled'] = 'Plugins.Tagging.Enabled';
+$Definition['Reveal Password'] = 'كشف كلمة المرور';
 
-$Definition['SMTP Host'] = 'SMTP Host';
-$Definition['SMTP Port'] = 'SMTP Port';
-$Definition['SMTP User'] = 'SMTP User';
-$Definition['Sink'] = 'Sink';
+$Definition['Site Description'] = 'وصف الموقع';
+
+$Definition['Test Mode: The pocket will only be displayed for pocket administrators.'] = 'Test Mode';
 
 $Definition['Use an SMTP server to send email'] = 'Use an SMTP server to send email.';
-
-$Definition['We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.'] = 'We will attempt to use the local mail server to send email by default. If you want to use a separate SMTP mail server, you can configure it below.';

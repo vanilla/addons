@@ -9,7 +9,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-   'Version' => '1.1.6',
+   'Version' => '1.2.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -70,11 +70,11 @@ class JsConnectPlugin extends Gdn_Plugin {
       if (GetValue('NoConnectLabel', $Options)) {
          $ConnectLabel = '';
       } else {
-         $ConnectLabel = '<span class="Username"></span><div class="ConnectLabel">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div>';
+         $ConnectLabel = '<span class="Username"></span><div class="ConnectLabel TextColor">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div>';
       }
 
       $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">
-         <div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button SignInLink').$RegisterLink.'</div>
+         <div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button Primary SignInLink').$RegisterLink.'</div>
          <div class="JsConnect-Connect"><a class="'.$PopupWindow.' NoMSIE ConnectLink" popupHeight="300" popupWidth="600">'.Img('http://cdn.vanillaforums.com/images/usericon_50.png', array('class' => 'ProfilePhotoSmall UserPhoto')).
             $ConnectLabel.
          '</a></div>
@@ -236,16 +236,35 @@ class JsConnectPlugin extends Gdn_Plugin {
             throw new Gdn_UserException(T("Signature invalid."), 400);
       }
 
-      $Form->AddHidden('JsConnect', $JsData);
-      $Form->SetFormValue('UniqueID', GetValue('uniqueid', $JsData));
+      
+      
+      // Map all of the standard jsConnect data.
+      $Map = array('uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo');
+      foreach ($Map as $Key => $Value) {
+         $Form->SetFormValue($Value, GetValue($Key, $JsData, ''));
+      }
+      
+      if (isset($JsData['roles'])) {
+         $Form->SetFormValue('Roles', $JsData['roles']);
+      }
+      
+      // Now add any extended information that jsConnect might have sent.
+      $ExtData = array_diff_key($JsData, $Map);
+      
+      if (class_exists('SimpleAPIPlugin')) {
+         SimpleAPIPlugin::TranslatePost($ExtData, FALSE);
+      }
+      
+      foreach ($ExtData as $Key => $Value) {
+         $Form->SetFormValue($Key, $Value);
+      }
+      
       $Form->SetFormValue('Provider', $client_id);
       $Form->SetFormValue('ProviderName', GetValue('Name', $Provider, ''));
-      $Form->SetFormValue('Name', GetValue('name', $JsData));
-      $Form->SetFormValue('Email', GetValue('email', $JsData));
-      $Form->SetFormValue('Photo', GetValue('photourl', $JsData, ''));
-      $Form->SetFormValue('Roles', GetValue('roles', $JsData, ''));
+      $Form->AddHidden('JsConnect', $JsData);
       
       $Sender->SetData('Verified', TRUE);
+      $Sender->SetData('Trusted', GetValue('Trusted', $Provider, TRUE)); // this is a trusted connection.
    }
 
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
@@ -412,7 +431,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $Values = ArrayTranslate($Values, array('Name', 'AuthenticationKey', 'URL', 'AssociationSecret', 'AuthenticateUrl', 'SignInUrl', 'RegisterUrl'));
             $Values['AuthenticationSchemeAlias'] = 'jsconnect';
             $Values['AssociationHashMethod'] = 'md5';
-            $Values['Attributes'] = serialize(array('HashType' => $Form->GetFormValue('HashType'), 'TestMode' => $Form->GetFormValue('TestMode')));
+            $Values['Attributes'] = serialize(array('HashType' => $Form->GetFormValue('HashType'), 'TestMode' => $Form->GetFormValue('TestMode'), 'Trusted' => $Form->GetFormValue('Trusted', 0)));
 
             if ($Form->ErrorCount() == 0) {
                if ($client_id) {
@@ -427,8 +446,11 @@ class JsConnectPlugin extends Gdn_Plugin {
       } else {
          if ($client_id) {
             $Provider = self::GetProvider($client_id);
-            $Form->SetData($Provider);
+            TouchValue('Trusted', $Provider, 1);
+         } else {
+            $Provider = array();
          }
+         $Form->SetData($Provider);
       }
 
       $Sender->SetData('Title', sprintf(T($client_id ? 'Edit %s' : 'Add %s'), T('Connection')));

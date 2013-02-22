@@ -22,7 +22,7 @@ class SupportTrackerPlugin extends Gdn_Plugin {
       if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
          $DiscussionModel = new DiscussionModel();
          $Active = $Controller->RequestMethod == 'unanswered' ? ' Active' : '';
-         $Unanswered = T('Unanswered').FilterCountString($DiscussionModel->UnansweredCount());
+         $Unanswered = Sprite('SpUnansweredQuestionsSpUnansweredQuestions').' '.T('Unanswered').FilterCountString($DiscussionModel->UnansweredCount());
          echo '<li class="Unanswered '.$Active.'">'.Anchor($Unanswered, 'discussions/unanswered').'</li>';
       }
    }

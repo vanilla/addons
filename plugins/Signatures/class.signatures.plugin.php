@@ -1,18 +1,25 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
 
-// Define the plugin:
+/**
+ * Signatures Plugin
+ * 
+ * This plugin allows users to maintain a 'Signature' which is automatically
+ * appended to all discussions and comments they make.
+ * 
+ * Changes: 
+ *  1.0     Initial release
+ *  1.4     Add SimpleAPI hooks
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Addons
+ */
+
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.3',
+   'Version' => '1.4',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -29,6 +36,25 @@ $PluginInfo['Signatures'] = array(
 class SignaturesPlugin extends Gdn_Plugin {
    public $Disabled = FALSE;
    
+   /**
+    * Add mapper methods
+    * 
+    * @param SimpleApiPlugin $Sender
+    */
+   public function SimpleApiPlugin_Mapper_Handler($Sender) {
+      switch ($Sender->Mapper->Version) {
+         case '1.0':
+            $Sender->Mapper->AddMap(array(
+               'signature/get'         => 'dashboard/profile/signature/modify',
+               'signature/set'         => 'dashboard/profile/signature/modify',
+            ), NULL, array(
+               'signature/get'         => array('Signature'),
+               'signature/set'         => array('Success'),
+            ));
+            break;
+      }
+   }
+   
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
       if (!Gdn::Session()->CheckPermission(array(
          'Garden.SignIn.Allow',
@@ -41,13 +67,26 @@ class SignaturesPlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', Sprite('SpSignatures').T('Signature Settings'), '/profile/signature', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpSignatures').' '.T('Signature Settings'), '/profile/signature', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', Sprite('SpSignatures').T('Signature Settings'), UserUrl($Sender->User, '', 'signature'), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpSignatures').' '.T('Signature Settings'), UserUrl($Sender->User, '', 'signature'), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
    
+   /**
+    * Profile settings
+    * 
+    * @param ProfileController $Sender 
+    */
    public function ProfileController_Signature_Create($Sender) {
+      $Sender->Permission('Garden.SignIn.Allow');
+      $Sender->Title('Signature Settings');
+      
+      $this->Dispatch($Sender);
+   }
+   
+   
+   public function Controller_Index($Sender) {
       $Sender->Permission(array(
          'Garden.Profiles.Edit',
          'Plugins.Signatures.Edit'
@@ -60,6 +99,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Args = array_slice($Args, 0, 2);
       
       list($UserReference, $Username) = $Args;
+      
       $Sender->Permission('Plugins.Signatures.Edit');
       $Sender->GetUserInfo($UserReference, $Username);
       $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
@@ -72,8 +112,8 @@ class SignaturesPlugin extends Gdn_Plugin {
          'Plugin.Signatures.Sig'          => NULL,
          'Plugin.Signatures.HideAll'      => NULL,
          'Plugin.Signatures.HideImages'   => NULL,
-         'Plugin.Signatures.HideMobile' => NULL,
-         'Plugin.Signatures.Format' => NULL
+         'Plugin.Signatures.HideMobile'   => NULL,
+         'Plugin.Signatures.Format'       => NULL
       );
       $SigUserID = $ViewingUserID = Gdn::Session()->UserID;
       
@@ -93,9 +133,11 @@ class SignaturesPlugin extends Gdn_Plugin {
       // Set the model on the form.
       $Sender->Form->SetModel($ConfigurationModel);
       
+      $Data = $ConfigurationModel->Data;
+      $Sender->SetData('Signature', $Data);
+      
       // If seeing the form for the first time...
-      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
-         $Data = $ConfigurationModel->Data;
+      if ($Sender->Form->IsPostBack() === FALSE) {
          $Data['Body'] = GetValue('Plugin.Signatures.Sig', $Data);
          $Data['Format'] = GetValue('Plugin.Signatures.Format', $Data);
          
@@ -118,7 +160,6 @@ class SignaturesPlugin extends Gdn_Plugin {
             foreach ($FrmValues as $UserMetaKey => $UserMetaValue) {
                $Key = $this->TrimMetaKey($UserMetaKey);
                
-               
                switch ($Key) {
                   case 'Format':
                      if (strcasecmp($UserMetaValue, 'Raw') == 0)
@@ -133,7 +174,62 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Sender->InformMessage(T("Your changes have been saved."));
       }
 
-      $Sender->Render($this->GetView('signature.php'));
+      $Sender->Render('signature', '', 'plugins/Signatures');
+   }
+   
+   /*
+    * API METHODS
+    */
+   
+   public function Controller_Modify($Sender) {
+      $Sender->Permission('Garden.Users.Edit');
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      $UserID = Gdn::Request()->Get('UserID');
+      $User = Gdn::UserModel()->GetID($UserID);
+      if (!$User)
+         throw new Exception("No such user '{$UserID}'", 404);
+         
+      $Translation = array(
+         'Plugin.Signatures.Sig'          => 'Body',
+         'Plugin.Signatures.Format'       => 'Format',
+         'Plugin.Signatures.HideAll'      => 'HideAll',
+         'Plugin.Signatures.HideImages'   => 'HideImages',
+         'Plugin.Signatures.HideMobile'   => 'HideMobile'
+      );
+         
+      $UserMeta = $this->GetUserMeta($UserID, '%');
+      $SigData = array();
+      foreach ($Translation as $TranslationField => $TranslationShortcut)
+         $SigData[$TranslationShortcut] = GetValue($TranslationField, $UserMeta, NULL);
+
+      $Sender->SetData('Signature', $SigData);
+      
+      if ($Sender->Form->IsPostBack()) {
+         $Sender->SetData('Success', FALSE);
+         foreach ($Translation as $TranslationField => $TranslationShortcut) {
+            $UserMetaValue = $Sender->Form->GetValue($TranslationShortcut, NULL);
+            if (is_null($UserMetaValue)) continue;
+            
+            if ($TranslationShortcut == 'Body' && empty($UserMetaValue))
+               $UserMetaValue = NULL;
+            
+            $Key = $this->TrimMetaKey($TranslationField);
+
+            switch ($Key) {
+               case 'Format':
+                  if (strcasecmp($UserMetaValue, 'Raw') == 0)
+                     $UserMetaValue = NULL; // don't allow raw signatures.
+               break;
+            }
+
+            $this->SetUserMeta($UserID, $Key, $UserMetaValue);
+         }
+         $Sender->SetData('Success', TRUE);
+      }
+      
+      $Sender->Render();
    }
    
    protected function UserPreferences($SigKey = NULL, $Default = NULL) {

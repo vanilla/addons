@@ -90,7 +90,11 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
    }
 
+   /**
+    * Censor words in discussions / comments.
+    */
    public function DiscussionController_Render_Before($Sender, $Args) {
+      // Process OP
       $Discussion = GetValue('Discussion', $Sender);
       if ($Discussion) {
          $Discussion->Name = $this->Replace($Discussion->Name);
@@ -98,10 +102,17 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $Discussion->Body = $this->Replace($Discussion->Body);
          }
       }
-
-      if (isset($Sender->CommentData)) {
-         $CommentData = $Sender->CommentData->Result();
-         foreach ($CommentData as $Comment) {
+      
+      // Get comments (2.1+)
+      $Comments = $Sender->Data('Comments');
+      
+      // Backwards compatibility to 2.0.18
+      if (isset($Sender->CommentData)) 
+         $Comments = $Sender->CommentData->Result();
+      
+      // Process comments
+      if ($Comments) {
+         foreach ($Comments as $Comment) {
             $Comment->Body = $this->Replace($Comment->Body);
          }
       }

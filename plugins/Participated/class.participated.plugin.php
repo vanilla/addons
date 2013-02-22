@@ -105,16 +105,11 @@ class ParticipatedPlugin extends Gdn_Plugin {
    }
       
    /**
-    * Add navigation tab.
+    * Add navigation tab (DEPRECATED).
     */
    public function AddParticipatedTab($Sender) {
-      $Count = $this->GetCountParticipated();
-      if ($Count > 0) {
-         $MyParticipated = T('Participated Discussions');
-         if (C('Vanilla.Discussions.ShowCounts', TRUE))
-            $MyParticipated .= '<span>'.$Count.'</span>';
-         echo ' <li '.(($Sender->RequestMethod == 'participated') ? ' class="Active"' : '').'>'.Anchor($MyParticipated, '/discussions/participated', 'MyParticipated TabLink').'</li> ';
-      }
+      $MyParticipated = T('Participated Discussions');
+      echo ' <li '.(($Sender->RequestMethod == 'participated') ? ' class="Active"' : '').'>'.Anchor($MyParticipated, '/discussions/participated', 'MyParticipated TabLink').'</li> ';
    }
    public function DiscussionsController_AfterDiscussionTabs_Handler($Sender) {
       $this->AddParticipatedTab($Sender);
@@ -124,6 +119,19 @@ class ParticipatedPlugin extends Gdn_Plugin {
    }
    public function DraftsController_AfterDiscussionTabs_Handler($Sender) {
       $this->AddParticipatedTab($Sender);
+   }
+   
+   /**
+    * New navigation menu item.
+    *
+    * @since 2.1
+    */
+   public function Base_AfterDiscussionFilters_Handler($Sender) {
+      // Participated
+      $CssClass = 'Participated';
+      if (strtolower(Gdn::Controller()->ControllerName) == 'discussionscontroller' && strtolower(Gdn::Controller()->RequestMethod) == 'participated')
+         $CssClass .= ' Active';
+      echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpParticipated').T('Participated'), '/discussions/participated').'</li>';
    }
    
    /**
@@ -169,10 +177,9 @@ class ParticipatedPlugin extends Gdn_Plugin {
       
       // Add modules
       $Sender->AddModule('NewDiscussionModule');
+      $Sender->AddModule('DiscussionFilterModule');
       $Sender->AddModule('CategoriesModule');
-      $BookmarkedModule = new BookmarkedModule($Sender);
-      $BookmarkedModule->GetData();
-      $Sender->AddModule($BookmarkedModule);
+      $Sender->AddModule('BookmarkedModule');
       
       $Sender->Render($this->GetView('participated.php'));
    }

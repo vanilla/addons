@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['LastEdited'] = array(
    'Name' => 'Last Edited',
    'Description' => 'Appends "Post edited by [User] at [Time]" to the end of edited posts.',
-   'Version' => '1.1',
+   'Version' => '1.1.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
@@ -25,17 +25,11 @@ $PluginInfo['LastEdited'] = array(
 );
 
 class LastEditedPlugin extends Gdn_Plugin {
-
-   public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
-      $this->PrepareEdited($Sender);
-   }
-   
-   public function PostController_BeforeCommentRender_Handler(&$Sender) {
-      $this->PrepareEdited($Sender);
-   }
-   
-   public function PrepareEdited($Sender) {
-      $Sender->AddCssFile($this->GetResource('design/lastedited.css', FALSE, FALSE));
+   /**
+    * @param AssetModel $Sender
+    */
+   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+      $Sender->AddCssFile('lastedited.css', 'plugins/LastEdited');
    }
    
    public function DiscussionController_AfterDiscussionBody_Handler(&$Sender) {

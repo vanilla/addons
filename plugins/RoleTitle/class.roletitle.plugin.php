@@ -117,4 +117,16 @@ class RoleTitlePlugin extends Gdn_Plugin {
    private function _FormatRoleCss($RawRole) {
       return 'Role_'.str_replace(' ','_', Gdn_Format::AlphaNumeric($RawRole));
    }
+   
+   // Add the roles to the profile body tag
+   public function ProfileController_Render_Before($Sender) {
+      $CssRoles = $Sender->Data('UserRoles');
+      if (!is_array($CssRoles))
+         return;
+      
+      foreach ($CssRoles as &$RawRole)
+         $RawRole = $this->_FormatRoleCss($RawRole);
+      
+      $Sender->CssClass = trim($Sender->CssClass.' '.implode(' ',$CssRoles));
+   }
 }

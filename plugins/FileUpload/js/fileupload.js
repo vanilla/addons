@@ -524,6 +524,18 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
 					});
 				}
             
+            // Add delete button
+            var DeleteAnchor = jQuery(FileListing.find('a.DeleteFile'));
+            var DeleteHref = gdn.definition('WebRoot') + 'plugin/fileupload/delete/' + MediaID;
+            DeleteAnchor.live('click', function() {
+               // Delete file
+               jQuery.ajax({url: DeleteHref, type: 'GET'});
+               // Remove image
+               jQuery(FileListing).remove();
+               // Stay here
+               return false;
+            });
+            
          } else {
             // FAILURE
             FailReason = JResponse.MediaResponse.StrError;

@@ -2,8 +2,8 @@
 
 $PluginInfo['IndexPhotos'] = array(
    'Name' => 'Discussion Photos',
-   'Description' => "Displays photo of the user who started each discussion anywhere discussions are listed.",
-   'Version' => '1.1',
+   'Description' => "Displays photo and name of the user who started each discussion anywhere discussions are listed.",
+   'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RegisterPermissions' => FALSE,
    'MobileFriendly' => TRUE,
@@ -25,6 +25,18 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     */
    public function CategoriesController_Render_Before($Sender) {
       $Sender->AddCssFile($this->GetResource('design/indexphotos.css', FALSE, FALSE));
+   }
+   
+   /**
+    * Add OP name to start of discussion meta.
+    */
+   public function DiscussionsController_AfterDiscussionLabels_Handler($Sender, $Args) {
+      if (GetValue('FirstUser', $Args))
+         echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
+   }
+   public function CategoriesController_AfterDiscussionLabels_Handler($Sender, $Args) {
+      if (GetValue('FirstUser', $Args))
+         echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
    }
 
    /**

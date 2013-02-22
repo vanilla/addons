@@ -28,6 +28,26 @@ class MediaModel extends VanillaModel {
    }
    
    /**
+    * Retrieve all media for a foreign record.
+    * 
+    * @param int $ForeignID
+    * @param string $ForeignTable Lowercase.
+    * @return object SQL results.
+    */
+   public function Reassign($ForeignID, $ForeignTable, $NewForeignID, $NewForeignTable) {
+      $this->FireEvent('BeforeReassign');
+      $Data = $this->SQL
+         ->Update('Media')
+         ->Set('ForeignID', $NewForeignID)
+         ->Set('ForeignTable', $NewForeignTable)
+         ->Where('ForeignID', $ForeignID)
+         ->Where('ForeignTable', $ForeignTable)
+         ->Put();
+		
+		return $Data;
+   }
+   
+   /**
     * If passed path leads to an image, return size
     *
     * @param string $Path Path to file.
