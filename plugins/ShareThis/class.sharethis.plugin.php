@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ShareThis'] = array(
    'Name' => 'ShareThis',
    'Description' => 'Adds ShareThis (http://sharethis.com) buttons below discussions.',
-   'Version' => '1.1',
+   'Version' => '1.1.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -27,34 +27,39 @@ $PluginInfo['ShareThis'] = array(
 
 
 class ShareThisPlugin extends Gdn_Plugin {
-
+   /**
+    * Show buttons after OP message body.
+    */
 	public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
       $PublisherNumber = C('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
-      echo '<script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
-      <script type="text/javascript">stLight.options({publisher:"'.$PublisherNumber.'"});</script>
-      <div style="margin: 20px 0; text-align: right;">
-      <span class="st_twitter_hcount" displayText="Tweet"></span>
-      <span class="st_facebook_hcount" displayText="Share"></span>
-      <span class="st_email_hcount" displayText="Email"></span>
-      <span class="st_sharethis_hcount" displayText="Share"></span>
+      echo '
+      <script type="text/javascript">var switchTo5x=true;</script>
+      <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+      <script type="text/javascript">stLight.options({publisher: "'.$PublisherNumber.'", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
+      <div class="ShareThisButtonWrapper">
+         <span class="st_twitter_hcount ShareThisButton" displayText="Tweet"></span>
+         <span class="st_facebook_hcount ShareThisButton" displayText="Facebook"></span>
+         <span class="st_linkedin_hcount ShareThisButton" displayText="LinkedIn"></span>
+         <span class="st_reddit_hcount ShareThisButton" displayText="Reddit"></span>
+         <span class="st_email_hcount ShareThisButton" displayText="Email"></span>
       </div>';
-	}		
+   }
 
    public function Setup() {
       // Nothing to do here!
    }
    
-   public function Structure() {
-      // Nothing to do here!
-   }
-   
-  /*Add to dashboard side menu. */ 
-  
+   /**
+    * Add to dashboard side menu. 
+    */ 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Add-ons', T('ShareThis'), 'plugin/sharethis', 'Garden.Settings.Manage');
    }
-
+   
+   /**
+    * Settings page.
+    */
    public function PluginController_ShareThis_Create($Sender) {
    	$Sender->Permission('Garden.AdminUser.Only');
    	$Sender->Title('ShareThis');
