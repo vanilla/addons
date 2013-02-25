@@ -36,12 +36,15 @@ class ShareThisPlugin extends Gdn_Plugin {
       <script type="text/javascript">var switchTo5x=true;</script>
       <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
       <script type="text/javascript">stLight.options({publisher: "'.$PublisherNumber.'", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
-      <div class="ShareThisButtonWrapper">
+      <div class="ShareThisButtonWrapper Right">
          <span class="st_twitter_hcount ShareThisButton" displayText="Tweet"></span>
          <span class="st_facebook_hcount ShareThisButton" displayText="Facebook"></span>
-         <span class="st_linkedin_hcount ShareThisButton" displayText="LinkedIn"></span>
-         <span class="st_reddit_hcount ShareThisButton" displayText="Reddit"></span>
+         <span class="st_linkedin_hcount ShareThisButton Hidden" displayText="LinkedIn"></span>
+         <span class="st_googleplus_hcount ShareThisButton Hidden" displayText="Google +"></span>
+         <span class="st_reddit_hcount ShareThisButton Hidden" displayText="Reddit"></span>
+         <span class="st_pinterest_hcount ShareThisButton Hidden" displayText="Pinterest"></span>
          <span class="st_email_hcount ShareThisButton" displayText="Email"></span>
+         <span class="st_sharethis_hcountShareThisButton" displayText="ShareThis"></span>
       </div>';
    }
 
