@@ -11,6 +11,7 @@
  *  1.6     Fix the file upload plugin for external storage.
  *          Add file extensions to the non-image icons.
  *  1.7     Add support for discussions and comments placed in moderation queue (Lincoln, Nov 2012)
+ *  1.7.1   Fix for fileupload not working now that we have json rendered as application/json.
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -21,7 +22,7 @@
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'Images and files may be attached to discussions and comments.',
-   'Version' => '1.7.0',
+   'Version' => '1.7.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -883,6 +884,13 @@ class FileUploadPlugin extends Gdn_Plugin {
       }
       
       $Sender->SetJSON('MediaResponse', $MediaResponse);
+      
+      // Kludge: This needs to have a content type of text/* because it's in an iframe.
+      ob_clean();
+      header('Content-Type: text/html');
+      echo json_encode($Sender->GetJson());
+      die();
+      
       $Sender->Render($this->GetView('blank.php'));
    }
    
