@@ -96,7 +96,7 @@ class ExamplePlugin extends Gdn_Plugin {
    
    public function Controller_Index($Sender) {
       // Prevent non-admins from accessing this page
-      $Sender->Permission('Vanilla.Settings.Manage');
+      $Sender->Permission('Garden.Settings.Manage');
       
       $Sender->SetData('PluginDescription',$this->GetPluginKey('Description'));
 		

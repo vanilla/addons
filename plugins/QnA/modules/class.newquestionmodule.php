@@ -16,6 +16,6 @@ class NewQuestionModule extends Gdn_Module {
    public function ToString() {
       $HasPermission = Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', 'any');
       if ($HasPermission)
-         echo Anchor(T('Ask a Question'), '/post/discussion?Type=Question', 'BigButton NewDiscussion');
+         echo Anchor(T('Ask a Question'), '/post/discussion?Type=Question', 'Button BigButton NewQuestion');
    }
 }
