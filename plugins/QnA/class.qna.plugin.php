@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.1.3',
+   'Version' => '1.1.4',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -723,6 +723,7 @@ class QnAPlugin extends Gdn_Plugin {
       if ($Unanswered) {
          $Args['Wheres']['Type'] = 'Question';
          $Sender->SQL->WhereIn('d.QnA', array('Unanswered', 'Rejected'));
+         Gdn::Controller()->Title('Unanswered Questions');
       } elseif ($QnA = Gdn::Request()->Get('qna')) {
          $Args['Wheres']['QnA'] = $QnA;
       }
@@ -917,10 +918,10 @@ class QnAPlugin extends Gdn_Plugin {
    /** 
     * Create the new question method on post controller.
     */
-   public function PostController_Question_Create($Sender) {
+   public function PostController_Question_Create($Sender, $CategoryUrlCode = '') {
       // Create & call PostController->Discussion()
       $Sender->View = PATH_PLUGINS.'/QnA/views/post.php';
-      $Sender->Discussion(GetValue(0, $Sender->RequestArgs, ''));
+      $Sender->Discussion($CategoryUrlCode);
    }
    
    /** 
