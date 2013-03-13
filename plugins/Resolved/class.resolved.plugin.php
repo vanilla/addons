@@ -132,13 +132,17 @@ class ResolvedPlugin extends Gdn_Plugin {
 
    /**
     * Disallow comments in Resolved discussions by new participants.
+    * 
+    * @param DiscussionController $Sender
     */
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender, $Args) {
-      $Resolved = GetValue('Resolved', $Sender->Discussion);
-      $IsStarter = (GetValue('InsertUserID', $Sender->Discussion) == Gdn::Session()->UserID);
+      $Discussion = $Sender->Data('Discussion');
+      $Resolved = GetValue('Resolved', $Discussion);
+      $IsStarter = (GetValue('InsertUserID', $Discussion) == Gdn::Session()->UserID);
       if (!CheckPermission('Plugins.Resolved.Manage') && $Resolved && !$IsStarter) {
          // Pretend we're closed 
-         SetValue('Closed', $Sender->Discussion, 1);  
+         SetValue('Closed', $Discussion, 1);  
+         $Sender->SetData('Discussion', $Discussion);
       }
    }
    
