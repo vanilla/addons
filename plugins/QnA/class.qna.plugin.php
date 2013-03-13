@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.1.4',
+   'Version' => '1.1.5',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -712,7 +712,7 @@ class QnAPlugin extends Gdn_Plugin {
       }
       
       $Sender->SetData('Discussion', $Discussion);
-      $Sender->SetData('_Types', array('Question' => T('Question'), 'Discussion' => T('Discussion')));
+      $Sender->SetData('_Types', array('Question' => '@'.T('Question Type', 'Question'), 'Discussion' => '@'.T('Discussion Type', 'Discussion')));
       $Sender->SetData('Title', T('Q&A Options'));
       $Sender->Render('DiscussionOptions', '', 'plugins/QnA');
    }
