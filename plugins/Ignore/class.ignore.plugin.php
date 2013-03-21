@@ -12,7 +12,7 @@
  *  1.0.2   Change Plugin.Ignore.MaxIgnores to Plugins.Ignore.MaxIgnores
  *  1.0.3   Fix usage of T() (or lack of usage in some cases)
  *  1.1     Add SimpleAPI hooks
- *  1.1.1   Allow self-API access
+ *  1.2     Hook into conversations application and block ignored PMs
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -22,7 +22,7 @@
 
 $PluginInfo['Ignore'] = array(
    'Description' => 'This plugin allows users to ignore others, filtering their comments out of discussions.',
-   'Version' => '1.1.1',
+   'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -187,31 +187,31 @@ class IgnorePlugin extends Gdn_Plugin {
       
       $User = Gdn::UserModel()->GetID($UserID);
       if (!$User)
-         throw new Exception("No such user '{$UserID}'", 404);
+         throw new Exception(sprintf(T("No such user '%s'"), $UserID), 404);
       
       $IgnoreUserID = Gdn::Request()->Get('IgnoreUserID');
       $IgnoreUser = Gdn::UserModel()->GetID($IgnoreUserID);
       if (!$IgnoreUser)
-         throw new Exception("No such user '{$IgnoreUserID}'", 404);
+         throw new Exception(sprintf(T("No such user '%s'"), $IgnoreUserID), 404);
          
       $AddRestricted = $this->IgnoreRestricted($IgnoreUserID, $UserID);
 
       switch ($AddRestricted) {
          case self::IGNORE_GOD:
-            throw new Exception("You can't ignore that person.", 403);
+            throw new Exception(T("You can't ignore that person."), 403);
 
          case self::IGNORE_LIMIT:
-            throw new Exception("You have reached the maximum number of ignores.", 406);
+            throw new Exception(T("You have reached the maximum number of ignores."), 406);
 
          case self::IGNORE_RESTRICTED:
-            throw new Exception("Your ignore privileges have been revoked.", 403);
+            throw new Exception(T("Your ignore privileges have been revoked."), 403);
 
          case self::IGNORE_SELF:
-            throw new Exception("You can't put yourself on ignore.", 406);
+            throw new Exception(T("You can't put yourself on ignore."), 406);
 
          default:
             $this->AddIgnore($UserID, $IgnoreUserID);
-            $this->SetData('Success', sprintf("Added %s to ignore list.", $IgnoreUser->Name));
+            $this->SetData('Success', sprintf(T("Added %s to ignore list."), $IgnoreUser->Name));
             break;
       }
       
@@ -228,15 +228,15 @@ class IgnorePlugin extends Gdn_Plugin {
       
       $User = Gdn::UserModel()->GetID($UserID);
       if (!$User)
-         throw new Exception("No such user '{$UserID}'", 404);
+         throw new Exception(sprintf(T("No such user '%s'"), $UserID), 404);
       
       $IgnoreUserID = Gdn::Request()->Get('IgnoreUserID');
       $IgnoreUser = Gdn::UserModel()->GetID($IgnoreUserID);
       if (!$IgnoreUser)
-         throw new Exception("No such user '{$IgnoreUserID}'", 404);
+         throw new Exception(sprintf(T("No such user '%s'"), $IgnoreUserID), 404);
       
       $this->RemoveIgnore($UserID, $IgnoreUserID);
-      $Sender->SetData('Success', sprintf("Removed %s from ignore list.", $IgnoreUser->Name));
+      $Sender->SetData('Success', sprintf(T("Removed %s from ignore list."), $IgnoreUser->Name));
       
       $Sender->Render();
    }
@@ -257,10 +257,10 @@ class IgnorePlugin extends Gdn_Plugin {
       $Restricted = in_array($Restricted, array('yes', 'true', 'on', TRUE)) ? TRUE : NULL;
       $this->SetUserMeta($UserID, 'Forbidden', $Restricted);
       
-      $Sender->SetData('Success', sprintf($Restricted ? 
+      $Sender->SetData('Success', sprintf(T($Restricted ? 
          "%s's ignore privileges have been disabled." :
          "%s's ignore privileges have been enabled."
-      , $User->Name));
+      ), $User->Name));
       
       $Sender->Render();
    }
@@ -280,7 +280,6 @@ class IgnorePlugin extends Gdn_Plugin {
          
          $UserIgnored = $this->Ignored($Sender->User->UserID);
          $Label = ($UserIgnored) ? 'Unignore' : 'Ignore';
-         $Method = ($UserIgnored) ? 'unset' : 'set';
          echo ' '.Anchor(T($Label), "/user/ignore/toggle/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Ignore NavButton').' ';
       }
    }
@@ -300,6 +299,49 @@ class IgnorePlugin extends Gdn_Plugin {
          $Classes = implode(' ',array_keys($Classes));
          $Sender->EventArguments['CssClass'] = $Classes;
       }
+   }
+   
+   /**
+    * 
+    * 
+    * @param MessageController $Sender
+    */
+   public function MessagesController_BeforeAddConversation_Handler($Sender) {
+      
+      $Recipients = $Sender->EventArguments['Recipients'];
+      if (!is_array($Recipients) || !sizeof($Recipients)) return;
+      
+      $UserID = Gdn::Session()->UserID;
+      foreach ($Recipients as $RecipientID) {
+         if ($this->Ignored($UserID, $RecipientID)) {
+            $User = Gdn::UserModel()->GetID($RecipientID, DATASET_TYPE_ARRAY);
+            $Sender->Form->AddError(sprintf(T("Unable to create conversation, %s is ignoring you."), $User['Name']));
+         }
+      }
+   }
+   
+   /**
+    * Add a new message to a conversatio
+    * 
+    * @param MessageController $Sender
+    */
+   public function MessagesController_BeforeAddMessage_Handler($Sender) {
+      
+      $ConversationID = $Sender->EventArguments['ConversationID'];
+      $ConversationModel = new ConversationModel();
+      $Recipients = $ConversationModel->GetRecipients($ConversationID);
+      if (!$Recipients->NumRows()) return;
+      
+      $Recipients = $Recipients->ResultArray();
+      $Recipients = ConsolidateArrayValuesByKey($Recipients, 'UserID');
+      
+      $UserID = Gdn::Session()->UserID;
+      foreach ($Recipients as $RecipientID => $Recipient) {
+         if ($this->Ignored($UserID, $RecipientID)) {
+            $Sender->Form->AddError(sprintf(T('Unable to send message, %s is ignoring you.'), $User['Name']));
+         }
+      }
+      
    }
    
    public function UserController_Ignore_Create($Sender) {
