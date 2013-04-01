@@ -2,7 +2,7 @@
 <div class="jsConnect-Connecting" style="margin-top: 25%">
    <h1 style="text-align: center;"><?php echo $this->Data('Title'); ?></h1>
    <?php
-   echo $this->Form->Open(), $this->Form->Errors();
+   echo $this->Form->Open(array('id' => 'Form_JsConnect-Connect')), $this->Form->Errors();
 
    //echo '<div><div class="Info">',
    //   T('Verifying your credentials...'),

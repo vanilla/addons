@@ -9,7 +9,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-   'Version' => '1.2.2',
+   'Version' => '1.3a',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -285,7 +285,7 @@ class JsConnectPlugin extends Gdn_Plugin {
     * @param EntryController $Sender
     * @param array $Args
     */
-   public function EntryController_JsConnect_Create($Sender, $Action = '') {
+   public function EntryController_JsConnect_Create($Sender, $Action = '', $Target = '') {
       if ($Action) {
          if ($Action == 'guest') {
 //            Redirect('/');
@@ -319,7 +319,7 @@ class JsConnectPlugin extends Gdn_Plugin {
          $Sender->SetData('Title', T('Connecting...'));
          $Sender->Form->Action = Url('/entry/connect/jsconnect?'.  http_build_query($Get));
          $Sender->Form->AddHidden('JsConnect', '');
-         $Sender->Form->AddHidden('Target', $Sender->Request->Get('Target', '/'));
+         $Sender->Form->AddHidden('Target', $Target);
 
          $Sender->MasterView = 'empty';
          $Sender->Render('JsConnect', '', 'plugins/jsconnect');
@@ -387,6 +387,21 @@ class JsConnectPlugin extends Gdn_Plugin {
       exit();
    }
    
+   public function RootController_SSO_Handler($Sender, $Args) {
+      $Provider = $Args['DefaultProvider'];
+      if (GetValue('AuthenticationSchemeAlias', $Provider) !== 'jsconnect')
+         return;
+      
+      // The default provider is jsconnect so let's redispatch there.
+      $Get = array(
+         'client_id' => GetValue('AuthenticationKey', $Provider),
+         'target' => GetValue('Target', $Args, '/'));
+      $Url = '/entry/jsconnect?'.http_build_query($Get);
+      Gdn::Request()->PathAndQuery($Url);
+      Gdn::Dispatcher()->Dispatch();
+      $Args['Handled'] = TRUE;
+   }
+   
    public function SettingsController_JsConnect_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->AddSideMenu();
@@ -431,7 +446,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
             $Values = $Form->FormValues();
 
-            $Values = ArrayTranslate($Values, array('Name', 'AuthenticationKey', 'URL', 'AssociationSecret', 'AuthenticateUrl', 'SignInUrl', 'RegisterUrl'));
+            $Values = ArrayTranslate($Values, array('Name', 'AuthenticationKey', 'URL', 'AssociationSecret', 'AuthenticateUrl', 'SignInUrl', 'RegisterUrl', 'IsDefault'));
             $Values['AuthenticationSchemeAlias'] = 'jsconnect';
             $Values['AssociationHashMethod'] = 'md5';
             $Values['Attributes'] = serialize(array('HashType' => $Form->GetFormValue('HashType'), 'TestMode' => $Form->GetFormValue('TestMode'), 'Trusted' => $Form->GetFormValue('Trusted', 0)));

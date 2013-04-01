@@ -61,6 +61,11 @@ echo $this->Form->Open(), $this->Form->Errors();
       ?>
    </li>
    <li>
+     <?php
+      echo $this->Form->CheckBox('IsDefault', 'Make this connection your default signin method.');
+     ?> 
+   </li>
+   <li>
       <h2>Advanced</h2>
    </li>
    <li>
