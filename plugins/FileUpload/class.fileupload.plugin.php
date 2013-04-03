@@ -32,6 +32,8 @@ $PluginInfo['FileUpload'] = array(
       'Plugins.Attachments.Upload.Allow' => 'Garden.Profiles.Edit',
       'Plugins.Attachments.Download.Allow' => 'Garden.Profiles.Edit'
    ),
+   'SettingsUrl' => 'settings/fileupload',
+   'SettingsPermission' => 'Garden.Settings.Manage',
    //'SettingsUrl' => '/dashboard/plugin/fileupload',
    //'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Tim Gunter",
@@ -53,6 +55,48 @@ class FileUploadPlugin extends Gdn_Plugin {
       $this->_MediaCache = NULL;
       $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
+   }
+
+   public function SettingsController_FileUpload_Create($Sender) {
+       $Sender->Permission('Garden.Plugins.Manage');
+       $Sender->AddSideMenu();
+       $Sender->Title('FileUpload');
+       $ConfigurationModule = new ConfigurationModule($Sender);
+       $ConfigurationModule->RenderAll = True;
+       $Schema = array( 'Plugins.FileUpload.AddBodyUrls' =>
+                        array('LabelCode' => 'Append direct files urls at the end of message body',
+                              'Control' => 'CheckBox',
+                              'Default' => C('Plugins.FileUpload.AddBodyUrls', '0')
+                        )
+       );
+       $ConfigurationModule->Schema($Schema);
+       $ConfigurationModule->Initialize();
+       $Sender->View = dirname(__FILE__) . DS . 'views' . DS . 'fuploadsettings.php';
+       $Sender->ConfigurationModule = $ConfigurationModule;
+       $Sender->Render();
+   }
+   
+   public function DiscussionController_BeforeCommentBody_Handler($Sender) {
+       if( C('Plugins.FileUpload.AddBodyUrls', '0') == 1 ) {
+           $Comment = GetValue('Comment',$Sender->EventArguments);
+           $Object = NULL;
+           $MediaKey = '';
+           if($Comment){
+               $MediaKey = 'comment/' . $Comment->CommentID;
+               $Object = $Comment;
+           }else{
+               $Object = GetValue('Discussion',$Sender->EventArguments);
+               $MediaKey = 'discussion/' . $Object->DiscussionID;
+               
+           }
+           $MediaList = $this->MediaCache();
+           if (!is_array($MediaList)) return;
+           if (array_key_exists($MediaKey, $MediaList)) {
+               foreach ($MediaList[$MediaKey] as $Media) {
+                   $Object->Body .=  " " . Url(MediaModel::Url($Media));
+               }
+           }
+       }
    }
    
    public function AssetModel_StyleCss_Handler($Sender) {
