@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.1.6',
+   'Version' => '1.1.7',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -934,7 +934,14 @@ class QnAPlugin extends Gdn_Plugin {
     */
    public function Base_BeforeNewDiscussionButton_Handler($Sender) {
       $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
-      $NewDiscussionModule->AddButton(T('Ask a Question'), 'post/question');
+      
+      $Category = Gdn::Controller()->Data('Category.UrlCode');
+      if ($Category)
+         $Category = '/'.rawurlencode($Category);
+      else
+         $Category = '';
+      
+      $NewDiscussionModule->AddButton(T('Ask a Question'), 'post/question'.$Category);
    }
    
    /** 
