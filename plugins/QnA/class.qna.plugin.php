@@ -363,7 +363,22 @@ class QnAPlugin extends Gdn_Plugin {
       $CommentModel = new CommentModel();
       $Answers = $CommentModel->GetWhere(array('DiscussionID' => $Sender->Data('Discussion.DiscussionID'), 'Qna' => 'Accepted'))->Result();
       
+      if (class_exists('ReplyModel')) {
+         $ReplyModel = new ReplyModel();
+         $Discussion = NULL;
+         $ReplyModel->JoinReplies($Discussion, $Answers);
+      }
+      
       $Sender->SetData('Answers', $Answers);
+      
+      // Remove the accepted answers from the comments.
+      if (isset($Sender->Data['Comments'])) {
+         $Comments = $Sender->Data['Comments']->Result();
+         $Comments = array_filter($Comments, function($Row) {
+            return strcasecmp(GetValue('QnA', $Row), 'accepted');
+         });
+         $Sender->Data['Comments'] = new Gdn_DataSet(array_values($Comments));
+      }
    }
    
    /**
