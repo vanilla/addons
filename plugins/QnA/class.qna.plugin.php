@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.1.5',
+   'Version' => '1.1.6',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -316,15 +316,27 @@ class QnAPlugin extends Gdn_Plugin {
          return;
       if (strtolower($Discussion['Type']) != 'question')
          return;
-
-      $ActivityID = $ActivityModel->Add(
-         $Comment['InsertUserID'],
-         'QuestionAnswer',
-         Anchor(Gdn_Format::Text($Discussion['Name']), "discussion/comment/$CommentID/#Comment_$CommentID"),
-         $Discussion['InsertUserID'], 
-         '',
-         "/discussion/comment/$CommentID/#Comment_$CommentID");
-      $ActivityModel->QueueNotification($ActivityID, '', 'first');
+      if (!C('Plugins.QnA.Notifications', TRUE))
+         return;
+      
+      $HeadlineFormat = T('HeadlingFormat.Answer', '{ActivityUserID,user} answered your question: <a href="{Url,html}">{Data.Name,text}</a>');
+      
+      $Activity = array(
+         'ActivityType' => 'Comment',
+         'ActivityUserID' => $Comment['InsertUserID'],
+         'NotifyUserID' => $Discussion['InsertUserID'],
+         'HeadlineFormat' => $HeadlineFormat,
+         'RecordType' => 'Comment',
+         'RecordID' => $CommentID,
+         'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
+         'Emailed' => ActivityModel::SENT_PENDING,
+         'Notified' => ActivityModel::SENT_PENDING,
+         'Data' => array(
+            'Name' => GetValue('Name', $Discussion)
+         )
+      );
+      
+      $ActivityModel->Queue($Activity);
    }
 
    /**
@@ -351,7 +363,22 @@ class QnAPlugin extends Gdn_Plugin {
       $CommentModel = new CommentModel();
       $Answers = $CommentModel->GetWhere(array('DiscussionID' => $Sender->Data('Discussion.DiscussionID'), 'Qna' => 'Accepted'))->Result();
       
+      if (class_exists('ReplyModel')) {
+         $ReplyModel = new ReplyModel();
+         $Discussion = NULL;
+         $ReplyModel->JoinReplies($Discussion, $Answers);
+      }
+      
       $Sender->SetData('Answers', $Answers);
+      
+      // Remove the accepted answers from the comments.
+      if (isset($Sender->Data['Comments'])) {
+         $Comments = $Sender->Data['Comments']->Result();
+         $Comments = array_filter($Comments, function($Row) {
+            return strcasecmp(GetValue('QnA', $Row), 'accepted');
+         });
+         $Sender->Data['Comments'] = new Gdn_DataSet(array_values($Comments));
+      }
    }
    
    /**
@@ -513,17 +540,9 @@ class QnAPlugin extends Gdn_Plugin {
 
          // Apply change effects
          if ($Change) {
-
             // Update the user
             $UserID = GetValue('InsertUserID', $Comment);
-            $User = Gdn::UserModel()->GetID($UserID);
-            $AcceptedAnswers = GetValue('CountAcceptedAnswers', $User, NULL);
-
-            if (!is_null($AcceptedAnswers)) {
-               $AcceptedAnswers += $Change;
-               $AcceptedAnswers = $AcceptedAnswers >= 0 ? $AcceptedAnswers : 0;
-               Gdn::UserModel()->SetField($UserID, 'CountAcceptedAnswers', $AcceptedAnswers);
-            }
+            $this->RecalculateUserQnA($UserID);
 
             // Update reactions
             if ($this->Reactions) {
@@ -584,6 +603,11 @@ class QnAPlugin extends Gdn_Plugin {
       }
       
       Gdn::Controller()->DiscussionModel->SetField(GetValue('DiscussionID', $Discussion), $Set);
+   }
+   
+   public function RecalculateUserQnA($UserID) {
+      $CountAcceptedAnswers = Gdn::SQL()->GetCount('Comment', array('InsertUserID' => $UserID, 'QnA' => 'Accepted'));
+      Gdn::UserModel()->SetField($UserID, 'CountAcceptedAnswers', $CountAcceptedAnswers);
    }
    
    public function _CommentOptions($Sender, $CommentID) {
@@ -649,14 +673,7 @@ class QnAPlugin extends Gdn_Plugin {
                
                // Update the user
                $UserID = GetValue('InsertUserID', $Comment);
-               $User = Gdn::UserModel()->GetID($UserID);
-               $AcceptedAnswers = GetValue('CountAcceptedAnswers', $User, NULL);
-
-               if (!is_null($AcceptedAnswers)) {
-                  $AcceptedAnswers += $Change;
-                  $AcceptedAnswers = $AcceptedAnswers >= 0 ? $AcceptedAnswers : 0;
-                  Gdn::UserModel()->SetField($UserID, 'CountAcceptedAnswers', $AcceptedAnswers);
-               }
+               $this->RecalculateUserQnA($UserID);
                
                // Update reactions
                if ($this->Reactions) {
