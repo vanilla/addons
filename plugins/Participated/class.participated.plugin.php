@@ -139,6 +139,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
     */
    public function DiscussionsController_Participated_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.SignIn.Allow');
+      Gdn_Theme::Section('DiscussionList');
       
       $Page = GetValue(0, $Args);
       $Limit = GetValue(1, $Args);
