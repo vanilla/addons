@@ -186,7 +186,7 @@ class QnAPlugin extends Gdn_Plugin {
           'Body' => 'Is there *anything* you don&rsquo;t know?',
           'Photo' => 'http://badges.vni.la/100/answer-6.png',
           'Points' => 20,
-          'Attributes' => array('Column' => 'CountComments'),
+          'Attributes' => array('Column' => 'CountAcceptedAnswers'),
           'Threshold' => 250,
           'Class' => 'Answerer',
           'Level' => 6,
