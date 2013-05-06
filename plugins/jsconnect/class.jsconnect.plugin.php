@@ -218,7 +218,8 @@ class JsConnectPlugin extends Gdn_Plugin {
       // Make sure the data is valid.
       $client_id = GetValue('client_id', $JsData, GetValue('clientid', $JsData, $Sender->Request->Get('client_id'), TRUE), TRUE);
       $Signature = GetValue('signature', $JsData, FALSE, TRUE);
-      $String = GetValue('string', $JsData, FALSE, TRUE); // debugging
+      $String = GetValue('sigStr', $JsData, FALSE, TRUE); // debugging
+      unset($JsData['string']);
 
       if (!$client_id)
          throw new Gdn_UserException(sprintf(T('ValidateRequired'), 'client_id'), 400);
