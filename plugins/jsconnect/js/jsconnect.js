@@ -2,9 +2,13 @@ jQuery(document).ready(function($) {
 
 var jsUrl = gdn.definition('JsAuthenticateUrl', false);
 if (jsUrl) {
+   // Reveal the please wait text after a small wait so that if the request is faster we never have to see it.
+   setTimeout(function() { $('.Connect-Wait').show(); }, 2000);
+    
    $.ajax({
       url: jsUrl,
       dataType: 'json',
+      timeout : 10000,
       success: function(data) {
          var connectData = $.param(data);
          
@@ -12,8 +16,15 @@ if (jsUrl) {
             if (data['error']) {
                $('#Form_JsConnect-Connect').attr('action', gdn.url('/entry/jsconnect/error'));
             } else if (!data['name']) {
+                // Just redirect to the target.
+                var target = $('#Form_Target').val();
+                if (!target)
+                    target = '/';
+                
+                window.location.replace(gdn.url(target));
+                return;
    //            data = {'error': 'unauthorized', 'message': 'You are not signed in.' };
-               $('#Form_JsConnect-Connect').attr('action', gdn.url('/entry/jsconnect/guest'));
+//               $('#Form_JsConnect-Connect').attr('action', gdn.url('/entry/jsconnect/guest'));
             } else {
                for(var key in data) {
                   if (data[key] == null)
@@ -34,8 +45,11 @@ if (jsUrl) {
             }
          }
       },
-      error: function(data, x, y) {
+      error: function(xhr, errorText) {
+         var error = $.param({ error: errorText });
+         $('#Form_JsConnect').val(error);
          $('#Form_JsConnect-Connect').attr('action', gdn.url('/entry/jsconnect/error'));
+         $('#Form_JsConnect-Connect').submit();
       }
    });
 }

@@ -9,7 +9,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-   'Version' => '1.3a',
+   'Version' => '1.4',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -73,9 +73,13 @@ class JsConnectPlugin extends Gdn_Plugin {
          $ConnectLabel = '<span class="Username"></span><div class="ConnectLabel TextColor">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div>';
       }
 
-      $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">
-         <div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button Primary SignInLink').$RegisterLink.'</div>
-         <div class="JsConnect-Connect"><a class="'.$PopupWindow.' NoMSIE ConnectLink" popupHeight="300" popupWidth="600">'.Img('http://cdn.vanillaforums.com/images/usericon_50.png', array('class' => 'ProfilePhotoSmall UserPhoto')).
+      $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">';
+      
+      if (!GetValue('IsDefault', $Provider))
+         $Result .= '<div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button Primary SignInLink').$RegisterLink.'</div>';
+      
+      $Result .=
+         '<div class="JsConnect-Connect"><a class="ConnectLink">'.Img('http://cdn.vanillaforums.com/images/usericon_50.png', array('class' => 'ProfilePhotoSmall UserPhoto')).
             $ConnectLabel.
          '</a></div>
       </div>';
@@ -301,10 +305,17 @@ class JsConnectPlugin extends Gdn_Plugin {
 
             $Error = GetValue('error', $JsData);
             $Message = GetValue('message', $JsData);
+            
+            if ($Error === 'timeout' && !$Message) {
+               $Message = T('Your sso timed out.', 'Your sso timed out during the request. Please try again.');
+            }
+            
+            Gdn::Dispatcher()->PassData('Exception', $Message ? htmlspecialchars($Message) : htmlspecialchars($Error))
+               ->Dispatch('home/error');
 
-            $Sender->Form->AddError($Message ? htmlspecialchars($Message) : htmlspecialchars($Error));
-            $Sender->SetData('Title', T('Error'));
-            $Sender->Render('JsConnect_Error', '', 'plugins/jsconnect');
+//            $Sender->Form->AddError($Message ? htmlspecialchars($Message) : htmlspecialchars($Error));
+//            $Sender->SetData('Title', T('Error'));
+//            $Sender->Render('JsConnect_Error', '', 'plugins/jsconnect');
          }
       } else {
          $client_id = $Sender->SetData('client_id', $Sender->Request->Get('client_id', 0));
