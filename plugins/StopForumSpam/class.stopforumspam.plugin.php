@@ -136,6 +136,8 @@ class StopForumSpamPlugin extends Gdn_Plugin {
       if ($Reason = GetValue('DiscoveryText', $Data)) {
          if (substr($Reason,0,1) === '{') {
             $Sender->EventArguments['IsSpam'] = TRUE;
+            $Data['Log_InsertUserID'] = $this->UserID();
+            $Data['RecordIPAddress'] = Gdn::Request()->IpAddress();
             return;
          }
       }
