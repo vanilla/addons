@@ -127,10 +127,20 @@ class StopForumSpamPlugin extends Gdn_Plugin {
       // Don't check for spam if another plugin has already determined it is.
       if ($Sender->EventArguments['IsSpam'])
          return;
-
+      
       $RecordType = $Args['RecordType'];
       $Data =& $Args['Data'];
       $Options =& $Args['Options'];
+      
+      // Detect our favorite bot and short-circuit
+      if ($Reason = GetValue('DiscoveryText', $Data)) {
+         if (substr($Reason,0,1) === '{') {
+            $Sender->EventArguments['IsSpam'] = TRUE;
+            $Data['Log_InsertUserID'] = $this->UserID();
+            $Data['RecordIPAddress'] = Gdn::Request()->IpAddress();
+            return;
+         }
+      }
 
       $Result = FALSE;
       switch ($RecordType) {

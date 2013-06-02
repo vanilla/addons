@@ -32,7 +32,7 @@
    opacity: 0.4;
 }
 
-.Ignored.IgnoreHide .Item-Body, 
+.Ignored.IgnoreHide .Item-BodyWrap, 
 .Ignored.IgnoreHide .CommentQuote {
    display: none;
 }

@@ -203,6 +203,9 @@ class JsConnectPlugin extends Gdn_Plugin {
 	}
    
    public function Base_BeforeSignInLink_Handler($Sender) {
+      if (Gdn::Session()->IsValid())
+         return;
+      
       $Providers = self::GetAllProviders();
       foreach ($Providers as $Provider) {
          echo "\n".Wrap(self::ConnectButton($Provider, array('NoRegister' => TRUE, 'NoConnectLabel' => TRUE)), 'li', array('class' => 'Connect jsConnect'));

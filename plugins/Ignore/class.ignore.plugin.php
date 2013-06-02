@@ -13,6 +13,7 @@
  *  1.0.3   Fix usage of T() (or lack of usage in some cases)
  *  1.1     Add SimpleAPI hooks
  *  1.2     Hook into conversations application and block ignored PMs
+ *  1.3     Mobile Friendly and improved CSS
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -26,6 +27,7 @@ $PluginInfo['Ignore'] = array(
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
+   'MobileFriendly' => TRUE,
    'HasLocale' => FALSE,
    'SettingsUrl' => FALSE,
    'SettingsPermission' => 'Garden.Settings.Manage',
@@ -267,9 +269,12 @@ class IgnorePlugin extends Gdn_Plugin {
    
    public function ProfileController_Render_Before($Sender) {
       $Sender->AddJsFile('ignore.js', 'plugins/Ignore');
-      $Sender->AddCssFile('ignore.css', 'plugins/Ignore');
    }
    
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('ignore.css', 'plugins/Ignore');
+   }
+  
    /**
     * Add "Ignore" option to profile options.
     */
@@ -280,13 +285,12 @@ class IgnorePlugin extends Gdn_Plugin {
          
          $UserIgnored = $this->Ignored($Sender->User->UserID);
          $Label = ($UserIgnored) ? 'Unignore' : 'Ignore';
-         echo ' '.Anchor(T($Label), "/user/ignore/toggle/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Ignore NavButton').' ';
+         echo ' '.Anchor(T($Label), "/user/ignore/toggle/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Ignore Popup NavButton IgnoreButton').' ';
       }
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
       $Sender->AddJsFile('ignore.js', 'plugins/Ignore');
-      $Sender->AddCssFile('ignore.css', 'plugins/Ignore');
    }
    
    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
@@ -344,11 +348,12 @@ class IgnorePlugin extends Gdn_Plugin {
       
    }
    
+   /**
+    * 
+    * @param Controller $Sender
+    */
    public function UserController_Ignore_Create($Sender) {
-      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
-      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
-      
-      $Sender->SetJson('Status',200);
+      $Sender->Permission('Garden.SignIn.Allow');
       
       $Args = $Sender->RequestArgs;
       if (sizeof($Args) < 3)
@@ -358,84 +363,93 @@ class IgnorePlugin extends Gdn_Plugin {
       
       list($UserReference, $Username) = $Args;
       
+      // Set user
       $User = $this->GetUserInfo($UserReference, $Username);
+      $Sender->SetData('User', $User);
       $UserID = GetValue('UserID', $User);
       
+      // Set title and mode
+      $IgnoreRestricted = $this->IgnoreIsRestricted($UserID);
       $UserIgnored = $this->Ignored($UserID);
       $Mode = $UserIgnored ? 'unset' : 'set';
-      
-      $IgnoreRestricted = $this->IgnoreRestricted($UserID);
-      if ($IgnoreRestricted && $IgnoreRestricted == self::IGNORE_RESTRICTED) {
-         $Sender->InformMessage('<span class="InformSprite Lightbulb"></span>'.T("Your ignore privileges have been revoked."),
-            'AutoDismiss HasSprite'
-         );
-         $Sender->Render('blank', 'utility', 'dashboard');
-      }
+      $ActionText = T($Mode == 'set' ? 'Ignore' : 'Unignore');
+      $Sender->Title($ActionText);
+      $Sender->SetData('Mode', $Mode);
       
       try {
          
-         switch ($Mode) {
-            case 'set':
-               
-               if ($IgnoreRestricted ) {
-                  switch ($IgnoreRestricted) {
-                     case self::IGNORE_GOD:
-                        $Sender->InformMessage('<span class="InformSprite Lightbulb"></span>'.T("You can't ignore that person."),
-                           'AutoDismiss HasSprite'
-                        );
-                        break;
-
-                     case self::IGNORE_LIMIT:
-                        $Sender->InformMessage('<span class="InformSprite Lightbulb"></span>'.T("You have reached the maximum number of ignores."),
-                           'AutoDismiss HasSprite'
-                        );
-                        break;
-
-                     case self::IGNORE_RESTRICTED:
-                        $Sender->InformMessage('<span class="InformSprite Lightbulb"></span>'.T("Your ignore privileges have been revoked."),
-                           'AutoDismiss HasSprite'
-                        );
-                        break;
-
-                     case self::IGNORE_SELF:
-                        $Sender->InformMessage('<span class="InformSprite Lightbulb"></span>'.T("You can't put yourself on ignore."),
-                           'AutoDismiss HasSprite'
-                        );
-                        break;
-                  }
-
-                  $Sender->Render('blank', 'utility', 'dashboard');
-               }
-               
-               $Sender->SetJson('Rename', T('Unignore'));
-               $this->AddIgnore(Gdn::Session()->UserID, $UserID);
-               $Sender->InformMessage(
-                  '<span class="InformSprite Contrast"></span>'.sprintf(T("%s is now on ignore."), $User->Name),
+         // Check for prevented states
+         switch ($IgnoreRestricted) {
+            case self::IGNORE_GOD:
+               $Sender->InformMessage('<span class="InformSprite Lightbulb"></span>'.T("You can't ignore that person."),
                   'AutoDismiss HasSprite'
                );
                break;
-            
-            case 'unset':
-               $Sender->SetJson('Rename', T('Ignore'));
-               $this->RemoveIgnore(Gdn::Session()->UserID, $UserID);
-               $Sender->InformMessage(
-                  '<span class="InformSprite Brightness"></span>'.sprintf(T("%s is no longer on ignore."), $User->Name),
+
+            case self::IGNORE_LIMIT:
+               $Sender->InformMessage('<span class="InformSprite Lightbulb"></span>'.T("You have reached the maximum number of ignores."),
                   'AutoDismiss HasSprite'
                );
                break;
-            
-            default:
-               $Sender->InformMessage(T("Unsupported operation."));
-               $Sender->SetJson('Status',400);
+
+            case self::IGNORE_RESTRICTED:
+               $Sender->InformMessage('<span class="InformSprite Lightbulb"></span>'.T("Your ignore privileges have been revoked."),
+                  'AutoDismiss HasSprite'
+               );
+               break;
+
+            case self::IGNORE_SELF:
+               $Sender->InformMessage('<span class="InformSprite Lightbulb"></span>'.T("You can't put yourself on ignore."),
+                  'AutoDismiss HasSprite'
+               );
                break;
          }
          
+         // Get conversation intersects
+         $Conversations = $this->IgnoreConversations($UserID);
+         $Sender->SetData('Conversations', $Conversations);
+         
+         if ($Sender->Form->AuthenticatedPostBack()) {
+            switch ($Mode) {
+               case 'set':
+                  
+                  if (!$IgnoreRestricted) {
+                     $Sender->JsonTarget('a.IgnoreButton', T('Unignore'), 'Text');
+                     $this->AddIgnore(Gdn::Session()->UserID, $UserID);
+                     $Sender->InformMessage(
+                        '<span class="InformSprite Contrast"></span>'.sprintf(T("%s is now on ignore."), $User->Name),
+                        'AutoDismiss HasSprite'
+                     );
+                  }
+                  
+                  break;
+
+               case 'unset':
+                  
+                  if (!$IgnoreRestricted) {
+                     $Sender->JsonTarget('a.IgnoreButton', T('Ignore'), 'Text');
+                     $this->RemoveIgnore(Gdn::Session()->UserID, $UserID);
+                     $Sender->InformMessage(
+                        '<span class="InformSprite Brightness"></span>'.sprintf(T("%s is no longer on ignore."), $User->Name),
+                        'AutoDismiss HasSprite'
+                     );
+                  }
+                  
+                  break;
+
+               default:
+                  $Sender->InformMessage(T("Unsupported operation."));
+                  $Sender->SetJson('Status',400);
+                  break;
+            }
+         }
+         
       } catch (Exception $Ex) {
-         $Sender->InformMessage(T("Could not find that person!"));
+         $Sender->InformMessage(T("Could not find that person! - ".$Ex->getMessage()));
          $Sender->SetJson('Status', 404);
       }
       
-      $Sender->Render('blank', 'utility', 'dashboard');
+      $Sender->Render('confirm', '', 'plugins/Ignore');
    }
    
    public function UserController_IgnoreList_Create($Sender) {
@@ -487,7 +501,7 @@ class IgnorePlugin extends Gdn_Plugin {
          }
          
       } catch (Exception $Ex) {
-         $Sender->InformMessage(T("Could not find that person!"));
+         $Sender->InformMessage(T("Could not find that person! - ".$Ex->getMessage()));
          $Sender->SetJson('Status', 404);
       }
       
@@ -522,6 +536,13 @@ class IgnorePlugin extends Gdn_Plugin {
    
    protected function AddIgnore($ForUserID, $IgnoreUserID) {
       $this->SetUserMeta($ForUserID, "Blocked.User.{$IgnoreUserID}", date('Y-m-d H:i:s'));
+      
+      // Remove from conversations
+      $Conversations = $this->IgnoreConversations($IgnoreUserID, $ForUserID);
+      Gdn::SQL()->Delete('UserConversation', array(
+         'UserID'          => $ForUserID,
+         'ConversationID'  => $Conversations
+      ));
    }
    
    protected function RemoveIgnore($ForUserID, $IgnoreUserID) {
@@ -590,6 +611,43 @@ class IgnorePlugin extends Gdn_Plugin {
       if ($IgnoreRestricted) return TRUE;
       
       return FALSE;
+   }
+   
+   public function IgnoreConversations($IgnoreUserID, $SessionUserID = NULL) {
+      // Guests cant ignore
+      if (!Gdn::Session()->IsValid()) return FALSE;
+      
+      if (is_null($SessionUserID))
+         $SessionUserID = Gdn::Session()->UserID;
+      
+      // Noone can ignore themselves
+      if ($IgnoreUserID == $SessionUserID) return self::IGNORE_SELF;
+      
+      // Get ignore user's conversation IDs
+      $IgnoreConversations = Gdn::SQL()
+         ->Select('ConversationID')
+         ->From('UserConversation')
+         ->Where('UserID', $IgnoreUserID)
+         ->Where('Deleted', 0)
+         ->Get()->ResultArray();
+      $IgnoreConversationIDs = ConsolidateArrayValuesByKey($IgnoreConversations, 'ConversationID','ConversationID');
+      unset($IgnoreConversations);
+      
+      // Get session user's conversation IDs
+      $SessionConversations = Gdn::SQL()
+         ->Select('ConversationID')
+         ->From('UserConversation')
+         ->Where('UserID', $SessionUserID)
+         ->Where('Deleted', 0)
+         ->Get()->ResultArray();
+      $SessionConversationIDs = ConsolidateArrayValuesByKey($SessionConversations, 'ConversationID','ConversationID');
+      unset($SessionConversations);
+      
+      $CommonConversations = array_intersect($IgnoreConversationIDs, $SessionConversationIDs);
+      $CommonConversationIDs = array_values($CommonConversations);
+      $CommonConversationIDs = array_unique($CommonConversationIDs);
+      
+      return $CommonConversationIDs;
    }
    
 }
