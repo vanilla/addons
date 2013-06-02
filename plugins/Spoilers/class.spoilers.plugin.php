@@ -41,8 +41,8 @@ class SpoilersPlugin extends Gdn_Plugin {
    
    protected function PrepareController(&$Sender) {
       //if (!$this->RenderSpoilers) return;
-      $Sender->AddJsFile($this->GetResource('js/spoilers.js', FALSE, FALSE));
-      $Sender->AddCssFile($this->GetResource('css/spoilers.css', FALSE, FALSE));
+      $Sender->AddJsFile('spoilers.js', 'plugins/Spoilers');
+      $Sender->AddCssFile('spoilers.css', 'plugins/Spoilers');
    }
    
    public function DiscussionController_AfterCommentFormat_Handler(&$Sender) {
