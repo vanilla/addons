@@ -268,8 +268,10 @@ class JsConnectPlugin extends Gdn_Plugin {
       $Form->SetFormValue('ProviderName', GetValue('Name', $Provider, ''));
       $Form->AddHidden('JsConnect', $JsData);
       
+      $Sender->SetData('ClientID', $client_id);
       $Sender->SetData('Verified', TRUE);
       $Sender->SetData('Trusted', GetValue('Trusted', $Provider, TRUE)); // this is a trusted connection.
+      $Sender->SetData('SSOUser', $JsData);
    }
 
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
