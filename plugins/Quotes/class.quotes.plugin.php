@@ -207,6 +207,9 @@ class QuotesPlugin extends Gdn_Plugin {
       if (is_null($ValidateUsernameRegex))
          $ValidateUsernameRegex = sprintf("[%s]+", C('Garden.User.ValidationRegex', "\d\w_ "));
 
+      $Format = GetValue('Format', $Sender->EventArguments['Object'], null);
+      if (is_null($Format)) return;
+      
       switch ($Sender->EventArguments['Object']->Format) {
          case 'Html':
             $Sender->EventArguments['Object']->Body = preg_replace_callback("/(<blockquote\s+(?:class=\"(?:User)?Quote\")?\s+rel=\"([^\"]+)\">)/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
