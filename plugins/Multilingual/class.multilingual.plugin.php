@@ -62,7 +62,8 @@ class MultilingualPlugin extends Gdn_Plugin {
     */
    public function Base_Render_Before($Sender) {
       // Not in Dashboard
-      if ($Sender->MasterView == 'admin')
+      // Block guests until guest sessions are restored
+      if ($Sender->MasterView == 'admin' || !CheckPermission('Garden.SignIn.Allow'))
          return;
       
       // Get locales
@@ -120,7 +121,7 @@ class MultilingualPlugin extends Gdn_Plugin {
       // Check intent
       if (isset($Args[1]))
          Gdn::Session()->ValidateTransientKey($Args[1]);
-      else return;
+      else Redirect($_SERVER['HTTP_REFERER']);
       
       // If we got a valid locale, save their preference
       if (isset($Args[0])) {

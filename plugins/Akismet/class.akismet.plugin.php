@@ -8,7 +8,7 @@
 $PluginInfo['Akismet'] = array(
    'Name' => 'Akismet',
    'Description' => 'Akismet spam protection integration for Vanilla.',
-   'Version' => '1.0.1b',
+   'Version' => '1.0.2b',
    'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
    'SettingsUrl' => '/settings/akismet',
    'SettingsPermission' => 'Garden.Settings.Manage',
@@ -103,10 +103,15 @@ class AkismetPlugin extends Gdn_Plugin {
 
       $Result = FALSE;
       switch ($RecordType) {
-         case 'User':
-//            $Data['Name'] = '';
-//            $Data['Body'] = GetValue('DiscoveryText', $Data);
-//            $Result = $this->CheckAkismet($RecordType, $Data);
+         case 'Registration':
+            $Data['Name'] = '';
+            $Data['Body'] = GetValue('DiscoveryText', $Data);
+            if ($Data['Body']) {
+               // Only check for spam if there is discovery text.
+               $Result = $this->CheckAkismet($RecordType, $Data);
+               if ($Result)
+                  $Data['Log_InsertUserID'] = $this->UserID();
+            }
             break;
          case 'Comment':
          case 'Discussion':
