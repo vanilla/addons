@@ -9,7 +9,7 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-   'Version' => '1.2.2',
+   'Version' => '1.2.3',
    'RequiredApplications' => array('Vanilla' => '2.0.18b1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -73,12 +73,22 @@ class JsConnectPlugin extends Gdn_Plugin {
          $ConnectLabel = '<span class="Username"></span><div class="ConnectLabel TextColor">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div>';
       }
 
-      $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">
-         <div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button Primary SignInLink').$RegisterLink.'</div>
-         <div class="JsConnect-Connect"><a class="'.$PopupWindow.' NoMSIE ConnectLink" popupHeight="300" popupWidth="600">'.Img('http://cdn.vanillaforums.com/images/usericon_50.png', array('class' => 'ProfilePhotoSmall UserPhoto')).
-            $ConnectLabel.
-         '</a></div>
-      </div>';
+      if (!C('Plugins.JsConnect.NoGuestCheck')) {
+         $Result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$Url.'">';
+
+         if (!GetValue('IsDefault', $Provider))
+            $Result .= '<div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button Primary SignInLink').$RegisterLink.'</div>';
+
+         $Result .=
+            '<div class="JsConnect-Connect"><a class="ConnectLink">'.Img('http://cdn.vanillaforums.com/images/usericon_50.png', array('class' => 'ProfilePhotoSmall UserPhoto')).
+               $ConnectLabel.
+            '</a></div>';
+
+         $Result .= '</div>';
+      } else {
+         if (!GetValue('IsDefault', $Provider))
+            $Result = '<div class="JsConnect-Guest">'.Anchor(sprintf(T('Sign In with %s'), $Provider['Name']), $SignInUrl, 'Button Primary SignInLink').$RegisterLink.'</div>';
+      }
       
       return $Result;
    }
@@ -193,6 +203,9 @@ class JsConnectPlugin extends Gdn_Plugin {
 	}
    
    public function Base_BeforeSignInLink_Handler($Sender) {
+      if (Gdn::Session()->IsValid())
+         return;
+      
       $Providers = self::GetAllProviders();
       foreach ($Providers as $Provider) {
          echo "\n".Wrap(self::ConnectButton($Provider, array('NoRegister' => TRUE, 'NoConnectLabel' => TRUE)), 'li', array('class' => 'Connect jsConnect'));
