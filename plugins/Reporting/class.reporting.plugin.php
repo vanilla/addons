@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Reporting'] = array(
    'Name' => 'Community Reporting',
    'Description' => 'Allows users to report comments and discussions for content violations or awesomeness.',
-   'Version' => '1.0.2',
+   'Version' => '1.0.3',
    'RequiredApplications' => array('Vanilla' => '2.0.18a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -319,7 +319,7 @@ class ReportingPlugin extends Gdn_Plugin {
       //$Sender->EventArguments['CommentOptions'][$ButtonTitle] = array('Label' => $ButtonTitle, 'Url' => "plugin/reporting/{$ButtonType}/{$Context}/{$ElementID}/{$EncodedURL}", $ContainerCSS.' ReportContent Popup');
       
       $SpriteType = "React".ucfirst($ButtonType);
-      $Text = Anchor(Sprite($SpriteType, 'ReactSprite').$ButtonTitle, $EventUrl, "React {$ContainerCSS} Popup");
+      $Text = Anchor(Sprite($SpriteType, 'ReactSprite').$ButtonTitle, $EventUrl, "ReactButton React {$ContainerCSS} Popup");
       echo Bullet();
       echo $Text;
    }

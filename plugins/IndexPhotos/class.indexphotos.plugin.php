@@ -17,14 +17,14 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     * Extra style sheet.
     */
    public function DiscussionsController_Render_Before($Sender) {
-      $Sender->AddCssFile($this->GetResource('design/indexphotos.css', FALSE, FALSE));
+      $Sender->AddCssFile('indexphotos.css', 'plugin/IndexPhotos');
    }
    
    /**
     * Extra style sheet.
     */
    public function CategoriesController_Render_Before($Sender) {
-      $Sender->AddCssFile($this->GetResource('design/indexphotos.css', FALSE, FALSE));
+      $Sender->AddCssFile('indexphotos.css', 'plugin/IndexPhotos');
    }
    
    /**

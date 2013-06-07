@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Example'] = array(
    'Description' => 'Provides an example Development Pattern for Vanilla 2 plugins by demonstrating how to insert discussion body excerpts into the discussions list.',
    'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.0.10'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18.4'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
@@ -46,8 +46,8 @@ class ExamplePlugin extends Gdn_Plugin {
     * @param $Sender Sending controller instance
     */
    public function Base_Render_Before($Sender) {
-      $Sender->AddCssFile($this->GetResource('design/example.css', FALSE, FALSE));
-      $Sender->AddJsFile($this->GetResource('js/example.js', FALSE, FALSE));
+      $Sender->AddCssFile('example.css', 'plugins/Example');
+      $Sender->AddJsFile('example.js', 'plugins/Example');
    }
    
    /**

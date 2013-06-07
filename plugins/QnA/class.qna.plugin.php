@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.1.6',
+   'Version' => '1.1.8',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -99,109 +99,138 @@ class QnAPlugin extends Gdn_Plugin {
             ->Put();
       }
       
-      // Define 'Accept' reaction
-      if ($this->Reactions) {
-         $Rm = new ReactionModel();
-         
-         if (Gdn::Structure()->Table('ReactionType')->ColumnExists('Hidden')) {
-         
-            // AcceptAnswer
-            $Rm->DefineReactionType(array('UrlCode' => 'AcceptAnswer', 'Name' => 'Accept Answer', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Curation.Manage', 'Hidden' => 1,
-               'Description' => "When someone correctly answers a question, they are rewarded with this reaction."));
-            
-         }
-         
-         Gdn::Structure()->Reset();
-      }
-      
+      $this->StructureReactions();
+      $this->StructureBadges();
+   }
+   
+   /**
+    * Define all of the structure related to badges.
+    */
+   public function StructureBadges() {
       // Define 'Answer' badges
-      if ($this->Badges) {
-         $BadgeModel = new BadgeModel();
+      if (!$this->Badges)
+         return;
+      
+      $BadgeModel = new BadgeModel();
 
-         // Answer Counts
-         $BadgeModel->Define(array(
-             'Name' => 'First Answer',
-             'Slug' => 'answer',
-             'Type' => 'UserCount',
-             'Body' => 'Answering questions is a great way to show your support for a community!',
-             'Photo' => 'http://badges.vni.la/100/answer.png',
-             'Points' => 2,
-             'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-             'Threshold' => 1,
-             'Class' => 'Answerer',
-             'Level' => 1,
-             'CanDelete' => 0
-         ));
-         $BadgeModel->Define(array(
-             'Name' => '5 Answers',
-             'Slug' => 'answer-5',
-             'Type' => 'UserCount',
-             'Body' => 'Your willingness to share knowledge has definitely been noticed.',
-             'Photo' => 'http://badges.vni.la/100/answer-2.png',
-             'Points' => 3,
-             'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-             'Threshold' => 5,
-             'Class' => 'Answerer',
-             'Level' => 2,
-             'CanDelete' => 0
-         ));
-         $BadgeModel->Define(array(
-             'Name' => '25 Answers',
-             'Slug' => 'answer-25',
-             'Type' => 'UserCount',
-             'Body' => 'Looks like you&rsquo;re starting to make a name for yourself as someone who knows the score!',
-             'Photo' => 'http://badges.vni.la/100/answer-3.png',
-             'Points' => 5,
-             'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-             'Threshold' => 25,
-             'Class' => 'Answerer',
-             'Level' => 3,
-             'CanDelete' => 0
-         ));
-         $BadgeModel->Define(array(
-             'Name' => '50 Answers',
-             'Slug' => 'answer-50',
-             'Type' => 'UserCount',
-             'Body' => 'Why use Google when we could just ask you?',
-             'Photo' => 'http://badges.vni.la/100/answer-4.png',
-             'Points' => 10,
-             'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-             'Threshold' => 50,
-             'Class' => 'Answerer',
-             'Level' => 4,
-             'CanDelete' => 0
-         ));
-         $BadgeModel->Define(array(
-             'Name' => '100 Answers',
-             'Slug' => 'answer-100',
-             'Type' => 'UserCount',
-             'Body' => 'Admit it, you read Wikipedia in your spare time.',
-             'Photo' => 'http://badges.vni.la/100/answer-5.png',
-             'Points' => 15,
-             'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-             'Threshold' => 100,
-             'Class' => 'Answerer',
-             'Level' => 5,
-             'CanDelete' => 0
-         ));
-         $BadgeModel->Define(array(
-             'Name' => '250 Answers',
-             'Slug' => 'answer-250',
-             'Type' => 'UserCount',
-             'Body' => 'Is there *anything* you don&rsquo;t know?',
-             'Photo' => 'http://badges.vni.la/100/answer-6.png',
-             'Points' => 20,
-             'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-             'Threshold' => 250,
-             'Class' => 'Answerer',
-             'Level' => 6,
-             'CanDelete' => 0
-         ));
+      // Answer Counts
+      $BadgeModel->Define(array(
+          'Name' => 'First Answer',
+          'Slug' => 'answer',
+          'Type' => 'UserCount',
+          'Body' => 'Answering questions is a great way to show your support for a community!',
+          'Photo' => 'http://badges.vni.la/100/answer.png',
+          'Points' => 2,
+          'Attributes' => array('Column' => 'CountAcceptedAnswers'),
+          'Threshold' => 1,
+          'Class' => 'Answerer',
+          'Level' => 1,
+          'CanDelete' => 0
+      ));
+      $BadgeModel->Define(array(
+          'Name' => '5 Answers',
+          'Slug' => 'answer-5',
+          'Type' => 'UserCount',
+          'Body' => 'Your willingness to share knowledge has definitely been noticed.',
+          'Photo' => 'http://badges.vni.la/100/answer-2.png',
+          'Points' => 3,
+          'Attributes' => array('Column' => 'CountAcceptedAnswers'),
+          'Threshold' => 5,
+          'Class' => 'Answerer',
+          'Level' => 2,
+          'CanDelete' => 0
+      ));
+      $BadgeModel->Define(array(
+          'Name' => '25 Answers',
+          'Slug' => 'answer-25',
+          'Type' => 'UserCount',
+          'Body' => 'Looks like you&rsquo;re starting to make a name for yourself as someone who knows the score!',
+          'Photo' => 'http://badges.vni.la/100/answer-3.png',
+          'Points' => 5,
+          'Attributes' => array('Column' => 'CountAcceptedAnswers'),
+          'Threshold' => 25,
+          'Class' => 'Answerer',
+          'Level' => 3,
+          'CanDelete' => 0
+      ));
+      $BadgeModel->Define(array(
+          'Name' => '50 Answers',
+          'Slug' => 'answer-50',
+          'Type' => 'UserCount',
+          'Body' => 'Why use Google when we could just ask you?',
+          'Photo' => 'http://badges.vni.la/100/answer-4.png',
+          'Points' => 10,
+          'Attributes' => array('Column' => 'CountAcceptedAnswers'),
+          'Threshold' => 50,
+          'Class' => 'Answerer',
+          'Level' => 4,
+          'CanDelete' => 0
+      ));
+      $BadgeModel->Define(array(
+          'Name' => '100 Answers',
+          'Slug' => 'answer-100',
+          'Type' => 'UserCount',
+          'Body' => 'Admit it, you read Wikipedia in your spare time.',
+          'Photo' => 'http://badges.vni.la/100/answer-5.png',
+          'Points' => 15,
+          'Attributes' => array('Column' => 'CountAcceptedAnswers'),
+          'Threshold' => 100,
+          'Class' => 'Answerer',
+          'Level' => 5,
+          'CanDelete' => 0
+      ));
+      $BadgeModel->Define(array(
+          'Name' => '250 Answers',
+          'Slug' => 'answer-250',
+          'Type' => 'UserCount',
+          'Body' => 'Is there *anything* you don&rsquo;t know?',
+          'Photo' => 'http://badges.vni.la/100/answer-6.png',
+          'Points' => 20,
+          'Attributes' => array('Column' => 'CountAcceptedAnswers'),
+          'Threshold' => 250,
+          'Class' => 'Answerer',
+          'Level' => 6,
+          'CanDelete' => 0
+      ));
+   }
+   
+   /**
+    * Define all of the structure releated to reactions.
+    * @return type
+    */
+   public function StructureReactions() {
+      // Define 'Accept' reaction
+      if (!$this->Reactions)
+         return;
+      
+      $Rm = new ReactionModel();
+
+      if (Gdn::Structure()->Table('ReactionType')->ColumnExists('Hidden')) {
+
+         // AcceptAnswer
+         $Rm->DefineReactionType(array('UrlCode' => 'AcceptAnswer', 'Name' => 'Accept Answer', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Curation.Manage', 'Hidden' => 1,
+            'Description' => "When someone correctly answers a question, they are rewarded with this reaction."));
+
       }
+
+      Gdn::Structure()->Reset();
    }
 
 
    /// EVENTS ///
+   
+   public function Base_AddonEnabled_Handler($Sender, $Args) {
+      switch (strtolower($Args['AddonName'])) {
+         case 'reactions':
+            $this->Reactions = TRUE;
+            $this->StructureReactions();
+            break;
+         case 'reputation':
+            $this->Badges = TRUE;
+            $this->StructureBadges();
+            break;
+      }
+   }
 
    public function Base_BeforeCommentDisplay_Handler($Sender, $Args) {
       $QnA = GetValueR('Comment.QnA', $Args);
@@ -920,7 +949,14 @@ class QnAPlugin extends Gdn_Plugin {
     */
    public function Base_BeforeNewDiscussionButton_Handler($Sender) {
       $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
-      $NewDiscussionModule->AddButton(T('Ask a Question'), 'post/question');
+      
+      $Category = Gdn::Controller()->Data('Category.UrlCode');
+      if ($Category)
+         $Category = '/'.rawurlencode($Category);
+      else
+         $Category = '';
+      
+      $NewDiscussionModule->AddButton(T('Ask a Question'), 'post/question'.$Category);
    }
    
    /** 

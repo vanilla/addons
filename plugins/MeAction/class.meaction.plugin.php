@@ -20,8 +20,8 @@ class MeActionPlugin extends Gdn_Plugin {
 	}
 	
 	private function AddMeAction($Sender) {
-		$Sender->AddJsFile('plugins/MeAction/js/meaction.js');
-		$Sender->AddCssFile('plugins/MeAction/design/meaction.css');
+		$Sender->AddJsFile('meaction.js', 'plugins/MeAction');
+		$Sender->AddCssFile('meaction.css', 'plugins/MeAction');
 	}
 
 	/**

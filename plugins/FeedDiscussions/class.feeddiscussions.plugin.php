@@ -10,6 +10,7 @@
  *  1.0.1   Minor fixes for logic
  *  1.0.2   Fix repeat posting bug
  *  1.0.3   Change version requirement to 2.0.18.4
+ *  1.1     Changed paths
  *  1.1.1   Fire 'Published' event after publication
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
@@ -50,9 +51,9 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
       if ($this->IsEnabled()) {
          if ($this->CheckFeeds(FALSE))
-            $Sender->AddJsFile($this->GetResource('js/feeddiscussions.js', FALSE, FALSE));
+            $Sender->AddJsFile('feeddiscussions.js', 'plugins/FeedDiscussions');
          
-         $Sender->AddCssFile($this->GetResource('css/feeddiscussions.css', FALSE, FALSE));
+         $Sender->AddCssFile('feeddiscussions.css', 'plugins/FeedDiscussions');
       }
    }
    
@@ -77,13 +78,17 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
    }
    
    public function Controller_CheckFeeds($Sender) {
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       $this->CheckFeeds();
-      exit();
+      $Sender->Render();
    }
    
    public function CheckFeeds($AutoImport = TRUE) {
+      Gdn::Controller()->SetData("AutoImport", $AutoImport);
       $NeedToPoll = 0;
       foreach ($this->GetFeeds() as $FeedURL => $FeedData) {
+         Gdn::Controller()->SetData("{$FeedURL}", $FeedData);
          // Check feed here
          $LastImport = GetValue('LastImport', $FeedData) == 'never' ? NULL : strtotime(GetValue('LastImport', $FeedData));
          if (is_null($LastImport))
@@ -117,20 +122,24 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             }
          }
       }
-      return (bool)$NeedToPoll;
+      $NeedToPoll = (bool)$NeedToPoll;   
+      if ($NeedToPoll && $AutoImport) 
+         Gdn::Controller()->StatusCode(201);
+      
+      return $NeedToPoll;
    }
    
    public function Controller_Index($Sender) {
       $Sender->Title($this->GetPluginKey('Name'));
       $Sender->AddSideMenu('plugin/feeddiscussions');
       $Sender->SetData('Description', $this->GetPluginKey('Description'));
-      $Sender->AddCssFile($this->GetResource('css/feeddiscussions.css',FALSE,FALSE));
+      $Sender->AddCssFile('feeddiscussions.css', 'plugins/FeedDiscussions');
       
       $Categories = CategoryModel::Categories();
       $Sender->SetData('Categories', $Categories);
       $Sender->SetData('Feeds', $this->GetFeeds());
       
-      $Sender->Render($this->GetView('feeddiscussions.php'));
+      $Sender->Render('feeddiscussions', '', 'plugins/FeedDiscussions');
    }
    
    public function Controller_AddFeed($Sender) {

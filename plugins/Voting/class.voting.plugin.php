@@ -59,7 +59,7 @@ class VotingPlugin extends Gdn_Plugin {
 //			return;
 		
       $Sender->AddCSSFile('voting.css', 'plugins/Voting');
-		$Sender->AddJSFile('plugins/Voting/voting.js');
+		$Sender->AddJSFile('voting.js', 'plugins/Voting');
    }
 	public function DiscussionsController_Render_Before($Sender) {
 		$this->AddJsCss($Sender);
@@ -502,15 +502,6 @@ class VotingPlugin extends Gdn_Plugin {
          $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
          $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
          $Sender->View = 'discussions';
-      }
-      
-      // Set a definition of the user's current timezone from the db. jQuery
-      // will pick this up, compare to the browser, and update the user's
-      // timezone if necessary.
-      $CurrentUser = Gdn::Session()->User;
-      if (is_object($CurrentUser)) {
-         $ClientHour = $CurrentUser->HourOffset + date('G', time());
-         $Sender->AddDefinition('SetClientHour', $ClientHour);
       }
       
       // Render the controller
