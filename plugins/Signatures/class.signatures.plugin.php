@@ -20,7 +20,7 @@
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.4.1',
+   'Version' => '1.4.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -297,20 +297,6 @@ class SignaturesPlugin extends Gdn_Plugin {
       return $Signatures;
    }
    
-   public function DiscussionController_Render_Before($Sender) {
-      $this->PrepareController($Sender);
-   }
-   
-   public function PostController_Render_Before($Sender) {
-      $this->PrepareController($Sender);
-   }
-   
-   protected function PrepareController($Controller) {
-      // Short circuit if not needed
-      if ($this->Hide()) return;
-      
-      $Controller->AddCssFile('signature.css', 'plugins/Signature');
-   }
    
    /** Deprecated in 2.1. */
    public function DiscussionController_AfterCommentBody_Handler($Sender) {
@@ -421,6 +407,10 @@ class SignaturesPlugin extends Gdn_Plugin {
    
    public function Structure() {
       // Nothing to do here!
+   }
+   
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('signature.css', 'plugins/Signature');
    }
    
    
