@@ -56,9 +56,21 @@ echo $this->Form->Open(), $this->Form->Errors();
      ?>
    </li>
    <li>
+     <?php
+     echo $this->Form->Label('Sign Out Url', 'SignOutUrl'),
+     '<div class="Info">'.T('The url that users use to sign out of your site.').'</div>',
+      $this->Form->TextBox('SignOutUrl', array('class' => 'InputBox BigInput'));
+     ?>
+   </li>
+   <li>
       <?php
          echo $this->Form->CheckBox('Trusted', 'This is trusted connection and can sync roles & permissions.');
       ?>
+   </li>
+   <li>
+     <?php
+      echo $this->Form->CheckBox('IsDefault', 'Make this connection your default signin method.');
+     ?> 
    </li>
    <li>
       <h2>Advanced</h2>

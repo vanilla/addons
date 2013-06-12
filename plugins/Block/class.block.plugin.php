@@ -30,8 +30,8 @@ class BlockPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-      $Sender->AddJsFile($this->GetResource('js/block.js', FALSE, FALSE));
-      $Sender->AddCssFile($this->GetResource('design/block.css', FALSE, FALSE));
+      $Sender->AddJsFile('block.js', 'plugins/Block');
+      $Sender->AddCssFile('block.css', 'plugins/Block');
    }
    
    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {

@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Pockets'] = array(
    'Name' => 'Pockets',
    'Description' => 'Administrators may add raw HTML to various places on the site. This plugin is very powerful, but can easily break your site if you make a mistake.',
-   'Version' => '1.1',
+   'Version' => '1.1.1',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
@@ -47,6 +47,9 @@ class PocketsPlugin extends Gdn_Plugin {
     */
    protected $_Pockets = array();
    protected $_PocketNames = array();
+   
+   protected $StateLoaded = FALSE;
+   
 
    /** Whether or not to display test items for all pockets. */
    public $TestMode = NULL;
@@ -57,7 +60,7 @@ class PocketsPlugin extends Gdn_Plugin {
 
       if ($this->TestMode && Gdn::Session()->CheckPermission('Plugins.Pockets.Manage')) {
          // Add the css for the test pockets to the page.
-         $Sender->AddCSSFile('plugins/Pockets/design/pockets.css');
+         $Sender->AddCSSFile('pockets.css', 'plugins/Pockets');
       }
    }
 
@@ -112,7 +115,7 @@ class PocketsPlugin extends Gdn_Plugin {
    public function SettingsController_Pockets_Create($Sender, $Args = array()) {
       $Sender->Permission('Plugins.Pockets.Manage');
       $Sender->AddSideMenu('settings/pockets');
-      $Sender->AddJsFile('plugins/Pockets/pockets.js');
+      $Sender->AddJsFile('pockets.js', 'plugins/Pockets');
 
       $Page = GetValue(0, $Args);
       switch(strtolower($Page)) {
@@ -306,28 +309,18 @@ class PocketsPlugin extends Gdn_Plugin {
       return GetValue($Name, $this->_PocketNames, array());
    }
 
-   protected function _LoadState() {
-      $PM = Gdn::PluginManager();
-      if (isset($PM->_PocketsPluginState)) {
-         $State = $PM->_PocketsPluginState;
-         $this->_Pockets = (array)GetValue('Pockets', $State, array());
-         $this->_Counters = (array)GetValue('Counters', $State, array());
-
-      } else {
-         // Grab all of the pockets from the database.
-         $Pockets = Gdn::SQL()->Get('Pocket', 'Location, Sort, Name')->ResultArray();
-         foreach ($Pockets as $Row) {
-            $Pocket = new Pocket();
-            $Pocket->Load($Row);
-            $this->AddPocket($Pocket);
-         }
-
-//         $Pocket = new Pocket('BetweenComment');
-//         $Pocket->Body = $this->TestHtml('<li>Between Comment</li>');
-//         $Pocket->Repeat(Pocket::REPEAT_EVERY, 3);
-//         $this->AddPocket($Pocket);
-
+   protected function _LoadState($Force = FALSE) {
+      if (!$Force && $this->StateLoaded)
+         return;
+      
+      $Pockets = Gdn::SQL()->Get('Pocket', 'Location, Sort, Name')->ResultArray();
+      foreach ($Pockets as $Row) {
+         $Pocket = new Pocket();
+         $Pocket->Load($Row);
+         $this->AddPocket($Pocket);
       }
+      
+      $this->StateLoaded = TRUE;
    }
 
    public function ProcessPockets($Sender, $Location, $CountHint = NULL) {
@@ -387,7 +380,7 @@ class PocketsPlugin extends Gdn_Plugin {
       $this->_SaveState();
    }
 
-   public static function PocketString($Name) {
+   public static function PocketString($Name, $Data = NULL) {
       $Inst = Gdn::PluginManager()->GetPluginInstance('PocketsPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
       $Pockets = $Inst->GetPockets($Name);
       
@@ -395,16 +388,37 @@ class PocketsPlugin extends Gdn_Plugin {
       foreach ($Pockets as $Pocket) {
          $Result .= $Pocket->ToString();
       }
+      
+      if (is_array($Data)) {
+         $Data = array_change_key_case($Data);
+         
+         self::PocketStringCb($Data, TRUE);
+         $Result = preg_replace_callback('`{{(\w+)}}`', array('PocketsPlugin', 'PocketStringCb'), $Result);
+      }
+      
       return $Result;
+   }
+   
+   public static function PocketStringCb($Match = NULL, $SetArgs = FALSE) {
+      static $Data;
+      if ($SetArgs) {
+         $Data = $Match;
+      }
+      
+      $Key = strtolower($Match[1]);
+      if (isset($Data[$Key]))
+         return $Data[$Key];
+      else
+         return '';
    }
 
    protected function _SaveState() {
-      $State = array(
-         'Counters' => $this->_Counters,
-         'Pockets' => $this->_Pockets
-      );
-      $PM = Gdn::PluginManager();
-      $PM->_PocketsPluginState = $State;
+//      $State = array(
+//         'Counters' => $this->_Counters,
+//         'Pockets' => $this->_Pockets
+//      );
+//      $PM = Gdn::PluginManager();
+//      $PM->_PocketsPluginState = $State;
    }
 
    public function Setup() {

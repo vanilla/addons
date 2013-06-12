@@ -3,7 +3,7 @@
 $PluginInfo['IndexPhotos'] = array(
    'Name' => 'Discussion Photos',
    'Description' => "Displays photo and name of the user who started each discussion anywhere discussions are listed.",
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RegisterPermissions' => FALSE,
    'MobileFriendly' => TRUE,
@@ -13,18 +13,8 @@ $PluginInfo['IndexPhotos'] = array(
 );
 
 class IndexPhotosPlugin extends Gdn_Plugin {
-   /**
-    * Extra style sheet.
-    */
-   public function DiscussionsController_Render_Before($Sender) {
-      $Sender->AddCssFile($this->GetResource('design/indexphotos.css', FALSE, FALSE));
-   }
-   
-   /**
-    * Extra style sheet.
-    */
-   public function CategoriesController_Render_Before($Sender) {
-      $Sender->AddCssFile($this->GetResource('design/indexphotos.css', FALSE, FALSE));
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('indexphotos.css', 'plugins/IndexPhotos');
    }
    
    /**
