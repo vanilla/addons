@@ -42,11 +42,19 @@ class ResolvedPlugin extends Gdn_Plugin {
       $Resolved = GetValue('Resolved', $Discussion);
       $NewResolved = (int)!$Resolved; 
       if (CheckPermission('Plugins.Resolved.Manage')) {
-         $Args['DiscussionOptions']['ResolveDiscussion'] = array(
-            'Label' => T($Resolved ? 'Unresolve' : 'Resolve'), 
-            'Url' => "/discussion/resolve?discussionid={$Discussion->DiscussionID}&resolve=$NewResolved", 
-            'Class' => 'Hijack'
-         ); 
+         $Label = T($Resolved ? 'Unresolve' : 'Resolve');
+         $Url = "/discussion/resolve?discussionid={$Discussion->DiscussionID}&resolve=$NewResolved";
+         // Deal with inconsistencies in how options are passed
+         if (isset($Sender->Options)) {
+            $Sender->Options .= Wrap(Anchor($Label, $Url, 'ResolveDiscussion Hijack'), 'li');
+         }
+         else {
+            $Args['DiscussionOptions']['ResolveDiscussion'] = array(
+               'Label' => $Label,
+               'Url' => $Url,
+               'Class' => 'ResolveDiscussion Hijack'
+            );
+         }
       }
    }
    
@@ -151,8 +159,26 @@ class ResolvedPlugin extends Gdn_Plugin {
     */
    public function Base_AfterDiscussionFilters_Handler($Sender) {
       if (CheckPermission('Plugins.Resolved.Manage')) {
-         echo '<li class="Unresolved">'.Anchor(Sprite('SpUnresolved').' '.T('Unresolved'), '/discussions/unresolved').'</li>';
+         $Unresolved .= T('Unresolved') . FilterCountString(self::CountUnresolved());
+         echo '<li class="Unresolved">'.Anchor(Sprite('SpUnresolved').' '.$Unresolved, '/discussions/unresolved').'</li>';
       }
+   }
+
+   /**
+    * Count the number of unresolved discussions.
+    *
+    * @return int
+    */
+   public static function CountUnresolved() {
+      $NumUnresolved = Gdn::SQL()
+         ->Select('count(DISTINCT d.DiscussionID)', '', 'NumUnresolved')
+         ->From('Discussion d')
+         ->Where('d.Resolved', 0)
+         ->Get()
+         ->FirstRow()
+         ->NumUnresolved;
+
+      return $NumUnresolved;
    }
    
    /**
