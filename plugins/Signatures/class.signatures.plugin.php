@@ -410,7 +410,7 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    public function AssetModel_StyleCss_Handler($Sender) {
-      $Sender->AddCssFile('signature.css', 'plugins/Signature');
+      $Sender->AddCssFile('signature.css', 'plugins/Signatures');
    }
    
    
