@@ -1,0 +1,23 @@
+#CountriesOnline strong
+{
+	float: left;
+}
+
+#CountriesOnline img
+{
+	position: relative;
+	top: 1px;
+	margin-right: 5px;
+}
+
+/* because I'm banal about alignment */
+#CountriesOnline .cc_VF img
+{
+	position: relative;
+	top: 3px;
+}
+
+#CountriesOnline .geoip_notice
+{
+	font-size: 80%;
+}
