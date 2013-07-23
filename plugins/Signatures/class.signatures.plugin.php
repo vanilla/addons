@@ -298,20 +298,6 @@ class SignaturesPlugin extends Gdn_Plugin {
       return $Signatures;
    }
    
-   public function DiscussionController_Render_Before($Sender) {
-      $this->PrepareController($Sender);
-   }
-   
-   public function PostController_Render_Before($Sender) {
-      $this->PrepareController($Sender);
-   }
-   
-   protected function PrepareController($Controller) {
-      // Short circuit if not needed
-      if ($this->Hide()) return;
-      
-      $Controller->AddCssFile('signature.css', 'plugins/Signature');
-   }
    
    /** Deprecated in 2.1. */
    public function DiscussionController_AfterCommentBody_Handler($Sender) {
@@ -415,6 +401,10 @@ class SignaturesPlugin extends Gdn_Plugin {
    
    public function Structure() {
       // Nothing to do here!
+   }
+   
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('signature.css', 'plugins/Signatures');
    }
    
    
