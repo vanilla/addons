@@ -10,6 +10,7 @@
  *  1.0     Initial release
  *  1.4     Add SimpleAPI hooks
  *  1.4.1   Allow self-API access
+ *  1.5     Improve "Hide Images"
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -20,7 +21,7 @@
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.4.2',
+   'Version' => '1.5',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -344,27 +345,20 @@ class SignaturesPlugin extends Gdn_Plugin {
       );
 //      $this->FireEvent('BeforeDrawSignature');
       
+      $SigClasses = '';
       if (!is_null($Signature)) {
          $HideImages = $this->UserPreferences('Plugin.Signatures.HideImages', FALSE);
          
-         if ($HideImages) {
-            // Strip img tags
-            $Signature = $this->_StripOnly($Signature, array('img'));
-         
-            // Remove blank lines and spare whitespace
-            $Signature = preg_replace('/^\S*\n\S*/m','',str_replace("\r\n","\n",$Signature));
-            $Signature = trim($Signature);
-         }
+         if ($HideImages)
+            $SigClasses .= 'HideImages ';
          
          // Don't show empty sigs
          if ($Signature == '') return;
          
          $UserSignature = Gdn_Format::To($Signature, $SigFormat)."<!-- $SigFormat -->";
          
-         
-         if ($UserSignature) {
-            echo '<div class="Signature UserSignature">'.$UserSignature.'</div>';
-         }
+         if ($UserSignature)
+            echo "<div class=\"Signature UserSignature {$SigClasses}\">{$UserSignature}</div>";
       }
    }
    
