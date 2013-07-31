@@ -21,15 +21,18 @@ echo $this->Form->Errors();
          echo $this->Form->CheckBox('Plugin.Signatures.HideImages','Strip images out of signatures');
       ?>
    </li>
-   <?php if ($this->Data('CanEdit')): ?>
+   
    <li>
       <?php
          echo $this->Form->Label('Signature Code', 'Plugin.Signatures.Sig');
-         echo $this->Form->BodyBox('Body');
-//         echo Wrap($this->Form->TextBox('Plugin.Signatures.Sig', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
-      ?>
+         if ($this->Data('CanEdit')) {
+            echo $this->Form->BodyBox('Body');
+//            echo Wrap($this->Form->TextBox('Plugin.Signatures.Sig', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
+         } else {
+            echo T("You don't have permission to use a signature.");
+         } ?>
    </li>
-   <?php endif; ?>
+   
    
    <?php
       $this->FireEvent('EditMySignatureAfter');
