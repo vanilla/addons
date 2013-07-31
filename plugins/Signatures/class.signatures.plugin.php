@@ -11,6 +11,7 @@
  *  1.4     Add SimpleAPI hooks
  *  1.4.1   Allow self-API access
  *  1.5     Improve "Hide Images"
+ *  1.5.1   Improve permission checking granularity
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -21,7 +22,7 @@
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.5',
+   'Version' => '1.5.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -59,8 +60,7 @@ class SignaturesPlugin extends Gdn_Plugin {
    
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
       if (!Gdn::Session()->CheckPermission(array(
-         'Garden.SignIn.Allow',
-         'Plugins.Signatures.Edit'
+         'Garden.SignIn.Allow'
       ))) {
          return;
       }
@@ -90,8 +90,7 @@ class SignaturesPlugin extends Gdn_Plugin {
    
    public function Controller_Index($Sender) {
       $Sender->Permission(array(
-         'Garden.Profiles.Edit',
-         'Plugins.Signatures.Edit'
+         'Garden.Profiles.Edit'
       ));
       
       $Args = $Sender->RequestArgs;
@@ -102,7 +101,8 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       list($UserReference, $Username) = $Args;
       
-      $Sender->Permission('Plugins.Signatures.Edit');
+      $canEditSignatures = Gdn::Session()->CheckPermission('Plugins.Signatures.Edit');
+      
       $Sender->GetUserInfo($UserReference, $Username);
       $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
       if (!is_array($UserPrefs))
@@ -122,8 +122,10 @@ class SignaturesPlugin extends Gdn_Plugin {
       if ($Sender->User->UserID != $ViewingUserID) {
          $Sender->Permission('Garden.Users.Edit');
          $SigUserID = $Sender->User->UserID;
+         $canEditSignatures = true;
       }
       
+      $Sender->SetData('CanEdit', $canEditSignatures);
       $Sender->SetData('Plugin-Signatures-ForceEditing', ($SigUserID == Gdn::Session()->UserID) ? FALSE : $Sender->User->Name);
       $UserMeta = $this->GetUserMeta($SigUserID, '%');
       
@@ -147,8 +149,12 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Sender->Form->SetData($Data);
       } else {
          $Values = $Sender->Form->FormValues();
-         $Values['Plugin.Signatures.Sig'] = GetValue('Body', $Values, NULL);
-         $Values['Plugin.Signatures.Format'] = GetValue('Format', $Values, NULL);
+         
+         if ($canEditSignatures) {
+            $Values['Plugin.Signatures.Sig'] = GetValue('Body', $Values, NULL);
+            $Values['Plugin.Signatures.Format'] = GetValue('Format', $Values, NULL);
+         }
+         
          $FrmValues = array_intersect_key($Values, $ConfigArray);
          
          if (sizeof($FrmValues)) {
