@@ -22,7 +22,7 @@
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.5.1',
+   'Version' => '1.5.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -362,6 +362,12 @@ class SignaturesPlugin extends Gdn_Plugin {
          if ($Signature == '') return;
          
          $UserSignature = Gdn_Format::To($Signature, $SigFormat)."<!-- $SigFormat -->";
+         
+         $this->EventArguments = array(
+            'UserID'    => $SourceUserID,
+            'String' => &$UserSignature
+         );
+         $this->FireEvent('FilterContent');
          
          if ($UserSignature)
             echo "<div class=\"Signature UserSignature {$SigClasses}\">{$UserSignature}</div>";

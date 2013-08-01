@@ -4,7 +4,7 @@
 $PluginInfo['CivilTongueEx'] = array(
    'Name' => 'Civil Tongue Ex',
    'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'MobileFriendly' => TRUE,
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -30,6 +30,13 @@ class CivilTonguePlugin extends Gdn_Plugin {
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Forum', T('Censored Words'), 'plugin/tongue', 'Garden.Moderation.Manage');
    }
+   
+   public function Base_FilterContent_Handler($Sender, $Args) {
+      if (!isset($Args['String']))
+         return;
+      
+      $Args['String'] = $this->Replace($Args['String']);
+   }
 
 	public function PluginController_Tongue_Create($Sender, $Args = array()) {
 		$Sender->Permission('Garden.Moderation.Manage');	
@@ -52,7 +59,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
 		$Sender->AddSideMenu('plugin/tongue');		
 		$Sender->SetData('Title', T('Civil Tongue'));
 		$Sender->Render($this->GetView('index.php'));
-	
+      
 	}
 
    public function ProfileController_Render_Before($Sender, $Args) {
@@ -87,7 +94,6 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
          }
       }
-
    }
 
    /**
