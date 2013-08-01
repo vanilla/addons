@@ -119,8 +119,8 @@ class MollomPlugin extends Gdn_Plugin {
 
       $Cf = new ConfigurationModule($Sender);
       $Cf->Initialize(array(
-          'Plugins.Mollom.publicKey' => array('Description' => T('Public key')),
-          'Plugins.Mollom.privateKey' => array('Description' => T('Private key'))
+          'Plugins.Mollom.publicKey' => array(),
+          'Plugins.Mollom.privateKey' => array()
           ));
 
       $Sender->AddSideMenu('dashboard/settings/plugins');
