@@ -127,10 +127,30 @@ class CivilTonguePlugin extends Gdn_Plugin {
          }
       }
    }
+   
+   public function UtilityController_CivilPatterns_Create($Sender) {
+      $Patterns = $this->GetPatterns();
+      
+      
+      
+      $Text = "What's a person to do? ass";
+      $Result = array();
+      
+      foreach ($Patterns as $Pattern) {
+         $r = preg_replace($Pattern, $this->Replace, $Text);
+         if ($r != $Text)
+            $Result[] = $Pattern;
+      }
+      
+      $Sender->SetData('Matches', $Result);
+      $Sender->SetData('Patterns', $Patterns);
+      $Sender->Render('Blank', 'Utility');
+   }
 
    public function Replace($Text) {
       $Patterns = $this->GetPatterns();
       $Result = preg_replace($Patterns, $this->Replacement, $Text);
+//      $Result = preg_replace_callback($Patterns, function($m) { return $m[0][0].str_repeat('*', strlen($m[0]) - 1); }, $Text);
       return $Result;
    }
 	
@@ -145,7 +165,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $ExplodedWords = explode(';', $Words);
             foreach($ExplodedWords as $Word) {
                if (trim($Word))
-                  $Patterns[] = '/\b' . preg_quote(trim($Word)) . '\b/is';
+                  $Patterns[] = '`\b' . preg_quote(trim($Word), '`') . '\b`is';
             }
          }
       }
