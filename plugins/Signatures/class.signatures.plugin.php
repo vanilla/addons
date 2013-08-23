@@ -70,7 +70,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       if ($Sender->User->UserID == $ViewingUserID) {
          $SideMenu->AddLink('Options', Sprite('SpSignatures').' '.T('Signature Settings'), '/profile/signature', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', Sprite('SpSignatures').' '.T('Signature Settings'), UserUrl($Sender->User, '', 'signature'), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpSignatures').' '.T('Signature Settings'), UserUrl($Sender->User, '', 'signature'), array('Garden.Users.Edit','Moderation.Signatures.Edit'), array('class' => 'Popup'));
       }
    }
    
@@ -119,7 +119,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       $SigUserID = $ViewingUserID = Gdn::Session()->UserID;
       
       if ($Sender->User->UserID != $ViewingUserID) {
-         $Sender->Permission('Garden.Users.Edit');
+         $Sender->Permission(array('Garden.Users.Edit','Moderation.Signatures.Edit'), FALSE);
          $SigUserID = $Sender->User->UserID;
       }
       
@@ -188,7 +188,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       $UserID = Gdn::Request()->Get('UserID');
       if ($UserID != Gdn::Session()->UserID)
-         $Sender->Permission('Garden.Users.Edit');
+         $Sender->Permission(array('Garden.Users.Edit','Moderation.Signatures.Edit'), FALSE);
       
       $User = Gdn::UserModel()->GetID($UserID);
       if (!$User)
