@@ -9,3 +9,7 @@
 .UserSignature p {
    margin: 2px 0;
 }
+
+.UserSignature.HideImages img {
+   display: none;
+}

@@ -4,7 +4,7 @@
 $PluginInfo['CivilTongueEx'] = array(
    'Name' => 'Civil Tongue Ex',
    'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'MobileFriendly' => TRUE,
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -30,6 +30,13 @@ class CivilTonguePlugin extends Gdn_Plugin {
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Forum', T('Censored Words'), 'plugin/tongue', 'Garden.Moderation.Manage');
    }
+   
+   public function Base_FilterContent_Handler($Sender, $Args) {
+      if (!isset($Args['String']))
+         return;
+      
+      $Args['String'] = $this->Replace($Args['String']);
+   }
 
 	public function PluginController_Tongue_Create($Sender, $Args = array()) {
 		$Sender->Permission('Garden.Moderation.Manage');	
@@ -52,7 +59,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
 		$Sender->AddSideMenu('plugin/tongue');		
 		$Sender->SetData('Title', T('Civil Tongue'));
 		$Sender->Render($this->GetView('index.php'));
-	
+      
 	}
 
    public function ProfileController_Render_Before($Sender, $Args) {
@@ -87,7 +94,6 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
          }
       }
-
    }
 
    /**
@@ -127,10 +133,30 @@ class CivilTonguePlugin extends Gdn_Plugin {
          }
       }
    }
+   
+   public function UtilityController_CivilPatterns_Create($Sender) {
+      $Patterns = $this->GetPatterns();
+      
+      
+      
+      $Text = "What's a person to do? ass";
+      $Result = array();
+      
+      foreach ($Patterns as $Pattern) {
+         $r = preg_replace($Pattern, $this->Replace, $Text);
+         if ($r != $Text)
+            $Result[] = $Pattern;
+      }
+      
+      $Sender->SetData('Matches', $Result);
+      $Sender->SetData('Patterns', $Patterns);
+      $Sender->Render('Blank', 'Utility');
+   }
 
    public function Replace($Text) {
       $Patterns = $this->GetPatterns();
       $Result = preg_replace($Patterns, $this->Replacement, $Text);
+//      $Result = preg_replace_callback($Patterns, function($m) { return $m[0][0].str_repeat('*', strlen($m[0]) - 1); }, $Text);
       return $Result;
    }
 	
@@ -145,7 +171,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $ExplodedWords = explode(';', $Words);
             foreach($ExplodedWords as $Word) {
                if (trim($Word))
-                  $Patterns[] = '/\b' . preg_quote(trim($Word)) . '\b/is';
+                  $Patterns[] = '`\b' . preg_quote(trim($Word), '`') . '\b`is';
             }
          }
       }

@@ -10,7 +10,7 @@
 
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.0.9b',
+    'Version' => '1.0.10b',
     'RequiredApplications' => array('Vanilla' => '2.0.2a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -178,6 +178,7 @@ EOT;
    }
 
    public function Format($Result) {
+      $Result = str_replace(array('[CODE]', '[/CODE]'), array('[code]', '[/code]'), $Result);
       $Result = $this->NBBC()->Parse($Result);
       return $Result;
    }
@@ -205,7 +206,7 @@ EOT;
 
    protected $_NBBC = NULL;
    /**
-    *
+    * 
     * @return BBCode 
     */
    public function NBBC() {
@@ -226,7 +227,6 @@ EOT;
             'plain_content' => Array(),
             ));
 
-
          $BBCode->AddRule('code', Array(
              'mode' => BBCODE_MODE_ENHANCED,
              'template' => "\n<pre>{\$_content/v}\n</pre>\n",
@@ -240,6 +240,7 @@ EOT;
              'plain_start' => "\n<b>Code:</b>\n",
              'plain_end' => "\n",
          ));
+         
 
          $BBCode->AddRule('quote', array('mode' => BBCODE_MODE_CALLBACK,
              'method' => array($this, "DoQuote"),
