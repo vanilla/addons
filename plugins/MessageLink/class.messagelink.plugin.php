@@ -3,8 +3,8 @@
 $PluginInfo['MessageLink'] = array(
    'Name' => 'Message Link',
    'Description' => "Adds a link to message the author of each discussion and comment.",
-   'Version' => '1.1',
-   'RequiredApplications' => array('Vanilla' => '2.0.18', 'Conversations' => '2.0.18'),
+   'Version' => '1.2',
+   'RequiredApplications' => array('Vanilla' => '2.2', 'Conversations' => '2.2'),
    'Author' => "Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com'
@@ -15,7 +15,8 @@ class MessageLinkPlugin extends Gdn_Plugin {
     * Add 'Send Message' option to Discussion.
     */
    public function Base_AfterFlag_Handler($Sender, $Args) {
-      $this->AddSendMessageButton($Sender, $Args);
+      if (CheckPermission('Conversations.Conversations.Add'))
+         $this->AddSendMessageButton($Sender, $Args);
    }
    
    /**
