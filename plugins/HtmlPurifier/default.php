@@ -23,7 +23,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 $PluginInfo['HTMLPurifier'] = array(
    'Description' => 'Adapts HtmlPurifier to work with Garden. This plugin is maintained at http://github.com/vanillaforums/Addons.',
-   'Version' => '1.4.2.0.1',
+   'Version' => '1.4.2.0.2',
    'RequiredApplications' => NULL, 
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -70,5 +70,17 @@ class HTMLPurifierPlugin extends Gdn_Plugin {
 	
 	public function Setup() {
 		if (!file_exists(PATH_CACHE.'/HtmlPurifier')) mkdir(PATH_CACHE.'/HtmlPurifier');
+		$ConfigDefaults = array(
+			'HtmlPurifier.AutoFormat.Linkify' => TRUE,
+			'HtmlPurifier.AutoFormat.AutoParagraph' => TRUE,
+			'HtmlPurifier.Cache.SerializerPath' => PATH_CACHE . '/HtmlPurifier'
+		);
+		$ConfigValues = array();
+		foreach ($ConfigDefaults as $Name => $Default) {
+			$Value = Gdn::Config($Name, NULL);
+			if (is_null($Value)) $ConfigValues[$Name] = $Default;
+		}
+		if (count($ConfigValues) > 0) SaveToConfig($ConfigValues);
+		
 	}
 }
