@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.1.8',
+   'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -239,7 +239,16 @@ class QnAPlugin extends Gdn_Plugin {
          $Args['CssClass'] = ConcatSep(' ', $Args['CssClass'], "QnA-Item-$QnA");
       }
    }
-
+   
+   public function Base_DiscussionTypes_Handler($Sender, $Args) {
+      $Args['Types']['Question'] = array(
+            'Singular' => 'Question',
+            'Plural' => 'Questions', 
+            'AddUrl' => '/post/question',
+            'AddText' => 'Ask a Question'
+            );
+   }
+   
    /**
     *
     * @param Gdn_Controller $Sender
@@ -947,17 +956,17 @@ class QnAPlugin extends Gdn_Plugin {
    /** 
     * Add the "new question" option to the new discussion button group dropdown.
     */
-   public function Base_BeforeNewDiscussionButton_Handler($Sender) {
-      $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
-      
-      $Category = Gdn::Controller()->Data('Category.UrlCode');
-      if ($Category)
-         $Category = '/'.rawurlencode($Category);
-      else
-         $Category = '';
-      
-      $NewDiscussionModule->AddButton(T('Ask a Question'), 'post/question'.$Category);
-   }
+//   public function Base_BeforeNewDiscussionButton_Handler($Sender) {
+//      $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
+//      
+//      $Category = Gdn::Controller()->Data('Category.UrlCode');
+//      if ($Category)
+//         $Category = '/'.rawurlencode($Category);
+//      else
+//         $Category = '';
+//      
+//      $NewDiscussionModule->AddButton(T('Ask a Question'), 'post/question'.$Category);
+//   }
    
    /** 
     * Add the question form to vanilla's post page.
@@ -974,6 +983,7 @@ class QnAPlugin extends Gdn_Plugin {
    public function PostController_Question_Create($Sender, $CategoryUrlCode = '') {
       // Create & call PostController->Discussion()
       $Sender->View = PATH_PLUGINS.'/QnA/views/post.php';
+      $Sender->SetData('Type', 'Question');
       $Sender->Discussion($CategoryUrlCode);
    }
    
