@@ -17,7 +17,7 @@ $PluginInfo['ShareThis'] = array(
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/plugin/sharethis',
-   'SettingsPermission' => 'Garden.AdminUser.Only',
+   'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
    'Author' => "Brendan Sera-Shriar a.k.a digibomb",
@@ -64,7 +64,7 @@ class ShareThisPlugin extends Gdn_Plugin {
     * Settings page.
     */
    public function PluginController_ShareThis_Create($Sender) {
-   	$Sender->Permission('Garden.AdminUser.Only');
+   	$Sender->Permission('Garden.Settings.Manage');
    	$Sender->Title('ShareThis');
       $Sender->AddSideMenu('plugin/sharethis');
       $Sender->Form = new Gdn_Form();
