@@ -1,12 +1,12 @@
 var SpoilersPlugin = {
    FindAndReplace: function() {
-      $('div.UserSpoiler').each(function(i, el) {
+      jQuery('div.UserSpoiler').each(function(i, el) {
          SpoilersPlugin.ReplaceSpoiler(el);
       });
    },
    
    ReplaceComment: function(Comment) {
-      $(Comment).find('div.UserSpoiler').each(function(i,el){
+      jQuery(Comment).find('div.UserSpoiler').each(function(i,el){
          SpoilersPlugin.ReplaceSpoiler(el);
       },this);
    },
@@ -17,7 +17,7 @@ var SpoilersPlugin = {
       Spoiler.SpoilerFunctioning = true;
       
       // Extend object with jQuery
-      Spoiler = $(Spoiler);
+      Spoiler = jQuery(Spoiler);
       var SpoilerTitle = Spoiler.find('div.SpoilerTitle').first();
       var SpoilerButton = document.createElement('input');
       SpoilerButton.type = 'button';
@@ -54,6 +54,6 @@ jQuery(document).bind('CommentAdded', function() {
 });
 
 jQuery('input.SpoilerToggle').livequery('click',function(event){
-   var Spoiler = $(event.target).parents('div.UserSpoiler');
-   SpoilersPlugin.ToggleSpoiler(Spoiler, $(event.target));
+   var Spoiler = jQuery(event.target).parents('div.UserSpoiler');
+   SpoilersPlugin.ToggleSpoiler(Spoiler, jQuery(event.target));
 });
