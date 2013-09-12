@@ -165,21 +165,30 @@ class SignaturesPlugin extends Gdn_Plugin {
                $FrmValues[$this->MakeMetaKey('Format')] = NULL;
             }
             
-            foreach ($FrmValues as $UserMetaKey => $UserMetaValue) {
-               $Key = $this->TrimMetaKey($UserMetaKey);
-               
-               switch ($Key) {
-                  case 'Format':
-                     if (strcasecmp($UserMetaValue, 'Raw') == 0)
-                        $UserMetaValue = NULL; // don't allow raw signatures.
-                  break;
+            // Validate the signature.
+            if (function_exists('ValidateSignature')) {
+               $Sig = trim(GetValue($this->MakeMetaKey('Sig'), $FrmValues));
+               if (ValidateRequired($Sig) && !ValidateSignature($Sig, GetValue($this->MakeMetaKey('Format'), $FrmValues))) {
+                  $Sender->Form->AddError('Signature invalid.');
                }
-               
-               $this->SetUserMeta($SigUserID, $Key, $UserMetaValue);
+            }
+            
+            if ($Sender->Form->ErrorCount() == 0) {
+               foreach ($FrmValues as $UserMetaKey => $UserMetaValue) {
+                  $Key = $this->TrimMetaKey($UserMetaKey);
+
+                  switch ($Key) {
+                     case 'Format':
+                        if (strcasecmp($UserMetaValue, 'Raw') == 0)
+                           $UserMetaValue = NULL; // don't allow raw signatures.
+                     break;
+                  }
+
+                  $this->SetUserMeta($SigUserID, $Key, $UserMetaValue);
+               }
+               $Sender->InformMessage(T("Your changes have been saved."));
             }
          }
-         
-         $Sender->InformMessage(T("Your changes have been saved."));
       }
 
       $Sender->Render('signature', '', 'plugins/Signatures');
