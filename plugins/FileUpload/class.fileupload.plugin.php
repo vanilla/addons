@@ -12,6 +12,7 @@
  *          Add file extensions to the non-image icons.
  *  1.7     Add support for discussions and comments placed in moderation queue (Lincoln, Nov 2012)
  *  1.7.1   Fix for fileupload not working now that we have json rendered as application/json.
+ *  1.8     Added the ability to restrict file uploads per category.
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -22,7 +23,7 @@
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'Images and files may be attached to discussions and comments.',
-   'Version' => '1.7.1',
+   'Version' => '1.8',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -53,6 +54,12 @@ class FileUploadPlugin extends Gdn_Plugin {
       $this->_MediaCache = NULL;
       $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
+      
+      if ($this->CanUpload) {
+         $PermissionCategory = CategoryModel::PermissionCategory(Gdn::Controller()->Data('Category'));
+         if (!GetValue('AllowFileUploads', $PermissionCategory, TRUE))
+            $this->CanUpload = FALSE;
+      }
    }
    
    public function AssetModel_StyleCss_Handler($Sender) {
@@ -340,6 +347,14 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function PostController_AfterCommentBody_Handler($Sender) {
       $this->AttachUploadsToComment($Sender);
+   }
+   
+   /*
+    * 
+    * @param Gdn_Controller $Sender
+    */
+   public function SettingsController_AddEditCategory_Handler($Sender) {
+      $Sender->Data['_PermissionFields']['AllowFileUploads'] = array('Control' => 'CheckBox');
    }
       
    /**
@@ -1016,6 +1031,11 @@ class FileUploadPlugin extends Gdn_Plugin {
          ->Column('ForeignID', 'int(11)', TRUE)
          ->Column('ForeignTable', 'varchar(24)', TRUE)
          ->Set(FALSE, FALSE);
+      
+      $Structure
+         ->Table('Category')
+         ->Column('AllowFileUploads', 'tinyint(1)', '1')
+         ->Set();
    }
 
    public function OnDisable() {

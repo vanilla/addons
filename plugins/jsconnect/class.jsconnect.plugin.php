@@ -269,8 +269,17 @@ class JsConnectPlugin extends Gdn_Plugin {
          SimpleAPIPlugin::TranslatePost($ExtData, FALSE);
       }
       
+      Gdn::UserModel()->DefineSchema();
+      $Keys = array_keys(Gdn::UserModel()->Schema->Fields());
+      $UserFields = array_change_key_case(array_combine($Keys, $Keys));
+      
       foreach ($ExtData as $Key => $Value) {
-         $Form->SetFormValue($Key, $Value);
+         $lkey = strtolower($Key);
+         if (array_key_exists($lkey, $UserFields)) {
+            $Form->SetFormValue($UserFields[$lkey], $Value);
+         } else {
+            $Form->SetFormValue($Key, $Value);
+         }
       }
       
       $Form->SetFormValue('Provider', $client_id);

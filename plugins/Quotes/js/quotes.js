@@ -7,8 +7,8 @@ function Gdn_Quotes() {
    Gdn_Quotes.prototype.Prepare = function() {
    
       // Attach quote event to each Quote button, and return false to prevent link follow
-      $('a.ReactButton.Quote').livequery('click', jQuery.proxy(function(event){
-         var QuoteLink = $(event.target);
+      jQuery('a.ReactButton.Quote').livequery('click', jQuery.proxy(function(event){
+         var QuoteLink = jQuery(event.target);
          var ObjectID = QuoteLink.attr('href').split('/').pop();
          this.Quote(ObjectID, QuoteLink);
          return false;
@@ -22,14 +22,14 @@ function Gdn_Quotes() {
        
       // Follow edit clicks
       var Quotes = this;
-      $('textarea.TextBox').livequery(function(){
+      jQuery('textarea.TextBox').livequery(function(){
          Quotes.EditorStack(this);
       }, function(){
          Quotes.EditorStack(this, true);
       });
       
       // Determine what mode we're in (default, cleditor... ?)
-      $('div.cleditorMain').livequery(function(){
+      jQuery('div.cleditorMain').livequery(function(){
          Quotes.SetInsertMode('cleditor', this);
       });
       
@@ -38,26 +38,26 @@ function Gdn_Quotes() {
       if (QuoteFoldingLevel != 'None') {
          QuoteFoldingLevel = parseInt(QuoteFoldingLevel) + 1;
          var MaxFoldingLevel = 6;
-         $('.Comment .Message').livequery(function(){
+         jQuery('.Comment .Message').livequery(function(){
 
             
             // Find the closest child quote
-            var PetQuote = $(this).children('.UserQuote');
+            var PetQuote = jQuery(this).children('.UserQuote');
             if (!PetQuote.length) return;
 
             Quotes.ExploreFold(PetQuote, 1, MaxFoldingLevel, QuoteFoldingLevel);
             
          });
 
-         $('a.QuoteFolding').livequery('click', function(){
-            var QuoteTarget = $(this).closest('.QuoteText').children('.UserQuote');
-            QuoteTarget = $(QuoteTarget);
+         jQuery('a.QuoteFolding').livequery('click', function(){
+            var QuoteTarget = jQuery(this).closest('.QuoteText').children('.UserQuote');
+            QuoteTarget = jQuery(QuoteTarget);
             QuoteTarget.toggle();
 
             if (QuoteTarget.css('display') != 'none')
-               $(this).html('&laquo; hide previous quotes');
+               jQuery(this).html('&laquo; hide previous quotes');
             else
-               $(this).html('&raquo; show previous quotes');
+               jQuery(this).html('&raquo; show previous quotes');
 
             return false;
          });
@@ -67,16 +67,16 @@ function Gdn_Quotes() {
    Gdn_Quotes.prototype.ExploreFold = function(QuoteTree, FoldingLevel, MaxLevel, TargetLevel) {
       if (FoldingLevel > MaxLevel || FoldingLevel > TargetLevel) return;
       var Quotes = this;
-      $(QuoteTree).each(function(i, el){
-         var ExamineQuote = $(el);
+      jQuery(QuoteTree).each(function(i, el){
+         var ExamineQuote = jQuery(el);
          
          if (FoldingLevel == TargetLevel) {
-            $(ExamineQuote).addClass('QuoteFolded').hide();
-            $(ExamineQuote).before('<div><a href="" class="QuoteFolding">&raquo; show previous quotes</a></div>');
+            jQuery(ExamineQuote).addClass('QuoteFolded').hide();
+            jQuery(ExamineQuote).before('<div><a href="" class="QuoteFolding">&raquo; show previous quotes</a></div>');
             return;
          }
          
-         var FoldQuote = $(ExamineQuote).children('.QuoteText').children('.UserQuote');
+         var FoldQuote = jQuery(ExamineQuote).children('.QuoteText').children('.UserQuote');
          if (!FoldQuote.length) return;
 
          Quotes.ExploreFold(FoldQuote, FoldingLevel + 1, MaxLevel, TargetLevel);
@@ -91,7 +91,7 @@ function Gdn_Quotes() {
       switch (this.InsertMode) {
          case 'cleditor':
 
-            var Frame = $($(ChangeElement).find('textarea.TextBox').get(0).editor.$frame).get(0);
+            var Frame = jQuery(jQuery(ChangeElement).find('textarea.TextBox').get(0).editor.$frame).get(0);
             var FrameBody = null;
             var FrameDocument = null;
             
@@ -166,17 +166,17 @@ function Gdn_Quotes() {
    }
    
    Gdn_Quotes.prototype.GetObjectID = function(Anchor) {
-      return $(Anchor).attr('href').split('/').pop();
+      return jQuery(Anchor).attr('href').split('/').pop();
    }
    
    Gdn_Quotes.prototype.EditorStack = function(AreaContainer, Remove) {
       if (AreaContainer == undefined) return false;
       
       var TextArea = null;
-      if ($(AreaContainer).get(0).nodeName.toLowerCase() == 'textarea')
-         TextArea = $(AreaContainer);
+      if (jQuery(AreaContainer).get(0).nodeName.toLowerCase() == 'textarea')
+         TextArea = jQuery(AreaContainer);
       else {
-         TextArea = $(AreaContainer).find('textarea.TextBox');
+         TextArea = jQuery(AreaContainer).find('textarea.TextBox');
          if (TextArea.length == 0) return false;
       }
    
@@ -190,7 +190,7 @@ function Gdn_Quotes() {
          var EID = TextArea.get(0).eid;
          
          // Get rid of an editor
-         $(this.Editors).each(jQuery.proxy(function(i,el){
+         jQuery(this.Editors).each(jQuery.proxy(function(i,el){
             if (el.get(0).eid == EID) {
                this.Editors.splice(i,1);
                return;
@@ -211,7 +211,7 @@ function Gdn_Quotes() {
       
       switch (this.InsertMode) {
          case 'cleditor':
-            var ScrollY = $(this.GetEditor().get(0).editor.$frame).offset().top - 100; // 100 provides buffer in viewport
+            var ScrollY = jQuery(this.GetEditor().get(0).editor.$frame).offset().top - 100; // 100 provides buffer in viewport
          break;
          
          case 'default':
@@ -220,18 +220,18 @@ function Gdn_Quotes() {
          break;
       }
       
-      $('html,body').animate({scrollTop: ScrollY}, 800);
+      jQuery('html,body').animate({scrollTop: ScrollY}, 800);
    }
    
    Gdn_Quotes.prototype.GetQuoteData = function(ObjectID) {
-      var QuotedElement = $('#'+ObjectID);
+      var QuotedElement = jQuery('#'+ObjectID);
       if (!QuotedElement) return false;
       
       this.AddSpinner();
       var QuotebackURL = gdn.url('/discussion/getquote/'+ObjectID);
       jQuery.ajax({
          url: QuotebackURL,
-         data: { format: $('#Form_Format').val() },
+         data: { format: jQuery('#Form_Format').val() },
          type: 'GET',
          dataType: 'json',
          success: jQuery.proxy(this.QuoteResponse,this)
