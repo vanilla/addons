@@ -57,14 +57,16 @@ class SignaturesPlugin extends Gdn_Plugin {
             break;
       }
    }
-   
+
+   /**
+    * Add "Signature Settings" to profile edit mode side menu.
+    *
+    * @param $Sender
+    */
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
-      if (!Gdn::Session()->CheckPermission(array(
-         'Garden.SignIn.Allow'
-      ))) {
+      if (!CheckPermission('Garden.SignIn.Allow'))
          return;
-      }
-   
+
       $SideMenu = $Sender->EventArguments['SideMenu'];
       $ViewingUserID = Gdn::Session()->UserID;
       
@@ -73,6 +75,18 @@ class SignaturesPlugin extends Gdn_Plugin {
       } else {
          $SideMenu->AddLink('Options', Sprite('SpSignatures').' '.T('Signature Settings'), UserUrl($Sender->User, '', 'signature'), array('Garden.Users.Edit','Moderation.Signatures.Edit'), array('class' => 'Popup'));
       }
+   }
+
+   /**
+    * Add "Signature Settings" to Profile Edit button group.
+    * Only do this if they cannot edit profiles because otherwise they can't navigate there.
+    *
+    * @param $Sender
+    */
+   public function ProfileController_BeforeProfileOptions_Handler($Sender, $Args) {
+      $CanEditProfiles = CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Profiles.Edit');
+      if (CheckPermission('Moderation.Signatures.Edit') && !$CanEditProfiles)
+         $Args['ProfileOptions'][] = array('Text' => Sprite('SpSignatures').' '.T('Signature Settings'), 'Url' => UserUrl($Sender->User, '', 'signature'));
    }
    
    /**
@@ -101,7 +115,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       list($UserReference, $Username) = $Args;
       
-      $canEditSignatures = Gdn::Session()->CheckPermission('Plugins.Signatures.Edit');
+      $canEditSignatures = CheckPermission('Plugins.Signatures.Edit');
       
       $Sender->GetUserInfo($UserReference, $Username);
       $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
