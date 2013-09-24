@@ -241,25 +241,39 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       if ($Sender->Form->IsPostBack()) {
          $Sender->SetData('Success', FALSE);
-         foreach ($Translation as $TranslationField => $TranslationShortcut) {
-            $UserMetaValue = $Sender->Form->GetValue($TranslationShortcut, NULL);
-            if (is_null($UserMetaValue)) continue;
-            
-            if ($TranslationShortcut == 'Body' && empty($UserMetaValue))
-               $UserMetaValue = NULL;
-            
-            $Key = $this->TrimMetaKey($TranslationField);
-
-            switch ($Key) {
-               case 'Format':
-                  if (strcasecmp($UserMetaValue, 'Raw') == 0)
-                     $UserMetaValue = NULL; // don't allow raw signatures.
-               break;
+         
+         // Validate the signature.
+         if (function_exists('ValidateSignature')) {
+            $Sig = $Sender->Form->GetFormValue('Body');
+            $Format = $Sender->Form->GetFormValue('Format');
+            if (ValidateRequired($Sig) && !ValidateSignature($Sig, $Format)) {
+               $Sender->Form->AddError('Signature invalid.');
             }
-
-            $this->SetUserMeta($UserID, $Key, $UserMetaValue);
          }
-         $Sender->SetData('Success', TRUE);
+         
+         if ($Sender->Form->ErrorCount() == 0) {
+            foreach ($Translation as $TranslationField => $TranslationShortcut) {
+               $UserMetaValue = $Sender->Form->GetValue($TranslationShortcut, NULL);
+               if (is_null($UserMetaValue)) continue;
+
+               if ($TranslationShortcut == 'Body' && empty($UserMetaValue))
+                  $UserMetaValue = NULL;
+
+               $Key = $this->TrimMetaKey($TranslationField);
+
+               switch ($Key) {
+                  case 'Format':
+                     if (strcasecmp($UserMetaValue, 'Raw') == 0)
+                        $UserMetaValue = NULL; // don't allow raw signatures.
+                  break;
+               }
+
+               if ($Sender->Form->ErrorCount() == 0) {
+                  $this->SetUserMeta($UserID, $Key, $UserMetaValue);
+               }
+            }
+            $Sender->SetData('Success', TRUE);
+         }
       }
       
       $Sender->Render();
