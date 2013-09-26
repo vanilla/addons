@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ShareThis'] = array(
    'Name' => 'ShareThis',
    'Description' => 'Adds ShareThis (http://sharethis.com) buttons below discussions.',
-   'Version' => '1.1.1',
+   'Version' => '1.1.2',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -32,10 +32,12 @@ class ShareThisPlugin extends Gdn_Plugin {
     */
 	public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
       $PublisherNumber = C('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
-      echo '
+      $ViaHandle = C('Plugin.ShareThis.ViaHandle', '');
+
+      echo <<<SHARETHIS
       <script type="text/javascript">var switchTo5x=true;</script>
       <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
-      <script type="text/javascript">stLight.options({publisher: "'.$PublisherNumber.'", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
+      <script type="text/javascript">stLight.options({publisher: "{$PublisherNumber}", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
       <div class="ShareThisButtonWrapper Right">
          <span class="st_twitter_hcount ShareThisButton" displayText="Tweet"></span>
          <span class="st_facebook_hcount ShareThisButton" displayText="Facebook"></span>
@@ -45,7 +47,9 @@ class ShareThisPlugin extends Gdn_Plugin {
          <span class="st_pinterest_hcount ShareThisButton Hidden" displayText="Pinterest"></span>
          <span class="st_email_hcount ShareThisButton" displayText="Email"></span>
          <span class="st_sharethis_hcountShareThisButton" displayText="ShareThis"></span>
-      </div>';
+         <span class="st_twitter" st_via="{$ViaHandle}"></span>
+SHARETHIS;
+
    }
 
    public function Setup() {
@@ -69,12 +73,16 @@ class ShareThisPlugin extends Gdn_Plugin {
       $Sender->AddSideMenu('plugin/sharethis');
       $Sender->Form = new Gdn_Form();
 
-      $PublisherNumber = C('Vanilla.Plugin.PublisherNumber', 'Publisher Number');
+      $PublisherNumber = C('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
+      $ViaHandle = C('Plugin.ShareThis.ViaHandle', '');
+      
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigArray = array('Plugin.ShareThis.PublisherNumber');
-      if ($Sender->Form->AuthenticatedPostBack() === FALSE)
+      $ConfigArray = array('Plugin.ShareThis.PublisherNumber','Plugin.ShareThis.ViaHandle');
+      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
          $ConfigArray['Plugin.ShareThis.PublisherNumber'] = $PublisherNumber;
+         $ConfigArray['Plugin.ShareThis.ViaHandle'] = $ViaHandle;
+      }
       
       $ConfigurationModel->SetField($ConfigArray);
       $Sender->Form->SetModel($ConfigurationModel);
