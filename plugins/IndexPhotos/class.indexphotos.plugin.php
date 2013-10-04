@@ -2,7 +2,7 @@
 
 $PluginInfo['IndexPhotos'] = array(
    'Name' => 'Discussion Photos',
-   'Description' => "Displays photo and name of the user who started each discussion anywhere discussions are listed.",
+   'Description' => "Displays photo and name of the user who started each discussion anywhere discussions are listed. Note that this plugin will not have any affect when table layouts are enabled.",
    'Version' => '1.2.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RegisterPermissions' => FALSE,
