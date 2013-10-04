@@ -54,6 +54,12 @@ echo $this->Form->Errors();
          		echo $this->Form->TextBox('Plugin.ShareThis.PublisherNumber');
       		?>
          </li>
+         <li>
+            <?php
+         		echo $this->Form->Label("Enter 'via' handle");
+         		echo $this->Form->TextBox('Plugin.ShareThis.ViaHandle');
+      		?>
+         </li>
       </ul>
       <?php echo $this->Form->Button('Save', array('class' => 'Button SliceSubmit')); ?>
    </div>
