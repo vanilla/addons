@@ -40,12 +40,18 @@ class TrollManagementPlugin extends Gdn_Plugin {
    
 	/**
 	 * Validates the current user's permissions & transientkey and then marks a user as a troll.
+    * @param Gdn_Controller $Sender
 	 */
-	public function UserController_MarkTroll_Create($Sender) {
-		$TrollUserID = GetValue('0', $Sender->RequestArgs);
-		$TransientKey = GetValue('1', $Sender->RequestArgs);
+	public function UserController_MarkTroll_Create($Sender, $UserID, $TK) {
+      $Sender->Permission('Garden.Users.Edit');
+      
+		$TrollUserID = $UserID; //GetValue('0', $Sender->RequestArgs);
+		$TransientKey = $TK; //GetValue('1', $Sender->RequestArgs);
+      
+      // TODO: $Sender->Request->IsAuthenticatedPostBack()
+      
 		// Validate the transient key && permissions
-		if (Gdn::Session()->ValidateTransientKey($TransientKey) && Gdn::Session()->CheckPermission('Garden.Users.Edit')) {
+		if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
 			$Trolls = C('Plugins.TrollManagement.Cache');
 			if (!is_array($Trolls))
 				$Trolls = array();
@@ -60,6 +66,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
 			}
 			SaveToConfig('Plugins.TrollManagement.Cache', $Trolls);
 		}
+      
+      // TODO: 
 		Redirect('profile/'.$TrollUserID.'/troll');
 	}
 	
@@ -218,7 +226,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
 		$Object = $Sender->EventArguments[$EventArgumentName];
 		if (GetValue('IsTroll', $Object)) {
          if ($Style === 'message')
-            echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: -4px 0 8px; background: rgba(0, 0, 0, 0.05); color: #d00; font-size: 11px;">'.T('Troll.Content', '<strong style="font-weight: bold;">Troll</strong><br />This user has been marked as a troll.<br />This content is only visible to you and the troll.<br/ >This message does not appear for the troll.').'</div>';
+            echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: -4px 0 8px; background: rgba(0, 0, 0, 0.05); color: #d00; font-size: 11px;">'.T('Troll.Content', '<b>Troll</b> <ul> <li>This user has been marked as a troll.</li> <li>Their content is only visible to moderators and the troll.</li> <li>This message does not appear for the troll.</li></ul>').'</div>';
          else
             echo '<span class="Tag Tag-Troll" title="This user has been marked as a troll.">Troll</span>';
       }
