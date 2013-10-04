@@ -187,7 +187,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
 	 * Identify troll discussions for admins.
 	 */
 	public function Base_BeforeDiscussionContent_Handler($Sender) {
-		$this->_ShowAdmin($Sender, 'Discussion');
+//		$this->_ShowAdmin($Sender, 'Discussion');
 	}
 
 	/**
@@ -196,8 +196,12 @@ class TrollManagementPlugin extends Gdn_Plugin {
 	public function Base_BeforeCommentBody_Handler($Sender) {
 		$this->_ShowAdmin($Sender, 'Object');
 	}
+   
+   public function Base_BeforeDiscussionMeta_Handler($Sender, $Args) {
+      $this->_ShowAdmin($Sender, 'Discussion', 'tag');
+   }
 	
-	private function _ShowAdmin($Sender, $EventArgumentName) {
+	private function _ShowAdmin($Sender, $EventArgumentName, $Style = 'message') {
 		// Don't do anything if there are no trolls
 		$Trolls = C('Plugins.TrollManagement.Cache');
 		if (!is_array($Trolls))
@@ -212,8 +216,12 @@ class TrollManagementPlugin extends Gdn_Plugin {
 			return;
 
 		$Object = $Sender->EventArguments[$EventArgumentName];
-		if (GetValue('IsTroll', $Object))
-			echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: -4px 0 8px; background: rgba(0, 0, 0, 0.05); color: #d00; font-size: 11px;">'.T('Troll.Content', '<strong style="font-weight: bold;">Troll</strong><br />This user has been marked as a troll.<br />This content is only visible to you and the troll.<br/ >This message does not appear for the troll.').'</div>';
+		if (GetValue('IsTroll', $Object)) {
+         if ($Style === 'message')
+            echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: -4px 0 8px; background: rgba(0, 0, 0, 0.05); color: #d00; font-size: 11px;">'.T('Troll.Content', '<strong style="font-weight: bold;">Troll</strong><br />This user has been marked as a troll.<br />This content is only visible to you and the troll.<br/ >This message does not appear for the troll.').'</div>';
+         else
+            echo '<span class="Tag Tag-Troll" title="This user has been marked as a troll.">Troll</span>';
+      }
 	}
 	
 	/**
