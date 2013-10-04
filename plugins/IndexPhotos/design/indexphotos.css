@@ -1,7 +1,10 @@
-ul.Discussions li img {
+.IndexPhoto {
+   float: left;
+}
+
+.IndexPhoto img {
    height: 40px;
    width: 40px;
-   float: left;
 }
 
 .Discussion.ItemContent {
