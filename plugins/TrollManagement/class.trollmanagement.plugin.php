@@ -42,33 +42,36 @@ class TrollManagementPlugin extends Gdn_Plugin {
 	 * Validates the current user's permissions & transientkey and then marks a user as a troll.
     * @param Gdn_Controller $Sender
 	 */
-	public function UserController_MarkTroll_Create($Sender, $UserID, $TK) {
+	public function UserController_MarkTroll_Create($Sender, $UserID, $Troll = TRUE) {
       $Sender->Permission('Garden.Users.Edit');
+      $Sender->Permission('Garden.Moderation.Manage');
       
-		$TrollUserID = $UserID; //GetValue('0', $Sender->RequestArgs);
-		$TransientKey = $TK; //GetValue('1', $Sender->RequestArgs);
+		$TrollUserID = $UserID;
       
-      // TODO: $Sender->Request->IsAuthenticatedPostBack()
+      // Validate the transient key && permissions
+      // Make sure we are posting back.
+      if (!$Sender->Request->IsAuthenticatedPostBack()) {
+         throw PermissionException('Javascript');
+      }
       
-		// Validate the transient key && permissions
-		if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
-			$Trolls = C('Plugins.TrollManagement.Cache');
-			if (!is_array($Trolls))
-				$Trolls = array();
-			
-			// Toggle
-			if (in_array($TrollUserID, $Trolls)) {
-				Gdn::SQL()->Update('User', array('Troll' => 0), array('UserID' => $TrollUserID))->Put();
-				unset($Trolls[array_search($TrollUserID, $Trolls)]);
-			} else {
-				Gdn::SQL()->Update('User', array('Troll' => 1), array('UserID' => $TrollUserID))->Put();
-				$Trolls[] = $TrollUserID;
-			}
-			SaveToConfig('Plugins.TrollManagement.Cache', $Trolls);
-		}
+      $Trolls = C('Plugins.TrollManagement.Cache');
+      if (!is_array($Trolls)) {
+         $Trolls = array();
+      }
+
+      // Toggle troll value in DB
+      if (in_array($TrollUserID, $Trolls)) {
+         Gdn::SQL()->Update('User', array('Troll' => 0), array('UserID' => $TrollUserID))->Put();
+         unset($Trolls[array_search($TrollUserID, $Trolls)]);
+      } else {
+         Gdn::SQL()->Update('User', array('Troll' => 1), array('UserID' => $TrollUserID))->Put();
+         $Trolls[] = $TrollUserID;
+      }
       
-      // TODO: 
-		Redirect('profile/'.$TrollUserID.'/troll');
+      SaveToConfig('Plugins.TrollManagement.Cache', $Trolls);
+
+      $Sender->JsonTarget('', '', 'Refresh');
+      $Sender->Render('Blank', 'Utility', 'Dashboard');
 	}
 	
 	/**
@@ -116,23 +119,6 @@ class TrollManagementPlugin extends Gdn_Plugin {
       $SharedFingerprintModule = new SharedFingerprintModule($Sender);
       $SharedFingerprintModule->GetData($Sender->User->UserID, $FingerprintValue);
       $Sender->AddModule($SharedFingerprintModule);
-	}
-	
-	/**
-	 * Add a link to the user profile page that lets you mark the user as a troll (or unmark)
-	 */
-   public function ProfileController_AfterAddSideMenu_Handler($Sender) {
-		if (!Gdn::Session()->CheckPermission('Garden.Users.Edit'))
-			return;
-		
-		$Trolls = C('Plugins.TrollManagement.Cache');
-		if (!is_array($Trolls))
-			$Trolls = array();
-			
-      $SideMenu = $Sender->EventArguments['SideMenu'];
-      $ViewingUserID = Gdn::Session()->UserID;
-      if ($Sender->User->UserID != $ViewingUserID)
-         $SideMenu->AddLink('Options', T(in_array($Sender->User->UserID, $Trolls) ? 'Unmark as Troll' : 'Mark as Troll'), '/user/marktroll/'.$Sender->User->UserID.'/'.Gdn::Session()->TransientKey(), '', array('class' => 'PopConfirm'));
 	}
    
 	/**
@@ -195,40 +181,45 @@ class TrollManagementPlugin extends Gdn_Plugin {
 	 * Identify troll discussions for admins.
 	 */
 	public function Base_BeforeDiscussionContent_Handler($Sender) {
-//		$this->_ShowAdmin($Sender, 'Discussion');
+      // $this->_ShowAdmin($Sender, 'Discussion');
 	}
 
 	/**
 	 * Identify troll comments for admins.
 	 */
 	public function Base_BeforeCommentBody_Handler($Sender) {
+      // Note that for DiscussionController, the IsTroll var is not being set.
 		$this->_ShowAdmin($Sender, 'Object');
 	}
    
    public function Base_BeforeDiscussionMeta_Handler($Sender, $Args) {
       $this->_ShowAdmin($Sender, 'Discussion', 'tag');
    }
-	
+
 	private function _ShowAdmin($Sender, $EventArgumentName, $Style = 'message') {
 		// Don't do anything if there are no trolls
 		$Trolls = C('Plugins.TrollManagement.Cache');
-		if (!is_array($Trolls))
+		if (!is_array($Trolls)) {
 			return;
+      }
 		
+      $Object = $Sender->EventArguments[$EventArgumentName];
+      $ViewingUserID = Gdn::Session()->UserID;
+      $InsertUserID = GetValue('InsertUserID', $Object);
+      
 		// Don't do anything if this is a troll
-		if (in_array(Gdn::Session()->UserID, $Trolls))
+		if (in_array($ViewingUserID, $Trolls))
 			return;
 		
 		// Don't do anything if the user is not admin (sanity check).
 		if (!Gdn::Session()->CheckPermission('Garden.Users.Edit'))
 			return;
-
-		$Object = $Sender->EventArguments[$EventArgumentName];
-		if (GetValue('IsTroll', $Object)) {
+      
+		if (in_array($InsertUserID, $Trolls)) {
          if ($Style === 'message')
             echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: -4px 0 8px; background: rgba(0, 0, 0, 0.05); color: #d00; font-size: 11px;">'.T('Troll.Content', '<b>Troll</b> <ul> <li>This user has been marked as a troll.</li> <li>Their content is only visible to moderators and the troll.</li> <li>This message does not appear for the troll.</li></ul>').'</div>';
          else
-            echo '<span class="Tag Tag-Troll" title="This user has been marked as a troll.">Troll</span>';
+            echo '<span class="Tag Tag-Troll" title="'. T('This user has been marked as a troll.') .'">Troll</span>';
       }
 	}
 	
@@ -255,4 +246,50 @@ class TrollManagementPlugin extends Gdn_Plugin {
 		if (in_array(Gdn::Session()->UserID, $Trolls))
 			$Sender->EventArguments['FormPostValues']['Sink'] = 1;
 	}
+   
+   /**
+    * If user has been marked as troll, write a message at the top of their 
+    * profile for only site admins to read. 
+    * 
+    * @param ProfileController $Sender
+    */
+   public function ProfileController_BeforeUserInfo_Handler($Sender) {
+      $UserID        = $Sender->User->UserID;
+      $Trolls        = C('Plugins.TrollManagement.Cache');
+      $ViewingUserID = Gdn::Session()->UserID;
+      
+      if (!is_array($Trolls)) {
+         $Trolls = array();
+      }
+      
+      if (is_array($Trolls) 
+      && $ViewingUserID != $UserID
+      && in_array($UserID, $Trolls)) {
+         
+         echo '
+         <div class="Hero Warning">
+            <h3>'. T('Troll') .'</h3>
+            '. T('This user has been marked as a troll.') .'
+         </div>';
+      }
+   }
+   
+   public function ProfileController_BeforeProfileOptions_Handler($Sender) {
+      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         $UserID        = $Sender->User->UserID;
+         $Trolls        = C('Plugins.TrollManagement.Cache');
+         
+         if (!is_array($Trolls)) {
+            $Trolls = array();
+         }
+
+         $troll = in_array($UserID, $Trolls) ? 1 : 0;
+
+         $Sender->EventArguments['ProfileOptions']['TrollToggle'] = array(
+            'Text' => T(($troll) ? 'Unmark as Troll' : 'Mark as Troll'),
+            'Url' => '/user/marktroll?userid='.$UserID.'&troll='.(int)(!$troll),
+            'CssClass' => 'Hijack Button-Troll'
+         );
+      }
+   }
 }
