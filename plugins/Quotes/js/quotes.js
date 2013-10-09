@@ -8,7 +8,7 @@ function Gdn_Quotes() {
    
       // Attach quote event to each Quote button, and return false to prevent link follow
       $('a.ReactButton.Quote').livequery('click', jQuery.proxy(function(event){
-         var QuoteLink = $(event.target).closest('a');
+         var QuoteLink = jQuery(event.target).closest('a');
          var ObjectID = QuoteLink.attr('href').split('/').pop();
          this.Quote(ObjectID, QuoteLink);
          return false;
