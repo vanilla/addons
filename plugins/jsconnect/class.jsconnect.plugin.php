@@ -472,6 +472,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $Sender->SetFormSaved(FALSE);
          } else {
             $Form->ValidateRule('AuthenticationKey', 'ValidateRequired');
+            $Form->ValidateRule('AuthenticationKey', 'regex:`^[a-z0-9_-]+$`i', T('The client id must contain only letters, numbers and dashes.'));
             $Form->ValidateRule('AssociationSecret', 'ValidateRequired');
             $Form->ValidateRule('AuthenticateUrl', 'ValidateRequired');
 
