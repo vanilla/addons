@@ -32,20 +32,19 @@ class LastEditedPlugin extends Gdn_Plugin {
       $Sender->AddCssFile('lastedited.css', 'plugins/LastEdited');
    }
    
-   public function DiscussionController_AfterDiscussionBody_Handler(&$Sender) {
+   public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
       $this->DrawEdited($Sender);
    }
    
-   public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
+   public function DiscussionController_AfterCommentBody_Handler($Sender) {
       $this->DrawEdited($Sender);
    }
    
-   public function PostController_AfterCommentBody_Handler(&$Sender) {
+   public function PostController_AfterCommentBody_Handler($Sender) {
       $this->DrawEdited($Sender);
    }
    
-   protected function DrawEdited(&$Sender) {
-      
+   protected function DrawEdited($Sender) {
       $Record = $Sender->Data('Discussion');
       if (!$Record)
          $Record = $Sender->Data('Record');
