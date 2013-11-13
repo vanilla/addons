@@ -998,4 +998,11 @@ class QnAPlugin extends Gdn_Plugin {
          $Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/question')));
       }
    }
+
+   /**
+    * Add 'New Question Form' location to Messages.
+    */
+   public function MessageController_AfterGetLocationData_Handler($Sender, $Args) {
+      $Args['ControllerData']['Vanilla/Post/Question'] = T('New Question Form');
+   }
 }
