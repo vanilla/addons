@@ -64,24 +64,11 @@ class IndexPhotosPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Determine whether layout is "table" (vs. "modern")
+    * Determine whether layout of discussions page is "table" (vs. "modern").
     * 
     * @return bool If forum is using table layout, returns true
     */
    public function hasLayoutTables() {
-      $layoutTables = false;
-      $layoutFormat = 'table';
-      
-      // These are the two areas where tables could be used.
-      $tablePossibilities = array(
-         C('Vanilla.Discussions.Layout'), 
-         C('Vanilla.Categories.Layout')
-      );
-      
-      if (in_array($layoutFormat, $tablePossibilities)) {
-         $layoutTables = true;
-      }
-
-      return $layoutTables;
+      return (C('Vanilla.Discussions.Layout') == 'table');
    }
 }
