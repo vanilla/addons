@@ -14,7 +14,7 @@ $PluginInfo['ShareThis'] = array(
    'Description' => 'Adds ShareThis (http://sharethis.com) buttons below discussions.',
    'Version' => '1.1.2',
    'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE, 
+   'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/plugin/sharethis',
    'SettingsPermission' => 'Garden.Settings.Manage',
@@ -47,6 +47,7 @@ class ShareThisPlugin extends Gdn_Plugin {
          <span class="st_pinterest_hcount ShareThisButton Hidden" displayText="Pinterest"></span>
          <span class="st_email_hcount ShareThisButton" displayText="Email"></span>
          <span class="st_sharethis_hcountShareThisButton" displayText="ShareThis"></span>
+      </div>
 SHARETHIS;
 
    }
@@ -54,15 +55,15 @@ SHARETHIS;
    public function Setup() {
       // Nothing to do here!
    }
-   
+
    /**
-    * Add to dashboard side menu. 
-    */ 
+    * Add to dashboard side menu.
+    */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Add-ons', T('ShareThis'), 'plugin/sharethis', 'Garden.Settings.Manage');
    }
-   
+
    /**
     * Settings page.
     */
@@ -74,7 +75,7 @@ SHARETHIS;
 
       $PublisherNumber = C('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
       $ViaHandle = C('Plugin.ShareThis.ViaHandle', '');
-      
+
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigArray = array('Plugin.ShareThis.PublisherNumber','Plugin.ShareThis.ViaHandle');
@@ -82,7 +83,7 @@ SHARETHIS;
          $ConfigArray['Plugin.ShareThis.PublisherNumber'] = $PublisherNumber;
          $ConfigArray['Plugin.ShareThis.ViaHandle'] = $ViaHandle;
       }
-      
+
       $ConfigurationModel->SetField($ConfigArray);
       $Sender->Form->SetModel($ConfigurationModel);
       // If seeing the form for the first time...
@@ -95,8 +96,8 @@ SHARETHIS;
          if ($Sender->Form->Save() !== FALSE)
             $Sender->InformMessage(T("Your changes have been saved."));
       }
-      
+
       $Sender->Render('sharethis', '', 'plugins/ShareThis');
    }
-      
+
 }
