@@ -28,7 +28,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
     */
 	public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Forum', T('Censored Words'), 'plugin/tongue', 'Garden.Moderation.Manage');
+      $Menu->AddLink('Forum', T('Censored Words'), 'plugin/tongue', 'Garden.Settings.Manage');
    }
    
    public function Base_FilterContent_Handler($Sender, $Args) {
@@ -39,7 +39,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
    }
 
 	public function PluginController_Tongue_Create($Sender, $Args = array()) {
-		$Sender->Permission('Garden.Moderation.Manage');	
+		$Sender->Permission('Garden.Settings.Manage');
 		$Sender->Form = new Gdn_Form();
 		$Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
