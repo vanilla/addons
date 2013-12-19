@@ -60,6 +60,11 @@ echo $this->Form->Errors();
          		echo $this->Form->TextBox('Plugin.ShareThis.ViaHandle');
       		?>
          </li>
+         <li>
+            <?php
+         		echo $this->Form->CheckBox('Plugin.ShareThis.CopyNShare', "Enable 'CopyNShare' functionality");
+      		?>
+         </li>
       </ul>
       <?php echo $this->Form->Button('Save', array('class' => 'Button SliceSubmit')); ?>
    </div>
@@ -69,7 +74,7 @@ echo $this->Form->Errors();
 		<p><strong>Using ShareThis with Vanilla Social Connect</strong>If you are using the <a href="http://vanillaforums.com/features/social-connect" target="_blank">Social Connect</a> plugin to allow your community members to sign in with Facebook or Twitter, the ShareThis plugin will automatically retrieve their information for seamless sharing. </p>
    </div>
 </div>
-<?php 
+<?php
    echo $this->Form->Close();
 
-		
+
