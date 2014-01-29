@@ -76,6 +76,11 @@ class DebugbarPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      */
     public function Base_Render_Before($sender) {
+        static $called = false;
+
+        if ($called)
+           return;
+
         $bar = $this->debugBar();
         $bar['time']->stopMeasure('controller');
         $bar['time']->startMeasure('render', 'Render');
@@ -86,12 +91,19 @@ class DebugbarPlugin extends Gdn_Plugin {
         $head = $this->jsRenderer()->renderHead();
 
         $sender->AddAsset('Head', $head, 'debugbar-head');
+        $called = true;
     }
 
     public function Gdn_Dispatcher_BeforeControllerMethod_Handler($sender) {
-        $bar = $this->debugBar();
-        $bar['time']->stopMeasure('dispatch');
-        $bar['time']->startMeasure('controller', 'Controller');
+       static $called = false;
+
+       if ($called)
+          return;
+
+      $bar = $this->debugBar();
+      $bar['time']->stopMeasure('dispatch');
+      $bar['time']->startMeasure('controller', 'Controller');
+      $called = true;
     }
 
     public function Gdn_PluginManager_AfterStart_Handler($sender) {
