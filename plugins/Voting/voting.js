@@ -1,7 +1,7 @@
 jQuery(document).ready(function($) {
-   
-   // Handle Vote button clicks   
-   $('div.VotesBox a').live('click', function() {
+
+   // Handle Vote button clicks
+   $(document).on('click', 'div.VotesBox a', function() {
       var btn = this;
       var parent = $(this).parents('.Bookmarks');
       var oldClass = $(btn).attr('class');
@@ -40,10 +40,10 @@ jQuery(document).ready(function($) {
          }
       });
       return false;
-   });   
+   });
 
-   // Handle follow button clicks   
-   $('div.FollowsBox a').live('click', function() {
+   // Handle follow button clicks
+   $(document).on('click', 'div.FollowsBox a', function() {
       var btn = this;
       var parent = $(this).parents('.Bookmarks');
       var oldClass = $(btn).attr('class');
@@ -70,7 +70,7 @@ jQuery(document).ready(function($) {
             } else {
                // Otherwise just change the class & title on the anchor
                $(btn).attr('title', json.AnchorTitle);
-               
+
                if ($(btn).hasClass('Bookmark')) {
                   $(btn).attr('class', 'Bookmark');
                   $(btn).attr('title', 'Follow');
@@ -94,10 +94,10 @@ jQuery(document).ready(function($) {
          }
       });
       return false;
-   });   
+   });
 
-   // Handle Vote button clicks   
-   $('.Voter a').live('click', function() {
+   // Handle Vote button clicks
+   $(document).on('click', '.Voter a', function() {
       if (!$(this).hasClass('SignInPopup')) {
          var btn = this;
          var parent = $(this).parents('.Voter');

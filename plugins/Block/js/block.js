@@ -1,25 +1,25 @@
 jQuery(document).ready(function($){
-   
+
    $('.UserBlocked').each(function(i,el){
       $(el).addClass('UserBlock');
    });
 
-   $('.UserBlocked .Meta').live('click', function(event) {
+   $(document).on('click', '.UserBlocked .Meta', function(event) {
       var el = $(event.target);
       if (!el.hasClass('UserBlocked'))
          el = el.parents('.UserBlocked');
-      
+
       if (el.hasClass('UserBlock'))
          el.removeClass('UserBlock');
       else
          el.addClass('UserBlock');
    });
-   
-   $('span.Author a.ProfileLink').live('hover',function(event){
+
+   $(document).on('hover', 'span.Author a.ProfileLink', function(event){
       var el = $(event.target);
       if (!el.hasClass('ProfileLink'))
          el = el.closest('.ProfileLink');
-      
+
       if (event.type == 'mouseover') {
          var overlay = document.createElement('div');
          overlay.className = 'UserBlockOption';
@@ -36,12 +36,12 @@ jQuery(document).ready(function($){
          el.find('.UserBlockOption').remove();
       }
    });
-   
-   $('span.Author a.ProfileLink').live('click',function(event){
+
+   $(document).on('click', 'span.Author a.ProfileLink', function(event){
       var el = $(event.target);
       if (!el.hasClass('ProfileLink'))
          el = el.parents('.ProfileLink');
-      
+
       var ProfileURL = el.attr('href');
       if (el.parents('.UserBlocked').length) {
          // Unblock
@@ -50,7 +50,7 @@ jQuery(document).ready(function($){
          // Block
          var RequestURL = ProfileURL.replace('/profile','/profile/block');
       }
-      
+
       RequestURL = gdn.url(RequestURL);
       jQuery.ajax({
          dataType: 'json',
@@ -58,13 +58,13 @@ jQuery(document).ready(function($){
          url: RequestURL,
          success: function(json) {
             gdn.inform(json);
-            
+
             if (json.Status == 200)
                window.location.reload();
          }
       });
-      
+
       return false;
    });
-   
+
 })
