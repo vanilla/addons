@@ -197,8 +197,6 @@ class TrollManagementPlugin extends Gdn_Plugin {
    }
 
 	private function _ShowAdmin($Sender, $EventArgumentName, $Style = 'message') {
-      $Sender->Permission('Garden.Moderation.Manage');
-
 		// Don't do anything if there are no trolls
 		$Trolls = C('Plugins.TrollManagement.Cache');
 		if (!is_array($Trolls)) {
