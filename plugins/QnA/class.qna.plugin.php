@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -401,9 +401,6 @@ class QnAPlugin extends Gdn_Plugin {
       $CommentModel = new CommentModel();
       $Answers = $CommentModel->GetWhere(array('DiscussionID' => $Sender->Data('Discussion.DiscussionID'), 'Qna' => 'Accepted'))->Result();
 
-      // If answer has any media
-
-
       if (class_exists('ReplyModel')) {
          $ReplyModel = new ReplyModel();
          $Discussion = NULL;
@@ -418,7 +415,6 @@ class QnAPlugin extends Gdn_Plugin {
          $Comments = array_filter($Comments, function($Row) {
             return strcasecmp(GetValue('QnA', $Row), 'accepted');
          });
-
          $Sender->Data['Comments'] = new Gdn_DataSet(array_values($Comments));
       }
    }
@@ -847,25 +843,25 @@ class QnAPlugin extends Gdn_Plugin {
     * @param DiscussionsController $Sender
     * @param type $Args
     */
-   public function DiscussionsController_Render_Before($Sender, $Args) {
-      if (strcasecmp($Sender->RequestMethod, 'unanswered') == 0) {
-         $Sender->SetData('CountDiscussions', FALSE);
-      }
+   public function DiscussionsController_Unanswered_Render($Sender, $Args) {
+      $Sender->SetData('CountDiscussions', FALSE);
+
       // Add 'Ask a Question' button if using BigButtons.
       if (C('Plugins.QnA.UseBigButtons')) {
          $QuestionModule = new NewQuestionModule($Sender, 'plugins/QnA');
          $Sender->AddModule($QuestionModule);
       }
 
-      if (isset($this->InUnanswered)) {
-         // Remove announcements that aren't questions...
-         $Announcements = $Sender->Data('Announcements');
-         foreach ($Announcements as $i => $Row) {
-            if (GetValue('Type', $Row) != 'Questions')
-               unset($Announcements[$i]);
-         }
-         $Sender->SetData('Announcements', array_values($Announcements));
+      // Remove announcements that aren't questions...
+      $Sender->Data('Announcements')->Result();
+      $Announcements = array();
+      foreach ($Sender->Data('Announcements') as $i => $Row) {
+         if (GetValue('Type', $Row) == 'Question')
+            $Announcements[] = $Row;
       }
+      Trace($Announcements);
+      $Sender->SetData('Announcements', $Announcements);
+      $Sender->AnnounceData = $Announcements;
    }
 
     /**
