@@ -114,10 +114,10 @@ class TrollManagementPlugin extends Gdn_Plugin {
 		$FingerprintValue = GetValue('Fingerprint', $Sender->User);
 		if (!$FingerprintValue)
 			return;
-		
+      
 		// Display all accounts that share that fingerprint value
       $SharedFingerprintModule = new SharedFingerprintModule($Sender);
-      $SharedFingerprintModule->GetData($Sender->User->UserID, $FingerprintValue);
+      $SharedFingerprintModule->GetData(GetValueR('User.UserID', $Sender), $FingerprintValue);
       $Sender->AddModule($SharedFingerprintModule);
 	}
    
