@@ -286,7 +286,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $Comments = $Sender->Data('Comments');
       $CommentIDList = array();
-
+      
 //      decho($Comments);
 //      die($Comments);
       
@@ -300,9 +300,10 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (isset($Sender->Comment) && isset($Sender->Comment->CommentID)) {
          $CommentIDList[] = $Sender->Comment->CommentID;
       }
-
+      
       if (count($CommentIDList)) {
          $DiscussionID = $Sender->Data('Discussion.DiscussionID');
+         
          $MediaData = $this->MediaModel()->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
       } else {
          $MediaData = FALSE;
@@ -365,17 +366,17 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    protected function AttachUploadsToComment($Controller, $Type = 'comment') {
       if (!$this->IsEnabled()) return;
-
+      
       //$Type = strtolower($RawType = $Controller->EventArguments['Type']);
       $RawType = ucfirst($Type);
 
-      /*if (StringEndsWith($Controller->RequestMethod, 'Comment', TRUE) && $Type != 'comment') {
+      if (StringEndsWith($Controller->RequestMethod, 'Comment', TRUE) && $Type != 'comment') {
          $Type = 'comment';
          $RawType = 'Comment';
          if (!isset($Controller->Comment))
             return;
          $Controller->EventArguments['Comment'] = $Controller->Comment;
-      }*/
+      }
       
       $MediaList = $this->MediaCache();
       if (!is_array($MediaList)) return;
