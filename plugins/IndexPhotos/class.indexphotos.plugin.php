@@ -15,7 +15,7 @@ $PluginInfo['IndexPhotos'] = array(
 class IndexPhotosPlugin extends Gdn_Plugin {
    
    public function AssetModel_StyleCss_Handler($Sender) {
-      if (!$this->hasLayoutTables()) {
+      if (!$this->hasLayoutTables() || IsMobile()) {
          $Sender->AddCssFile('indexphotos.css', 'plugins/IndexPhotos');
       }
    }
@@ -24,13 +24,13 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     * Add OP name to start of discussion meta.
     */
    public function DiscussionsController_AfterDiscussionLabels_Handler($Sender, $Args) {
-      if (!$this->hasLayoutTables()) {
+      if (!$this->hasLayoutTables() || IsMobile()) {
          if (GetValue('FirstUser', $Args))
             echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
       }
    }
    public function CategoriesController_AfterDiscussionLabels_Handler($Sender, $Args) {
-      if (!$this->hasLayoutTables()) {
+      if (!$this->hasLayoutTables() || IsMobile()) {
          if (GetValue('FirstUser', $Args))
             echo '<span class="MItem DiscussionAuthor">'.UserAnchor(GetValue('FirstUser', $Args)).'</span>';
       }
@@ -40,7 +40,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     * Trigger on All Discussions.
     */
    public function DiscussionsController_BeforeDiscussionContent_Handler($Sender) {
-      if (!$this->hasLayoutTables()) {
+      if (!$this->hasLayoutTables() || IsMobile()) {
          $this->DisplayPhoto($Sender);
       }
    }
