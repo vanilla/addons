@@ -33,11 +33,20 @@ class ShareThisPlugin extends Gdn_Plugin {
 	public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
       $PublisherNumber = C('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
       $ViaHandle = C('Plugin.ShareThis.ViaHandle', '');
+      $CopyNShare = C('Plugin.ShareThis.CopyNShare', false);
+
+      $doNotHash = $CopyNShare ? 'false' : 'true';
+      $doNotCopy = $CopyNShare ? 'false' : 'true';
 
       echo <<<SHARETHIS
       <script type="text/javascript">var switchTo5x=true;</script>
       <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
-      <script type="text/javascript">stLight.options({publisher: "{$PublisherNumber}", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
+      <script type="text/javascript">stLight.options({
+         publisher: "{$PublisherNumber}",
+         doNotHash: {$doNotHash},
+         doNotCopy: {$doNotCopy},
+         hashAddressBar: false
+      });</script>
       <div class="ShareThisButtonWrapper Right">
          <span class="st_twitter_hcount ShareThisButton" st_via="{$ViaHandle}" displayText="Tweet"></span>
          <span class="st_facebook_hcount ShareThisButton" displayText="Facebook"></span>
@@ -75,13 +84,15 @@ SHARETHIS;
 
       $PublisherNumber = C('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
       $ViaHandle = C('Plugin.ShareThis.ViaHandle', '');
+      $CopyNShare = C('Plugin.ShareThis.CopyNShare', false);
 
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigArray = array('Plugin.ShareThis.PublisherNumber','Plugin.ShareThis.ViaHandle');
+      $ConfigArray = array('Plugin.ShareThis.PublisherNumber','Plugin.ShareThis.ViaHandle', 'Plugin.ShareThis.CopyNShare');
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
          $ConfigArray['Plugin.ShareThis.PublisherNumber'] = $PublisherNumber;
          $ConfigArray['Plugin.ShareThis.ViaHandle'] = $ViaHandle;
+         $ConfigArray['Plugin.ShareThis.CopyNShare'] = $CopyNShare;
       }
 
       $ConfigurationModel->SetField($ConfigArray);
