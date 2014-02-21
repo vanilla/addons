@@ -108,7 +108,7 @@ class QnAPlugin extends Gdn_Plugin {
     */
    public function StructureBadges() {
       // Define 'Answer' badges
-      if (!$this->Badges)
+      if (!$this->Badges || !class_exists('BadgeModel'))
          return;
 
       $BadgeModel = new BadgeModel();
