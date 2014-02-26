@@ -56,6 +56,7 @@ class ShareThisPlugin extends Gdn_Plugin {
          <span class="st_pinterest_hcount ShareThisButton Hidden" displayText="Pinterest"></span>
          <span class="st_email_hcount ShareThisButton" displayText="Email"></span>
          <span class="st_sharethis_hcountShareThisButton" displayText="ShareThis"></span>
+      </div>
 SHARETHIS;
 
    }
