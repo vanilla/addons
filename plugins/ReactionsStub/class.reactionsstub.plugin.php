@@ -22,7 +22,7 @@ class ReactionsStubPlugin extends Gdn_Plugin {
    }
    
    private function AddJs($Sender) {
-      $Sender->AddJsFile('jquery-ui-1.8.17.custom.min.js');
+      $Sender->AddJsFile('jquery-ui.js');
       $Sender->AddJsFile('reactions.js', 'plugins/ReactionsStub');
    }
    

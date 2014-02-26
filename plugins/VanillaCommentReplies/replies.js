@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-   
+
    // Show delete button when hovering over replies.
    $('.Reply').livequery(function() {
       $(this).hover(function() {
@@ -24,11 +24,11 @@ jQuery(document).ready(function($) {
                for (i = 1; i < rowCount - 1; i++) {
                   $(children[i]).hide();
                }
-   
+
                // Add a link to reveal hidden replies
                var text = (rowCount > 3) ? gdn.definition('Replies').replace('%s', rowCount - 2) : gdn.definition('Reply');
                $(children[0]).after('<li class="Reply Reveal"><a href="#">' + text + '</a></li>');
-               
+
                // bind to the click event of the anchor and re-reveal the replies when it is clicked
                $(children[0]).next().find('a').click(function() {
                   $(this).parent().hide();
@@ -38,28 +38,28 @@ jQuery(document).ready(function($) {
             }
          }
       });
-   }   
+   }
 
    // Hide/reveal the replies when the comment reply link is clicked
-   $('li.Comment ul.Info li.ReplyCount a').live('click', function() {
+   $(document).on('click', 'li.Comment ul.Info li.ReplyCount a', function() {
       var replies = $(this).parents('.Comment').find('.Replies');
       replies.toggle();
       replies.find('a.ReplyLink').click();
       return false;
    });
-   
+
    // Hijack reply form link clicks
-   $('ul.Replies a.ReplyLink').live('click', function() {
+   $(document).on('click', 'ul.Replies a.ReplyLink', function() {
       // Hide the anchor
       var anchor = this;
       $(anchor).hide();
       var row = $(anchor).parent();
-   
+
       // Reveal the form
       var frm = $(anchor).parent().find('form');
       frm.show();
-      
-      // Focus on the textbox 
+
+      // Focus on the textbox
       var textbox = frm.find('.TextBox');
       textbox.focus().blur(function() {
          // Hide the form onblur if empty
@@ -74,14 +74,14 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+
    // Hijack reply form button clicks
-   $('ul.Replies form input.Button').live('click', function() {
+   $(document).on('click', 'ul.Replies form input.Button', function() {
       var button = this;
       var frm = $(button).parents('form');
       var row = $(frm).parents('.ReplyForm');
       var textbox = $(frm).find('textarea');
-      
+
       // Post the form and place the results above the input and erase the textbox
       var postValues = frm.serialize() + '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
       // Get the most recent reply CommentID to be added
@@ -116,17 +116,17 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
-   
+
    function setVisibilities() {
       // Hide all reply forms and reveal all showform buttons
       $('ul.Replies a.ReplyLink').show();
       $('.ReplyForm form').hide();
-   
+
       // Hide middle replies
       $('.Replies').hideReplies();
    }
    setVisibilities();
-   
+
    // Bind the setvisibilities to a couple of different events
    $('body').bind('CommentAdded', setVisibilities);
    $('body').bind('CommentEdited', setVisibilities);
@@ -148,7 +148,7 @@ jQuery(document).ready(function($) {
       }
    });
 
-   
+
    $('a.DeleteReply').livequery(function() {
       $(this).hide();
    });

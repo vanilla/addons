@@ -1,6 +1,6 @@
 <?php
 
-function MediaThumbnail($Media) {
+function MediaThumbnail($Media, $Data = FALSE) {
       $Media = (array)$Media;
    
       if (GetValue('ThumbPath', $Media)) {
@@ -31,7 +31,10 @@ function MediaThumbnail($Media) {
             $Src = Gdn_Upload::Url($Path);
          }
       }
-      $Result = Img($Src, array('class' => 'ImageThumbnail', 'width' => GetValue('ThumbWidth', $Media), 'height' => GetValue('ThumbHeight', $Media)));
+      if ($Data)
+         $Result = array('src' => $Src, 'width' => GetValue('ThumbWidth', $Media), 'height' => GetValue('ThumbHeight', $Media));
+      else
+         $Result = Img($Src, array('class' => 'ImageThumbnail', 'width' => GetValue('ThumbWidth', $Media), 'height' => GetValue('ThumbHeight', $Media)));
       
       return $Result;
    

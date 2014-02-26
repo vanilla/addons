@@ -11,8 +11,9 @@
  *  1.6     Fix the file upload plugin for external storage.
  *          Add file extensions to the non-image icons.
  *  1.7     Add support for discussions and comments placed in moderation queue (Lincoln, Nov 2012)
- *  1.7.1   Fix for fileupload not working now that we have json rendered as application/json.
+ *  1.7.1   Fix for file upload not working now that we have json rendered as application/json.
  *  1.8     Added the ability to restrict file uploads per category.
+ *  1.8.1   Remove deprecated jQuery functions.
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -23,7 +24,7 @@
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'Images and files may be attached to discussions and comments.',
-   'Version' => '1.8',
+   'Version' => '1.8.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,

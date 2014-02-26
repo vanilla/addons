@@ -11,7 +11,7 @@ jQuery(document).ready(function($) {
    };
    toggleWhisperForm(true);
 
-   $('#Form_Whisper').live('click', toggleWhisperForm);
+   $(document).on('click', '#Form_Whisper', toggleWhisperForm);
 
 
 

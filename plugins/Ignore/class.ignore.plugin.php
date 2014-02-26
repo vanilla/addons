@@ -278,14 +278,19 @@ class IgnorePlugin extends Gdn_Plugin {
    /**
     * Add "Ignore" option to profile options.
     */
-   public function ProfileController_BeforeProfileOptions_Handler($Sender) {
+   public function ProfileController_BeforeProfileOptions_Handler($Sender, $Args) {
       if (!$Sender->EditMode && Gdn::Session()->IsValid()) {
+         // Only show option if allowed
          $IgnoreRestricted = $this->IgnoreRestricted($Sender->User->UserID);
-         if ($IgnoreRestricted && $IgnoreRestricted != self::IGNORE_LIMIT) return;
-         
+         if ($IgnoreRestricted && $IgnoreRestricted != self::IGNORE_LIMIT)
+            return;
+
+         // Add to dropdown
          $UserIgnored = $this->Ignored($Sender->User->UserID);
-         $Label = ($UserIgnored) ? 'Unignore' : 'Ignore';
-         echo ' '.Anchor(T($Label), "/user/ignore/toggle/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Ignore Popup NavButton IgnoreButton').' ';
+         $Label = ($UserIgnored) ? Sprite('SpUnignore').' '.T('Unignore') : Sprite('SpIgnore').' '.T('Ignore');
+         $Args['ProfileOptions'][] = array('Text' => $Label,
+            'Url' => "/user/ignore/toggle/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name),
+            'CssClass' => 'Popup');
       }
    }
    
