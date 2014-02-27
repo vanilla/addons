@@ -8,7 +8,7 @@
 $PluginInfo['Whispers'] = array(
    'Name' => 'Whispers',
    'Description' => "Users may 'whisper' private comments to each other in the middle of normal discussions. Caution: this can be a confusing feature for some people.",
-   'Version' => '1.1.1',
+   'Version' => '1.1.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18a3', 'Conversations' => '2.0.18a3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -83,7 +83,7 @@ class WhispersPlugin extends Gdn_Plugin {
          $Sql->Where('cm.DateInserted <', $LastDate);
 
       $Whispers = $Sql->Get();
-      
+
       Gdn::UserModel()->JoinUsers($Whispers->Result(), array('InsertUserID'));
 
       // Add dummy comment fields to the whispers.
@@ -130,7 +130,7 @@ class WhispersPlugin extends Gdn_Plugin {
          ->Column('DiscussionID', 'int', NULL, 'index')
          ->Set();
    }
-   
+
    public function UserRowCompare($A, $B) {
       return strcasecmp($A['Name'], $B['Name']);
    }
@@ -233,7 +233,7 @@ class WhispersPlugin extends Gdn_Plugin {
          echo $Str;
       }
    }
-   
+
    /**
     * @param DiscussionController $Sender
     */
@@ -241,8 +241,8 @@ class WhispersPlugin extends Gdn_Plugin {
       $ConversationID = $Sender->Data('Discussion.Attributes.WhisperConversationID');
       if (!$ConversationID)
          return;
-      
-      if ($ConversationID === TRUE) {   
+
+      if ($ConversationID === TRUE) {
          $UserIDs = $Sender->Data('Discussion.Attributes.WhisperUserIDs');
          // Grab the users that are in the conversaton.
          $WhisperUsers = array();
@@ -257,14 +257,14 @@ class WhispersPlugin extends Gdn_Plugin {
             ->Where('ConversationID', $ConversationID)
             ->Where('Deleted', 0)
             ->Get()->ResultArray();
-         $UserIDs = ConsolidateArrayValuesByKey($WhisperUsers, 'UserID');  
+         $UserIDs = ConsolidateArrayValuesByKey($WhisperUsers, 'UserID');
       }
-      
+
       if (!Gdn::Session()->CheckPermission('Conversations.Moderation.Manage') && !in_array(Gdn::Session()->UserID, $UserIDs)) {
          $Sender->Data['Discussion']->Closed = TRUE;
          return;
       }
-      
+
       Gdn::UserModel()->JoinUsers($WhisperUsers, array('UserID'));
       $Sender->SetData('WhisperUsers', $WhisperUsers);
    }
@@ -347,12 +347,12 @@ class WhispersPlugin extends Gdn_Plugin {
    public function PostController_Comment_Create($Sender, $Args = array()) {
       if ($Sender->Form->IsPostBack()) {
          $Sender->Form->SetModel($Sender->CommentModel);
-         
+
          // Grab the discussion for use later.
          $DiscussionID = $Sender->Form->GetFormValue('DiscussionID');
          $DiscussionModel = new DiscussionModel();
          $Discussion = $DiscussionModel->GetID($DiscussionID);
-         
+
          // Check to see if the discussion is supposed to be in private...
          $WhisperConversationID = GetValueR('Attributes.WhisperConversationID', $Discussion);
          if ($WhisperConversationID === TRUE) {
@@ -372,7 +372,7 @@ class WhispersPlugin extends Gdn_Plugin {
 
          // If this isn't a whisper then post as normal.
          if (!$Whisper)
-            return call_user_func_array(array($Sender, 'Comment'), $Args);         
+            return call_user_func_array(array($Sender, 'Comment'), $Args);
 
          $ConversationModel = new ConversationModel();
          $ConversationMessageModel = new ConversationMessageModel();
@@ -399,7 +399,7 @@ class WhispersPlugin extends Gdn_Plugin {
                $Discussion->Attributes['WhisperConversationID'] = $ID;
                $DiscussionModel->SetProperty($DiscussionID, 'Attributes', serialize($Discussion->Attributes));
             }
-            
+
             $LastCommentID = GetValue('LastCommentID', $Discussion);
             $MessageID = GetValue('LastMessageID', $ConversationMessageModel, FALSE);
 

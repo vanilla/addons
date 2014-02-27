@@ -12,9 +12,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['VanillaCommentScore'] = array(
    'Description' => 'The comment score plugin allows users to assign scores to comments.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '>=2'),
-   'RequiredTheme' => FALSE, 
+   'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
    'RegisterPermissions' => array('Plugins.Vanilla.CommentScore.Single', 'Plugins.Vanilla.CommentScore.Unlimited'),
@@ -26,36 +26,36 @@ $PluginInfo['VanillaCommentScore'] = array(
 );
 
 class VanillaCommentScorePlugin extends Gdn_Plugin {
-   
+
    public function DiscussionController_Render_Before($Sender) {
       $Sender->AddCssFile('commentscore.css', 'plugins/VanillaCommentScore');
       $Sender->AddJsFile('commentscore.js', 'plugins/VanillaCommentScore');
    }
-   
+
    public function DiscussionController_CommentOptions_Handler($Sender) {
       $Comment = $Sender->CurrentComment;
       $Session = Gdn::Session();
-      
+
       $Inc = $this->GetScoreIncrements($Comment->CommentID);
-      
+
       $Signs = array(-1 => 'Neg', +1 => 'Pos');
-      
+
       // Create a container for the score.
       echo '<div class="CommentScore">';
-      
+
       $SumScore = (is_null($Comment->SumScore) ? 0 : $Comment->SumScore);
-      
+
       // Write the current score.
       echo '<span class="Score">' . sprintf(Plural($SumScore, '%s point', '%s points'), $SumScore) . '</span>';
-      
+
       // Write the buttons.
       foreach($Inc as $Key => $IncAmount) {
          $Button = '<span>'.($Key < 0 ? '-' : '+').'</span>';
-         
+
          $Attributes = array();
          $CssClass = $Signs[$Key] . ' Inc';
          $Href = '/vanilla/discussion/score/' . $Comment->CommentID . '/' . $Signs[$Key] . '/' . $Session->TransientKey() . '?Target=' . urlencode($Sender->SelfUrl);
-         
+
          if($IncAmount == 0) {
             $Attributes['href2'] = Url($Href);
             $CssClass .= ' Disabled';
@@ -63,12 +63,12 @@ class VanillaCommentScorePlugin extends Gdn_Plugin {
          } else {
             $Attributes['title'] = ($Key > 0 ? '+' : '') . $Inc[$Key];
          }
-         
+
          // Display an increment button.
          $Foo = Anchor($Button, $Href, $CssClass, $Attributes, TRUE);
          echo $Foo;
       }
-      
+
       echo '</div>';
    }
 
@@ -87,10 +87,10 @@ class VanillaCommentScorePlugin extends Gdn_Plugin {
       $CommentID = $Args[0];
       $ScoreKey = (substr($Args[1], 0, 3) == 'Neg' ? -1 : 1);
       //$TransientKey = $Args[2];
-      
+
       $SQL = Gdn::SQL();
       $Session = Gdn::Session();
-      
+
       // Get the current score for this user.
       $Data = $SQL
          ->Select('uc.Score')
@@ -100,12 +100,12 @@ class VanillaCommentScorePlugin extends Gdn_Plugin {
          ->Get()
          ->FirstRow();
       $UserScore = $Data ? $Data->Score : 0;
-      
+
       // Get the score increments.
       $Inc = $this->GetScoreIncrements($CommentID, $UserScore);
       $Score = $Inc[$ScoreKey];
       $UserScore += $Score;
-      
+
       if($Score != 0) {
          if($Data) {
             // Update the score on an existing comment.
@@ -130,7 +130,7 @@ class VanillaCommentScorePlugin extends Gdn_Plugin {
                'UpdateUserID' => $Session->UserID)
                );
          }
-   
+
          // Update the comment table with the sum of the scores.
          $Data = $SQL
             ->Select('uc.Score', 'sum', 'SumScore')
@@ -139,36 +139,36 @@ class VanillaCommentScorePlugin extends Gdn_Plugin {
             ->Get()
             ->FirstRow();
          $SumScore = $Data ? $Data->SumScore : 0;
-         
+
          $SQL
             ->Update('Comment')
             ->Set('SumScore', $SumScore)
             ->Where('CommentID', $CommentID)
             ->Put();
-            
+
          $Inc = $this->GetScoreIncrements($CommentID, $UserScore);
       }
-         
+
       // Redirect back where the user came from if necessary
       if ($Sender->DeliveryType() != DELIVERY_TYPE_BOOL) {
          $Target = GetIncomingValue('Target', '/vanilla/discussions/scored');
          Redirect($Target);
       }
-      
+
       // Send the current information back to be dealt with on the client side.
       $Sender->SetJson('SumScore', isset($SumScore) ? sprintf(Plural($SumScore, '%s point', '%s points'), $SumScore) : NULL);
       $Sender->SetJson('Inc', $Inc);
-      $Sender->Render();   
+      $Sender->Render();
       break;
    }
-   
+
    public function GetScoreIncrements($CommentID, $UserScore = NULL) {
       $Session = Gdn::Session();
-      
+
       // Figure out how much the user can increment the score by depending on permissions.
       $SinglePermission = $Session->CheckPermission('Plugins.Vanilla.CommentScore.Single');
       $UnlimitPermission = $Session->CheckPermission('Plugins.Vanilla.CommentScore.Unlimited');
-      
+
       $Inc = array(-1 => 0, +1 => 0);
       if($SinglePermission || $UnlimitPermission) {
          if(is_null($UserScore)) {
@@ -181,7 +181,7 @@ class VanillaCommentScorePlugin extends Gdn_Plugin {
                ->FirstRow();
             $UserScore = $UserScore ? $UserScore->Score : 0;
          }
-            
+
          if($UnlimitPermission) {
             // A user with unlimit permission can sway the score by any number of points.
             if(abs($UserScore) <= 15) {
@@ -198,13 +198,13 @@ class VanillaCommentScorePlugin extends Gdn_Plugin {
             }
          }
       }
-      
+
       return $Inc;
    }
-   
+
    public function Setup() {
       $Structure = Gdn::Structure();
-      
+
       // Construct the user comment table.
       $Structure->Table('UserComment')
          ->PrimaryKey('CommentID', 'int', FALSE, 'primary')
@@ -215,7 +215,7 @@ class VanillaCommentScorePlugin extends Gdn_Plugin {
          ->Column('DateInserted', 'datetime')
          ->Column('DateUpdated', 'datetime')
          ->Set(FALSE, FALSE);
-         
+
       // Add the total score to the comment table.
       $Structure->Table('Comment')
          ->Column('Score', 'int', TRUE)

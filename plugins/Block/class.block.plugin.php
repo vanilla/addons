@@ -11,9 +11,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Block'] = array(
    'Description' => 'This plugin lets user ignore other users, filtering their posts out of discussions.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.0.10a'),
-   'RequiredTheme' => FALSE, 
+   'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
    'SettingsUrl' => FALSE,
@@ -26,14 +26,14 @@ $PluginInfo['Block'] = array(
 class BlockPlugin extends Gdn_Plugin {
 
    public function __construct() {
-      
+
    }
-   
+
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
       $Sender->AddJsFile('block.js', 'plugins/Block');
       $Sender->AddCssFile('block.css', 'plugins/Block');
    }
-   
+
    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
       $UserID = GetValue('InsertUserID',$Sender->EventArguments['Object']);
       if ($this->Blocked($UserID)) {
@@ -44,12 +44,12 @@ class BlockPlugin extends Gdn_Plugin {
          $Sender->EventArguments['CssClass'] = $Classes;
       }
    }
-   
+
    public function ProfileController_Block_Create($Sender) {
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->SetJson('Status',200);
-      
+
       try {
          $User = call_user_func_array(array($this, 'GetUserInfo'), $Sender->RequestArgs);
          $BlockUserID = GetValue('UserID', $User);
@@ -59,15 +59,15 @@ class BlockPlugin extends Gdn_Plugin {
          $Sender->InformMessage(T("Could not find that person!"));
          $Sender->SetJson('Status',404);
       }
-      
+
       $Sender->Render('blank','utility','dashboard');
    }
-   
+
    public function ProfileController_Unblock_Create($Sender) {
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->SetJson('Status',200);
-      
+
       try {
          $User = call_user_func_array(array($this, 'GetUserInfo'), $Sender->RequestArgs);
          $BlockUserID = GetValue('UserID', $User);
@@ -79,17 +79,17 @@ class BlockPlugin extends Gdn_Plugin {
          $Sender->InformMessage(T("Could not find that person! ({$BlockUserID})"));
          $Sender->SetJson('Status',404);
       }
-      
+
       $Sender->Render('blank','utility','dashboard');
    }
-   
+
    protected function GetUserInfo($UserReference = '', $Username = '', $UserID = '') {
       // If a UserID was provided as a querystring parameter, use it over anything else:
 		if ($UserID) {
 			$UserReference = $UserID;
 			$Username = 'Unknown'; // Fill this with a value so the $UserReference is assumed to be an integer/userid.
 		}
-		   
+
       if ($UserReference == '') {
          $User = Gdn::UserModel()->Get(Gdn::Session()->UserID);
       } else if (is_numeric($UserReference) && $Username != '') {
@@ -97,7 +97,7 @@ class BlockPlugin extends Gdn_Plugin {
       } else {
          $User = Gdn::UserModel()->GetByUsername($UserReference);
       }
-         
+
       if ($User === FALSE) {
          throw NotFoundException();
       } else if ($this->User->Deleted == 1) {
@@ -108,18 +108,18 @@ class BlockPlugin extends Gdn_Plugin {
          return $User;
       }
    }
-   
+
    public function Blocked($UserID) {
       static $BlockedUsers = NULL;
       if (is_null($BlockedUsers)) {
          $Blocked = $this->GetUserMeta(Gdn::Session()->UserID, 'Blocked.User.%');
          $BlockedUsers = array_values($Blocked);
       }
-      
+
       if (in_array($UserID, $BlockedUsers))
          return TRUE;
-      
+
       return FALSE;
    }
-   
+
 }
