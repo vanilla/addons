@@ -36,7 +36,7 @@ $Restricted = $this->Data('IgnoreRestricted');
          <td class="IgnoreUserPhoto"><?php echo UserPhoto($IgnoredUser); ?></td>
          <td class="IgnoreUserName"><?php echo UserAnchor($IgnoredUser); ?></td>
          <td class="IgnoreUserDate"><?php echo $DateIgnored; ?></td>
-         <td class="IgnoreUserAction"><?php echo (!$this->Data('ForceEditing') & !$Restricted) ? Anchor('Unignore', "/user/ignore/toggle/{$IgnoredUser['UserID']}/".Gdn_Format::Url($IgnoredUser['Name']), 'Ignore Button') : ''; ?></td>
+         <td class="IgnoreUserAction"><?php echo (!$this->Data('ForceEditing') & !$Restricted) ? Anchor('Unignore', "/user/ignore/toggle/{$IgnoredUser['UserID']}/".Gdn_Format::Url($IgnoredUser['Name']), 'Ignore Button Popup') : ''; ?></td>
       </tr>
       <?php endforeach; ?>
    </tbody>
