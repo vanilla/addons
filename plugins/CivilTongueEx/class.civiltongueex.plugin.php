@@ -66,6 +66,12 @@ class CivilTonguePlugin extends Gdn_Plugin {
       $this->ActivityController_Render_Before($Sender, $Args);
    }
 
+   /**
+    * Clean up activities and activity comments.
+    * 
+    * @param Controller $Sender
+    * @param array $Args
+    */
    public function ActivityController_Render_Before($Sender, $Args) {
       $User = GetValue('User', $Sender);
       if ($User)
@@ -75,6 +81,12 @@ class CivilTonguePlugin extends Gdn_Plugin {
          $Activities =& $Sender->Data['Activities'];
          foreach ($Activities as &$Row) {
             SetValue('Story', $Row, $this->Replace(GetValue('Story', $Row)));
+
+            if (isset($Row['Comments'])) {
+               foreach ($Row['Comments'] as &$Comment) {
+                  $Comment['Body'] = $this->Replace($Comment['Body']);
+               }
+            }
          }
       }
 
