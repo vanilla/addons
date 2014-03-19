@@ -107,8 +107,10 @@ class CivilTonguePlugin extends Gdn_Plugin {
                if (isset($Row['LastTitle'])) {
                   $Row['LastTitle'] = $this->Replace($Row['LastTitle']);
                }
-            } elseif (isset($Row->LastTitle)) {
-               $Row->LastTitle = $this->Replace($Row->LastTitle);
+            } elseif (is_object($Row)) {
+               if (isset($Row->LastTitle)) {
+                  $Row->LastTitle = $this->Replace($Row->LastTitle);
+               }
             }
          }
       }
