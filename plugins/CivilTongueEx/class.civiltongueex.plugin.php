@@ -4,7 +4,7 @@
 $PluginInfo['CivilTongueEx'] = array(
    'Name' => 'Civil Tongue Ex',
    'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
-   'Version' => '1.0.2',
+   'Version' => '1.0.3',
    'MobileFriendly' => TRUE,
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -71,10 +71,9 @@ class CivilTonguePlugin extends Gdn_Plugin {
       if ($User)
          SetValue('About', $User, $this->Replace(GetValue('About', $User)));
 
-      $ActivityData = GetValue('ActivityData', $Sender);
-      if ($ActivityData) {
-         $Result =& $ActivityData->Result();
-         foreach ($Result as &$Row) {
+      if (isset($Sender->Data['Activities'])) {
+         $Activities =& $Sender->Data['Activities'];
+         foreach ($Activities as &$Row) {
             SetValue('Story', $Row, $this->Replace(GetValue('Story', $Row)));
          }
       }
@@ -92,6 +91,25 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $Value = $this->Replace(GetValue('Body', $Row));
             SetValue('Body', $Row, $Value);
 
+         }
+      }
+   }
+
+   /**
+    * Clean up the last title.
+    *
+    * @param CategoriesController $Sender
+    */
+   public function CategoriesController_Render_Before($Sender) {
+      if (isset($Sender->Data['Categories'])) {
+         foreach ($Sender->Data['Categories'] as &$Row) {
+            if (is_array($Row)) {
+               if (isset($Row['LastTitle'])) {
+                  $Row['LastTitle'] = $this->Replace($Row['LastTitle']);
+               }
+            } elseif (isset($Row->LastTitle)) {
+               $Row->LastTitle = $this->Replace($Row->LastTitle);
+            }
          }
       }
    }
@@ -124,6 +142,20 @@ class CivilTonguePlugin extends Gdn_Plugin {
       }
    }
 
+   /**
+    * Clean up the search results.
+    * @param SearchController $Sender
+    */
+   public function SearchController_Render_Before($Sender) {
+      if (isset($Sender->Data['SearchResults'])) {
+         $Results =& $Sender->Data['SearchResults'];
+         foreach ($Results as &$Row) {
+            $Row['Title'] = $this->Replace($Row['Title']);
+            $Row['Summary'] = $this->Replace($Row['Summary']);
+         }
+      }
+   }
+
    public function Base_BeforeDiscussionName_Handler($Sender, $Args) {
       $Discussion = GetValue('Discussion', $Args);
       if ($Discussion) {
@@ -133,12 +165,24 @@ class CivilTonguePlugin extends Gdn_Plugin {
          }
       }
    }
+
+   /**
+    * Clean up the search results.
+    * @param RootController $Sender
+    */
+   public function RootController_BestOf_Render($Sender) {
+
+      if (isset($Sender->Data['Data'])) {
+         foreach ($Sender->Data['Data'] as &$Row) {
+            $Row['Name'] = $this->Replace($Row['Name']);
+            $Row['Body'] = $this->Replace($Row['Body']);
+         }
+      }
+   }
    
    public function UtilityController_CivilPatterns_Create($Sender) {
       $Patterns = $this->GetPatterns();
-      
-      
-      
+
       $Text = "What's a person to do? ass";
       $Result = array();
       
