@@ -408,9 +408,9 @@ class JsConnectPlugin extends Gdn_Plugin {
          // Grab the user's roles.
          $Roles = Gdn::UserModel()->GetRoles(Gdn::Session()->UserID);
          $Roles = ConsolidateArrayValuesByKey($Roles, 'Name');
-         if (is_array($Roles) && sizeof($Roles)) {
+         $User['Roles'] = '';
+         if (is_array($Roles) && sizeof($Roles))
             $User['Roles'] = implode(',', $Roles);
-         }
 
 //         $Sfx = 'F';
 //         $User['UniqueID'] .= $Sfx;
