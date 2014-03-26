@@ -404,6 +404,14 @@ class JsConnectPlugin extends Gdn_Plugin {
       $Secret = GetValue('AssociationSecret', $Provider);
       if (Gdn::Session()->IsValid()) {
          $User = ArrayTranslate((array)Gdn::Session()->User, array('UserID' => 'UniqueID', 'Name', 'Email', 'PhotoUrl', 'DateOfBirth', 'Gender'));
+
+         // Grab the user's roles.
+         $Roles = Gdn::UserModel()->GetRoles(Gdn::Session()->UserID);
+         $Roles = ConsolidateArrayValuesByKey($Roles, 'Name');
+         if (is_array($Roles) && sizeof($Roles)) {
+            $User['Roles'] = implode(',', $Roles);
+         }
+
 //         $Sfx = 'F';
 //         $User['UniqueID'] .= $Sfx;
 //         $User['Name'] .= $Sfx;
