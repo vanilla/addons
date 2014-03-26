@@ -22,7 +22,7 @@
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.5.3',
+   'Version' => '1.5.4',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -169,9 +169,10 @@ class SignaturesPlugin extends Gdn_Plugin {
             $Values['Plugin.Signatures.Format'] = GetValue('Format', $Values, NULL);
          }
 
-         // If images are in the signature, throw an error.
+         // If images are in the signature, throw an error. Possibly revisit
+         // to add more granular regex.
          if (!C('Plugins.Signatures.AllowImages')
-         && preg_match('/<img/', $Values['Plugin.Signatures.Sig'])) {
+         && preg_match('/(<img|\[img.*\]|\!\[.*\])/', $Values['Plugin.Signatures.Sig'])) {
             $Sender->Form->AddError('Images are not allowed in signatures. Remove them and save to keep the changes.');
          }
 
