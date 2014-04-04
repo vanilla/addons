@@ -12,6 +12,7 @@
  *  1.4.1   Allow self-API access
  *  1.5     Improve "Hide Images"
  *  1.5.1   Improve permission checking granularity
+ *  1.5.3-5 Disallow images plugin-wide from dashboard.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -22,7 +23,7 @@
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.5.4',
+   'Version' => '1.5.5',
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -171,7 +172,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
          // If images are in the signature, throw an error. Possibly revisit
          // to add more granular regex.
-         if (!C('Plugins.Signatures.AllowImages')
+         if (!C('Plugins.Signatures.AllowImages', TRUE)
          && preg_match('/(<img|\[img.*\]|\!\[.*\])/', $Values['Plugin.Signatures.Sig'])) {
             $Sender->Form->AddError('Images are not allowed in signatures. Remove them and save to keep the changes.');
          }
