@@ -16,7 +16,7 @@
 $PluginInfo['TrollManagement'] = array(
    'Name' => 'Troll Management',
    'Description' => "Allows you to mark users as trolls, making it so that only they can see their comments & discussions. They essentially become invisible to other users and eventually just leave because no-one responds to them.",
-   'Version' => '1',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'MobileFriendly' => TRUE,
    'Author' => "Mark O'Sullivan",
@@ -43,7 +43,6 @@ class TrollManagementPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
 	 */
 	public function UserController_MarkTroll_Create($Sender, $UserID, $Troll = TRUE) {
-      $Sender->Permission('Garden.Users.Edit');
       $Sender->Permission('Garden.Moderation.Manage');
 
 		$TrollUserID = $UserID;
@@ -104,7 +103,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
 	 * Display shared accounts on the user profiles for admins.
 	 */
 	public function ProfileController_Render_Before($Sender) {
-		if (!Gdn::Session()->CheckPermission('Garden.Users.Edit'))
+		if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
 			return;
 
 		if (!property_exists($Sender, 'User'))
@@ -161,7 +160,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
 		// Examine the data, and remove any rows that belong to the trolls
 		$Data = &$Sender->EventArguments[$DataEventArgument];
 		$Result = &$Data->Result();
-		$IsAdmin = Gdn::Session()->CheckPermission('Garden.Users.Edit');
+		$IsAdmin = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
 		foreach ($Result as $Index => $Row) {
 			if (in_array(GetValue('InsertUserID', $Row), $Trolls)) {
 				if ($IsAdmin) {
@@ -212,7 +211,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
 			return;
 
 		// Don't do anything if the user is not admin (sanity check).
-		if (!Gdn::Session()->CheckPermission('Garden.Users.Edit'))
+		if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
 			return;
 
 		if (in_array($InsertUserID, $Trolls)) {
