@@ -209,8 +209,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
          'Profile' => $Profile
       );
       $Form->SetFormValue('Attributes', $Attributes);
-
       $Sender->SetData('Verified', TRUE);
+
+      $this->FireEvent('AfterConnectData');
    }
 
    public function Base_SignInIcons_Handler($Sender, $Args) {
