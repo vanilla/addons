@@ -14,7 +14,7 @@ $PluginInfo['LastEdited'] = array(
    'Description' => 'Appends "Post edited by [User] at [Time]" to the end of edited posts.',
    'Version' => '1.1.1',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,

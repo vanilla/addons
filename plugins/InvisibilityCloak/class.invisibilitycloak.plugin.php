@@ -4,7 +4,7 @@ $PluginInfo['InvisibilityCloak'] = array(
    'Name' => 'Invisibility Cloak',
    'Description' => 'Hide your forum from the prying eyes of search engines and bots while you set it up.',
    'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => "Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com'
 );

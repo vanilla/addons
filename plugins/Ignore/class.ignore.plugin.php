@@ -24,7 +24,7 @@
 $PluginInfo['Ignore'] = array(
    'Description' => 'This plugin allows users to ignore others, filtering their comments out of discussions.',
    'Version' => '1.2.1',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'MobileFriendly' => TRUE,

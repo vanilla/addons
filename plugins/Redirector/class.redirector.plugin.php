@@ -16,7 +16,7 @@ $PluginInfo['Redirector'] = array(
    'Name' => 'Forum Redirector',
    'Description' => "Adds 301 redirects for Vanilla from common forum platforms. This redirector redirects urls from IPB, phpBB, punBB, smf, vBulletin, and Xenforo",
    'Version' => '1.0.1b',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'

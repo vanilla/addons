@@ -9,7 +9,7 @@ $PluginInfo['AllowRawFormat'] = array(
    'Name' => 'Allow Raw Format',
    'Description' => 'Adds a permission to allow users with permission to post raw html.',
    'Version' => '1.0b',
-   'RequiredApplications' => array('Vanilla' => '2.0.16'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RegisterPermissions' => array('Plugins.AllowRawFormat.Allow'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',

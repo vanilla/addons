@@ -6,6 +6,7 @@ $PluginInfo['CivilTongueEx'] = array(
    'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
    'Version' => '1.0.3',
    'MobileFriendly' => TRUE,
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',

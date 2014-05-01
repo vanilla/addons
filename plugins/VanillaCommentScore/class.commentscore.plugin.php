@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['VanillaCommentScore'] = array(
-   'Description' => 'The comment score plugin allows users to assign scores to comments.',
+   'Description' => 'DEPRECATED. The comment score plugin allows users to assign scores to comments.',
    'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '>=2'),
    'RequiredTheme' => FALSE,

@@ -22,7 +22,7 @@ $PluginInfo['Quotes'] = array(
     'Description' => "Adds an option to each comment for users to easily quote each other.",
     'Version' => '1.6.7',
     'MobileFriendly' => TRUE,
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
+    'RequiredApplications' => array('Vanilla' => '2.1'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
     'HasLocale' => TRUE,

@@ -10,9 +10,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Block'] = array(
-   'Description' => 'This plugin lets user ignore other users, filtering their posts out of discussions.',
+   'Description' => 'DEPRECATED. his plugin lets user ignore other users, filtering their posts out of discussions.',
    'Version' => '1.0.1',
-   'RequiredApplications' => array('Vanilla' => '2.0.10a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.10'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,

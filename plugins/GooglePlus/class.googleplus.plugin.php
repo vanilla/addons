@@ -9,7 +9,7 @@ $PluginInfo['GooglePlus'] = array(
    'Name' => 'Google+',
    'Description' => 'Users may sign into your site using their Google Plus account.',
    'Version' => '1.0.2',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',

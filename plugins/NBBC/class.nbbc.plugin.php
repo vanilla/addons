@@ -11,7 +11,7 @@
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
     'Version' => '1.0.10b',
-    'RequiredApplications' => array('Vanilla' => '2.0.2a'),
+    'RequiredApplications' => array('Vanilla' => '2.0.2'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
     'HasLocale' => FALSE,

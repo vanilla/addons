@@ -4,7 +4,7 @@
 $PluginInfo['ReactionsStub'] = array(
    'Description' => 'Provides an example Raction bar to allow local-install theming.',
    'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,

@@ -22,7 +22,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 
 $PluginInfo['HTMLPurifier'] = array(
-   'Description' => 'Adapts HtmlPurifier to work with Garden. This plugin is maintained at http://github.com/vanillaforums/Addons.',
+   'Description' => 'DEPRECATED. Adapts HtmlPurifier to work with Garden. This plugin is maintained at http://github.com/vanillaforums/Addons.',
    'Version' => '1.4.2.0.1',
    'RequiredApplications' => NULL, 
    'RequiredTheme' => FALSE, 

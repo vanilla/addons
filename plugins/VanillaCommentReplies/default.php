@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['VanillaCommentReplies'] = array(
    'Name' => 'Vanilla Replies',
-   'Description' => "Adds one-level-deep replies to comments in Vanilla discussions.",
+   'Description' => "DEPRECATED. Adds one-level-deep replies to comments in Vanilla discussions.",
    'Version' => '1.0.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',

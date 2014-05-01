@@ -16,10 +16,7 @@ $PluginInfo['CountriesOnline'] = array(
 	'Description' => "Display the user count per country from the last five (or n) minutes. This requires the Geoip module to be installed on the server.",
 	'Version' => '1.0',
 	'Author' => "Dane MacMillan",
-	'RequiredTheme' => false, 
-	'RequiredPlugins' => false,
-	'HasLocale' => false,
-	'SettingsUrl' => false, 
+   'RequiredApplications' => array('Vanilla' => '2.1'),
 );
 
 class CountriesOnlinePlugin extends Gdn_Plugin 

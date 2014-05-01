@@ -4,7 +4,7 @@ $PluginInfo['Resolved'] = array(
    'Name' => 'Resolved Discussions',
    'Description' => "Adds an option to mark discussions as Resolved. Resolved discussions are closed to new participants.",
    'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'RegisterPermissions' => array('Plugins.Resolved.Manage'),
    'MobileFriendly' => TRUE,
    'Author' => "Matt Lincoln Russell",
