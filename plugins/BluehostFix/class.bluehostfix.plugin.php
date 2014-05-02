@@ -35,3 +35,5 @@ class BluehostFixPlugin extends Gdn_Plugin {
       @unlink(PATH_CACHE.'/library_map.ini');
    }
 }
+
+?>
