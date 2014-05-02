@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<ruleset name="Vanilla">
+    <description>Vanilla coding standard</description>
+
+    <exclude-pattern>*/views/*</exclude-pattern>
+    <exclude-pattern>*/design/*</exclude-pattern>
+    <exclude-pattern>*/cache/*</exclude-pattern>
+
+    <rule ref="PSR1" >
+        <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />
+    </rule>
+    <rule ref="PSR2" >
+        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine" />
+        <exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine" />
+    </rule>
+
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <type>warning</type>
+        <severity>5</severity>
+    </rule>
+
+    <!-- Ensure there's no use of deprecated functions -->
+    <rule ref="Generic.PHP.DeprecatedFunctions"/>
+
+    <!-- Ensure file starts with <?php -->
+    <rule ref="Generic.PHP.CharacterBeforePHPOpeningTag"/>
+
+    <!-- Reject <? opening tags -->
+    <rule ref="Generic.PHP.DisallowShortOpenTag"/>
+
+    <!-- Check that $this isn't used in static methods -->
+    <rule ref="Squiz.Scope.StaticThisUsage"/>
+
+    <!-- Include generic commenting sniffs -->
+    <rule ref="Generic.Commenting.Fixme"/>
+    <rule ref="Generic.Commenting.Todo"/>
+
+    <!-- Same-line open braces for functions -->
+    <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie"/>
+    <rule ref="Vanilla.NamingConventions.ValidClassBrackets"/>
+
+</ruleset>
