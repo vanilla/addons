@@ -5,6 +5,8 @@
     <exclude-pattern>*/views/*</exclude-pattern>
     <exclude-pattern>*/design/*</exclude-pattern>
     <exclude-pattern>*/cache/*</exclude-pattern>
+    <exclude-pattern>*/vendors/*</exclude-pattern>
+    <exclude-pattern>*/uploads/*</exclude-pattern>
 
     <rule ref="PSR1" >
         <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />
