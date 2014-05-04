@@ -1,3 +1,0 @@
-<?php
-
-$Definition['Null Date'] = '-';
