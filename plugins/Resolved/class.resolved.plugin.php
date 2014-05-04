@@ -2,7 +2,7 @@
 
 $PluginInfo['Resolved'] = array(
    'Name' => 'Resolved Discussions',
-   'Description' => "Adds an option to mark discussions as Resolved. Resolved discussions are closed to new participants.",
+   'Description' => "Adds an option to mark discussions as Resolved with custom permission. Resolved discussions are Closed to new participants, however additional posts by the OP unresolve it. Only users with the custom permission see its Resolved status.",
    'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'RegisterPermissions' => array('Plugins.Resolved.Manage'),
