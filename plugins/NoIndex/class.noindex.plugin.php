@@ -66,7 +66,8 @@ class NoIndexPlugin extends Gdn_Plugin {
      * Add a mod message to NoIndex discussions.
      */
     public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender, $Args) {
-        $Sender->Permission(array('Garden.Moderation.Manage', 'Garden.Curation.Manage'), FALSE);
+        if (!CheckPermission(array('Garden.Moderation.Manage', 'Garden.Curation.Manage'), FALSE))
+            return;
 
         if (GetValue('NoIndex', $Sender->Data('Discussion'))) {
             echo Wrap(T('Discussion marked as noindex'), 'div', array('class' => 'Warning'));
