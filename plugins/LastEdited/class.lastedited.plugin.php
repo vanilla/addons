@@ -11,12 +11,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['LastEdited'] = array(
    'Name' => 'Last Edited',
-   'Description' => 'Appends "Post edited by [User] at [Time]" to the end of edited posts.',
+   'Description' => 'Appends "Post edited by [User] at [Time]" to the end of edited posts and links to change log.',
    'Version' => '1.1.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1'),
-   'RequiredTheme' => FALSE, 
-   'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
