@@ -369,7 +369,7 @@ class Vanilla_Sniffs_Commenting_FileCommentSniff implements PHP_CodeSniffer_Snif
          }
          date_default_timezone_set('UTC');
          preg_match('/^2009\-(\d{4}) Vanilla Forums Inc.$/', $content, $matches);
-         if ($matches[1] != date('Y', time())) {
+         if (empty($matches) || $matches[1] != date('Y', time())) {
             $error = 'Expected "2009-' . date('Y') .' Vanilla Forums Inc." for copyright declaration';
             $this->currentFile->addError($error, $errorPos, 'IncorrectCopyright');
          }
