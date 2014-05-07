@@ -41,4 +41,7 @@
     <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie"/>
     <rule ref="Vanilla.NamingConventions.ValidClassBrackets"/>
 
+    <!-- Check that file level DocBlock exists and is valid -->
+    <rule ref="Vanilla.Commenting.FileComment"/>
+
 </ruleset>
