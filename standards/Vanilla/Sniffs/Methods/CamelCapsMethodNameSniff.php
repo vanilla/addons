@@ -124,6 +124,30 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_St
      */
     protected function processTokenOutsideScope(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
     {
+        $functionName = $phpcsFile->getDeclarationName($stackPtr);
+        if ($functionName === null) {
+            // Ignore closures.
+            return;
+        }
+
+        // allow things like php array_something..
+        if (stristr($functionName, '_') !== false) {
+            $parts = preg_split('/_/', $functionName);
+            foreach ($parts as $part) {
+                if (!ctype_lower($part)) {
+                    $error     = 'Function name "%s" should all be lowercase';
+                    $errorData = array($functionName);
+                    $phpcsFile->addError($error, $stackPtr, 'globalFunctionNaming', $errorData);
+                }
+            }
+
+        } else {
+            if (PHP_CodeSniffer::isCamelCaps($functionName, false, true, false) === false) {
+                $error     = 'Function name "%s" is not in valid vanilla format';
+                $errorData = array($functionName);
+                $phpcsFile->addError($error, $stackPtr, 'globalFunctionNaming', $errorData);
+            }
+        }
 
 
     }//end processTokenOutsideScope()
