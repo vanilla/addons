@@ -92,6 +92,7 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_St
             '_before',
             '_override',
             '_after',
+            'controller_'
         );
         foreach ($patterns as $pattern) {
             if (stristr($name, $pattern) !== false) {

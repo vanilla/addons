@@ -39,7 +39,7 @@
     <rule ref="Vanilla.NamingConventions.ValidClassBrackets"/>
 
     <!-- Check that file level DocBlock exists and is valid -->
-    <rule ref="Vanilla.Commenting.FileComment"/>
+
     <rule ref="Vanilla.Commenting.ClassComment"/>
     <rule ref="Vanilla.Commenting.FunctionComment"/>
 
