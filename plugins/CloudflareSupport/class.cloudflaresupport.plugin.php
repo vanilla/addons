@@ -21,7 +21,7 @@
 $PluginInfo['CloudflareSupport'] = array(
    'Description' => 'This plugin modifies the Request object to work with Cloudflare.',
    'Version' => '1.2.1',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,

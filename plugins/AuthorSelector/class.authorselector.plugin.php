@@ -4,7 +4,7 @@ $PluginInfo['AuthorSelector'] = array(
    'Name' => 'Author Selector',
    'Description' => "Allows administrators to change the author of a discussion.",
    'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'MobileFriendly' => TRUE,
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincolnwebs@gmail.com',

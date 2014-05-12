@@ -13,7 +13,7 @@ $PluginInfo['Reporting'] = array(
    'Name' => 'Community Reporting',
    'Description' => 'Allows users to report comments and discussions for content violations or awesomeness.',
    'Version' => '1.0.3',
-   'RequiredApplications' => array('Vanilla' => '2.0.18a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,

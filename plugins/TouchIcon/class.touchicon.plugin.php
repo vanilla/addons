@@ -8,7 +8,7 @@ $PluginInfo['TouchIcon'] = array(
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com',
-   'RequiredApplications' => array('Vanilla' => '2.0.18b'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'SettingsUrl' => '/settings/touchicon',
    'SettingsPermission' => 'Garden.Settings.Manage'
