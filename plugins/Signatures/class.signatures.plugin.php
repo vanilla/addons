@@ -409,9 +409,9 @@ class SignaturesPlugin extends Gdn_Plugin {
          // If embeds were disabled from the dashboard, temporarily set the
          // universal config to make sure no URLs are turned into embeds.
          if (!C('Plugins.Signatures.AllowEmbeds', true)) {
-             $originalEnableUrlEmbeds = C('Garden.Format.EnableUrlEmbeds', true);
+             $originalEnableUrlEmbeds = C('Garden.Format.DisableUrlEmbeds', false);
              SaveToConfig(array(
-                'Garden.Format.EnableUrlEmbeds' => false
+                'Garden.Format.DisableUrlEmbeds' => true
              ));
          }
 
@@ -420,7 +420,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          // Restore original config.
          if (!C('Plugins.Signatures.AllowEmbeds', true)) {
              SaveToConfig(array(
-                'Garden.Format.EnableUrlEmbeds' => $originalEnableUrlEmbeds
+                'Garden.Format.DisableUrlEmbeds' => $originalEnableUrlEmbeds
              ));
          }
 
