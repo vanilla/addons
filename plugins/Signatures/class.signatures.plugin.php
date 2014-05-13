@@ -412,6 +412,8 @@ class SignaturesPlugin extends Gdn_Plugin {
              $originalEnableUrlEmbeds = C('Garden.Format.DisableUrlEmbeds', false);
              SaveToConfig(array(
                 'Garden.Format.DisableUrlEmbeds' => true
+             ), null, array(
+                'Save' => false
              ));
          }
 
@@ -421,6 +423,8 @@ class SignaturesPlugin extends Gdn_Plugin {
          if (!C('Plugins.Signatures.AllowEmbeds', true)) {
              SaveToConfig(array(
                 'Garden.Format.DisableUrlEmbeds' => $originalEnableUrlEmbeds
+             ), null, array(
+                'Save' => false
              ));
          }
 
