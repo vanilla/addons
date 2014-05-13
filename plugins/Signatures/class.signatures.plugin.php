@@ -406,7 +406,23 @@ class SignaturesPlugin extends Gdn_Plugin {
          // Don't show empty sigs
          if ($Signature == '') return;
 
+         // If embeds were disabled from the dashboard, temporarily set the
+         // universal config to make sure no URLs are turned into embeds.
+         if (!C('Plugins.Signatures.AllowEmbeds', true)) {
+             $originalEnableUrlEmbeds = C('Garden.Format.EnableUrlEmbeds', true);
+             SaveToConfig(array(
+                'Garden.Format.EnableUrlEmbeds' => false
+             ));
+         }
+
          $UserSignature = Gdn_Format::To($Signature, $SigFormat)."<!-- $SigFormat -->";
+
+         // Restore original config.
+         if (!C('Plugins.Signatures.AllowEmbeds', true)) {
+             SaveToConfig(array(
+                'Garden.Format.EnableUrlEmbeds' => $originalEnableUrlEmbeds
+             ));
+         }
 
          $this->EventArguments = array(
             'UserID'    => $SourceUserID,
@@ -472,7 +488,8 @@ class SignaturesPlugin extends Gdn_Plugin {
       $Conf->Initialize(array(
           'Plugins.Signatures.HideGuest' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures for guests'),
           'Plugins.Signatures.HideEmbed' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => TRUE),
-          'Plugins.Signatures.AllowImages' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow images', 'Default' => TRUE)
+          'Plugins.Signatures.AllowImages' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow images', 'Default' => TRUE),
+          'Plugins.Signatures.AllowEmbeds' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow embedded content', 'Default' => true)
       ));
 
       $Sender->AddSideMenu();

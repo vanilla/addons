@@ -13,6 +13,15 @@ echo $this->Form->Errors();
    <?php
       }
    ?>
+
+    <li>
+        <?php if (!C('Plugins.Signatures.AllowEmbeds', true)): ?>
+            <div class="Info">
+                <?php echo T('Video embedding has been disabled. URLs will not translate to their embedded equivalent.'); ?>
+            </div>
+        <?php endif; ?>
+    </li>
+
    <li>
       <?php
          echo $this->Form->Label('Settings');
@@ -21,7 +30,7 @@ echo $this->Form->Errors();
          echo $this->Form->CheckBox('Plugin.Signatures.HideImages','Strip images out of signatures');
       ?>
    </li>
-   
+
    <li>
       <?php
          echo $this->Form->Label('Signature Code', 'Plugin.Signatures.Sig');
@@ -32,8 +41,8 @@ echo $this->Form->Errors();
             echo T("You don't have permission to use a signature.");
          } ?>
    </li>
-   
-   
+
+
    <?php
       $this->FireEvent('EditMySignatureAfter');
    ?>
