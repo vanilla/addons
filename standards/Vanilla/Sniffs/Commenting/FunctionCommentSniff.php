@@ -336,12 +336,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
                     continue;
                 }
 
-                $spacing = substr_count($see->getWhitespaceBeforeContent(), ' ');
-                if ($spacing !== 4) {
-                    $error = '@see tag indented incorrectly; expected 4 spaces but found %s';
-                    $data  = array($spacing);
-                    $this->currentFile->addError($error, $errorPos, 'SeeIndent', $data);
-                }
+
             }//end foreach
         }//end if
 
