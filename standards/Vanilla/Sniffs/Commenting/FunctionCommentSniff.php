@@ -212,6 +212,13 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
             $phpcsFile->addError($error, $commentStart, 'ContentAfterOpen');
         }
 
+        // Check for a comment description.
+        $short = $comment->getShortComment();
+        //ignore bocks with inheritdoc tags
+        if (stristr($short, '{@inheritdoc}') !== false) {
+            return;
+        }
+
         $this->processParams($commentStart, $commentEnd);
         $this->processSees($commentStart);
         $this->processThrows($commentStart);
@@ -259,7 +266,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
         }
 
         //ignore bocks with inheritdoc tags
-        if (stristr($long, '{@inheritdoc}') !== false) {
+        if (stristr($long, '{inheritdoc}') !== false) {
             return;
         }
 
