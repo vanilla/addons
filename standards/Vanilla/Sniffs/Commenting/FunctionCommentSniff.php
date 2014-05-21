@@ -224,6 +224,11 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
             return;
         }
 
+        //ignore bocks with inheritdoc tags
+        if (stristr($short, '{@inheritdoc}') !== false) {
+            return;
+        }
+
         // No extra newline before short description.
         $newlineCount = 0;
         $newlineSpan  = strspn($short, $phpcsFile->eolChar);
@@ -251,7 +256,12 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
                 $error = 'Function comment long description must start with a capital letter';
                 $phpcsFile->addError($error, ($commentStart + $newlineCount), 'LongNotCapital');
             }
-        }//end if
+        }
+
+        //ignore bocks with inheritdoc tags
+        if (stristr($long, '{@inheritdoc}') !== false) {
+            return;
+        }
 
         // Exactly one blank line before tags.
         $params = $this->commentParser->getTagOrders();
