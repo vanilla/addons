@@ -426,11 +426,11 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
 
         if (empty($params) === false) {
 
-            if (substr_count($params[(count($params) - 1)]->getWhitespaceAfter(), $this->currentFile->eolChar) !== 2) {
-                $error    = 'Last parameter comment requires a blank newline after it';
-                $errorPos = ($params[(count($params) - 1)]->getLine() + $commentStart);
-                $this->currentFile->addError($error, $errorPos, 'SpacingAfterParams');
-            }
+            // if (substr_count($params[(count($params) - 1)]->getWhitespaceAfter(), $this->currentFile->eolChar) !== 2) {
+            //     $error    = 'Last parameter comment requires a blank newline after it';
+            //     $errorPos = ($params[(count($params) - 1)]->getLine() + $commentStart);
+            //     $this->currentFile->addError($error, $errorPos, 'SpacingAfterParams');
+            // }
 
             // Parameters must appear immediately after the comment.
             if ($params[0]->getOrder() !== 2) {
