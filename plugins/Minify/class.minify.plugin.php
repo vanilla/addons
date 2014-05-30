@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Minify'] = array(
    'Name' => 'Minify',
-   'Description' => 'Analyzes each page request for Javascript and CSS files, merging and minifying them where applicable.',
+   'Description' => 'DEPRECATED. Analyzes each page request for Javascript and CSS files, merging and minifying them where applicable.',
    'Version' => '1.0.3b',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',

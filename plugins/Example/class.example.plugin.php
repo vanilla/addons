@@ -12,12 +12,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Example'] = array(
    'Description' => 'Provides an example Development Pattern for Vanilla 2 plugins by demonstrating how to insert discussion body excerpts into the discussions list.',
    'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.0.18.4'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
    'SettingsUrl' => '/plugin/example',
-   'SettingsPermission' => 'Garden.AdminUser.Only',
+   'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'

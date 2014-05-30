@@ -19,7 +19,7 @@ $PluginInfo['CustomizeText'] = array(
    'Name' => 'Customize Text',
    'Description' => "Allows administrators to edit the text throughout their forum.",
    'Version' => '1.2',
-   'RequiredApplications' => array('Vanilla' => '2.1a2'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',

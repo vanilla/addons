@@ -9,7 +9,7 @@ $PluginInfo['Whispers'] = array(
    'Name' => 'Whispers',
    'Description' => "Users may 'whisper' private comments to each other in the middle of normal discussions. Caution: this can be a confusing feature for some people.",
    'Version' => '1.1.2',
-   'RequiredApplications' => array('Vanilla' => '2.0.18a3', 'Conversations' => '2.0.18a3'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18', 'Conversations' => '2.0.18'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',

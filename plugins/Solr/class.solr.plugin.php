@@ -9,7 +9,7 @@ $PluginInfo['Solr'] = array(
    'Name' => 'Solr Search',
    'Description' => "Allows Vanilla's search functionality to use solr instead of MySQL fulltext search.",
    'Version' => '1.0b',
-   'RequiredApplications' => array('Vanilla' => '2.0.18a1'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',

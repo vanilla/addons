@@ -24,7 +24,7 @@ $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
    'Version' => '1.5.6',
-   'RequiredApplications' => array('Vanilla' => '2.0.18b'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
@@ -406,7 +406,27 @@ class SignaturesPlugin extends Gdn_Plugin {
          // Don't show empty sigs
          if ($Signature == '') return;
 
+         // If embeds were disabled from the dashboard, temporarily set the
+         // universal config to make sure no URLs are turned into embeds.
+         if (!C('Plugins.Signatures.AllowEmbeds', true)) {
+             $originalEnableUrlEmbeds = C('Garden.Format.DisableUrlEmbeds', false);
+             SaveToConfig(array(
+                'Garden.Format.DisableUrlEmbeds' => true
+             ), null, array(
+                'Save' => false
+             ));
+         }
+
          $UserSignature = Gdn_Format::To($Signature, $SigFormat)."<!-- $SigFormat -->";
+
+         // Restore original config.
+         if (!C('Plugins.Signatures.AllowEmbeds', true)) {
+             SaveToConfig(array(
+                'Garden.Format.DisableUrlEmbeds' => $originalEnableUrlEmbeds
+             ), null, array(
+                'Save' => false
+             ));
+         }
 
          $this->EventArguments = array(
             'UserID'    => $SourceUserID,
@@ -472,7 +492,8 @@ class SignaturesPlugin extends Gdn_Plugin {
       $Conf->Initialize(array(
           'Plugins.Signatures.HideGuest' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures for guests'),
           'Plugins.Signatures.HideEmbed' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => TRUE),
-          'Plugins.Signatures.AllowImages' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow images', 'Default' => TRUE)
+          'Plugins.Signatures.AllowImages' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow images', 'Default' => TRUE),
+          'Plugins.Signatures.AllowEmbeds' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow embedded content', 'Default' => true)
       ));
 
       $Sender->AddSideMenu();

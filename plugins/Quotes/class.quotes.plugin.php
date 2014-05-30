@@ -2,15 +2,16 @@
 
 /**
  * Quotes Plugin
- * 
+ *
  * This plugin allows users to quote comments for reference in their own comments
  * within a discussion.
- * 
- * Changes: 
+ *
+ * Changes:
  *  1.0     Initial release
  *  1.6.1   Overhaul
  *  1.6.4   Moved button to reactions area & changed js accordingly.
- * 
+ *  1.6.8   Textarea target will now automatically resize to fit text body.
+ *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -20,9 +21,9 @@
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.6.7',
+    'Version' => '1.6.8',
     'MobileFriendly' => TRUE,
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
+    'RequiredApplications' => array('Vanilla' => '2.1'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
     'HasLocale' => TRUE,
@@ -209,7 +210,7 @@ class QuotesPlugin extends Gdn_Plugin {
 
       $Format = GetValue('Format', $Sender->EventArguments['Object'], null);
       if (is_null($Format)) return;
-      
+
       switch ($Sender->EventArguments['Object']->Format) {
          case 'Html':
             $Sender->EventArguments['Object']->Body = preg_replace_callback("/(<blockquote\s+(?:class=\"(?:User)?Quote\")?\s+rel=\"([^\"]+)\">)/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);

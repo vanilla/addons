@@ -6,9 +6,9 @@
 
 $PluginInfo['RoleTitle'] = array(
    'Name' => 'Role Titles',
-   'Description' => "Lists user's assigned roles under their name and allows theming by role (adds role-specific CSS classes to comments).",
-   'Version' => '0.4',
-   'RequiredApplications' => array('Vanilla' => '2.0.17'),
+   'Description' => "Lists users' roles under their name and adds role-specific CSS classes to their comments for theming.",
+   'Version' => '1.0',
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'RegisterPermissions' => FALSE,
    'Author' => "Matt Lincoln Russell",
