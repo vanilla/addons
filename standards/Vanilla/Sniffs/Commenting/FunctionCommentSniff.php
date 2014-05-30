@@ -212,6 +212,13 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
             $phpcsFile->addError($error, $commentStart, 'ContentAfterOpen');
         }
 
+        // Check for a comment description.
+        $short = $comment->getShortComment();
+        //ignore bocks with inheritdoc tags
+        if (stristr($short, '{@inheritdoc}') !== false) {
+            return;
+        }
+
         $this->processParams($commentStart, $commentEnd);
         $this->processSees($commentStart);
         $this->processThrows($commentStart);
@@ -221,6 +228,11 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
         if (trim($short) === '') {
             $error = 'Missing short description in function doc comment';
             $phpcsFile->addError($error, $commentStart, 'MissingShort');
+            return;
+        }
+
+        //ignore bocks with inheritdoc tags
+        if (stristr($short, '{@inheritdoc}') !== false) {
             return;
         }
 
@@ -251,7 +263,12 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
                 $error = 'Function comment long description must start with a capital letter';
                 $phpcsFile->addError($error, ($commentStart + $newlineCount), 'LongNotCapital');
             }
-        }//end if
+        }
+
+        //ignore bocks with inheritdoc tags
+        if (stristr($long, '{inheritdoc}') !== false) {
+            return;
+        }
 
         // Exactly one blank line before tags.
         $params = $this->commentParser->getTagOrders();
@@ -336,12 +353,7 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
                     continue;
                 }
 
-                $spacing = substr_count($see->getWhitespaceBeforeContent(), ' ');
-                if ($spacing !== 4) {
-                    $error = '@see tag indented incorrectly; expected 4 spaces but found %s';
-                    $data  = array($spacing);
-                    $this->currentFile->addError($error, $errorPos, 'SeeIndent', $data);
-                }
+
             }//end foreach
         }//end if
 
@@ -421,11 +433,11 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
 
         if (empty($params) === false) {
 
-            if (substr_count($params[(count($params) - 1)]->getWhitespaceAfter(), $this->currentFile->eolChar) !== 2) {
-                $error    = 'Last parameter comment requires a blank newline after it';
-                $errorPos = ($params[(count($params) - 1)]->getLine() + $commentStart);
-                $this->currentFile->addError($error, $errorPos, 'SpacingAfterParams');
-            }
+            // if (substr_count($params[(count($params) - 1)]->getWhitespaceAfter(), $this->currentFile->eolChar) !== 2) {
+            //     $error    = 'Last parameter comment requires a blank newline after it';
+            //     $errorPos = ($params[(count($params) - 1)]->getLine() + $commentStart);
+            //     $this->currentFile->addError($error, $errorPos, 'SpacingAfterParams');
+            // }
 
             // Parameters must appear immediately after the comment.
             if ($params[0]->getOrder() !== 2) {

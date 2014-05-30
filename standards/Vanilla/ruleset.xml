@@ -18,6 +18,7 @@
         <exclude name="PSR2.Classes.PropertyDeclaration" />
     </rule>
 
+
     <!-- Ensure there's no use of deprecated functions -->
     <rule ref="Generic.PHP.DeprecatedFunctions"/>
 
@@ -40,6 +41,10 @@
 
     <!-- Check that file level DocBlock exists and is valid -->
 
+    <rule ref="Vanilla.Commenting.FileComment">
+        <exclude name="Vanilla.Commenting.FileComment.DuplicateCopyrightTag" />
+    </rule>
+
     <rule ref="Vanilla.Commenting.ClassComment"/>
     <rule ref="Vanilla.Commenting.FunctionComment"/>
 
@@ -48,5 +53,6 @@
 
     <!-- camelCase or Vanilla Events -->
     <rule ref="Vanilla.Methods.CamelCapsMethodName"/>
+
 
 </ruleset>

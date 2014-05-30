@@ -5,6 +5,7 @@ $PluginInfo['MessageLink'] = array(
    'Description' => "Adds a link to message the author of each discussion and comment.",
    'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.2', 'Conversations' => '2.2'),
+   'MobileFriendly' => TRUE,
    'Author' => "Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com'
