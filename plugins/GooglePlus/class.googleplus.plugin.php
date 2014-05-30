@@ -9,7 +9,7 @@ $PluginInfo['GooglePlus'] = array(
    'Name' => 'Google+',
    'Description' => 'Users may sign into your site using their Google Plus account.',
    'Version' => '1.0.2',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -56,7 +56,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
       return $Result;
    }
    
-   public function AuthorizeUri($State = FALSE) {
+   public function AuthorizeUri($State = array()) {
       $Url = 'https://accounts.google.com/o/oauth2/auth';
       $Get = array(
           'response_type' => 'code',
@@ -90,6 +90,10 @@ class GooglePlusPlugin extends Gdn_Plugin {
    public function IsConfigured() {
       $Result = C('Plugins.GooglePlus.ClientID') && C('Plugins.GooglePlus.Secret');
       return $Result;
+   }
+   
+   public function IsDefault() {
+      return (bool)C('Plugins.GooglePlus.Default');
    }
    
    public function SocialSharing() {
@@ -140,7 +144,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
    }
 
    public function SignInButton($type = 'button') {
-      $Url = $this->AuthorizeUri();
+      $Url = $this->AuthorizeUri(array('target' => Url('', '/')));
 
       $Result = SocialSignInButton('Google', $Url, $type);
       return $Result;
@@ -211,15 +215,20 @@ class GooglePlusPlugin extends Gdn_Plugin {
       $Form->SetFormValue('Attributes', $Attributes);
       $Sender->SetData('Verified', TRUE);
 
+      $this->EventArguments['Form'] = $Form;
       $this->FireEvent('AfterConnectData');
    }
 
    public function Base_SignInIcons_Handler($Sender, $Args) {
+      if (!$this->IsDefault()) {
       echo ' '.$this->SignInButton('icon').' ';
+   }
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
+      if (!$this->IsDefault()) {
       echo ' '.$this->SignInButton('icon').' ';
+      }
    }
    
    public function Base_GetConnections_Handler($Sender, $Args) {
@@ -298,9 +307,50 @@ class GooglePlusPlugin extends Gdn_Plugin {
          default:
             // This is an sso request, we need to redispatch to /entry/connect/googleplus
             Gdn::Session()->Stash(self::ProviderKey, array('AccessToken' => $AccessToken, 'Profile' => $Profile));
-            Redirect('/entry/connect/googleplus');
+            $url = '/entry/connect/googleplus';
+
+            if ($target = val('target', $State)) {
+               $url .= '?Target='.urlencode($target);
+            }
+            Redirect($url);
             break;
       }
+   }
+
+    /**
+     *
+     * @param Gdn_Controller $Sender
+     */
+    public function EntryController_SignIn_Handler($Sender, $Args) {
+//      if (!$this->IsEnabled()) return;
+
+        if (isset($Sender->Data['Methods'])) {
+            $Url = $this->AuthorizeUri();
+
+            // Add the twitter method to the controller.
+            $Method = array(
+                'Name' => 'Google',
+                'SignInHtml' => $this->SignInButton() //SocialSigninButton('Google', $Url, 'button', array('class' => 'js-extern'))
+            );
+
+            $Sender->Data['Methods'][] = $Method;
+    }
+      }
+
+   /**
+    * Override the sign in if Google+ is the default sign-in method.
+    * @param EntryController $Sender
+    * @param array $Args
+    */
+   public function EntryController_OverrideSignIn_Handler($Sender, $Args) {
+      if (valr('DefaultProvider.AuthenticationKey', $Args) !== self::ProviderKey || !$this->IsConfigured()) {
+         return;
+      }
+
+      $Url = $this->AuthorizeUri(array('target' => $Args['Target']));
+      $Args['DefaultProvider']['SignInUrl'] = $Url;
+
+//      Redirect($Url);
    }
    
    /**
@@ -331,15 +381,21 @@ class GooglePlusPlugin extends Gdn_Plugin {
 
       $Conf = new ConfigurationModule($Sender);
       $Conf->Initialize(array(
-          'Plugins.GooglePlus.ClientID',
-          'Plugins.GooglePlus.Secret',
-          'Plugins.GooglePlus.SocialReactions'  => array('Control' => 'checkbox', 'Default' => TRUE),
-          'Plugins.GooglePlus.SocialSharing'    => array('Control' => 'checkbox', 'Default' => TRUE)
+          'Plugins.GooglePlus.ClientID' => array('LabelCode' => 'Client ID', 'Options' => array('class' => 'InputBox BigInput')),
+          'Plugins.GooglePlus.Secret' => array('LabelCode' => 'Client secret', 'Options' => array('class' => 'InputBox BigInput')),
+          'Plugins.GooglePlus.SocialReactions' => array('Control' => 'checkbox', 'Default' => TRUE),
+          'Plugins.GooglePlus.SocialSharing' => array('Control' => 'checkbox', 'Default' => TRUE),
+          'Plugins.GooglePlus.Default' => array('Control' => 'checkbox', 'LabelCode' => 'Make this connection your default signin method.')
       ));
+
+      if (Gdn::Request()->IsAuthenticatedPostBack()) {
+         $Model = new Gdn_AuthenticationProviderModel();
+         $Model->Save(array('AuthenticationKey' => self::ProviderKey, 'IsDefault' => C('Plugins.GooglePlus.Default')));
+      }
 
       $Sender->AddSideMenu('dashboard/social');
       $Sender->SetData('Title', sprintf(T('%s Settings'), 'Google+'));
       $Sender->ConfigurationModule = $Conf;
-      $Conf->RenderAll();
+      $Sender->Render('Settings', '', 'plugins/GooglePlus');
    }
 }
