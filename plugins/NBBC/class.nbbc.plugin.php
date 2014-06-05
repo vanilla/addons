@@ -100,6 +100,14 @@ EOT;
       }
    }
 
+   function DoYoutube($bbcode, $action, $name, $default, $params, $content) {
+       if ($action == BBCODE_CHECK) return true;
+
+       $videoId = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
+
+       return '<div class="Video P"><iframe width="560" height="315" src="http://www.youtube.com/embed/' . $videoId . '" frameborder="0" allowfullscreen></iframe></div>';
+   }
+
    function DoQuote($bbcode, $action, $name, $default, $params, $content) {
       if ($action == BBCODE_CHECK)
          return true;
@@ -160,7 +168,7 @@ EOT;
       if ($action == BBCODE_CHECK) return true;
       
       $url = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
-      
+
       if ($bbcode->IsValidURL($url)) {
          if ($bbcode->debug)
             print "ISVALIDURL<br />";
@@ -303,8 +311,44 @@ EOT;
              'plain_end' => "\n",
          ));
 
-         $BBCode->AddRule('url', array(
-            'mode' => BBCODE_MODE_CALLBACK,
+          $BBCode->AddRule('youtube', array(
+              'mode' => BBCODE_MODE_CALLBACK,
+              'method' => array($this, 'DoYouTube'),
+              'class' => 'link',
+              'allow_in' => Array('listitem', 'block', 'columns', 'inline'),
+              'content' => BBCODE_REQUIRED,
+              'plain_start' => "\n<b>Video:</b>\n",
+              'plain_end' => "\n",
+              'plain_content' => Array('_content', '_default'),
+              'plain_link' => Array('_default', '_content')
+          ));
+
+          $BBCode->AddRule('hr', Array(
+              'simple_start' => "",
+              'simple_end' => "",
+              'allow_in' => Array('listitem', 'block', 'columns'),
+              'before_tag' => "sns",
+              'after_tag' => "sns",
+              'before_endtag' => "sns",
+              'after_endtag' => "sns",
+              'plain_start' => "\n",
+              'plain_end' => "\n"
+          ));
+
+          $BBCode->AddRule('attachment', array(
+              'mode' => BBCODE_MODE_CALLBACK,
+              'method' => array($this, "RemoveAttachment"),
+              'class' => 'image',
+              'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+              'end_tag' => BBCODE_REQUIRED,
+              'content' => BBCODE_REQUIRED,
+              'plain_start' => "[image]",
+              'plain_content' => Array(),
+          ));
+
+
+          $BBCode->AddRule('url', array(
+             'mode' => BBCODE_MODE_CALLBACK,
             'method' => array($this, 'DoURL'),
             'class' => 'link',
             'allow_in' => Array('listitem', 'block', 'columns', 'inline'),
@@ -312,13 +356,19 @@ EOT;
             'plain_start' => "<a rel=\"nofollow\" href=\"{\$link}\">",
             'plain_end' => "</a>",
             'plain_content' => Array('_content', '_default'),
-            'plain_link' => Array('_default', '_content')));
+            'plain_link' => Array('_default', '_content')
+         ));
 
          $this->EventArguments['BBCode'] = $BBCode;
          $this->FireEvent('AfterNBBCSetup');
          $this->_NBBC = $BBCode;
       }
       return $this->_NBBC;
+   }
+
+   public function RemoveAttachment() {
+       // We dont need this since we show attachments.
+       return '<!-- PhpBB Attachments -->';
    }
 
    public function Setup() {
