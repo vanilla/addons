@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ShareThis'] = array(
    'Name' => 'ShareThis',
    'Description' => 'Adds ShareThis (http://sharethis.com) buttons below discussions.',
-   'Version' => '1.1.2',
+   'Version' => '1.2',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -37,10 +37,11 @@ class ShareThisPlugin extends Gdn_Plugin {
 
       $doNotHash = $CopyNShare ? 'false' : 'true';
       $doNotCopy = $CopyNShare ? 'false' : 'true';
+      $Domain = Gdn::Request()->Scheme() == 'https' ? 'https://ws.sharethis.com' : 'http://w.sharethis.com';
 
       echo <<<SHARETHIS
       <script type="text/javascript">var switchTo5x=true;</script>
-      <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+      <script type="text/javascript" src="{$Domain}/button/buttons.js"></script>
       <script type="text/javascript">stLight.options({
          publisher: "{$PublisherNumber}",
          doNotHash: {$doNotHash},
