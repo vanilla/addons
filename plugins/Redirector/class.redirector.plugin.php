@@ -35,6 +35,19 @@ class RedirectorPlugin extends Gdn_Plugin {
          '_arg0' => array('CategoryID', 'Filter' => array('RedirectorPlugin', 'RemoveID')),
          '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'GetNumber'))
          ),
+      'forumindex.jspa' => array( // jive 4 category
+          'categoryID' => 'CategoryID'
+       ),
+      'forum.jspa' => array( // jive 4; forums imported as tags
+         'forumID' => 'TagID',
+         'start' => 'Offset'
+      ),
+      'thread.jspa' => array( //jive 4 comment/discussion
+         'threadID' => 'DiscussionID'
+      ),
+      'category.jspa' => array(  // jive 4 category
+         'categoryID' => 'CategoryID'
+      ),
       'index.php' => array( // smf
          'board' => array('CategoryID', 'Filter' => array('RedirectorPlugin', 'SmfOffset')),
          'topic' => array('DiscussionID', 'Filter' => array('RedirectorPlugin', 'SmfOffset')),
@@ -79,8 +92,11 @@ class RedirectorPlugin extends Gdn_Plugin {
          't' => 'DiscussionID',
          'p' => 'CommentID',
          'start' => 'Offset'
-         )
-      );
+         ),
+      'profile.jspa' => array( //jive4 profile
+         'userID' => 'UserID'
+      )
+   );
    
    /**
     * @param Gdn_Dispatcher $Sender
@@ -113,7 +129,6 @@ class RedirectorPlugin extends Gdn_Plugin {
             $Filename = '';
          }
       }
-      
       if (!$Filename) {
          // There was no filename, so we can try the first folder as the filename.
          while (count($After) > 0) {
@@ -122,7 +137,7 @@ class RedirectorPlugin extends Gdn_Plugin {
                break;
          }
       }
-      
+
       // Add the after parts to the array.
       $i = 0;
       foreach ($After as $Arg) {
@@ -143,7 +158,7 @@ class RedirectorPlugin extends Gdn_Plugin {
       Trace(array('Filename' => $Filename, 'Get' => $Get), 'Testing');
       $Filename = strtolower($Filename);
       array_change_key_case($Get);
-      
+
       if (!isset(self::$Files[$Filename]))
          return FALSE;
       
@@ -185,7 +200,6 @@ class RedirectorPlugin extends Gdn_Plugin {
       }
       
       Trace($Vars, 'Translated Arguments');
-      
       // Now let's see what kind of record we have.
       // We'll check the various primary keys in order of importance.
       $Result = FALSE;
@@ -222,6 +236,11 @@ class RedirectorPlugin extends Gdn_Plugin {
          $User = Gdn::UserModel()->GetID($Vars['UserID']);
          if ($User)
             $Result = Url(UserUrl($User), '//');
+      } elseif (isset($Vars['TagID'])) {
+         $Tag = TagModel::instance()->GetID($Vars['TagID']);
+         if ($Tag) {
+             $Result = TagUrl($Tag, self::PageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
+         }
       } elseif (isset($Vars['CategoryID'])) {
          Trace("Looking up category {$Vars['CategoryID']}.");
          
