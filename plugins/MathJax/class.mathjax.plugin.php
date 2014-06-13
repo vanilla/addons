@@ -53,7 +53,8 @@ class MathJaxPlugin extends Gdn_Plugin {
             processEscapes: true
         },
         "HTML-CSS": { availableFonts: ["TeX"] },
-        messageStyle: "none"
+        messageStyle: "none",
+        showProcessingMessages: false
     });
 </script>
 MATHJAX;
