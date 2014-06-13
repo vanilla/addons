@@ -40,18 +40,20 @@ class MathJaxPlugin extends Gdn_Plugin {
 
         // Add basic MathJax configuration
         $mathJaxConfig = <<<MATHJAX
-MathJax.Hub.Config({
-    extensions: ["tex2jax.js"],
-    jax: ["input/TeX", "output/HTML-CSS"],
-    tex2jax: {
-        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-        processEscapes: true
-    },
-    "HTML-CSS": { availableFonts: ["TeX"] }
-});
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true
+        },
+        "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+</script>
 MATHJAX;
-        $sender->Head->addScript($mathJaxConfig, 'text/x-mathjax-config');
+        $sender->Head->addString($mathJaxConfig);
 
         $sender->addJsFile("http://cdn.mathjax.org/mathjax/2.4-latest/MathJax.js");
         $sender->addJsFile("live.js", "plugins/MathJax");
