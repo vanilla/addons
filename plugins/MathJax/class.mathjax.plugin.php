@@ -42,14 +42,18 @@ class MathJaxPlugin extends Gdn_Plugin {
         $mathJaxConfig = <<<MATHJAX
 <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
-        extensions: ["tex2jax.js"],
-        jax: ["input/TeX", "output/HTML-CSS"],
+        jax: ["input/TeX","output/HTML-CSS"],
+        extensions: ["tex2jax.js","MathMenu.js","MathZoom.js"],
+        TeX: {
+            extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+        }
         tex2jax: {
             inlineMath: [ ['$','$'], ["\\(","\\)"] ],
             displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
             processEscapes: true
         },
-        "HTML-CSS": { availableFonts: ["TeX"] }
+        "HTML-CSS": { availableFonts: ["TeX"] },
+        messageStyle: "none"
     });
 </script>
 MATHJAX;
