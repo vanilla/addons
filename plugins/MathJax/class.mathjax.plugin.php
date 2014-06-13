@@ -46,7 +46,7 @@ class MathJaxPlugin extends Gdn_Plugin {
         extensions: ["tex2jax.js","MathMenu.js","MathZoom.js"],
         TeX: {
             extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
-        }
+        },
         tex2jax: {
             inlineMath: [ ['$','$'], ["\\(","\\)"] ],
             displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
