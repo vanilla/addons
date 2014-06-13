@@ -55,7 +55,7 @@ class MathJaxPlugin extends Gdn_Plugin {
 MATHJAX;
         $sender->Head->addString($mathJaxConfig);
 
-        $sender->addJsFile("http://cdn.mathjax.org/mathjax/2.4-latest/MathJax.js");
+        $sender->addJsFile("http://cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?delayStartupUntil=onload");
         $sender->addJsFile("live.js", "plugins/MathJax");
     }
 
