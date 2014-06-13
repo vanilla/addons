@@ -48,8 +48,8 @@ class MathJaxPlugin extends Gdn_Plugin {
             extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
         },
         tex2jax: {
-            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            inlineMath: [ ['$\(','\)$'] ],
+            displayMath: [ ['$$\(','\)$$'] ],
             processEscapes: true
         },
         "HTML-CSS": { availableFonts: ["TeX"] },
