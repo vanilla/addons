@@ -5,7 +5,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
-$PluginInfo['mathjax'] = array(
+$PluginInfo['MathJax'] = array(
     'Description' => 'This plugin enables MathJax syntax in discussions and comments.',
     'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.1'),
