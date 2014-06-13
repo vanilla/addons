@@ -7,7 +7,7 @@
 
 $PluginInfo['MathJax'] = array(
     'Description' => 'This plugin enables MathJax syntax in discussions and comments.',
-    'Version' => '1.0',
+    'Version' => '1.1',
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'MobileFriendly' => TRUE,
     'Author' => "Tim Gunter",
@@ -25,6 +25,7 @@ $PluginInfo['MathJax'] = array(
  *
  * Changes:
  *  1.0     Initial release
+ *  1.1     Support previews
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package addons

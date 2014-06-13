@@ -14,3 +14,7 @@
 jQuery(document).on('CommentAdded', function () {
     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 });
+
+jQuery('form').on('PreviewLoaded', function() {
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+});
