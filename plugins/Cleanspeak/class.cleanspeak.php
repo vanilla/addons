@@ -31,30 +31,34 @@ class Cleanspeak extends Gdn_Pluggable {
         return self::$Instance;
     }
 
-    public function moderation($UUID, $content, $forceModeration = true) {
+
+    /**
+     * Send post to cleanspeak to see if content requires moderation.
+     *
+     * @param $UUID
+     * @param $content
+     * @param bool $forceModeration
+     * @return array|mixed
+     */
+    public function moderation($UUID, $content, $forceModeration = false) {
 
         if ($forceModeration) {
             $content['moderation'] = 'requiresApproval';
         }
 
-        $fakeResponse['allow'] = array(
-            'content' => array(),
-            'contentAction' => 'allow',
-            'stored' => false
-        );
-        $fakeResponse['requiresApproval'] = array(
-            'content' => array(),
-            'contentAction' => 'requiresApproval',
-            'stored' => true
-        );
-        return $fakeResponse['requiresApproval'];
-
-        $response = $this->apiRequest('/content/item/moderate/' . $UUID, $content);
+        $response = $this->apiRequest('/content/item/moderate/' . urlencode($UUID), $content);
 
         return $response;
 
     }
 
+    /**
+     *
+     * Generate UUIDs for Content.
+     * see uuidSeed property for pattern to be used.
+     *
+     * @return string UUID
+     */
     public function getRandomUUID() {
         $seed = $this->uuidSeed;
         foreach ($seed as &$int) {
@@ -151,12 +155,20 @@ class Cleanspeak extends Gdn_Pluggable {
 
     }
 
-
+    /**
+     * Send API request to cleanspeak.
+     *
+     * @param string $url URL with Port number included
+     * @param array $post Post data.
+     * @return mixed Response from server. If json response will be decoded.
+     *
+     * @throws Gdn_UserException
+     */
     public function apiRequest($url, $post) {
 
         $proxyRequest = new ProxyRequest();
         $options = array(
-            'Url' => 'http://cleanspeak-752583346.us-east-1.elb.amazonaws.com:8001/' . ltrim($url, '/'),
+            'Url' => C('Plugins.Cleanspeak.ApiUrl') . '/'. ltrim($url, '/'),
 //            'Timeout' => 30, //connection was timing out.
 //            'ConnectTimeout' => 30,
         );
@@ -186,12 +198,17 @@ class Cleanspeak extends Gdn_Pluggable {
             $response = json_decode($response, true);
         }
 
-        file_put_contents('/tmp/cleanspeak.log', var_export($response, true), FILE_APPEND);
-
         return $response;
 
     }
 
+    /**
+     * Split data into Parts as read by Cleanspeak.
+     *
+     * @param $data
+     * @return array
+     * @throws Gdn_UserException
+     */
     public function getParts($data) {
 
         if (GetValue('Name', $data)) {

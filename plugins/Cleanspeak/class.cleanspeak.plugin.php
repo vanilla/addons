@@ -28,9 +28,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $cleanSpeak = new Cleanspeak();
         $args['Premoderate'] = false;
 
-return;
-
-
         if (!$this->isConfigured()) {
             throw new Gdn_UserException('Cleanspeak is not configured.');
             return;
@@ -55,14 +52,12 @@ return;
                 'senderId' => $cleanSpeak->generateUUIDFromInts($data['InsertUserID'], 0, 0, 0)
             )
         );
-
-        if (GetValue('DiscussionID', $data)) {
+        if (GetValue('DiscussionID', $data) && GetValue('Name', $data)) {
             $content['content']['location'] = DiscussionUrl($data);
         }
-
         $UUID = $cleanSpeak->getRandomUUID($data);
         $result = $cleanSpeak->moderation($UUID, $content);
-
+return;
         if (GetValue('contentAction', $result) == 'allow') {
             return;
         }
@@ -330,7 +325,11 @@ return;
      * @return bool
      */
     public function isConfigured() {
-        return (C('Plugins.Cleanspeak.ApplicationID') && C('Plugins.Cleanspeak.UserID'));
+
+        return (C('Plugins.Cleanspeak.ApplicationID')
+            && C('Plugins.Cleanspeak.UserID')
+            && C('Plugins.Cleanspeak.ApiUrl')
+        );
     }
 
     /**
@@ -367,6 +366,9 @@ return;
 
     /**
      * Plugin settings page.
+     *
+     * @param SettingsController $sender Sending Controller,
+     * @param array $args Sending Arguments
      */
     public function settingsController_cleanspeak_create($sender, $args) {
         $sender->Permission('Garden.Settings.Manage');
@@ -374,7 +376,41 @@ return;
         $sender->AddSideMenu('plugin/Cleanspeak');
         $sender->Form = new Gdn_Form();
 
-        $sender->Render('settings', '', 'plugins/Cleanspeak');
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->SetField(array(
+                'ApiUrl',
+                'ApplicationID',
+            ));
+        // Set the model on the form.
+        $sender->Form->SetModel($configurationModel);
+
+        if ($sender->Form->AuthenticatedPostBack() === FALSE) {
+            // Apply the config settings to the form.
+            $sender->Form->SetData($configurationModel->Data);
+        } else {
+            $FormValues = $sender->Form->FormValues();
+            if ($sender->Form->IsPostBack()) {
+                $sender->Form->ValidateRule('ApplicationID', 'function:ValidateRequired', 'Application ID is required');
+                $sender->Form->ValidateRule('ApiUrl', 'function:ValidateRequired', 'Api Url is required');
+
+                if ($sender->Form->ErrorCount() == 0) {
+                    SaveToConfig('Plugins.Cleanspeak.ApplicationID', $FormValues['ApplicationID']);
+                    SaveToConfig('Plugins.Cleanspeak.ApiUrl', $FormValues['ApiUrl']);
+                    $sender->InformMessage(T('Settings updated.'));
+                } else {
+                    $sender->InformMessage(T("Error saving settings to config."));
+                }
+
+
+            }
+        }
+
+        $sender->Form->SetValue('ApplicationID', C('Plugins.Cleanspeak.ApplicationID'));
+        $sender->Form->SetValue('ApiUrl', C('Plugins.Cleanspeak.ApiUrl'));
+
+        $sender->Render($this->GetView('settings.php'));
+
 
     }
 
