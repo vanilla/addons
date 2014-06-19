@@ -49,56 +49,52 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 'createInstant' => time(),
                 'parts' => $cleanSpeak->getParts($data),
                 'senderDisplayName' => $foreignUser['Name'],
-                'senderId' => $cleanSpeak->generateUUIDFromInts($data['InsertUserID'], 0, 0, 0)
+                'senderId' => $cleanSpeak->getUserUUID($data['InsertUserID'])
             )
         );
         if (GetValue('DiscussionID', $data) && GetValue('Name', $data)) {
             $content['content']['location'] = DiscussionUrl($data);
         }
         $UUID = $cleanSpeak->getRandomUUID($data);
-        $result = $cleanSpeak->moderation($UUID, $content);
-return;
+
+        try {
+            $result = $cleanSpeak->moderation($UUID, $content);
+        } catch (Gdn_UserException $e) {
+            // Error communicating with cleanspeak
+            // Content will go into premoderation queue
+            // InsertUserID will not be updated.
+            $args['Premoderate'] = true;
+            return;
+        }
+
+        // Content is allowed
         if (GetValue('contentAction', $result) == 'allow') {
             return;
         }
 
-        file_put_contents('/tmp/cleanspeak.log', var_export($result, true), FILE_APPEND);
-
-        if (true == true) {
+        // Content is in Pre Moderation Queue
+        if (GetValue('requiresApproval', $result) == 'requiresApproval'
+            || GetValue('contentAction', $result) == 'queuedForApproval') {
             $args['Premoderate'] = true;
             $args['ForeignID'] = $UUID;
             $args['InsertUserID'] = $this->getUserID();
+            return;
         }
 
-    }
+        //if not handled by above; then add to queue for preapproval.
+        $args['Premoderate'] = true;
+        return;
 
-    /**
-     * Creates the Virtual Controller
-     *
-     * @param PluginController $sender
-     */
-    public function pluginController_cleanspeak_create($sender) {
-        $sender->Permission('Garden.Settings.Manage');
-        $sender->Title('Cleanspeak');
-        $sender->AddSideMenu('plugin/Cleanspeak');
-        $sender->Form = new Gdn_Form();
-        $this->Dispatch($sender, $sender->RequestArgs);
-    }
-
-    public function controller_test() {
-        $cs = new Cleanspeak();
-        $cs->testUUID();
     }
 
     /**
      * @param PluginController $sender
      * @throws Gdn_UserException
      */
-    public function controller_moderation($sender) {
-        //    public function ModController_CleanspeakPostback_Create($sender) {
+    public function modController_cleanspeakPostback_create($sender) {
+
         /*
-        http://localhost/api/v1/plugin.json/cleanspeak/moderation?access_token=d7db8b7f0034c13228e4761bf1bfd434
-            {
+        http://localhost/api/v1/mod.json/cleanspeakPostback/?access_token=d7db8b7f0034c13228e4761bf1bfd434            {
                 "type" : "contentApproval",
                 "approvals" : {
                     "8207bc26-f048-478d-8945-84f236cb5637" : "approved",
@@ -134,6 +130,7 @@ return;
         */
 
         $post = Gdn::Request()->Post();
+        Cleanspeak::fix($post, file_get_contents('php://input'));
         if (!$post) {
             throw new Gdn_UserException('Invalid Request Type');
         }
@@ -162,6 +159,7 @@ return;
      */
     protected function setModerator() {
         $post = Gdn::Request()->Post();
+        Cleanspeak::fix($post, file_get_contents('php://input'));
         $queueModel = QueueModel::Instance();
         $queueModel->setModerator(
             $this->getModeratorUserID(
@@ -182,6 +180,7 @@ return;
      */
     protected function contentApproval($sender) {
         $post = Gdn::Request()->Post();
+        Cleanspeak::fix($post, file_get_contents('php://input'));
 
         // Content Approval
         $queueModel = QueueModel::Instance();
@@ -216,11 +215,17 @@ return;
      */
     protected function contentDelete($sender) {
         $post = Gdn::Request()->Post();
+        Cleanspeak::fix($post, file_get_contents('php://input'));
+
         $queueModel = QueueModel::Instance();
         $this->setModerator();
         $id = $post['id'];
-        $queueModel->deny(array('ForeignID' => $id));
-        $sender->setData('Success', true);
+        $deleted = $queueModel->deny(array('ForeignID' => $id));
+        if ($deleted) {
+            $sender->setData('Success', true);
+        } else {
+            $sender->SetData('Errors', 'Error deleting content.');
+        }
 
     }
 
@@ -232,6 +237,8 @@ return;
      */
     protected function userAction($sender) {
         $post = Gdn::Request()->Post();
+        Cleanspeak::fix($post, file_get_contents('php://input'));
+
         $this->setModerator();
 
         $action = $post['action'];
@@ -255,12 +262,7 @@ return;
      * @throws Gdn_UserException Error sending message to user.
      */
     protected function warnUser($UUID, $reason = '') {
-
-        $ints = Cleanspeak::getIntsFromUUID($UUID);
-        $userID = $ints[0];
-        if ($ints[1] != 0 || $ints[2] != 0 || $ints[3] != 0) {
-            throw new Gdn_UserException('Invalid UUID');
-        }
+        $userID = Cleanspeak::getUserIDFromUUID($UUID);
         $user = Gdn::UserModel()->GetID($userID);
         if (!$user) {
             throw new Gdn_UserException('User not found: '. $UUID);
@@ -292,6 +294,7 @@ return;
     }
 
     public function setup() {
+
         // Get a user for operations.
         $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'Cleanspeak', 'Admin' => 2))->Value('UserID');
 
@@ -306,9 +309,6 @@ return;
                 ));
         }
         SaveToConfig('Plugins.Cleanspeak.UserID', $UserID);
-
-        //@todo make this part of plugin settings
-//        SaveToConfig('Plugins.Cleanspeak.ApplicationID', null);
 
     }
 

@@ -4,8 +4,14 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 class Cleanspeak extends Gdn_Pluggable {
+
     /// Properties ///
 
+    /**
+     * Used when generating random UUID's for content.
+     * Will be used when routing requests from HUB to proper site.
+     * @var array
+     */
     public $uuidSeed = array(6969, 0, 0, 0);
 
     /**
@@ -70,6 +76,14 @@ class Cleanspeak extends Gdn_Pluggable {
         return static::generateUUIDFromInts($seed);
     }
 
+    public static function getUserUUID($userID) {
+        return static::generateUUIDFromInts(array($userID, 0, 0, 0));
+    }
+
+    public static function getUserIDFromUUID($UUID) {
+        $ints = static::getIntsFromUUID($UUID);
+        return $ints[0];
+    }
 
     /**
      * @param string $UUID Universal Unique Identifier.
@@ -239,5 +253,24 @@ class Cleanspeak extends Gdn_Pluggable {
         return $parts;
 
     }
+
+    /**
+     * The PHP $_POST and $_REQUEST global variables cannot be used in their default form to handle
+     * notifications from CleanSpeak due to PHP replacing dots with underscores.  This corrects that.
+     *
+     * @param post array $target
+     * @param $source
+     */
+    public static function fix(&$target, $source) {
+        if (!$source) return;
+        $target = array();
+        $source = preg_replace_callback('/(^|(?<=&))[^=[]+/', function($key) {
+                return bin2hex(urldecode($key[0]));
+            }, $source);
+        parse_str($source, $post);
+        foreach($post as $key => $val)
+            $target[ hex2bin($key) ] = $val;
+    }
+
 
 }
