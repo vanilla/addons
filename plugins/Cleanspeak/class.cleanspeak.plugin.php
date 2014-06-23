@@ -11,7 +11,7 @@ $PluginInfo['Cleanspeak'] = array(
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'SettingsUrl' => '/settings/cleanspeak',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => 'Jonh Ashton',
+    'Author' => 'John Ashton',
     'AuthorEmail' => 'john@vanillaforums.com',
     'AuthorUrl' => 'http://www.github.com/John0x00'
 );
@@ -58,7 +58,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $UUID = $cleanSpeak->getRandomUUID($data);
 
         try {
-            $result = $cleanSpeak->moderation($UUID, $content);
+            $result = $cleanSpeak->moderation($UUID, $content, true);
         } catch (Gdn_UserException $e) {
             // Error communicating with cleanspeak
             // Content will go into premoderation queue
@@ -134,7 +134,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
 //          'moderatorEmail' => string 'catherine@email.com' (length=19)
 //          'moderatorExternalId' => string 'foo-bar-baz' (length=11)
 
-
         $post = Gdn::Request()->Post();
         Cleanspeak::fix($post, file_get_contents('php://input'));
         if (!$post) {
@@ -143,7 +142,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         if ($post['type'] == 'contentApproval') {
             foreach ($post['approvals'] as $UUID => $action) {
 
-                $ints = Cleanspeak::getIntsFromUUID($UUID);
+                $ints = QueueModel::getIntsFromUUID($UUID);
                 $siteID = $ints[0];
                 $siteApprovals[$siteID][$UUID] = $action;
 
@@ -169,6 +168,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function modController_cleanspeakPostback_create($sender) {
+
+        // Minimum Permissions needed
+        $sender->Permission('Garden.Moderation.Manage');
 
         /*
         http://localhost/api/v1/mod.json/cleanspeakPostback/?access_token=d7db8b7f0034c13228e4761bf1bfd434            {
@@ -314,19 +316,69 @@ class CleanspeakPlugin extends Gdn_Plugin {
      */
     protected function userAction($sender) {
         $post = Gdn::Request()->Post();
+        $cleanspeak = Cleanspeak::Instance();
         Cleanspeak::fix($post, file_get_contents('php://input'));
 
         $this->setModerator();
-
         $action = $post['action'];
         $UUID = $post['userId'];
-
         switch (strtolower($action)) {
             case 'warn':
                 $this->warnUser($UUID);
                 break;
+            case 'ban':
+                $sender->Permission(array('Garden.Moderation.Manage','Garden.Users.Edit','Moderation.Users.Ban'), FALSE);
+                $this->BanUser($UUID);
+                break;
+            case 'unban':
+                $sender->Permission(array('Garden.Moderation.Manage','Garden.Users.Edit','Moderation.Users.Ban'), FALSE);
+                $this->BanUser($UUID, true);
+                break;
             default:
                 throw new Gdn_UserException('Unknown UserAction: ' . $action);
+        }
+
+    }
+
+    /**
+     * Ban/Unban a user.
+     *
+     * @param string $UUID Unique User ID.
+     * @param bool $unBan Set to true to un-ban a user.
+     * @return bool user was ban/unbanned.
+     * @throws Exception User not found, Attempt to remove system acccount.
+     */
+    protected function banUser($UUID, $unBan = false) {
+
+        $userID = Cleanspeak::getUserIDFromUUID($UUID);
+        $restoreContent = true;
+        $deleteContent = true;
+
+        //@todo Use cleanspeak reason.
+        $reason = 'Cleanspeak: Moderator Banned.';
+
+        $user = Gdn::UserModel()->GetID($userID, DATASET_TYPE_ARRAY);
+        if (!$user) {
+            throw NotFoundException('User');
+        }
+
+        $userModel = Gdn::UserModel();
+
+        // Block banning the superadmin or System accounts
+        $user = $userModel->GetID($userID);
+        if (GetValue('Admin', $user) == 2) {
+            throw ForbiddenException("@You may not ban a System user.");
+        } elseif (GetValue('Admin', $user)) {
+            throw ForbiddenException("@You may not ban a user with the Admin flag set.");
+        }
+
+
+        if ($unBan) {
+            $userModel->Unban($userID, array('RestoreContent' => $restoreContent));
+        } else {
+            // Just because we're banning doesn't mean we can nuke their content
+            $deleteContent = (CheckPermission('Garden.Moderation.Manage')) ? $deleteContent : FALSE;
+            $userModel->Ban($userID, array('Reason' => $reason, 'DeleteContent' => $deleteContent));
         }
 
     }
@@ -339,7 +391,8 @@ class CleanspeakPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException Error sending message to user.
      */
     protected function warnUser($UUID, $reason = '') {
-        $userID = Cleanspeak::getUserIDFromUUID($UUID);
+        $cleanspeak = Cleanspeak::Instance();
+        $userID = $cleanspeak->getUserIDFromUUID($UUID);
         $user = Gdn::UserModel()->GetID($userID);
         if (!$user) {
             throw new Gdn_UserException('User not found: '. $UUID);
@@ -373,10 +426,10 @@ class CleanspeakPlugin extends Gdn_Plugin {
     public function setup() {
 
         // Get a user for operations.
-        $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'Cleanspeak', 'Admin' => 2))->Value('UserID');
+        $userID = Gdn::SQL()->GetWhere('User', array('Name' => 'Cleanspeak', 'Admin' => 2))->Value('UserID');
 
-        if (!$UserID) {
-            $UserID = Gdn::SQL()->Insert('User', array(
+        if (!$userID) {
+            $userID = Gdn::SQL()->Insert('User', array(
                     'Name' => 'Cleanspeak',
                     'Password' => RandomString('20'),
                     'HashMethod' => 'Random',
@@ -385,7 +438,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
                     'Admin' => '2'
                 ));
         }
-        SaveToConfig('Plugins.Cleanspeak.UserID', $UserID);
+        SaveToConfig('Plugins.Cleanspeak.UserID', $userID);
 
     }
 

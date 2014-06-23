@@ -8,8 +8,9 @@ class Cleanspeak extends Gdn_Pluggable {
     /// Properties ///
 
     /**
-     * Used when generating random UUID's for content.
+     * Used when generating random UUID's for content and users.
      * Will be used when routing requests from HUB to proper site.
+     *    First Item reserved for SITE ID
      * @var array
      */
     public $uuidSeed = array(6969, 0, 0, 0);
@@ -69,30 +70,23 @@ class Cleanspeak extends Gdn_Pluggable {
         $seed = $this->uuidSeed;
         foreach ($seed as &$int) {
             if (!$int) {
-                $int = static::get32BitRand();
+                $int = QueueModel::get32BitRand();
             }
         }
 
         return static::generateUUIDFromInts($seed);
     }
 
-    public static function getUserUUID($userID) {
-        return static::generateUUIDFromInts(array($userID, 0, 0, 0));
+    public function getUserUUID($userID) {
+        return $this->generateUUIDFromInts(array($this->uuidSeed[0], 0, 0, $userID));
     }
 
     public static function getUserIDFromUUID($UUID) {
-        $ints = static::getIntsFromUUID($UUID);
-        return $ints[0];
-    }
-
-    /**
-     * @param string $UUID Universal Unique Identifier.
-     * @return array Containing the 4 numbers used to generate generateUUIDFromInts
-     */
-    public static function getIntsFromUUID($UUID) {
-        $parts = str_split(str_replace('-', '', $UUID), 8);
-        $parts = array_map('hexdec', $parts);
-        return $parts;
+        $ints = QueueModel::getIntsFromUUID($UUID);
+        if ($ints[3] == 0 || !is_numeric($ints[3])) {
+            return false;
+        }
+        return $ints[3];
     }
 
     /**
@@ -116,57 +110,9 @@ class Cleanspeak extends Gdn_Pluggable {
         if (!isset($ints[3])) {
             $ints[3] = 0;
         }
-        $result = static::hexInt($ints[0]) . '-' . static::hexInt($ints[1], true) . '-'
-            . static::hexInt($ints[2], true).static::hexInt($ints[3]);
+        $result = QueueModel::hexInt($ints[0]) . '-' . QueueModel::hexInt($ints[1], true) . '-'
+            . QueueModel::hexInt($ints[2], true) . QueueModel::hexInt($ints[3]);
         return $result;
-    }
-
-    /**
-     * Used to help generate UUIDs; pad and convert from decimal to hexadecimal; and split if neeeded
-     *
-     * @param $int Integer to be converted
-     * @param bool $split Split result into parts.
-     * @return string
-     */
-    public static function hexInt($int, $split = false) {
-        $result = substr(str_pad(dechex($int), 8, '0', STR_PAD_LEFT), 0, 8);
-        if ($split) {
-            $result = implode('-', str_split($result, 4));
-        }
-        return $result;
-    }
-
-    /**
-     * Get a random 32bit integer.  0x80000000 to 0xFFFFFFFF were not being tested with rand().
-     *
-     * @return int randon 32bi integer.
-     */
-    public static function get32BitRand() {
-        return mt_rand(0, 0xFFFF) | (mt_rand(0, 0xFFFF) << 16);
-    }
-
-    /**
-     * Tests for generateUUIDFromInts and getIntsFromUUID
-     */
-    public function testUUID() {
-        $cs = new Cleanspeak();
-        $pass = true;
-        for ($i=0; $i < 10000; $i++) {
-            $a = array($cs->get32BitRand(), $cs->get32BitRand(), $cs->get32BitRand(), $cs->get32BitRand());
-            $uuid = $cs->generateUUIDFromInts($a);
-            $ints = $cs->getIntsFromUUID($uuid);
-            if ($a != $ints) {
-                $pass = false;
-                echo "Test FAILED $i Random combinations\n";
-                echo "UID: $uuid\n";
-                echo "Input:" . var_export($a, true) . "\n";
-                echo "Output:" . var_export($ints, true) . "\n";
-            }
-        }
-        if ($pass) {
-            echo "Test PASSED. $i Random combinations [0 - 0xFFFFFFFF]\n";
-        }
-
     }
 
     /**
