@@ -13,7 +13,7 @@ class Cleanspeak extends Gdn_Pluggable {
      *    First Item reserved for SITE ID
      * @var array
      */
-    public $uuidSeed = array(6969, 0, 0, 0);
+    public $uuidSeed = array(0, 0, 0, 0);
 
     /**
      * @var Cleanspeak
@@ -139,6 +139,7 @@ class Cleanspeak extends Gdn_Pluggable {
             $queryParams = json_encode($post);
         }
         $headers['Content-Type'] = 'application/json';
+        file_put_contents('/tmp/cleanspeak.log', var_export($queryParams, true) . "\n", FILE_APPEND);
 
         $response = $proxyRequest->Request($options, $queryParams, null, $headers);
 
@@ -147,12 +148,25 @@ class Cleanspeak extends Gdn_Pluggable {
             throw new Gdn_UserException('Error in cleanspeak request.');
         }
 
-        if ($proxyRequest->ResponseStatus != 200) {
-            file_put_contents('/tmp/cleanspeak.log', var_export($response, true), FILE_APPEND);
-            throw new Gdn_UserException('Error communicating with the cleanspeak server.');
+        // check for timeouts.
+        if ($proxyRequest->ResponseStatus == 0) {
+            //fake response.
+//            return array(
+//                'content' => array(),
+//                'applicationId' => 'f81d4fae-7dec-11d0-a765-00a0c91e6bf6',
+//                'id' => 'ae34fae-7dec-11d0-a765-13a0c91e6829',
+//                'moderationAction' => 'requiresApproval',
+//                'contentAction' => 'queuedForApproval',
+//                'stored' => true
+//            );
+            //cant seem to catch...
+            throw new Gdn_UserException('Error communicating with the cleanspeak server.', 500);
         }
 
-        // check for timeouts.
+        if ($proxyRequest->ResponseStatus != 200) {
+            file_put_contents('/tmp/cleanspeak.log', var_export($response, true) . "\n", FILE_APPEND);
+            throw new Gdn_UserException('Error communicating with the cleanspeak server.');
+        }
 
         if (stristr($proxyRequest->ResponseHeaders['Content-Type'], 'application/json') != false) {
             $response = json_decode($response, true);
@@ -173,21 +187,21 @@ class Cleanspeak extends Gdn_Pluggable {
 
         if (GetValue('Name', $data)) {
             $parts[] = array(
-                'content' => Gdn_Format::Text($data['Name']),
+                'content' => Gdn_Format::Text($data['Name'], false),
                 'name' => 'Name',
                 'type' => 'text'
             );
         }
         if (GetValue('Body', $data)) {
             $parts[] = array(
-                'content' => Gdn_Format::Text($data['Body']),
+                'content' => Gdn_Format::Text($data['Body'], false),
                 'name' => 'Body',
                 'type' => 'text'
             );
         }
         if (GetValue('Story', $data)) {
             $parts[] = array(
-                'content' => Gdn_Format::Text($data['Story']),
+                'content' => Gdn_Format::Text($data['Story'], false),
                 'name' => 'WallPost',
                 'type' => 'text'
             );
@@ -208,6 +222,9 @@ class Cleanspeak extends Gdn_Pluggable {
      * @param $source
      */
     public static function fix(&$target, $source) {
+        //this doesnt appear to be working...
+        return;
+
         if (!$source) return;
         $target = array();
         $source = preg_replace_callback('/(^|(?<=&))[^=[]+/', function($key) {
@@ -218,5 +235,9 @@ class Cleanspeak extends Gdn_Pluggable {
             $target[ hex2bin($key) ] = $val;
     }
 
+
+}
+
+class CleanspeakNoResponseException extends Exception {
 
 }

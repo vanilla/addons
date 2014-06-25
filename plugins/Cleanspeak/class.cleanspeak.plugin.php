@@ -135,10 +135,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
 //          'moderatorExternalId' => string 'foo-bar-baz' (length=11)
 
         $post = Gdn::Request()->Post();
-        Cleanspeak::fix($post, file_get_contents('php://input'));
-        if (!$post) {
-            throw new Gdn_UserException('Invalid Request Type');
-        }
+
         if ($post['type'] == 'contentApproval') {
             foreach ($post['approvals'] as $UUID => $action) {
 
@@ -173,7 +170,8 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $sender->Permission('Garden.Moderation.Manage');
 
         /*
-        http://localhost/api/v1/mod.json/cleanspeakPostback/?access_token=d7db8b7f0034c13228e4761bf1bfd434            {
+        http://localhost/api/v1/mod.json/cleanspeakPostback/?access_token=d7db8b7f0034c13228e4761bf1bfd434
+            {
                 "type" : "contentApproval",
                 "approvals" : {
                     "8207bc26-f048-478d-8945-84f236cb5637" : "approved",
@@ -209,7 +207,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         */
 
         $post = Gdn::Request()->Post();
-        Cleanspeak::fix($post, file_get_contents('php://input'));
+        Cleanspeak::fix($post, $_SERVER['QUERY_STRING']);
         if (!$post) {
             throw new Gdn_UserException('Invalid Request Type');
         }
@@ -541,6 +539,38 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         $sender->Render($this->GetView('settings.php'));
 
+
+    }
+
+    /**
+     * This event is called when the number of reports has been met.
+     * Content will be sent to Cleanspeak for moderation.
+     * Content will be removed until its been approved.
+     * Content that had already been premoderated will not be handled.
+     *
+     * @param QueueModel $sender
+     * @param $args
+     */
+    public function queueModel_reportRemoval_handler($sender, &$args) {
+
+
+        // send reports to cleanspeak
+        $cleanspeak = Cleanspeak::Instance();
+        $args['ForeignID'] = $cleanspeak->getRandomUUID();
+
+        $foreignUser = Gdn::UserModel()->GetID($args['QueueRow']['ForeignUserID'], DATASET_TYPE_ARRAY);
+        $content = array(
+            'content' => array(
+                'applicationId' => C('Plugins.Cleanspeak.ApplicationID'),
+                'createInstant' => time(),
+                'parts' => $cleanspeak->getParts($args['QueueRow']),
+                'senderDisplayName' => $foreignUser['Name'],
+                'senderId' => $cleanspeak->getUserUUID($args['QueueRow']['ForeignUserID'])
+            )
+        );
+        $cleanspeak->moderation($args['ForeignID'], $content, true);
+
+        $args['ReportHandled'] = true;
 
     }
 
