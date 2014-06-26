@@ -221,7 +221,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $queueModel = QueueModel::Instance();
         $this->setModerator();
         $id = $post['id'];
-        $deleted = $queueModel->deny(array('ForeignID' => $id));
+        $deleted = $queueModel->denyWhere(array('ForeignID' => $id));
         if ($deleted) {
             $sender->setData('Success', true);
         } else {
