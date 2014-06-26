@@ -2,15 +2,15 @@
 
 /**
  * Quotes Plugin
- * 
+ *
  * This plugin allows users to quote comments for reference in their own comments
  * within a discussion.
- * 
- * Changes: 
+ *
+ * Changes:
  *  1.0     Initial release
  *  1.6.1   Overhaul
  *  1.6.4   Moved button to reactions area & changed js accordingly.
- * 
+ *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -89,12 +89,12 @@ class QuotesPlugin extends Gdn_Plugin {
       $Sender->Form->SetValue('QuoteFolding', $QuoteFolding);
 
       $Sender->SetData('QuoteFoldingOptions', array(
-          'None' => "Don't ever fold quotes",
-          '1' => 'One level deep',
-          '2' => 'Two levels deep',
-          '3' => 'Three levels deep',
-          '4' => 'Four levels deep',
-          '5' => 'Five levels deep'
+          'None' => t("Don't ever fold quotes"),
+          '1' => t('One level deep'),
+          '2' => t('Two levels deep'),
+          '3' => t('Three levels deep'),
+          '4' => t('Four levels deep'),
+          '5' => t('Five levels deep')
       ));
 
       // If seeing the form for the first time...
@@ -209,7 +209,7 @@ class QuotesPlugin extends Gdn_Plugin {
 
       $Format = GetValue('Format', $Sender->EventArguments['Object'], null);
       if (is_null($Format)) return;
-      
+
       switch ($Sender->EventArguments['Object']->Format) {
          case 'Html':
             $Sender->EventArguments['Object']->Body = preg_replace_callback("/(<blockquote\s+(?:class=\"(?:User)?Quote\")?\s+rel=\"([^\"]+)\">)/ui", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
