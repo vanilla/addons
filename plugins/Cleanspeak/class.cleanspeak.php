@@ -204,27 +204,6 @@ class Cleanspeak extends Gdn_Pluggable {
     }
 
     /**
-     * The PHP $_POST and $_REQUEST global variables cannot be used in their default form to handle
-     * notifications from CleanSpeak due to PHP replacing dots with underscores.  This corrects that.
-     *
-     * @param post array $target
-     * @param $source
-     */
-    public static function fix(&$target, $source) {
-        //this doesnt appear to be working...
-        return;
-
-        if (!$source) return;
-        $target = array();
-        $source = preg_replace_callback('/(^|(?<=&))[^=[]+/', function($key) {
-                return bin2hex(urldecode($key[0]));
-            }, $source);
-        parse_str($source, $post);
-        foreach($post as $key => $val)
-            $target[ hex2bin($key) ] = $val;
-    }
-
-    /**
      * @param string $UUID Universal Unique Identifier.
      * @return array Containing the 4 numbers used to generate generateUUIDFromInts
      */

@@ -88,79 +88,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
     }
 
-
-    public function modController_cleanspeakHubPostback_create($sender) {
-
-        /**
-         * http://localhost/api/v1/mod.json/cleanspeakHubPostback/?access_token=d7db8b7f0034c13228e4761bf1bfd434
-         *
-         *
-         */
-
-//        {
-//        "type" : "contentApproval",
-//          "approvals" : {
-//              "00001b39-dc65-9308-a25e-37537c2913eb" : "approved",
-//              "00001b39-dc65-9308-a25e-37537c2914eb" : "approved",
-//              "00000001-dc65-9308-a25e-37537c2914eb" : "approved"
-//        },
-//          "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
-//          "moderatorEmail" : "catherine@email.com",
-//          "moderatorExternalId": "foo-bar-baz"
-//        }
-
-        // Turns into:
-
-
-//        Post to site ID: 6969
-//
-//        array (size=5)
-//          'type' => string 'contentApproval' (length=15)
-//          'approvals' =>
-//            array (size=2)
-//              '00001b39-dc65-9308-a25e-37537c2913eb' => string 'approved' (length=8)
-//              '00001b39-dc65-9308-a25e-37537c2914eb' => string 'approved' (length=8)
-//          'moderatorId' => string 'b00916ba-f647-4e9f-b2a6-537f69f89b87' (length=36)
-//          'moderatorEmail' => string 'catherine@email.com' (length=19)
-//          'moderatorExternalId' => string 'foo-bar-baz' (length=11)
-
-//        Post to site ID: 1
-//
-//        array (size=5)
-//          'type' => string 'contentApproval' (length=15)
-//          'approvals' =>
-//            array (size=1)
-//              '00000001-dc65-9308-a25e-37537c2914eb' => string 'approved' (length=8)
-//          'moderatorId' => string 'b00916ba-f647-4e9f-b2a6-537f69f89b87' (length=36)
-//          'moderatorEmail' => string 'catherine@email.com' (length=19)
-//          'moderatorExternalId' => string 'foo-bar-baz' (length=11)
-
-        $post = Gdn::Request()->Post();
-
-        if ($post['type'] == 'contentApproval') {
-            foreach ($post['approvals'] as $UUID => $action) {
-
-                $ints = QueueModel::getIntsFromUUID($UUID);
-                $siteID = $ints[0];
-                $siteApprovals[$siteID][$UUID] = $action;
-
-            }
-
-        }
-
-        foreach ($siteApprovals as $siteID => $siteApproval) {
-            $sitePost = array();
-            $sitePost['type'] = $post['type'];
-            $sitePost['approvals'] = $siteApproval;
-            $sitePost['moderatorId'] = $post['moderatorId'];
-            $sitePost['moderatorEmail'] = $post['moderatorEmail'];
-            $sitePost['moderatorExternalId'] = $post['moderatorExternalId'];
-
-            echo "Post to site ID: " . $siteID . "<br />\n";
-            var_dump($sitePost);
-        }
-    }
-
     /**
      * @param PluginController $sender
      * @throws Gdn_UserException
@@ -208,7 +135,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
         */
 
         $post = Gdn::Request()->Post();
-        Cleanspeak::fix($post, $_SERVER['QUERY_STRING']);
         if (!$post) {
             throw new Gdn_UserException('Invalid Request Type');
         }
@@ -237,7 +163,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
      */
     protected function setModerator() {
         $post = Gdn::Request()->Post();
-        Cleanspeak::fix($post, file_get_contents('php://input'));
         $queueModel = QueueModel::Instance();
         $queueModel->setModerator(
             $this->getModeratorUserID(
@@ -258,7 +183,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
      */
     protected function contentApproval($sender) {
         $post = Gdn::Request()->Post();
-        Cleanspeak::fix($post, file_get_contents('php://input'));
 
         // Content Approval
         $queueModel = QueueModel::Instance();
@@ -293,7 +217,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
      */
     protected function contentDelete($sender) {
         $post = Gdn::Request()->Post();
-        Cleanspeak::fix($post, file_get_contents('php://input'));
 
         $queueModel = QueueModel::Instance();
         $this->setModerator();
@@ -315,8 +238,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
      */
     protected function userAction($sender) {
         $post = Gdn::Request()->Post();
-        $cleanspeak = Cleanspeak::Instance();
-        Cleanspeak::fix($post, file_get_contents('php://input'));
 
         $this->setModerator();
         $action = $post['action'];
@@ -403,7 +324,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         switch ($reason) {
             default:
-                $body = 'You have been warned.';
+                $body = T('You have been warned.');
         }
 
         $Row = array(
