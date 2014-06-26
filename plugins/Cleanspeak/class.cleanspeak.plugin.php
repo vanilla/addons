@@ -63,6 +63,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
             // Error communicating with cleanspeak
             // Content will go into premoderation queue
             // InsertUserID will not be updated.
+            $args['ForeignID'] = $UUID;
             $args['Premoderate'] = true;
             return;
         }

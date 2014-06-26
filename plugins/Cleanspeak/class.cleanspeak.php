@@ -18,7 +18,7 @@ class Cleanspeak extends Gdn_Pluggable {
     /**
      * @var Cleanspeak
      */
-    public static $Instance;
+    public static $instance;
 
     function __construct() {
         parent::__construct();
@@ -30,12 +30,12 @@ class Cleanspeak extends Gdn_Pluggable {
      *
      * @return Cleanspeak
      */
-    public static function Instance() {
-        if (isset(self::$Instance)) {
-            return self::$Instance;
+    public static function instance() {
+        if (isset(self::$instance)) {
+            return self::$instance;
         }
-        self::$Instance = new Cleanspeak();
-        return self::$Instance;
+        self::$instance = new Cleanspeak();
+        return self::$instance;
     }
 
 
@@ -70,7 +70,7 @@ class Cleanspeak extends Gdn_Pluggable {
         $seed = $this->uuidSeed;
         foreach ($seed as &$int) {
             if (!$int) {
-                $int = QueueModel::get32BitRand();
+                $int = self::get32BitRand();
             }
         }
 
@@ -82,7 +82,7 @@ class Cleanspeak extends Gdn_Pluggable {
     }
 
     public static function getUserIDFromUUID($UUID) {
-        $ints = QueueModel::getIntsFromUUID($UUID);
+        $ints = self::getIntsFromUUID($UUID);
         if ($ints[3] == 0 || !is_numeric($ints[3])) {
             return false;
         }
@@ -110,8 +110,8 @@ class Cleanspeak extends Gdn_Pluggable {
         if (!isset($ints[3])) {
             $ints[3] = 0;
         }
-        $result = QueueModel::hexInt($ints[0]) . '-' . QueueModel::hexInt($ints[1], true) . '-'
-            . QueueModel::hexInt($ints[2], true) . QueueModel::hexInt($ints[3]);
+        $result = self::hexInt($ints[0]) . '-' . self::hexInt($ints[1], true) . '-'
+            . self::hexInt($ints[2], true) . self::hexInt($ints[3]);
         return $result;
     }
 
@@ -128,9 +128,7 @@ class Cleanspeak extends Gdn_Pluggable {
 
         $proxyRequest = new ProxyRequest();
         $options = array(
-            'Url' => C('Plugins.Cleanspeak.ApiUrl') . '/'. ltrim($url, '/'),
-//            'Timeout' => 30, //connection was timing out.
-//            'ConnectTimeout' => 30,
+            'Url' => C('Plugins.Cleanspeak.ApiUrl') . '/'. ltrim($url, '/')
         );
         $queryParams = array();
         if ($post != null) {
@@ -139,32 +137,23 @@ class Cleanspeak extends Gdn_Pluggable {
             $queryParams = json_encode($post);
         }
         $headers['Content-Type'] = 'application/json';
-        file_put_contents('/tmp/cleanspeak.log', var_export($queryParams, true) . "\n", FILE_APPEND);
+
+        Logger::log(Logger::DEBUG, 'Cleanspeak API Request.', array($options, $queryParams, $headers));
 
         $response = $proxyRequest->Request($options, $queryParams, null, $headers);
 
+        Logger::log(Logger::DEBUG, 'Cleanspeak API Response.', array($response));
+
         if ($proxyRequest->ResponseStatus == 400) {
-            file_put_contents('/tmp/cleanspeak.log', var_export($response, true), FILE_APPEND);
             throw new Gdn_UserException('Error in cleanspeak request.');
         }
 
         // check for timeouts.
         if ($proxyRequest->ResponseStatus == 0) {
-            //fake response.
-//            return array(
-//                'content' => array(),
-//                'applicationId' => 'f81d4fae-7dec-11d0-a765-00a0c91e6bf6',
-//                'id' => 'ae34fae-7dec-11d0-a765-13a0c91e6829',
-//                'moderationAction' => 'requiresApproval',
-//                'contentAction' => 'queuedForApproval',
-//                'stored' => true
-//            );
-            //cant seem to catch...
             throw new Gdn_UserException('Error communicating with the cleanspeak server.', 500);
         }
 
         if ($proxyRequest->ResponseStatus != 200) {
-            file_put_contents('/tmp/cleanspeak.log', var_export($response, true) . "\n", FILE_APPEND);
             throw new Gdn_UserException('Error communicating with the cleanspeak server.');
         }
 
@@ -235,9 +224,40 @@ class Cleanspeak extends Gdn_Pluggable {
             $target[ hex2bin($key) ] = $val;
     }
 
+    /**
+     * @param string $UUID Universal Unique Identifier.
+     * @return array Containing the 4 numbers used to generate generateUUIDFromInts
+     */
+    public static function getIntsFromUUID($UUID) {
+        $parts = str_split(str_replace('-', '', $UUID), 8);
+        $parts = array_map('hexdec', $parts);
+        return $parts;
+    }
 
-}
 
-class CleanspeakNoResponseException extends Exception {
+    /**
+     * Get a random 32bit integer.  0x80000000 to 0xFFFFFFFF were not being tested with rand().
+     *
+     * @return int randon 32bi integer.
+     */
+    public static function get32BitRand() {
+        return mt_rand(0, 0xFFFF) | (mt_rand(0, 0xFFFF) << 16);
+    }
+
+    /**
+     * Used to help generate UUIDs; pad and convert from decimal to hexadecimal; and split if neeeded
+     *
+     * @param $int Integer to be converted
+     * @param bool $split Split result into parts.
+     * @return string
+     */
+    public static function hexInt($int, $split = false) {
+        $result = substr(str_pad(dechex($int), 8, '0', STR_PAD_LEFT), 0, 8);
+        if ($split) {
+            $result = implode('-', str_split($result, 4));
+        }
+        return $result;
+    }
+
 
 }
