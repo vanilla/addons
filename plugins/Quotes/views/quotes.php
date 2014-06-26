@@ -11,7 +11,7 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Quote Folding', 'QuoteFolding');
-         echo Wrap('How many levels deep should we start folding up quote trees?', 'div');
+         echo Wrap(t('How many levels deep should we start folding up quote trees?'), 'div');
          echo $this->Form->DropDown('QuoteFolding', $this->Data('QuoteFoldingOptions'));
       ?>
    </li>
