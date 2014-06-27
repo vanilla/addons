@@ -78,6 +78,11 @@ class Cleanspeak extends Gdn_Pluggable {
     }
 
     public function getUserUUID($userID) {
+        $userAuth = Gdn::SQL()->GetWhere('UserAuthentication', array('UserID' => $userID, 'ProviderKey' => 'cleanspeak'))
+            ->FirstRow(DATASET_TYPE_ARRAY);
+        if (GetValue('ForeignUserKey', $userAuth)) {
+            return $userAuth['ForeignUserKey'];
+        }
         return $this->generateUUIDFromInts(array($this->uuidSeed[0], 0, 0, $userID));
     }
 

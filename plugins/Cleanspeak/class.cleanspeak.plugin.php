@@ -53,7 +53,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 'senderId' => $cleanSpeak->getUserUUID($args['Data']['InsertUserID'])
             )
         );
-        if (GetValue('DiscussionID', $data) && GetValue('Name', $args['Data'])) {
+        if (GetValue('DiscussionID', $args['Data']) && GetValue('Name', $args['Data'])) {
             $content['content']['location'] = DiscussionUrl($args['Data']);
         }
         $UUID = $cleanSpeak->getRandomUUID($args['Data']);
@@ -414,9 +414,21 @@ class CleanspeakPlugin extends Gdn_Plugin {
     public function getModeratorUserID($moderator) {
         $userID = false;
 
-        $id = GetValue('moderatorExternalId', $moderator);
+        $id = GetValue('moderatorId', $moderator);
         if ($id) {
-            $user = Gdn::UserModel()->GetID($id, DATASET_TYPE_ARRAY);
+            $userAuth = Gdn::SQL()->GetWhere(
+                'UserAuthentication',
+                array('ForeignUserKey' => $moderator['moderatorId'], 'ProviderKey' => 'cleanspeak')
+            )->FirstRow(DATASET_TYPE_ARRAY);
+            if ($userAuth) {
+                return $userAuth['ForeignUserKey'];
+            }
+        }
+
+
+        $externalID = GetValue('moderatorExternalId', $moderator);
+        if ($id) {
+            $user = Gdn::UserModel()->GetID($externalID, DATASET_TYPE_ARRAY);
             if ($user) {
                 $userID = $user['UserID'];
             }
@@ -478,8 +490,26 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $sender->Form->SetValue('ApplicationID', C('Plugins.Cleanspeak.ApplicationID'));
         $sender->Form->SetValue('ApiUrl', C('Plugins.Cleanspeak.ApiUrl'));
 
+        $sender->SetData('Enabled', C('Plugins.Cleanspeak.Enabled'));
+        $sender->SetData('IsConfigured', $this->isConfigured());
         $sender->Render($this->GetView('settings.php'));
 
+
+    }
+
+    /**
+     * @param SettingsController $sender Sending controller.
+     */
+    public function settingsController_cleanspeakToggle_create($sender) {
+
+
+        if (C('Plugins.Cleanspeak.Enabled')) {
+            SaveToConfig('Plugins.Cleanspeak.Enabled', false);
+        } else {
+            SaveToConfig('Plugins.Cleanspeak.Enabled', true);
+        }
+        $sender->InformMessage(T('Changes Saved'));
+        Redirect(Url('/settings/cleanspeak'));
 
     }
 
