@@ -122,7 +122,7 @@ class Cleanspeak extends Gdn_Pluggable {
      * @param array $post Post data.
      * @return mixed Response from server. If json response will be decoded.
      *
-     * @throws Gdn_UserException
+     * @throws CleanspeakException
      */
     public function apiRequest($url, $post) {
 
@@ -145,16 +145,17 @@ class Cleanspeak extends Gdn_Pluggable {
         Logger::log(Logger::DEBUG, 'Cleanspeak API Response.', array($response));
 
         if ($proxyRequest->ResponseStatus == 400) {
-            throw new Gdn_UserException('Error in cleanspeak request.');
+            throw new CleanspeakException('Error in cleanspeak request.');
         }
 
         // check for timeouts.
         if ($proxyRequest->ResponseStatus == 0) {
-            throw new Gdn_UserException('Error communicating with the cleanspeak server.', 500);
+            throw new CleanspeakException('Error communicating with the cleanspeak server.', 500);
+            //throw new Gdn_UserException('Error communicating with the cleanspeak server.', 500);
         }
 
         if ($proxyRequest->ResponseStatus != 200) {
-            throw new Gdn_UserException('Error communicating with the cleanspeak server.');
+            throw new CleanspeakException('Error communicating with the cleanspeak server.');
         }
 
         if (stristr($proxyRequest->ResponseHeaders['Content-Type'], 'application/json') != false) {

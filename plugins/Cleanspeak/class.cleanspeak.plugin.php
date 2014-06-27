@@ -20,8 +20,14 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
 
     /**
+     * Check if content requires premoderation.
+     *
      * @param QueueModel $sender
-     * @param $args
+     * @param array $args
+     *  [Premoderate]   - bool      - True if to be premoderated.
+     *  [ForeignID]     - string    - ForeignID that will be added to queue.
+     *  [InsertUserID]  - int       - InsertUserID in the queue.
+     * @throws Gdn_UserException
      */
     public function queueModel_checkpremoderation_handler($sender, &$args) {
 
@@ -33,33 +39,30 @@ class CleanspeakPlugin extends Gdn_Plugin {
             return;
         }
 
-
-        $data =& $args['Data'];
-        $options =& $args['Options'];
-
-        // Make an api request to cleanspeak.
-        $foreignUser = Gdn::UserModel()->GetID($data['InsertUserID'], DATASET_TYPE_ARRAY);
+        // Prepare Data.
+        $foreignUser = Gdn::UserModel()->GetID($args['Data']['InsertUserID'], DATASET_TYPE_ARRAY);
         if (!$foreignUser) {
             throw new Gdn_UserException('Can not find user.');
         }
-
         $content = array(
             'content' => array(
                 'applicationId' => C('Plugins.Cleanspeak.ApplicationID'),
                 'createInstant' => time(),
-                'parts' => $cleanSpeak->getParts($data),
+                'parts' => $cleanSpeak->getParts($args['Data']),
                 'senderDisplayName' => $foreignUser['Name'],
-                'senderId' => $cleanSpeak->getUserUUID($data['InsertUserID'])
+                'senderId' => $cleanSpeak->getUserUUID($args['Data']['InsertUserID'])
             )
         );
-        if (GetValue('DiscussionID', $data) && GetValue('Name', $data)) {
-            $content['content']['location'] = DiscussionUrl($data);
+        if (GetValue('DiscussionID', $data) && GetValue('Name', $args['Data'])) {
+            $content['content']['location'] = DiscussionUrl($args['Data']);
         }
-        $UUID = $cleanSpeak->getRandomUUID($data);
+        $UUID = $cleanSpeak->getRandomUUID($args['Data']);
 
+        // Make an api request to cleanspeak.
         try {
-            $result = $cleanSpeak->moderation($UUID, $content, true);
-        } catch (Gdn_UserException $e) {
+            $result = $cleanSpeak->moderation($UUID, $content, C('Plugins.Cleanspeak.ForceModeration'));
+        } catch (CleanspeakException $e) {
+
             // Error communicating with cleanspeak
             // Content will go into premoderation queue
             // InsertUserID will not be updated.
@@ -82,13 +85,56 @@ class CleanspeakPlugin extends Gdn_Plugin {
             return;
         }
 
-        //if not handled by above; then add to queue for preapproval.
+        //if not handled by above; then add to queue for premoderation.
         $args['Premoderate'] = true;
         return;
 
     }
 
     /**
+     * Handle Postbacks from Cleanspeak or Hub.
+     *
+     * Examples:
+     *
+     * Postback URL:
+     *
+     * http://localhost/api/v1/mod.json/cleanspeakPostback/?access_token=d7db8b7f0034c13228e4761bf1bfd434
+     *
+     *    {
+     *     "type" : "contentApproval",
+     *     "approvals" : {
+     *     "8207bc26-f048-478d-8945-84f236cb5637" : "approved",
+     *     "86d9e3e1-5752-41dc-aa55-2a832728ec33" : "dismissed",
+     *     "a1fca416-5573-4662-a31a-a4ff808c34dd" : "rejected",
+     *     "af777ea8-1874-463c-a97c-a1f9e494bee1" : "approved",
+     *     "73031050-2016-44fc-b8f6-b97184793587" : "approved"
+     *     },
+     *     "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
+     *     "moderatorEmail" : "catherine@email.com",
+     *     "moderatorExternalId": "foo-bar-baz"
+     *    }
+     *
+     *    {
+     *     "type" : "contentDelete",
+     *     "applicationId" : "63d797d4-0603-48f7-8fef-5008edc670dd",
+     *     "id" : "3f8f66cb-d933-4e5e-a76d-5b3a4d9209cd",
+     *     "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
+     *     "moderatorEmail" : "catherine@email.com",
+     *     "moderatorExternalId": "foo-bar-baz"
+     *     }
+     *
+     *    {
+     *     "type" : "userAction",
+     *     "action" : "Warn",
+     *     "applicationIds" : [ "2c84ed53-6b75-4bef-ab68-eddb9ee253b4" ],
+     *     "comment" : "a comment",
+     *     "key" : "Language",
+     *     "userId" : "f9caf789-b316-4233-bd62-19f8fb649275",
+     *     "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
+     *     "moderatorEmail" : "catherine@email.com",
+     *     "moderatorExternalId": "foo-bar-baz"
+     *     }
+     *
      * @param PluginController $sender
      * @throws Gdn_UserException
      */
@@ -96,43 +142,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         // Minimum Permissions needed
         $sender->Permission('Garden.Moderation.Manage');
-
-        /*
-        http://localhost/api/v1/mod.json/cleanspeakPostback/?access_token=d7db8b7f0034c13228e4761bf1bfd434
-            {
-                "type" : "contentApproval",
-                "approvals" : {
-                    "8207bc26-f048-478d-8945-84f236cb5637" : "approved",
-                    "86d9e3e1-5752-41dc-aa55-2a832728ec33" : "dismissed",
-                    "a1fca416-5573-4662-a31a-a4ff808c34dd" : "rejected",
-                    "af777ea8-1874-463c-a97c-a1f9e494bee1" : "approved",
-                    "73031050-2016-44fc-b8f6-b97184793587" : "approved"
-                },
-                "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
-                "moderatorEmail" : "catherine@email.com",
-                "moderatorExternalId": "foo-bar-baz"
-            }
-            {
-                "type" : "contentDelete",
-                "applicationId" : "63d797d4-0603-48f7-8fef-5008edc670dd",
-                "id" : "3f8f66cb-d933-4e5e-a76d-5b3a4d9209cd",
-                "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
-                "moderatorEmail" : "catherine@email.com",
-                "moderatorExternalId": "foo-bar-baz"
-            }
-            {
-                "type" : "userAction",
-                "action" : "Warn",
-                "applicationIds" : [ "2c84ed53-6b75-4bef-ab68-eddb9ee253b4" ],
-                "comment" : "a comment",
-                "key" : "Language",
-                "userId" : "f9caf789-b316-4233-bd62-19f8fb649275",
-                "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
-                "moderatorEmail" : "catherine@email.com",
-                "moderatorExternalId": "foo-bar-baz"
-            }
-
-        */
 
         $post = Gdn::Request()->Post();
         if (!$post) {
@@ -160,19 +169,26 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
     /**
      * Set Moderator information from post.
+     *
+     * @param ModController $sender Sending controller.
+     * @throws Gdn_UserException Moderator not found.
      */
-    protected function setModerator() {
+    protected function setModerator($sender) {
         $post = Gdn::Request()->Post();
         $queueModel = QueueModel::Instance();
-        $queueModel->setModerator(
-            $this->getModeratorUserID(
-                array(
-                    "moderatorId" => $post['moderatorId'],
-                    "moderatorEmail" => $post['moderatorEmail'],
-                    "moderatorExternalId" => $post['moderatorExternalId']
-                )
+        $moderatorUserID = $this->getModeratorUserID(
+            array(
+                "moderatorId" => $post['moderatorId'],
+                "moderatorEmail" => $post['moderatorEmail'],
+                "moderatorExternalId" => $post['moderatorExternalId']
             )
         );
+        if (!$moderatorUserID) {
+            throw new Gdn_UserException('Unknown Moderator');
+        }
+        $sender->SetData('ModeratorUserID', $moderatorUserID);
+        $queueModel->setModerator($moderatorUserID);
+
     }
 
     /**
@@ -186,18 +202,18 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         // Content Approval
         $queueModel = QueueModel::Instance();
-        $this->setModerator();
+        $this->setModerator($sender);
 
         foreach ($post['approvals'] as $UUID => $action) {
             switch ($action) {
                 case 'approved':
-                    $result = $queueModel->approveWhere(array('ForeignID' => $UUID));
+                    $result = $queueModel->approveOrDenyWhere(array('ForeignID' => $UUID), 'approve', $sender);
                 break;
                 case 'dismissed':
-                    $queueModel->approveWhere(array('ForeignID' => $UUID));
+                    $queueModel->approveOrDenyWhere(array('ForeignID' => $UUID), 'deny', $sender);
                     break;
                 case 'rejected':
-                    $queueModel->denyWhere(array('ForeignID' => $UUID));
+                    $queueModel->approveOrDenyWhere(array('ForeignID' => $UUID), 'deny', $sender);
                     break;
                 default:
                     throw new Gdn_UserException('Unknown action.');
@@ -219,7 +235,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $post = Gdn::Request()->Post();
 
         $queueModel = QueueModel::Instance();
-        $this->setModerator();
+        $this->setModerator($sender);
         $id = $post['id'];
         $deleted = $queueModel->denyWhere(array('ForeignID' => $id));
         if ($deleted) {
@@ -239,7 +255,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
     protected function userAction($sender) {
         $post = Gdn::Request()->Post();
 
-        $this->setModerator();
+        $this->setModerator($sender);
         $action = $post['action'];
         $UUID = $post['userId'];
         switch (strtolower($action)) {
@@ -319,15 +335,15 @@ class CleanspeakPlugin extends Gdn_Plugin {
         }
 
         // Send a message to the person being warned.
-        $Model = new ConversationModel();
-        $MessageModel = new ConversationMessageModel();
+        $model = new ConversationModel();
+        $messageModel = new ConversationMessageModel();
 
         switch ($reason) {
             default:
                 $body = T('You have been warned.');
         }
 
-        $Row = array(
+        $row = array(
             'Subject' => T('HeadlineFormat.Warning.ToUser', "You've been warned."),
             'Type' => 'warning',
             'Body' => $body,
@@ -335,14 +351,17 @@ class CleanspeakPlugin extends Gdn_Plugin {
             'RecipientUserID' => (array)$userID
         );
 
-        $ConversationID = $Model->Save($Row, $MessageModel);
-        if ($ConversationID) {
+        $conversationID = $model->Save($row, $messageModel);
+        if ($conversationID) {
             throw new Gdn_UserException('Error sending message to user');
         }
 
 
     }
 
+    /**
+     * Setup the plugin.
+     */
     public function setup() {
 
         // Get a user for operations.
@@ -364,7 +383,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
     /**
      * Get cleanspeak UserID from config.
-     * @return mixed Int or NULL.
+     * @return int Int or NULL.
      */
     public function getUserID() {
         return C('Plugins.Cleanspeak.UserID', NULL);
