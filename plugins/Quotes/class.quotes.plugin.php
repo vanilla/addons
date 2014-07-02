@@ -90,12 +90,12 @@ class QuotesPlugin extends Gdn_Plugin {
       $Sender->Form->SetValue('QuoteFolding', $QuoteFolding);
 
       $Sender->SetData('QuoteFoldingOptions', array(
-          'None' => "Don't ever fold quotes",
-          '1' => 'One level deep',
-          '2' => 'Two levels deep',
-          '3' => 'Three levels deep',
-          '4' => 'Four levels deep',
-          '5' => 'Five levels deep'
+          'None' => t("Don't ever fold quotes"),
+          '1' => t('One level deep'),
+          '2' => t('Two levels deep'),
+          '3' => t('Three levels deep'),
+          '4' => t('Four levels deep'),
+          '5' => t('Five levels deep')
       ));
 
       // If seeing the form for the first time...

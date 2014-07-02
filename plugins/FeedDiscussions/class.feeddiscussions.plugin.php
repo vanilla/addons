@@ -301,6 +301,10 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       $FeedLastPublishTime = 0;
       foreach (GetValue('item', $Channel) as $Item) {
          $FeedItemGUID = trim((string)GetValue('guid', $Item));
+         if (empty($FeedItemGUID)) {
+            Trace('guid is not set in each item of the RSS.  Will attempt to use link as unique identifier.');
+            $FeedItemGUID = GetValue('link', $Item);
+         }
          $FeedItemID = substr(md5($FeedItemGUID), 0, 30);
          
          $ItemPubDate = (string)GetValue('pubDate', $Item, NULL);
