@@ -65,7 +65,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
           'scope' => 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
           );
       
-      if (!empty($State)) {
+      if (is_array($State)) {
          $Get['state'] = http_build_query($State);
       }
       
@@ -91,7 +91,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
       $Result = C('Plugins.GooglePlus.ClientID') && C('Plugins.GooglePlus.Secret');
       return $Result;
    }
-
+   
    public function IsDefault() {
       return (bool)C('Plugins.GooglePlus.Default');
    }
@@ -221,13 +221,13 @@ class GooglePlusPlugin extends Gdn_Plugin {
 
    public function Base_SignInIcons_Handler($Sender, $Args) {
       if (!$this->IsDefault()) {
-         echo ' '.$this->SignInButton('icon').' ';
-      }
+      echo ' '.$this->SignInButton('icon').' ';
+   }
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       if (!$this->IsDefault()) {
-         echo ' '.$this->SignInButton('icon').' ';
+      echo ' '.$this->SignInButton('icon').' ';
       }
    }
    
@@ -316,6 +316,26 @@ class GooglePlusPlugin extends Gdn_Plugin {
             break;
       }
    }
+
+    /**
+     *
+     * @param Gdn_Controller $Sender
+     */
+    public function EntryController_SignIn_Handler($Sender, $Args) {
+//      if (!$this->IsEnabled()) return;
+
+        if (isset($Sender->Data['Methods'])) {
+            $Url = $this->AuthorizeUri();
+
+            // Add the twitter method to the controller.
+            $Method = array(
+                'Name' => 'Google',
+                'SignInHtml' => $this->SignInButton() //SocialSigninButton('Google', $Url, 'button', array('class' => 'js-extern'))
+            );
+
+            $Sender->Data['Methods'][] = $Method;
+    }
+      }
 
    /**
     * Override the sign in if Google+ is the default sign-in method.

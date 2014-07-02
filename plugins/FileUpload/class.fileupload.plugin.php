@@ -14,6 +14,7 @@
  *  1.7.1   Fix for file upload not working now that we have json rendered as application/json.
  *  1.8     Added the ability to restrict file uploads per category.
  *  1.8.1   Remove deprecated jQuery functions.
+ *  1.8.3   Modified fileupload.js to handle dependency on jquery.popup better.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -24,7 +25,7 @@
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'Images and files may be attached to discussions and comments.',
-   'Version' => '1.8.2',
+   'Version' => '1.8.3',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,

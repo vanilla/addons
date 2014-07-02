@@ -1,5 +1,4 @@
 <?php if (!defined('APPLICATION')) exit();
-
 /**
  * Feed Discussions
  * 
@@ -12,6 +11,7 @@
  *  1.0.3   Change version requirement to 2.0.18.4
  *  1.1     Changed paths
  *  1.1.1   Fire 'Published' event after publication
+ *  1.2     Cleanup docs & version
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -23,10 +23,8 @@
 $PluginInfo['FeedDiscussions'] = array(
    'Name' => 'Feed Discussions',
    'Description' => "Automatically creates new discussions based on content imported from supplied RSS feeds.",
-   'Version' => '1.1.1',
-   'RequiredApplications' => array('Vanilla' => '2.0.18.4'),
-   'RequiredTheme' => FALSE, 
-   'RequiredPlugins' => FALSE,
+   'Version' => '1.2',
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
@@ -47,7 +45,12 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       $Menu->AddItem('Forum', T('Forum'));
       $Menu->AddLink('Forum', T('Feed Discussions'), 'plugin/feeddiscussions', 'Garden.Settings.Manage');
    }
-   
+
+   /**
+    * Include Javascript in discussion pages.
+    *
+    * @param $Sender
+    */
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
       if ($this->IsEnabled()) {
          if ($this->CheckFeeds(FALSE))
@@ -76,14 +79,24 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       // Handle Enabled/Disabled toggling
       $this->AutoToggle($Sender);
    }
-   
+
+   /**
+    * Endpoint to trigger feed check & update.
+    * @param $Sender
+    */
    public function Controller_CheckFeeds($Sender) {
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       $this->CheckFeeds();
       $Sender->Render();
    }
-   
+
+   /**
+    * Time to update from RSS?
+    *
+    * @param bool $AutoImport
+    * @return bool|int
+    */
    public function CheckFeeds($AutoImport = TRUE) {
       Gdn::Controller()->SetData("AutoImport", $AutoImport);
       $NeedToPoll = 0;
@@ -128,8 +141,13 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       
       return $NeedToPoll;
    }
-   
-   public function Controller_Index($Sender) {
+
+    /**
+     * Dashboard settings page.
+     *
+     * @param $Sender
+     */
+    public function Controller_Index($Sender) {
       $Sender->Title($this->GetPluginKey('Name'));
       $Sender->AddSideMenu('plugin/feeddiscussions');
       $Sender->SetData('Description', $this->GetPluginKey('Description'));
@@ -141,7 +159,12 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       
       $Sender->Render('feeddiscussions', '', 'plugins/FeedDiscussions');
    }
-   
+
+   /**
+    * Add a feed.
+    *
+    * @param $Sender
+    */
    public function Controller_AddFeed($Sender) {
       
       $Categories = CategoryModel::Categories();
@@ -206,7 +229,12 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       // Redirect('/plugin/feeddiscussions/');
       $this->Controller_Index($Sender);
    }
-   
+
+   /**
+    * Delete a feed.
+    *
+    * @param $Sender
+    */
    public function Controller_DeleteFeed($Sender) {
       $FeedKey = GetValue(1, $Sender->RequestArgs, NULL);
       if (!is_null($FeedKey) && $this->HaveFeed($FeedKey)) {
@@ -423,9 +451,4 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
    public function Setup() {
       // Nothing to do here!
    }
-   
-   public function Structure() {
-      // Nothing to do here!
-   }
-         
 }
