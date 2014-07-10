@@ -70,7 +70,7 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_St
                 $phpcsFile->addError($error, $stackPtr, 'NotVanilla', $errorData);
             }
 
-        } elseif (PHP_CodeSniffer::isCamelCaps($testName, false, true, false) === false) {
+        } elseif (PHP_CodeSniffer::isCamelCaps($testName, false, false, false) === false) {
             $error     = 'Method name "%s" is not in camel caps format';
             $className = $phpcsFile->getDeclarationName($currScope);
             $errorData = array($className.'::'.$methodName);
@@ -135,7 +135,7 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_St
         if (stristr($functionName, '_') !== false) {
             $parts = preg_split('/_/', $functionName);
             foreach ($parts as $part) {
-                if (!ctype_lower($part)) {
+                if ($part != strtolower($part)) {
                     $error     = 'Function name "%s" should all be lowercase';
                     $errorData = array($functionName);
                     $phpcsFile->addError($error, $stackPtr, 'globalFunctionNaming', $errorData);
