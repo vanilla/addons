@@ -14,6 +14,7 @@
  *  1.1     Add SimpleAPI hooks
  *  1.2     Hook into conversations application and block ignored PMs
  *  1.3     Mobile Friendly and improved CSS
+ *  1.3.2   Enable revoke JS
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -23,7 +24,7 @@
 
 $PluginInfo['Ignore'] = array(
    'Description' => 'This plugin allows users to ignore others, filtering their comments out of discussions.',
-   'Version' => '1.2.1',
+   'Version' => '1.3.2',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
