@@ -15,7 +15,7 @@
  *  1.2     Hook into conversations application and block ignored PMs
  *  1.3     Mobile Friendly and improved CSS
  *  1.3.2   Enable revoke JS
- *  1.3.3   Change revoke to use hijack.  Prevent forum admins from being ignored
+ *  1.4     Change revoke to use hijack.  Prevent forum admins from being ignored
  *          Added optional setting to prevent moderators from being ignored
  *
  * @author Tim Gunter <tim@vanillaforums.com>
@@ -131,10 +131,10 @@ class IgnorePlugin extends Gdn_Plugin {
          try {
             $AddIgnoreUser = Gdn::UserModel()->GetByUsername($IgnoreUsername);
             $AddRestricted = $this->IgnoreRestricted($AddIgnoreUser->UserID);
-
+            if (empty($IgnoreUsername)) {
+               throw new Exception(T("You must enter a username to ignore."));
+            }
             switch ($AddRestricted) {
-               case self::IGNORE_GOD:
-                  throw new Exception(T("You can't ignore that person."));
 
                case self::IGNORE_LIMIT:
                   throw new Exception(T("You have reached the maximum number of ignores."));
@@ -145,9 +145,8 @@ class IgnorePlugin extends Gdn_Plugin {
                case self::IGNORE_SELF:
                   throw new Exception(T("You can't put yourself on ignore."));
 
+               case self::IGNORE_GOD:
                case self::IGNORE_FORUM_ADMIN:
-                   throw new Exception(T("You can't ignore that person."));
-
                case self::IGNORE_FORUM_MOD:
                   throw new Exception(T("You can't ignore that person."));
 
