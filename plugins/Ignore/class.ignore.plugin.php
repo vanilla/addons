@@ -132,11 +132,11 @@ class IgnorePlugin extends Gdn_Plugin {
          try {
             $AddIgnoreUser = Gdn::UserModel()->GetByUsername($IgnoreUsername);
             $AddRestricted = $this->IgnoreRestricted($AddIgnoreUser->UserID);
-            if ($AddIgnoreUser === FALSE) {
-               throw new Exception(sprintf(T("User '%s' can not be found."), $IgnoreUsername));
-            }
             if (empty($IgnoreUsername)) {
                throw new Exception(T("You must enter a username to ignore."));
+            }
+            if ($AddIgnoreUser === FALSE) {
+               throw new Exception(sprintf(T("User '%s' can not be found."), $IgnoreUsername));
             }
             switch ($AddRestricted) {
 
