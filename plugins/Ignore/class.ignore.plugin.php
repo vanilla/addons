@@ -17,6 +17,7 @@
  *  1.3.2   Enable revoke JS
  *  1.4     Change revoke to use hijack.  Prevent forum admins from being ignored
  *          Added optional setting to prevent moderators from being ignored
+ *          Added check to username when adding
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -26,7 +27,7 @@
 
 $PluginInfo['Ignore'] = array(
    'Description' => 'This plugin allows users to ignore others, filtering their comments out of discussions.',
-   'Version' => '1.3.2',
+   'Version' => '1.4.0',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -131,6 +132,9 @@ class IgnorePlugin extends Gdn_Plugin {
          try {
             $AddIgnoreUser = Gdn::UserModel()->GetByUsername($IgnoreUsername);
             $AddRestricted = $this->IgnoreRestricted($AddIgnoreUser->UserID);
+            if ($AddIgnoreUser === FALSE) {
+               throw new Exception(sprintf(T("User '%s' can not be found."), $IgnoreUsername));
+            }
             if (empty($IgnoreUsername)) {
                throw new Exception(T("You must enter a username to ignore."));
             }
