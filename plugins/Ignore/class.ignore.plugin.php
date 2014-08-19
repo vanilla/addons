@@ -14,6 +14,10 @@
  *  1.1     Add SimpleAPI hooks
  *  1.2     Hook into conversations application and block ignored PMs
  *  1.3     Mobile Friendly and improved CSS
+ *  1.3.2   Enable revoke JS
+ *  1.4     Change revoke to use hijack.  Prevent forum admins from being ignored
+ *          Added optional setting to prevent moderators from being ignored
+ *          Added check to username when adding
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -23,7 +27,7 @@
 
 $PluginInfo['Ignore'] = array(
    'Description' => 'This plugin allows users to ignore others, filtering their comments out of discussions.',
-   'Version' => '1.2.1',
+   'Version' => '1.4.0',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -42,6 +46,16 @@ class IgnorePlugin extends Gdn_Plugin {
    const IGNORE_GOD = 'god';
    const IGNORE_LIMIT = 'limit';
    const IGNORE_RESTRICTED = 'restricted';
+   const IGNORE_FORUM_ADMIN = 'forumadmin';
+   const IGNORE_FORUM_MOD = 'forummods';
+
+   public $allowModeratorIgnore;
+
+   public function __construct() {
+      parent::__construct();
+      $this->allowModeratorIgnore = C('Plugins.Ignore.AllowModeratorIgnore', TRUE);
+      $this->FireEvent('Init');
+   }
 
    /**
     * Add mapper methods
@@ -118,10 +132,13 @@ class IgnorePlugin extends Gdn_Plugin {
          try {
             $AddIgnoreUser = Gdn::UserModel()->GetByUsername($IgnoreUsername);
             $AddRestricted = $this->IgnoreRestricted($AddIgnoreUser->UserID);
-
+            if (empty($IgnoreUsername)) {
+               throw new Exception(T("You must enter a username to ignore."));
+            }
+            if ($AddIgnoreUser === FALSE) {
+               throw new Exception(sprintf(T("User '%s' can not be found."), $IgnoreUsername));
+            }
             switch ($AddRestricted) {
-               case self::IGNORE_GOD:
-                  throw new Exception(T("You can't ignore that person."));
 
                case self::IGNORE_LIMIT:
                   throw new Exception(T("You have reached the maximum number of ignores."));
@@ -131,6 +148,11 @@ class IgnorePlugin extends Gdn_Plugin {
 
                case self::IGNORE_SELF:
                   throw new Exception(T("You can't put yourself on ignore."));
+
+               case self::IGNORE_GOD:
+               case self::IGNORE_FORUM_ADMIN:
+               case self::IGNORE_FORUM_MOD:
+                  throw new Exception(T("You can't ignore that person."));
 
                default:
                   $this->AddIgnore($UserID, $AddIgnoreUser->UserID);
@@ -380,9 +402,11 @@ class IgnorePlugin extends Gdn_Plugin {
       $ActionText = T($Mode == 'set' ? 'Ignore' : 'Unignore');
       $Sender->Title($ActionText);
       $Sender->SetData('Mode', $Mode);
-
+      if ($Mode == 'set') {
+         // Check is Ignore is allowed.
+         $IgnoreRestricted = $this->IgnoreRestricted($UserID);
+      }
       try {
-
          // Check for prevented states
          switch ($IgnoreRestricted) {
             case self::IGNORE_GOD:
@@ -458,6 +482,9 @@ class IgnorePlugin extends Gdn_Plugin {
       $Sender->Render('confirm', '', 'plugins/Ignore');
    }
 
+   /**
+    * @param UserController $Sender
+    */
    public function UserController_IgnoreList_Create($Sender) {
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
@@ -490,14 +517,17 @@ class IgnorePlugin extends Gdn_Plugin {
 
       try {
 
-         $Sender->SetJson('Reload', TRUE);
          switch ($Mode) {
             case 'allow':
                $this->SetUserMeta($UserID, 'Forbidden', NULL);
+               $Sender->JsonTarget('#revoke', T('Restored'));
+               $Sender->JsonTarget('', '', 'Refresh');
                break;
 
             case 'revoke':
                $this->SetUserMeta($UserID, 'Forbidden', TRUE);
+               $Sender->JsonTarget('#revoke', T('Revoked'));
+               $Sender->JsonTarget('', '', 'Refresh');
                break;
 
             default:
@@ -510,7 +540,6 @@ class IgnorePlugin extends Gdn_Plugin {
          $Sender->InformMessage(T("Could not find that person! - ".$Ex->getMessage()));
          $Sender->SetJson('Status', 404);
       }
-
       $Sender->Render('blank', 'utility', 'dashboard');
    }
 
@@ -583,6 +612,15 @@ class IgnorePlugin extends Gdn_Plugin {
       // Admins can't be ignored
       $IgnoreUser = Gdn::UserModel()->GetID($UserID);
       if ($IgnoreUser->Admin) return self::IGNORE_GOD;
+
+      // Forum admins can;t be ignored.
+      if (Gdn::UserModel()->CheckPermission($IgnoreUser, 'Garden.Settings.Manage')) {
+         return self::IGNORE_FORUM_ADMIN;
+      }
+
+      if (!$this->allowModeratorIgnore && Gdn::UserModel()->CheckPermission($IgnoreUser, 'Garden.Moderation.Manage')) {
+         return self::IGNORE_FORUM_MOD;
+      }
 
       // Admins can ignore anyone
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) return FALSE;

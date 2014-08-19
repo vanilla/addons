@@ -58,11 +58,11 @@ endif;
    <div class="Info">
       <?php echo sprintf(T("%s prohibited from using the ignore feature."),$ReferTo); ?>
       <?php if ($Moderator && $this->Data('ForceEditing', TRUE)):
-         echo Anchor('Restore', "/user/ignorelist/allow/{$this->User->UserID}/".Gdn_Format::Url($this->User->Name), 'Ignore');
+         echo Anchor('Restore', "/user/ignorelist/allow/{$this->User->UserID}/".Gdn_Format::Url($this->User->Name), 'Ignore Hijack', array('id' => 'revoke'));
       endif; ?>
    </div>
 <?php elseif ($Moderator && $this->Data('ForceEditing', TRUE)): ?>
-   <div class="Warning"><?php echo sprintf(T("Revoke <b>%s</b>'s ignore list privileges?"), $this->Data('ForceEditing')); ?> <?php echo Anchor('Revoke', "/user/ignorelist/revoke/{$this->User->UserID}/".Gdn_Format::Url($this->User->Name), 'Ignore'); ?></div>
+   <div class="Warning"><?php echo sprintf(T("Revoke <b>%s</b>'s ignore list privileges?"), $this->Data('ForceEditing')); ?> <?php echo Anchor('Revoke', "/user/ignorelist/revoke/{$this->User->UserID}/".Gdn_Format::Url($this->User->Name), 'Ignore Hijack', array('id' => 'revoke')); ?></div>
 <?php endif; ?>
    
 <?php if (!$this->Data('ForceEditing') && !$Restricted): ?>
