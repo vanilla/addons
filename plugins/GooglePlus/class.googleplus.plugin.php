@@ -151,7 +151,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
    }
    
    public function Structure() {
-      // Save the facebook provider type.
+      // Save the google+ provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
          array('AuthenticationSchemeAlias' => 'Google+', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),
          array('AuthenticationKey' => self::ProviderKey), TRUE);
