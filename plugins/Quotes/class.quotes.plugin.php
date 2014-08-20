@@ -90,12 +90,12 @@ class QuotesPlugin extends Gdn_Plugin {
       $Sender->Form->SetValue('QuoteFolding', $QuoteFolding);
 
       $Sender->SetData('QuoteFoldingOptions', array(
-          'None' => t("Don't ever fold quotes"),
-          '1' => t('One level deep'),
-          '2' => t('Two levels deep'),
-          '3' => t('Three levels deep'),
-          '4' => t('Four levels deep'),
-          '5' => t('Five levels deep')
+          'None' => t("Don't fold quotes"),
+          '1' => Plural(1, '%s level deep', '%s levels deep'),
+          '2' => Plural(2, '%s level deep', '%s levels deep'),
+          '3' => Plural(3, '%s level deep', '%s levels deep'),
+          '4' => Plural(4, '%s level deep', '%s levels deep'),
+          '5' => Plural(5, '%s level deep', '%s levels deep')
       ));
 
       // If seeing the form for the first time...
