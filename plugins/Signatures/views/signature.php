@@ -17,7 +17,7 @@ echo $this->Form->Errors();
     <li>
         <?php if (!C('Plugins.Signatures.AllowEmbeds', true)): ?>
             <div class="Info">
-                <?php echo T('Signatures embed disabled notice', 'Video embedding has been disabled. URLs will not translate to their embedded equivalent.'); ?>
+                <?php echo T('Video embedding has been disabled.', 'Video embedding has been disabled. URLs will not translate to their embedded equivalent.'); ?>
             </div>
         <?php endif; ?>
     </li>

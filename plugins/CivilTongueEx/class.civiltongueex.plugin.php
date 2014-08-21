@@ -4,7 +4,7 @@
 $PluginInfo['CivilTongueEx'] = array(
    'Name' => 'Civil Tongue Ex',
    'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
-   'Version' => '1.0.3',
+   'Version' => '1.0.4',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => "Todd Burry",
@@ -88,6 +88,18 @@ class CivilTonguePlugin extends Gdn_Plugin {
                   $Comment['Body'] = $this->Replace($Comment['Body']);
                }
             }
+         }
+      }
+
+      // Reactions store their data in the Data key.
+      if (isset($Sender->Data['Data']) && is_array($Sender->Data['Data'])) {
+         $Data =& $Sender->Data['Data'];
+         foreach ($Data as &$Row) {
+            if (!is_array($Row) || !isset($Row['Body'])) {
+               continue;
+            }
+
+            SetValue('Body', $Row, $this->Replace(GetValue('Body', $Row)));
          }
       }
 
