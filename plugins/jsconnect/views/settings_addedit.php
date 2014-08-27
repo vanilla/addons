@@ -46,7 +46,7 @@ echo $this->Form->Open(), $this->Form->Errors();
      echo $this->Form->Label('Sign In Url', 'SignInUrl'),
      '<div class="Info">'.
      T('The url that users use to sign in.').' '.
-     T('Use {target} to specify a redirect.')
+     T('Use {target} to specify a redirect.').
      '</div>',
       $this->Form->TextBox('SignInUrl', array('class' => 'InputBox BigInput'));
      ?>
