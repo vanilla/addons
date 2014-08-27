@@ -10,7 +10,7 @@
 
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.0.10b',
+    'Version' => '1.1.0',
     'RequiredApplications' => array('Vanilla' => '2.0.2'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -188,6 +188,7 @@ EOT;
    public function Format($Result) {
       $Result = str_replace(array('[CODE]', '[/CODE]'), array('[code]', '[/code]'), $Result);
       $Result = $this->NBBC()->Parse($Result);
+      Emoji::instance()->translateToHtml($Result);
       return $Result;
    }
    
@@ -221,7 +222,7 @@ EOT;
       if ($this->_NBBC === NULL) {
          require_once(dirname(__FILE__) . '/nbbc/nbbc.php');
          $BBCode = new $this->Class();
-         $BBCode->smiley_url = Url('/plugins/NBBC/design/smileys');
+         $BBCode->enable_smileys = false;
          $BBCode->SetAllowAmpersand(TRUE);
          
          $BBCode->AddRule('attach', array(
@@ -349,14 +350,14 @@ EOT;
 
           $BBCode->AddRule('url', array(
              'mode' => BBCODE_MODE_CALLBACK,
-            'method' => array($this, 'DoURL'),
-            'class' => 'link',
-            'allow_in' => Array('listitem', 'block', 'columns', 'inline'),
-            'content' => BBCODE_REQUIRED,
-            'plain_start' => "<a rel=\"nofollow\" href=\"{\$link}\">",
-            'plain_end' => "</a>",
-            'plain_content' => Array('_content', '_default'),
-            'plain_link' => Array('_default', '_content')
+             'method' => array($this, 'DoURL'),
+             'class' => 'link',
+             'allow_in' => Array('listitem', 'block', 'columns', 'inline'),
+             'content' => BBCODE_REQUIRED,
+             'plain_start' => "<a rel=\"nofollow\" href=\"{\$link}\">",
+             'plain_end' => "</a>",
+             'plain_content' => Array('_content', '_default'),
+             'plain_link' => Array('_default', '_content')
          ));
 
          $this->EventArguments['BBCode'] = $BBCode;
