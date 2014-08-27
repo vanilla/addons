@@ -144,7 +144,8 @@ class GooglePlusPlugin extends Gdn_Plugin {
    }
 
    public function SignInButton($type = 'button') {
-      $Url = $this->AuthorizeUri(array('target' => Url('', '/')));
+      $Target = Gdn::Request()->Post('Target', Gdn::Request()->Get('Target', Url('', '/')));
+      $Url = $this->AuthorizeUri(array('target' => $Target));
 
       $Result = SocialSignInButton('Google', $Url, $type);
       return $Result;
