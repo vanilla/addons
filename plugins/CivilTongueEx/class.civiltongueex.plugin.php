@@ -146,7 +146,6 @@ class CivilTonguePlugin extends Gdn_Plugin {
    }
 
    public function DiscussionsController_Render_Before($Sender, $Args) {
-      //var_dump($Sender->Data);
       $Discussions = val('Discussions', $Sender->Data);
       foreach ($Discussions as &$Discussion) {
          $Discussion->Name = $this->Replace($Discussion->Name);
