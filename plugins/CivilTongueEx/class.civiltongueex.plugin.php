@@ -88,6 +88,10 @@ class CivilTonguePlugin extends Gdn_Plugin {
                   $Comment['Body'] = $this->Replace($Comment['Body']);
                }
             }
+
+            if (val('Headline', $Row)) {
+               $Row['Headline'] = $this->Replace($Row['Headline']);
+            }
          }
       }
 
@@ -141,7 +145,15 @@ class CivilTonguePlugin extends Gdn_Plugin {
       }
    }
 
-   /**
+   public function DiscussionsController_Render_Before($Sender, $Args) {
+      //var_dump($Sender->Data);
+      $Discussions = val('Discussions', $Sender->Data);
+      foreach ($Discussions as &$Discussion) {
+         $Discussion->Name = $this->Replace($Discussion->Name);
+         $Discussion->Body = $this->Replace($Discussion->Body);
+      }
+   }
+      /**
     * Censor words in discussions / comments.
     */
    public function DiscussionController_Render_Before($Sender, $Args) {
@@ -167,6 +179,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $Comment->Body = $this->Replace($Comment->Body);
          }
       }
+
+      $Sender->Data['Title'] = $this->Replace($Sender->Data['Title']);;
    }
 
    /**
@@ -179,16 +193,6 @@ class CivilTonguePlugin extends Gdn_Plugin {
          foreach ($Results as &$Row) {
             $Row['Title'] = $this->Replace($Row['Title']);
             $Row['Summary'] = $this->Replace($Row['Summary']);
-         }
-      }
-   }
-
-   public function Base_BeforeDiscussionName_Handler($Sender, $Args) {
-      $Discussion = GetValue('Discussion', $Args);
-      if ($Discussion) {
-         $Discussion->Name = $this->Replace($Discussion->Name);
-         if (isset($Discussion->Body)) {
-            $Discussion->Body = $this->Replace($Discussion->Body);
          }
       }
    }
@@ -253,5 +257,32 @@ class CivilTonguePlugin extends Gdn_Plugin {
    public function Setup() {
       // Set default configuration
 		SaveToConfig('Plugins.CivilTongue.Replacement', '****');
+   }
+
+   /**
+    * Cleanup Emails.
+    *
+    * @param Gdn_Email $Sender
+    */
+   public function Gdn_Email_BeforeSendMail_Handler($Sender) {
+      $Sender->PhpMailer->Subject = $this->Replace($Sender->PhpMailer->Subject);
+      $Sender->PhpMailer->Body = $this->Replace($Sender->PhpMailer->Body);
+      $Sender->PhpMailer->AltBody = $this->Replace($Sender->PhpMailer->AltBody);
+   }
+
+   /**
+    * Cleanup Inform messages.
+    *
+    * @param $Sender
+    * @param $Args
+    */
+   public function NotificationsController_InformNotifications_Handler($Sender, &$Args) {
+      $Activities = val('Activities', $Args);
+      foreach ($Activities as $Key => &$Activity) {
+         if (val('Headline', $Activity)) {
+            $Activity['Headline'] = $this->Replace($Activity['Headline']);
+            $Args['Activities'][$Key]['Headline'] = $this->Replace($Args['Activities'][$Key]['Headline']);
+         }
+      }
    }
 }
