@@ -93,6 +93,22 @@ class JsConnectPlugin extends Gdn_Plugin {
       return $Result;
    }
 
+   protected static function connectQueryString($provider, $target = null) {
+      if ($target === null) {
+         $target = Gdn::Request()->Get('Target');
+         if (!$target) {
+            $target = '/'.ltrim(Gdn::Request()->Path(), '/');
+         }
+      }
+
+      if (StringBeginsWith($target, '/entry/signin')) {
+         $target = '/';
+      }
+
+      $qs = array('client_id' => $provider['AuthenticationKey'], 'Target' => $target);
+      return $qs;
+   }
+
    public static function ConnectUrl($Provider, $Secure = FALSE, $Callback = TRUE) {
       if (!is_array($Provider))
          $Provider = self::GetProvider($Provider);
@@ -148,6 +164,62 @@ class JsConnectPlugin extends Gdn_Plugin {
       return $Result;
    }
 
+   /**
+    * Gets the full sign in url with the jsConnect redirect added.
+    *
+    * @param arrat|int $provider The authentication provider or its ID.
+    * @param string|null $target The url to redirect to after signing in or null to guess the target.
+    * @return string Returns the sign in url.
+    */
+   public static function getSignInUrl($provider, $target = null) {
+      if (!is_array($provider)) {
+         $provider = static::GetProvider($provider);
+      }
+
+      $signInUrl = val('SignInUrl', $provider);
+      if (!$signInUrl) {
+         return '';
+      }
+
+      $qs = static::connectQueryString($provider, $target);
+      $finalTarget = urlencode(Url('/entry/jsconnect', true).'?'.  http_build_query($qs));
+
+      $signInUrl = str_ireplace(
+         array('{target}', '{redirect}'),
+         $finalTarget,
+         $signInUrl);
+
+      return $signInUrl;
+   }
+
+   /**
+    * Gets the full sign in url with the jsConnect redirect added.
+    *
+    * @param arrat|int $provider The authentication provider or its ID.
+    * @param string|null $target The url to redirect to after signing in or null to guess the target.
+    * @return string Returns the sign in url.
+    */
+   public static function getRegisterUrl($provider, $target = null) {
+      if (!is_array($provider)) {
+         $provider = static::GetProvider($provider);
+      }
+
+      $registerUrl = val('RegisterUrl', $provider);
+      if (!$registerUrl) {
+         return '';
+      }
+
+      $qs = static::connectQueryString($provider, $target);
+      $finalTarget = urlencode(Url('/entry/jsconnect', true).'?'.  http_build_query($qs));
+
+      $registerUrl = str_ireplace(
+         array('{target}', '{redirect}'),
+         $finalTarget,
+         $registerUrl);
+
+      return $registerUrl;
+   }
+
 
    /// EVENT HANDLERS ///
 
@@ -194,6 +266,20 @@ class JsConnectPlugin extends Gdn_Plugin {
 //         }
 //      }
 //   }
+
+   /**
+    * Calculate the final sign in and register urls for jsConnect.
+    *
+    * @param object $sender Not used.
+    * @param array $args Contains the provider and
+    */
+   public function authenticationProviderModel_calculateJsConnect_handler($sender, $args) {
+      $provider =& $args['Provider'];
+      $target = val('Target', null);
+
+      $provider['SignInUrlFinal'] = static::getSignInUrl($provider, $target);
+      $provider['RegisterUrlFinal'] = static::getRegisterUrl($provider, $target);
+   }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       $Providers = self::GetAllProviders();
@@ -471,6 +557,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
       $Form = new Gdn_Form();
       $Sender->Form = $Form;
+      $Model = new Gdn_AuthenticationProviderModel();
 
       if ($Form->AuthenticatedPostBack()) {
          if ($Form->GetFormValue('Generate') || $Sender->Request->Post('Generate')) {
@@ -493,6 +580,15 @@ class JsConnectPlugin extends Gdn_Plugin {
             $Values['Attributes'] = serialize(array('HashType' => $Form->GetFormValue('HashType'), 'TestMode' => $Form->GetFormValue('TestMode'), 'Trusted' => $Form->GetFormValue('Trusted', 0)));
 
             if ($Form->ErrorCount() == 0) {
+               $IsDefault = GetValue('IsDefault', $Values);
+               if ($IsDefault) {
+                  Gdn::SQL()->Put(
+                     'UserAuthenticationProvider',
+                     array('IsDefault' => 0),
+                     array('AuthenticationKey <>' => val('AuthenticationKey', $Values)));
+               }
+
+
                if ($client_id) {
                   Gdn::SQL()->Put('UserAuthenticationProvider', $Values, array('AuthenticationKey' => $client_id));
                } else {
