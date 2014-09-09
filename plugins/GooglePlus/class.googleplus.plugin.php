@@ -152,13 +152,33 @@ class GooglePlusPlugin extends Gdn_Plugin {
    }
    
    public function Structure() {
+      Gdn::SQL()->Put('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => self::ProviderKey), array('AuthenticationSchemeAlias' => 'Google+'));
+
       // Save the google+ provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
-         array('AuthenticationSchemeAlias' => 'Google+', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),
+         array('AuthenticationSchemeAlias' => self::ProviderKey, 'URL' => '', 'AssociationSecret' => '', 'AssociationHashMethod' => '...'),
          array('AuthenticationKey' => self::ProviderKey), TRUE);
    }
    
    /// Event Handlers ///
+
+   /**
+    * Calculate the final sign in and register urls for google+.
+    *
+    * @param object $sender Not used.
+    * @param array $args Contains the provider and
+    */
+   public function authenticationProviderModel_calculateGooglePlus_handler($sender, $args) {
+      $provider =& $args['Provider'];
+      $target = val('Target', null);
+
+      if (!$target) {
+         $target = Gdn::Request()->Post('Target', Gdn::Request()->Get('Target', Url('', '/')));
+      }
+
+      $provider['SignInUrlFinal'] = $this->AuthorizeUri(array('target' => $target));
+//      $provider['RegisterUrlFinal'] = static::getRegisterUrl($provider, $target);
+   }
    
    /**
     * Add 'Google+' option to the row.
