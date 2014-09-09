@@ -159,7 +159,7 @@ EOT;
       if ($title)
          $title = "<div class=\"QuoteAuthor\">$title</div>";
 
-      return "\n<blockquote class=\"UserQuote\">\n"
+      return "\n<blockquote class=\"Quote UserQuote\">\n"
       . $title . "\n<div class=\"QuoteText\">"
       . $content . "</div>\n</blockquote>\n";
    }

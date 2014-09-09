@@ -225,7 +225,7 @@ class QuotesPlugin extends Gdn_Plugin {
             $Sender->EventArguments['Object']->Body = preg_replace_callback("#(\[quote(\s+author)?=[\"']?(.*?)(\s+link.*?)?(;[\d]+)?[\"']?\])#usi", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
 
             // BBCode quotes without authors
-            $Sender->EventArguments['Object']->Body = str_ireplace('[quote]', '<blockquote class="UserQuote"><div class="QuoteText"><p>', $Sender->EventArguments['Object']->Body);
+            $Sender->EventArguments['Object']->Body = str_ireplace('[quote]', '<blockquote class="Quote UserQuote"><div class="QuoteText"><p>', $Sender->EventArguments['Object']->Body);
 
             // End of BBCode quotes
             $Sender->EventArguments['Object']->Body = str_ireplace('[/quote]', '</p></div></blockquote>', $Sender->EventArguments['Object']->Body);
