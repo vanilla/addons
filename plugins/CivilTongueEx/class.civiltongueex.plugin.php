@@ -205,8 +205,9 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $Comment->Body = $this->Replace($Comment->Body);
          }
       }
-
-      $Sender->Data['Title'] = $this->Replace($Sender->Data['Title']);;
+      if (val('Title', $Sender->Data)) {
+         $Sender->Data['Title'] = $this->Replace($Sender->Data['Title']);
+      }
    }
 
    /**
