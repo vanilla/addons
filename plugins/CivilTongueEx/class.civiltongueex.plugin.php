@@ -143,6 +143,33 @@ class CivilTonguePlugin extends Gdn_Plugin {
             }
          }
       }
+
+      // When category layout is table.
+      $Discussions = val('Discussions', $Sender->Data, false);
+      if ($Discussions) {
+         foreach ($Discussions as &$Discussion) {
+            $Discussion->Name = $this->Replace($Discussion->Name);
+            $Discussion->Body = $this->Replace($Discussion->Body);
+         }
+      }
+
+   }
+
+   /**
+    * Cleanup discussions if category layout is Mixed
+    * @param $Sender
+    * @param $Args
+    */
+   public function CategoriesController_Discussions_Render($Sender, $Args) {
+
+      foreach ($Sender->CategoryDiscussionData as $discussions) {
+         if (!$discussions instanceof Gdn_DataSet) {
+            continue;
+         }
+         foreach ($discussions->Result() as &$row) {
+            SetValue('Name', $row, $this->Replace(GetValue('Name', $row)));
+         }
+      }
    }
 
    public function DiscussionsController_Render_Before($Sender, $Args) {
