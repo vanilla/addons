@@ -275,7 +275,7 @@ class JsConnectPlugin extends Gdn_Plugin {
     */
    public function authenticationProviderModel_calculateJsConnect_handler($sender, $args) {
       $provider =& $args['Provider'];
-      $target = val('Target', null);
+      $target = val('Target', $args, null);
 
       $provider['SignInUrlFinal'] = static::getSignInUrl($provider, $target);
       $provider['RegisterUrlFinal'] = static::getRegisterUrl($provider, $target);
