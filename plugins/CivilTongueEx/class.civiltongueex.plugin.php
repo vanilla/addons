@@ -122,6 +122,23 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
          }
       }
+
+      $Comments = GetValue('Comments', $Sender->Data);
+      if ($Comments) {
+         $Result =& $Comments->Result();
+         foreach ($Result as &$Row) {
+            $Value = $this->Replace(GetValue('Story', $Row));
+            SetValue('Story', $Row, $Value);
+
+            $Value = $this->Replace(GetValue('DiscussionName', $Row));
+            SetValue('DiscussionName', $Row, $Value);
+
+            $Value = $this->Replace(GetValue('Body', $Row));
+            SetValue('Body', $Row, $Value);
+
+         }
+      }
+
    }
 
    /**
@@ -191,7 +208,6 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $Discussion->Body = $this->Replace($Discussion->Body);
          }
       }
-      
       // Get comments (2.1+)
       $Comments = $Sender->Data('Comments');
       
