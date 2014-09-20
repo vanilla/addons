@@ -1,5 +1,5 @@
 <dataConfig>
-<dataSource driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/#DATABASE#" user="#USERNAME#" password="#PASSWORD#"/>
+<dataSource driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/#DATABASE#?zeroDateTimeBehavior=convertToNull" user="#USERNAME#" password="#PASSWORD#"/>
 <document name="Discussions">
 	<entity 
       name="Discussion"
