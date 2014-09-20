@@ -53,7 +53,7 @@ jQuery(document).bind('CommentAdded', function() {
    SpoilersPlugin.FindAndReplace();
 });
 
-jQuery('input.SpoilerToggle').livequery('click',function(event){
-   var Spoiler = jQuery(event.target).parents('div.UserSpoiler');
-   SpoilersPlugin.ToggleSpoiler(Spoiler, jQuery(event.target));
+jQuery('div.UserSpoiler').on('click', 'input.SpoilerToggle', function(event){
+   event.stopPropagation();
+   SpoilersPlugin.ToggleSpoiler($(event.delegateTarget), $(event.target));
 });
