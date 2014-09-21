@@ -24,6 +24,10 @@ var SpoilersPlugin = {
       SpoilerButton.value = 'show';
       SpoilerButton.className = 'SpoilerToggle';
       SpoilerTitle.append(SpoilerButton);
+      Spoiler.on('click', 'input.SpoilerToggle', function(event) {
+         event.stopPropagation();
+         SpoilersPlugin.ToggleSpoiler(jQuery(event.delegateTarget), jQuery(event.target));
+      });
    },
    
    ToggleSpoiler: function(Spoiler, SpoilerButton) {
@@ -45,15 +49,14 @@ jQuery(document).ready(function(){
    SpoilersPlugin.FindAndReplace();
 });
 
-jQuery(document).bind('CommentPagingComplete',function() {
+jQuery(document).on('CommentPagingComplete',function() {
    SpoilersPlugin.FindAndReplace();
 });
 
-jQuery(document).bind('CommentAdded', function() {
+jQuery(document).on('CommentAdded', function() {
    SpoilersPlugin.FindAndReplace();
 });
 
-jQuery('input.SpoilerToggle').livequery('click',function(event){
-   var Spoiler = jQuery(event.target).parents('div.UserSpoiler');
-   SpoilersPlugin.ToggleSpoiler(Spoiler, jQuery(event.target));
+jQuery(document).on('PreviewLoaded', function() {
+   window.setTimeout(SpoilersPlugin.FindAndReplace, 150);
 });
