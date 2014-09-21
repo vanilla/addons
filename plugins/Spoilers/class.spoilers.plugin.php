@@ -59,7 +59,7 @@ class SpoilersPlugin extends Gdn_Plugin {
 
    public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
       $Sender->EventArguments['Object']->FormatBody = &$Sender->Comment->Body;
-	  $this->RenderSpoilers($Sender);
+      $this->RenderSpoilers($Sender);
    }
 
    protected function RenderSpoilers(&$Sender) {
