@@ -62,7 +62,7 @@ class AgeGatePlugin extends Gdn_Pluggable implements Gdn_IPlugin {
         $year = (int)$sender->Form->GetFormValue('Year', 0);
 
         if ($day == 0 || $year == 0 || $month == 0) {
-            $sender->Form->AddError("Please select a valid Date of Birth.");
+            $sender->UserModel->Validation->AddValidationResult('', "Please select a valid Date of Birth.");
             return;
         }
 
@@ -73,18 +73,15 @@ class AgeGatePlugin extends Gdn_Pluggable implements Gdn_IPlugin {
         $interval = $datetime1->diff($datetime2);
         $age =  $interval->format('%y');
         $minimumAge = C('Plugins.AgeGate.MinimumAge', 0);
-        if ($age <= $minimumAge) {
-            $sender->Form->AddError(sprintf("You must be at least %d years old to Register.", $minimumAge));
+        if ($age < $minimumAge) {
+            $sender->UserModel->Validation->AddValidationResult('', sprintf("You must be at least %d years old to Register.", $minimumAge));
             return;
         }
 
         // Set the value on the form so that it will be saved to user model
-        $sender->Form->_FormValues['DateOfBirth'] = $dob;
-
-        // Unset the values we dont need,
-        unset($sender->Form->_FormValues['Day']);
-        unset($sender->Form->_FormValues['Month']);
-        unset($sender->Form->_FormValues['Year']);
+        if ($sender->Form->ErrorCount() == 0 && !$sender->UserModel->Validation->Results()) {
+            $sender->Form->_FormValues['DateOfBirth'] = $dob;
+        }
 
     }
 
