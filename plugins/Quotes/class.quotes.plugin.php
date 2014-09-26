@@ -312,8 +312,13 @@ BLOCKQUOTE;
             else
                $NewBody = Gdn_Format::PlainText($NewBody, $QuoteFormat);
 
-            if (!in_array($NewFormat, array('Html', 'Wysiwyg')))
-               Gdn::Controller()->InformMessage(sprintf(T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'), $QuoteFormat, $NewFormat));
+            if (!in_array($NewFormat, array('Html', 'Wysiwyg'))) {
+               Gdn::Controller()->InformMessage(sprintf(
+                  T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'),
+                  Gdn_Format::Text($QuoteFormat),
+                  $NewFormat
+               ));
+            }
          }
          $Data->Body = $NewBody;
 
