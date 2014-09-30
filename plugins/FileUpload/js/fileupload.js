@@ -483,7 +483,7 @@ var GdnUploaders = null;
          var Response = IFR.contentWindow.document.body.innerHTML;
 
          var UploadResultStatus = 'fail';
-         var FailReason = 'An unknown error occured.';
+         var FailReason = 'An unknown error occurred.';
 
          var JResponse = jQuery.parseJSON(Response);
          if (JResponse && JResponse.MediaResponse) {
