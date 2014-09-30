@@ -6,7 +6,7 @@
 
 // Define the plugin:
 $PluginInfo['GooglePlus'] = array(
-   'Name' => 'Google+',
+   'Name' => 'Google+ Social Connect',
    'Description' => 'Users may sign into your site using their Google Plus account.',
    'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.1'),

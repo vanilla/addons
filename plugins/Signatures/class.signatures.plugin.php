@@ -351,7 +351,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
 
    /** Deprecated in 2.1. */
-   public function DiscussionController_AfterCommentBody_Handler($Sender) {
+   public function Base_AfterCommentBody_Handler($Sender) {
       if ($this->Disabled)
          return;
 
