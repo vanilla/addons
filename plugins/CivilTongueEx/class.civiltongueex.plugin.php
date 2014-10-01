@@ -23,7 +23,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
       parent::__construct();
       $this->Replacement = C('Plugins.CivilTongue.Replacement', '');
    }
-   
+
    /**
     * Add settings page to Dashboard sidebar menu.
     */
@@ -31,11 +31,11 @@ class CivilTonguePlugin extends Gdn_Plugin {
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Forum', T('Censored Words'), 'plugin/tongue', 'Garden.Settings.Manage');
    }
-   
+
    public function Base_FilterContent_Handler($Sender, $Args) {
       if (!isset($Args['String']))
          return;
-      
+
       $Args['String'] = $this->Replace($Args['String']);
    }
 
@@ -46,21 +46,21 @@ class CivilTonguePlugin extends Gdn_Plugin {
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
 		$ConfigurationModel->SetField(array('Plugins.CivilTongue.Words', 'Plugins.CivilTongue.Replacement'));
 		$Sender->Form->SetModel($ConfigurationModel);
-		
-		if ($Sender->Form->AuthenticatedPostBack() === FALSE) { 
-			
-         $Sender->Form->SetData($ConfigurationModel->Data);    
+
+		if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+
+         $Sender->Form->SetData($ConfigurationModel->Data);
       } else {
          $Data = $Sender->Form->FormValues();
-			
+
          if ($Sender->Form->Save() !== FALSE)
             $Sender->StatusMessage = T("Your settings have been saved.");
       }
 
-		$Sender->AddSideMenu('plugin/tongue');		
+		$Sender->AddSideMenu('plugin/tongue');
 		$Sender->SetData('Title', T('Civil Tongue'));
 		$Sender->Render($this->GetView('index.php'));
-      
+
 	}
 
    public function ProfileController_Render_Before($Sender, $Args) {
@@ -69,7 +69,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
    /**
     * Clean up activities and activity comments.
-    * 
+    *
     * @param Controller $Sender
     * @param array $Args
     */
@@ -166,7 +166,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
          if (!$discussions instanceof Gdn_DataSet) {
             continue;
          }
-         foreach ($discussions->Result() as &$row) {
+         $r = $discussions->Result();
+         foreach ($r as &$row) {
             SetValue('Name', $row, $this->Replace(GetValue('Name', $row)));
          }
       }
@@ -191,14 +192,14 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $Discussion->Body = $this->Replace($Discussion->Body);
          }
       }
-      
+
       // Get comments (2.1+)
       $Comments = $Sender->Data('Comments');
-      
+
       // Backwards compatibility to 2.0.18
-      if (isset($Sender->CommentData)) 
+      if (isset($Sender->CommentData))
          $Comments = $Sender->CommentData->Result();
-      
+
       // Process comments
       if ($Comments) {
          foreach ($Comments as $Comment) {
@@ -237,19 +238,19 @@ class CivilTonguePlugin extends Gdn_Plugin {
          }
       }
    }
-   
+
    public function UtilityController_CivilPatterns_Create($Sender) {
       $Patterns = $this->GetPatterns();
 
       $Text = "What's a person to do? ass";
       $Result = array();
-      
+
       foreach ($Patterns as $Pattern) {
          $r = preg_replace($Pattern, $this->Replace, $Text);
          if ($r != $Text)
             $Result[] = $Pattern;
       }
-      
+
       $Sender->SetData('Matches', $Result);
       $Sender->SetData('Patterns', $Patterns);
       $Sender->Render('Blank', 'Utility');
@@ -261,7 +262,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
 //      $Result = preg_replace_callback($Patterns, function($m) { return $m[0][0].str_repeat('*', strlen($m[0]) - 1); }, $Text);
       return $Result;
    }
-	
+
 	public function GetPatterns() {
 		// Get config.
 		static $Patterns = NULL;
@@ -279,8 +280,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
       }
 		return $Patterns;
 	}
-	
-	
+
+
    public function Setup() {
       // Set default configuration
 		SaveToConfig('Plugins.CivilTongue.Replacement', '****');
