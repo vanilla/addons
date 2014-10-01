@@ -79,8 +79,14 @@ class RoleTitlePlugin extends Gdn_Plugin {
 		if (property_exists($Sender, 'Discussion')) {
 			$JoinDiscussion = array($Sender->Discussion);
 			RoleModel::SetUserRoles($JoinDiscussion, 'InsertUserID');
-         $Comments = $Sender->Data('Comments');
+            $Comments = $Sender->Data('Comments');
 			RoleModel::SetUserRoles($Comments->Result(), 'InsertUserID');
+
+            $Answers = $Sender->Data('Answers');
+            if (is_array($Answers)) {
+                RoleModel::SetUserRoles($Answers, 'InsertUserID');
+            }
+
          // And add the css class to the discussion
          if (is_array($Sender->Discussion->Roles)) {
             if (count($Sender->Discussion->Roles)) {
