@@ -123,17 +123,17 @@ class CivilTonguePlugin extends Gdn_Plugin {
          }
       }
 
-      $Comments = GetValue('Comments', $Sender->Data);
+      $Comments = val('Comments', $Sender->Data);
       if ($Comments) {
          $Result =& $Comments->Result();
          foreach ($Result as &$Row) {
-            $Value = $this->Replace(GetValue('Story', $Row));
+            $Value = $this->Replace(val('Story', $Row));
             SetValue('Story', $Row, $Value);
 
-            $Value = $this->Replace(GetValue('DiscussionName', $Row));
+            $Value = $this->Replace(val('DiscussionName', $Row));
             SetValue('DiscussionName', $Row, $Value);
 
-            $Value = $this->Replace(GetValue('Body', $Row));
+            $Value = $this->Replace(val('Body', $Row));
             SetValue('Body', $Row, $Value);
 
          }
