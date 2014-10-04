@@ -49,11 +49,7 @@ jQuery(document).ready(function(){
    SpoilersPlugin.FindAndReplace();
 });
 
-jQuery(document).on('CommentPagingComplete',function() {
-   SpoilersPlugin.FindAndReplace();
-});
-
-jQuery(document).on('CommentAdded', function() {
+jQuery(document).on('CommentPagingComplete CommentAdded popupReveal', function() {
    SpoilersPlugin.FindAndReplace();
 });
 
