@@ -101,7 +101,7 @@ class IgnorePlugin extends Gdn_Plugin {
     */
    public function ProfileController_Ignore_Create($Sender) {
       $Sender->Permission('Garden.SignIn.Allow');
-      $Sender->Title('Ignore List');
+      $Sender->Title(T('Ignore List'));
 
       $this->Dispatch($Sender);
    }

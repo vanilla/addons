@@ -594,14 +594,19 @@ class QnAPlugin extends Gdn_Plugin {
 
          // Record the activity.
          if ($QnA == 'Accepted') {
-            AddActivity(
-               Gdn::Session()->UserID,
-               'AnswerAccepted',
-               Anchor(Gdn_Format::Text($Discussion['Name']), "/discussion/{$Discussion['DiscussionID']}/".Gdn_Format::Url($Discussion['Name'])),
-               $Comment['InsertUserID'],
-               "/discussion/comment/{$Comment['CommentID']}/#Comment_{$Comment['CommentID']}",
-               TRUE
+            $Activity = array(
+               'ActivityType' => 'AnswerAccepted',
+               'NotifyUserID' => $Comment['InsertUserID'],
+               'HeadlineFormat' => '{ActivityUserID,You} accepted {NotifyUserID,your} answer.',
+               'RecordType' => 'Comment',
+               'RecordID' => $Comment['CommentID'],
+               'Route' => CommentUrl($Comment, '/'),
+               'Emailed' => ActivityModel::SENT_PENDING,
+               'Notified' => ActivityModel::SENT_PENDING,
             );
+
+            $ActivityModel = new ActivityModel();
+            $ActivityModel->Save($Activity);
          }
       }
       Redirect("/discussion/comment/{$Comment['CommentID']}#Comment_{$Comment['CommentID']}");

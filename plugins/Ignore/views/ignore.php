@@ -24,7 +24,7 @@ $Restricted = $this->Data('IgnoreRestricted');
    </thead>
    <tbody>
       <?php foreach ($this->Data('IgnoreList') as $IgnoredUser): ?>
-      
+
       <?php
          $DateIgnoredTime = strtotime($IgnoredUser['IgnoreDate']);
          if (!$DateIgnoredTime)
@@ -43,7 +43,7 @@ $Restricted = $this->Data('IgnoreRestricted');
 </table>
 <?php endif; ?>
 
-<?php 
+<?php
 $NumIgnoreLimit = $this->Data('IgnoreLimit');
 if ($NumIgnoreLimit != 'infinite'):
    $IgnoreListPercent = round(($NumIgnoredUsers / $NumIgnoreLimit) * 100, 2);
@@ -64,7 +64,7 @@ endif;
 <?php elseif ($Moderator && $this->Data('ForceEditing', TRUE)): ?>
    <div class="Warning"><?php echo sprintf(T("Revoke <b>%s</b>'s ignore list privileges?"), $this->Data('ForceEditing')); ?> <?php echo Anchor('Revoke', "/user/ignorelist/revoke/{$this->User->UserID}/".Gdn_Format::Url($this->User->Name), 'Ignore Hijack', array('id' => 'revoke')); ?></div>
 <?php endif; ?>
-   
+
 <?php if (!$this->Data('ForceEditing') && !$Restricted): ?>
 <ul>
    <li>
@@ -74,7 +74,7 @@ endif;
       ?>
    </li>
 </ul>
-<?php echo $this->Form->Close('Ignore User');
+<?php echo $this->Form->Close('OK');
 
 else:
    echo $this->Form->Close();

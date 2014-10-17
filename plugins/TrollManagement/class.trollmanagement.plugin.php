@@ -16,7 +16,7 @@
 $PluginInfo['TrollManagement'] = array(
    'Name' => 'Troll Management',
    'Description' => "Allows you to mark users as trolls, making it so that only they can see their comments & discussions. They essentially become invisible to other users and eventually just leave because no-one responds to them.",
-   'Version' => '1.1',
+   'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'MobileFriendly' => TRUE,
    'Author' => "Mark O'Sullivan",
@@ -150,10 +150,6 @@ class TrollManagementPlugin extends Gdn_Plugin {
 		if (!is_array($Trolls))
 			return;
 
-		// Don't do anything if this is a troll
-		if (in_array(Gdn::Session()->UserID, $Trolls))
-			return;
-
 		if (!array_key_exists($DataEventArgument, $Sender->EventArguments))
 			return;
 
@@ -170,8 +166,13 @@ class TrollManagementPlugin extends Gdn_Plugin {
 						$Row->IsTroll = TRUE;
 						$Result[$Index] = $Row;
 					}
-				} else
-					unset($Result[$Index]);
+				} else {
+                    // Remove all troll posts for all non-trolls, but if current
+                    // user is troll, remove other troll posts, but keep own.
+                    if (Gdn::Session()->UserID != GetValue('InsertUserID', $Row)) {
+					    unset($Result[$Index]);
+                    }
+                }
 			}
 		}
 	}
