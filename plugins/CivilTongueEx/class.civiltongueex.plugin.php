@@ -329,4 +329,19 @@ class CivilTonguePlugin extends Gdn_Plugin {
          }
       }
    }
+
+   /**
+    * Cleanup poll and poll options.
+    *
+    * @param PollModule $Sender Sending Controller.
+    * @param array $Args Sending arguments.
+    */
+   public function PollModule_AfterLoadPoll_Handler($Sender, &$Args) {
+      if (!val('Poll', $Args) || !val('PollOptions', $Args)) {
+         return;
+      }
+      foreach ($Args['PollOptions'] as &$Option) {
+         $Option['Body'] = $this->Replace($Option['Body']);
+      }
+   }
 }
