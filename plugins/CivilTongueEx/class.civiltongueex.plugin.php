@@ -341,7 +341,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
     * @param array $Args Sending arguments.
     */
    public function PollModule_AfterLoadPoll_Handler($Sender, &$Args) {
-      if (!val('Poll', $Args) && !val('PollOptions', $Args)) {
+      if (!val('Poll', $Args) || !val('PollOptions', $Args)) {
          return;
       }
       foreach ($Args['PollOptions'] as &$Option) {
