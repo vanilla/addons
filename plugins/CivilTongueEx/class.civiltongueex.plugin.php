@@ -4,7 +4,7 @@
 $PluginInfo['CivilTongueEx'] = array(
    'Name' => 'Civil Tongue Ex',
    'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
-   'Version' => '1.0.4',
+   'Version' => '1.0.5',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => "Todd Burry",
@@ -197,8 +197,12 @@ class CivilTonguePlugin extends Gdn_Plugin {
          $Discussion->Body = $this->Replace($Discussion->Body);
       }
    }
-      /**
+
+   /**
     * Censor words in discussions / comments.
+    *
+    * @param DiscussionController $Sender Sending Controller.
+    * @param array $Args Sending arguments.
     */
    public function DiscussionController_Render_Before($Sender, $Args) {
       // Process OP
@@ -328,5 +332,21 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $Args['Activities'][$Key]['Headline'] = $this->Replace($Args['Activities'][$Key]['Headline']);
          }
       }
+   }
+
+   /**
+    * Cleanup poll and poll options.
+    *
+    * @param PollModule $Sender Sending Controller.
+    * @param array $Args Sending arguments.
+    */
+   public function PollModule_AfterLoadPoll_Handler($Sender, &$Args) {
+      if (!val('Poll', $Args) && !val('PollOptions', $Args)) {
+         return;
+      }
+      foreach ($Args['PollOptions'] as &$Option) {
+         $Option['Body'] = $this->Replace($Option['Body']);
+      }
+      $Args['Poll']->Name = $this->Replace($Args['Poll']->Name);
    }
 }
