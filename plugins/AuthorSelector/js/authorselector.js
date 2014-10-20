@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
     // Enable multicomplete on selected inputs
-    jQuery('.MultiComplete').livequery(function() {
+    $(document).on('click', '.MultiComplete', function() {
         /// Author tag token input.
         var $author = $(this);
 
