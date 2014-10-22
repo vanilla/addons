@@ -95,3 +95,17 @@ caption, th, td, .Flyout, .Dropdown {
 
 time {
   unicode-bidi: embed; }
+
+.MItem:first-child {
+  margin-right: 0;
+  margin-left: 8px; }
+
+.OptionsMenu .Flyout {
+  right: inherit;
+  left: -9px; }
+  .OptionsMenu .Flyout::before {
+    left: 9px;
+    right: inherit; }
+  .OptionsMenu .Flyout::after {
+    left: 9px;
+    right: inherit; }

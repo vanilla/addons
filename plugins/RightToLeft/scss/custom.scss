@@ -151,3 +151,25 @@ td,
 time {
   unicode-bidi: embed;
 }
+
+  .MItem:first-child {
+    margin-right: 0;
+    margin-left: 8px;
+  }
+
+.OptionsMenu {
+  .Flyout {
+    right: inherit;
+    left: -9px;
+
+    &::before {
+      left: 9px;
+      right: inherit;
+    }
+
+    &::after {
+      left: 9px;
+      right: inherit;
+    }
+  }
+}
