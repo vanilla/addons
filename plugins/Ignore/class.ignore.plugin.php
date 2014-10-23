@@ -202,7 +202,7 @@ class IgnorePlugin extends Gdn_Plugin {
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
 
-      if (!$Sender->Form->IsPostBack())
+      if (!$Sender->Form->AuthenticatedPostBack())
          throw new Exception(405);
 
       $UserID = Gdn::Request()->Get('UserID');

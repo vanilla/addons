@@ -98,8 +98,8 @@ class QuotesPlugin extends Gdn_Plugin {
           '5' => Plural(5, '%s level deep', '%s levels deep')
       ));
 
-      // If seeing the form for the first time...
-      if ($Sender->Form->IsPostBack()) {
+      // Form submission handling.
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $NewFoldingLevel = $Sender->Form->GetValue('QuoteFolding', '1');
          if ($NewFoldingLevel != $QuoteFolding) {
             Gdn::UserModel()->SavePreference($UserID, 'Quotes.Folding', $NewFoldingLevel);

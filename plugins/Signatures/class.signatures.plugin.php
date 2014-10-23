@@ -155,14 +155,8 @@ class SignaturesPlugin extends Gdn_Plugin {
       $Data = $ConfigurationModel->Data;
       $Sender->SetData('Signature', $Data);
 
-      // If seeing the form for the first time...
-      if ($Sender->Form->IsPostBack() === FALSE) {
-         $Data['Body'] = GetValue('Plugin.Signatures.Sig', $Data);
-         $Data['Format'] = GetValue('Plugin.Signatures.Format', $Data);
-
-         // Apply the config settings to the form.
-         $Sender->Form->SetData($Data);
-      } else {
+      // Form submission handling.
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $Values = $Sender->Form->FormValues();
 
          if ($canEditSignatures) {
@@ -211,6 +205,14 @@ class SignaturesPlugin extends Gdn_Plugin {
                $Sender->InformMessage(T("Your changes have been saved."));
             }
          }
+      }
+      else {
+         // Load form data.
+         $Data['Body'] = GetValue('Plugin.Signatures.Sig', $Data);
+         $Data['Format'] = GetValue('Plugin.Signatures.Format', $Data);
+
+         // Apply the config settings to the form.
+         $Sender->Form->SetData($Data);
       }
 
       $Sender->Render('signature', '', 'plugins/Signatures');
