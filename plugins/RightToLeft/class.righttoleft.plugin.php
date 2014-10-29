@@ -15,9 +15,9 @@ $PluginInfo['RightToLeft'] = array(
     'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => TRUE,
-    'Author' => 'Todd Burry, Becky Van Bussel',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+    'Author' => 'Becky Van Bussel',
+    'AuthorEmail' => 'becky@vanillaforums.com',
+    'AuthorUrl' => 'http://www.vanillaforums.org/'
 );
 
 class RightToLeftPlugin extends Gdn_Plugin {
