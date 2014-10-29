@@ -21,17 +21,25 @@ $PluginInfo['RightToLeft'] = array(
 );
 
 class RightToLeftPlugin extends Gdn_Plugin {
+
+    /**
+    * @var $rtlLocales list locales that are rtl
+    */
+    protected $rtlLocales = array('ar');
+
    /**
     *
-    * @param Gdn_Controller $Sender 
+    * @param Gdn_Controller $Sender
     */
-   public function Base_Render_Before($Sender) {
-      $Css = $Sender->CssFiles();
-      
-      if (ArrayHasValue($Css, 'style.css')) {
-         $Sender->AddCssFile('style_rtl.css', 'plugins/RightToLeft');
-      } else {
-         $Sender->AddCssFile('admin_rtl.css', 'plugins/RightToLeft');
-      }
-   }
+    public function Base_Render_Before(&$Sender) {
+
+       $currentLocale = Gdn::Locale()->Current();
+       $realLocale = C('Garden.RealLocale', $currentLocale);
+
+       if (in_array($realLocale, $this->rtlLocales)) {
+          $Sender->AddJsFile('custom-rtl.js', 'plugins/RightToLeft');
+          $Sender->AddCssFile('style_rtl.css', 'plugins/RightToLeft');
+          $Sender->AddCssFile('admin_rtl.css', 'plugins/RightToLeft');
+       }
+    }
 }
