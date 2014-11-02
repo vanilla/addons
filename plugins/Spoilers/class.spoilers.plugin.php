@@ -10,7 +10,7 @@
 $PluginInfo['Spoilers'] = array(
    'Name' => 'Spoilers',
    'Description' => "Wrapping text in [spoiler] tags requires the text to be clicked in order to read it. Adds >! spoiler for Markdown.",
-   'Version' => '1.2',
+   'Version' => '1.3',
    'MobileFriendly' => TRUE,
    'HasLocale' => TRUE,
    'Author' => "Tim Gunter",
