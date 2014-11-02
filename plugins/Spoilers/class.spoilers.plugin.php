@@ -76,7 +76,7 @@ class SpoilersPlugin extends Gdn_Plugin {
    public function EditorPlugin_toolbarConfig_Handler($Sender, &$Args) {
       $Args['format'] += array(
          'spoiler' => array(
-            'text' => 'Spoiler',
+            'text' => T('Spoiler'),
             'command' => 'spoiler',
             'value' => 'spoiler',
             'class' => '',
