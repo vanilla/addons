@@ -9,7 +9,7 @@
 // Define the plugin:
 $PluginInfo['Spoilers'] = array(
    'Name' => 'Spoilers',
-   'Description' => "Users may prevent accidental spoiler by wrapping text in [spoiler] tags. This requires the text to be clicked in order to read it.",
+   'Description' => "Wrapping text in [spoiler] tags requires the text to be clicked in order to read it. Adds >! spoiler for Markdown.",
    'Version' => '1.2',
    'MobileFriendly' => TRUE,
    'HasLocale' => TRUE,
@@ -47,20 +47,33 @@ class SpoilersPlugin extends Gdn_Plugin {
    
    /** Render spoilers in comments. */
    public function DiscussionController_AfterCommentFormat_Handler(&$Sender) {
-      $this->RenderSpoilers($Sender);
+      $this->ParseSpoilers($Sender);
    }
 
    /** Render spoilers for preview. */
    public function PostController_AfterCommentFormat_Handler(&$Sender) {
-      $this->RenderSpoilers($Sender);
+      $this->ParseSpoilers($Sender);
    }
 
    /**
-    * Create spoiler HTML in body of comment via hooks.
+    * Add spoilers to the Markdown parser's to-do list.
+    *
+    * The doSpoilers method and its dependencies are in our Markdown extension in core.
     *
     * @param $Sender
+    * @param $Args
     */
-   protected function RenderSpoilers(&$Sender) {
+   public function MarkdownVanilla_Init_Handler($Sender, &$Args) {
+      $Args['block_gamut'] += array("doSpoilers" => 55);
+   }
+
+   /**
+    * Parse default BBCode-style spoiler in body of comment to HTML via hooks.
+    *
+    * @todo Non-HTML spoiler text doesn't get wrapped in 'p' tags correctly (differs from Markdown parser).
+    * @param $Sender
+    */
+   protected function ParseSpoilers(&$Sender) {
       if (!$this->RenderSpoilers) {
          return;
       }
@@ -70,34 +83,73 @@ class SpoilersPlugin extends Gdn_Plugin {
       // Fix a wysiwyg but where spoilers
       $FormatBody = preg_replace('`<div>\s*(\[/?spoiler\])\s*</div>`', '$1', $FormatBody);
       
-      $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
-      $FormatBody = str_ireplace('[/spoiler]','</div></div>',$FormatBody);
+      $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu",
+         array($this, 'SpoilerCallback'), $FormatBody);
+      $FormatBody = str_ireplace('[/spoiler]', SpoilerClose(), $FormatBody);
    }
 
    /**
-    * Callback for RenderSpoilers().
+    * Callback for ParseSpoilers().
     *
     * @param $Matches
     * @return string
     */
-   protected function SpoilerCallback($Matches) {
-      $Attribution = T('Spoiler: %s');
-      $SpoilerText = (sizeof($Matches) > 2) ? $Matches[2] : NULL;
+    protected function SpoilerCallback($Matches) {
+      $Author = (sizeof($Matches) > 2) ? $Matches[2] : NULL;
+      return SpoilerOpen($Author, FALSE);
+   }
+   
+   public function Setup() {
+      // Nothing to do here!
+   }
+}
 
-      if (is_null($SpoilerText)) {
-         $SpoilerText = '';
+
+if (!function_exists('FormatSpoiler')) {
+   /**
+    * HTML formatting for spoiler text.
+    *
+    * Convenience function for calling open & close together.
+    *
+    * @param string $SpoilerText.
+    * @return string HTML.
+    */
+   function FormatSpoiler($SpoilerText) {
+      return SpoilerOpen().$SpoilerText.SpoilerClose();
+   }
+}
+
+if (!function_exists('FormatSpoilerOpen')) {
+   /**
+    * Opening HTML for a spoiler tag.
+    *
+    * @param mixed $Author
+    * @return string HTML.
+    */
+   function SpoilerOpen($Author = NULL) {
+      $Attribution = T('Spoiler: %s');
+
+      if (is_null($Author)) {
+         $Author = '';
       } else {
-         $SpoilerText = "<span>{$SpoilerText}</span>";
+         $Author = "<span>{$Author}</span>";
       }
 
-      $Attribution = sprintf($Attribution,$SpoilerText);
+      $Attribution = sprintf($Attribution,$Author);
 
       return <<<BLOCKQUOTE
       <div class="UserSpoiler"><div class="SpoilerTitle">{$Attribution}</div><div class="SpoilerReveal"></div><div class="SpoilerText">
 BLOCKQUOTE;
    }
-   
-   public function Setup() {
-      // Nothing to do here!
+}
+
+if (!function_exists('FormatSpoilerClose')) {
+   /**
+    * Closing HTML for a spoiler tag.
+    *
+    * @return string
+    */
+   function SpoilerClose() {
+      return '</div></div>';
    }
 }
