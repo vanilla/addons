@@ -156,7 +156,7 @@ var GdnUploaders = null;
             jQuery('div.Attachments a.DeleteFile').popup({
                confirm: true,
                followConfirm: false,
-               deliveryType: 'JSON',
+               deliveryType: 'VIEW',
                afterConfirm: function(json, sender) {
                   var MediaData = json.Delete;
                   var FileRow = jQuery(sender).closest('.Attachment');
