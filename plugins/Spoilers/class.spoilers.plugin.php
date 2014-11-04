@@ -9,7 +9,7 @@
 // Define the plugin:
 $PluginInfo['Spoilers'] = array(
    'Name' => 'Spoilers',
-   'Description' => "Wrapping text in [spoiler] tags requires the text to be clicked in order to read it. Adds >! spoiler for Markdown.",
+   'Description' => "Wrapping text in BBCode [spoiler] tags requires the text to be clicked in order to read it.",
    'Version' => '1.3',
    'MobileFriendly' => TRUE,
    'HasLocale' => TRUE,
