@@ -56,36 +56,6 @@ class SpoilersPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Add spoilers to the Markdown parser's to-do list.
-    *
-    * The doSpoilers method and its dependencies are in our Markdown extension in core.
-    *
-    * @param $Sender
-    * @param $Args
-    */
-   public function MarkdownVanilla_Init_Handler($Sender, &$Args) {
-      $Args['block_gamut'] += array("doSpoilers" => 55);
-   }
-
-   /**
-    * Add 'spoiler' option to Advanced Editor.
-    *
-    * @param $Sender
-    * @param $Args
-    */
-   public function EditorPlugin_toolbarConfig_Handler($Sender, &$Args) {
-      $Args['format'] += array(
-         'spoiler' => array(
-            'text' => T('Spoiler'),
-            'command' => 'spoiler',
-            'value' => 'spoiler',
-            'class' => '',
-            'sort' => 8
-         )
-      );
-   }
-
-   /**
     * Parse default BBCode-style spoiler in body of comment to HTML via hooks.
     *
     * @todo Non-HTML spoiler text doesn't get wrapped in 'p' tags correctly (differs from Markdown parser).
