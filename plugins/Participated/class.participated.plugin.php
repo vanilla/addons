@@ -154,7 +154,13 @@ class ParticipatedPlugin extends Gdn_Plugin {
       
       $CountDiscussions = $DiscussionModel->GetCountParticipated(Gdn::Session()->UserID);
       $Sender->SetData('CountDiscussions', $CountDiscussions);
-      
+
+      //Set view
+      $Sender->View = 'index';
+      if (C('Vanilla.Discussions.Layout') === 'table') {
+         $Sender->View = 'table';
+      }
+
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
 		$Sender->EventArguments['PagerType'] = 'Pager';
@@ -181,8 +187,9 @@ class ParticipatedPlugin extends Gdn_Plugin {
       $Sender->AddModule('DiscussionFilterModule');
       $Sender->AddModule('CategoriesModule');
       $Sender->AddModule('BookmarkedModule');
-      
-      $Sender->Render($this->GetView('participated.php'));
+
+      $Sender->Title(T('Participated Discussions'));
+      $Sender->Render();
    }
    
    public function Setup() {
