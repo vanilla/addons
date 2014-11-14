@@ -30,15 +30,16 @@
          <?php endif; ?>
       </li>
       <li>
-         <?php if (isset($this->Data['SignatureRules']) && $this->Data['SignatureRules'] != ""): ?>
-            <div class="SignatureRules">
-               <?php echo $this->Data['SignatureRules']; ?>
-            </div>
-         <?php endif; ?>
-      </li>
-      <li>
          <?php
             if ($this->Data('CanEdit')) {
+               if ($this->Data('SignatureRules')) {
+                  ?>
+                  <div class="SignatureRules">
+                     <?php echo $this->Data('SignatureRules'); ?>
+                  </div>
+                  <?php
+               }
+
                echo $this->Form->BodyBox('Body');
    //            echo Wrap($this->Form->TextBox('Plugin.Signatures.Sig', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
             } else {
