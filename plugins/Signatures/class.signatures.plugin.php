@@ -270,50 +270,39 @@ class SignaturesPlugin extends Gdn_Plugin {
             $Sender->Form->AddError('Images not allowed');
          }
          else if ($numMatches > $max) {
-            $Sender->Form->AddError('@'.T('The maximum number of images is')." ".$max);
+            $Sender->Form->AddError('@'.FormatString('You are only allowed {maxImages,plural,%s image,%s images}.',
+                  array('maxImages' => $max)));
          }
       }
    }
-
-   /**
-    * Sets inline max-height css style to image tags to signature images to comply
-    * with Plugins.Signatures.MaxImageHeight
-    *
-    * @param string $UserSignature Html signature string
-    */
-   public function EnforceImageHeight(&$UserSignature) {
-      if (C('Plugins.Signatures.MaxImageHeight') && C('Plugins.Signatures.MaxImageHeight') > 0) {
-         //Parse signature and add max height css to img tags
-         $ImgStyle = 'style="max-height: '.C('Plugins.Signatures.MaxImageHeight').'px;"';
-         $UserSignature = preg_replace('/<img/', '<img '.$ImgStyle.' ', $UserSignature);
-      }
-   }
-
 
    public function SetSignatureRules(&$Sender) {
-      $rules = "";
+      $rules = array();
       $rulesParams = array();
       $imagesAllowed = true;
-      if (C('Plugins.Signatures.MaxNumberImages') !== 'Unlimited') {
+
+
+
+      if (C('Plugins.Signatures.MaxNumberImages', 'Unlimited') !== 'Unlimited') {
          if (C('Plugins.Signatures.MaxNumberImages') === 'None') {
-            $rules .= T('Images not allowed').'. ';
+            $rules[] = T('Images not allowed.');
             $imagesAllowed = false;
-         }
-         else {
-            C('Plugins.Signatures.MaxNumberImages') === 1 ? $rules .= T('Use up to {max-images} image').'. ' : $rules .= T('Use up to {max-images} images').'. ';
-            $rulesParams['max-images'] = C('Plugins.Signatures.MaxNumberImages');
+         } else {
+            $rulesParams['maxImages'] = C('Plugins.Signatures.MaxNumberImages');
+            $rules[] = FormatString(T('Use up to {maxImages,plural,%s image, %s images}.'), $rulesParams);
          }
       }
       if ($imagesAllowed && C('Plugins.Signatures.MaxImageHeight') && C('Plugins.Signatures.MaxImageHeight') > 0) {
-         $rules .= T('Images will be scaled to a max-height of {max-image-height}px').'. ';
-         $rulesParams['max-image-height'] = C('Plugins.Signatures.MaxImageHeight');
+         $rulesParams['maxImageHeight'] = C('Plugins.Signatures.MaxImageHeight');
+         $rules[] = FormatString(T('Images will be scaled to a maximum height of {maxImageHeight}px.'), $rulesParams);
+
       }
       if (C('Plugins.Signatures.MaxLength') && C('Plugins.Signatures.MaxLength') > 0) {
-         $rules .= T('Signatures can be up to {max-length} characters long').'. ';
-         $rulesParams['max-length'] = C('Plugins.Signatures.MaxLength');
+         $rulesParams['maxLength'] = C('Plugins.Signatures.MaxLength');
+         $rules[] = FormatString(T('Signatures can be up to {maxLength} characters long.'), $rulesParams);
       }
 
-      $Sender->SetData('SignatureRules', FormatString($rules, $rulesParams));
+      $Sender->SetData('SignatureRules', implode(' ', $rules));
    }
 
 
@@ -482,6 +471,26 @@ class SignaturesPlugin extends Gdn_Plugin {
       $this->DrawSignature($Sender);
    }
 
+   /**
+    * Add a custom signature style tag to enforce image height.
+    *
+    * @param Gdn_Control $sender
+    * @param array $args
+    */
+   public function base_render_before($sender, $args) {
+      if ($maxImageHeight = C('Plugins.Signatures.MaxImageHeight')) {
+         $maxImageHeight = (int)$maxImageHeight;
+
+         $style = <<<EOT
+.Signature img, .UserSignature img {
+   max-height: {$maxImageHeight}px !important;
+}
+EOT;
+
+         $sender->Head->AddTag('style', array('_sort' => 100), $style);
+      }
+   }
+
    /** New call for 2.1. */
    public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
       if ($this->Disabled)
@@ -528,7 +537,9 @@ class SignaturesPlugin extends Gdn_Plugin {
             $SigClasses .= 'HideImages ';
 
          // Don't show empty sigs
-         if ($Signature == '') return;
+         if ($Signature == '') {
+            return;
+         }
 
          // If embeds were disabled from the dashboard, temporarily set the
          // universal config to make sure no URLs are turned into embeds.
@@ -557,11 +568,11 @@ class SignaturesPlugin extends Gdn_Plugin {
             'String' => &$UserSignature
          );
 
-         $this->EnforceImageHeight($UserSignature);
          $this->FireEvent('FilterContent');
 
-         if ($UserSignature)
+         if ($UserSignature) {
             echo "<div class=\"Signature UserSignature {$SigClasses}\">{$UserSignature}</div>";
+         }
       }
    }
 
