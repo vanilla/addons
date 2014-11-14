@@ -41,6 +41,12 @@ class SignaturesPlugin extends Gdn_Plugin {
    public $Disabled = FALSE;
 
    /**
+    * @var array List of config settings can be overridden by sessions in other plugins
+    */
+   private $overriddenConfigSettings = array('MaxNumberImages', 'MaxLength');
+
+
+   /**
     * Add mapper methods
     *
     * @param SimpleApiPlugin $Sender
@@ -118,6 +124,11 @@ class SignaturesPlugin extends Gdn_Plugin {
 
       $canEditSignatures = CheckPermission('Plugins.Signatures.Edit');
 
+      // Normalize no image config setting
+      if (C('Plugins.Signatures.MaxNumberImages') === 0 || C('Plugins.Signatures.MaxNumberImages') === '0') {
+         SaveToConfig('Plugins.Signatures.MaxNumberImages', 'None');
+      }
+
       $Sender->GetUserInfo($UserReference, $Username);
       $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
       if (!is_array($UserPrefs))
@@ -155,6 +166,8 @@ class SignaturesPlugin extends Gdn_Plugin {
       $Data = $ConfigurationModel->Data;
       $Sender->SetData('Signature', $Data);
 
+      $this->SetSignatureRules($Sender);
+
       // If seeing the form for the first time...
       if ($Sender->Form->IsPostBack() === FALSE) {
          $Data['Body'] = GetValue('Plugin.Signatures.Sig', $Data);
@@ -170,12 +183,7 @@ class SignaturesPlugin extends Gdn_Plugin {
             $Values['Plugin.Signatures.Format'] = GetValue('Format', $Values, NULL);
          }
 
-         // If images are in the signature, throw an error. Possibly revisit
-         // to add more granular regex.
-         if (!C('Plugins.Signatures.AllowImages', TRUE)
-         && preg_match('/(<img|\[img.*\]|\!\[.*\])/i', $Values['Plugin.Signatures.Sig'])) {
-            $Sender->Form->AddError('Images are not allowed in signatures. Remove them and save to keep the changes.');
-         }
+         //$this->StripLineBreaks($Values['Plugin.Signatures.Sig']);
 
          $FrmValues = array_intersect_key($Values, $ConfigArray);
 
@@ -187,13 +195,7 @@ class SignaturesPlugin extends Gdn_Plugin {
                $FrmValues[$this->MakeMetaKey('Format')] = NULL;
             }
 
-            // Validate the signature.
-            if (function_exists('ValidateSignature')) {
-               $Sig = trim(GetValue($this->MakeMetaKey('Sig'), $FrmValues));
-               if (ValidateRequired($Sig) && !ValidateSignature($Sig, GetValue($this->MakeMetaKey('Format'), $FrmValues))) {
-                  $Sender->Form->AddError('Signature invalid.');
-               }
-            }
+            $this->CrossCheckSignature($Values, $Sender);
 
             if ($Sender->Form->ErrorCount() == 0) {
                foreach ($FrmValues as $UserMetaKey => $UserMetaValue) {
@@ -214,6 +216,117 @@ class SignaturesPlugin extends Gdn_Plugin {
       }
 
       $Sender->Render('signature', '', 'plugins/Signatures');
+   }
+
+   /**
+    * Checks signature against constraints set in config settings,
+    * and executes the external ValidateSignature function, if it exists.
+    *
+    * @param $Values Signature settings form values
+    * @param $Sender Controller
+    */
+   public function CrossCheckSignature($Values, &$Sender) {
+      $this->CheckSignatureLength($Values, $Sender);
+      $this->CheckNumberOfImages($Values, $Sender);
+
+      // Validate the signature.
+      if (function_exists('ValidateSignature')) {
+         $Sig = trim(GetValue('Plugin.Signatures.Sig', $Values));
+         if (ValidateRequired($Sig) && !ValidateSignature($Sig, GetValue('Plugin.Signatures.Format', $Values))) {
+            $Sender->Form->AddError('Signature invalid.');
+         }
+      }
+   }
+
+   /**
+    * Checks signature length against Plugins.Signatures.MaxLength
+    *
+    * @param $Values Signature settings form values
+    * @param $Sender Controller
+    */
+   public function CheckSignatureLength($Values, &$Sender) {
+      if (C('Plugins.Signatures.MaxLength') && C('Plugins.Signatures.MaxLength') > 0) {
+         $Sig = Gdn_Format::To($Values['Plugin.Signatures.Sig'], $Sender->Form->GetFormValue('Format'));
+         $TextValue = html_entity_decode(trim(strip_tags($Sig)));
+
+         // Validate the amount of text.
+         if (strlen($TextValue) > C('Plugins.Signatures.MaxLength')) {
+            $Sender->Form->AddError(sprintf(T('ValidateLength'), T('Signature'), (strlen($TextValue)-C('Plugins.Signatures.MaxLength'))));
+         }
+      }
+   }
+
+   /**
+    * Checks number of images in signature against Plugins.Signatures.MaxNumberImages
+    *
+    * @param $Values Signature settings form values
+    * @param $Sender Controller
+    */
+   public function CheckNumberOfImages($Values, &$Sender) {
+      if (C('Plugins.Signatures.MaxNumberImages') && C('Plugins.Signatures.MaxNumberImages') !== 'Unlimited') {
+         $max = C('Plugins.Signatures.MaxNumberImages');
+         $numMatches = preg_match_all('/(<img|\[img.*\]|\!\[.*\])/i', $Values['Plugin.Signatures.Sig']);
+         if (C('Plugins.Signatures.MaxNumberImages') === 'None' && $numMatches > 0) {
+            $Sender->Form->AddError('Images not allowed');
+         }
+         else if ($numMatches > $max) {
+            $Sender->Form->AddError('@'.FormatString('You are only allowed {maxImages,plural,%s image,%s images}.',
+                  array('maxImages' => $max)));
+         }
+      }
+   }
+
+   public function SetSignatureRules(&$Sender) {
+      $rules = array();
+      $rulesParams = array();
+      $imagesAllowed = true;
+
+
+
+      if (C('Plugins.Signatures.MaxNumberImages', 'Unlimited') !== 'Unlimited') {
+         if (C('Plugins.Signatures.MaxNumberImages') === 'None') {
+            $rules[] = T('Images not allowed.');
+            $imagesAllowed = false;
+         } else {
+            $rulesParams['maxImages'] = C('Plugins.Signatures.MaxNumberImages');
+            $rules[] = FormatString(T('Use up to {maxImages,plural,%s image, %s images}.'), $rulesParams);
+         }
+      }
+      if ($imagesAllowed && C('Plugins.Signatures.MaxImageHeight') && C('Plugins.Signatures.MaxImageHeight') > 0) {
+         $rulesParams['maxImageHeight'] = C('Plugins.Signatures.MaxImageHeight');
+         $rules[] = FormatString(T('Images will be scaled to a maximum height of {maxImageHeight}px.'), $rulesParams);
+
+      }
+      if (C('Plugins.Signatures.MaxLength') && C('Plugins.Signatures.MaxLength') > 0) {
+         $rulesParams['maxLength'] = C('Plugins.Signatures.MaxLength');
+         $rules[] = FormatString(T('Signatures can be up to {maxLength} characters long.'), $rulesParams);
+      }
+
+      $Sender->SetData('SignatureRules', implode(' ', $rules));
+   }
+
+
+         /**
+    * Strips all line breaks from text
+    *
+    * @param string $Text
+    * @param string $Delimiter
+    */
+   public function StripLineBreaks(&$Text, $Delimiter = ' ') {
+      $Text = str_replace(array("\r\n", "\r"), "\n", $Text);
+      $lines = explode("\n", $Text);
+      $new_lines = array();
+      foreach ($lines as $i => $line) {
+         $line = trim($line);
+         if(!empty($line)) {
+            $new_lines[] = $line;
+         }
+      }
+      $Text = implode($new_lines, $Delimiter);
+   }
+
+   public function StripFormatting() {
+
    }
 
    /*
@@ -358,6 +471,26 @@ class SignaturesPlugin extends Gdn_Plugin {
       $this->DrawSignature($Sender);
    }
 
+   /**
+    * Add a custom signature style tag to enforce image height.
+    *
+    * @param Gdn_Control $sender
+    * @param array $args
+    */
+   public function base_render_before($sender, $args) {
+      if ($maxImageHeight = C('Plugins.Signatures.MaxImageHeight')) {
+         $maxImageHeight = (int)$maxImageHeight;
+
+         $style = <<<EOT
+.Signature img, .UserSignature img {
+   max-height: {$maxImageHeight}px !important;
+}
+EOT;
+
+         $sender->Head->AddTag('style', array('_sort' => 100), $style);
+      }
+   }
+
    /** New call for 2.1. */
    public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
       if ($this->Disabled)
@@ -404,7 +537,9 @@ class SignaturesPlugin extends Gdn_Plugin {
             $SigClasses .= 'HideImages ';
 
          // Don't show empty sigs
-         if ($Signature == '') return;
+         if ($Signature == '') {
+            return;
+         }
 
          // If embeds were disabled from the dashboard, temporarily set the
          // universal config to make sure no URLs are turned into embeds.
@@ -432,10 +567,12 @@ class SignaturesPlugin extends Gdn_Plugin {
             'UserID'    => $SourceUserID,
             'String' => &$UserSignature
          );
+
          $this->FireEvent('FilterContent');
 
-         if ($UserSignature)
+         if ($UserSignature) {
             echo "<div class=\"Signature UserSignature {$SigClasses}\">{$UserSignature}</div>";
+         }
       }
    }
 
@@ -492,14 +629,42 @@ class SignaturesPlugin extends Gdn_Plugin {
       $Conf->Initialize(array(
           'Plugins.Signatures.HideGuest' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures for guests'),
           'Plugins.Signatures.HideEmbed' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => TRUE),
-          'Plugins.Signatures.AllowImages' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow images', 'Default' => TRUE),
-          'Plugins.Signatures.AllowEmbeds' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow embedded content', 'Default' => true)
+          'Plugins.Signatures.AllowEmbeds' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow embedded content', 'Default' => true),
+           //'Plugins.Signatures.TextOnly' => array('Control' => 'CheckBox', 'LabelCode' => '@'.sprintf(T('Enforce %s'), T('text-only'))),
+          'Plugins.Signatures.Default.MaxNumberImages' => array('Control' => 'Dropdown', 'LabelCode' => '@'.sprintf(T('Max number of %s'), T('images')), 'Items' => array('Unlimited' => T('Unlimited'), 'None' => T('None'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)),
+          'Plugins.Signatures.Default.MaxLength' => array('Control' => 'TextBox', 'Type' => 'int', 'LabelCode' => '@'.sprintf(T('Max %s length'), T('signature')), 'Options' => array('class' => 'InputBox SmallInput')),
+          'Plugins.Signatures.MaxImageHeight' => array('Control' => 'TextBox', 'LabelCode' => '@'.sprintf(T('Max height of %s'), T('images'))." ".T('in pixels'), 'Options' => array('class' => 'InputBox SmallInput')),
       ));
+
+      $this->SetConfigSettingsToDefault('Plugins.Signatures', $this->overriddenConfigSettings);
 
       $Sender->AddSideMenu();
       $Sender->SetData('Title', sprintf(T('%s Settings'), T('Signature')));
       $Sender->ConfigurationModule = $Conf;
       $Conf->RenderAll();
 //      $Sender->Render('Settings', '', 'plugins/AmazonS3');
+   }
+
+   /**
+    * Why do we need this? (i.e., Mantra for the function)
+    * We retrieve the signature restraints from the config settings.
+    * These are sometimes overridden by plugins (i.e., Ranks)
+    * If we load the dashboard signature settings form from the config file,
+    * we will get whatever session config settings are present, not
+    * the default. As such, we've created default config variables that
+    * populate the form, but we've got to transfer them over to the
+    * config settings in use.
+    *
+    * Sets config settings to the default settings.
+    *
+    *
+    * @param string $basename
+    * @param array $settings
+    *
+    */
+   public function SetConfigSettingsToDefault($basename, $settings) {
+      foreach ($settings as $setting) {
+         SaveToConfig($basename.'.'.$setting, C($basename.'.Default.'.$setting));
+      }
    }
 }
