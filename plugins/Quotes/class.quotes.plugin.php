@@ -11,6 +11,7 @@
  *  1.6.1   Overhaul
  *  1.6.4   Moved button to reactions area & changed js accordingly.
  *  1.6.8   Textarea target will now automatically resize to fit text body.
+ *  1.6.9   Security fix.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -21,7 +22,7 @@
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.6.8',
+    'Version' => '1.6.9',
     'MobileFriendly' => TRUE,
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RequiredTheme' => FALSE,
@@ -312,8 +313,13 @@ BLOCKQUOTE;
             else
                $NewBody = Gdn_Format::PlainText($NewBody, $QuoteFormat);
 
-            if (!in_array($NewFormat, array('Html', 'Wysiwyg')))
-               Gdn::Controller()->InformMessage(sprintf(T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'), $QuoteFormat, $NewFormat));
+            if (!in_array($NewFormat, array('Html', 'Wysiwyg'))) {
+               Gdn::Controller()->InformMessage(sprintf(
+                  T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'),
+                  htmlspecialchars($QuoteFormat),
+                  htmlspecialchars($NewFormat)
+               ));
+            }
          }
          $Data->Body = $NewBody;
 
