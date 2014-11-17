@@ -21,9 +21,7 @@ gulp.task('scripts', function () {
   var dependencies = require('wiredep')()
     , source = $.filter('js/src/**/*.js');
 
-  return gulp.src((dependencies.js || []).concat([
-    'js/src/main.js'
-  ]))
+   return gulp.src((dependencies.js || []).concat([]))
     .pipe($.plumber())
     .pipe(source)
     .pipe($.jshint('js/.jshintrc'))
@@ -62,7 +60,7 @@ gulp.task('wiredep', function () {
 });
 
 gulp.task('default', ['wiredep'], function () {
-  gulp.start('styles', 'scripts', 'images', 'fonts');
+   gulp.start('styles', 'images');
 });
 
 gulp.task('watch', function () {
@@ -80,7 +78,7 @@ gulp.task('watch', function () {
   gulp.watch('scss/**/*.scss', ['styles']);
   gulp.watch('js/src/**/*.js', ['scripts']);
   gulp.watch('design/images/**/*', ['images']);
-  gulp.watch('bower.json', ['wiredep']);
+   //gulp.watch('bower.json', ['wiredep']);
 });
 
 // Expose Gulp to external tools
