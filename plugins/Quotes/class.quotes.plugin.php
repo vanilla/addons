@@ -317,7 +317,7 @@ BLOCKQUOTE;
                Gdn::Controller()->InformMessage(sprintf(
                   T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'),
                   Gdn_Format::Text($QuoteFormat),
-                  $NewFormat
+                  Gdn_Format::Text($NewFormat)
                ));
             }
          }
