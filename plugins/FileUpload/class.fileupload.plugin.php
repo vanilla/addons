@@ -14,6 +14,7 @@
  *  1.7.1   Fix for file upload not working now that we have json rendered as application/json.
  *  1.8     Added the ability to restrict file uploads per category.
  *  1.8.1   Remove deprecated jQuery functions.
+ *  1.8.3   Modified fileupload.js to handle dependency on jquery.popup better.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -23,8 +24,8 @@
 
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
-   'Description' => 'Images and files may be attached to discussions and comments.',
-   'Version' => '1.8.2',
+   'Description' => 'Images and files may be attached to discussions and comments. Mod to work with 2.1.5 by Peregrine',
+   'Version' => '1.8.4.1',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -57,13 +58,30 @@ class FileUploadPlugin extends Gdn_Plugin {
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
 
       if ($this->CanUpload) {
-         $PermissionCategory = CategoryModel::PermissionCategory(Gdn::Controller()->Data('Category'));
+         $PermissionCategory = $this->PermissionCategory(Gdn::Controller()->Data('Category'));
          if (!GetValue('AllowFileUploads', $PermissionCategory, TRUE))
             $this->CanUpload = FALSE;
       }
    }
 
-   public function AssetModel_StyleCss_Handler($Sender) {
+  // added this
+  public static function PermissionCategory($Category) {
+      if (empty($Category))
+         return CategoryModel::Categories(-1);
+
+      if (!is_array($Category) && !is_object($Category)) {
+         $Category = CategoryModel::Categories($Category);
+      }
+
+      return CategoryModel::Categories(GetValue('PermissionCategoryID', $Category));
+   }
+
+
+
+
+
+
+    public function AssetModel_StyleCss_Handler($Sender) {
       $Sender->AddCssFile('fileupload.css', 'plugins/FileUpload');
    }
 
