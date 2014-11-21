@@ -36,7 +36,7 @@ class SteamPlugin extends Gdn_Plugin {
     }
 
     public function isConfig() {
-        return C('Plugins.SteamConnect.APIKey');
+        return C('Plugins.SteamConnect.APIKey', FALSE);
     }
 
     protected function _AuthorizeHref($Popup = FALSE) {
@@ -56,10 +56,6 @@ class SteamPlugin extends Gdn_Plugin {
 
     /// Plugin Event Handlers ///
 
-    /**
-     *
-     * @param Gdn_Controller $Sender
-     */
     public function EntryController_SignIn_Handler($Sender, $Args) {
 
         if (isset($Sender->Data['Methods']) && $this->isConfig()) {
