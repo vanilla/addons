@@ -134,11 +134,11 @@ class PocketsPlugin extends Gdn_Plugin {
    /**
     * View a single pocket
     *
-    * @param SettingsController $sender
+    * @param UtilityController $sender
     * @param array $args
     */
-   public function SettingsController_Pocket_Create($sender, $args = array()) {
-       
+   public function UtilityController_Pocket_Create($sender, $args = array()) {
+
        // Get pocket ID from URL: /settings/pocket/<id>
        $pocketID = val(0, $args, null);
        if (!$pocketID) {
