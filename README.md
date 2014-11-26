@@ -17,7 +17,6 @@ Also appearing in this repo:
 
 * `archive`: addons that have been abandoned
 * `forum-redirector`: tool for redirecting your legacy platform to Vanilla
-* `locales`: tool for updating our Transifex baseline. For actual locales, [see their separate repo](https://github.com/vanilla/locales).
 * `sass`: quick tutorial on using Sass with Vanilla
 * `standards`: our CodeSniffer implementation for following our coding standards.
 
