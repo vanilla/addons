@@ -32,7 +32,9 @@ $PluginInfo['Signatures'] = array(
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
-   'MobileFriendly' => FALSE,
+   // Note that EnableMobile setting is global across site, while
+   // HideMobile is set on a per-user basis.
+   'MobileFriendly' => C('Plugins.Signatures.EnableMobile', FALSE),
    'SettingsUrl' => '/settings/signatures',
    'SettingsPermission' => 'Garden.Settings.Manage'
 );
@@ -629,6 +631,7 @@ EOT;
       $Conf->Initialize(array(
           'Plugins.Signatures.HideGuest' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures for guests'),
           'Plugins.Signatures.HideEmbed' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => TRUE),
+          'Plugins.Signatures.EnableMobile' => array('Control' => 'CheckBox', 'LabelCode' => 'Show signatures on mobile', 'Default' => ''),
           'Plugins.Signatures.AllowEmbeds' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow embedded content', 'Default' => true),
            //'Plugins.Signatures.TextOnly' => array('Control' => 'CheckBox', 'LabelCode' => '@'.sprintf(T('Enforce %s'), T('text-only'))),
           'Plugins.Signatures.Default.MaxNumberImages' => array('Control' => 'Dropdown', 'LabelCode' => '@'.sprintf(T('Max number of %s'), T('images')), 'Items' => array('Unlimited' => T('Unlimited'), 'None' => T('None'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)),
