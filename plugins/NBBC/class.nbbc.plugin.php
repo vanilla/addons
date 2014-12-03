@@ -188,7 +188,6 @@ EOT;
    public function Format($Result) {
       $Result = str_replace(array('[CODE]', '[/CODE]'), array('[code]', '[/code]'), $Result);
       $Result = $this->NBBC()->Parse($Result);
-//      Emoji::instance()->translateToHtml($Result);
       return $Result;
    }
    
