@@ -58,7 +58,7 @@
    <li>
       <?php
       echo $this->Form->CheckBox('Plugin.Signatures.HideAll','Hide signatures always');
-      if (C('Plugins.Signatures.EnableMobile', FALSE)) {
+      if (!C('Plugins.Signatures.HideMobile', TRUE)) {
          echo $this->Form->CheckBox('Plugin.Signatures.HideMobile',"Hide signatures on my mobile device");
       }
       echo $this->Form->CheckBox('Plugin.Signatures.HideImages','Strip images out of signatures');
