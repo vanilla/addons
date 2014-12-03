@@ -12,7 +12,8 @@
  *  1.4.1   Allow self-API access
  *  1.5     Improve "Hide Images"
  *  1.5.1   Improve permission checking granularity
- *  1.5.3-5 Disallow images plugin-wide from dashboard.
+ *  1.5.3-5 Disallow images plugin-wide from dashboard
+ *  1.6     Add signature constraints and enhance mobile capacity
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -23,7 +24,7 @@
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.5.6',
+   'Version' => '1.6.0',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -32,7 +33,7 @@ $PluginInfo['Signatures'] = array(
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
-   'MobileFriendly' => FALSE,
+   'MobileFriendly' => TRUE,
    'SettingsUrl' => '/settings/signatures',
    'SettingsPermission' => 'Garden.Settings.Manage'
 );
@@ -589,7 +590,7 @@ EOT;
       if ($this->UserPreferences('Plugin.Signatures.HideAll', FALSE))
          return TRUE;
 
-      if (IsMobile() && $this->UserPreferences('Plugin.Signatures.HideMobile', FALSE))
+      if (IsMobile() && (C('Plugins.Signatures.HideMobile', TRUE) || $this->UserPreferences('Plugin.Signatures.HideMobile', FALSE)))
          return TRUE;
 
       return FALSE;
@@ -628,7 +629,8 @@ EOT;
       $Conf = new ConfigurationModule($Sender);
       $Conf->Initialize(array(
           'Plugins.Signatures.HideGuest' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures for guests'),
-          'Plugins.Signatures.HideEmbed' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => TRUE),
+          'Plugins.Signatures.HideEmbed' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => true),
+          'Plugins.Signatures.HideMobile' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on mobile', 'Default' => true),
           'Plugins.Signatures.AllowEmbeds' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow embedded content', 'Default' => true),
            //'Plugins.Signatures.TextOnly' => array('Control' => 'CheckBox', 'LabelCode' => '@'.sprintf(T('Enforce %s'), T('text-only'))),
           'Plugins.Signatures.Default.MaxNumberImages' => array('Control' => 'Dropdown', 'LabelCode' => '@'.sprintf(T('Max number of %s'), T('images')), 'Items' => array('Unlimited' => T('Unlimited'), 'None' => T('None'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)),
