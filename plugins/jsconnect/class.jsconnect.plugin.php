@@ -392,11 +392,20 @@ class JsConnectPlugin extends Gdn_Plugin {
    }
 
    /**
+    * An intermediate page for jsConnect that checks SSO against and then posts the information to /entry/connect.
     *
     * @param EntryController $Sender
-    * @param array $Args
+    * @param string $Action A specific action. It can be one of the following:
+    *
+    * - blank: The default action.
+    * - guest: There is no user signed in.
+    * -
+    * @param string $Target The url to redirect to after a successful connect.
+    * @throws /Exception Throws an exception when the jsConnect provider is not found.
     */
    public function EntryController_JsConnect_Create($Sender, $Action = '', $Target = '') {
+      $Sender->SetData('_NoMessages', true);
+
       if ($Action) {
          if ($Action == 'guest') {
 //            Redirect('/');
