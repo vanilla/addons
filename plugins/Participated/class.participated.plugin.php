@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Participated'] = array(
    'Name' => 'Participated Discussions',
    'Description' => "Users may view a list of all discussions they have commented on. This is a more user-friendly version of an 'auto-subscribe' option.",
-   'Version' => '1.1.0',
+   'Version' => '1.1.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
@@ -143,17 +143,15 @@ class ParticipatedPlugin extends Gdn_Plugin {
       
       $Page = GetValue(0, $Args);
       $Limit = GetValue(1, $Args);
-      
-      list($Offset, $Limit) = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
-         
-      // Get Discussions
+
+      // Set criteria & get discussions data
+      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+      $Session = Gdn::Session();
+      $Wheres = array('d.InsertUserID' => $Session->UserID);
       $DiscussionModel = new DiscussionModel();
-      
-      $Sender->DiscussionData = $DiscussionModel->GetParticipated(Gdn::Session()->UserID, $Offset, $Limit);
+      $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, $Wheres);
       $Sender->SetData('Discussions', $Sender->DiscussionData);
-      
-      $CountDiscussions = $DiscussionModel->GetCountParticipated(Gdn::Session()->UserID);
-      $Sender->SetData('CountDiscussions', $CountDiscussions);
+      $CountDiscussions = $Sender->SetData('CountDiscussions', $DiscussionModel->GetCount($Wheres));
 
       //Set view
       $Sender->View = 'index';
@@ -163,8 +161,8 @@ class ParticipatedPlugin extends Gdn_Plugin {
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
-		$Sender->EventArguments['PagerType'] = 'Pager';
-		$Sender->FireEvent('BeforeBuildPager');
+		$Sender->EventArguments['PagerType'] = 'MorePager';
+		$Sender->FireEvent('BeforeBuildParticipatedPager');
       $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $Sender);
       $Sender->Pager->ClientID = 'Pager';
       $Sender->Pager->Configure(
@@ -173,7 +171,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
          $CountDiscussions,
          'discussions/participated/%1$s'
       );
-		$Sender->FireEvent('AfterBuildPager');
+		$Sender->FireEvent('AfterBuildParticipatedPager');
       
       // Deliver JSON data if necessary
       if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL) {
@@ -181,6 +179,10 @@ class ParticipatedPlugin extends Gdn_Plugin {
          $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
          $Sender->View = 'discussions';
       }
+
+      $Sender->SetData('_PagerUrl', 'discussions/participated/{Page}');
+      $Sender->SetData('_Page', $Page);
+      $Sender->SetData('_Limit', $Limit);
       
       // Add modules
       $Sender->AddModule('NewDiscussionModule');
@@ -189,6 +191,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
       $Sender->AddModule('BookmarkedModule');
 
       $Sender->Title(T('Participated Discussions'));
+      $Sender->SetData('Breadcrumbs', array(array('Name' => T('Participated Discussions'), 'Url' => '/discussions/participated')));
       $Sender->Render();
    }
    
