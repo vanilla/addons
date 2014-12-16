@@ -32,20 +32,20 @@ class ParticipatedPlugin extends Gdn_Plugin {
    public function DiscussionsController_AfterInitialize_Handler($Sender) {
       $this->GetCountParticipated();
    }
-   
+
    protected function GetCountParticipated() {
       if (is_null($this->CountParticipated)) {
-         $DiscussionModel = new DiscussionModel();
-         try {
-            $this->CountParticipated = $DiscussionModel->GetCountParticipated(NULL);
-         } catch (Exception $e) {
-            $this->CountParticipated = FALSE;
-         }
+	 $DiscussionModel = new DiscussionModel();
+	 try {
+	    $this->CountParticipated = $DiscussionModel->GetCountParticipated(NULL);
+	 } catch (Exception $e) {
+	    $this->CountParticipated = FALSE;
+	 }
       }
-      
+
       return $this->CountParticipated;
    }
-   
+
    /**
     * Gets list of discussions user has commented on.
     * 
@@ -131,7 +131,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
       $CssClass = 'Participated';
       if (strtolower(Gdn::Controller()->ControllerName) == 'discussionscontroller' && strtolower(Gdn::Controller()->RequestMethod) == 'participated')
          $CssClass .= ' Active';
-      echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpParticipated').T('Participated'), '/discussions/participated').'</li>';
+      echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpParticipated').' '.T('Participated').' '.FilterCountString($this->GetCountParticipated()), '/discussions/participated').'</li>';
    }
    
    /**
@@ -149,9 +149,10 @@ class ParticipatedPlugin extends Gdn_Plugin {
       $Session = Gdn::Session();
       $Wheres = array('d.InsertUserID' => $Session->UserID);
       $DiscussionModel = new DiscussionModel();
-      $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit, $Wheres);
+      $Sender->DiscussionData = $DiscussionModel->GetParticipated(Gdn::Session()->UserID, $Offset, $Limit);
       $Sender->SetData('Discussions', $Sender->DiscussionData);
-      $CountDiscussions = $Sender->SetData('CountDiscussions', $DiscussionModel->GetCount($Wheres));
+      $CountDiscussions = $DiscussionModel->GetCountParticipated(Gdn::Session()->UserID);
+      $Sender->SetData('CountDiscussions', $CountDiscussions);
 
       //Set view
       $Sender->View = 'index';
