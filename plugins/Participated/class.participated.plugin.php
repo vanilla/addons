@@ -35,14 +35,13 @@ class ParticipatedPlugin extends Gdn_Plugin {
 
    protected function GetCountParticipated() {
       if (is_null($this->CountParticipated)) {
-	 $DiscussionModel = new DiscussionModel();
-	 try {
-	    $this->CountParticipated = $DiscussionModel->GetCountParticipated(NULL);
-	 } catch (Exception $e) {
-	    $this->CountParticipated = FALSE;
-	 }
+	      $DiscussionModel = new DiscussionModel();
+	      try {
+	         $this->CountParticipated = $DiscussionModel->GetCountParticipated(NULL);
+	      } catch (Exception $e) {
+	         $this->CountParticipated = FALSE;
+	      }
       }
-
       return $this->CountParticipated;
    }
 
@@ -146,11 +145,11 @@ class ParticipatedPlugin extends Gdn_Plugin {
 
       // Set criteria & get discussions data
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
-      $Session = Gdn::Session();
-      $Wheres = array('d.InsertUserID' => $Session->UserID);
       $DiscussionModel = new DiscussionModel();
+      
       $Sender->DiscussionData = $DiscussionModel->GetParticipated(Gdn::Session()->UserID, $Offset, $Limit);
       $Sender->SetData('Discussions', $Sender->DiscussionData);
+
       $CountDiscussions = $DiscussionModel->GetCountParticipated(Gdn::Session()->UserID);
       $Sender->SetData('CountDiscussions', $CountDiscussions);
 
