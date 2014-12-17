@@ -161,8 +161,8 @@ class ParticipatedPlugin extends Gdn_Plugin {
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
-		$Sender->EventArguments['PagerType'] = 'MorePager';
-		$Sender->FireEvent('BeforeBuildParticipatedPager');
+      $Sender->EventArguments['PagerType'] = 'MorePager';
+      $Sender->FireEvent('BeforeBuildParticipatedPager');
       $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $Sender);
       $Sender->Pager->ClientID = 'Pager';
       $Sender->Pager->Configure(
@@ -171,7 +171,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
          $CountDiscussions,
          'discussions/participated/%1$s'
       );
-		$Sender->FireEvent('AfterBuildParticipatedPager');
+      $Sender->FireEvent('AfterBuildParticipatedPager');
       
       // Deliver JSON data if necessary
       if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL) {
