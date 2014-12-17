@@ -35,12 +35,12 @@ class ParticipatedPlugin extends Gdn_Plugin {
 
    protected function GetCountParticipated() {
       if (is_null($this->CountParticipated)) {
-	      $DiscussionModel = new DiscussionModel();
-	      try {
-	         $this->CountParticipated = $DiscussionModel->GetCountParticipated(NULL);
-	      } catch (Exception $e) {
-	         $this->CountParticipated = FALSE;
-	      }
+         $DiscussionModel = new DiscussionModel();
+         try {
+            $this->CountParticipated = $DiscussionModel->GetCountParticipated(NULL);
+         } catch (Exception $e) {
+            $this->CountParticipated = FALSE;
+         }
       }
       return $this->CountParticipated;
    }
@@ -130,7 +130,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
       $CssClass = 'Participated';
       if (strtolower(Gdn::Controller()->ControllerName) == 'discussionscontroller' && strtolower(Gdn::Controller()->RequestMethod) == 'participated')
          $CssClass .= ' Active';
-      echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpParticipated').' '.T('Participated').' '.FilterCountString($this->GetCountParticipated()), '/discussions/participated').'</li>';
+      echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpParticipated').T('Participated'), '/discussions/participated').'</li>';
    }
    
    /**
