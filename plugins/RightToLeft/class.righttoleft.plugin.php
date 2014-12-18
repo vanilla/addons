@@ -12,7 +12,7 @@ if (!defined('APPLICATION'))
 $PluginInfo['RightToLeft'] = array(
     'Name' => 'Right to Left (RTL) Support',
     'Description' => "Adds a css stub to pages with some tweaks for right-to-left (rtl) languages and adds 'rtl' to body css class.",
-    'Version' => '1.0',
+    'Version' => '1.0.1',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => TRUE,
     'Author' => 'Becky Van Bussel',

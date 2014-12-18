@@ -3,7 +3,7 @@
 $PluginInfo['IndexPhotos'] = array(
    'Name' => 'Discussion Photos',
    'Description' => "Displays photo and name of the user who started each discussion anywhere discussions are listed. Note that this plugin will not have any affect when table layouts are enabled.",
-   'Version' => '1.2.1',
+   'Version' => '1.2.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RegisterPermissions' => FALSE,
    'MobileFriendly' => TRUE,
@@ -13,13 +13,13 @@ $PluginInfo['IndexPhotos'] = array(
 );
 
 class IndexPhotosPlugin extends Gdn_Plugin {
-   
+
    public function AssetModel_StyleCss_Handler($Sender) {
       if (!$this->hasLayoutTables() || IsMobile()) {
          $Sender->AddCssFile('indexphotos.css', 'plugins/IndexPhotos');
       }
    }
-   
+
    /**
     * Add OP name to start of discussion meta.
     */
@@ -44,7 +44,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
          $this->DisplayPhoto($Sender);
       }
    }
-   
+
    /**
     * Trigger on Categories.
     */
@@ -53,7 +53,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
          $this->DisplayPhoto($Sender);
       }
    }
-   
+
    /**
     * Display user photo for first user in each discussion.
     */
@@ -62,10 +62,10 @@ class IndexPhotosPlugin extends Gdn_Plugin {
       $FirstUser = UserBuilder($Sender->EventArguments['Discussion'], 'First');
       echo UserPhoto($FirstUser, array('LinkClass' => 'IndexPhoto'));
    }
-   
+
    /**
     * Determine whether layout of discussions page is "table" (vs. "modern").
-    * 
+    *
     * @return bool If forum is using table layout, returns true
     */
    public function hasLayoutTables() {
