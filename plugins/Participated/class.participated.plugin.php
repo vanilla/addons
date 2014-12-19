@@ -15,7 +15,7 @@ $PluginInfo['Participated'] = array(
    'Version' => '1.1.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE, 
+   'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -28,10 +28,6 @@ class ParticipatedPlugin extends Gdn_Plugin {
 
    protected $Participated = NULL;
    protected $CountParticipated = NULL;
-   
-   public function DiscussionsController_AfterInitialize_Handler($Sender) {
-      $this->GetCountParticipated();
-   }
 
    protected function GetCountParticipated() {
       if (is_null($this->CountParticipated)) {
@@ -47,22 +43,22 @@ class ParticipatedPlugin extends Gdn_Plugin {
 
    /**
     * Gets list of discussions user has commented on.
-    * 
+    *
     * @return DataSet
     */
    public function DiscussionModel_GetParticipated_Create($Sender) {
       $UserID = GetValue(0, $Sender->EventArguments);
       $Offset = GetValue(1, $Sender->EventArguments);
       $Limit = GetValue(2, $Sender->EventArguments);
-      
+
       if (is_null($UserID)) {
          if (!Gdn::Session()->IsValid()) throw new Exception(T("Could not get participated discussions for non logged-in user."));
          $UserID = Gdn::Session()->UserID;
       }
-      
+
       $Sender->SQL->Reset();
       $Sender->DiscussionSummaryQuery();
-      
+
       $Data = $Sender->SQL->Select('d.*')
          ->Select('w.UserID', '', 'WatchUserID')
          ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
@@ -74,35 +70,35 @@ class ParticipatedPlugin extends Gdn_Plugin {
          ->OrderBy('d.DateLastComment', 'desc')
          ->Limit($Limit, $Offset)
          ->Get();
-         
+
       $Sender->AddDiscussionColumns($Data);
-      
+
       return $Data;
    }
-   
+
    /**
     * Gets number of discussions user has commented on.
     *
     * @return int
     */
    public function DiscussionModel_GetCountParticipated_Create($Sender) {
-      
+
       $UserID = GetValue(0, $Sender->EventArguments);
-      
+
       if (is_null($UserID)) {
          if (!Gdn::Session()->IsValid()) throw new Exception(T("Could not get participated discussions for non logged-in user."));
          $UserID = Gdn::Session()->UserID;
       }
-      
+
       $Count = Gdn::SQL()->Select('c.DiscussionID','DISTINCT','NumDiscussions')
          ->From('Comment c')
          ->Where('c.InsertUserID', $UserID)
          ->GroupBy('c.DiscussionID')
          ->Get();
-      
+
       return ($Count instanceof Gdn_Dataset) ? $Count->NumRows() : FALSE;
    }
-      
+
    /**
     * Add navigation tab (DEPRECATED).
     */
@@ -119,7 +115,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
    public function DraftsController_AfterDiscussionTabs_Handler($Sender) {
       $this->AddParticipatedTab($Sender);
    }
-   
+
    /**
     * New navigation menu item.
     *
@@ -132,26 +128,23 @@ class ParticipatedPlugin extends Gdn_Plugin {
          $CssClass .= ' Active';
       echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpParticipated').T('Participated'), '/discussions/participated').'</li>';
    }
-   
+
    /**
     * Create paginated list of discussions user has participated in.
     */
    public function DiscussionsController_Participated_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.SignIn.Allow');
       Gdn_Theme::Section('DiscussionList');
-      
+
       $Page = GetValue(0, $Args);
       $Limit = GetValue(1, $Args);
 
       // Set criteria & get discussions data
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $DiscussionModel = new DiscussionModel();
-      
+
       $Sender->DiscussionData = $DiscussionModel->GetParticipated(Gdn::Session()->UserID, $Offset, $Limit);
       $Sender->SetData('Discussions', $Sender->DiscussionData);
-
-      $CountDiscussions = $DiscussionModel->GetCountParticipated(Gdn::Session()->UserID);
-      $Sender->SetData('CountDiscussions', $CountDiscussions);
 
       //Set view
       $Sender->View = 'index';
@@ -161,18 +154,19 @@ class ParticipatedPlugin extends Gdn_Plugin {
 
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
-      $Sender->EventArguments['PagerType'] = 'MorePager';
+      $Sender->EventArguments['PagerType'] = 'Pager';
       $Sender->FireEvent('BeforeBuildParticipatedPager');
       $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $Sender);
       $Sender->Pager->ClientID = 'Pager';
       $Sender->Pager->Configure(
          $Offset,
          $Limit,
-         $CountDiscussions,
-         'discussions/participated/%1$s'
+         FALSE,
+         'discussions/participated/{Page}'
       );
+      $Sender->SetData('CountDiscussions', false); // force prev/next pager
       $Sender->FireEvent('AfterBuildParticipatedPager');
-      
+
       // Deliver JSON data if necessary
       if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL) {
          $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
@@ -183,7 +177,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
       $Sender->SetData('_PagerUrl', 'discussions/participated/{Page}');
       $Sender->SetData('_Page', $Page);
       $Sender->SetData('_Limit', $Limit);
-      
+
       // Add modules
       $Sender->AddModule('NewDiscussionModule');
       $Sender->AddModule('DiscussionFilterModule');
@@ -194,7 +188,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
       $Sender->SetData('Breadcrumbs', array(array('Name' => T('Participated Discussions'), 'Url' => '/discussions/participated')));
       $Sender->Render();
    }
-   
+
    public function Setup() {
       // Nothing to do here!
    }
