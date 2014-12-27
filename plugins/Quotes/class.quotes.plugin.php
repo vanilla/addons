@@ -307,9 +307,9 @@ BLOCKQUOTE;
             if (in_array($NewFormat, array('Html', 'Wysiwyg')))
                $NewBody = Gdn_Format::To($NewBody, $QuoteFormat);
             elseif ($QuoteFormat == 'Html' && $NewFormat == 'BBCode')
-               $NewBody = Gdn_Format::Text($NewBody);
+               $NewBody = Gdn_Format::Text($NewBody, false);
             elseif ($QuoteFormat == 'Text' && $NewFormat == 'BBCode')
-               $NewBody = Gdn_Format::Text($NewBody);
+               $NewBody = Gdn_Format::Text($NewBody, false);
             else
                $NewBody = Gdn_Format::PlainText($NewBody, $QuoteFormat);
 
