@@ -3,7 +3,7 @@
 $PluginInfo['AuthorSelector'] = array(
    'Name' => 'Author Selector',
    'Description' => "Allows administrators to change the author of a discussion.",
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'MobileFriendly' => TRUE,
    'Author' => "Matt Lincoln Russell",
@@ -20,7 +20,7 @@ class AuthorSelectorPlugin extends Gdn_Plugin {
     */
    public function Base_DiscussionOptions_Handler($Sender, $Args) {
       $Discussion = $Args['Discussion'];
-      if (CheckPermission('Garden.Settings.Manage')) {
+      if (Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
          $Label = T('Change Author');
          $Url = "/discussion/author?discussionid={$Discussion->DiscussionID}";
          // Deal with inconsistencies in how options are passed
@@ -41,12 +41,13 @@ class AuthorSelectorPlugin extends Gdn_Plugin {
     * Handle discussion option menu Change Author action.
     */
    public function DiscussionController_Author_Create($Sender, $Args) {
-      $Sender->Permission('Garden.Settings.Manage');
-
       $DiscussionID = $Sender->Request->Get('discussionid');
       $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
       if (!$Discussion)
          throw NotFoundException('Discussion');
+
+      // Check edit permission
+      $Sender->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
 
       if ($Sender->Form->AuthenticatedPostBack()) {
          // Change the author
