@@ -10,3 +10,8 @@
 .Discussion.ItemContent {
    padding-left: 48px;
 }
+
+body.rtl .Discussion.ItemContent {
+   padding-right: 48px;
+   padding-left: 0;
+}
