@@ -72,17 +72,17 @@ class PocketsPlugin extends Gdn_Plugin {
    }
 
    public function Base_BeforeRenderAsset_Handler($Sender) {
-      $AssetName = GetValueR('EventArguments.AssetName', $Sender);
+      $AssetName = valr('EventArguments.AssetName', $Sender);
       $this->ProcessPockets($Sender, $AssetName, Pocket::REPEAT_BEFORE);
    }
 
    public function Base_AfterRenderAsset_Handler($Sender) {
-      $AssetName = GetValueR('EventArguments.AssetName', $Sender);
+      $AssetName = valr('EventArguments.AssetName', $Sender);
       $this->ProcessPockets($Sender, $AssetName, Pocket::REPEAT_AFTER);
    }
 
    public function Base_BetweenRenderAsset_Handler($Sender) {
-      $AssetName = GetValueR('EventArguments.AssetName', $Sender);
+      $AssetName = valr('EventArguments.AssetName', $Sender);
       $this->ProcessPockets($Sender, $AssetName);
 
       //echo $this->TestHtml("RenderAsset: $AssetName");
@@ -115,20 +115,50 @@ class PocketsPlugin extends Gdn_Plugin {
       $Sender->AddSideMenu('settings/pockets');
       $Sender->AddJsFile('pockets.js', 'plugins/Pockets');
 
-      $Page = GetValue(0, $Args);
+      $Page = val(0, $Args);
       switch(strtolower($Page)) {
          case 'add':
             return $this->_Add($Sender);
             break;
          case 'edit':
-            return $this->_Edit($Sender, GetValue(1, $Args));
+            return $this->_Edit($Sender, val(1, $Args));
             break;
          case 'delete':
-            return $this->_Delete($Sender, GetValue(1, $Args));
+            return $this->_Delete($Sender, val(1, $Args));
             break;
          default:
             return $this->_Index($Sender, $Args);
       }
+   }
+
+   /**
+    * View a single pocket
+    *
+    * @param UtilityController $sender
+    * @param array $args
+    */
+   public function UtilityController_Pocket_Create($sender, $args = array()) {
+
+       // Get pocket ID from URL: /settings/pocket/<id>
+       $pocketID = val(0, $args, null);
+       if (!$pocketID) {
+           throw notFoundException('Pocket');
+       }
+
+       // Get pocket data
+       $pocketData = Gdn::sql()->getWhere('Pocket', array(
+           'PocketID' => $pocketID
+       ))->firstRow(DATASET_TYPE_ARRAY);
+       if (!$pocketData) {
+           throw NotFoundException('Pocket');
+       }
+
+       // Load and render pocket
+       $pocket = new Pocket();
+       $pocket->load($pocketData);
+       $pocket->render();
+
+       exit;
    }
 
    protected function _Index($Sender, $Args) {
@@ -157,7 +187,7 @@ class PocketsPlugin extends Gdn_Plugin {
       $Form = new Gdn_Form();
 
       // Save global options.
-      switch (GetValue(0, $Args)) {
+      switch (val(0, $Args)) {
          case 'showlocations':
             SaveToConfig('Plugins.Pockets.ShowLocations', TRUE);
             break;
@@ -240,8 +270,8 @@ class PocketsPlugin extends Gdn_Plugin {
             // Convert some of the pocket data into a format digestable by the form.
             list($RepeatType, $RepeatFrequency) = Pocket::ParseRepeat($Pocket['Repeat']);
             $Pocket['RepeatType'] = $RepeatType;
-            $Pocket['EveryFrequency'] = GetValue(0, $RepeatFrequency, 1);
-            $Pocket['EveryBegin'] = GetValue(1, $RepeatFrequency, 1);
+            $Pocket['EveryFrequency'] = val(0, $RepeatFrequency, 1);
+            $Pocket['EveryBegin'] = val(1, $RepeatFrequency, 1);
             $Pocket['Indexes'] = implode(',', $RepeatFrequency);
             $Sender->ConditionModule->Conditions(Gdn_Condition::FromString($Pocket['Condition']));
             $Form->SetData($Pocket);
@@ -297,14 +327,14 @@ class PocketsPlugin extends Gdn_Plugin {
    public function GetLocationsArray() {
       $Result = array();
       foreach ($this->Locations as $Key => $Value) {
-         $Result[$Key] = GetValue('Name', $Value, $Key);
+         $Result[$Key] = val('Name', $Value, $Key);
       }
       return $Result;
    }
 
    public function GetPockets($Name) {
       $this->_LoadState();
-      return GetValue($Name, $this->_PocketNames, array());
+      return val($Name, $this->_PocketNames, array());
    }
 
    protected function _LoadState($Force = FALSE) {
@@ -349,14 +379,14 @@ class PocketsPlugin extends Gdn_Plugin {
       $Data['Count'] = $Count;
       $Data['PageName'] = Pocket::PageName($Sender);
 
-      $LocationOptions = GetValue($Location, $this->Locations, array());
+      $LocationOptions = val($Location, $this->Locations, array());
 
       if ($this->TestMode && array_key_exists($Location, $this->Locations) && Gdn::Session()->CheckPermission('Plugins.Pockets.Manage')) {
-         $LocationName = GetValue("Name", $this->Locations, $Location);
+         $LocationName = val("Name", $this->Locations, $Location);
          echo
-            GetValueR('Wrap.0', $LocationOptions, ''),
+            valr('Wrap.0', $LocationOptions, ''),
             "<div class=\"TestPocket\"><h3>$LocationName ($Count)</h3></div>",
-            GetValueR('Wrap.1', $LocationOptions, '');
+            valr('Wrap.1', $LocationOptions, '');
 
          if ($Location == 'Foot' && strcasecmp($Count, 'after') == 0) {
             echo $this->TestData($Sender);
@@ -369,11 +399,11 @@ class PocketsPlugin extends Gdn_Plugin {
             /** @var Pocket $Pocket */
 
             if ($Pocket->CanRender($Data)) {
-               $Wrap = GetValue('Wrap', $LocationOptions, array());
+               $Wrap = val('Wrap', $LocationOptions, array());
 
-               echo GetValue(0, $Wrap, '');
+               echo val(0, $Wrap, '');
                $Pocket->Render($Data);
-               echo GetValue(1, $Wrap, '');
+               echo val(1, $Wrap, '');
             }
          }
       }
@@ -385,7 +415,7 @@ class PocketsPlugin extends Gdn_Plugin {
       $Inst = Gdn::PluginManager()->GetPluginInstance('PocketsPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
       $Pockets = $Inst->GetPockets($Name);
 
-      if (GetValue('random', $Data)) {
+      if (val('random', $Data)) {
          $Pockets = array(array_rand($Pockets));
       }
 
