@@ -10,10 +10,11 @@ $PluginInfo['AgeGate'] = array(
 
 );
 
-class AgeGatePlugin extends Gdn_Pluggable implements Gdn_IPlugin {
-
+class AgeGatePlugin extends Gdn_Plugin {
 
     /**
+     * Add AgeGate fields to registration form.
+     *
      * @param EntryController $sender Sending Controller.
      * @param array $args Arguments.
      */
@@ -22,6 +23,8 @@ class AgeGatePlugin extends Gdn_Pluggable implements Gdn_IPlugin {
     }
 
     /**
+     * Add AgeGate fields to registration form.
+     *
      * @param EntryController $sender Sending Controller.
      * @param array $args Arguments.
      */
@@ -52,6 +55,8 @@ class AgeGatePlugin extends Gdn_Pluggable implements Gdn_IPlugin {
     }
 
     /**
+     * Enforces AgeGate verification at registration submission.
+     *
      * @param EntryController $sender Sending Controller.
      * @param array $args Arguments.
      */
@@ -85,8 +90,9 @@ class AgeGatePlugin extends Gdn_Pluggable implements Gdn_IPlugin {
 
     }
 
-
     /**
+     * AgeGate settings page.
+     *
      * @param SettingsController $sender
      */
     public function SettingsController_AgeGate_Create($sender) {
@@ -95,7 +101,7 @@ class AgeGatePlugin extends Gdn_Pluggable implements Gdn_IPlugin {
         $sender->SetData('Title', T('Age Gate Settings'));
         $sender->AddSideMenu();
 
-        if ($sender->Form->IsPostBack() && $sender->Form->AuthenticatedPostBack()) {
+        if ($sender->Form->AuthenticatedPostBack()) {
             $minimumAge = $sender->Form->GetValue('MinimumAge');
 
             if (!is_numeric($minimumAge)) {

@@ -627,7 +627,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
       $Sender->Form->InputPrefix = FALSE;
 
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          if ($Sender->Form->GetFormValue('Yes')) {
             $Model = new Gdn_AuthenticationProviderModel();
             $Model->Delete(array('AuthenticationKey' => $client_id));
