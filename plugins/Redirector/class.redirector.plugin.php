@@ -19,7 +19,8 @@ $PluginInfo['Redirector'] = array(
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+   'AuthorUrl' => 'http://vanillaforums.com',
+   'MobileFriendly' => TRUE,
 );
 
 class RedirectorPlugin extends Gdn_Plugin {

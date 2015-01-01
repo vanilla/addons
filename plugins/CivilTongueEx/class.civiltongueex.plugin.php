@@ -4,7 +4,7 @@
 $PluginInfo['CivilTongueEx'] = array(
    'Name' => 'Civil Tongue Ex',
    'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
-   'Version' => '1.0.3',
+   'Version' => '1.0.5',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => "Todd Burry",
@@ -23,19 +23,19 @@ class CivilTonguePlugin extends Gdn_Plugin {
       parent::__construct();
       $this->Replacement = C('Plugins.CivilTongue.Replacement', '');
    }
-   
+
    /**
     * Add settings page to Dashboard sidebar menu.
     */
 	public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Forum', T('Censored Words'), 'plugin/tongue', 'Garden.Settings.Manage');
+      $Menu->AddLink('Forum', T('Censored Words'), 'plugin/tongue', 'Garden.Settings.Manage', array('class' => 'nav-bad-words'));
    }
-   
+
    public function Base_FilterContent_Handler($Sender, $Args) {
       if (!isset($Args['String']))
          return;
-      
+
       $Args['String'] = $this->Replace($Args['String']);
    }
 
@@ -46,21 +46,21 @@ class CivilTonguePlugin extends Gdn_Plugin {
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
 		$ConfigurationModel->SetField(array('Plugins.CivilTongue.Words', 'Plugins.CivilTongue.Replacement'));
 		$Sender->Form->SetModel($ConfigurationModel);
-		
-		if ($Sender->Form->AuthenticatedPostBack() === FALSE) { 
-			
-         $Sender->Form->SetData($ConfigurationModel->Data);    
+
+		if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+
+         $Sender->Form->SetData($ConfigurationModel->Data);
       } else {
          $Data = $Sender->Form->FormValues();
-			
+
          if ($Sender->Form->Save() !== FALSE)
             $Sender->StatusMessage = T("Your settings have been saved.");
       }
 
-		$Sender->AddSideMenu('plugin/tongue');		
+		$Sender->AddSideMenu('plugin/tongue');
 		$Sender->SetData('Title', T('Civil Tongue'));
 		$Sender->Render($this->GetView('index.php'));
-      
+
 	}
 
    public function ProfileController_Render_Before($Sender, $Args) {
@@ -69,7 +69,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
    /**
     * Clean up activities and activity comments.
-    * 
+    *
     * @param Controller $Sender
     * @param array $Args
     */
@@ -88,6 +88,22 @@ class CivilTonguePlugin extends Gdn_Plugin {
                   $Comment['Body'] = $this->Replace($Comment['Body']);
                }
             }
+
+            if (val('Headline', $Row)) {
+               $Row['Headline'] = $this->Replace($Row['Headline']);
+            }
+         }
+      }
+
+      // Reactions store their data in the Data key.
+      if (isset($Sender->Data['Data']) && is_array($Sender->Data['Data'])) {
+         $Data =& $Sender->Data['Data'];
+         foreach ($Data as &$Row) {
+            if (!is_array($Row) || !isset($Row['Body'])) {
+               continue;
+            }
+
+            SetValue('Body', $Row, $this->Replace(GetValue('Body', $Row)));
          }
       }
 
@@ -106,6 +122,23 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
          }
       }
+
+      $Comments = val('Comments', $Sender->Data);
+      if ($Comments) {
+         $Result =& $Comments->Result();
+         foreach ($Result as &$Row) {
+            $Value = $this->Replace(val('Story', $Row));
+            SetValue('Story', $Row, $Value);
+
+            $Value = $this->Replace(val('DiscussionName', $Row));
+            SetValue('DiscussionName', $Row, $Value);
+
+            $Value = $this->Replace(val('Body', $Row));
+            SetValue('Body', $Row, $Value);
+
+         }
+      }
+
    }
 
    /**
@@ -127,10 +160,49 @@ class CivilTonguePlugin extends Gdn_Plugin {
             }
          }
       }
+
+      // When category layout is table.
+      $Discussions = val('Discussions', $Sender->Data, false);
+      if ($Discussions) {
+         foreach ($Discussions as &$Discussion) {
+            $Discussion->Name = $this->Replace($Discussion->Name);
+            $Discussion->Body = $this->Replace($Discussion->Body);
+         }
+      }
+
+   }
+
+   /**
+    * Cleanup discussions if category layout is Mixed
+    * @param $Sender
+    * @param $Args
+    */
+   public function CategoriesController_Discussions_Render($Sender, $Args) {
+
+      foreach ($Sender->CategoryDiscussionData as $discussions) {
+         if (!$discussions instanceof Gdn_DataSet) {
+            continue;
+         }
+         $r = $discussions->Result();
+         foreach ($r as &$row) {
+            SetValue('Name', $row, $this->Replace(GetValue('Name', $row)));
+         }
+      }
+   }
+
+   public function DiscussionsController_Render_Before($Sender, $Args) {
+      $Discussions = val('Discussions', $Sender->Data);
+      foreach ($Discussions as &$Discussion) {
+         $Discussion->Name = $this->Replace($Discussion->Name);
+         $Discussion->Body = $this->Replace($Discussion->Body);
+      }
    }
 
    /**
     * Censor words in discussions / comments.
+    *
+    * @param DiscussionController $Sender Sending Controller.
+    * @param array $Args Sending arguments.
     */
    public function DiscussionController_Render_Before($Sender, $Args) {
       // Process OP
@@ -141,19 +213,21 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $Discussion->Body = $this->Replace($Discussion->Body);
          }
       }
-      
       // Get comments (2.1+)
       $Comments = $Sender->Data('Comments');
-      
+
       // Backwards compatibility to 2.0.18
-      if (isset($Sender->CommentData)) 
+      if (isset($Sender->CommentData))
          $Comments = $Sender->CommentData->Result();
-      
+
       // Process comments
       if ($Comments) {
          foreach ($Comments as $Comment) {
             $Comment->Body = $this->Replace($Comment->Body);
          }
+      }
+      if (val('Title', $Sender->Data)) {
+         $Sender->Data['Title'] = $this->Replace($Sender->Data['Title']);
       }
    }
 
@@ -171,16 +245,6 @@ class CivilTonguePlugin extends Gdn_Plugin {
       }
    }
 
-   public function Base_BeforeDiscussionName_Handler($Sender, $Args) {
-      $Discussion = GetValue('Discussion', $Args);
-      if ($Discussion) {
-         $Discussion->Name = $this->Replace($Discussion->Name);
-         if (isset($Discussion->Body)) {
-            $Discussion->Body = $this->Replace($Discussion->Body);
-         }
-      }
-   }
-
    /**
     * Clean up the search results.
     * @param RootController $Sender
@@ -194,19 +258,19 @@ class CivilTonguePlugin extends Gdn_Plugin {
          }
       }
    }
-   
+
    public function UtilityController_CivilPatterns_Create($Sender) {
       $Patterns = $this->GetPatterns();
 
       $Text = "What's a person to do? ass";
       $Result = array();
-      
+
       foreach ($Patterns as $Pattern) {
          $r = preg_replace($Pattern, $this->Replace, $Text);
          if ($r != $Text)
             $Result[] = $Pattern;
       }
-      
+
       $Sender->SetData('Matches', $Result);
       $Sender->SetData('Patterns', $Patterns);
       $Sender->Render('Blank', 'Utility');
@@ -218,7 +282,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
 //      $Result = preg_replace_callback($Patterns, function($m) { return $m[0][0].str_repeat('*', strlen($m[0]) - 1); }, $Text);
       return $Result;
    }
-	
+
 	public function GetPatterns() {
 		// Get config.
 		static $Patterns = NULL;
@@ -236,10 +300,58 @@ class CivilTonguePlugin extends Gdn_Plugin {
       }
 		return $Patterns;
 	}
-	
-	
+
+
    public function Setup() {
       // Set default configuration
 		SaveToConfig('Plugins.CivilTongue.Replacement', '****');
+   }
+
+   /**
+    * Cleanup Emails.
+    *
+    * @param Gdn_Email $Sender
+    */
+   public function Gdn_Email_BeforeSendMail_Handler($Sender) {
+      $Sender->PhpMailer->Subject = $this->Replace($Sender->PhpMailer->Subject);
+      $Sender->PhpMailer->Body = $this->Replace($Sender->PhpMailer->Body);
+      $Sender->PhpMailer->AltBody = $this->Replace($Sender->PhpMailer->AltBody);
+   }
+
+   /**
+    * Cleanup Inform messages.
+    *
+    * @param $Sender
+    * @param $Args
+    */
+   public function NotificationsController_InformNotifications_Handler($Sender, &$Args) {
+      $Activities = val('Activities', $Args);
+      foreach ($Activities as $Key => &$Activity) {
+         if (val('Headline', $Activity)) {
+            $Activity['Headline'] = $this->Replace($Activity['Headline']);
+            $Args['Activities'][$Key]['Headline'] = $this->Replace($Args['Activities'][$Key]['Headline']);
+         }
+      }
+   }
+
+   /**
+    * Cleanup poll and poll options.
+    *
+    * @param PollModule $Sender Sending Controller.
+    * @param array $Args Sending arguments.
+    */
+   public function PollModule_AfterLoadPoll_Handler($Sender, &$Args) {
+      if (empty($Args['PollOptions']) || !is_array($Args['PollOptions'])) {
+         return;
+      }
+      if (empty($Args['Poll']) || !is_object($Args['Poll'])) {
+         return;
+      }
+      $Args['Poll']->Name = $this->Replace($Args['Poll']->Name);
+
+      foreach ($Args['PollOptions'] as &$Option) {
+         $Option['Body'] = $this->Replace($Option['Body']);
+      }
+      $Args['Poll']->Name = $this->Replace($Args['Poll']->Name);
    }
 }

@@ -11,6 +11,7 @@
  *  1.6.1   Overhaul
  *  1.6.4   Moved button to reactions area & changed js accordingly.
  *  1.6.8   Textarea target will now automatically resize to fit text body.
+ *  1.6.9   Security fix.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -21,7 +22,7 @@
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.6.8',
+    'Version' => '1.6.9',
     'MobileFriendly' => TRUE,
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RequiredTheme' => FALSE,
@@ -90,16 +91,16 @@ class QuotesPlugin extends Gdn_Plugin {
       $Sender->Form->SetValue('QuoteFolding', $QuoteFolding);
 
       $Sender->SetData('QuoteFoldingOptions', array(
-          'None' => t("Don't ever fold quotes"),
-          '1' => t('One level deep'),
-          '2' => t('Two levels deep'),
-          '3' => t('Three levels deep'),
-          '4' => t('Four levels deep'),
-          '5' => t('Five levels deep')
+          'None' => t("Don't fold quotes"),
+          '1' => Plural(1, '%s level deep', '%s levels deep'),
+          '2' => Plural(2, '%s level deep', '%s levels deep'),
+          '3' => Plural(3, '%s level deep', '%s levels deep'),
+          '4' => Plural(4, '%s level deep', '%s levels deep'),
+          '5' => Plural(5, '%s level deep', '%s levels deep')
       ));
 
-      // If seeing the form for the first time...
-      if ($Sender->Form->IsPostBack()) {
+      // Form submission handling.
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $NewFoldingLevel = $Sender->Form->GetValue('QuoteFolding', '1');
          if ($NewFoldingLevel != $QuoteFolding) {
             Gdn::UserModel()->SavePreference($UserID, 'Quotes.Folding', $NewFoldingLevel);
@@ -225,7 +226,7 @@ class QuotesPlugin extends Gdn_Plugin {
             $Sender->EventArguments['Object']->Body = preg_replace_callback("#(\[quote(\s+author)?=[\"']?(.*?)(\s+link.*?)?(;[\d]+)?[\"']?\])#usi", array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
 
             // BBCode quotes without authors
-            $Sender->EventArguments['Object']->Body = str_ireplace('[quote]', '<blockquote class="UserQuote"><div class="QuoteText"><p>', $Sender->EventArguments['Object']->Body);
+            $Sender->EventArguments['Object']->Body = str_ireplace('[quote]', '<blockquote class="Quote UserQuote"><div class="QuoteText"><p>', $Sender->EventArguments['Object']->Body);
 
             // End of BBCode quotes
             $Sender->EventArguments['Object']->Body = str_ireplace('[/quote]', '</p></div></blockquote>', $Sender->EventArguments['Object']->Body);
@@ -306,14 +307,19 @@ BLOCKQUOTE;
             if (in_array($NewFormat, array('Html', 'Wysiwyg')))
                $NewBody = Gdn_Format::To($NewBody, $QuoteFormat);
             elseif ($QuoteFormat == 'Html' && $NewFormat == 'BBCode')
-               $NewBody = Gdn_Format::Text($NewBody);
+               $NewBody = Gdn_Format::Text($NewBody, false);
             elseif ($QuoteFormat == 'Text' && $NewFormat == 'BBCode')
-               $NewBody = Gdn_Format::Text($NewBody);
+               $NewBody = Gdn_Format::Text($NewBody, false);
             else
                $NewBody = Gdn_Format::PlainText($NewBody, $QuoteFormat);
 
-            if (!in_array($NewFormat, array('Html', 'Wysiwyg')))
-               Gdn::Controller()->InformMessage(sprintf(T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'), $QuoteFormat, $NewFormat));
+            if (!in_array($NewFormat, array('Html', 'Wysiwyg'))) {
+               Gdn::Controller()->InformMessage(sprintf(
+                  T('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'),
+                  htmlspecialchars($QuoteFormat),
+                  htmlspecialchars($NewFormat)
+               ));
+            }
          }
          $Data->Body = $NewBody;
 

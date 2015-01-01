@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.2.1',
+   'Version' => '1.2.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -390,6 +390,12 @@ class QnAPlugin extends Gdn_Plugin {
       }
    }
 
+   /**
+    * Modify flow of discussion by pinning accepted answers.
+    *
+    * @param $Sender
+    * @param $Args
+    */
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender, $Args) {
       if ($Sender->Data('Discussion.QnA'))
          $Sender->CssClass .= ' Question';
@@ -410,12 +416,15 @@ class QnAPlugin extends Gdn_Plugin {
       $Sender->SetData('Answers', $Answers);
 
       // Remove the accepted answers from the comments.
-      if (isset($Sender->Data['Comments'])) {
-         $Comments = $Sender->Data['Comments']->Result();
-         $Comments = array_filter($Comments, function($Row) {
-            return strcasecmp(GetValue('QnA', $Row), 'accepted');
-         });
-         $Sender->Data['Comments'] = new Gdn_DataSet(array_values($Comments));
+      // Allow this to be skipped via config.
+      if (C('QnA.AcceptedAnswers.Filter', TRUE)) {
+         if (isset($Sender->Data['Comments'])) {
+            $Comments = $Sender->Data['Comments']->Result();
+            $Comments = array_filter($Comments, function($Row) {
+               return strcasecmp(GetValue('QnA', $Row), 'accepted');
+            });
+            $Sender->Data['Comments'] = new Gdn_DataSet(array_values($Comments));
+         }
       }
    }
 
@@ -594,14 +603,19 @@ class QnAPlugin extends Gdn_Plugin {
 
          // Record the activity.
          if ($QnA == 'Accepted') {
-            AddActivity(
-               Gdn::Session()->UserID,
-               'AnswerAccepted',
-               Anchor(Gdn_Format::Text($Discussion['Name']), "/discussion/{$Discussion['DiscussionID']}/".Gdn_Format::Url($Discussion['Name'])),
-               $Comment['InsertUserID'],
-               "/discussion/comment/{$Comment['CommentID']}/#Comment_{$Comment['CommentID']}",
-               TRUE
+            $Activity = array(
+               'ActivityType' => 'AnswerAccepted',
+               'NotifyUserID' => $Comment['InsertUserID'],
+               'HeadlineFormat' => '{ActivityUserID,You} accepted {NotifyUserID,your} answer.',
+               'RecordType' => 'Comment',
+               'RecordID' => $Comment['CommentID'],
+               'Route' => CommentUrl($Comment, '/'),
+               'Emailed' => ActivityModel::SENT_PENDING,
+               'Notified' => ActivityModel::SENT_PENDING,
             );
+
+            $ActivityModel = new ActivityModel();
+            $ActivityModel->Save($Activity);
          }
       }
       Redirect("/discussion/comment/{$Comment['CommentID']}#Comment_{$Comment['CommentID']}");
@@ -660,7 +674,7 @@ class QnAPlugin extends Gdn_Plugin {
 
       $Sender->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', GetValue('PermissionCategoryID', $Discussion));
 
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $QnA = $Sender->Form->GetFormValue('QnA');
          if (!$QnA)
             $QnA = NULL;

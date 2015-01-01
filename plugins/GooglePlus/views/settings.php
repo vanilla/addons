@@ -9,6 +9,9 @@
       ?>
    </div>
 <h1><?php echo $this->Data('Title'); ?></h1>
+<div class="Info">
+   <?php echo Anchor(T('How to set up Google+ Social Connect.'), 'http://docs.vanillaforums.com/addons/googleplus/', array('target' => '_blank')); ?>
+</div>
 <?php
 $Cf = $this->ConfigurationModule;
 
