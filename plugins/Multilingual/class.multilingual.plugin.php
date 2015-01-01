@@ -59,7 +59,7 @@ class MultilingualPlugin extends Gdn_Plugin {
       if ($Sender->MasterView == 'admin' || !CheckPermission('Garden.SignIn.Allow'))
          return;
 
-      $Sender->AddModule('LocaleChooser');
+      $Sender->AddModule('LocaleChooserModule');
       
       // Add a simple style
       $Sender->AddAsset('Head', '<style>.LocaleOption { padding-left: 10px; } .LocaleOptions { padding: 10px; } .Dashboard .LocaleOptions { display: none; }</style>');
