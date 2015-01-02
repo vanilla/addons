@@ -23,7 +23,7 @@
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.5.6',
+   'Version' => '1.6.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -267,7 +267,7 @@ class SignaturesPlugin extends Gdn_Plugin {
    public function CheckNumberOfImages($Values, &$Sender) {
       if (C('Plugins.Signatures.MaxNumberImages') && C('Plugins.Signatures.MaxNumberImages') !== 'Unlimited') {
          $max = C('Plugins.Signatures.MaxNumberImages');
-         $numMatches = preg_match_all('/(<img|\[img.*\]|\!\[.*\])/i', $Values['Plugin.Signatures.Sig']);
+         $numMatches = preg_match_all('/(<img|\[img((?!\]).)*|\!\[.*\])/i', $Values['Plugin.Signatures.Sig']);
          if (C('Plugins.Signatures.MaxNumberImages') === 'None' && $numMatches > 0) {
             $Sender->Form->AddError('Images not allowed');
          }
