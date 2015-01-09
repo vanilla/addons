@@ -23,7 +23,7 @@
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.6.1',
+   'Version' => '1.5.7',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
