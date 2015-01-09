@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
-    // Enable multicomplete on selected inputs
-    $(document).on('click', '.MultiComplete', function() {
+
+    $.fn.userTokenInput = function() {
         /// Author tag token input.
         var $author = $(this);
 
@@ -25,5 +25,8 @@ jQuery(document).ready(function($) {
             animateDropdown: false,
             tokenLimit: 1
         });
-    });
+    };
+
+    // Enable multicomplete on selected inputs
+    $('.MultiComplete').userTokenInput();
 });
