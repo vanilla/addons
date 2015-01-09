@@ -381,7 +381,7 @@ class JsConnectPlugin extends Gdn_Plugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Users', T('Users'));
-      $Menu->AddLink('Users', 'jsConnect', 'settings/jsconnect', 'Garden.Settings.Manage');
+      $Menu->AddLink('Users', 'jsConnect', 'settings/jsconnect', 'Garden.Settings.Manage', array('class' => 'nav-jsconnect'));
    }
 
    public function Base_Render_Before($Sender, $Args) {
@@ -627,7 +627,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
       $Sender->Form->InputPrefix = FALSE;
 
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          if ($Sender->Form->GetFormValue('Yes')) {
             $Model = new Gdn_AuthenticationProviderModel();
             $Model->Delete(array('AuthenticationKey' => $client_id));

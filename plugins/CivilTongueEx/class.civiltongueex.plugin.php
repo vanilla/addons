@@ -29,7 +29,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
     */
 	public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Forum', T('Censored Words'), 'plugin/tongue', 'Garden.Settings.Manage');
+      $Menu->AddLink('Forum', T('Censored Words'), 'plugin/tongue', 'Garden.Settings.Manage', array('class' => 'nav-bad-words'));
    }
 
    public function Base_FilterContent_Handler($Sender, $Args) {

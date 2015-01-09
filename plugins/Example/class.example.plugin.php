@@ -1,17 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+/**
+ * An example plugin.
+ *
+ * @copyright 2008-2014 Vanilla Forums, Inc.
+ * @license GNU GPLv2
+ */
 
 // Define the plugin:
 $PluginInfo['Example'] = array(
    'Description' => 'Provides an example Development Pattern for Vanilla 2 plugins by demonstrating how to insert discussion body excerpts into the discussions list.',
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -23,6 +21,12 @@ $PluginInfo['Example'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
+/**
+ * Class ExamplePlugin
+ *
+ * @see http://docs.vanillaforums.com/developers/plugins
+ * @see http://docs.vanillaforums.com/developers/plugins/quickstart
+ */
 class ExamplePlugin extends Gdn_Plugin {
 
    /**
@@ -37,15 +41,13 @@ class ExamplePlugin extends Gdn_Plugin {
    }
    
    /**
-    * Base_Render_Before Event Hook
+    * StyleCss Event Hook
     *
-    * This is a common hook that fires for all controllers (Base), on the Render method (Render), just 
-    * before execution of that method (Before). It is a good place to put UI stuff like CSS and Javascript 
-    * inclusions. Note that all the Controller logic has already been run at this point.
+    * This is a good place to put UI stuff like CSS and Javascript inclusions.
     *
     * @param $Sender Sending controller instance
     */
-   public function Base_Render_Before($Sender) {
+   public function AssetModel_StyleCss_Handler($Sender) {
       $Sender->AddCssFile('example.css', 'plugins/Example');
       $Sender->AddJsFile('example.js', 'plugins/Example');
    }
@@ -196,7 +198,7 @@ class ExamplePlugin extends Gdn_Plugin {
     *
     * This method is fired only once, immediately after the plugin has been enabled in the /plugins/ screen, 
     * and is a great place to perform one-time setup tasks, such as database structure changes, 
-    * addition/modification ofconfig file settings, filesystem changes, etc.
+    * addition/modification of config file settings, filesystem changes, etc.
     */
    public function Setup() {
    
@@ -204,6 +206,15 @@ class ExamplePlugin extends Gdn_Plugin {
       SaveToConfig('Plugin.Example.TrimSize', 100);
       SaveToConfig('Plugin.Example.RenderCondition', "all");
 
+      // Trigger database changes
+      $this->Structure();
+   }
+
+   /**
+    * This is a special method name that will automatically trigger when a forum owner runs /utility/update.
+    * It must be manually triggered if you want it to run on Setup().
+    */
+   public function Structure() {
       /*
       // Create table GDN_Example, if it doesn't already exist
       Gdn::Structure()
@@ -229,6 +240,9 @@ class ExamplePlugin extends Gdn_Plugin {
    public function OnDisable() {
       RemoveFromConfig('Plugin.Example.TrimSize');
       RemoveFromConfig('Plugin.Example.RenderCondition');
+
+      // Never delete from the database OnDisable.
+      // Usually, you want re-enabling a plugin to be as if it was never off.
    }
    
 }

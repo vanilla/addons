@@ -99,8 +99,8 @@ class QuotesPlugin extends Gdn_Plugin {
           '5' => Plural(5, '%s level deep', '%s levels deep')
       ));
 
-      // If seeing the form for the first time...
-      if ($Sender->Form->IsPostBack()) {
+      // Form submission handling.
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $NewFoldingLevel = $Sender->Form->GetValue('QuoteFolding', '1');
          if ($NewFoldingLevel != $QuoteFolding) {
             Gdn::UserModel()->SavePreference($UserID, 'Quotes.Folding', $NewFoldingLevel);
@@ -307,9 +307,9 @@ BLOCKQUOTE;
             if (in_array($NewFormat, array('Html', 'Wysiwyg')))
                $NewBody = Gdn_Format::To($NewBody, $QuoteFormat);
             elseif ($QuoteFormat == 'Html' && $NewFormat == 'BBCode')
-               $NewBody = Gdn_Format::Text($NewBody);
+               $NewBody = Gdn_Format::Text($NewBody, false);
             elseif ($QuoteFormat == 'Text' && $NewFormat == 'BBCode')
-               $NewBody = Gdn_Format::Text($NewBody);
+               $NewBody = Gdn_Format::Text($NewBody, false);
             else
                $NewBody = Gdn_Format::PlainText($NewBody, $QuoteFormat);
 
