@@ -9,7 +9,6 @@ $PluginInfo['SteamConnect'] = array(
     'Author'      => "Becky Van Bussel",
     'AuthorEmail' => 'becky@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
-    'License'     => 'Proprietary',
     'SettingsUrl' => '/settings/steamconnect',
     'SettingsPermission' => 'Garden.Settings.Manage'
 );
@@ -19,7 +18,6 @@ $PluginInfo['SteamConnect'] = array(
  *
  * @author    Becky Van Bussel <becky@vanillaforums.com>
  * @copyright 2014 (c) Vanilla Forums Inc
- * @license   Proprietary
  * @package   Steam Connect
  * @since     1.0.0
  */

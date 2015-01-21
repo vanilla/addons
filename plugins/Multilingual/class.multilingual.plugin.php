@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
  * Multilingual Plugin
- * 
+ *
  * @author Lincoln Russell <lincoln@vanillaforums.com>
  * @copyright 2011 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -29,7 +29,7 @@ $PluginInfo['Multilingual'] = array(
  * Allows multiple locales to work in Vanilla.
  *
  * You can trigger an alternate locale by adding 'locale' in the query string,
- * setting var vanilla_embed_locale in an embedded forum, or selecting one of the 
+ * setting var vanilla_embed_locale in an embedded forum, or selecting one of the
  * language links added to the footer. User-selected locale takes precedence.
  * The selected locale is stored in the session. If it is user-selected AND the
  * user is logged in, it is stored in UserMeta.
@@ -39,7 +39,7 @@ $PluginInfo['Multilingual'] = array(
  */
 class MultilingualPlugin extends Gdn_Plugin {
    /**
-    * Set user's preferred locale. 
+    * Set user's preferred locale.
     *
     * Moved event from AppStart to AfterAnalyzeRequest to allow Embed to set P3P header first.
     */
@@ -60,19 +60,19 @@ class MultilingualPlugin extends Gdn_Plugin {
          return;
 
       $Sender->AddModule('LocaleChooserModule');
-      
+
       // Add a simple style
       $Sender->AddAsset('Head', '<style>.LocaleOption { padding-left: 10px; } .LocaleOptions { padding: 10px; } .Dashboard .LocaleOptions { display: none; }</style>');
    }
-   
+
    /**
     * Get user preference or queried locale.
     */
    protected function GetAlternateLocale() {
       $Locale = FALSE;
-      
+
       // User preference
-      if (!$Locale) {
+      if (!$Locale && Gdn::Session()->UserID) {
          $Locale = $this->GetUserMeta(Gdn::Session()->UserID, 'Locale', FALSE);
          $Locale = GetValue('Plugin.Multilingual.Locale', $Locale, FALSE);
       }
@@ -86,19 +86,23 @@ class MultilingualPlugin extends Gdn_Plugin {
       if (!$Locale) {
          $Locale = Gdn::Session()->Stash('Locale', '', FALSE);
       }
-      
+
       return $Locale;
    }
-   
+
    /**
     * Allow user to set their preferred locale via link-click.
     */
    public function ProfileController_SetLocale_Create($Sender, $Args = array()) {
+      if (!Gdn::Session()->UserID) {
+         throw PermissionException('Garden.SignIn.Allow');
+      }
+
       // Check intent
       if (isset($Args[1]))
          Gdn::Session()->ValidateTransientKey($Args[1]);
       else Redirect($_SERVER['HTTP_REFERER']);
-      
+
       // If we got a valid locale, save their preference
       if (isset($Args[0])) {
          $Locale = $this->ValidateLocale($Args[0]);
@@ -108,14 +112,14 @@ class MultilingualPlugin extends Gdn_Plugin {
                $this->SetUserMeta(Gdn::Session()->UserID, 'Locale', $Locale);
          }
       }
-      
+
       // Back from whence we came
       Redirect($_SERVER['HTTP_REFERER']);
    }
-   
+
    /**
     * Confirm selected locale is valid and available.
-    * 
+    *
     * @param string $Locale Locale code.
     * @return $Locale or FALSE.
     */

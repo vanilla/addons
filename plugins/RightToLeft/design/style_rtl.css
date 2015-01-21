@@ -60,7 +60,8 @@ caption, th, td, .Flyout, .Dropdown {
   right: inherit; }
 
 .Pager {
-  direction: ltr; }
+  direction: ltr;
+  float: left; }
 
 #ConversationForm label {
   text-align: inherit; }
