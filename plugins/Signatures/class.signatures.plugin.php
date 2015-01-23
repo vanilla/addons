@@ -23,7 +23,7 @@
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-   'Version' => '1.5.6',
+   'Version' => '1.5.7',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -168,14 +168,8 @@ class SignaturesPlugin extends Gdn_Plugin {
 
       $this->SetSignatureRules($Sender);
 
-      // If seeing the form for the first time...
-      if ($Sender->Form->IsPostBack() === FALSE) {
-         $Data['Body'] = GetValue('Plugin.Signatures.Sig', $Data);
-         $Data['Format'] = GetValue('Plugin.Signatures.Format', $Data);
-
-         // Apply the config settings to the form.
-         $Sender->Form->SetData($Data);
-      } else {
+      // Form submission handling.
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $Values = $Sender->Form->FormValues();
 
          if ($canEditSignatures) {
@@ -213,6 +207,14 @@ class SignaturesPlugin extends Gdn_Plugin {
                $Sender->InformMessage(T("Your changes have been saved."));
             }
          }
+      }
+      else {
+         // Load form data.
+         $Data['Body'] = GetValue('Plugin.Signatures.Sig', $Data);
+         $Data['Format'] = GetValue('Plugin.Signatures.Format', $Data);
+
+         // Apply the config settings to the form.
+         $Sender->Form->SetData($Data);
       }
 
       $Sender->Render('signature', '', 'plugins/Signatures');
@@ -265,7 +267,8 @@ class SignaturesPlugin extends Gdn_Plugin {
    public function CheckNumberOfImages($Values, &$Sender) {
       if (C('Plugins.Signatures.MaxNumberImages') && C('Plugins.Signatures.MaxNumberImages') !== 'Unlimited') {
          $max = C('Plugins.Signatures.MaxNumberImages');
-         $numMatches = preg_match_all('/(<img|\[img.*\]|\!\[.*\])/i', $Values['Plugin.Signatures.Sig']);
+         $Sig = Gdn_Format::To(val('Plugin.Signatures.Sig', $Values), val('Plugin.Signatures.Format', $Values, C('Garden.InputFormatter')));
+         $numMatches = preg_match_all('/<img/i', $Sig);
          if (C('Plugins.Signatures.MaxNumberImages') === 'None' && $numMatches > 0) {
             $Sender->Form->AddError('Images not allowed');
          }

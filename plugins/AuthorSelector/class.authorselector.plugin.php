@@ -14,7 +14,7 @@ $PluginInfo['AuthorSelector'] = array(
 class AuthorSelectorPlugin extends Gdn_Plugin {
    /** None. */
    public function Setup() { }
-   
+
    /**
     * Allow admin to Change Author via discussion options.
     */
@@ -36,7 +36,7 @@ class AuthorSelectorPlugin extends Gdn_Plugin {
          }
       }
    }
-   
+
    /**
     * Handle discussion option menu Change Author action.
     */
@@ -68,8 +68,10 @@ class AuthorSelectorPlugin extends Gdn_Plugin {
                   Redirect(DiscussionUrl($Discussion));
                }
             }
+            else {
+               $Sender->Form->AddError('No user with that name was found.');
+            }
          }
-         $Sender->Form->AddError('No user with that name was found.');
       }
       else {
          // Form to change the author
