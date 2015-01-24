@@ -25,7 +25,7 @@
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'Images and files may be attached to discussions and comments.',
-   'Version' => '1.8.4',
+   'Version' => '1.8.5',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
@@ -58,10 +58,28 @@ class FileUploadPlugin extends Gdn_Plugin {
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
 
       if ($this->CanUpload) {
-         $PermissionCategory = CategoryModel::PermissionCategory(Gdn::Controller()->Data('Category'));
-         if (!GetValue('AllowFileUploads', $PermissionCategory, TRUE))
-            $this->CanUpload = FALSE;
+         if (method_exists('CategoryModel','PermissionCategory')) {
+            $PermissionCategory = CategoryModel::PermissionCategory(Gdn::Controller()->Data('Category'));
+         } else {
+            $PermissionCategory = $this->PermissionCategory(Gdn::Controller()->Data('Category'));
+         }
+            if (!GetValue('AllowFileUploads', $PermissionCategory, TRUE)) {
+               $this->CanUpload = FALSE;
+            }
       }
+   }
+
+
+  // use this PermissionCategory if it does not exist in Category Model
+  public static function PermissionCategory($Category) {
+      if (empty($Category)) {
+         return CategoryModel::Categories(-1);
+      }
+      if (!is_array($Category) && !is_object($Category)) {
+         $Category = CategoryModel::Categories($Category);
+      }
+
+      return CategoryModel::Categories(GetValue('PermissionCategoryID', $Category));
    }
 
    public function AssetModel_StyleCss_Handler($Sender) {
