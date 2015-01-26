@@ -2,7 +2,7 @@
 /**
  * Multilingual Plugin
  *
- * @author Matt Lincoln Russell <lincoln@vanillaforums.com>
+ * @author Lincoln Russell <lincoln@vanillaforums.com>
  * @copyright 2011 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Addons
@@ -11,10 +11,10 @@
 $PluginInfo['Multilingual'] = array(
    'Name' => 'Multilingual',
    'Description' => "Allows use of multiple languages. Users can select their preferred language via a link in the footer, and administrators may embed their forum in different languages in different places.",
-   'Version' => '1.1.1',
+   'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
-   'Author' => "Matt Lincoln Russell",
+   'Author' => "Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com'
 );
@@ -22,6 +22,7 @@ $PluginInfo['Multilingual'] = array(
 /* Changelog
    1.0 - Make MobileFriendly //Lincoln 2012-01-13
    1.1 - Move locale setting to later in startup for Embed //Lincoln 2012-02-22
+   1.2 - Create localechooser module //Lincoln 2014-08-13
 */
 
 /**
@@ -50,14 +51,6 @@ class MultilingualPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Build footer link to change locale.
-    */
-   public function BuildLocaleLink($Name, $UrlCode) {
-      $Url = 'profile/setlocale/'.$UrlCode.'/'.Gdn::Session()->TransientKey();
-      return Wrap(Anchor(ucwords($Name), $Url), 'span', array('class' => 'LocaleOption'));
-   }
-
-   /**
     * Show alternate locale options in Foot.
     */
    public function Base_Render_Before($Sender) {
@@ -66,27 +59,10 @@ class MultilingualPlugin extends Gdn_Plugin {
       if ($Sender->MasterView == 'admin' || !CheckPermission('Garden.SignIn.Allow'))
          return;
 
-      // Get locales
-      $LocaleModel = new LocaleModel();
-      $Options = $LocaleModel->EnabledLocalePacks();
-      $Locales = $LocaleModel->AvailableLocalePacks();
-
-      // Build & add links
-      $Links = T('Change language').': ';
-      foreach ($Options as $Slug => $Code) {
-         $LocaleInfo = GetValue($Slug, $Locales);
-         $LocaleName = str_replace(' Transifex', '' , GetValue('Name', $LocaleInfo)); // No 'Transifex' in names, pls.
-         $Links .= $this->BuildLocaleLink($LocaleName, $Code);
-      }
-
-      // Hackily add English option
-      $Links .= $this->BuildLocaleLink('English', 'en-CA');
-
-      $LocaleLinks = Wrap($Links, 'div', array('class' => 'LocaleOptions'));
-      $Sender->AddAsset('Foot', $LocaleLinks);
+      $Sender->AddModule('LocaleChooserModule');
 
       // Add a simple style
-      $Sender->AddAsset('Head', '<style>.LocaleOption { padding-left: 10px; } .Dashboard .LocaleOptions { display: none; }</style>');
+      $Sender->AddAsset('Head', '<style>.LocaleOption { padding-left: 10px; } .LocaleOptions { padding: 10px; } .Dashboard .LocaleOptions { display: none; }</style>');
    }
 
    /**
