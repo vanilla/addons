@@ -355,7 +355,7 @@ BQ;
                $QuoteBody = self::_StripMentions($QuoteBody);
 
                $Quote = '> ' . sprintf(T('%s said:'), '@' . $Data->InsertName) . "\n" .
-               '> ' . str_replace("\n", "\n> ", $QuoteBody);
+               '> ' . str_replace("\n", "\n> ", $QuoteBody)."\n";
 
                break;
             case 'Wysiwyg':
