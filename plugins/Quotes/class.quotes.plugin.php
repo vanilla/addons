@@ -22,7 +22,7 @@
 $PluginInfo['Quotes'] = array(
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.6.9',
+    'Version' => '1.6.10',
     'MobileFriendly' => TRUE,
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RequiredTheme' => FALSE,
@@ -355,7 +355,7 @@ BQ;
                $QuoteBody = self::_StripMentions($QuoteBody);
 
                $Quote = '> ' . sprintf(T('%s said:'), '@' . $Data->InsertName) . "\n" .
-               '> ' . str_replace("\n", "\n> ", $QuoteBody);
+               '> ' . str_replace("\n", "\n> ", $QuoteBody)."\n";
 
                break;
             case 'Wysiwyg':
