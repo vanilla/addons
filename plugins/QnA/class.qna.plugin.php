@@ -208,7 +208,7 @@ class QnAPlugin extends Gdn_Plugin {
       if (Gdn::Structure()->Table('ReactionType')->ColumnExists('Hidden')) {
 
          // AcceptAnswer
-         $Rm->DefineReactionType(array('UrlCode' => 'AcceptAnswer', 'Name' => 'Accept Answer', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Curation.Manage', 'Hidden' => 1,
+         $Rm->DefineReactionType(array('UrlCode' => 'AcceptAnswer', 'Name' => 'Accept Answer', 'Sort' => 0, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Curation.Manage', 'Hidden' => 1,
             'Description' => "When someone correctly answers a question, they are rewarded with this reaction."));
 
       }
