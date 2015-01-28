@@ -14,7 +14,7 @@ use DebugBar\StandardDebugBar;
 $PluginInfo['debugbar'] = array(
    'Name' => 'Debug Bar',
    'Description' => 'The debug bar shows debuggin information at the bottom of the page.',
-   'Version' => '1.0.0-alpha',
+   'Version' => '1.0',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE, // This is an array of plugin names/versions that this plugin requires
