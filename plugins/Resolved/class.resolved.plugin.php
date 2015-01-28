@@ -174,6 +174,7 @@ class ResolvedPlugin extends Gdn_Plugin {
          ->Select('count(DISTINCT d.DiscussionID)', '', 'NumUnresolved')
          ->From('Discussion d')
          ->Where('d.Resolved', 0)
+         ->Where('d.Type', null)
          ->Get()
          ->FirstRow()
          ->NumUnresolved;
