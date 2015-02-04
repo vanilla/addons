@@ -212,7 +212,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       else {
          // Load form data.
          $Data['Body'] = GetValue('Plugin.Signatures.Sig', $Data);
-         $Data['Format'] = GetValue('Plugin.Signatures.Format', $Data);
+         $Data['Format'] = GetValue('Plugin.Signatures.Format', $Data) ?: Gdn_Format::DefaultFormat();
 
          // Apply the config settings to the form.
          $Sender->Form->SetData($Data);
