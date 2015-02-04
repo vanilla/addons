@@ -108,10 +108,10 @@ class RedirectorPlugin extends Gdn_Plugin {
 
       // Grab the URI from the original request, see if it matches our special cases for the p parameter
       $RequestUri = Gdn::Request()->GetValueFrom('server', 'REQUEST_URI', FALSE);
+      // Grab the query_string value from the server, if available
+      $QueryString = Gdn::Request()->GetValueFrom('server', 'QUERY_STRING', FALSE);
+      Trace(array('REQUEST_URI' => $RequestUri, 'QUERY_STRING' => $QueryString), 'Server Variables');
       if ($RequestUri && preg_match('/(showpost.php|showthread.php|viewtopic.php)/i', $RequestUri)) {
-         // Grab the query_string value from the server, if available
-         $QueryString = Gdn::Request()->GetValueFrom('server', 'QUERY_STRING', FALSE);
-         Trace(array('RequestUri' => $RequestUri, 'QueryString' => $QueryString), 'Input');
          // Check for multiple values of p in our URL parameters
          if ($QueryString && preg_match_all('/(^|\?|\&)p\=(?P<val>[^&]+)/', $QueryString, $QueryParameters) > 1) {
             // Assume the first p is Vanilla's path
