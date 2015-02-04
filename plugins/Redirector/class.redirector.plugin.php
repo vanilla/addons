@@ -106,6 +106,21 @@ class RedirectorPlugin extends Gdn_Plugin {
       $Path = Gdn::Request()->Path();
       $Get = Gdn::Request()->Get();
 
+      // Grab the URI from the original request, see if it matches our special cases for the p parameter
+      $RequestUri = Gdn::Request()->GetValueFrom('server', 'REQUEST_URI', FALSE);
+      if ($RequestUri && preg_match('/(showpost.php|showthread.php|viewtopic.php)/i', $RequestUri)) {
+         // Grab the query_string value from the server, if available
+         $QueryString = Gdn::Request()->GetValueFrom('server', 'QUERY_STRING', FALSE);
+         Trace(array('RequestUri' => $RequestUri, 'QueryString' => $QueryString), 'Input');
+         // Check for multiple values of p in our URL parameters
+         if ($QueryString && preg_match_all('/(^|\?|\&)p\=(?P<val>[^&]+)/', $QueryString, $QueryParameters) > 1) {
+            // Assume the first p is Vanilla's path
+            $Path = trim($QueryParameters['val'][0], '/');
+            // The second p is used for our redirects
+            $Get['p'] = $QueryParameters['val'][1];
+         }
+      }
+
       Trace(array('Path' => $Path, 'Get' => $Get), 'Input');
 
       // Figure out the filename.
