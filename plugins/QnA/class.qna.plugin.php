@@ -867,15 +867,17 @@ class QnAPlugin extends Gdn_Plugin {
       }
 
       // Remove announcements that aren't questions...
-      $Sender->Data('Announcements')->Result();
-      $Announcements = array();
-      foreach ($Sender->Data('Announcements') as $i => $Row) {
-         if (GetValue('Type', $Row) == 'Question')
-            $Announcements[] = $Row;
+      if (is_a($Sender->Data('Announcements'), 'Gdn_DataSet')) {
+         $Sender->Data('Announcements')->Result();
+         $Announcements = array();
+         foreach ($Sender->Data('Announcements') as $i => $Row) {
+            if (GetValue('Type', $Row) == 'Question')
+               $Announcements[] = $Row;
+         }
+         Trace($Announcements);
+         $Sender->SetData('Announcements', $Announcements);
+         $Sender->AnnounceData = $Announcements;
       }
-      Trace($Announcements);
-      $Sender->SetData('Announcements', $Announcements);
-      $Sender->AnnounceData = $Announcements;
    }
 
     /**
