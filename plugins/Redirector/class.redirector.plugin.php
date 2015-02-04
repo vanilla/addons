@@ -2,10 +2,10 @@
 
 /**
  * Adds 301 redirects for Vanilla from common forum platforms.
- * 
+ *
  * Changes:
  *  1.0        Initial Release
- * 
+ *
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
@@ -98,16 +98,16 @@ class RedirectorPlugin extends Gdn_Plugin {
          'userID' => 'UserID'
       )
    );
-   
+
    /**
     * @param Gdn_Dispatcher $Sender
     */
    public function Gdn_Dispatcher_NotFound_Handler($Dispatcher, $Args) {
       $Path = Gdn::Request()->Path();
       $Get = Gdn::Request()->Get();
-      
+
       Trace(array('Path' => $Path, 'Get' => $Get), 'Input');
-      
+
       // Figure out the filename.
       $Parts = explode('/', $Path);
       $After = array();
@@ -118,7 +118,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             $Filename = $V;
             break;
          }
-         
+
          array_unshift($After, $V);
       }
       if ($Filename == 'index.php') {
@@ -145,8 +145,9 @@ class RedirectorPlugin extends Gdn_Plugin {
          $Get["_arg$i"] = $Arg;
          $i++;
       }
-      
+
       $Url = $this->FilenameRedirect($Filename, $Get);
+
       if ($Url) {
          if (Debug())
             Trace($Url, "Redirect found");
@@ -154,7 +155,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             Redirect($Url, 301);
       }
    }
-   
+
    public function FilenameRedirect($Filename, $Get) {
       Trace(array('Filename' => $Filename, 'Get' => $Get), 'Testing');
       $Filename = strtolower($Filename);
@@ -162,22 +163,22 @@ class RedirectorPlugin extends Gdn_Plugin {
 
       if (!isset(self::$Files[$Filename]))
          return FALSE;
-      
+
       $Row = self::$Files[$Filename];
-      
+
       if (is_callable($Row)) {
          // Use a callback to determine the translation.
          $Row = call_user_func($Row, $Get);
       }
-      
+
       // Translate all of the get parameters into new parameters.
       $Vars = array();
       foreach ($Get as $Key => $Value) {
          if (!isset($Row[$Key]))
             continue;
-         
+
          $Opts = (array)$Row[$Key];
-         
+
          if (isset($Opts['Filter'])) {
             // Call the filter function to change the value.
             $R = call_user_func($Opts['Filter'], $Value, $Opts[0]);
@@ -195,32 +196,42 @@ class RedirectorPlugin extends Gdn_Plugin {
                $Value = $R;
             }
          }
-         
+
          if ($Value !== NULL)
             $Vars[$Opts[0]] = $Value;
       }
-      
+
       Trace($Vars, 'Translated Arguments');
       // Now let's see what kind of record we have.
       // We'll check the various primary keys in order of importance.
       $Result = FALSE;
       if (isset($Vars['CommentID'])) {
          Trace("Looking up comment {$Vars['CommentID']}.");
-         
+
          $CommentModel = new CommentModel();
-         $Comment = $CommentModel->GetID($Vars['CommentID']);
+         // If a legacy slug is provided (assigned during a merge), attempt to lookup the comment using it
+         if (isset($Get['legacy']) && Gdn::Structure()->Table('Comment')->ColumnExists('ForeignID')) {
+            $Comment = $CommentModel->GetWhere(array('ForeignID' => $Get['legacy'] . $Vars['CommentID']))->FirstRow();
+         } else {
+            $Comment = $CommentModel->GetID($Vars['CommentID']);
+         }
          if ($Comment)
             $Result = CommentUrl($Comment, '//');
       } elseif (isset($Vars['DiscussionID'])) {
          Trace("Looking up discussion {$Vars['DiscussionID']}.");
-         
-         
+
+
          $DiscussionModel = new DiscussionModel();
          $DiscussionID = $Vars['DiscussionID'];
          $Discussion = FALSE;
-         
+
          if (is_numeric($DiscussionID)) {
-            $Discussion = $DiscussionModel->GetID($Vars['DiscussionID']);
+            // If a legacy slug is provided (assigned during a merge), attempt to lookup the discussion using it
+            if (isset($Get['legacy']) && Gdn::Structure()->Table('Discussion')->ColumnExists('ForeignID')) {
+               $Discussion = $DiscussionModel->GetWhere(array('ForeignID' => $Get['legacy'] . $DiscussionID))->FirstRow();
+            } else {
+               $Discussion = $DiscussionModel->GetID($Vars['DiscussionID']);
+            }
          } else {
             // This is a slug style discussion ID. Let's see if there is a UrlCode column in the discussion table.
             $DiscussionModel->DefineSchema();
@@ -228,12 +239,12 @@ class RedirectorPlugin extends Gdn_Plugin {
                $Discussion = $DiscussionModel->GetWhere(array('UrlCode' => $DiscussionID))->FirstRow();
             }
          }
-         
+
          if ($Discussion)
             $Result = DiscussionUrl($Discussion, self::PageNumber($Vars, 'Vanilla.Comments.PerPage'), '//');
       } elseif (isset($Vars['UserID'])) {
          Trace("Looking up user {$Vars['UserID']}.");
-         
+
          $User = Gdn::UserModel()->GetID($Vars['UserID']);
          if ($User)
             $Result = Url(UserUrl($User), '//');
@@ -244,15 +255,21 @@ class RedirectorPlugin extends Gdn_Plugin {
          }
       } elseif (isset($Vars['CategoryID'])) {
          Trace("Looking up category {$Vars['CategoryID']}.");
-         
-         $Category = CategoryModel::Categories($Vars['CategoryID']);
+
+         // If a legacy slug is provided (assigned during a merge), attempt to lookup the category ID based on it
+         if (isset($Get['legacy']) && Gdn::Structure()->Table('Category')->ColumnExists('ForeignID')) {
+            $CategoryModel = new CategoryModel();
+            $Category = $CategoryModel->GetWhere(array('ForeignID' => $Get['legacy'] . $Vars['CategoryID']))->FirstRow();
+         } else {
+            $Category = CategoryModel::Categories($Vars['CategoryID']);
+         }
          if ($Category)
             $Result = CategoryUrl($Category, self::PageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
       }
-      
+
       return $Result;
    }
-   
+
    public static function forum_Filter($Get) {
       if (GetValue('_arg2', $Get) == 'page') {
          // This is a punbb style forum.
@@ -273,22 +290,22 @@ class RedirectorPlugin extends Gdn_Plugin {
             );
       }
    }
-   
+
    public static function GetNumber($Value) {
       if (preg_match('`(\d+)`', $Value, $Matches))
          return $Matches[1];
       return NULL;
    }
-   
+
    public static function IPBPageNumber($Value) {
       if (preg_match('`page__st__(\d+)`i', $Value, $Matches))
          return array('Offset', $Matches[1]);
       return self::GetNumber($Value);
    }
-   
+
    /**
     * Return the page number from the given variables that may have an offset or a page.
-    * 
+    *
     * @param array $Vars The variables that should contain an Offset or Page key.
     * @param int|string $PageSize The pagesize or the config key of the pagesize.
     * @return int
@@ -304,13 +321,13 @@ class RedirectorPlugin extends Gdn_Plugin {
       }
       return 1;
    }
-   
+
    public static function RemoveID($Value) {
       if (preg_match('`^(\d+)`', $Value, $Matches))
          return $Matches[1];
       return NULL;
    }
-   
+
    public static function SmfAction($Value) {
       if (preg_match('`(\w+);(\w+)=(\d+)`', $Value, $M)) {
          switch (strtolower($M[1])) {
@@ -319,7 +336,7 @@ class RedirectorPlugin extends Gdn_Plugin {
          }
       }
    }
-   
+
    public static function SmfOffset($Value, $Key) {
       if (preg_match('`(\d+)\.(\d+)`', $Value, $M)) {
          return array($Key => $M[1], 'Offset' => $M[2]);
@@ -328,7 +345,7 @@ class RedirectorPlugin extends Gdn_Plugin {
          return array('CommentID' => $M[1]);
       }
    }
-   
+
    public static function topic_Filter($Get) {
       if (GetValue('_arg2', $Get) == 'page') {
          // This is a punbb style topic.
@@ -350,7 +367,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             );
       }
    }
-   
+
    public static function XenforoID($Value) {
       if (preg_match('`(\d+)$`', $Value, $Matches))
          return $Matches[1];
