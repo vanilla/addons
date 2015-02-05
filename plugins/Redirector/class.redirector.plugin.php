@@ -106,14 +106,16 @@ class RedirectorPlugin extends Gdn_Plugin {
       $Path = Gdn::Request()->Path();
       $Get = Gdn::Request()->Get();
 
-      // Grab the URI from the original request, see if it matches our special cases for the p parameter
-      $RequestUri = Gdn::Request()->GetValueFrom('server', 'REQUEST_URI', FALSE);
-      // Grab the query_string value from the server, if available
+      /**
+       * There may be two incoming p URL parameters.  If that is the case, we need to compensate for it.  This is done
+       * by manually parsing the server's QUERY_STRING variable, if available.
+       */
       $QueryString = Gdn::Request()->GetValueFrom('server', 'QUERY_STRING', FALSE);
-      Trace(array('REQUEST_URI' => $RequestUri, 'QUERY_STRING' => $QueryString), 'Server Variables');
-      if ($RequestUri && preg_match('/(showpost.php|showthread.php|viewtopic.php)/i', $RequestUri)) {
+      Trace(array('QUERY_STRING' => $QueryString), 'Server Variables');
+      if ($QueryString && preg_match('/(^|&)p\=(showpost\.php|showthread\.php|viewtopic\.php)/i', $QueryString)) {
          // Check for multiple values of p in our URL parameters
-         if ($QueryString && preg_match_all('/(^|\?|\&)p\=(?P<val>[^&]+)/', $QueryString, $QueryParameters) > 1) {
+         if ($QueryString && preg_match_all('/(^|\?|&)p\=(?P<val>[^&]+)/', $QueryString, $QueryParameters) > 1) {
+            Trace($QueryParameters['val'], 'p Values');
             // Assume the first p is Vanilla's path
             $Path = trim($QueryParameters['val'][0], '/');
             // The second p is used for our redirects
