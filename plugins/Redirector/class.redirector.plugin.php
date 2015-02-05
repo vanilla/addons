@@ -228,7 +228,7 @@ class RedirectorPlugin extends Gdn_Plugin {
          $CommentModel = new CommentModel();
          // If a legacy slug is provided (assigned during a merge), attempt to lookup the comment using it
          if (isset($Get['legacy']) && Gdn::Structure()->Table('Comment')->ColumnExists('ForeignID')) {
-            $Comment = $CommentModel->GetWhere(array('ForeignID' => $Get['legacy'] . $Vars['CommentID']))->FirstRow();
+            $Comment = $CommentModel->GetWhere(array('ForeignID' => $Get['legacy'] . '-' . $Vars['CommentID']))->FirstRow();
          } else {
             $Comment = $CommentModel->GetID($Vars['CommentID']);
          }
@@ -245,7 +245,7 @@ class RedirectorPlugin extends Gdn_Plugin {
          if (is_numeric($DiscussionID)) {
             // If a legacy slug is provided (assigned during a merge), attempt to lookup the discussion using it
             if (isset($Get['legacy']) && Gdn::Structure()->Table('Discussion')->ColumnExists('ForeignID')) {
-               $Discussion = $DiscussionModel->GetWhere(array('ForeignID' => $Get['legacy'] . $DiscussionID))->FirstRow();
+               $Discussion = $DiscussionModel->GetWhere(array('ForeignID' => $Get['legacy'] . '-' . $DiscussionID))->FirstRow();
             } else {
                $Discussion = $DiscussionModel->GetID($Vars['DiscussionID']);
             }
@@ -276,7 +276,7 @@ class RedirectorPlugin extends Gdn_Plugin {
          // If a legacy slug is provided (assigned during a merge), attempt to lookup the category ID based on it
          if (isset($Get['legacy']) && Gdn::Structure()->Table('Category')->ColumnExists('ForeignID')) {
             $CategoryModel = new CategoryModel();
-            $Category = $CategoryModel->GetWhere(array('ForeignID' => $Get['legacy'] . $Vars['CategoryID']))->FirstRow();
+            $Category = $CategoryModel->GetWhere(array('ForeignID' => $Get['legacy'] . '-' . $Vars['CategoryID']))->FirstRow();
          } else {
             $Category = CategoryModel::Categories($Vars['CategoryID']);
          }
