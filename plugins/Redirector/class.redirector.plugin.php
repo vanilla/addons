@@ -112,7 +112,7 @@ class RedirectorPlugin extends Gdn_Plugin {
        */
       $QueryString = Gdn::Request()->GetValueFrom('server', 'QUERY_STRING', FALSE);
       Trace(array('QUERY_STRING' => $QueryString), 'Server Variables');
-      if ($QueryString && preg_match('/(^|&)p\=(showpost\.php|showthread\.php|viewtopic\.php)/i', $QueryString)) {
+      if ($QueryString && preg_match('/(^|&)p\=\/?(showpost\.php|showthread\.php|viewtopic\.php)/i', $QueryString)) {
          // Check for multiple values of p in our URL parameters
          if ($QueryString && preg_match_all('/(^|\?|&)p\=(?P<val>[^&]+)/', $QueryString, $QueryParameters) > 1) {
             Trace($QueryParameters['val'], 'p Values');
