@@ -787,14 +787,16 @@ class QnAPlugin extends Gdn_Plugin {
    }
 
    public function DiscussionModel_BeforeGet_Handler($Sender, $Args) {
-      $Unanswered = Gdn::Controller()->ClassName == 'DiscussionsController' && Gdn::Controller()->RequestMethod == 'unanswered';
+      if (Gdn::Controller()) {
+         $Unanswered = Gdn::Controller()->ClassName == 'DiscussionsController' && Gdn::Controller()->RequestMethod == 'unanswered';
 
-      if ($Unanswered) {
-         $Args['Wheres']['Type'] = 'Question';
-         $Sender->SQL->WhereIn('d.QnA', array('Unanswered', 'Rejected'));
-         Gdn::Controller()->Title('Unanswered Questions');
-      } elseif ($QnA = Gdn::Request()->Get('qna')) {
-         $Args['Wheres']['QnA'] = $QnA;
+         if ($Unanswered) {
+            $Args['Wheres']['Type'] = 'Question';
+            $Sender->SQL->WhereIn('d.QnA', array('Unanswered', 'Rejected'));
+            Gdn::Controller()->Title('Unanswered Questions');
+         } elseif ($QnA = Gdn::Request()->Get('qna')) {
+            $Args['Wheres']['QnA'] = $QnA;
+         }
       }
    }
 
