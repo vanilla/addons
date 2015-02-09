@@ -614,7 +614,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (is_numeric($MediaID)) {
          // Save the thumbnail information.
          $Model = new MediaModel();
-         $Media = array('MediaID' => $MediaID, 'ThumbWidth' => $Width, 'ThumbHeight' => $Height, 'ThumbPath' => $ThumbParsed['SaveName']);
+         $Media = array('MediaID' => $MediaID, 'ThumbWidth' => $ThumbParsed['Width'], 'ThumbHeight' => $ThumbParsed['Height'], 'ThumbPath' => $ThumbParsed['SaveName']);
          $Model->Save($Media);
       }
 
@@ -818,7 +818,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          $SaveFilename = '/FileUpload/'.substr($SaveFilename, 0, 2).'/'.substr($SaveFilename, 2);
 
          // Get the image size before doing anything.
-         list($ImageWidth, $ImageHeight) = Gdn_UploadImage::ImageSize($FileTemp, $FileName);
+         list($ImageWidth, $ImageHeight, $ImageType) = Gdn_UploadImage::ImageSize($FileTemp, $FileName);
 
          // Fire event for hooking save location
          $this->EventArguments['Path'] = $FileTemp;
@@ -827,7 +827,11 @@ class FileUploadPlugin extends Gdn_Plugin {
          $this->EventArguments['OriginalFilename'] = $FileName;
          $Handled = FALSE;
          $this->EventArguments['Handled'] =& $Handled;
-         $this->FireAs('Gdn_Upload')->FireEvent('SaveAs');
+         if($ImageType !== FALSE) {
+            $this->FireAs('Gdn_Upload')->FireEvent('SaveImageAs');
+         } else {
+            $this->FireAs('Gdn_Upload')->FireEvent('SaveAs');
+         }
          $SavePath = $Parsed['Name'];
 
          if (!$Handled) {
@@ -839,7 +843,22 @@ class FileUploadPlugin extends Gdn_Plugin {
                throw new FileUploadPluginUploadErrorException("Internal error, could not save the file.", 9, $FileName);
 
             // Move to permanent location
-            $MoveSuccess = @move_uploaded_file($FileTemp, $SavePath);
+            // Use SaveImageAs so that image is rotated if necessary
+            if($ImageType !== FALSE) {
+               try {
+                  $ImgParsed = Gdn_UploadImage::SaveImageAs($FileTemp, $SavePath);
+                  $MoveSuccess = TRUE;
+                  // In case image got rotated
+                  $ImageWidth = $ImgParsed['Width'];
+                  $ImageHeight = $ImgParsed['Height'];
+               } catch(Exception $Ex) {
+                  // In case it was an image, but not a supported type - still upload
+                  $MoveSuccess = @move_uploaded_file($FileTemp, $SavePath);
+               }
+            } else {
+               // If not an image, just upload it
+               $MoveSuccess = @move_uploaded_file($FileTemp, $SavePath);
+            }
             if (!$MoveSuccess)
                throw new FileUploadPluginUploadErrorException("Internal error, could not move the file.", 9, $FileName);
          } else {
