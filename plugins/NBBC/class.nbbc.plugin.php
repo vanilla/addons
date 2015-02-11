@@ -10,7 +10,7 @@
 
 $PluginInfo['NBBC'] = array(
     'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.1.1',
+    'Version' => '1.1.0',
     'RequiredApplications' => array('Vanilla' => '2.0.2'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -23,7 +23,7 @@ $PluginInfo['NBBC'] = array(
 Gdn::FactoryInstall('BBCodeFormatter', 'NBBCPlugin', __FILE__, Gdn::FactorySingleton);
 
 class NBBCPlugin extends Gdn_Plugin {
-
+   
    public $Class = 'BBCode';
 
    /// CONSTRUCTOR ///
@@ -34,17 +34,17 @@ class NBBCPlugin extends Gdn_Plugin {
 
    /// PROPERTIES ///
    /// METHODS ///
-
+   
    public function DoAttachment($bbcode, $action, $name, $default, $params, $content) {
       $Medias = $this->Media();
       $MediaID = $content;
       if (isset($Medias[$MediaID])) {
          $Media = $Medias[$MediaID];
 //         decho($Media, 'Media');
-
+         
          $Src = htmlspecialchars(Gdn_Upload::Url(GetValue('Path', $Media)));
          $Name = htmlspecialchars(GetValue('Name', $Media));
-
+         
          if (GetValue('ImageWidth', $Media)) {
             return <<<EOT
 <div class="Attachment Image"><img src="$Src" alt="$Name" /></div>
@@ -53,7 +53,7 @@ EOT;
             return Anchor($Name, $Src, 'Attachment File');
          }
       }
-
+      
       return Anchor(T('Attachment not found.'), '#', 'Attachment NotFound');
    }
 
@@ -63,12 +63,12 @@ EOT;
       $content = trim($bbcode->UnHTMLEncode(strip_tags($content)));
       if (!$content && $default)
          $content = $default;
-
+      
       if ($bbcode->IsValidUrl($content, false))
          return "<img src=\"" . htmlspecialchars($content) . "\" alt=\""
             . htmlspecialchars(basename($content)) . "\" class=\"bbcode_img\" />";
-
-
+      
+      
 //      if (preg_match("/\\.(?:gif|jpeg|jpg|jpe|png)$/i", $content)) {
 //         if (preg_match("/^[a-zA-Z0-9_][^:]+$/", $content)) {
 //            if (!preg_match("/(?:\\/\\.\\.\\/)|(?:^\\.\\.\\/)|(?:^\\/)/", $content)) {
@@ -128,13 +128,13 @@ EOT;
       if (isset($params['name'])) {
          $username = trim($params['name']);
          $username = html_entity_decode($username, ENT_QUOTES, 'UTF-8');
-
+         
          $User = Gdn::UserModel()->GetByUsername($username);
          if ($User)
             $UserAnchor = UserAnchor($User);
          else
             $UserAnchor = Anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/' . rawurlencode($username));
-
+         
          $title = ConcatSep(' ', $title, $UserAnchor, T('Quote wrote', 'wrote'));
       }
 
@@ -163,10 +163,10 @@ EOT;
       . $title . "\n<div class=\"QuoteText\">"
       . $content . "</div>\n</blockquote>\n";
    }
-
+   
    function DoURL($bbcode, $action, $name, $default, $params, $content) {
       if ($action == BBCODE_CHECK) return true;
-
+      
       $url = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
 
       if ($bbcode->IsValidURL($url)) {
@@ -174,14 +174,14 @@ EOT;
             print "ISVALIDURL<br />";
          if ($bbcode->url_targetable !== false && isset($params['target']))
             $target = " target=\"" . htmlspecialchars($params['target']) . "\"";
-         else
+         else 
             $target = "";
-
+         
          if ($bbcode->url_target !== false)
             if (!($bbcode->url_targetable == 'override' && isset($params['target'])))
                $target = " target=\"" . htmlspecialchars($bbcode->url_target) . "\"";
             return '<a href="' . htmlspecialchars($url) . '" rel="nofollow" class="bbcode_url"' . $target . '>' . $content . '</a>';
-      } else
+      } else 
          return htmlspecialchars($params['_tag']) . $content . htmlspecialchars($params['_endtag']);
    }
 
@@ -190,7 +190,7 @@ EOT;
       $Result = $this->NBBC()->Parse($Result);
       return $Result;
    }
-
+   
    protected $_Media = NULL;
    public function Media() {
       if ($this->_Media === NULL) {
@@ -200,7 +200,7 @@ EOT;
          } catch (Exception $Ex) {
             $M = array();
          }
-
+         
          $Media = array();
          foreach ($M as $Key => $Data) {
             foreach ($Data as $Row) {
@@ -214,8 +214,8 @@ EOT;
 
    protected $_NBBC = NULL;
    /**
-    *
-    * @return BBCode
+    * 
+    * @return BBCode 
     */
    public function NBBC() {
       if ($this->_NBBC === NULL) {
@@ -223,7 +223,7 @@ EOT;
          $BBCode = new $this->Class();
          $BBCode->enable_smileys = false;
          $BBCode->SetAllowAmpersand(TRUE);
-
+         
          $BBCode->AddRule('attach', array(
             'mode' => BBCODE_MODE_CALLBACK,
             'method' => array($this, "DoAttachment"),
@@ -248,7 +248,7 @@ EOT;
              'plain_start' => "\n<b>Code:</b>\n",
              'plain_end' => "\n",
          ));
-
+         
 
          $BBCode->AddRule('quote', array('mode' => BBCODE_MODE_CALLBACK,
              'method' => array($this, "DoQuote"),
@@ -262,8 +262,11 @@ EOT;
          ));
 
          $BBCode->AddRule('spoiler', Array(
-             'simple_start' => "\n" . '<div class="Spoiler">',
-             'simple_end' => "</div>\n",
+             'simple_start' => "\n" . '<div class="UserSpoiler">
+   <div class="SpoilerTitle">' . T('Spoiler') . ': </div>
+   <div class="SpoilerReveal"></div>
+   <div class="SpoilerText" style="display: none;">',
+             'simple_end' => "</div></div>\n",
              'allow_in' => Array('listitem', 'block', 'columns'),
              'before_tag' => "sns",
              'after_tag' => "sns",
@@ -271,7 +274,7 @@ EOT;
              'after_endtag' => "sns",
              'plain_start' => "\n",
              'plain_end' => "\n"));
-
+         
          $BBCode->AddRule('img', array(
             'mode' => BBCODE_MODE_CALLBACK,
             'method' => array($this, "DoImage"),
@@ -282,7 +285,7 @@ EOT;
             'plain_start' => "[image]",
             'plain_content' => Array(),
             ));
-
+         
          $BBCode->AddRule('snapback', Array(
              'mode' => BBCODE_MODE_ENHANCED,
              'template' => ' <a href="'.Url('/discussion/comment/{$_content/v}#Comment_{$_content/v}', TRUE).'" class="SnapBack">»</a> ',
@@ -369,7 +372,7 @@ EOT;
    }
 
    public function Setup() {
-
+      
    }
 
 }
