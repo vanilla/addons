@@ -71,11 +71,8 @@ class RedirectorPlugin extends Gdn_Plugin {
          'p' => 'CommentID'
          ),
       'showthread.php' => array( // vBulletin discussion
-         't' => 'DiscussionID',
-         'p' => 'CommentID',
-         'page' => 'Page',
-         '_arg0' => array('DiscussionID', 'Filter' => array('RedirectorPlugin', 'RemoveID')),
-         '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'GetNumber'))
+         'RedirectorPlugin',
+         'showthread_Filter'
          ),
       'threads' => array( // xenforo discussion
          '_arg0' => array('DiscussionID', 'Filter' => array('RedirectorPlugin', 'XenforoID')),
@@ -185,8 +182,9 @@ class RedirectorPlugin extends Gdn_Plugin {
 
       if (is_callable($Row)) {
          // Use a callback to determine the translation.
-         $Row = call_user_func($Row, $Get);
+         $Row = call_user_func_array($Row, array(&$Get));
       }
+      Trace($Get, 'New Get');
 
       // Translate all of the get parameters into new parameters.
       $Vars = array();
@@ -343,6 +341,33 @@ class RedirectorPlugin extends Gdn_Plugin {
       if (preg_match('`^(\d+)`', $Value, $Matches))
          return $Matches[1];
       return NULL;
+   }
+
+   public static function showthread_Filter(&$Get) {
+      /**
+       * vBulletin 4 added "friendly URLs" that don't pass IDs as a name-value pair.  We need to extract the ID from
+       * this format, if we don't already have it.
+       * Ex: domain.com/showthread.php?0001-example-thread
+       */
+      if (!empty($Get) && !isset($Get['t'])) {
+         /**
+          * The thread ID should be the very first item in the query string.  PHP interprets these identifiers as keys
+          * without values.  We need to extract the first key and see if it's a match for the format.
+          */
+         $FriendlyURLID = array_shift(array_keys($Get));
+         if (preg_match('/^(?P<ThreadID>\d+)(-[\-A-Za-z0-9]+)?/', $FriendlyURLID, $FriendlyURLParts)) {
+            // Seems like we have a match.  Assign it as the value of t in our query string.
+            $Get['t'] = $FriendlyURLParts['ThreadID'];
+         }
+      }
+
+      return array(
+         't' => 'DiscussionID',
+         'p' => 'CommentID',
+         'page' => 'Page',
+         '_arg0' => array('DiscussionID', 'Filter' => array('RedirectorPlugin', 'RemoveID')),
+         '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'GetNumber'))
+      );
    }
 
    public static function SmfAction($Value) {
