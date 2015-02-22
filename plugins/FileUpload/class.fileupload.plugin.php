@@ -558,7 +558,8 @@ class FileUploadPlugin extends Gdn_Plugin {
          array_unshift($Args, $MediaID);
       $SubPath = implode('/', $Args);
       // Fix mauling of protocol:// URLs.
-      $Name = preg_replace('/:\/{1}/', '://', $SubPath);
+      $SubPath = preg_replace('/:\/{1}/', '://', $SubPath);
+      $Name = $SubPath;
       $Parsed = Gdn_Upload::Parse($Name);
 
       // Get actual path to the file.
