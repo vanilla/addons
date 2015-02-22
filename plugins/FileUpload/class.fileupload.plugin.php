@@ -557,6 +557,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (!is_numeric($MediaID))
          array_unshift($Args, $MediaID);
       $SubPath = implode('/', $Args);
+      // Fix mauling of protocol:// URLs.
+      $SubPath = preg_replace('/:\/{1}/', '://', $SubPath);
       $Name = $SubPath;
       $Parsed = Gdn_Upload::Parse($Name);
 
@@ -827,11 +829,8 @@ class FileUploadPlugin extends Gdn_Plugin {
          $this->EventArguments['OriginalFilename'] = $FileName;
          $Handled = FALSE;
          $this->EventArguments['Handled'] =& $Handled;
-         if($ImageType !== FALSE) {
-            $this->FireAs('Gdn_Upload')->FireEvent('SaveImageAs');
-         } else {
-            $this->FireAs('Gdn_Upload')->FireEvent('SaveAs');
-         }
+         $this->EventArguments['ImageType'] = $ImageType;
+         $this->FireAs('Gdn_Upload')->FireEvent('SaveAs');
          $SavePath = $Parsed['Name'];
 
          if (!$Handled) {
