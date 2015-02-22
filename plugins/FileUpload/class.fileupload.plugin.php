@@ -827,11 +827,8 @@ class FileUploadPlugin extends Gdn_Plugin {
          $this->EventArguments['OriginalFilename'] = $FileName;
          $Handled = FALSE;
          $this->EventArguments['Handled'] =& $Handled;
-         if($ImageType !== FALSE) {
-            $this->FireAs('Gdn_Upload')->FireEvent('SaveImageAs');
-         } else {
-            $this->FireAs('Gdn_Upload')->FireEvent('SaveAs');
-         }
+         $this->EventArguments['ImageType'] = $ImageType;
+         $this->FireAs('Gdn_Upload')->FireEvent('SaveAs');
          $SavePath = $Parsed['Name'];
 
          if (!$Handled) {
