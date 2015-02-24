@@ -31,10 +31,8 @@ class RedirectorPlugin extends Gdn_Plugin {
          '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'GetNumber'))
          ),
       'forumdisplay.php' => array( // vBulletin category
-         'f' => 'CategoryID',
-         'page' => 'Page',
-         '_arg0' => array('CategoryID', 'Filter' => array('RedirectorPlugin', 'RemoveID')),
-         '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'GetNumber'))
+         'RedirectorPlugin',
+         'forumdisplay_Filter'
          ),
       'forumindex.jspa' => array( // jive 4 category
           'categoryID' => 'CategoryID'
@@ -68,7 +66,8 @@ class RedirectorPlugin extends Gdn_Plugin {
          '_arg0' => 'CommentID'
          ),
       'showpost.php' => array( // vBulletin comment
-         'p' => 'CommentID'
+         'RedirectorPlugin',
+         'showpost_Filter'
          ),
       'showthread.php' => array( // vBulletin discussion
          'RedirectorPlugin',
@@ -285,7 +284,7 @@ class RedirectorPlugin extends Gdn_Plugin {
       return $Result;
    }
 
-   public static function forum_Filter($Get) {
+   public static function forum_Filter(&$Get) {
       if (GetValue('_arg2', $Get) == 'page') {
          // This is a punbb style forum.
          return array(
@@ -304,6 +303,17 @@ class RedirectorPlugin extends Gdn_Plugin {
             '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'IPBPageNumber'))
             );
       }
+   }
+
+   public static function forumdisplay_filter(&$Get) {
+      self::VbFriendlyUrlID($Get, 'f');
+
+      return array(
+         'f' => 'CategoryID',
+         'page' => 'Page',
+         '_arg0' => array('CategoryID', 'Filter' => array('RedirectorPlugin', 'RemoveID')),
+         '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'GetNumber'))
+      );
    }
 
    public static function GetNumber($Value) {
@@ -343,23 +353,17 @@ class RedirectorPlugin extends Gdn_Plugin {
       return NULL;
    }
 
+   public static function showpost_filter(&$Get) {
+      self::VbFriendlyUrlID($Get, 'p');
+
+      return array(
+         'p' => 'CommentID'
+      );
+
+   }
+
    public static function showthread_Filter(&$Get) {
-      /**
-       * vBulletin 4 added "friendly URLs" that don't pass IDs as a name-value pair.  We need to extract the ID from
-       * this format, if we don't already have it.
-       * Ex: domain.com/showthread.php?0001-example-thread
-       */
-      if (!empty($Get) && !isset($Get['t'])) {
-         /**
-          * The thread ID should be the very first item in the query string.  PHP interprets these identifiers as keys
-          * without values.  We need to extract the first key and see if it's a match for the format.
-          */
-         $FriendlyURLID = array_shift(array_keys($Get));
-         if (preg_match('/^(?P<ThreadID>\d+)(-[\-A-Za-z0-9]+)?/', $FriendlyURLID, $FriendlyURLParts)) {
-            // Seems like we have a match.  Assign it as the value of t in our query string.
-            $Get['t'] = $FriendlyURLParts['ThreadID'];
-         }
-      }
+      self::VbFriendlyUrlID($Get, 't');
 
       return array(
          't' => 'DiscussionID',
@@ -388,7 +392,7 @@ class RedirectorPlugin extends Gdn_Plugin {
       }
    }
 
-   public static function topic_Filter($Get) {
+   public static function topic_Filter(&$Get) {
       if (GetValue('_arg2', $Get) == 'page') {
          // This is a punbb style topic.
          return array(
@@ -408,6 +412,39 @@ class RedirectorPlugin extends Gdn_Plugin {
             '_arg1' => array('Page', 'Filter' => array('RedirectorPlugin', 'IPBPageNumber'))
             );
       }
+   }
+
+   /**
+    * Attempt to retrieve record ID from request parameters, if target parameter isn't already populated
+    * @param $Get Request parameters
+    * @param $TargetParam Name of the request parameter the record value should be stored in
+    * @return bool True if value saved, False if not (including if value was already set in target parameter)
+    */
+   private static function VbFriendlyUrlID(&$Get, $TargetParam, $SetPage = TRUE) {
+      /**
+       * vBulletin 4 added "friendly URLs" that don't pass IDs as a name-value pair.  We need to extract the ID from
+       * this format, if we don't already have it.
+       * Ex: domain.com/showthread.php?0001-example-thread
+       */
+      if (!empty($Get) && !isset($Get[$TargetParam])) {
+         /**
+          * The thread ID should be the very first item in the query string.  PHP interprets these identifiers as keys
+          * without values.  We need to extract the first key and see if it's a match for the format.
+          */
+         $FriendlyURLID = array_shift(array_keys($Get));
+         if (preg_match('/^(?P<RecordID>\d+)(-[^\/]+)?(\/page(?P<Page>\d+))?/', $FriendlyURLID, $FriendlyURLParts)) {
+            // Seems like we have a match.  Assign it as the value of t in our query string.
+            $Get[$TargetParam] = $FriendlyURLParts['RecordID'];
+
+            if (!empty($FriendlyURLParts['Page'])) {
+               $Get['page'] = $FriendlyURLParts['Page'];
+            }
+
+            return TRUE;
+         }
+      }
+
+      return FALSE;
    }
 
    public static function XenforoID($Value) {
