@@ -305,6 +305,14 @@ class RedirectorPlugin extends Gdn_Plugin {
       }
    }
 
+   /**
+    * Filter vBulletin category requests, specifically to handle "friendly URLs".
+    *
+    * @param $Get Request parameters
+    *
+    * @return array Mapping of vB parameters
+    */
+
    public static function forumdisplay_filter(&$Get) {
       self::VbFriendlyUrlID($Get, 'f');
 
@@ -353,6 +361,13 @@ class RedirectorPlugin extends Gdn_Plugin {
       return NULL;
    }
 
+   /**
+    * Filter vBulletin comment requests, specifically to handle "friendly URLs".
+    *
+    * @param $Get Request parameters
+    *
+    * @return array Mapping of vB parameters
+    */
    public static function showpost_filter(&$Get) {
       self::VbFriendlyUrlID($Get, 'p');
 
@@ -362,6 +377,13 @@ class RedirectorPlugin extends Gdn_Plugin {
 
    }
 
+   /**
+    * Filter vBulletin discussion requests, specifically to handle "friendly URLs".
+    *
+    * @param $Get Request parameters
+    *
+    * @return array Mapping of vB parameters
+    */
    public static function showthread_Filter(&$Get) {
       self::VbFriendlyUrlID($Get, 't');
 
@@ -415,9 +437,11 @@ class RedirectorPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Attempt to retrieve record ID from request parameters, if target parameter isn't already populated
+    * Attempt to retrieve record ID from request parameters, if target parameter isn't already populated.
+    *
     * @param $Get Request parameters
     * @param $TargetParam Name of the request parameter the record value should be stored in
+    *
     * @return bool True if value saved, False if not (including if value was already set in target parameter)
     */
    private static function VbFriendlyUrlID(&$Get, $TargetParam, $SetPage = TRUE) {
