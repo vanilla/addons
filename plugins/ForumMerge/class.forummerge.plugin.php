@@ -13,51 +13,57 @@ $PluginInfo['ForumMerge'] = array(
 
 /**
  * Forum Merge plugin.
- * 
+ *
  * @todo Allow multiple merges by resetting OldID to NULL before run.
  * @todo Add additional datatypes (noted at end of script)
  */
 class ForumMergePlugin implements Gdn_IPlugin {
-	/**
-	 * Add to the dashboard menu.
-	 */
+   /**
+    * Add to the dashboard menu.
+    */
    public function Base_GetAppSettingsMenuItems_Handler($Sender, $Args) {
       $Args['SideMenu']->AddLink('Import', T('Merge'), 'utility/merge', 'Garden.Settings.Manage');
-	}
-   
-	/**
-	 * Admin screen for merging forums.
-	 */
+   }
+
+   /**
+    * Admin screen for merging forums.
+    */
    public function UtilityController_Merge_Create($Sender) {
-		$Sender->Permission('Garden.Settings.Manage');
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->AddSideMenu('utility/merge');
-		
-		if ($Sender->Form->IsPostBack()) {
-			$Database = $Sender->Form->GetFormValue('Database');
-			$Prefix = $Sender->Form->GetFormValue('Prefix');
+
+      if ($Sender->Form->AuthenticatedPostBack()) {
+         $Database = $Sender->Form->GetFormValue('Database');
+         $Prefix = $Sender->Form->GetFormValue('Prefix');
+         $LegacySlug = $Sender->Form->GetFormValue('LegacySlug');
          $this->MergeCategories = ($Sender->Form->GetFormValue('MergeCategories')) ? TRUE : FALSE;
-			$this->MergeForums($Database, $Prefix);
-		}
-		
-		$Sender->Render($Sender->FetchViewLocation('merge', '', 'plugins/ForumMerge'));
-	}
-	
-	/**
-	 *  Match up columns existing in both target and source tables.
-	 *
-	 * @return string CSV list of columns in both copies of the table minus the primary key.
-	 */
-	public function GetColumns($Table, $OldDatabase, $OldPrefix) {
-		Gdn::Structure()->Database->DatabasePrefix = '';
-		$OldColumns = Gdn::Structure()->Get($OldDatabase.'.'.$OldPrefix.$Table)->Columns();
-		
-		Gdn::Structure()->Database->DatabasePrefix = C('Database.DatabasePrefix');
-		$NewColumns = Gdn::Structure()->Get($Table)->Columns();
-		
-		$Columns = array_intersect_key($OldColumns, $NewColumns);
-		unset($Columns[$Table.'ID']);
-		return trim(implode(',',array_keys($Columns)),',');
-	}
+         $this->MergeForums($Database, $Prefix, $LegacySlug);
+      }
+
+      $Sender->Render($Sender->FetchViewLocation('merge', '', 'plugins/ForumMerge'));
+   }
+
+   /**
+    *  Match up columns existing in both target and source tables.
+    *
+    * @return string CSV list of columns in both copies of the table minus the primary key.
+    */
+   public function GetColumns($Table, $OldDatabase, $OldPrefix, $Options = array()) {
+      Gdn::Structure()->Database->DatabasePrefix = '';
+      $OldColumns = Gdn::Structure()->Get($OldDatabase.'.'.$OldPrefix.$Table)->Columns();
+
+      Gdn::Structure()->Database->DatabasePrefix = C('Database.DatabasePrefix');
+      $NewColumns = Gdn::Structure()->Get($Table)->Columns();
+
+      $Columns = array_intersect_key($OldColumns, $NewColumns);
+      unset($Columns[$Table.'ID']);
+
+      if (!empty($Options['Legacy'])) {
+         unset($Columns['ForeignID']);
+      }
+
+      return trim(implode(',',array_keys($Columns)),',');
+   }
 
    /**
     * Do we have a corresponding table to merge?
@@ -69,21 +75,22 @@ class ForumMergePlugin implements Gdn_IPlugin {
       return (Gdn::SQL()->Query('SHOW TABLES IN `'.$this->OldDatabase.'` LIKE "'.$this->OldPrefix.$TableName.'"')->NumRows() == 1);
    }
 
-	/**
-	 * Grab second forum's data and merge with current forum.
-	 * 
-	 * Merge Users on email address. Keeps this forum's username/password.
-	 * Merge Roles, Tags, and Categories on precise name matches.
-    * 
+   /**
+    * Grab second forum's data and merge with current forum.
+    *
+    * Merge Users on email address. Keeps this forum's username/password.
+    * Merge Roles, Tags, and Categories on precise name matches.
+    *
     * @todo Compare column names between forums and use intersection
-	 */
-	public function MergeForums($OldDatabase, $OldPrefix) {
-		$NewPrefix = C('Database.DatabasePrefix');
+    */
+   public function MergeForums($OldDatabase, $OldPrefix, $LegacySlug) {
+      $NewPrefix = C('Database.DatabasePrefix');
       $this->OldDatabase = $OldDatabase;
       $this->OldPrefix = $OldPrefix;
 
+      $DoLegacy = !empty($LegacySlug);
 
-		// USERS //
+      // USERS //
       if ($this->OldTableExists('User')) {
          $UserColumns = $this->GetColumns('User', $OldDatabase, $OldPrefix);
 
@@ -106,8 +113,8 @@ class ForumMergePlugin implements Gdn_IPlugin {
          }
       }
 
-      
-		// ROLES //
+
+      // ROLES //
       if ($this->OldTableExists('Role')) {
          $RoleColumns = $this->GetColumns('Role', $OldDatabase, $OldPrefix);
 
@@ -130,10 +137,11 @@ class ForumMergePlugin implements Gdn_IPlugin {
          }
       }
 
-      
-		// CATEGORIES //
+
+      // CATEGORIES //
       if ($this->OldTableExists('Category')) {
-         $CategoryColumns = $this->GetColumns('Category', $OldDatabase, $OldPrefix);
+         $CategoryColumnOptions = array('Legacy' => $DoLegacy);
+         $CategoryColumns = $this->GetColumns('Category', $OldDatabase, $OldPrefix, $CategoryColumnOptions);
 
          /*if ($this->MergeCategories) {
             // Merge IDs of duplicate category names
@@ -147,34 +155,41 @@ class ForumMergePlugin implements Gdn_IPlugin {
                where Name not in (select Name from '.$NewPrefix.'Category)');
          }
          else {*/
-            // Import categories
-            Gdn::SQL()->Query('insert into '.$NewPrefix.'Category ('.$CategoryColumns.', OldID)
-            select '.$CategoryColumns.', CategoryID
-               from `'.$OldDatabase.'`.'.$OldPrefix.'Category
+         // Import categories
+         if ($DoLegacy) {
+            Gdn::SQL()->Query('insert into ' . $NewPrefix . 'Category (' . $CategoryColumns . ', OldID, ForeignID)
+               select ' . $CategoryColumns . ', CategoryID, concat(\'' . $LegacySlug . '-\', CategoryID)
+               from `' . $OldDatabase . '`.' . $OldPrefix . 'Category
                where Name <> "Root"');
+         } else {
+            Gdn::SQL()->Query('insert into ' . $NewPrefix . 'Category (' . $CategoryColumns . ', OldID)
+               select ' . $CategoryColumns . ', CategoryID
+               from `' . $OldDatabase . '`.' . $OldPrefix . 'Category
+               where Name <> "Root"');
+         }
 
-            // Remap hierarchy in the ugliest way possible
-            $CategoryMap = array();
-            $Categories = Gdn::SQL()->Select('CategoryID')
-               ->Select('ParentCategoryID')
-               ->Select('OldID')
-               ->From('Category')
-               ->Where(array('OldID >' => 0))
-               ->Get()->Result(DATASET_TYPE_ARRAY);
-            foreach ($Categories as $Category) {
-               $CategoryMap[$Category['OldID']] = $Category['CategoryID'];
+         // Remap hierarchy in the ugliest way possible
+         $CategoryMap = array();
+         $Categories = Gdn::SQL()->Select('CategoryID')
+            ->Select('ParentCategoryID')
+            ->Select('OldID')
+            ->From('Category')
+            ->Where(array('OldID >' => 0))
+            ->Get()->Result(DATASET_TYPE_ARRAY);
+         foreach ($Categories as $Category) {
+            $CategoryMap[$Category['OldID']] = $Category['CategoryID'];
+         }
+         foreach ($Categories as $Category) {
+            if ($Category['ParentCategoryID'] > 0 && !empty($CategoryMap[$Category['ParentCategoryID']])) {
+               $ParentID = $CategoryMap[$Category['ParentCategoryID']];
+               Gdn::SQL()->Update('Category')
+                  ->Set(array('ParentCategoryID' => $ParentID))
+                  ->Where(array('CategoryID' => $Category['CategoryID']))
+                  ->Put();
             }
-            foreach ($Categories as $Category) {
-               if ($Category['ParentCategoryID'] > 0) {
-                  $ParentID = $CategoryMap[$Category['ParentCategoryID']];
-                  Gdn::SQL()->Update('Category')
-                     ->Set(array('ParentCategoryID' => $ParentID))
-                     ->Where(array('CategoryID' => $Category['CategoryID']))
-                     ->Put();
-               }
-            }
-            $CategoryModel = new CategoryModel();
-            $CategoryModel->RebuildTree();
+         }
+         $CategoryModel = new CategoryModel();
+         $CategoryModel->RebuildTree();
 
          //}
 
@@ -182,15 +197,22 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
       }
 
-		
-		// DISCUSSIONS //
+
+      // DISCUSSIONS //
       if ($this->OldTableExists('Discussion')) {
-         $DiscussionColumns = $this->GetColumns('Discussion', $OldDatabase, $OldPrefix);
+         $DiscussionColumnOptions = array('Legacy' => $DoLegacy);
+         $DiscussionColumns = $this->GetColumns('Discussion', $OldDatabase, $OldPrefix, $DiscussionColumnOptions);
 
          // Copy over all discussions
-         Gdn::SQL()->Query('insert into '.$NewPrefix.'Discussion ('.$DiscussionColumns.', OldID)
-            select '.$DiscussionColumns.', DiscussionID
-            from `'.$OldDatabase.'`.'.$OldPrefix.'Discussion');
+         if ($DoLegacy) {
+            Gdn::SQL()->Query('insert into ' . $NewPrefix . 'Discussion (' . $DiscussionColumns . ', OldID, ForeignID)
+               select ' . $DiscussionColumns . ', DiscussionID, concat(\'' . $LegacySlug . '-\', DiscussionID)
+               from `' . $OldDatabase . '`.' . $OldPrefix . 'Discussion');
+         } else {
+            Gdn::SQL()->Query('insert into ' . $NewPrefix . 'Discussion (' . $DiscussionColumns . ', OldID)
+               select ' . $DiscussionColumns . ', DiscussionID
+               from `' . $OldDatabase . '`.' . $OldPrefix . 'Discussion');
+         }
 
          // Convert imported discussions to use new UserIDs
          Gdn::SQL()->Query('update '.$NewPrefix.'Discussion d
@@ -204,7 +226,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
            where d.OldID > 0');
 
          // UserDiscussion
-            if ($this->OldTableExists('UserDiscussion')) {
+         if ($this->OldTableExists('UserDiscussion')) {
             Gdn::SQL()->Query('insert ignore into '.$NewPrefix.'UserDiscussion
                   (DiscussionID, UserID, Score, CountComments, DateLastViewed, Dismissed, Bookmarked)
                select d.DiscussionID, u.UserID, ud.Score, ud.CountComments, ud.DateLastViewed, ud.Dismissed, ud.Bookmarked
@@ -212,16 +234,23 @@ class ForumMergePlugin implements Gdn_IPlugin {
                where u.OldID = (ud.UserID) and d.OldID = (ud.DiscussionID)');
          }
       }
-      
-      
+
+
       // COMMENTS //
       if ($this->OldTableExists('Comment')) {
-         $CommentColumns = $this->GetColumns('Comment', $OldDatabase, $OldPrefix);
+         $CommentColumnOptions = array('Legacy' => $DoLegacy);
+         $CommentColumns = $this->GetColumns('Comment', $OldDatabase, $OldPrefix, $CommentColumnOptions);
 
          // Copy over all comments
-         Gdn::SQL()->Query('insert into '.$NewPrefix.'Comment ('.$CommentColumns.', OldID)
-            select '.$CommentColumns.', CommentID
-            from `'.$OldDatabase.'`.'.$OldPrefix.'Comment');
+         if ($DoLegacy) {
+            Gdn::SQL()->Query('insert into ' . $NewPrefix . 'Comment (' . $CommentColumns . ', OldID, ForeignID)
+               select ' . $CommentColumns . ', CommentID, concat(\'' . $LegacySlug . '-\', CommentID)
+               from `' . $OldDatabase . '`.' . $OldPrefix . 'Comment');
+         } else {
+            Gdn::SQL()->Query('insert into ' . $NewPrefix . 'Comment (' . $CommentColumns . ', OldID)
+               select ' . $CommentColumns . ', CommentID
+               from `' . $OldDatabase . '`.' . $OldPrefix . 'Comment');
+         }
 
          // Convert imported comments to use new UserIDs
          Gdn::SQL()->Query('update '.$NewPrefix.'Comment c
@@ -238,7 +267,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
       }
 
 
-		// MEDIA //
+      // MEDIA //
       if ($this->OldTableExists('Media')) {
          $MediaColumns = $this->GetColumns('Media', $OldDatabase, $OldPrefix);
 
@@ -261,8 +290,8 @@ class ForumMergePlugin implements Gdn_IPlugin {
            where m.OldID > 0 and m.ForeignTable = \'discussion\'');
       }
 
-      
-		// CONVERSATION //
+
+      // CONVERSATION //
       if ($this->OldTableExists('Conversation')) {
          $ConversationColumns = $this->GetColumns('Conversation', $OldDatabase, $OldPrefix);
 
@@ -351,7 +380,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
          $PollOptionColumns = $this->GetColumns('PollOption', $OldDatabase, $OldPrefix);
 
          // Copy over all polls & options
-         Gdn::SQL()->Query('insert into '.$NewPrefix.'Poll ('.$DiscussionColumns.', OldID)
+         Gdn::SQL()->Query('insert into '.$NewPrefix.'Poll ('.$PollColumns.', OldID)
             select '.$PollColumns.', PollID
             from `'.$OldDatabase.'`.'.$OldPrefix.'Poll');
          Gdn::SQL()->Query('insert into '.$NewPrefix.'PollOption ('.$PollOptionColumns.', OldID)
@@ -405,15 +434,15 @@ class ForumMergePlugin implements Gdn_IPlugin {
          }
       }
 
-		////
-		
-		// Draft - new UserIDs
-		// Activity - wallpost, activitycomment
-		// Tag - new UserID, merge on name
-		// TagDiscussion - new DiscussionID, TagID
-		// Update counters
-		// LastCommentID
-	}
+      ////
+
+      // Draft - new UserIDs
+      // Activity - wallpost, activitycomment
+      // Tag - new UserID, merge on name
+      // TagDiscussion - new DiscussionID, TagID
+      // Update counters
+      // LastCommentID
+   }
 
    /**
     * Nuke every OldID column before a second merge.
@@ -433,18 +462,22 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
       $Construct = Gdn::Database()->Structure();
       $Construct->Table('Poll');
-      if ($Construct->TableExists())
+      if ($Construct->TableExists()) {
          Gdn::SQL()->Update('Poll')->Set('OldID', NULL)->Put();
+         Gdn::SQL()->Update('PollOption')->Set('OldID', NULL)->Put();
+      }
    }
 
    public function Setup() {
-   	$this->Structure();
+      $this->Structure();
    }
 
    public function Structure() {
       Gdn::Structure()->Table('Activity')->Column('OldID', 'int', TRUE, 'key')->Set();
-      Gdn::Structure()->Table('Category')->Column('OldID', 'int', TRUE, 'key')->Set();
-      Gdn::Structure()->Table('Comment')->Column('OldID', 'int', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('Category')->Column('OldID', 'int', TRUE, 'key')
+         ->Column('ForeignID', 'varchar(32)', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('Comment')->Column('OldID', 'int', TRUE, 'key')
+         ->Column('ForeignID', 'varchar(32)', TRUE, 'key')->Set();
       Gdn::Structure()->Table('Conversation')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('ConversationMessage')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('Discussion')->Column('OldID', 'int', TRUE, 'key')->Set();
@@ -456,7 +489,9 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
       $Construct = Gdn::Database()->Structure();
       $Construct->Table('Poll');
-      if ($Construct->TableExists())
+      if ($Construct->TableExists()) {
          Gdn::Structure()->Table('Poll')->Column('OldID', 'int', TRUE, 'key')->Set();
+         Gdn::Structure()->Table('PollOption')->Column('OldID', 'int', TRUE, 'key')->Set();
+      }
    }
 }
