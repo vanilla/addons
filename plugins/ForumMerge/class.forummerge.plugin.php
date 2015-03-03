@@ -18,6 +18,12 @@ $PluginInfo['ForumMerge'] = array(
  * @todo Add additional datatypes (noted at end of script)
  */
 class ForumMergePlugin implements Gdn_IPlugin {
+
+   /**
+    * @var int Limit of rows in a table before structural changes are aborted
+    */
+   protected $TableRowThreshold = 500000;
+
    /**
     * Add to the dashboard menu.
     */
@@ -473,11 +479,40 @@ class ForumMergePlugin implements Gdn_IPlugin {
    }
 
    public function Structure() {
+      $Px = Gdn::Database()->DatabasePrefix;
+
+      // Preparing to capture SQL (not execute) for operations that may need to be performed manually by the user
+      Gdn::Structure()->CaptureOnly = TRUE;
+      Gdn::Structure()->Database->CapturedSql = array();
+
+      // Comment table threshold check
+      $CurrentComments =  GDN::SQL()->Query("show table status where Name = '{$Px}Comment'")->FirstRow()->Rows;
+      if ($CurrentComments > $this->TableRowThreshold) { // Does the number of rows exceed the threshold?
+         // Execute functions for generating the SQL related to structural updates.  SQL is saved in CapturedSql
+         Gdn::Structure()->Table('Comment')->Column('OldID', 'int', true, 'key')
+            ->Column('ForeignID', 'varchar(32)', true, 'key')->Set();
+      }
+
+      // Allow execution of structural operations
+      Gdn::Structure()->CaptureOnly = FALSE;
+
+      /**
+       * If any SQL commands were captured, it means we have a problem.  Throw an exception and report the necessary
+       * SQL commands back to the user
+       */
+      $CapturedSql = Gdn::Structure()->Database->CapturedSql;
+      if (!empty($CapturedSql)) {
+         throw new Exception(
+            "Due to the size of some tables, the following MySQL commands will need to be manually executed:\n" .
+            implode("\n", $CapturedSql)
+         );
+      }
+
       Gdn::Structure()->Table('Activity')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('Category')->Column('OldID', 'int', TRUE, 'key')
          ->Column('ForeignID', 'varchar(32)', TRUE, 'key')->Set();
-      Gdn::Structure()->Table('Comment')->Column('OldID', 'int', TRUE, 'key')
-         ->Column('ForeignID', 'varchar(32)', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('Comment')->Column('OldID', 'int', true, 'key')
+         ->Column('ForeignID', 'varchar(32)', true, 'key')->Set();
       Gdn::Structure()->Table('Conversation')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('ConversationMessage')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('Discussion')->Column('OldID', 'int', TRUE, 'key')->Set();
