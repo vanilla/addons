@@ -850,7 +850,7 @@ class QnAPlugin extends Gdn_Plugin {
    public function DiscussionsController_Unanswered_Create($Sender, $Args = array()) {
       $Sender->View = 'Index';
       $Sender->SetData('_PagerUrl', 'discussions/unanswered/{Page}');
-      $Sender->Index(GetValue(0, $Args, 'p1'));
+      $Sender->Index(GetValue(0, $Args, 'p1'), array('QnA' => array('Unanswered', 'Rejected')));
       $this->InUnanswered = TRUE;
    }
 
