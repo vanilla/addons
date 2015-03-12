@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
    'Name' => 'Q&A',
    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-   'Version' => '1.2.3',
+   'Version' => '1.2.4',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -55,7 +55,7 @@ class QnAPlugin extends Gdn_Plugin {
       $DateAcceptedExists = Gdn::Structure()->ColumnExists('DateAccepted');
 
       Gdn::Structure()
-         ->Column('QnA', array('Unanswered', 'Answered', 'Accepted', 'Rejected'), NULL)
+         ->Column('QnA', array('Unanswered', 'Answered', 'Accepted', 'Rejected'), NULL, 'index')
          ->Column('DateAccepted', 'datetime', TRUE) // The
          ->Column('DateOfAnswer', 'datetime', TRUE) // The time to answer an accepted question.
          ->Set();
@@ -854,6 +854,21 @@ class QnAPlugin extends Gdn_Plugin {
       $this->InUnanswered = TRUE;
    }
 
+   public function DiscussionsController_BeforeBuildPager_Handler($Sender, &$Args = array()) {
+      $Count = $this->GetUnansweredCount();
+      $Sender->SetData('CountDiscussions', $Count);
+   }
+
+   public function GetUnansweredCount() {
+      $Count = Gdn::Cache()->Get('QnA-UnansweredCount');
+      if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
+         Gdn::SQL()->WhereIn('QnA', array('Unanswered', 'Rejected'));
+         $Count = Gdn::SQL()->GetCount('Discussion', array('Type' => 'Question'));
+         Gdn::Cache()->Store('QnA-UnansweredCount', $Count, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));
+      }
+      return $Count;
+   }
+
    /**
     *
     * @param DiscussionsController $Sender
@@ -887,9 +902,7 @@ class QnAPlugin extends Gdn_Plugin {
     * @param array $Args
     */
    public function DiscussionsController_UnansweredCount_Create($Sender, $Args = array()) {
-      Gdn::SQL()->WhereIn('QnA', array('Unanswered', 'Rejected'));
-      $Count = Gdn::SQL()->GetCount('Discussion', array('Type' => 'Question'));
-      Gdn::Cache()->Store('QnA-UnansweredCount', $Count, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));
+      $Count = $this->GetUnansweredCount();
 
       $Sender->SetData('UnansweredCount', $Count);
       $Sender->SetData('_Value', $Count);
