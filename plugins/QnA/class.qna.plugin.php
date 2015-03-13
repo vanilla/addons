@@ -856,7 +856,9 @@ class QnAPlugin extends Gdn_Plugin {
 
    public function DiscussionsController_BeforeBuildPager_Handler($Sender, &$Args = array()) {
       $Count = $this->GetUnansweredCount();
-      $Sender->SetData('CountDiscussions', $Count);
+      if (Gdn::Controller()->RequestMethod == 'unanswered') {
+         $Sender->SetData('CountDiscussions', $Count);
+      }
    }
 
    public function GetUnansweredCount() {
