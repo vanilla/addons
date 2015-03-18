@@ -531,7 +531,7 @@ EOT;
          'UserID'    => $SourceUserID,
          'Signature' => &$Signature
       );
-//      $this->FireEvent('BeforeDrawSignature');
+      $this->FireEvent('BeforeDrawSignature');
 
       $SigClasses = '';
       if (!is_null($Signature)) {
