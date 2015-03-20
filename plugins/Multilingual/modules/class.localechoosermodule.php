@@ -27,21 +27,12 @@ class LocaleChooserModule extends Gdn_Module {
     * @return string HTML.
     */
    public function BuildLocales() {
-      // Get locales
-      $LocaleModel = new LocaleModel();
-      $Options = $LocaleModel->EnabledLocalePacks();
-      $Locales = $LocaleModel->AvailableLocalePacks();
+      $locales = MultilingualPlugin::EnabledLocales();
 
-      // Build & add links
       $Links = '';
-      foreach ($Options as $Slug => $Code) {
-         $LocaleInfo = GetValue($Slug, $Locales);
-         $LocaleName = str_replace(' Transifex', '' , GetValue('Name', $LocaleInfo)); // No 'Transifex' in names, pls.
-         $Links .= $this->BuildLocaleLink($LocaleName, $Code);
+      foreach ($locales as $code => $name) {
+         $Links .= $this->BuildLocaleLink($name, $code);
       }
-
-      // Hackily add English option
-      $Links .= $this->BuildLocaleLink('English', 'en-CA');
 
       return $Links;
    }
