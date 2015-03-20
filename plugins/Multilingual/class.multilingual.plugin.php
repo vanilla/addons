@@ -39,6 +39,40 @@ $PluginInfo['Multilingual'] = array(
  */
 class MultilingualPlugin extends Gdn_Plugin {
    /**
+    * Return the enabled locales suitable for local choosing.
+    *
+    * @return array Returns an array in the form `[locale => localeName]`.
+    */
+   public static function EnabledLocales() {
+      $defaultLocale = Gdn_Locale::Canonicalize(C('Garden.Locale'));
+
+      $localeModel = new LocaleModel();
+      if (class_exists('Locale')) {
+         $localePacks = $localeModel->EnabledLocalePacks(false);
+         $locales = array();
+         foreach ($localePacks as $locale) {
+            $locales[$locale] = Locale::getDisplayName($locale, $locale);
+         }
+         $defaultName = Locale::getDisplayName($defaultLocale, $defaultLocale);
+      } else {
+         $locales = $localeModel->EnabledLocalePacks(true);
+         $locales = array_column($locales, 'Name', 'Locale');
+         $defaultName = $defaultLocale === 'en' ? 'English' : $defaultLocale;
+      }
+      asort($locales);
+
+      if (!array_key_exists($defaultLocale, $locales)) {
+         $locales = array_merge(
+            array($defaultLocale => $defaultName),
+            $locales
+         );
+      }
+
+      return $locales;
+   }
+
+
+   /**
     * Set user's preferred locale.
     *
     * Moved event from AppStart to AfterAnalyzeRequest to allow Embed to set P3P header first.
