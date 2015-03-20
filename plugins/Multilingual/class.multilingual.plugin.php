@@ -11,7 +11,7 @@
 $PluginInfo['Multilingual'] = array(
    'Name' => 'Multilingual',
    'Description' => "Allows use of multiple languages. Users can select their preferred language via a link in the footer, and administrators may embed their forum in different languages in different places.",
-   'Version' => '1.2',
+   'Version' => '1.3',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => "Lincoln Russell",
@@ -19,10 +19,11 @@ $PluginInfo['Multilingual'] = array(
    'AuthorUrl' => 'http://lincolnwebs.com'
 );
 
-/* Changelog
+/* Change Log
    1.0 - Make MobileFriendly //Lincoln 2012-01-13
    1.1 - Move locale setting to later in startup for Embed //Lincoln 2012-02-22
-   1.2 - Create localechooser module //Lincoln 2014-08-13
+   1.2 - Create locale chooser module //Lincoln 2014-08-13
+   1.3 - Updates to accommodate locale canonicalization //Todd 2015-03-20
 */
 
 /**
@@ -106,15 +107,16 @@ class MultilingualPlugin extends Gdn_Plugin {
       $Locale = FALSE;
 
       // User preference
-      if (!$Locale && Gdn::Session()->UserID) {
+      if (Gdn::Session()->IsValid()) {
          $Locale = $this->GetUserMeta(Gdn::Session()->UserID, 'Locale', FALSE);
-         $Locale = GetValue('Plugin.Multilingual.Locale', $Locale, FALSE);
+         $Locale = val('Plugin.Multilingual.Locale', $Locale, FALSE);
       }
       // Query string
       if (!$Locale) {
-         $Locale = $this->ValidateLocale(GetValue('locale', $_GET, FALSE));
-         if ($Locale)
+         $Locale = $this->ValidateLocale(Gdn::Request()->Get('locale'));
+         if ($Locale) {
             Gdn::Session()->Stash('Locale', $Locale);
+         }
       }
       // Session
       if (!$Locale) {
@@ -127,27 +129,25 @@ class MultilingualPlugin extends Gdn_Plugin {
    /**
     * Allow user to set their preferred locale via link-click.
     */
-   public function ProfileController_SetLocale_Create($Sender, $Args = array()) {
+   public function ProfileController_SetLocale_Create($Sender, $locale, $TK) {
       if (!Gdn::Session()->UserID) {
          throw PermissionException('Garden.SignIn.Allow');
       }
 
-      // Check intent
-      if (isset($Args[1]))
-         Gdn::Session()->ValidateTransientKey($Args[1]);
-      else Redirect($_SERVER['HTTP_REFERER']);
+      // Check intent.
+      if (!Gdn::Session()->ValidateTransientKey($TK)) {
+         Redirect($_SERVER['HTTP_REFERER']);
+      }
 
       // If we got a valid locale, save their preference
-      if (isset($Args[0])) {
-         $Locale = $this->ValidateLocale($Args[0]);
-         if ($Locale) {
-            Gdn::Session()->Stash('Locale', $Locale);
-            if (CheckPermission('Garden.SignIn.Allow'))
-               $this->SetUserMeta(Gdn::Session()->UserID, 'Locale', $Locale);
+      if (isset($locale)) {
+         $locale = $this->ValidateLocale($locale);
+         if ($locale) {
+            $this->SetUserMeta(Gdn::Session()->UserID, 'Locale', $locale);
          }
       }
 
-      // Back from whence we came
+      // Back from whence we came.
       Redirect($_SERVER['HTTP_REFERER']);
    }
 
@@ -155,12 +155,13 @@ class MultilingualPlugin extends Gdn_Plugin {
     * Confirm selected locale is valid and available.
     *
     * @param string $Locale Locale code.
-    * @return $Locale or FALSE.
+    * @return string Returns the canonical version of the locale on success or an empty string otherwise.
     */
    protected function ValidateLocale($Locale) {
-      $LocaleModel = new LocaleModel();
-      $Options = $LocaleModel->EnabledLocalePacks();
-      $Options['English'] = 'en-CA'; // Hackily include the default
-      return (in_array($Locale, $Options)) ? $Locale : FALSE;
+      $canonicalLocale = Gdn_Locale::Canonicalize($Locale);
+      $locales = static::EnabledLocales();
+
+      $result = isset($locales[$canonicalLocale]) ? $canonicalLocale : '';
+      return $result;
    }
 }
