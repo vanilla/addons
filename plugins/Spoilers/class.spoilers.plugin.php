@@ -15,7 +15,7 @@ $PluginInfo['Spoilers'] = array(
    'Version' => '1.2',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE, 
+   'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -25,12 +25,12 @@ $PluginInfo['Spoilers'] = array(
 );
 
 class SpoilersPlugin extends Gdn_Plugin {
-   
+
    public function __construct() {
       // Whether to handle drawing quotes or leave it up to some other plugin
       $this->RenderSpoilers = C('Plugins.Spoilers.RenderSpoilers',TRUE);
    }
-   
+
    public function AssetModel_StyleCss_Handler($Sender) {
       $Sender->AddCssFile('spoilers.css', 'plugins/Spoilers');
    }
@@ -38,21 +38,21 @@ class SpoilersPlugin extends Gdn_Plugin {
    public function DiscussionController_Render_Before(&$Sender) {
       $this->PrepareController($Sender);
    }
-   
+
    public function PostController_Render_Before(&$Sender) {
       $this->PrepareController($Sender);
    }
-   
+
    protected function PrepareController(&$Sender) {
       //if (!$this->RenderSpoilers) return;
       $Sender->AddJsFile('spoilers.js', 'plugins/Spoilers');
    }
-   
-   
+
+
    public function DiscussionController_AfterCommentFormat_Handler(&$Sender) {
       $this->RenderSpoilers($Sender);
    }
-   
+
    public function PostController_AfterCommentFormat_Handler(&$Sender) {
       $this->RenderSpoilers($Sender);
    }
@@ -63,17 +63,19 @@ class SpoilersPlugin extends Gdn_Plugin {
    }
 
    protected function RenderSpoilers(&$Sender) {
-      if (!$this->RenderSpoilers) return;
-      
+      if (!$this->RenderSpoilers || Gdn::PluginManager()->CheckPlugin('NBBC') ) {
+         return;
+      }
+
       $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
-      
+
       // Fix a wysiwyg but where spoilers
       $FormatBody = preg_replace('`<div>\s*(\[/?spoiler\])\s*</div>`', '$1', $FormatBody);
-      
+
       $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
       $FormatBody = str_ireplace('[/spoiler]','</div></div>',$FormatBody);
    }
-   
+
    protected function SpoilerCallback($Matches) {
       $Attribution = T('Spoiler: %s');
       $SpoilerText = (sizeof($Matches) > 2) ? $Matches[2] : NULL;
@@ -85,13 +87,13 @@ class SpoilersPlugin extends Gdn_Plugin {
       <div class="UserSpoiler"><div class="SpoilerTitle">{$Attribution}</div><div class="SpoilerReveal"></div><div class="SpoilerText">
 BLOCKQUOTE;
    }
-   
+
    public function Setup() {
       // Nothing to do here!
    }
-   
+
    public function Structure() {
       // Nothing to do here!
    }
-         
+
 }
