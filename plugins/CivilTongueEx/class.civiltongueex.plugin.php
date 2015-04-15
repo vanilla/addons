@@ -65,6 +65,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
    public function ProfileController_Render_Before($Sender, $Args) {
       $this->ActivityController_Render_Before($Sender, $Args);
+      $this->DiscussionsController_Render_Before($Sender, $Args);
    }
 
    /**
