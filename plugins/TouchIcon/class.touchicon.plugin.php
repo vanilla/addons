@@ -4,7 +4,7 @@
 $PluginInfo['TouchIcon'] = array(
    'Name' => 'Touch Icon',
    'Description' => 'Adds option to upload a touch icon for Apple iDevices.',
-   'Version' => '1.0',
+   'Version' => '1.1',
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com',
@@ -40,6 +40,17 @@ class TouchIconPlugin extends Gdn_Plugin {
    }
 
    /**
+    * Updates.
+    */
+   public function Structure() {
+      // Backwards compatibility with v1.
+      if (C('Plugins.TouchIcon.Uploaded')) {
+         SaveToConfig('Garden.TouchIcon', PATH_ROOT.'/uploads/TouchIcon/apple-touch-icon.png');
+         RemoveFromConfig('Plugins.TouchIcon.Uploaded');
+      }
+   }
+
+   /**
     * Touch icon management screen.
     *
     * @since 1.0
@@ -56,15 +67,16 @@ class TouchIconPlugin extends Gdn_Plugin {
             // Validate the upload
             $TmpImage = $Upload->ValidateUpload('TouchIcon', FALSE);
             if ($TmpImage) {
-               // Save the uploaded image
+               // Save the uploaded image.
+               $TouchIconPath ='banner/touchicon_'.substr(md5(microtime()), 16).'.png';
                $Upload->SaveImageAs(
                   $TmpImage,
-                  'apple-touch-icon.png',
+                  $TouchIconPath,
                   114,
                   114,
                   array('OutputType' => 'png', 'ImageQuality' => '8')
                );
-               SaveToConfig('Plugins.TouchIcon.Uploaded', TRUE);
+               SaveToConfig('Garden.TouchIcon', $TouchIconPath);
             }
          } catch (Exception $ex) {
             $Sender->Form->AddError($ex->getMessage());
@@ -77,15 +89,13 @@ class TouchIconPlugin extends Gdn_Plugin {
       $Sender->Render($this->GetView('touchicon.php'));
    }
 
-
    /**
-    * Get path to icon
+    * Get path to icon.
     *
     * @return string Path to icon
     */
    public function getIconPath() {
-      $IconPath = Gdn_Upload::Url('apple-touch-icon.png');
-      return (C('Plugins.TouchIcon.Uploaded')) ? $IconPath : self::DEFAULT_PATH;
+      return Gdn_Upload::Url(C('Garden.TouchIcon', self::DEFAULT_PATH));
    }
 
    /**
