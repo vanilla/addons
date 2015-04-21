@@ -95,7 +95,8 @@ class TouchIconPlugin extends Gdn_Plugin {
     * @return string Path to icon
     */
    public function getIconPath() {
-      return Gdn_Upload::Url(C('Garden.TouchIcon', self::DEFAULT_PATH));
+      $Icon = C('Garden.TouchIcon') ? Gdn_Upload::Url(C('Garden.TouchIcon')) : self::DEFAULT_PATH;
+      return $Icon;
    }
 
    /**
