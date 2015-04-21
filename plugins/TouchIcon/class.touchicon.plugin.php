@@ -15,6 +15,12 @@ $PluginInfo['TouchIcon'] = array(
 );
 
 class TouchIconPlugin extends Gdn_Plugin {
+
+   /**
+    * @var string Default icon path
+    */
+   const DEFAULT_PATH = 'plugins/TouchIcon/design/default.png';
+
    /**
 	 * Create route.
 	 */
@@ -67,7 +73,19 @@ class TouchIconPlugin extends Gdn_Plugin {
          $Sender->InformMessage(T('TouchIconSaved', "Your icon has been saved."));
       }
 
+      $Sender->SetData('Path', $this->getIconPath());
       $Sender->Render($this->GetView('touchicon.php'));
+   }
+
+
+   /**
+    * Get path to icon
+    *
+    * @return string Path to icon
+    */
+   public function getIconPath() {
+      $IconPath = Gdn_Upload::Url('apple-touch-icon.png');
+      return (C('Plugins.TouchIcon.Uploaded')) ? $IconPath : self::DEFAULT_PATH;
    }
 
    /**
@@ -77,9 +95,7 @@ class TouchIconPlugin extends Gdn_Plugin {
     * @access public
     */
    public function UtilityController_ShowTouchIcon_Create($Sender) {
-      $DefaultPath = 'plugins/TouchIcon/design/default.png';
-      $IconPath = Gdn_Upload::Url('apple-touch-icon.png');
-      $Redirect = (C('Plugins.TouchIcon.Uploaded')) ? $IconPath : $DefaultPath;
+      $Redirect = $this->getIconPath();
       Redirect($Redirect, 301);
       exit();
    }
