@@ -16,9 +16,9 @@ echo $this->Form->Errors();
                'div',
                array('class' => 'Info')
             );
-            
+
          echo Wrap(
-            Img('/apple-touch-icon.png'),
+            Img(val('Path', $this->Data)),
             'div'
          );
          echo Wrap(
@@ -26,7 +26,7 @@ echo $this->Form->Errors();
             'div',
             array('class' => 'Info')
          );
-         
+
          echo $this->Form->Input('TouchIcon', 'file');
       ?>
    </li>
