@@ -45,7 +45,7 @@ class TouchIconPlugin extends Gdn_Plugin {
    public function Structure() {
       // Backwards compatibility with v1.
       if (C('Plugins.TouchIcon.Uploaded')) {
-         SaveToConfig('Garden.TouchIcon', PATH_ROOT.'/uploads/TouchIcon/apple-touch-icon.png');
+         SaveToConfig('Garden.TouchIcon', 'TouchIcon/apple-touch-icon.png');
          RemoveFromConfig('Plugins.TouchIcon.Uploaded');
       }
    }
@@ -69,23 +69,24 @@ class TouchIconPlugin extends Gdn_Plugin {
             if ($TmpImage) {
                // Save the uploaded image.
                $TouchIconPath ='banner/touchicon_'.substr(md5(microtime()), 16).'.png';
-               $Upload->SaveImageAs(
+               $ImageInfo = $Upload->SaveImageAs(
                   $TmpImage,
                   $TouchIconPath,
                   114,
                   114,
                   array('OutputType' => 'png', 'ImageQuality' => '8')
                );
-               SaveToConfig('Garden.TouchIcon', $TouchIconPath);
+
+               SaveToConfig('Garden.TouchIcon', $ImageInfo['SaveName']);
             }
          } catch (Exception $ex) {
             $Sender->Form->AddError($ex->getMessage());
          }
 
-         $Sender->InformMessage(T('TouchIconSaved', "Your icon has been saved."));
+         $Sender->InformMessage(T("Your icon has been saved."));
       }
 
-      $Sender->SetData('Path', $this->getIconPath());
+      $Sender->SetData('Path', $this->getIconUrl());
       $Sender->Render($this->GetView('touchicon.php'));
    }
 
@@ -94,8 +95,8 @@ class TouchIconPlugin extends Gdn_Plugin {
     *
     * @return string Path to icon
     */
-   public function getIconPath() {
-      $Icon = C('Garden.TouchIcon') ? Gdn_Upload::Url(C('Garden.TouchIcon')) : self::DEFAULT_PATH;
+   public function getIconUrl() {
+      $Icon = C('Garden.TouchIcon') ? Gdn_Upload::Url(C('Garden.TouchIcon')) : Asset(self::DEFAULT_PATH);
       return $Icon;
    }
 
@@ -106,8 +107,8 @@ class TouchIconPlugin extends Gdn_Plugin {
     * @access public
     */
    public function UtilityController_ShowTouchIcon_Create($Sender) {
-      $Redirect = $this->getIconPath();
-      Redirect($Redirect, 301);
+      $Redirect = $this->getIconUrl();
+      Redirect($Redirect, 302);
       exit();
    }
 }
