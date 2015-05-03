@@ -12,6 +12,7 @@
  *  1.1     Changed paths
  *  1.1.1   Fire 'Published' event after publication
  *  1.2     Cleanup docs & version
+ *  1.2.1   Include link to source of feed
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -23,7 +24,7 @@
 $PluginInfo['FeedDiscussions'] = array(
    'Name' => 'Feed Discussions',
    'Description' => "Automatically creates new discussions based on content imported from supplied RSS feeds.",
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -340,7 +341,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
          $StoryPublished = date("Y-m-d H:i:s", $ItemPubTime);
 
          $ParsedStoryBody = $StoryBody;
-         $ParsedStoryBody = '<div class="AutoFeedDiscussion">'.$ParsedStoryBody.'</div>';
+         $ParsedStoryBody = '<div class="AutoFeedDiscussion">'.$ParsedStoryBody.'</div><br> Source:'.$FeedItemGUID.'';
 
          $DiscussionData = array(
                'Name'            => $StoryTitle,
