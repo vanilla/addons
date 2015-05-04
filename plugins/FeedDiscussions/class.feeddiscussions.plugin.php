@@ -341,7 +341,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
          $StoryPublished = date("Y-m-d H:i:s", $ItemPubTime);
 
          $ParsedStoryBody = $StoryBody;
-         $ParsedStoryBody = '<div class="AutoFeedDiscussion">'.$ParsedStoryBody.'</div><br> Source:'.$FeedItemGUID.'';
+         $ParsedStoryBody = '<div class="AutoFeedDiscussion">'.$ParsedStoryBody.'</div> <br /><div class="AutoFeedSource">Source: '.$FeedItemGUID.'</div>';
 
          $DiscussionData = array(
                'Name'            => $StoryTitle,
