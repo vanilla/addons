@@ -178,7 +178,10 @@ class ResolvedPlugin extends Gdn_Plugin {
          ->Select('count(DISTINCT d.DiscussionID)', '', 'NumUnresolved')
          ->From('Discussion d')
          ->Where('d.Resolved', 0)
+         ->BeginWhereGroup()
          ->Where('d.Type <>', 'page')
+         ->OrWhere('Type is null')
+         ->EndWhereGroup()
          ->Get()
          ->FirstRow()
          ->NumUnresolved;
@@ -201,7 +204,13 @@ class ResolvedPlugin extends Gdn_Plugin {
          $Page = 0;
 
       $DiscussionModel = new DiscussionModel();
-      $Wheres = array('d.Resolved' => '0', 'd.Type <>' => 'page');
+      $Wheres = array('d.Resolved' => '0');
+
+      // Hack in our wheregroup.
+      Gdn::SQL()->BeginWhereGroup()
+         ->Where('d.Type <>', 'page')
+         ->OrWhere('Type is null')
+         ->EndWhereGroup();
 
       $Sender->DiscussionData = $DiscussionModel->Get($Page, $Limit, $Wheres);
       $Sender->SetData('Discussions', $Sender->DiscussionData);
