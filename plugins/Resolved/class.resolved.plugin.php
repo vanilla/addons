@@ -179,7 +179,7 @@ class ResolvedPlugin extends Gdn_Plugin {
          ->From('Discussion d')
          ->Where('d.Resolved', 0)
          ->BeginWhereGroup()
-         ->Where('d.Type <>', 'page')
+         ->WhereNotIn('d.Type', array('page', 'Report', 'poll', 'SimplePage'))
          ->OrWhere('Type is null')
          ->EndWhereGroup()
          ->Get()
@@ -208,7 +208,7 @@ class ResolvedPlugin extends Gdn_Plugin {
 
       // Hack in our wheregroup.
       Gdn::SQL()->BeginWhereGroup()
-         ->Where('d.Type <>', 'page')
+         ->WhereNotIn('d.Type', array('page', 'Report', 'poll', 'SimplePage'))
          ->OrWhere('Type is null')
          ->EndWhereGroup();
 
