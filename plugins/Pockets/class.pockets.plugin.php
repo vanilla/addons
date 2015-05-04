@@ -12,12 +12,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Pockets'] = array(
    'Name' => 'Pockets',
    'Description' => 'Administrators may add raw HTML to various places on the site. This plugin is very powerful, but can easily break your site if you make a mistake.',
-   'Version' => '1.1.2',
+   'Version' => '1.1.3',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
    'RequiredApplications' => array('Vanilla' => '2.1'),
-   'RegisterPermissions' => array('Plugins.Pockets.Manage'),
+   'RegisterPermissions' => array('Plugins.Pockets.Manage', 'Garden.NoAds.Allow'),
    'SettingsUrl' => '/settings/pockets',
    'SettingsPermission' => 'Plugins.Pockets.Manage',
    'MobileFriendly' => TRUE,
@@ -37,7 +37,8 @@ class PocketsPlugin extends Gdn_Plugin {
       'BetweenDiscussions' => array('Name' => 'Between Discussions', 'Wrap' => array('<li>', '</li>')),
       'BetweenComments' => array('Name' => 'Between Comments', 'Wrap' => array('<li>', '</li>')),
       'Head' => array('Name' => 'Head'),
-      'Foot' => array('Name' => 'Foot'));
+      'Foot' => array('Name' => 'Foot'),
+      'Custom' => array('Name' => 'Custom'));
 
    /** An array of all of the pockets indexed by location.
     *
@@ -224,6 +225,11 @@ class PocketsPlugin extends Gdn_Plugin {
          $Form->SetFormValue('Format', 'Raw');
          $Condition = Gdn_Condition::ToString($Sender->ConditionModule->Conditions(TRUE));
          $Form->SetFormValue('Condition', $Condition);
+         if ($Form->GetFormValue('Ad', 0)) {
+            $Form->SetFormValue('Type', Pocket::TYPE_AD);
+         } else {
+            $Form->SetFormValue('Type', Pocket::TYPE_DEFAULT);
+         }
 
          $Saved = $Form->Save();
          if ($Saved) {
@@ -243,6 +249,7 @@ class PocketsPlugin extends Gdn_Plugin {
             $Pocket['EveryFrequency'] = GetValue(0, $RepeatFrequency, 1);
             $Pocket['EveryBegin'] = GetValue(1, $RepeatFrequency, 1);
             $Pocket['Indexes'] = implode(',', $RepeatFrequency);
+            $Pocket['Ad'] = $Pocket['Type'] == Pocket::TYPE_AD;
             $Sender->ConditionModule->Conditions(Gdn_Condition::FromString($Pocket['Condition']));
             $Form->SetData($Pocket);
          } else {
@@ -308,8 +315,9 @@ class PocketsPlugin extends Gdn_Plugin {
    }
 
    protected function _LoadState($Force = FALSE) {
-      if (!$Force && $this->StateLoaded)
+      if (!$Force && $this->StateLoaded) {
          return;
+      }
 
       $Pockets = Gdn::SQL()->Get('Pocket', 'Location, Sort, Name')->ResultArray();
       foreach ($Pockets as $Row) {
@@ -325,8 +333,10 @@ class PocketsPlugin extends Gdn_Plugin {
       if (Gdn::Controller()->DeliveryMethod() != DELIVERY_METHOD_XHTML) {
          return;
       }
-      if (Gdn::Controller()->Data('_NoMessages'))
+
+      if (Gdn::Controller()->Data('_NoMessages') && $Location != 'Head') {
          return;
+      }
 
       // Since plugins can't currently maintain their state we have to stash it in the Gdn object.
       $this->_LoadState();
@@ -390,8 +400,18 @@ class PocketsPlugin extends Gdn_Plugin {
       }
 
       $Result = '';
+
+      $ControllerName = Gdn::Controller()->ControllerName;
+
       foreach ($Pockets as $Pocket) {
-         $Result .= $Pocket->ToString();
+         if (val('Location', $Pocket) == 'Custom' ) {
+            $Data['PageName'] = Pocket::PageName($ControllerName);
+            if ($Pocket->CanRender($Data)) {
+               $Result .= $Pocket->ToString();
+            }
+         } else {
+            $Result .= $Pocket->ToString();
+         }
       }
 
       if (is_array($Data)) {
@@ -430,9 +450,10 @@ class PocketsPlugin extends Gdn_Plugin {
       $this->Structure();
    }
 
-   public function Structure($Explicit = FALSE, $Drop = FALSE) {
-   	  // It seems plugins need to be disabled and enabled for this to happen.
-   	  // Might want to warn users that upgrade.
+   public function Structure() {
+      // Pocket class isn't autoloaded on Enable.
+      require_once('library/class.pocket.php');
+
       $St = Gdn::Structure();
       $St->Table('Pocket')
          ->PrimaryKey('PocketID')
@@ -450,7 +471,13 @@ class PocketsPlugin extends Gdn_Plugin {
          ->Column('MobileNever', 'tinyint', '0')
          ->Column('EmbeddedNever', 'tinyint', '0')
          ->Column('ShowInDashboard', 'tinyint', '0')
-         ->Set($Explicit, $Drop);
+         ->Column('Type', array(Pocket::TYPE_DEFAULT, Pocket::TYPE_AD), Pocket::TYPE_DEFAULT)
+         ->Set();
+
+      $PermissionModel = Gdn::PermissionModel();
+      $PermissionModel->Define(array(
+         'Garden.NoAds.Allow' => 0
+      ));
    }
 
    public function TestData($Sender) {

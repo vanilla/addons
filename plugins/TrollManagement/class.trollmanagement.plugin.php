@@ -100,6 +100,15 @@ class TrollManagementPlugin extends Gdn_Plugin {
    }
 
    /**
+    * Hide counters on profile of trolls unless viewer is a moderator.
+    */
+   public function ProfileController_UserLoaded_Handler($Sender) {
+      if (GetValueR('User.Troll', $Sender) && !Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         SaveToConfig('Vanilla.Profile.ShowCounts', false, false);
+      }
+   }
+
+   /**
     * Display shared accounts on the user profiles for admins.
     */
    public function ProfileController_Render_Before($Sender) {
