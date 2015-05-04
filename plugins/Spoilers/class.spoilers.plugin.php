@@ -43,6 +43,10 @@ class SpoilersPlugin extends Gdn_Plugin {
       $this->PrepareController($Sender);
    }
 
+   public function MessagesController_Render_Before(&$Sender) {
+      $this->PrepareController($Sender);
+   }
+
    protected function PrepareController(&$Sender) {
       //if (!$this->RenderSpoilers) return;
       $Sender->AddJsFile('spoilers.js', 'plugins/Spoilers');
