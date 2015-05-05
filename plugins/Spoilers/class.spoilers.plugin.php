@@ -66,6 +66,11 @@ class SpoilersPlugin extends Gdn_Plugin {
       $this->RenderSpoilers($Sender);
    }
 
+   public function MessagesController_BeforeConversationMessageBody_Handler(&$Sender) {
+      $Sender->EventArguments['Object']->FormatBody = &$Sender->EventArguments['Message']->Body;
+      $this->RenderSpoilers($Sender);
+   }
+
    protected function RenderSpoilers(&$Sender) {
       if (!$this->RenderSpoilers || Gdn::PluginManager()->CheckPlugin('NBBC') ) {
          return;
