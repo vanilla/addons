@@ -43,6 +43,10 @@ class SpoilersPlugin extends Gdn_Plugin {
       $this->PrepareController($Sender);
    }
 
+   public function MessagesController_Render_Before(&$Sender) {
+      $this->PrepareController($Sender);
+   }
+
    protected function PrepareController(&$Sender) {
       //if (!$this->RenderSpoilers) return;
       $Sender->AddJsFile('spoilers.js', 'plugins/Spoilers');
@@ -59,6 +63,11 @@ class SpoilersPlugin extends Gdn_Plugin {
 
    public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
       $Sender->EventArguments['Object']->FormatBody = &$Sender->Comment->Body;
+      $this->RenderSpoilers($Sender);
+   }
+
+   public function MessagesController_BeforeConversationMessageBody_Handler(&$Sender) {
+      $Sender->EventArguments['Object']->FormatBody = &$Sender->EventArguments['Message']->Body;
       $this->RenderSpoilers($Sender);
    }
 

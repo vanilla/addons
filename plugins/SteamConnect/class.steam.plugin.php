@@ -120,8 +120,15 @@ class SteamPlugin extends Gdn_Plugin {
         $Form->SetFormValue('Provider', 'Steam');
         $Form->SetFormValue('ProviderName', 'Steam');
         $Form->SetFormValue('UniqueID', $SteamID);
-        $Form->SetFormValue('Name', $player->personaname);
         $Form->SetFormValue('Photo', $player->avatarfull);
+
+        /**
+         * Check to see if we already have an authentication record for this user.  If we don't, setup their username.
+         */
+        if (!Gdn::UserModel()->GetAuthentication($SteamID, 'Steam')) {
+            $Form->SetFormValue('Name', $player->personaname);
+        }
+
         if (isset($player->realname)) {
             $Form->SetFormValue('FullName', $player->realname);
         }
