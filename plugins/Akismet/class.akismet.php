@@ -207,6 +207,7 @@ class Akismet
 
    /**
     * Specify the character encoding for the form values included in comment_* parameters.
+    * 
     * @param string $blogCharset Character set for parameters.
     */
    public function setBlogCharset($blogCharset) {
