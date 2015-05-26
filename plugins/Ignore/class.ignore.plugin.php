@@ -352,7 +352,7 @@ class IgnorePlugin extends Gdn_Plugin {
    }
 
    /**
-    * Add a new message to a conversatio
+    * Add a new message to a conversation.
     *
     * @param MessageController $Sender
     */
