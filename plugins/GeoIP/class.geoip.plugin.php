@@ -94,8 +94,8 @@ class GeoipPlugin extends Gdn_Plugin {
     public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender, $Args=[]) {
 
         echo "<p>Hello Discussion: {$Args['Discussion']->InsertIPAddress}</p>";
-        GDN::cache()->store('testkey', 'blatest');
-        echo "<p>Test Cache Data: ".GDN::cache()->get('testkey')."</p>\n";
+        //GDN::cache()->store('testkey', 'blatest');
+        //echo "<p>Test Cache Data: ".GDN::cache()->get('testkey')."</p>\n";
 
         $ipList = [$Args['Discussion']->InsertIPAddress];
         foreach ($Sender->Data('Comments')->result() as $comment) {
@@ -112,6 +112,7 @@ class GeoipPlugin extends Gdn_Plugin {
 
         return true;
     }
+
 
     /**
      * Gets GeoIP info for given IP list.
@@ -134,8 +135,8 @@ echo "<pre>Cache List: ".print_r($targetKeys,true)."</pre>\n";
 
         $cachedData   = $this->getCache($targetKeys);
         $cachedIPList = $this->extractIPList($cachedData);
-        echo "<pre>Cached IPs: ".print_r($cachedIPList,true)."</pre>\n";
-        echo "<pre>Cache Data: ".print_r($cachedData,true)."</pre>\n";
+echo "<pre>Cached IPs: ".print_r($cachedIPList,true)."</pre>\n";
+echo "<pre>Cache Data: ".print_r($cachedData,true)."</pre>\n";
 
         $loadList = [];
         foreach ($input AS $i => $ip) {
@@ -148,8 +149,6 @@ echo "<pre>Load IP List: ".print_r($loadList,true)."</pre>\n";
 
         $loadedIPs = self::ipInfo($loadList, true, true);
 echo "<pre>Loaded IPs: ".print_r($loadedIPs,true)."</pre>\n";
-
-
 
     }
 
@@ -167,7 +166,6 @@ echo "<pre>Loaded IPs: ".print_r($loadedIPs,true)."</pre>\n";
         }
 
         $output = GDN::cache()->Get($input);
-        echo "<pre>Cached Data: ".print_r($output,true)."</pre>\n";
 
         return $output;
     }
@@ -294,6 +292,7 @@ echo "<pre>Loaded IPs: ".print_r($loadedIPs,true)."</pre>\n";
         }
 
         // Check if given IP is an actualy IP:
+echo "<p>Checking IP</p>\n";
         if(!self::isIP($ip)) {
             trigger_error("Invalid IP passed to ".__METHOD__."()", E_USER_NOTICE);
             return false;
@@ -305,17 +304,14 @@ echo "<pre>Cached IP Info (".self::cacheKey($ip)."): ".print_r($cached,true)."</
 
         // Return cached info IF it exists:
         if (!empty($cached)) {
-echo "<p>".__METHOD__."() Returning Cache!</p>\n";
             return $cached;
         }
-
-echo "<p>Hello ".__METHOD__."()!</p>\n";
 
         // If user's IP is local, get public IP address:
         if ($checkLocal == true && self::isLocalIP($ip)) {
             //echo "Getting Public IP<br/>\n";
             $pubIP = self::myIP();
-            if (!empty($pubIP)) {
+            if (empty($pubIP)) {
                 trigger_error("Failed to lookup public IP in ".__METHOD__."()!");
                 return false;
             }
@@ -445,6 +441,12 @@ echo "<pre>Cached Data Saved (".self::cacheKey($ip)."): ".print_r(GDN::cache()->
         return true;
     }
 
+    /**
+     * Generate a cache key based on given $input. (normally an IP)
+     *
+     * @param $input Given input to create cache key with.
+     * @return string Returns requested cache key.
+     */
     public static function cacheKey($input) {
         return self::cachePre.$input;
     }
