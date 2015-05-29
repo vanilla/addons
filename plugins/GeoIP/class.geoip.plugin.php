@@ -54,8 +54,10 @@ class GeoipPlugin extends Gdn_Plugin {
         return true;
     }
 
-
     public function Controller_Index($Sender) {
+
+
+        // echo "<p>Do Login:".C('Plugin.GeoIP.doLogin')."</p>";
 
         $Sender->Permission('Garden.Settings.Manage');
         $Sender->SetData('PluginDescription',$this->GetPluginKey('Description'));
@@ -93,7 +95,6 @@ class GeoipPlugin extends Gdn_Plugin {
         $Sender->Render($this->GetView('geoip.php'));
     }
 
-
     /**
      * Load GeoIP data upon login.
      *
@@ -102,6 +103,11 @@ class GeoipPlugin extends Gdn_Plugin {
      * @return bool Returns true on success, false on failure.
      */
     public function UserModel_AfterSignIn_Handler($Sender, $Args=[]) {
+
+        // Check IF feature is enabled for this plugin:
+        if (C('Plugin.GeoIP.doLogin')==false) {
+            return false;
+        }
 
         $userID = Gdn::Session()->User->UserID;
         if (empty($user)) {
@@ -114,6 +120,11 @@ class GeoipPlugin extends Gdn_Plugin {
     }
 
     public function Base_AuthorInfo_Handler($Sender, $Args=[]) {
+
+        // Check IF feature is enabled for this plugin:
+        if (C('Plugin.GeoIP.doDiscussions')==false) {
+            return false;
+        }
 
         // Get IP based on context:
         if (!empty($Args['Comment']->InsertIPAddress)) { // If author is from comment.
@@ -139,7 +150,13 @@ class GeoipPlugin extends Gdn_Plugin {
         return;
     }
 
+
     public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender, $Args=[]) {
+
+        // Check IF feature is enabled for this plugin:
+        if (C('Plugin.GeoIP.doDiscussions')==false) {
+            return false;
+        }
 
         // Create list of IPs from this discussion we want to look up.
         $ipList = [$Args['Discussion']->InsertIPAddress]; // Add discussion IP.
@@ -154,7 +171,6 @@ class GeoipPlugin extends Gdn_Plugin {
 
         return true;
     }
-
 
     /**
      * Gets GeoIP info for given IP list.
@@ -279,7 +295,6 @@ class GeoipPlugin extends Gdn_Plugin {
 
         return $output;
     } // Closes ipQuery().
-
 
     /**
      * Add IP information to local cache.

@@ -32,8 +32,4 @@ echo $this->Form->Close('Save');
 ?>
 
 
-<pre>
-    <?php print_r($this->Data); ?>
-</pre>
-
 <!-- END GeoIP.php template -->
