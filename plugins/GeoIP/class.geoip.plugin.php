@@ -22,6 +22,7 @@ class GeoipPlugin extends Gdn_Plugin {
     const   cachePre    = 'GeoIP-Plugin_';
 
     private $localCache = [];
+    private $localCacheMax = 100;
 
 
     public function __construct() {
@@ -94,7 +95,7 @@ class GeoipPlugin extends Gdn_Plugin {
             return false;
         }
 
-        // @todo Run ipQuery to get list IP if not cached.
+        // Make sure target IP is in local cache:
         if (!isset($this->localCache[$targetIP])) {
             $this->ipInfo($targetIP);
         }
@@ -103,6 +104,7 @@ class GeoipPlugin extends Gdn_Plugin {
         $country_code  = strtolower($this->localCache[$targetIP]['country_code']);
         $country_name  = $this->localCache[$targetIP]['country_name'];
 
+        // Echo Image:
         echo Img("/plugins/GeoIP/design/flags/{$country_code}.png", ['alt'=>"({$country_name})", 'title'=>$country_name]);
 
         return;
@@ -159,7 +161,6 @@ class GeoipPlugin extends Gdn_Plugin {
             }
         }
         $loadList   = array_unique($loadList);
-        // echo "<pre>Load IP List: ".print_r($loadList,true)."</pre>\n";
 
         // Load target IP info from loadList (uncached):
         $loadedInfo = self::ipQuery($loadList, true, true); // Do not look in cache...
@@ -172,7 +173,8 @@ class GeoipPlugin extends Gdn_Plugin {
         }
 
         // Merge output/results with existing localCache:
-        $this->localCache = array_merge($this->localCache, $output);
+        //$this->localCache = array_merge($this->localCache, $output);
+        $this->addLocalCache($output);
 
         return $output;
     }
@@ -219,23 +221,26 @@ class GeoipPlugin extends Gdn_Plugin {
 
         // If user's IP is local, get public IP address:
         if ($checkLocal == true && self::isLocalIP($ip)) {
-            echo "Getting Public IP<br/>\n";
+            //echo "Getting Private IP<br/>\n";
             $pubIP = self::myIP();
+            $checkedLocal = true;
             if (empty($pubIP)) {
                 trigger_error("Failed to lookup public IP in ".__METHOD__."()!");
                 return false;
             }
+        } else {
+            $checkedLocal = false;
         }
 
+        // Query GeoIP database:
         $searchIP = !empty($pubIP) ? $pubIP : $ip;
-        echo "<p>Search IP: {$searchIP}</p>\n";
         $output   = geoip_record_by_name($searchIP);
 
+        // Store target IP in data set as well as whether checkLocal is enabled.
         $output['_ip'] = $ip;
-        $output['_checkLocal'] = $checkLocal;
-        // echo "<pre>Loaded GeoIP Info: ".print_r($output,true)."</pre>\n";
+        $output['_checkedLocal'] = $checkedLocal;
 
-
+        // Store to cache:
         if ($caching == true) {
             GDN::cache()->store(self::cacheKey($ip), $output);
             // echo "<pre>Cached Data Saved (".self::cacheKey($ip)."): ".print_r(GDN::cache()->get(self::cacheKey($ip)),true)."</pre>\n";
@@ -244,6 +249,26 @@ class GeoipPlugin extends Gdn_Plugin {
         return $output;
     } // Closes ipQuery().
 
+
+    /**
+     * Add IP information to local cache.
+     *
+     * Merges given input with this->localCache.
+     *
+     * @todo Verify size of local cache is smaller than this->localCacheMax.
+     *
+     * @param $input array Data being added to localCache.
+     * @return bool Returns true/false upon success.
+     */
+    private function addLocalCache($input) {
+        if (empty($input) || !is_array($input)) {
+            return false;
+        }
+
+        $this->localCache = array_merge($this->localCache, $input);
+
+        return $this->localCache;
+    }
 
     /**
      * Get cached records for given cache key(s).
@@ -260,11 +285,13 @@ class GeoipPlugin extends Gdn_Plugin {
 
         // Check Local Cache:
         $local = [];
-        foreach ($input AS $targetItem) {
+        foreach ($input AS $i => $targetItem) {
             if (isset($this->localCache[$targetItem])) {
                 $local[] = $targetItem;
+                //unset($input[$i]);
             }
         }
+        //$input = array_values($input); // @todo remove localCache items from input array for optimization...
 
         // Get Cached Records:
         $cached = GDN::cache()->Get($input);
@@ -372,7 +399,7 @@ class GeoipPlugin extends Gdn_Plugin {
      * @param $ip IP to be verified.
      * @return bool Returns true or false.
      */
-    public static function isLocalIP($ip) {
+    private static function isLocalIP($ip) {
         if (empty($ip) OR !self::isIP($ip)) {
             trigger_error("Invalid IP passed to ".__METHOD__."()", E_USER_NOTICE);
             return false;
@@ -393,7 +420,7 @@ class GeoipPlugin extends Gdn_Plugin {
      * @param $range Subnet to be verified agains.
      * @return bool Returns true if IP is in subnet. False if not.
      */
-    public static function isInSubnet($ip, $range) {
+    private static function isInSubnet($ip, $range) {
         if (!self::isIP($ip)) {
             return false;
         }
@@ -415,7 +442,7 @@ class GeoipPlugin extends Gdn_Plugin {
      *
      * @return string
      */
-    public static function myIP() {
+    private static function myIP() {
 
         if (!self::isLocalIP($_SERVER['REMOTE_ADDR'])) {
             return $_SERVER['REMOTE_ADDR'];
@@ -442,7 +469,7 @@ class GeoipPlugin extends Gdn_Plugin {
      * @param int $version IP version we are verifying
      * @return bool Returns true if given IP is a proper IP. False if not.
      */
-    public static function isIP($ip, $version=4) {
+    private static function isIP($ip, $version=4) {
         if (empty($ip)) {
             return false;
         } else if (!in_array($version,[4,6])) {
@@ -479,7 +506,7 @@ class GeoipPlugin extends Gdn_Plugin {
      * @param $input Given input to create cache key with.
      * @return string Returns requested cache key.
      */
-    public static function cacheKey($input) {
+    private static function cacheKey($input) {
         return self::cachePre.$input;
     }
 
