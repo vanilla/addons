@@ -2,17 +2,17 @@
 
 // Define the plugin:
 $PluginInfo['GeoIP'] = array(
-   'Description' => 'Provides Geo IP location functionality.',
-   'Version' => '0.0.1',
-   'RequiredApplications' => array('Vanilla' => '2.0.10'),
-   'RequiredTheme' => FALSE, 
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => FALSE,
-   'SettingsUrl' => '/plugin/geoip',
-   'SettingsPermission' => 'Garden.AdminUser.Only',
-   'Author' => "Deric D. Davis",
-   'AuthorEmail' => 'deric.d@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+    'Description' => 'Provides Geo IP location functionality.',
+    'Version' => '0.0.1',
+    'RequiredApplications' => array('Vanilla' => '2.0.10'),
+    'RequiredTheme' => FALSE,
+    'RequiredPlugins' => FALSE,
+    'HasLocale' => FALSE,
+    'SettingsUrl' => '/plugin/geoip',
+    'SettingsPermission' => 'Garden.AdminUser.Only',
+    'Author' => "Deric D. Davis",
+    'AuthorEmail' => 'deric.d@vanillaforums.com',
+    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
 class GeoipPlugin extends Gdn_Plugin {
@@ -44,9 +44,9 @@ class GeoipPlugin extends Gdn_Plugin {
 
     public function PluginController_GeoIP_Create($Sender) {
 
-        $Sender->Title('DDD: GeoIP Plugin');
+        $Sender->Title('Carmen Sandiego Plugin (GeoIP)');
         $Sender->AddSideMenu('plugin/geoip');
-        //$Sender->AddSideMenu();
+        $Sender->Form = new Gdn_Form();
 
         $this->Dispatch($Sender, $Sender->RequestArgs);
         $this->Render('geoip');
@@ -57,26 +57,56 @@ class GeoipPlugin extends Gdn_Plugin {
 
     public function Controller_Index($Sender) {
 
-    	echo "Hello Index World!\n";
-    	//exit();
+        $Sender->Permission('Garden.Settings.Manage');
+        $Sender->SetData('PluginDescription',$this->GetPluginKey('Description'));
+
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+        $ConfigurationModel->SetField(array(
+            'Plugin.GeoIP.doLogin'       => false,
+            'Plugin.GeoIP.doDiscussions' => false,
+        ));
+
+        // Set the model on the form.
+        $Sender->Form->SetModel($ConfigurationModel);
+
+
+        // If seeing the form for the first time...
+        if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+            // Apply the config settings to the form.
+            $Sender->Form->SetData($ConfigurationModel->Data);
+
+        } else {
+
+            // @todo Set proper validation rules.
+            //$ConfigurationModel->Validation->ApplyRule('Plugin.Example.RenderCondition', 'Required');
+            //$ConfigurationModel->Validation->ApplyRule('Plugin.Example.TrimSize', 'Required');
+            //$ConfigurationModel->Validation->ApplyRule('Plugin.Example.TrimSize', 'Integer');
+
+            $Saved = $Sender->Form->Save();
+            if ($Saved) {
+                $Sender->StatusMessage = T("Your changes have been saved.");
+            }
+        }
+
+
+        $Sender->Render($this->GetView('geoip.php'));
     }
-    public function Controller_Tester($Sender) {
-
-        $Sender->SetData('bla', 'tester');
-        $Sender->SetData('method', __METHOD__);
-        $Sender->SetData('country', 'ca');
-        //echo "Hello Tester World!\n";
-    	//exit();
-
-        return;
-    }
 
 
+    /**
+     * Load GeoIP data upon login.
+     *
+     * @param $Sender Referencing object
+     * @param array $Args Arguments provided
+     * @return bool Returns true on success, false on failure.
+     */
     public function UserModel_AfterSignIn_Handler($Sender, $Args=[]) {
 
         $userID = Gdn::Session()->User->UserID;
-        system("date >> /tmp/bla.txt");
-        system("echo '  UserID={$userID}' >> /tmp/bla.txt");
+        if (empty($user)) {
+            return false;
+        }
 
         $this->setUserMetaGeo($userID);
 
@@ -120,7 +150,7 @@ class GeoipPlugin extends Gdn_Plugin {
 
         // Get IP information for given IP list:
         $this->ipInfo($ipList);
-echo "<pre>localCache: ".print_r($this->localCache,true)."</pre>\n";
+        //echo "<pre>localCache: ".print_r($this->localCache,true)."</pre>\n";
 
         return true;
     }
