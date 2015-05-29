@@ -17,7 +17,6 @@ $PluginInfo['GeoIP'] = array(
 
 class GeoipPlugin extends Gdn_Plugin {
 
-    private $cacheObj;
     public  $geoExpTime = 604800; // 604800 = 1 week
     const   cachePre    = 'GeoIP-Plugin_';
 
@@ -121,6 +120,7 @@ class GeoipPlugin extends Gdn_Plugin {
 
         // Get IP information for given IP list:
         $this->ipInfo($ipList);
+echo "<pre>localCache: ".print_r($this->localCache,true)."</pre>\n";
 
         return true;
     }
@@ -239,6 +239,7 @@ class GeoipPlugin extends Gdn_Plugin {
         // Store target IP in data set as well as whether checkLocal is enabled.
         $output['_ip'] = $ip;
         $output['_checkedLocal'] = $checkedLocal;
+        $output['_time'] = microtime(true);
 
         // Store to cache:
         if ($caching == true) {
