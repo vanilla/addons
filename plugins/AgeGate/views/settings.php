@@ -15,7 +15,7 @@ echo $this->Form->Errors();
         <?php echo $this->Form->TextBox('MinimumAge', array('Class' => 'SmallInput')); ?>
     </li>
     <li>
-        <?php echo $this->Form->CheckBox('AddConfirmation', 'Allow underage users to register with a confirmation of consent');  ?>
+        <?php echo $this->Form->CheckBox('AddConfirmation', 'Allow underage users to register with a confirmation of consent.');  ?>
     </li>
 </ul>
 

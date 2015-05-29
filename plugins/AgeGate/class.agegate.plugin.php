@@ -3,9 +3,9 @@
 $PluginInfo['AgeGate'] = array(
     'Name' => 'Age Gate',
     'Description' => 'Add Date of Birth to the registration form, and require a certain age to register.',
-    'Version' => '1.0',
-    'Author' => "John Ashton",
-    'AuthorEmail' => 'john@vanillaforums.com',
+    'Version' => '1.1.0',
+    'Author' => "Becky Van Bussel",
+    'AuthorEmail' => 'becky@vanillaforums.com',
     'SettingsUrl' => '/settings/agegate', // Url of the plugin's settings page.
 
 );
@@ -27,7 +27,7 @@ class AgeGatePlugin extends Gdn_Plugin {
      *
      * @param EntryController $sender Sending Controller.
      */
-    public function EntryController_Render_Before(&$sender) {
+    public function EntryController_Render_Before($sender) {
         $sender->AddJsFile('agegate.js', 'plugins/AgeGate');
     }
 
@@ -137,10 +137,13 @@ class AgeGatePlugin extends Gdn_Plugin {
             if ($sender->Form->ErrorCount() == 0) {
                 SaveToConfig('Plugins.AgeGate.MinimumAge', $minimumAge);
                 SaveToConfig('Plugins.AgeGate.AddConfirmation', $addConfirmation);
+                $sender->InformMessage(T('Saved'));
             }
         } else {
-            $sender->Form->SetData(array('MinimumAge' => C('Plugins.AgeGate.MinimumAge'),
-                'AddConfirmation' => C('Plugins.AgeGate.AddConfirmation')));
+            $sender->Form->SetData(array(
+               'MinimumAge' => C('Plugins.AgeGate.MinimumAge'),
+               'AddConfirmation' => C('Plugins.AgeGate.AddConfirmation')
+            ));
         }
 
         $sender->Render($sender->FetchViewLocation('settings', '', 'plugins/AgeGate'));
