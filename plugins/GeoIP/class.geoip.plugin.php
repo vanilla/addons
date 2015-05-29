@@ -21,6 +21,8 @@ class GeoipPlugin extends Gdn_Plugin {
     public  $geoExpTime = 604800; // 604800 = 1 week
     const   cachePre    = 'GeoIP-Plugin_';
 
+    private $localCache = [];
+
 
     public function __construct() {
 
@@ -76,39 +78,47 @@ class GeoipPlugin extends Gdn_Plugin {
         system("date >> /tmp/bla.txt");
         system("echo '  UserID={$userID}' >> /tmp/bla.txt");
 
-        $this->setUserGeo($userID);
+        $this->setUserMetaGeo($userID);
 
         return true;
     }
 
     public function Base_AuthorInfo_Handler($Sender, $Args=[]) {
 
-        // echo "<pre>Args: ".print_r($Args,true)."</pre>\n";
-        $userID    = $Args['Author']->UserID;
-        $userMeta  = $this->getUserGeo($userID, 'geo_country');
+        // Get IP based on context:
+        if (!empty($Args['Comment']->InsertIPAddress)) { // If author is from comment.
+            $targetIP = $Args['Comment']->InsertIPAddress;
+        } else if (!empty($Args['Discussion']->InsertIPAddress)) { // If author is from discussion.
+            $targetIP = $Args['Discussion']->InsertIPAddress;
+        } else {
+            return false;
+        }
 
-        echo Img("/plugins/GeoIP/design/flags/".strtolower($userMeta['geo_country']).".png");
-        //echo "<pre>User Meta: ".print_r($userMeta,true)."</pre>\n";
+        // @todo Run ipQuery to get list IP if not cached.
+        if (!isset($this->localCache[$targetIP])) {
+            $this->ipInfo($targetIP);
+        }
+
+        // Get Country Code:
+        $country_code  = strtolower($this->localCache[$targetIP]['country_code']);
+        $country_name  = $this->localCache[$targetIP]['country_name'];
+
+        echo Img("/plugins/GeoIP/design/flags/{$country_code}.png", ['alt'=>"({$country_name})", 'title'=>$country_name]);
+
+        return;
     }
 
     public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender, $Args=[]) {
 
-        echo "<p>Hello Discussion: {$Args['Discussion']->InsertIPAddress}</p>";
-        //GDN::cache()->store('testkey', 'blatest');
-        //echo "<p>Test Cache Data: ".GDN::cache()->get('testkey')."</p>\n";
-
-        $ipList = [$Args['Discussion']->InsertIPAddress];
+        // Create list of IPs from this discussion we want to look up.
+        $ipList = [$Args['Discussion']->InsertIPAddress]; // Add discussion IP.
         foreach ($Sender->Data('Comments')->result() as $comment) {
             if(empty($comment->InsertIPAddress)) continue;
             $ipList[] = $comment->InsertIPAddress;
         }
-        echo "<pre>IPs All: ".print_r($ipList,true)."</pre>\n";
 
-        $geoInfo = $this->getGeoFromList($ipList);
-
-        //echo "<pre>Geo Info: ".print_r($geoInfo,true)."</pre>\n";
-        //echo "<pre>All Args: ".print_r($Args,true)."</pre>\n";
-        //echo "<pre>Comments: ".print_r($Sender->Data('Comments'),true)."</pre>\n";
+        // Get IP information for given IP list:
+        $this->ipInfo($ipList);
 
         return true;
     }
@@ -120,37 +130,120 @@ class GeoipPlugin extends Gdn_Plugin {
      * @param $input array IP array list
      * @return bool Returns true on success
      */
-    private function getGeoFromList($input) {
-        if (empty($input) OR !is_array($input)) {
+    private function ipInfo($input) {
+        if (empty($input)) {
             return false;
         }
+        if (!is_array($input)) {
+            $input = [$input];
+        }
 
-        // Build list of target cache Keys
+        // Build list of target cache Keys:
         $targetKeys = [];
         foreach ($input AS $item) {
             $targetKeys[] = self::cacheKey($item);
         }
         $targetKeys = array_unique($targetKeys);
-echo "<pre>Cache List: ".print_r($targetKeys,true)."</pre>\n";
 
+        // Get data that is already cached:
         $cachedData   = $this->getCache($targetKeys);
-        $cachedIPList = $this->extractIPList($cachedData);
-echo "<pre>Cached IPs: ".print_r($cachedIPList,true)."</pre>\n";
-echo "<pre>Cache Data: ".print_r($cachedData,true)."</pre>\n";
 
+        // Get list of IPs from data that is already cached:
+        $cachedIPList = $this->extractIPList($cachedData);
+
+        // Build list of IPs to load:
         $loadList = [];
         foreach ($input AS $i => $ip) {
             if (!in_array($ip, $cachedIPList)) {
                 $loadList[] = $ip;
             }
         }
-        $loadList = array_unique($loadList);
-echo "<pre>Load IP List: ".print_r($loadList,true)."</pre>\n";
+        $loadList   = array_unique($loadList);
+        // echo "<pre>Load IP List: ".print_r($loadList,true)."</pre>\n";
 
-        $loadedIPs = self::ipInfo($loadList, true, true);
-echo "<pre>Loaded IPs: ".print_r($loadedIPs,true)."</pre>\n";
+        // Load target IP info from loadList (uncached):
+        $loadedInfo = self::ipQuery($loadList, true, true); // Do not look in cache...
+        $info       = array_merge($cachedData, $loadedInfo);
 
+        // Make sure IP is pointer in array:
+        $output = [];
+        foreach ($info AS $item) {
+            $output[$item['_ip']] = $item;
+        }
+
+        // Merge output/results with existing localCache:
+        $this->localCache = array_merge($this->localCache, $output);
+
+        return $output;
     }
+
+    /**
+     * Looks up GeoIP information for given IP.
+     *
+     * If $checkLocal is true, function will attempt to get public
+     * info if given IP is a local network IP.
+     *
+     * @param $ip IP address we are looking up
+     * @param bool $checkLocal Enable checking of public IP on private subnet.
+     * @param bool $caching Enable caching in this method.
+     * @return array|bool
+     */
+    public static function ipQuery($ip, $checkLocal = false, $caching = true) {
+        // IF given IP input is an array of IPs:
+
+        if (is_array($ip)) {
+            $output = [];
+            foreach ($ip as $item) {
+                $output[] = self::ipQuery($item, $checkLocal, $caching);
+            }
+            return $output;
+        }
+
+        // Check if given IP is an actualy IP:
+        if(!self::isIP($ip)) {
+            trigger_error("Invalid IP passed to ".__METHOD__."()", E_USER_NOTICE);
+            return false;
+        }
+
+        // IF caching is true, check cache first:
+        if ($caching==true) {
+            // Check Cache:
+            $cached = GDN::cache()->get(self::cacheKey($ip));
+            // echo "<pre>Cached IP Info (".self::cacheKey($ip)."): ".print_r($cached,true)."</pre>\n";
+
+            // Return cached info IF it exists:
+            if (!empty($cached)) {
+                return $cached;
+            }
+        }
+
+        // If user's IP is local, get public IP address:
+        if ($checkLocal == true && self::isLocalIP($ip)) {
+            echo "Getting Public IP<br/>\n";
+            $pubIP = self::myIP();
+            if (empty($pubIP)) {
+                trigger_error("Failed to lookup public IP in ".__METHOD__."()!");
+                return false;
+            }
+        }
+
+        $searchIP = !empty($pubIP) ? $pubIP : $ip;
+        echo "<p>Search IP: {$searchIP}</p>\n";
+        $output   = geoip_record_by_name($searchIP);
+
+        $output['_ip'] = $ip;
+        $output['_checkLocal'] = $checkLocal;
+        // echo "<pre>Loaded GeoIP Info: ".print_r($output,true)."</pre>\n";
+
+
+        if ($caching == true) {
+            GDN::cache()->store(self::cacheKey($ip), $output);
+            // echo "<pre>Cached Data Saved (".self::cacheKey($ip)."): ".print_r(GDN::cache()->get(self::cacheKey($ip)),true)."</pre>\n";
+        }
+
+        return $output;
+    } // Closes ipQuery().
+
 
     /**
      * Get cached records for given cache key(s).
@@ -165,7 +258,19 @@ echo "<pre>Loaded IPs: ".print_r($loadedIPs,true)."</pre>\n";
             return [];
         }
 
-        $output = GDN::cache()->Get($input);
+        // Check Local Cache:
+        $local = [];
+        foreach ($input AS $targetItem) {
+            if (isset($this->localCache[$targetItem])) {
+                $local[] = $targetItem;
+            }
+        }
+
+        // Get Cached Records:
+        $cached = GDN::cache()->Get($input);
+
+        // Merge local and cached records:
+        $output = array_merge($local, $cached);
 
         return $output;
     }
@@ -197,7 +302,7 @@ echo "<pre>Loaded IPs: ".print_r($loadedIPs,true)."</pre>\n";
      * @param $userID
      * @return bool
      */
-    private function setUserGeo($userID) {
+    private function setUserMetaGeo($userID) {
         if (empty($userID) OR !is_numeric($userID)) {
             tigger_error("Invalid UserID passed to ".__METHOD__."()");
             return false;
@@ -216,7 +321,7 @@ echo "<pre>Loaded IPs: ".print_r($loadedIPs,true)."</pre>\n";
         }
         //echo "<p>User IP: '{$userIP}'</p>\n";
 
-        $ipInfo = self::ipInfo($userIP,true);
+        $ipInfo = self::ipQuery($userIP,true,true);
         if (empty($ipInfo)) {
             trigger_error("Failed to get IP info in ".__METHOD__."()");
             return false;
@@ -238,7 +343,7 @@ echo "<pre>Loaded IPs: ".print_r($loadedIPs,true)."</pre>\n";
      * @param $userID Target user's ID number.
      * @return array|bool Returns array of information or false on failure.
      */
-    private function getUserGeo($userID, $field='geo_%') {
+    private function getUserMetaGeo($userID, $field='geo_%') {
         if (empty($userID) OR !is_numeric($userID)) {
             tigger_error("Invalid UserID passed to ".__METHOD__."()", E_USER_WARNING);
             return false;
@@ -256,83 +361,10 @@ echo "<pre>Loaded IPs: ".print_r($loadedIPs,true)."</pre>\n";
                 $output[$var] = $value;
             }
         }
-/* Yeah no... this will be way to slow.
-        $output = [
-            'country'    =>  GDN::userMetaModel()->getUserMeta($userID, 'geo_country'),
-            'latitude'   =>  GDN::userMetaModel()->getUserMeta($userID, 'geo_latitude'),
-            'longitude'  =>  GDN::userMetaModel()->getUserMeta($userID, 'geo_longitude'),
-            'city'       =>  GDN::userMetaModel()->getUserMeta($userID, 'geo_city'),
-            'updated'    =>  GDN::userMetaModel()->getUserMeta($userID, 'geo_updated'),
-        ];
-*/
+
         return $output;
     }
 
-
-    /**
-     * Looks up GeoIP information for given IP.
-     *
-     * If $checkLocal is true, function will attempt to get public
-     * info if given IP is a local network IP.
-     *
-     * @param $ip IP address we are looking up
-     * @param bool $checkLocal Enable checking of public IP on private subnet.
-     * @param bool $caching Enable caching in this method.
-     * @return array|bool
-     */
-    public static function ipInfo($ip, $checkLocal = false, $caching = true) {
-
-        // IF given IP input is an array of IPs:
-        if (is_array($ip)) {
-            $output = [];
-            foreach ($ip as $item) {
-                $output[] = self::ipInfo($item, $checkLocal, $caching);
-            }
-            return $output;
-        }
-
-        // Check if given IP is an actualy IP:
-echo "<p>Checking IP</p>\n";
-        if(!self::isIP($ip)) {
-            trigger_error("Invalid IP passed to ".__METHOD__."()", E_USER_NOTICE);
-            return false;
-        }
-
-        // Check Cache:
-        $cached = GDN::cache()->get(self::cacheKey($ip));
-echo "<pre>Cached IP Info (".self::cacheKey($ip)."): ".print_r($cached,true)."</pre>\n";
-
-        // Return cached info IF it exists:
-        if (!empty($cached)) {
-            return $cached;
-        }
-
-        // If user's IP is local, get public IP address:
-        if ($checkLocal == true && self::isLocalIP($ip)) {
-            //echo "Getting Public IP<br/>\n";
-            $pubIP = self::myIP();
-            if (empty($pubIP)) {
-                trigger_error("Failed to lookup public IP in ".__METHOD__."()!");
-                return false;
-            }
-        }
-
-        $searchIP = !empty($pubIP) ? $pubIP : $ip;
-        $output   = geoip_record_by_name($searchIP);
-
-        $output['_ip'] = $ip;
-        $output['_checkLocal'] = $checkLocal;
-echo "<pre>Loaded GeoIP Info: ".print_r($output,true)."</pre>\n";
-
-
-        if ($caching == true) {
-echo "<p>Store to Cache!</p>\n";
-            GDN::cache()->store(self::cacheKey($ip), $output);
-echo "<pre>Cached Data Saved (".self::cacheKey($ip)."): ".print_r(GDN::cache()->get(self::cacheKey($ip)),true)."</pre>\n";
-        }
-
-        return $output;
-    } // Closes ipInfo().
 
     /**
      * Determines if given IP is a local IP.
