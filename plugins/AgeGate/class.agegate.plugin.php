@@ -3,9 +3,9 @@
 $PluginInfo['AgeGate'] = array(
     'Name' => 'Age Gate',
     'Description' => 'Add Date of Birth to the registration form, and require a certain age to register.',
-    'Version' => '1.0',
-    'Author' => "John Ashton",
-    'AuthorEmail' => 'john@vanillaforums.com',
+    'Version' => '1.1.0',
+    'Author' => "Becky Van Bussel",
+    'AuthorEmail' => 'becky@vanillaforums.com',
     'SettingsUrl' => '/settings/agegate', // Url of the plugin's settings page.
 
 );
@@ -20,6 +20,15 @@ class AgeGatePlugin extends Gdn_Plugin {
      */
     public function EntryController_RegisterBeforeTerms_Handler($sender, $args) {
         $this->EntryController_RegisterFormBeforeTerms_Handler($sender, $args);
+    }
+
+    /**
+     * Add AgeGate javascript file.
+     *
+     * @param EntryController $sender Sending Controller.
+     */
+    public function EntryController_Render_Before($sender) {
+        $sender->AddJsFile('agegate.js', 'plugins/AgeGate');
     }
 
     /**
@@ -44,14 +53,24 @@ class AgeGatePlugin extends Gdn_Plugin {
             );
         $years = array(0 => T('Year')) + $years;
 
-        echo '<li>';
-        echo $sender->Form->Label('Date of Birth', 'DOB');
+        $minimumAge = C('Plugins.AgeGate.MinimumAge', 0);
+        $addConfirmation = C('Plugins.AgeGate.AddConfirmation', false);
+
+        echo '<li class="agegate-dob">';
+        echo $sender->Form->Label('Birthday', 'DOB');
         echo $sender->Form->DropDown('Day', $days, array('class' => 'AgeGate'));
         echo ' ';
         echo $sender->Form->DropDown('Month', $months, array('class' => 'AgeGate'));
         echo ' ';
         echo $sender->Form->DropDown('Year', $years, array('class' => 'AgeGate'));
         echo '</li>';
+
+        if ($addConfirmation) {
+            echo '<input type="hidden" id="Form_MinimumAge" name="MinimumAge" value="' . $minimumAge . '">';
+            echo '<li class="agegate-confirmation js-agegate-confirmation Hidden">';
+            echo $sender->Form->CheckBox('AgeGateConfirmation', sprintf(T('As I am under %d years of age, I confirm that I have received proper consent in participating in this forum.'), $minimumAge));
+            echo '</li>';
+        }
     }
 
     /**
@@ -78,8 +97,14 @@ class AgeGatePlugin extends Gdn_Plugin {
         $interval = $datetime1->diff($datetime2);
         $age =  $interval->format('%y');
         $minimumAge = C('Plugins.AgeGate.MinimumAge', 0);
+        $addConfirmation = C('Plugins.AgeGate.AddConfirmation', false);
+
         if ($age < $minimumAge) {
-            $sender->UserModel->Validation->AddValidationResult('', sprintf("You must be at least %d years old to Register.", $minimumAge));
+            if ($addConfirmation) {
+                $sender->UserModel->Validation->ApplyRule('AgeGateConfirmation', 'Required', T('You must receive proper consent to participate in this forum.'));
+            } else {
+                $sender->UserModel->Validation->AddValidationResult('', sprintf("You must be at least %d years old to Register.", $minimumAge));
+            }
             return;
         }
 
@@ -103,15 +128,22 @@ class AgeGatePlugin extends Gdn_Plugin {
 
         if ($sender->Form->AuthenticatedPostBack()) {
             $minimumAge = $sender->Form->GetValue('MinimumAge');
+            $addConfirmation = $sender->Form->GetValue('AddConfirmation');
+
 
             if (!is_numeric($minimumAge)) {
                 $sender->Form->AddError('Please enter a valid number.');
             }
             if ($sender->Form->ErrorCount() == 0) {
                 SaveToConfig('Plugins.AgeGate.MinimumAge', $minimumAge);
+                SaveToConfig('Plugins.AgeGate.AddConfirmation', $addConfirmation);
+                $sender->InformMessage(T('Saved'));
             }
         } else {
-            $sender->Form->SetData(array('MinimumAge' => C('Plugins.AgeGate.MinimumAge')));
+            $sender->Form->SetData(array(
+               'MinimumAge' => C('Plugins.AgeGate.MinimumAge'),
+               'AddConfirmation' => C('Plugins.AgeGate.AddConfirmation')
+            ));
         }
 
         $sender->Render($sender->FetchViewLocation('settings', '', 'plugins/AgeGate'));
