@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @package Resolved
  * @copyright 2010-2015 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
@@ -29,8 +30,6 @@ $PluginInfo['Resolved'] = array(
  *  1.2        Commenting, spacening
  *
  * @author Matt Lincoln Russell <lincoln@vanillaforums.com>
- * @package Addons
- * @subpackage Resolved
  * @since 1.0
  */
 class ResolvedPlugin extends Gdn_Plugin {
