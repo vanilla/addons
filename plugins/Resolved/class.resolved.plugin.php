@@ -9,10 +9,10 @@
 $PluginInfo['Resolved'] = array(
     'Name' => 'Resolved Discussions',
     'Description' => "Adds an option to mark discussions as Resolved with custom permission. Resolved discussions are Closed to new participants, however additional posts by the OP unresolve it. Only users with the custom permission see its Resolved status.",
-    'Version' => '1.1',
+    'Version' => '1.2.1',
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RegisterPermissions' => array('Plugins.Resolved.Manage'),
-    'MobileFriendly' => TRUE,
+    'MobileFriendly' => true,
     'Author' => "Matt Lincoln Russell",
     'AuthorEmail' => 'lincolnwebs@gmail.com',
     'AuthorUrl' => 'http://lincolnwebs.com'
@@ -28,6 +28,7 @@ $PluginInfo['Resolved'] = array(
  *  1.0        Initial Release
  *  1.1
  *  1.2        Commenting, spacening
+ *  1.2.1      Fix DateResolved issue
  *
  * @author Matt Lincoln Russell <lincoln@vanillaforums.com>
  * @since 1.0
@@ -35,20 +36,36 @@ $PluginInfo['Resolved'] = array(
 class ResolvedPlugin extends Gdn_Plugin {
 
     /**
-     * Plugin setup method.
+     * Get a DiscussionModel.
      *
-     * Add 'Resolved' columns to the Discussion table.
+     * @staticvar DiscussionModel $model
+     * @return DiscussionModel Returns a DiscussionModel
+     */
+    public static function discussionModel() {
+        static $model = null;
+        if (!($model instanceof DiscussionModel)) {
+            $model = new DiscussionModel();
+        }
+        return $model;
+    }
+
+    /**
+     * Resolves a discussion
      *
+     * @param object $discussion
+     * @param int $resolve
      * @return void
      */
-    public function setup() {
+    public function resolve(&$discussion, $resolve) {
+        $resolution = array(
+            'Resolved' => $resolve,
+            'DateResolved' => $resolve ? Gdn_Format::toDateTime() : null,
+            'ResolvedUserID' => $resolve ? Gdn::session()->UserID : null
+        );
 
-        Gdn::structure()
-            ->Table('Discussion')
-            ->Column('Resolved', 'int', '0')
-            ->Column('DateResolved', 'datetime', TRUE)
-            ->Column('ResolvedUserID', 'int', TRUE)
-            ->Set();
+        $discussionID = val('DiscussionID', $discussion);
+        self::discussionModel()->setField($discussionID, $resolution);
+        svalr('Resolved', $discussion, $resolve);
     }
 
     /**
@@ -56,10 +73,10 @@ class ResolvedPlugin extends Gdn_Plugin {
      *
      * @return void
      */
-    public function Base_AfterBodyField_Handler($Sender, $Args) {
-        if (CheckPermission('Plugins.Resolved.Manage')) {
+    public function base_afterBodyField_handler($sender, $args) {
+        if (checkPermission('Plugins.Resolved.Manage')) {
             echo '<span class="ResolvedCheckbox">' .
-            $Sender->Form->CheckBox('Resolved', T('Resolved'), array('value' => '1')) . '</span>';
+            $sender->Form->checkBox('Resolved', T('Resolved'), array('value' => '1')) . '</span>';
         }
     }
 
@@ -68,20 +85,20 @@ class ResolvedPlugin extends Gdn_Plugin {
      *
      * @return void
      */
-    public function Base_DiscussionOptions_Handler($Sender, $Args) {
-        $Discussion = $Args['Discussion'];
-        $Resolved = GetValue('Resolved', $Discussion);
-        $NewResolved = (int) !$Resolved;
-        if (CheckPermission('Plugins.Resolved.Manage')) {
-            $Label = T($Resolved ? 'Unresolve' : 'Resolve');
-            $Url = "/discussion/resolve?discussionid={$Discussion->DiscussionID}&resolve=$NewResolved";
+    public function base_discussionOptions_handler($sender, $args) {
+        $discussion = $args['Discussion'];
+        $resolved = val('Resolved', $discussion);
+        $newResolved = (int) !$resolved;
+        if (checkPermission('Plugins.Resolved.Manage')) {
+            $label = T($resolved ? 'Unresolve' : 'Resolve');
+            $url = "/discussion/resolve?discussionid={$discussion->DiscussionID}&resolve={$newResolved}";
             // Deal with inconsistencies in how options are passed
-            if (isset($Sender->Options)) {
-                $Sender->Options .= Wrap(Anchor($Label, $Url, 'ResolveDiscussion Hijack'), 'li');
+            if (isset($sender->Options)) {
+                $sender->Options .= wrap(anchor($label, $url, 'ResolveDiscussion Hijack'), 'li');
             } else {
-                $Args['DiscussionOptions']['ResolveDiscussion'] = array(
-                    'Label' => $Label,
-                    'Url' => $Url,
+                $args['DiscussionOptions']['ResolveDiscussion'] = array(
+                    'Label' => $label,
+                    'Url' => $url,
                     'Class' => 'ResolveDiscussion Hijack'
                 );
             }
@@ -93,9 +110,9 @@ class ResolvedPlugin extends Gdn_Plugin {
      *
      * @return void
      */
-    public function Base_BeforeDiscussionMeta_Handler($Sender, $Args) {
-        $Resolved = GetValue('Resolved', GetValue('Discussion', $Args));
-        if (CheckPermission('Plugins.Resolved.Manage') && !$Resolved) {
+    public function base_beforeDiscussionMeta_handler($sender, $args) {
+        $resolved = val('Resolved', val('Discussion', $args));
+        if (checkPermission('Plugins.Resolved.Manage') && !$resolved) {
             echo ' <span class="Tag Tag-Unresolved">' . T('Unresolved') . '</span> ';
         }
     }
@@ -105,12 +122,12 @@ class ResolvedPlugin extends Gdn_Plugin {
      *
      * @return void
      */
-    public function DiscussionController_BeforeDiscussionOptions_Handler($Sender, $Args) {
-        $Discussion = $Sender->Data('Discussion');
-        if (CheckPermission('Plugins.Resolved.Manage') && $Discussion->Resolved) {
-            $NewName = '<span class="DiscussionResolved">[RESOLVED]</span> ' . GetValue('Name', $Discussion);
-            SetValue('Name', $Discussion, $NewName);
-            $Sender->SetData('Discussion', $Discussion);
+    public function discussionController_beforeDiscussionOptions_handler($sender, $args) {
+        $discussion = $sender->data('Discussion');
+        if (checkPermission('Plugins.Resolved.Manage') && $discussion->Resolved) {
+            $newName = '<span class="DiscussionResolved">[RESOLVED]</span> '.val('Name', $discussion);
+            svalr('Name', $discussion, $newName);
+            $sender->setData('Discussion', $discussion);
         }
     }
 
@@ -120,41 +137,40 @@ class ResolvedPlugin extends Gdn_Plugin {
      * @throws Exception Throws an exception when the discussion is not found, or the request is not a POST
      * @return void
      */
-    public function DiscussionController_Resolve_Create($Sender, $Args) {
-        $Sender->Permission('Plugins.Resolved.Manage');
-        $DiscussionID = $Sender->Request->Get('discussionid');
-        $Resolve = $Sender->Request->Get('resolve');
+    public function discussionController_resolve_create($sender, $args) {
+        $sender->permission('Plugins.Resolved.Manage');
+        $discussionID = $sender->Request->get('discussionid');
+        $resolve = $sender->Request->get('resolve');
 
         // Make sure we are posting back.
-        if (!$Sender->Request->IsPostBack()) {
+        if (!$sender->Request->isPostBack()) {
             throw PermissionException('Javascript');
         }
 
-        $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
+        $discussion = $sender->DiscussionModel->getID($discussionID);
 
-        if (!$Discussion) {
+        if (!$discussion) {
             throw NotFoundException('Discussion');
         }
 
         // Resolve the discussion.
-        $Sender->DiscussionModel->SetField($DiscussionID, 'Resolved', $Resolve);
-        $Discussion->Resolved = $Resolve;
+        $this->resolve($discussion, $resolve);
 
-        $Sender->SendOptions($Discussion);
+        $sender->sendOptions($discussion);
 
-        if (!$Resolve) {
-            require_once $Sender->FetchViewLocation('helper_functions', 'Discussions');
-            $Sender->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Meta-Discussion", '<span class="Tag Tag-Unresolved" title="Unresolved">' . T('Unresolved') . '</span>', 'Prepend');
-            $Sender->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Unresolved', 'AddClass');
+        if (!$resolve) {
+            require_once $sender->fetchViewLocation('helper_functions', 'Discussions');
+            $sender->jsonTarget(".Section-DiscussionList #Discussion_{$discussionID} .Meta-Discussion", '<span class="Tag Tag-Unresolved" title="Unresolved">' . T('Unresolved') . '</span>', 'Prepend');
+            $sender->jsonTarget(".Section-DiscussionList #Discussion_{$discussionID}", 'Unresolved', 'AddClass');
         } else {
-            $Sender->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID .Tag-Unresolved", NULL, 'Remove');
-            $Sender->JsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", 'Unresolved', 'RemoveClass');
+            $sender->jsonTarget(".Section-DiscussionList #Discussion_{$discussionID} .Tag-Unresolved", null, 'Remove');
+            $sender->jsonTarget(".Section-DiscussionList #Discussion_{$discussionID}", 'Unresolved', 'RemoveClass');
         }
 
-        $Sender->JsonTarget("#Discussion_$DiscussionID", NULL, 'Highlight');
-        $Sender->JsonTarget(".Discussion #Item_0", NULL, 'Highlight');
+        $sender->jsonTarget("#Discussion_{$discussionID}", null, 'Highlight');
+        $sender->jsonTarget(".Discussion #Item_0", null, 'Highlight');
 
-        $Sender->Render('Blank', 'Utility', 'Dashboard');
+        $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
@@ -162,38 +178,38 @@ class ResolvedPlugin extends Gdn_Plugin {
      *
      * @return void
      */
-    public function CommentModel_AfterSaveComment_Handler($Sender, $Args) {
-        $Resolved = GetValueR('FormPostValues.Resolved', $Args);
-        if (!CheckPermission('Plugins.Resolved.Manage')) {
+    public function commentModel_afterSaveComment_handler($sender, $args) {
+        $resolved = valr('FormPostValues.Resolved', $args);
+        $discussionID = val('DiscussionID', $args['FormPostValues']);
+        $discussion = array(
+            'DiscussionID' => $discussionID
+        );
+        if (!checkPermission('Plugins.Resolved.Manage')) {
             // Unset Resolved flag
-            $DiscussionModel = new DiscussionModel();
-            $DiscussionID = GetValue('DiscussionID', $Args['FormPostValues']);
-            $DiscussionModel->SetField($DiscussionID, 'Resolved', 0);
-        } else if ($Resolved) {
+            $this->resolve($discussion, 0);
+        } else if ($resolved) {
             // Set Resolved flag
-            $DiscussionModel = new DiscussionModel();
-            $DiscussionID = GetValue('DiscussionID', $Args['FormPostValues']);
-            $DiscussionModel->SetField($DiscussionID, 'Resolved', 1);
+            $this->resolve($discussion, 1);
         }
     }
 
     /**
      * Disallow comments in Resolved discussions by new participants.
      *
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      */
-    public function DiscussionController_BeforeDiscussionRender_Handler($Sender, $Args) {
-        $Discussion = $Sender->Data('Discussion');
+    public function discussionController_beforeDiscussionRender_handler($sender, $args) {
+        $discussion = $sender->data('Discussion');
         // Do not close blog comments.
-        if ('page' == val('Type', $Discussion)) {
+        if ('page' == val('Type', $discussion)) {
             return;
         }
-        $Resolved = GetValue('Resolved', $Discussion);
-        $IsStarter = (GetValue('InsertUserID', $Discussion) == Gdn::Session()->UserID);
-        if (!CheckPermission('Plugins.Resolved.Manage') && $Resolved && !$IsStarter) {
+        $resolved = val('Resolved', $discussion);
+        $isStarter = (val('InsertUserID', $discussion) == Gdn::session()->UserID);
+        if (!checkPermission('Plugins.Resolved.Manage') && $resolved && !$isStarter) {
             // Pretend we're closed
-            SetValue('Closed', $Discussion, 1);
-            $Sender->SetData('Discussion', $Discussion);
+            svalr('Closed', $discussion, 1);
+            $sender->setData('Discussion', $discussion);
         }
     }
 
@@ -202,10 +218,10 @@ class ResolvedPlugin extends Gdn_Plugin {
      *
      * @return void
      */
-    public function Base_AfterDiscussionFilters_Handler($Sender) {
-        if (CheckPermission('Plugins.Resolved.Manage')) {
-            $Unresolved .= T('Unresolved') . FilterCountString(self::CountUnresolved());
-            echo '<li class="Unresolved">' . Anchor(Sprite('SpUnresolved') . ' ' . $Unresolved, '/discussions/unresolved') . '</li>';
+    public function base_afterDiscussionFilters_handler($sender) {
+        if (checkPermission('Plugins.Resolved.Manage')) {
+            $unresolved .= T('Unresolved').filterCountString(self::countUnresolved());
+            echo '<li class="Unresolved">'.anchor(sprite('SpUnresolved').' '.$unresolved, '/discussions/unresolved') . '</li>';
         }
     }
 
@@ -214,20 +230,20 @@ class ResolvedPlugin extends Gdn_Plugin {
      *
      * @return integer Returns the number of unresolved discussions
      */
-    public static function CountUnresolved() {
-        $NumUnresolved = Gdn::SQL()
-            ->Select('count(DISTINCT d.DiscussionID)', '', 'NumUnresolved')
-            ->From('Discussion d')
-            ->Where('d.Resolved', 0)
-            ->BeginWhereGroup()
-            ->WhereNotIn('d.Type', array('page', 'Report', 'poll', 'SimplePage'))
-            ->OrWhere('d.Type is null')
-            ->EndWhereGroup()
-            ->Get()
-            ->FirstRow()
+    public static function countUnresolved() {
+        $numUnresolved = Gdn::sql()
+            ->select('count(DISTINCT d.DiscussionID)', '', 'NumUnresolved')
+            ->from('Discussion d')
+            ->where('d.Resolved', 0)
+            ->beginWhereGroup()
+            ->whereNotIn('d.Type', array('page', 'Report', 'poll', 'SimplePage'))
+            ->orWhere('d.Type is null')
+            ->endWhereGroup()
+            ->get()
+            ->firstRow()
             ->NumUnresolved;
 
-        return $NumUnresolved;
+        return $numUnresolved;
     }
 
     /**
@@ -235,68 +251,93 @@ class ResolvedPlugin extends Gdn_Plugin {
      *
      * @return void
      */
-    public function DiscussionsController_Unresolved_Create($Sender, $Args) {
-        $Sender->Permission('Plugins.Resolved.Manage');
-        $Page = ArrayValue(0, $Args, 0);
+    public function discussionsController_unresolved_create($sender, $args) {
+        $sender->permission('Plugins.Resolved.Manage');
+        $page = val(0, $args, 0);
 
         // Determine offset from $Page
-        list($Page, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+        list($page, $limit) = offsetLimit($page, C('Vanilla.Discussions.PerPage', 30));
 
         // Validate $Page
-        if (!is_numeric($Page) || $Page < 0) {
-            $Page = 0;
+        if (!is_numeric($page) || $page < 0) {
+            $page = 0;
         }
 
-        $DiscussionModel = new DiscussionModel();
-        $Wheres = array('d.Resolved' => '0');
+        $discussionModel = new DiscussionModel();
+        $wheres = array('d.Resolved' => '0');
 
         // Hack in our wheregroup.
-        Gdn::SQL()->BeginWhereGroup()
-            ->WhereNotIn('d.Type', array('page', 'Report', 'poll', 'SimplePage'))
-            ->OrWhere('d.Type is null')
-            ->EndWhereGroup();
+        Gdn::sql()->beginWhereGroup()
+            ->whereNotIn('d.Type', array('page', 'Report', 'poll', 'SimplePage'))
+            ->orWhere('d.Type is null')
+            ->endWhereGroup();
 
-        $Sender->DiscussionData = $DiscussionModel->Get($Page, $Limit, $Wheres);
-        $Sender->SetData('Discussions', $Sender->DiscussionData);
-        $CountDiscussions = $DiscussionModel->GetCount($Wheres);
-        $Sender->SetData('CountDiscussions', $CountDiscussions);
-        $Sender->Category = FALSE;
+        $sender->DiscussionData = $discussionModel->Get($page, $limit, $wheres);
+        $sender->setData('Discussions', $sender->DiscussionData);
+        $countDiscussions = $discussionModel->GetCount($wheres);
+        $sender->setData('CountDiscussions', $countDiscussions);
+        $sender->Category = false;
 
-        $Sender->SetJson('Loading', $Page . ' to ' . $Limit);
+        $sender->setJson('Loading', $page . ' to ' . $limit);
 
         // Build a pager
-        $PagerFactory = new Gdn_PagerFactory();
-        $Sender->EventArguments['PagerType'] = 'Pager';
-        $Sender->FireEvent('BeforeBuildBookmarkedPager');
-        $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $Sender);
-        $Sender->Pager->ClientID = 'Pager';
-        $Sender->Pager->Configure(
-            $Page, $Limit, $CountDiscussions, 'discussions/unresolved/%1$s'
+        $pagerFactory = new Gdn_PagerFactory();
+        $sender->EventArguments['PagerType'] = 'Pager';
+        $sender->fireEvent('BeforeBuildBookmarkedPager');
+        $sender->Pager = $pagerFactory->getPager($sender->EventArguments['PagerType'], $sender);
+        $sender->Pager->ClientID = 'Pager';
+        $sender->Pager->configure(
+            $page, $limit, $countDiscussions, 'discussions/unresolved/%1$s'
         );
 
-        if (!$Sender->Data('_PagerUrl')) {
-            $Sender->SetData('_PagerUrl', 'discussions/unresolved/{Page}');
+        if (!$sender->data('_PagerUrl')) {
+            $sender->setData('_PagerUrl', 'discussions/unresolved/{Page}');
         }
-        $Sender->SetData('_Page', $Page);
-        $Sender->SetData('_Limit', $Limit);
-        $Sender->FireEvent('AfterBuildBookmarkedPager');
+        $sender->setData('_Page', $page);
+        $sender->setData('_Limit', $limit);
+        $sender->fireEvent('AfterBuildBookmarkedPager');
 
         // Deliver JSON data if necessary
-        if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL) {
-            $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
-            $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
-            $Sender->View = 'discussions';
+        if ($sender->deliveryType() != DELIVERY_TYPE_ALL) {
+            $sender->setJson('LessRow', $sender->Pager->toString('less'));
+            $sender->setJson('MoreRow', $sender->Pager->toString('more'));
+            $sender->View = 'discussions';
         }
 
         // Add modules
-        $Sender->AddModule('DiscussionFilterModule');
-        $Sender->AddModule('NewDiscussionModule');
-        $Sender->AddModule('CategoriesModule');
+        $sender->addModule('DiscussionFilterModule');
+        $sender->addModule('NewDiscussionModule');
+        $sender->addModule('CategoriesModule');
 
         // Render default view
-        $Sender->SetData('Title', T('Unresolved'));
-        $Sender->SetData('Breadcrumbs', array(array('Name' => T('Unresolved'), 'Url' => '/discussions/unresolved')));
-        $Sender->Render('index');
+        $sender->setData('Title', T('Unresolved'));
+        $sender->setData('Breadcrumbs', array(array('Name' => T('Unresolved'), 'Url' => '/discussions/unresolved')));
+        $sender->render('index');
+    }
+
+    /**
+     * Plugin setup method.
+     *
+     * @return void
+     */
+    public function setup() {
+        $this->structure();
+    }
+
+    /**
+     * Plugin structure method.
+     *
+     * Add 'Resolved' columns to the Discussion table.
+     *
+     * @return void
+     */
+    public function structure() {
+        Gdn::structure()
+            ->table('Discussion')
+            ->column('Resolved', 'int', '0')
+            ->column('DateResolved', 'datetime', true)
+            ->column('ResolvedUserID', 'int', true)
+            ->set();
     }
 
 }
