@@ -10,6 +10,7 @@
 
     <rule ref="PSR1" >
         <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />
+        <exclude name="Squiz.Classes.ValidClassName.NotCamelCaps"/>
         <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps" />
     </rule>
     <rule ref="PSR2" >
@@ -47,6 +48,8 @@
 
     <rule ref="Vanilla.Commenting.ClassComment"/>
     <rule ref="Vanilla.Commenting.FunctionComment"/>
+
+    <rul ref="Vanilla.Classes.ValidClassName" />
 
     <!-- camelCase Properties; no underscore -->
     <rule ref="Vanilla.Classes.PropertyDeclaration"/>
