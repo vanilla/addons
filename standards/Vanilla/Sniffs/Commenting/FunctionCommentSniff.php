@@ -298,9 +298,9 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
             $phpcsFile->addError($error, ($commentStart + 1), 'ShortNotCapital');
         }
 
-        if ($lastChar !== '.') {
-            $error = 'Function comment short description must end with a full stop';
-            $phpcsFile->addError($error, ($commentStart + 1), 'ShortFullStop');
+        if (!in_array($lastChar,  ['.', '?', '!'])) {
+            $error = 'Function comment short descriptions must end with punctuation';
+            $phpcsFile->addError($error, ($commentStart + 1), 'ShortPunctuation');
         }
 
         // Check for unknown/deprecated tags.
@@ -628,9 +628,9 @@ class Vanilla_Sniffs_Commenting_FunctionCommentSniff implements PHP_CodeSniffer_
                     }
 
                     $lastChar = $paramComment[(strlen($paramComment) - 1)];
-                    if ($lastChar !== '.') {
-                        $error = 'Param comment must end with a full stop';
-                        $this->currentFile->addError($error, $errorPos, 'ParamCommentFullStop');
+                    if (!in_array($lastChar, ['.', '?', '!'])) {
+                        $error = 'Param comment must end with punctuation';
+                        $this->currentFile->addError($error, $errorPos, 'ParamCommentPunctuation');
                     }
                 }
 
