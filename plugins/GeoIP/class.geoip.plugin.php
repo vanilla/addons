@@ -21,7 +21,7 @@ class GeoipPlugin extends Gdn_Plugin {
     public  $geoExpTime = 604800; // 604800 = 1 week
     const   cachePre    = 'GeoIP-Plugin_';
 
-    private static $errorLog = "/tmp/php-geoip-error.log";
+    private static $errorLog = "/tmp/php-geoip.log";
 
     private $localCache = [];
     private $localCacheMax = 100;
@@ -594,8 +594,9 @@ class GeoipPlugin extends Gdn_Plugin {
 
         $oldErrorOn  = ini_set("log_errors", true);
         $oldErrorLog = ini_set("error_log", self::$errorLog);
+
         error_log("...Starting GeoIP CSV Import...");
-        error_log("New Error Log: ".self::$errorLog, E_USER_NOTICE);
+        error_log("Log File: ".self::$errorLog, E_USER_NOTICE);
 
         // Download Zip:
         $downloadZip  = $this->downloadGeoipZip(self::$csvDownloadURL);
@@ -603,17 +604,17 @@ class GeoipPlugin extends Gdn_Plugin {
             error_log("Failed to download GeoIP CSV file in ".__METHOD__."()");
             return false;
         }
-error_log("Zip Downloaded: {$downloadZip}");
+        error_log("Zip Downloaded: {$downloadZip}");
 
         // Extract downloaded payload file to get to the CSV files:
         $payloadFiles = $this->extractGeoipCSV($downloadZip);
-        if (empty($payloadFiles)) {
+        if (empty($payloadFiles) OR !is_array($payloadFiles)) {
             error_log("Failed to extract GeoIP CSV file in ".__METHOD__."()");
             return false;
         }
-        $blockFile    = $payloadFiles['block_file'];
-        $locationFile = $payloadFiles['location_file'];
-error_log("Zip Extracted ({$blockFile}, {$locationFile})");
+        $blockFile    = !empty($payloadFiles['block_file'])    ? $payloadFiles['block_file']    : false;
+        $locationFile = !empty($payloadFiles['location_file']) ? $payloadFiles['location_file'] : false;
+        error_log("Zip Extracted");
 
         // Check File Paths:
         if (!is_file($blockFile)) {
@@ -624,7 +625,7 @@ error_log("Zip Extracted ({$blockFile}, {$locationFile})");
             error_log("Failed to locate GeoIP CSV location file in ".__METHOD__."()");
             return false;
         }
-error_log("Zip Content Confirmed ({$blockFile}, {$locationFile})");
+        error_log("Zip Content Confirmed ({$blockFile}, {$locationFile})");
 
         // Create Location Table:
         $locationCreated   = $this->createLocationTable();
@@ -632,14 +633,15 @@ error_log("Zip Content Confirmed ({$blockFile}, {$locationFile})");
             error_log("Failed to create GeoIP location table in ".__METHOD__."()");
             return false;
         }
-error_log("Location Table Created");
+        error_log("Location Table Created");
+
         // Create Block Table:
         $blockCreated      = $this->createBlockTable();
         if (empty($blockCreated)) {
             error_log("Failed to create GeoIP block table in ".__METHOD__."()");
             return false;
         }
-error_log("Block Table Created");
+        error_log("Block Table Created");
 
         // Import Location CSV file into SQL:
         $locationImported  = $this->importLocationCSV($locationFile);
@@ -647,7 +649,7 @@ error_log("Block Table Created");
             error_log("Failed to import GeoIP CSV location file into SQL table in ".__METHOD__."()");
             return false;
         }
-error_log("Location Table Imported");
+        error_log("Location Table Imported");
 
         // Import Block CSV file into SQL:
         $blockImported  = $this->importBlockCSV($locationFile);
@@ -655,7 +657,7 @@ error_log("Location Table Imported");
             error_log("Failed to import GeoIP CSV block file into SQL table in ".__METHOD__."()");
             return false;
         }
-error_log("Block Table Imported");
+        error_log("Block Table Imported");
 
         // Clean up after ourselves:
         unlink($blockFile);
@@ -677,7 +679,7 @@ error_log("Block Table Imported");
      */
     private function createLocationTable() {
 
-error_log("Creating Location Table");
+        error_log("Creating Location Table");
         if ($this->tableExists(self::$locationTableName)==false) {
 
             try {
@@ -724,6 +726,12 @@ error_log("Creating Location Table");
             return false;
         }
 
+        /*
+         * @todo this process will have to be replaced with a manual loop through CSV file.
+         *
+         * Many hosts do not allow LOAD DATA to run. This will allow for more portability.
+         */
+
         try{
             $sql  = "LOAD DATA LOCAL INFILE '{$input}'\n";
             $sql .= "INTO TABLE geoip_location\n";
@@ -734,7 +742,7 @@ error_log("Creating Location Table");
             $sql .= "  , country_iso_code, country_name, subdivision_1_iso_code\n";
             $sql .= "  , subdivision_1_name, subdivision_2_iso_code, subdivision_2_name\n";
             $sql .= "  , city_name, metro_code, time_zone);\n";
-    error_log("Load Location Table:\n{$sql}");
+error_log("Load Location Table:\n{$sql}");
 
             //GDN::SQL()->ConnectionOptions[PDO::MYSQL_ATTR_LOCAL_INFILE] = true;
             //$output  = GDN::SQL()->Query($sql);
@@ -750,7 +758,7 @@ error_log("Creating Location Table");
 
     private function createBlockTable() {
 
-error_log("Creating Block Table");
+        error_log("Creating Block Table");
         if ($this->tableExists(self::$blockTableName)==false) {
 
             try{
@@ -834,7 +842,7 @@ error_log("Load Block Table:\n{$sql}");
 
         // Output destination file:
         $output = "{$tmpDir}/{$name}";
-error_log("Destination Filename: {$output}");
+        error_log("Destination Zip Filename: {$output}");
 
         $fp = fopen ($output, 'w+');//This is the file where we save the    information
         $ch = curl_init($url);//Here is the file we are downloading, replace spaces with %20
