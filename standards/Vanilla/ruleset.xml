@@ -19,7 +19,6 @@
         <exclude name="PSR2.Classes.PropertyDeclaration" />
     </rule>
 
-
     <!-- Ensure there's no use of deprecated functions -->
     <rule ref="Generic.PHP.DeprecatedFunctions"/>
 
@@ -41,14 +40,13 @@
     <rule ref="Vanilla.NamingConventions.ValidClassBrackets"/>
 
     <!-- Check that file level DocBlock exists and is valid -->
-
     <rule ref="Vanilla.Commenting.FileComment">
         <exclude name="Vanilla.Commenting.FileComment.DuplicateCopyrightTag" />
     </rule>
-
     <rule ref="Vanilla.Commenting.ClassComment"/>
     <rule ref="Vanilla.Commenting.FunctionComment"/>
 
+    <!-- StegosaurusCase class names, underscores allowed -->
     <rul ref="Vanilla.Classes.ValidClassName" />
 
     <!-- camelCase Properties; no underscore -->
@@ -57,5 +55,13 @@
     <!-- camelCase or Vanilla Events -->
     <rule ref="Vanilla.Methods.CamelCapsMethodName"/>
 
+    <!-- Increase lineLimit to 150 characters -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+        <property name="lineLimit" value="150"/>
+        <property name="absoluteLineLimit" value="220"/>
+     </properties>
+
+ </rule>
 
 </ruleset>
