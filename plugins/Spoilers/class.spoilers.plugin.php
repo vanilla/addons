@@ -10,140 +10,146 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Spoilers'] = array(
-   'Name' => 'Spoilers',
-   'Description' => "Users may prevent accidental spoiler by wrapping text in [spoiler] tags. This requires the text to be clicked in order to read it.",
-   'Version' => '1.2',
-   'MobileFriendly' => TRUE,
-   'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => TRUE,
-   'RegisterPermissions' => FALSE,
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+    'Name' => 'Spoilers',
+    'Description' => "Users may prevent accidental spoiler by wrapping text in [spoiler] tags. This requires the text to be clicked in order to read it.",
+    'Version' => '1.2',
+    'MobileFriendly' => TRUE,
+    'RequiredApplications' => FALSE,
+    'RequiredTheme' => FALSE,
+    'RequiredPlugins' => FALSE,
+    'HasLocale' => TRUE,
+    'RegisterPermissions' => FALSE,
+    'Author' => "Tim Gunter",
+    'AuthorEmail' => 'tim@vanillaforums.com',
+    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
 class SpoilersPlugin extends Gdn_Plugin {
 
-   public function __construct() {
-      // Whether to handle drawing quotes or leave it up to some other plugin
-      $this->renderSpoilers = C('Plugins.Spoilers.RenderSpoilers',TRUE);
-   }
+    public function __construct() {
+        // Whether to handle drawing quotes or leave it up to some other plugin
+        $this->renderSpoilers = C('Plugins.Spoilers.RenderSpoilers',TRUE);
+    }
 
-   public function assetModel_styleCss_handler($sender) {
-      $sender->addCssFile('spoilers.css', 'plugins/Spoilers');
-   }
+    public function assetModel_styleCss_handler($sender) {
+        $sender->addCssFile('spoilers.css', 'plugins/Spoilers');
+    }
 
-   public function discussionController_render_before(&$sender) {
-      $this->prepareController($sender);
-   }
+    public function discussionController_render_before(&$sender) {
+        $this->prepareController($sender);
+    }
 
-   public function postController_render_before(&$sender) {
-      $this->prepareController($sender);
-   }
+    public function postController_render_before(&$sender) {
+        $this->prepareController($sender);
+    }
 
-   public function messagesController_render_before(&$sender) {
-      $this->prepareController($sender);
-   }
+    public function messagesController_render_before(&$sender) {
+        $this->prepareController($sender);
+    }
 
-   protected function prepareController(&$sender) {
-      //if (!$this->RenderSpoilers) return;
-      $sender->addJsFile('spoilers.js', 'plugins/Spoilers');
-   }
+    protected function prepareController(&$sender) {
+        //if (!$this->RenderSpoilers) return;
+        $sender->addJsFile('spoilers.js', 'plugins/Spoilers');
+    }
 
+    public function discussionController_afterCommentFormat_handler(&$sender) {
+        $this->renderSpoilers($sender);
+    }
 
-   public function discussionController_afterCommentFormat_handler(&$sender) {
-      $this->renderSpoilers($sender);
-   }
+    public function postController_afterCommentFormat_handler(&$sender) {
+        $this->renderSpoilers($sender);
+    }
 
-   public function postController_afterCommentFormat_handler(&$sender) {
-      $this->renderSpoilers($sender);
-   }
+    public function postController_afterCommentPreviewFormat_handler($sender) {
+        $sender->EventArguments['Object']->FormatBody = &$sender->Comment->Body;
+        $this->renderSpoilers($sender);
+    }
 
-   public function postController_afterCommentPreviewFormat_handler($sender) {
-      $sender->EventArguments['Object']->FormatBody = &$sender->Comment->Body;
-      $this->renderSpoilers($sender);
-   }
+    public function messagesController_beforeConversationMessageBody_handler(&$sender) {
+        $sender->EventArguments['Object']->FormatBody = &$sender->EventArguments['Message']->Body;
+        $this->renderSpoilers($sender);
+    }
 
-   public function messagesController_beforeConversationMessageBody_handler(&$sender) {
-      $sender->EventArguments['Object']->FormatBody = &$sender->EventArguments['Message']->Body;
-      $this->renderSpoilers($sender);
-   }
-
-   public function messagesController_beforeMessagesPopin_handler($sender, &$args) {
-      if (val('Conversations', $args)) {
-         foreach($args['Conversations'] as &$conversation) {
-            if ($body = val('LastBody', $conversation)) {
-               $conversation['LastBody'] = $this->replaceSpoilers($body,  val('LastFormat', $conversation));
+    public function messagesController_beforeMessagesPopin_handler($sender, &$args) {
+        if (val('Conversations', $args)) {
+            foreach($args['Conversations'] as &$conversation) {
+                if ($body = val('LastBody', $conversation)) {
+                    $conversation['LastBody'] = $this->replaceSpoilers($body,  val('LastFormat', $conversation));
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   public function messagesController_beforeMessagesAll_handler($sender, &$args) {
-      if (val('Conversations', $args)) {
-         foreach($args['Conversations'] as &$conversation) {
-            if ($body = val('LastBody', $conversation)) {
-               $conversation['LastBody'] = $this->replaceSpoilers($body, val('LastFormat', $conversation));
+    public function messagesController_beforeMessagesAll_handler($sender, &$args) {
+        if (val('Conversations', $args)) {
+            foreach($args['Conversations'] as &$conversation) {
+                if ($body = val('LastBody', $conversation)) {
+                    $conversation['LastBody'] = $this->replaceSpoilers($body, val('LastFormat', $conversation));
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   protected function replaceSpoilers($body, $format) {
-      if (!$this->renderSpoilers) {
-         return;
-      }
-      $spoilerReplacement = T('Spoiler Replacement', T('Spoiler'));
-      switch($format) {
-         case 'Markdown':
-            $body = preg_replace("/>!.*(\n|$)/", $spoilerReplacement.' ', $body);
-            break;
-         case 'BBCode':
-            $body = preg_replace("/\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\].*\[\/spoiler\]/siu", $spoilerReplacement, $body);
-            break;
-         case 'Html':
-            $body = preg_replace('/<div class="Spoile[dr]">.*<\/div>/', $spoilerReplacement, $body);
-            break;
-      }
-      return $body;
-   }
+    /**
+     * Replaces spoiler body and tags with a string.
+     *
+     * @param string $body Text to replace spoilers in.
+     * @param string $format Format of $body.
+     * @return string Text with spoilers replaced.
+     */
+    protected function replaceSpoilers($body, $format) {
+        if (!$this->renderSpoilers) {
+            return;
+        }
+        $spoilerReplacement = T('Spoiler Replacement', T('Spoiler'));
+        switch($format) {
+            case 'Markdown':
+                $body = preg_replace("/>!.*(\n|$)/", $spoilerReplacement.' ', $body);
+                break;
+            case 'BBCode':
+                $body = preg_replace("/\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\].*\[\/spoiler\]/siu", $spoilerReplacement, $body);
+                break;
+            case 'Html':
+                $body = preg_replace('/<div class="Spoile[dr]">.*<\/div>/', $spoilerReplacement, $body);
+                break;
+        }
+        return $body;
+    }
 
-   protected function renderSpoilers(&$sender) {
-      if (!$this->renderSpoilers || Gdn::PluginManager()->checkPlugin('NBBC') ) {
-         return;
-      }
+    protected function renderSpoilers(&$sender) {
+        if (!$this->renderSpoilers || Gdn::PluginManager()->checkPlugin('NBBC') ) {
+            return;
+        }
 
-      $formatBody = &$sender->EventArguments['Object']->FormatBody;
+        $formatBody = &$sender->EventArguments['Object']->FormatBody;
 
-      // Fix a wysiwyg but where spoilers
-      $formatBody = preg_replace('`<div>\s*(\[/?spoiler\])\s*</div>`', '$1', $formatBody);
+        // Fix a wysiwyg but where spoilers
+        $formatBody = preg_replace('`<div>\s*(\[/?spoiler\])\s*</div>`', '$1', $formatBody);
 
-      $formatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'spoilerCallback'), $formatBody);
-      $formatBody = str_ireplace('[/spoiler]','</div></div>',$formatBody);
-   }
+        $formatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'spoilerCallback'), $formatBody);
+        $formatBody = str_ireplace('[/spoiler]','</div></div>',$formatBody);
+    }
 
-   protected function spoilerCallback($matches) {
-      $attribution = T('Spoiler: %s');
-      $spoilerText = (sizeof($matches) > 2) ? $matches[2] : NULL;
-      if (is_null($spoilerText)) {
-         $spoilerText = '';
-      } else {
-         $spoilerText = "<span>{$spoilerText}</span>";
-      }
-      $attribution = sprintf($attribution, $spoilerText);
-      return <<<BLOCKQUOTE
-      <div class="UserSpoiler"><div class="SpoilerTitle">{$attribution}</div><div class="SpoilerReveal"></div><div class="SpoilerText">
+    protected function spoilerCallback($matches) {
+        $attribution = T('Spoiler: %s');
+        $spoilerText = (sizeof($matches) > 2) ? $matches[2] : NULL;
+        if (is_null($spoilerText)) {
+            $spoilerText = '';
+        } else {
+            $spoilerText = "<span>{$spoilerText}</span>";
+        }
+        $attribution = sprintf($attribution, $spoilerText);
+        return <<<BLOCKQUOTE
+        <div class="UserSpoiler"><div class="SpoilerTitle">{$attribution}</div><div class="SpoilerReveal"></div><div class="SpoilerText">
 BLOCKQUOTE;
-   }
+    }
 
-   public function setup() {
-      // Nothing to do here!
-   }
+    public function setup() {
+        // Nothing to do here!
+    }
 
-   public function structure() {
-      // Nothing to do here!
-   }
+    public function structure() {
+        // Nothing to do here!
+    }
 
 }
