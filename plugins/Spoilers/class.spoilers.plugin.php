@@ -28,47 +28,47 @@ class SpoilersPlugin extends Gdn_Plugin {
 
    public function __construct() {
       // Whether to handle drawing quotes or leave it up to some other plugin
-      $this->RenderSpoilers = C('Plugins.Spoilers.RenderSpoilers',TRUE);
+      $this->renderSpoilers = C('Plugins.Spoilers.RenderSpoilers',TRUE);
    }
 
-   public function AssetModel_StyleCss_Handler($Sender) {
-      $Sender->AddCssFile('spoilers.css', 'plugins/Spoilers');
+   public function assetModel_styleCss_handler($sender) {
+      $sender->addCssFile('spoilers.css', 'plugins/Spoilers');
    }
 
-   public function DiscussionController_Render_Before(&$Sender) {
-      $this->PrepareController($Sender);
+   public function discussionController_render_before(&$sender) {
+      $this->prepareController($sender);
    }
 
-   public function PostController_Render_Before(&$Sender) {
-      $this->PrepareController($Sender);
+   public function postController_render_before(&$sender) {
+      $this->prepareController($sender);
    }
 
-   public function MessagesController_Render_Before(&$Sender) {
-      $this->PrepareController($Sender);
+   public function messagesController_render_before(&$sender) {
+      $this->prepareController($sender);
    }
 
-   protected function PrepareController(&$Sender) {
+   protected function prepareController(&$sender) {
       //if (!$this->RenderSpoilers) return;
-      $Sender->AddJsFile('spoilers.js', 'plugins/Spoilers');
+      $sender->addJsFile('spoilers.js', 'plugins/Spoilers');
    }
 
 
-   public function DiscussionController_AfterCommentFormat_Handler(&$Sender) {
-      $this->RenderSpoilers($Sender);
+   public function discussionController_afterCommentFormat_handler(&$sender) {
+      $this->renderSpoilers($sender);
    }
 
-   public function PostController_AfterCommentFormat_Handler(&$Sender) {
-      $this->RenderSpoilers($Sender);
+   public function postController_afterCommentFormat_handler(&$sender) {
+      $this->renderSpoilers($sender);
    }
 
-   public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
-      $Sender->EventArguments['Object']->FormatBody = &$Sender->Comment->Body;
-      $this->RenderSpoilers($Sender);
+   public function postController_afterCommentPreviewFormat_handler($sender) {
+      $sender->EventArguments['Object']->FormatBody = &$sender->Comment->Body;
+      $this->renderSpoilers($sender);
    }
 
-   public function MessagesController_BeforeConversationMessageBody_Handler(&$Sender) {
-      $Sender->EventArguments['Object']->FormatBody = &$Sender->EventArguments['Message']->Body;
-      $this->RenderSpoilers($Sender);
+   public function messagesController_beforeConversationMessageBody_handler(&$sender) {
+      $sender->EventArguments['Object']->FormatBody = &$sender->EventArguments['Message']->Body;
+      $this->renderSpoilers($sender);
    }
 
    public function messagesController_beforeMessagesPopin_handler($sender, &$args) {
@@ -92,7 +92,7 @@ class SpoilersPlugin extends Gdn_Plugin {
    }
 
    protected function replaceSpoilers($body, $format) {
-      if (!$this->RenderSpoilers) {
+      if (!$this->renderSpoilers) {
          return;
       }
       $spoilerReplacement = T('Spoiler Replacement', T('Spoiler'));
@@ -110,37 +110,39 @@ class SpoilersPlugin extends Gdn_Plugin {
       return $body;
    }
 
-   protected function RenderSpoilers(&$Sender) {
-      if (!$this->RenderSpoilers || Gdn::PluginManager()->CheckPlugin('NBBC') ) {
+   protected function renderSpoilers(&$sender) {
+      if (!$this->renderSpoilers || Gdn::PluginManager()->checkPlugin('NBBC') ) {
          return;
       }
 
-      $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
+      $formatBody = &$sender->EventArguments['Object']->FormatBody;
 
       // Fix a wysiwyg but where spoilers
-      $FormatBody = preg_replace('`<div>\s*(\[/?spoiler\])\s*</div>`', '$1', $FormatBody);
+      $formatBody = preg_replace('`<div>\s*(\[/?spoiler\])\s*</div>`', '$1', $formatBody);
 
-      $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
-      $FormatBody = str_ireplace('[/spoiler]','</div></div>',$FormatBody);
+      $formatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'spoilerCallback'), $formatBody);
+      $formatBody = str_ireplace('[/spoiler]','</div></div>',$formatBody);
    }
 
-   protected function SpoilerCallback($Matches) {
-      $Attribution = T('Spoiler: %s');
-      $SpoilerText = (sizeof($Matches) > 2) ? $Matches[2] : NULL;
-      if (is_null($SpoilerText)) $SpoilerText = '';
-      else
-         $SpoilerText = "<span>{$SpoilerText}</span>";
-      $Attribution = sprintf($Attribution,$SpoilerText);
+   protected function spoilerCallback($matches) {
+      $attribution = T('Spoiler: %s');
+      $spoilerText = (sizeof($matches) > 2) ? $matches[2] : NULL;
+      if (is_null($spoilerText)) {
+         $spoilerText = '';
+      } else {
+         $spoilerText = "<span>{$spoilerText}</span>";
+      }
+      $attribution = sprintf($attribution, $spoilerText);
       return <<<BLOCKQUOTE
-      <div class="UserSpoiler"><div class="SpoilerTitle">{$Attribution}</div><div class="SpoilerReveal"></div><div class="SpoilerText">
+      <div class="UserSpoiler"><div class="SpoilerTitle">{$attribution}</div><div class="SpoilerReveal"></div><div class="SpoilerText">
 BLOCKQUOTE;
    }
 
-   public function Setup() {
+   public function setup() {
       // Nothing to do here!
    }
 
-   public function Structure() {
+   public function structure() {
       // Nothing to do here!
    }
 
