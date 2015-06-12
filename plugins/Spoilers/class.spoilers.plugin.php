@@ -71,6 +71,45 @@ class SpoilersPlugin extends Gdn_Plugin {
       $this->RenderSpoilers($Sender);
    }
 
+   public function messagesController_beforeMessagesPopin_handler($sender, &$args) {
+      if (val('Conversations', $args)) {
+         foreach($args['Conversations'] as &$conversation) {
+            if ($body = val('LastBody', $conversation)) {
+               $conversation['LastBody'] = $this->replaceSpoilers($body,  val('LastFormat', $conversation));
+            }
+         }
+      }
+   }
+
+   public function messagesController_beforeMessagesAll_handler($sender, &$args) {
+      if (val('Conversations', $args)) {
+         foreach($args['Conversations'] as &$conversation) {
+            if ($body = val('LastBody', $conversation)) {
+               $conversation['LastBody'] = $this->replaceSpoilers($body, val('LastFormat', $conversation));
+            }
+         }
+      }
+   }
+
+   protected function replaceSpoilers($body, $format) {
+      if (!$this->RenderSpoilers) {
+         return;
+      }
+      $spoilerReplacement = T('Spoiler Replacement', T('Spoiler'));
+      switch($format) {
+         case 'Markdown':
+            $body = preg_replace("/>!.*(\n|$)/", $spoilerReplacement.' ', $body);
+            break;
+         case 'BBCode':
+            $body = preg_replace("/\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\].*\[\/spoiler\]/siu", $spoilerReplacement, $body);
+            break;
+         case 'Html':
+            $body = preg_replace('/<div class="Spoile[dr]">.*<\/div>/', $spoilerReplacement, $body);
+            break;
+      }
+      return $body;
+   }
+
    protected function RenderSpoilers(&$Sender) {
       if (!$this->RenderSpoilers || Gdn::PluginManager()->CheckPlugin('NBBC') ) {
          return;
