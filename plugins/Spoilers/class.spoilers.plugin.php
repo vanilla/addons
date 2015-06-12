@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Spoilers'] = array(
     'Name' => 'Spoilers',
     'Description' => "Users may prevent accidental spoiler by wrapping text in [spoiler] tags. This requires the text to be clicked in order to read it.",
-    'Version' => '1.2',
+    'Version' => '1.3',
     'MobileFriendly' => TRUE,
     'RequiredApplications' => FALSE,
     'RequiredTheme' => FALSE,
