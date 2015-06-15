@@ -13,6 +13,7 @@
  *  1.1.1   Fire 'Published' event after publication
  *  1.2     Cleanup docs & version
  *  1.2.1   Include link to source of feed
+ *  1.2.2   Tigthen permissions
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -149,6 +150,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      * @param $Sender
      */
     public function Controller_Index($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title($this->GetPluginKey('Name'));
       $Sender->AddSideMenu('plugin/feeddiscussions');
       $Sender->SetData('Description', $this->GetPluginKey('Description'));

@@ -32,6 +32,12 @@ if (class_exists('PHP_CodeSniffer_Standards_AbstractScopeSniff', true) === false
 class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_Standards_AbstractScopeSniff
 {
 
+    protected $magicMethods = [
+        '__construct', '__destruct', '__call', '__callStatic', '__get', '__set', '__isset', '__unset',
+        '__sleep', '__wakeup', '__toString', '__invoke', '__set_state', '__clone', 'debugInfo()'
+    ];
+
+
     /**
      * Constructs a PSR1_Sniffs_Methods_CamelCapsMethodNameSniff.
      */
@@ -60,6 +66,11 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_St
             return;
         }
 
+        // Check for magic methods.
+        if (in_array($methodName, $this->magicMethods)) {
+            return;
+        }
+
         $testName = ltrim($methodName, '_');
 
         if (self::isVanillaMethod($testName) === true) {
@@ -70,7 +81,7 @@ class Vanilla_Sniffs_Methods_CamelCapsMethodNameSniff extends PHP_CodeSniffer_St
                 $phpcsFile->addError($error, $stackPtr, 'NotVanilla', $errorData);
             }
 
-        } elseif (PHP_CodeSniffer::isCamelCaps($testName, false, false, false) === false) {
+        } elseif (!PHP_CodeSniffer::isCamelCaps($testName, false, true, false)) {
             $error     = 'Method name "%s" is not in camel caps format';
             $className = $phpcsFile->getDeclarationName($currScope);
             $errorData = array($className.'::'.$methodName);
