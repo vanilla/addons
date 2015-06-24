@@ -91,9 +91,9 @@ class AgeGatePlugin extends Gdn_Plugin {
      */
     public function EntryController_RegisterValidation_Handler($sender, $args) {
 
-        $day = (int)$sender->Form->GetFormValue('Day', 0);
-        $month = (int)$sender->Form->GetFormValue('Month', 0);
-        $year = (int)$sender->Form->GetFormValue('Year', 0);
+        $day = (int)$sender->Form->GetFormValue('DateOfBirth_Day', 0);
+        $month = (int)$sender->Form->GetFormValue('DateOfBirth_Month', 0);
+        $year = (int)$sender->Form->GetFormValue('DateOfBirth_Year', 0);
 
         if ($day == 0 || $year == 0 || $month == 0) {
             $sender->UserModel->Validation->AddValidationResult('', "Please select a valid Date of Birth.");
