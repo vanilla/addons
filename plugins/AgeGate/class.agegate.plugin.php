@@ -3,13 +3,22 @@
 $PluginInfo['AgeGate'] = array(
     'Name' => 'Age Gate',
     'Description' => 'Add Date of Birth to the registration form, and require a certain age to register.',
-    'Version' => '1.1.0',
+    'Version' => '1.2.0',
     'Author' => "Becky Van Bussel",
     'AuthorEmail' => 'becky@vanillaforums.com',
     'SettingsUrl' => '/settings/agegate', // Url of the plugin's settings page.
 
 );
 
+/**
+ * Class AgeGatePlugin
+ *
+ * Adds Date of Birth to the registration form and requires a certain age to register.
+ *
+ * Hidden config setting Plugins.AgeGate.MinimumAgeWithConsent makes the Plugins.AgeGate.MinimumAge setting
+ * the age the user must be in order to register. Anybody between the MinimumAge and MinimumAgeWithConsent
+ * must confirm they have consent to use the forums.
+ */
 class AgeGatePlugin extends Gdn_Plugin {
 
     /**
@@ -54,6 +63,7 @@ class AgeGatePlugin extends Gdn_Plugin {
         $years = array(0 => T('Year')) + $years;
 
         $minimumAge = C('Plugins.AgeGate.MinimumAge', 0);
+        $minimumAgeWithConsent = C('Plugins.AgeGate.MinimumAgeWithConsent', false);
         $addConfirmation = C('Plugins.AgeGate.AddConfirmation', false);
 
         echo '<li class="agegate-dob">';
@@ -66,9 +76,13 @@ class AgeGatePlugin extends Gdn_Plugin {
         echo '</li>';
 
         if ($addConfirmation) {
-            echo '<input type="hidden" id="Form_MinimumAge" name="MinimumAge" value="' . $minimumAge . '">';
+            echo '<input type="hidden" id="Form_MinimumAge" name="MinimumAge" value="'.$minimumAge.'">';
+            if ($minimumAgeWithConsent) {
+                echo '<input type="hidden" id="Form_MinimumAgeWithConsent" name="MinimumAgeWithConsent" value="'.$minimumAgeWithConsent.'">';
+                $minimumAge = $minimumAgeWithConsent;
+            }
             echo '<li class="agegate-confirmation js-agegate-confirmation Hidden">';
-            echo $sender->Form->CheckBox('AgeGateConfirmation', sprintf(T('As I am under %d years of age, I confirm that I have received proper consent in participating in this forum.'), $minimumAge));
+            echo $sender->Form->CheckBox('AgeGateConfirmation', sprintf(t('I confirm that I have received consent to join this community.'), $minimumAge));
             echo '</li>';
         }
     }
@@ -97,9 +111,19 @@ class AgeGatePlugin extends Gdn_Plugin {
         $interval = $datetime1->diff($datetime2);
         $age =  $interval->format('%y');
         $minimumAge = C('Plugins.AgeGate.MinimumAge', 0);
+        $minimumAgeWithConsent = C('Plugins.AgeGate.MinimumAgeWithConsent', false);
         $addConfirmation = C('Plugins.AgeGate.AddConfirmation', false);
 
-        if ($age < $minimumAge) {
+        if ($minimumAgeWithConsent) {
+            if ($addConfirmation && $age < $minimumAgeWithConsent && $age >= $minimumAge) {
+                $sender->UserModel->Validation->ApplyRule('AgeGateConfirmation', 'Required', T('You must receive proper consent to participate in this forum.'));
+                return;
+            }
+            if ($age < $minimumAge) {
+                $sender->UserModel->Validation->AddValidationResult('', sprintf("You must be at least %d years old to Register.", $minimumAge));
+                return;
+            }
+        } else if ($age < $minimumAge) {
             if ($addConfirmation) {
                 $sender->UserModel->Validation->ApplyRule('AgeGateConfirmation', 'Required', T('You must receive proper consent to participate in this forum.'));
             } else {
@@ -129,7 +153,6 @@ class AgeGatePlugin extends Gdn_Plugin {
         if ($sender->Form->AuthenticatedPostBack()) {
             $minimumAge = $sender->Form->GetValue('MinimumAge');
             $addConfirmation = $sender->Form->GetValue('AddConfirmation');
-
 
             if (!is_numeric($minimumAge)) {
                 $sender->Form->AddError('Please enter a valid number.');

@@ -4,13 +4,23 @@ $(function() {
     if ($('#Form_Day').val() > 0 && $('#Form_Month').val() > 0 && $('#Form_Year').val() > 0) {
       var userDob = new Date($('#Form_Year').val(), $('#Form_Month').val()-1, $('#Form_Day').val(), 0, 0, 0, 0).getTime();
       var minAge = $('#Form_MinimumAge').val();
+      var minAgeWithConsent = $('#Form_MinimumAgeWithConsent').val();
       var now = new Date();
       var currentYear = now.getFullYear();
-      var maxDob = now.setFullYear(currentYear - minAge);
-      if (userDob > maxDob) {
-        $('.js-agegate-confirmation').removeClass('Hidden');
+      var minDob = now.setFullYear(currentYear - minAge);
+      var maxDobWithConsent = now.setFullYear(currentYear - minAgeWithConsent);
+      if (minAgeWithConsent) { // Hidden config setting is set
+        if (userDob < minDob && userDob > maxDobWithConsent) {
+          $('.js-agegate-confirmation').removeClass('Hidden');
+        } else {
+          $('.js-agegate-confirmation').addClass('Hidden');
+        }
       } else {
-        $('.js-agegate-confirmation').addClass('Hidden');
+        if (userDob > minDob) {
+          $('.js-agegate-confirmation').removeClass('Hidden');
+        } else {
+          $('.js-agegate-confirmation').addClass('Hidden');
+        }
       }
     }
   }
@@ -20,4 +30,5 @@ $(function() {
   $('.AgeGate').change(function() {
     checkAge();
   });
+
 });
