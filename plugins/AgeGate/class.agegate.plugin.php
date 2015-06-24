@@ -67,12 +67,8 @@ class AgeGatePlugin extends Gdn_Plugin {
         $addConfirmation = C('Plugins.AgeGate.AddConfirmation', false);
 
         echo '<li class="agegate-dob">';
-        echo $sender->Form->Label('Birthday', 'DOB');
-        echo $sender->Form->DropDown('Day', $days, array('class' => 'AgeGate'));
-        echo ' ';
-        echo $sender->Form->DropDown('Month', $months, array('class' => 'AgeGate'));
-        echo ' ';
-        echo $sender->Form->DropDown('Year', $years, array('class' => 'AgeGate'));
+        echo $sender->Form->label('Birthday', 'DateOfBirth');
+        echo $sender->Form->date('DateOfBirth', array('class' => 'AgeGate'));
         echo '</li>';
 
         if ($addConfirmation) {

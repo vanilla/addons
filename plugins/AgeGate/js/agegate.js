@@ -1,8 +1,8 @@
 $(function() {
 
   function checkAge() {
-    if ($('#Form_Day').val() > 0 && $('#Form_Month').val() > 0 && $('#Form_Year').val() > 0) {
-      var userDob = new Date($('#Form_Year').val(), $('#Form_Month').val()-1, $('#Form_Day').val(), 0, 0, 0, 0).getTime();
+    if ($('#Form_DateOfBirth_Day').val() > 0 && $('#Form_DateOfBirth_Month').val() > 0 && $('#Form_DateOfBirth_Year').val() > 0) {
+      var userDob = new Date($('#Form_DateOfBirth_Year').val(), $('#Form_DateOfBirth_Month').val()-1, $('#Form_DateOfBirth_Day').val(), 0, 0, 0, 0).getTime();
       var minAge = $('#Form_MinimumAge').val();
       var minAgeWithConsent = $('#Form_MinimumAgeWithConsent').val();
       var now = new Date();
