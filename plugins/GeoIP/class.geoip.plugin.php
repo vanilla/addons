@@ -644,15 +644,16 @@ class GeoipPlugin extends Gdn_Plugin {
         error_log("Block Table Created");
 
         // Import Location CSV file into SQL:
-        $locationImported  = $this->importLocationCSV($locationFile);
+        $locationImported  = $this->importLocationCSV2($locationFile);
         if (empty($locationImported)) {
             error_log("Failed to import GeoIP CSV location file into SQL table in ".__METHOD__."()");
             return false;
         }
         error_log("Location Table Imported");
+//exit("END:\t".__METHOD__);
 
         // Import Block CSV file into SQL:
-        $blockImported  = $this->importBlockCSV($locationFile);
+        $blockImported  = $this->importBlockCSV2($blockFile);
         if (empty($blockImported)) {
             error_log("Failed to import GeoIP CSV block file into SQL table in ".__METHOD__."()");
             return false;
@@ -756,6 +757,43 @@ error_log("Load Location Table:\n{$sql}");
         return $output;
     }
 
+    private function importLocationCSV2($input) {
+        if (empty($input) OR !is_file($input)) {
+            trigger_error("Invalid path to block CSV in ".__METHOD__."()!", E_USER_WARNING);
+            return false;
+        }
+//error_log("Hello ".__METHOD__);
+
+        $fh   = fopen($input,'r');
+        $rem  = null;
+        $i    = 0;
+
+        while (!feof($fh)) {
+
+            //$content  = !empty($rem) ? $rem : '';
+            //$content .= fread($fh, 8192);
+            $cells = fgetcsv($fh, 1024, ",", '"');
+            //error_log("-{$i})\n".print_r($cells,true));
+
+            $sql  = "INSERT into ".self::$locationTableName."\n";
+            $sql .= "(geoname_id, locale_code, continent_code, continent_name, country_iso_code, country_name, subdivision_1_iso_code, subdivision_1_name, subdivision_2_iso_code, subdivision_2_name, city_name, metro_code, time_zone)\n";
+            $sql .= "VALUES ('{$cells[0]}','{$cells[1]}','{$cells[2]}','".str_replace("'","\\'",$cells[3])."','".str_replace("'","\\'",$cells[4])."','".str_replace("'","\\'",$cells[5])."','".str_replace("'","\\'",$cells[6])."','".str_replace("'","\\'",$cells[7])."','".str_replace("'","\\'",$cells[8])."','".str_replace("'","\\'",$cells[9])."','".str_replace("'","\\'",$cells[10])."','".str_replace("'","\\'",$cells[11])."','".str_replace("'","\\'",$cells[12])."')\n";
+error_log("-{$i})\n{$sql}");
+
+            try {
+                $this->runQuery($sql);
+            } catch(Exception $e) {
+                error_log("Failed Query: ".$e->getMessage());
+            }
+
+            $i++;
+        }
+
+        fclose($fh);
+
+        return true;
+    }
+
     private function createBlockTable() {
 
         error_log("Creating Block Table");
@@ -823,6 +861,46 @@ error_log("Load Block Table:\n{$sql}");
 
         return $output;
     }
+
+    private function importBlockCSV2($input) {
+        if (empty($input) OR !is_file($input)) {
+            trigger_error("Invalid path to block CSV in ".__METHOD__."()!", E_USER_WARNING);
+            return false;
+        }
+//error_log("Hello ".__METHOD__);
+
+        $fh   = fopen($input,'r');
+        $rem  = null;
+        $i    = 0;
+
+        while (!feof($fh)) {
+
+            //$content  = !empty($rem) ? $rem : '';
+            //$content .= fread($fh, 8192);
+            $cells = fgetcsv($fh, 1024, ",", '"');
+error_log("-{$i})\n".print_r($cells,true));
+
+            // @todo Fix table. Does not seem to have correct number of columns.
+
+            $sql  = "INSERT into ".self::$blockTableName."\n";
+            $sql .= "(network,start_ip,end_ip,netmask_cidr,geoname_id,registered_country_geoname_id,represented_country_geoname_id,is_anonymous_proxy,is_satellite_provider,postal_code,latitude,longitude)\n";
+            $sql .= "VALUES ('".str_replace("'","\\'",$cells[0])."','".str_replace("'","\\'",$cells[1])."','".str_replace("'","\\'",$cells[2])."','".str_replace("'","\\'",$cells[3])."','".str_replace("'","\\'",$cells[4])."','".str_replace("'","\\'",$cells[5])."','".str_replace("'","\\'",$cells[6])."','".str_replace("'","\\'",$cells[7])."','".str_replace("'","\\'",$cells[8])."')\n";
+error_log("-{$i})\n{$sql}");
+
+            try {
+                $this->runQuery($sql);
+            } catch(Exception $e) {
+                error_log("Failed Query: ".$e->getMessage());
+            }
+
+            $i++;
+        }
+
+        fclose($fh);
+
+        return true;
+    }
+
 
     private function downloadGeoipZip($url=null) {
 
