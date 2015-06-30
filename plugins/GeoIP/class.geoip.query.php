@@ -2,7 +2,7 @@
 
 class GeoipQuery {
 
-    private $localCache = [];
+    public  $localCache = [];
     private $localCacheMax = 100;
 
     private static $blockTableName       = 'geoip_block';
@@ -12,7 +12,7 @@ class GeoipQuery {
     const   cachePre    = 'GeoIP-Plugin_';
 
 
-    public function get($input) {
+    public function get($input, $caching=true) {
         if (empty($input)) {
             return false;
         }
@@ -21,29 +21,28 @@ class GeoipQuery {
         if (!is_array($input)) {
             $input = [$input];
         }
-echo "<pre>IP List: ".print_r($input, true)."</pre>\n";
+
+        // Get Cached Records:
+        if ($caching==true) {
+            $cached = GDN::cache()->Get($this->cacheKey($input));
+            if (!empty($cached)) {
+                $this->addLocalCache($cached);
+                return $cached;
+            }
+        }
 
         // Get SQL Query:
         $sql     = $this->getSQL($input);
         $output  = GDN::Database()->Connection()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
         $output  = $this->assocIpsToResults($output, $input);
+        //echo "<pre>OUTPUT IP Results: ".print_r($output, true)."</pre>\n";
 
-echo "<pre>OUTPUT IP Results: ".print_r($output, true)."</pre>\n";
-
-        return $output;
-    }
-
-    private function runQuery($sql) {
-        try{
-            //GDN::Database()->ConnectionOptions[PDO::MYSQL_ATTR_LOCAL_INFILE] = true;
-            $PDO = GDN::Database()->Connection();
-            $output = $PDO->query($sql);
-            //GDN::SQL()->ConnectionOptions[PDO::MYSQL_ATTR_LOCAL_INFILE] = true;
-            //$output = GDN::SQL()->Query($sql);
-        } catch(Exception $e) {
-            error_log(__METHOD__."() SQL Error: ".$e->getMessage());
-            return false;
+        // Store to cache:
+        if ($caching == true) {
+            GDN::cache()->store(self::cacheKey($input), $output);
         }
+        $this->addLocalCache($output);
+
         return $output;
     }
 
@@ -66,7 +65,7 @@ echo "<pre>OUTPUT IP Results: ".print_r($output, true)."</pre>\n";
             $sql .= "inet_aton('{$ip}') BETWEEN B.start AND B.end\n";
         }
         $sql .= ";\n";
-echo "<pre>SQL:\n{$sql}</pre>\n";
+        // echo "<pre>SQL:\n{$sql}</pre>\n";
 
         return $sql;
     }
@@ -152,11 +151,17 @@ echo "<pre>SQL:\n{$sql}</pre>\n";
         return $this->localCache;
     }
 
-    private function addIpsToResults(&$data, $ips) {
+    /**
+     * Takes result data array of GeoIP results and adds it's associated
+     * ip from the IP list
+     *
+     * @param $data Array of GeoIP result data.
+     * @param $ips Array of IPs used to produce dataset
+     * @return array Returns original data array with associated IP from ips list.
+     */
+    private function assocIpsToResults($data, $ips, $options=[]) {
 
-    }
-
-    private function assocIpsToResults(&$data, $ips) {
+        // @todo Should be making list using IPs as first loop, not data array.
 
         $output = [];
         foreach ($data AS $item) {
@@ -173,5 +178,118 @@ echo "<pre>SQL:\n{$sql}</pre>\n";
         return $output;
     }
 
+    /**
+     * Get cached records for given cache key(s).
+     *
+     * @param $input Target cache key(s) to load.
+     * @return array|mixed Returns array
+     */
+    private function getCache($input) {
+        if (empty($input)) {
+            return [];
+        } else if (!Gdn::cache()->activeEnabled()) {
+            return [];
+        }
+
+        // Check Local Cache:
+        $local = [];
+        foreach ($input AS $i => $targetItem) {
+            if (isset($this->localCache[$targetItem])) {
+                $local[] = $targetItem;
+                //unset($input[$i]);
+            }
+        }
+        //$input = array_values($input); // @todo remove localCache items from input array for optimization...
+
+        // Get Cached Records:
+        $cached = GDN::cache()->Get($input);
+
+        // Merge local and cached records:
+        $output = array_merge($local, $cached);
+
+        return $output;
+    }
+
+    /**
+     * Generate a cache key based on given $input. (normally an IP)
+     *
+     * @param $input Given input to create cache key with.
+     * @return string Returns requested cache key.
+     */
+    private static function cacheKey($input) {
+        if (is_array($input)) {
+            $input = serialize($input);
+        }
+
+        return md5(self::cachePre.$input);
+    }
+
+    /**
+     * Determines if given IP is a local IP.
+     *
+     * @param $ip IP to be verified.
+     * @return bool Returns true or false.
+     */
+    private static function isLocalIP($ip) {
+        if (empty($ip) OR !self::isIP($ip)) {
+            trigger_error("Invalid IP passed to ".__METHOD__."()", E_USER_NOTICE);
+            return false;
+        }
+
+        // Make sure Input is not in private range of IPs:
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Gets current public IP address.
+     *
+     * This is used if working in local installation and we want to determine public IP address.
+     *
+     * @return string
+     */
+    private static function myIP() {
+
+        if (!self::isLocalIP($_SERVER['REMOTE_ADDR'])) {
+            return $_SERVER['REMOTE_ADDR'];
+        }
+
+        // Get curl handle:
+        $ch = curl_init('http://checkip.dyndns.org');
+        //curl_setopt($ch, CURLOPT_HEADER, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322)");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $output  = trim( substr($response, strpos($response,':') + 2) );
+        $output  = strip_tags($output);
+
+        return $output;
+    }
+
+    /**
+     * Extract IP list from given dataset.
+     *
+     * @param $input array Array of records containing GeoIP data.
+     * @return array Returns array list of IPs
+     */
+    private function extractIPList($input, $pointer='_ip') {
+        if (empty($input)) {
+            return [];
+        }
+
+        $output = [];
+        foreach ($input AS $item) {
+            if (isset($item[$pointer])) {
+                $output[] = $item[$pointer];
+            }
+        }
+
+        return $output;
+    }
 
 }
