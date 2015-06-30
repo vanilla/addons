@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
+require_once 'class.geoip_import.php';
+
 // Define the plugin:
 $PluginInfo['GeoIP'] = array(
     'Name' => 'Carmen Sandiego (GeoIP)',
@@ -28,32 +30,10 @@ class GeoipPlugin extends Gdn_Plugin {
 
     private $pdo;
 
-    public  $baseDir = '/tmp/geoip';
-    //private $userDir; // Defined in __get().
-
-    //private static $csvDownloadURL = "http://deric.ca/geoip/GeoLite2-City-CSV.zip";
-    private static $csvDownloadURL = "http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip";
-
-    private static $blockFileName    = 'GeoLite2-City-Blocks-IPv4.csv';
-    private static $locationFileName = 'GeoLite2-City-Locations-%s.csv';
-    private static $locationLocales  = ['de','en','es','fr','ja','pt-BR','ru','zh-CN'];
 
     private static $blockTableName       = 'geoip_block';
     private static $locationTableName    = 'geoip_location';
 
-    private static $blockRowsPerQuery    = 2000;
-    private static $locationRowsPerQuery = 500;
-
-    private $blockImportTime      = 0;
-    private $locationImportTime   = 0;
-
-    private $downloadZip;
-    private $locationFile;
-    private $blockFile;
-
-    const tuncateQuery  = "TRUNCATE `%s`";
-    const describeQuery = "DESCRIBE `%s`";
-    const dropTableQuery = "DROP TABLE %s IF EXISTS";
 
 
     public function __construct() {
@@ -138,6 +118,7 @@ class GeoipPlugin extends Gdn_Plugin {
         exit(__METHOD__);
     }
 
+
     /**
      * Load GeoIP data upon login.
      *
@@ -215,11 +196,13 @@ class GeoipPlugin extends Gdn_Plugin {
     }
 
 
+    /**
+     * Import GeoIP City Lite from Max Mind into MySQL.
+     *
+     * @return bool Returns TRUE on Success, FALSE on failure.
+     */
     private function import() {
         ini_set('max_execution_time', 300); //300 seconds = 5 minutes
-
-        // Clean anything there before:
-        $this->trash();
 
         $oldErrorOn  = ini_set("log_errors", true);
         $oldErrorLog = ini_set("error_log", self::$errorLog);
@@ -227,17 +210,9 @@ class GeoipPlugin extends Gdn_Plugin {
         error_log(">> ...Starting GeoIP CSV Import... <<");
         error_log("Log File: ".self::$errorLog, E_USER_NOTICE);
 
-        // Download Files:
-        $downloaded = $this->importDownload();
-        if ($downloaded==false) {
-            error_log("Failed to Import data into MySQL!");
-        }
-
-        // Import Data:
-        $imported   = $this->importData();
-        if ($imported==false) {
-            error_log("Failed to Import data into MySQL!");
-        }
+        // Do Import:
+        $import = new GeoipImport();
+        $import->run();
 
         error_log("|| ...OK: Done importing GeoIP... ||");
 
@@ -245,456 +220,14 @@ class GeoipPlugin extends Gdn_Plugin {
         ini_set("log_errors", $oldErrorOn);
         ini_set("error_log", $oldErrorLog);
 
-        // Clean up after ourselves:
-        $this->trash();
-
         return true;
     }
 
-    private function importDownload() {
-
-        // Download Zip:
-        $this->downloadZip  = $this->downloadGeoipZip(self::$csvDownloadURL);
-        if (!is_file($this->downloadZip)) {
-            error_log("Failed to download GeoIP CSV file in ".__METHOD__."()");
-            return false;
-        }
-        error_log("Zip Downloaded: {$this->downloadZip}");
-
-        // Extract downloaded payload file to get to the CSV files:
-        $payloadFiles = $this->extractGeoipCSV($this->downloadZip);
-        if (empty($payloadFiles) OR !is_array($payloadFiles)) {
-            error_log("Failed to extract GeoIP CSV file in ".__METHOD__."()");
-            return false;
-        }
-        $this->locationFile = !empty($payloadFiles['location_file']) ? $payloadFiles['location_file'] : false;
-        $this->blockFile    = !empty($payloadFiles['block_file'])    ? $payloadFiles['block_file']    : false;
-        //error_log("Zip Extracted");
-
-        // Check File Paths:
-        if (!is_file($this->locationFile)) {
-            error_log("Failed to locate GeoIP CSV location file in ".__METHOD__."()");
-            return false;
-        }
-        if (!is_file($this->blockFile)) {
-            error_log("Failed to locate GeoIP CSV block file in ".__METHOD__."()");
-            return false;
-        }
-        //error_log("Zip Content Confirmed ({$this->blockFile}, {$this->locationFile})");
-        error_log("Zip Content Confirmed.");
-
-        return true;
-    }
-
-    private function importData() {
-
-        if (!is_file($this->locationFile)) {
-            error_log("Failed to locate GeoIP CSV location file in ".__METHOD__."()");
-            return false;
-        }
-        if (!is_file($this->blockFile)) {
-            error_log("Failed to locate GeoIP CSV block file in ".__METHOD__."()");
-            return false;
-        }
-
-        // Create Location Table:
-        $locationCreated   = $this->createLocationTable();
-        if (empty($locationCreated)) {
-            error_log("Failed to create GeoIP location table in ".__METHOD__."()");
-            return false;
-        }
-        error_log("Location Table Created");
-
-        // Create Block Table:
-        $blockCreated      = $this->createBlockTable();
-        if (empty($blockCreated)) {
-            error_log("Failed to create GeoIP block table in ".__METHOD__."()");
-            return false;
-        }
-        error_log("Block Table Created");
-
-
-        // Import Location CSV file into SQL:
-        $locStart = microtime(true);
-        $locationImported  = $this->importLocationCSV($this->locationFile);
-        if (empty($locationImported)) {
-            error_log("Failed to import GeoIP CSV location file into SQL table in ".__METHOD__."()");
-            return false;
-        }
-        $this->locationImportTime = microtime(true) - $locStart;
-        error_log("Location Table Imported in {$this->locationImportTime} seconds.");
-
-
-        // Import Block CSV file into SQL:
-        $blockStart = microtime(true);
-        $blockImported  = $this->importBlockCSV($this->blockFile);
-        if (empty($blockImported)) {
-            error_log("Failed to import GeoIP CSV block file into SQL table in ".__METHOD__."()");
-            return false;
-        }
-        $this->blockImportTime = microtime(true) - $blockStart;
-        error_log("Block Table Imported in {$this->blockImportTime} seconds.");
-
-        return true;
-    }
-
-
-    /**
-     * Creates MySQL geoip location table.
-     *
-     * @return bool|Gdn_DataSet|object|string
-     */
-    private function createLocationTable() {
-
-        error_log("Creating Location Table");
-        if ($this->tableExists(self::$locationTableName)==false) {
-
-            try {
-                $sql = "CREATE TABLE ".self::$locationTableName." (\n";
-                $sql .= "  `geoname_id` int(10) unsigned NOT NULL\n";
-                $sql .= ", `locale_code` char(2) NOT NULL\n";
-                $sql .= ", `continent_code` char(2) NOT NULL\n";
-                $sql .= ", `continent_name` varchar(24) NOT NULL\n";
-                $sql .= ", `country_iso_code` char(2) NOT NULL\n";
-                $sql .= ", `country_name` varchar(36) NOT NULL\n";
-                $sql .= ", `subdivision_1_iso_code` char(3) NOT NULL\n";
-                $sql .= ", `subdivision_1_name` varchar(36) NOT NULL\n";
-                $sql .= ", `subdivision_2_iso_code` char(3) NOT NULL\n";
-                $sql .= ", `subdivision_2_name` varchar(36) NOT NULL\n";
-                $sql .= ", `city_name` varchar(50) NOT NULL\n";
-                $sql .= ", `metro_code` int(4) NOT NULL\n";
-                $sql .= ", `time_zone` varchar(24) NOT NULL\n";
-                $sql .= ", PRIMARY KEY (`geoname_id`)\n";
-                $sql .= ") ENGINE=InnoDB DEFAULT CHARSET=utf8\n;";
-                //error_log("Create Location Table:\n{$sql}");
-
-                $output = GDN::SQL()->Query($sql);
-
-            } catch(\Exception $e) {
-                error_log("SQL Error: ".$e->getMessage());
-                return false;
-            }
-
-        } else {
-            error_log("-Location table exists.");
-            //error_log("--Deleting and recreating...");
-            //$this->tableDrop(self::$locationTableName);
-            //$this->createLocationTable();
-            $this->tableTruncate(self::$locationTableName);
-            return true;
-        }
-
-        return $output;
-    }
-
-    /**
-     * Imports GeoIP location CSV file into MySQL database.
-     *
-     * @param $input Filename of CSV to import.
-     * @return bool
-     */
-    private function importLocationCSV($input) {
-        if (empty($input) OR !is_file($input)) {
-            trigger_error("Invalid path to block CSV in ".__METHOD__."()!", E_USER_WARNING);
-            return false;
-        }
-
-        $fh   = fopen($input,'r');
-        $rem  = null;
-        $i    = 0;
-
-        while (!feof($fh)) {
-
-            $sql  = "INSERT into ".self::$locationTableName."\n";
-            $sql .= "(geoname_id, locale_code, continent_code, continent_name, country_iso_code, country_name, subdivision_1_iso_code, subdivision_1_name, subdivision_2_iso_code, subdivision_2_name, city_name, metro_code, time_zone)\n";
-            $sql .= "VALUES\n";
-
-            $j = 0;
-            while ($j < self::$locationRowsPerQuery && !feof($fh)) {
-
-                $cells = fgetcsv($fh, 1024, ",", '"');
-                if (empty($cells[0])) {
-                    continue;
-                }
-
-                $sql .= $j==0 ? "  " : ", ";
-                $sql .= "('{$cells[0]}','{$cells[1]}','{$cells[2]}','".str_replace("'","\\'",$cells[3])."','".str_replace("'","\\'",$cells[4])."','".str_replace("'","\\'",$cells[5])."','".str_replace("'","\\'",$cells[6])."','".str_replace("'","\\'",$cells[7])."','".str_replace("'","\\'",$cells[8])."','".str_replace("'","\\'",$cells[9])."','".str_replace("'","\\'",$cells[10])."','".str_replace("'","\\'",$cells[11])."','".str_replace("'","\\'",$cells[12])."')\n";
-                $j++;
-            }
-            $sql .= ";";
-            // error_log("-{$i})\n{$sql}");
-
-            try {
-                $this->runQuery($sql);
-            } catch(Exception $e) {
-                error_log("Failed Query: ".$e->getMessage());
-            }
-
-            $i++;
-        }
-
-        fclose($fh);
-
-        return true;
-    }
-
-    /**
-     * Creates MySQL geoip block table.
-     *
-     * @return bool|Gdn_DataSet|object|string
-     */
-    private function createBlockTable() {
-
-        error_log("Creating Block Table");
-        if ($this->tableExists(self::$blockTableName)==false) {
-
-            try{
-                $sql  = "CREATE TABLE ".self::$blockTableName." (\n";
-                $sql .= "  `network` varchar(20) NOT NULL\n";
-                $sql .= ", `start` bigint(14) unsigned NOT NULL\n";
-                $sql .= ", `end` bigint(14) unsigned NOT NULL\n";
-                $sql .= ", `geoname_id` int(10) unsigned NOT NULL\n";
-                $sql .= ", `registered_country_geoname_id` int(10) unsigned NOT NULL\n";
-                $sql .= ", `represented_country_geoname_id` int(10) unsigned NOT NULL\n";
-                $sql .= ", `is_anonymous_proxy` tinyint(1) unsigned NOT NULL\n";
-                $sql .= ", `is_satellite_provider` tinyint(1) unsigned NOT NULL\n";
-                $sql .= ", `postal_code` varchar(15) NOT NULL\n";
-                $sql .= ", `latitude` decimal(7,4) NOT NULL\n";
-                $sql .= ", `longitude` decimal(7,4) NOT NULL\n";
-                $sql .= ", PRIMARY KEY (`network`)\n";
-                $sql .= ") ENGINE=InnoDB DEFAULT CHARSET=utf8\n;";
-                //error_log("Create Block Table:\n{$sql}");
-
-                $output = GDN::SQL()->Query($sql);
-
-            } catch(\Exception $e) {
-                error_log("SQL Error: ".$e->getMessage());
-                return false;
-            }
-
-        } else {
-            error_log("-Block table exists.");
-            //$this->tableDrop(self::$blockTableName);
-            //$this->createBlockTable();
-            $this->tableTruncate(self::$blockTableName);
-            return true;
-        }
-
-        return $output;
-    }
-
-    /**
-     * Imports GeoIP block CSV file into MySQL database.
-     *
-     * @param $input Filename of CSV to import.
-     * @return bool
-     */
-    private function importBlockCSV($input) {
-        if (empty($input) OR !is_file($input)) {
-            trigger_error("Invalid path to block CSV in ".__METHOD__."()!", E_USER_WARNING);
-            return false;
-        }
-
-        $fh   = fopen($input,'r');
-        $rem  = null;
-        $i    = 0;
-
-        while (!feof($fh)) {
-
-            $sql  = "INSERT into ".self::$blockTableName."\n";
-            $sql .= "(network,start,end,geoname_id,registered_country_geoname_id,represented_country_geoname_id,is_anonymous_proxy,is_satellite_provider,postal_code,latitude,longitude)\n";
-            //$sql .= "(network,geoname_id,registered_country_geoname_id,represented_country_geoname_id,is_anonymous_proxy,is_satellite_provider,postal_code,latitude,longitude)\n";
-            $sql .= "VALUES\n";
-
-            $j = 0;
-            while ($j < self::$blockRowsPerQuery && !feof($fh)) {
-
-                $cells = fgetcsv($fh, 1024, ",", '"');
-                if (empty($cells[0])) {
-                    continue;
-                }
-
-                $sql .= $j==0 ? "  " : ", ";
-                $sql .= "('".str_replace("'","\\'",$cells[0])."'"
-                      . ", inet_aton(SUBSTRING(network, 1, LOCATE('/',network) -1))"
-                      . ", inet_aton(SUBSTRING(network, 1, LOCATE('/',network) -1)) + pow(2, (32 - CONVERT( SUBSTRING(network, LOCATE('/',network) +1), UNSIGNED) )) -1"
-                      . ",'".str_replace("'","\\'",$cells[1])."'"
-                      . ",'".str_replace("'","\\'",$cells[2])."'"
-                      . ",'".str_replace("'","\\'",$cells[3])."'"
-                      . ",'".str_replace("'","\\'",$cells[4])."'"
-                      . ",'".str_replace("'","\\'",$cells[5])."'"
-                      . ",'".str_replace("'","\\'",$cells[6])."'"
-                      . ",'".str_replace("'","\\'",$cells[7])."'"
-                      . ",'".str_replace("'","\\'",$cells[8])."'"
-                      . ")\n";
-                $j++;
-            }
-            $sql .= ";";
-error_log("-{$i})\n{$sql}");
-
-            try {
-                $this->runQuery($sql);
-            } catch(Exception $e) {
-                error_log("Failed Query: ".$e->getMessage());
-            }
-
-            $i++;
-        }
-
-        fclose($fh);
-
-        return true;
-    }
-
-    private function downloadGeoipZip($url=null) {
-
-        // Remove time limit for php execution:
-        set_time_limit(0);
-
-        $url    = !empty($url) ? $url : self::$csvDownloadURL;
-        $name   = substr($url, strrpos($url,'/')+1);
-
-        // Create TMP User Dir:
-        //$this->userDir = "{$this->baseDir}_".Gdn::session()->UserID;
-        if (!is_dir($this->userDir)) {
-            mkdir($this->userDir, 0775, true);
-        }
-
-        // Output destination file:
-        $output = "{$this->userDir}/{$name}";
-
-        $fp = fopen ($output, 'w+');//This is the file where we save the    information
-        $ch = curl_init($url);//Here is the file we are downloading, replace spaces with %20
-        //curl_setopt($ch, CURLOPT_TIMEOUT, 50);
-        curl_setopt($ch, CURLOPT_FILE, $fp); // write curl response to file
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_exec($ch); // get curl response
-        curl_close($ch);
-
-        return $output;
-    }
-
-    private function extractGeoipCSV($input, $locale='en') {
-        if (!is_file($input)) {
-            error_log("Invalid Zip file passed for extraction in ".__METHOD__."()");
-            return false;
-        }
-
-        $baseDir = dirname($input);
-
-        // UnZip Archive:
-        $zip = new ZipArchive;
-
-        if ($zip->open($input) === TRUE) {
-            $zip->extractTo($baseDir);
-            $zip->close();
-        } else {
-            return false;
-        }
-
-        // Get Extracted Directory Name:
-        $geoipDir = self::locateSubDir($baseDir);
-        error_log("GeoIP Directory: {$baseDir}/{$geoipDir}");
-
-        $output = [];
-        $output['block_file']    = "{$baseDir}/{$geoipDir}/".self::$blockFileName;
-        $output['location_file'] = "{$baseDir}/{$geoipDir}/".sprintf(self::$locationFileName, $locale);
-
-        // Check extracted payload files are properly linked:
-        if (!is_file($output['block_file'])) {
-            error_log("Could not locate extract GeoIP Block file in ".__METHOD__."()!");
-        }
-        if (!is_file($output['location_file'])) {
-            error_log("Could not locate extract GeoIP Location file in ".__METHOD__."()!");
-        }
-
-        // Delete original Zip file.
-        $deleted = unlink($input);
-        if ($deleted==false) {
-            error_log("ERROR: Failed to delete original downloaded ZIP file.");
-        }
-
-        return $output;
-    }
-
-    private function locateSubDir($input) {
-
-        $cmd = "ls -1 {$input}";
-        exec($cmd, $dirList);
-        // error_log("Scanning dir {$input} for CSV folder.");
-
-        foreach ($dirList AS $item) {
-            // error_log("-- {$item}");
-            if (is_dir("{$input}/{$item}")) {
-                $output = $item;
-                break;
-            }
-        }
-
-        return $output;
-    }
-
-    private function tableExists($input, $maxNameLength=20) {
-        if (empty($input) || !is_string($input) || !strlen($input) > $maxNameLength) {
-            error_log("Invalid INPUT {$input} passed to ".__METHOD__."()");
-            return false;
-        }
-        //error_log("Checking Table {$input} Exists!");
-
-        //$result = GDN::SQL()->query(sprintf(self::describeQuery, $input));
-        $result = $this->runQuery(sprintf(self::describeQuery, $input));
-        $output = empty($result) ? false : true;
-        return $output;
-    }
-
-    private function tableTruncate($input, $maxNameLength=20) {
-        if (empty($input) || !is_string($input) || !strlen($input) > $maxNameLength) {
-            error_log("Invalid INPUT {$input} passed to ".__METHOD__."()");
-            return false;
-        }
-        error_log("TRUNCATing table {$input}");
-        $result = GDN::SQL()->query(sprintf(self::tuncateQuery, $input));
-        $output = empty($result) ? false : true;
-
-        return $output;
-    }
-
-    private function tableDrop($input, $maxNameLength=20) {
-        if (empty($input) || !is_string($input) || !strlen($input) > $maxNameLength) {
-            error_log("Invalid INPUT {$input} passed to ".__METHOD__."()");
-            return false;
-        }
-
-        $result = GDN::SQL()->query(sprintf(self::dropTableQuery, $input));
-        $output = empty($result) ? false : true;
-        error_log("Dropped table {$input}");
-        return $output;
-    }
-
-    /**
-     * Cleans all temporary files used during import process.
-     *
-     * @return bool
-     */
-    private function trash() {
-        //unlink($this->blockFile);
-        //unlink($this->locationFile);
-        //rmdir(dirname($this->blockFile));
-        //rmdir(dirname($this->downloadZip));
-
-        if (is_dir($this->userDir)) {
-            $cmd = "rm -Rf {$this->userDir}";
-            system($cmd);
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     private function runQuery($sql) {
 
         try{
-            GDN::Database()->ConnectionOptions[PDO::MYSQL_ATTR_LOCAL_INFILE] = true;
+            //GDN::Database()->ConnectionOptions[PDO::MYSQL_ATTR_LOCAL_INFILE] = true;
             $PDO = GDN::Database()->Connection();
             $output = $PDO->query($sql);
 
@@ -734,7 +267,7 @@ error_log("-{$i})\n{$sql}");
         // Get data that is already cached:
         $cachedData   = $this->getCache($targetKeys);
 
-        // Get list of IPs from data that is already cached:
+        // Get list of IPs from data that are already cached:
         $cachedIPList = $this->extractIPList($cachedData);
 
         // Build list of IPs to load:
@@ -745,20 +278,56 @@ error_log("-{$i})\n{$sql}");
             }
         }
         $loadList   = array_unique($loadList);
+echo "<pre>Load List: ".print_r($loadList,true)."</pre>\n";
 
         // Load target IP info from loadList (uncached):
-        $loadedInfo = self::ipQuery($loadList, true, true); // Do not look in cache...
+        $loadedInfo = !empty($loadList) ? self::ipQuery2($loadList, true, true) : []; // Do not look in cache...
         $info       = array_merge($cachedData, $loadedInfo);
+echo "<pre>IP Info: ".print_r($info,true)."</pre>\n";
 
         // Make sure IP is pointer in array:
         $output = [];
         foreach ($info AS $item) {
             $output[$item['_ip']] = $item;
         }
+echo "<pre>IP OUTPUT: ".print_r($output,true)."</pre>\n";
 
         // Merge output/results with existing localCache:
         //$this->localCache = array_merge($this->localCache, $output);
         $this->addLocalCache($output);
+
+        return $output;
+    }
+
+    private function ipQuery2($input) {
+        if (empty($input)) {
+            return false;
+        }
+        if (!is_array($input)) {
+            $input = [$input];
+        }
+echo "<pre>INPUT Load List: ".print_r($input,true)."</pre>\n";
+
+        $sql  = "SELECT\n";
+        $sql .= "  B.*\n";
+        $sql .= "FROM ".self::$blockTableName." AS B\n";
+        $sql .= "  LEFT JOIN ".self::$locationTableName." AS L ON B.geoname_id=L.geoname_id\n";
+        $sql .= "WHERE\n";
+        foreach ($input AS $i => $ip) {
+            $sql .= ($i==0) ? '  ' : 'OR ';
+            $sql .= " inet_aton('{$ip}') BETWEEN B.start AND B.end\n";
+        }
+        $sql .= ";\n";
+echo "<pre>SQL:\n{$sql}</pre>\n";
+
+        $output = [];
+        $PDO = GDN::Database()->Connection();
+        foreach ($PDO->query($sql, PDO::FETCH_COLUMN) AS $row) {
+            $output[] = $row;
+        }
+
+        //$results  = $this->runQuery($sql);
+echo "<pre>IP Results: ".print_r($output, true)."</pre>\n";
 
         return $output;
     }
@@ -775,8 +344,8 @@ error_log("-{$i})\n{$sql}");
      * @return array|bool
      */
     public static function ipQuery($ip, $checkLocal = false, $caching = true) {
-        // IF given IP input is an array of IPs:
 
+        // IF given IP input is an array of IPs:
         if (is_array($ip)) {
             $output = [];
             foreach ($ip as $item) {
@@ -787,7 +356,7 @@ error_log("-{$i})\n{$sql}");
 
         // Check if given IP is an actualy IP:
         if(!self::isIP($ip)) {
-            trigger_error("Invalid IP passed to ".__METHOD__."()", E_USER_NOTICE);
+            error_log("Invalid IP passed to ".__METHOD__."()");
             return false;
         }
 
@@ -830,7 +399,7 @@ error_log("-{$i})\n{$sql}");
             GDN::cache()->store(self::cacheKey($ip), $output);
             // echo "<pre>Cached Data Saved (".self::cacheKey($ip)."): ".print_r(GDN::cache()->get(self::cacheKey($ip)),true)."</pre>\n";
         }
-
+echo "<pre>IP Query Output: ".print_r($output, true)."</pre>\n";
         return $output;
     } // Closes ipQuery().
 
@@ -892,15 +461,15 @@ error_log("-{$i})\n{$sql}");
      * @param $input array Array of records containing GeoIP data.
      * @return array Returns array list of IPs
      */
-    private function extractIPList($input) {
+    private function extractIPList($input, $pointer='_ip') {
         if (empty($input)) {
             return [];
         }
 
         $output = [];
         foreach ($input AS $item) {
-            if (!empty($item['_ip'])) {
-                $output[] = $item['_ip'];
+            if (isset($item[$pointer])) {
+                $output[] = $item[$pointer];
             }
         }
 
@@ -1158,14 +727,5 @@ error_log("-{$i})\n{$sql}");
 
         return $output;
     }
-
-
-    function __get($varName) {
-        switch ($varName) {
-            case 'userDir': return $this->baseDir.'_'.GDN::session()->UserID;
-            default: null;
-        }
-    }
-
 
 } // Closes GeoipPlugin.
