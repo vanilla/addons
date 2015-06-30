@@ -28,9 +28,35 @@ class GeoipImport {
     public $blockFile;
 
     public  $baseDir = '/tmp/geoip';
+    private $userDir;
     //private $userDir; // Defined in __get().
 
+    private static $errorLog = "/tmp/geoip.log";
+
+
+    function __construct() {
+
+        // Set user's import directory:
+        $this->userDir = $this->baseDir.'_'.GDN::session()->UserID;
+
+        return;
+    }
+
+
+    /**
+     * Runs primary import procedure for importing GeoIP CSV files into MySQL.
+     *
+     * @return bool Returns TRUE on success, FALSE on failure.
+     */
     public function run() {
+
+        ini_set('max_execution_time', 300); //300 seconds = 5 minutes
+
+        $oldErrorOn  = ini_set("log_errors", true);
+        $oldErrorLog = ini_set("error_log", self::$errorLog);
+
+        error_log(">> ...Starting GeoIP CSV Import... <<");
+        error_log("Log File: ".self::$errorLog, E_USER_NOTICE);
 
         // Clean previous working files:
         $this->trash();
@@ -51,6 +77,12 @@ class GeoipImport {
 
         // Clean up after ourselves:
         $this->trash();
+
+        error_log("|| ...OK: Done importing GeoIP... ||");
+
+        // Reset INI:
+        ini_set("log_errors", $oldErrorOn);
+        ini_set("error_log", $oldErrorLog);
 
         return true;
     }
@@ -521,11 +553,74 @@ class GeoipImport {
         }
     }
 
-    function __get($varName) {
-        switch ($varName) {
-            case 'userDir': return $this->baseDir.'_'.GDN::session()->UserID;
-            default: null;
+
+
+    private function importLocationCSVLoadData($input) {
+        if (empty($input) OR !is_file($input)) {
+            trigger_error("Invalid path to location CSV in ".__METHOD__."()!", E_USER_WARNING);
+            return false;
         }
+
+        /*
+         * @todo this process will have to be replaced with a manual loop through CSV file.
+         *
+         * Many hosts do not allow LOAD DATA to run. This will allow for more portability.
+         */
+
+        try{
+            $sql  = "LOAD DATA LOCAL INFILE '{$input}'\n";
+            $sql .= "INTO TABLE geoip_location\n";
+            $sql .= "COLUMNS TERMINATED BY ','\n";
+            $sql .= "OPTIONALLY ENCLOSED BY '\"'\n";
+            $sql .= "IGNORE 1 LINES\n";
+            $sql .= "  (geoname_id, locale_code, continent_code, continent_name\n";
+            $sql .= "  , country_iso_code, country_name, subdivision_1_iso_code\n";
+            $sql .= "  , subdivision_1_name, subdivision_2_iso_code, subdivision_2_name\n";
+            $sql .= "  , city_name, metro_code, time_zone);\n";
+            error_log("Load Location Table:\n{$sql}");
+
+            //GDN::SQL()->ConnectionOptions[PDO::MYSQL_ATTR_LOCAL_INFILE] = true;
+            //$output  = GDN::SQL()->Query($sql);
+            //$output = $this->runQuery($sql);
+            $PDO = GDN::Database()->Connection();
+            $output = $PDO->query($sql);
+
+
+        } catch(\Exception $e) {
+            error_log("SQL Error: ".$e->getMessage());
+            return false;
+        }
+
+        return $output;
+    }
+
+    private function importBlockCSVLoadData($input) {
+        if (empty($input) OR !is_file($input)) {
+            trigger_error("Invalid path to block CSV in ".__METHOD__."()!", E_USER_WARNING);
+            return false;
+        }
+
+        try{
+            $sql  = "LOAD DATA LOCAL INFILE '{$input}'\n";
+            $sql .= "INTO TABLE geoip_block\n";
+            $sql .= "COLUMNS TERMINATED BY ','\n";
+            $sql .= "OPTIONALLY ENCLOSED BY '\"'\n";
+            $sql .= "IGNORE 1 LINES\n";
+            $sql .= "(network, geoname_id, registered_country_geoname_id, represented_country_geoname_id\n";
+            $sql .= ", is_anonymous_proxy, is_satellite_provider, postal_code, latitude, longitude);\n";
+            error_log("Load Block Table:\n{$sql}");
+
+            //GDN::SQL()->ConnectionOptions[PDO::MYSQL_ATTR_LOCAL_INFILE] = true;
+            //$output  = GDN::SQL()->Query($sql);
+            $PDO = GDN::Database()->Connection();
+            $output = $PDO->query($sql);
+
+        } catch(\Exception $e) {
+            error_log("SQL Error: ".$e->getMessage());
+            return false;
+        }
+
+        return $output;
     }
 
 }

@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
-require_once 'class.geoip_import.php';
+require_once 'class.geoip.import.php';
+require_once 'class.geoip.query.php';
 
 // Define the plugin:
 $PluginInfo['GeoIP'] = array(
@@ -20,20 +21,13 @@ $PluginInfo['GeoIP'] = array(
 
 class GeoipPlugin extends Gdn_Plugin {
 
-    public  $geoExpTime = 604800; // 604800 = 1 week
-    const   cachePre    = 'GeoIP-Plugin_';
-
-    private static $errorLog = "/tmp/geoip.log";
-
-    private $localCache = [];
-    private $localCacheMax = 100;
 
     private $pdo;
 
 
-    private static $blockTableName       = 'geoip_block';
-    private static $locationTableName    = 'geoip_location';
 
+    private $query;
+    private $import;
 
 
     public function __construct() {
@@ -44,6 +38,11 @@ class GeoipPlugin extends Gdn_Plugin {
             return false;
         }
 
+        // Instantiate Query Object:
+        $this->query  = new GeoipQuery();
+
+        // Instantiate Import Object:
+        $this->import = new GeoipImport();
     }
 
     public function Base_Render_Before($Sender) {
@@ -160,16 +159,21 @@ class GeoipPlugin extends Gdn_Plugin {
         }
 
         // Make sure target IP is in local cache:
-        if (!isset($this->localCache[$targetIP])) {
-            $this->ipInfo($targetIP);
+        if (!isset($this->query->localCache[$targetIP])) {
+            //$this->ipInfo($targetIP);
+            return false;
         }
 
         // Get Country Code:
-        $country_code  = strtolower($this->localCache[$targetIP]['country_code']);
-        $country_name  = $this->localCache[$targetIP]['country_name'];
+        if (!empty($this->query->localCache[$targetIP])) {
+            $countryCode  = strtolower($this->query->localCache[$targetIP]['country_code']);
+            $countryName  = $this->query->localCache[$targetIP]['country_name'];
 
-        // Echo Image:
-        echo Img("/plugins/GeoIP/design/flags/{$country_code}.png", ['alt'=>"({$country_name})", 'title'=>$country_name]);
+            // Echo Image:
+            if (!empty($country_code)) {
+                echo Img("/plugins/GeoIP/design/flags/{$countryCode}.png", ['alt'=>"({$countryName})", 'title'=>$countryName]);
+            }
+        }
 
         return;
     }
@@ -189,7 +193,8 @@ class GeoipPlugin extends Gdn_Plugin {
         }
 
         // Get IP information for given IP list:
-        $this->ipInfo($ipList);
+        //$this->ipInfo($ipList);
+        $this->query->get($ipList);
         //echo "<pre>localCache: ".print_r($this->localCache,true)."</pre>\n";
 
         return true;
@@ -202,45 +207,10 @@ class GeoipPlugin extends Gdn_Plugin {
      * @return bool Returns TRUE on Success, FALSE on failure.
      */
     private function import() {
-        ini_set('max_execution_time', 300); //300 seconds = 5 minutes
-
-        $oldErrorOn  = ini_set("log_errors", true);
-        $oldErrorLog = ini_set("error_log", self::$errorLog);
-
-        error_log(">> ...Starting GeoIP CSV Import... <<");
-        error_log("Log File: ".self::$errorLog, E_USER_NOTICE);
-
         // Do Import:
-        $import = new GeoipImport();
-        $import->run();
-
-        error_log("|| ...OK: Done importing GeoIP... ||");
-
-        // Reset INI:
-        ini_set("log_errors", $oldErrorOn);
-        ini_set("error_log", $oldErrorLog);
-
-        return true;
+        return $this->import->run();;
     }
 
-
-    private function runQuery($sql) {
-
-        try{
-            //GDN::Database()->ConnectionOptions[PDO::MYSQL_ATTR_LOCAL_INFILE] = true;
-            $PDO = GDN::Database()->Connection();
-            $output = $PDO->query($sql);
-
-            //GDN::SQL()->ConnectionOptions[PDO::MYSQL_ATTR_LOCAL_INFILE] = true;
-            //$output = GDN::SQL()->Query($sql);
-
-        } catch(Exception $e) {
-            error_log(__METHOD__."() SQL Error: ".$e->getMessage());
-            return false;
-        }
-
-        return $output;
-    }
 
 
     /**
@@ -299,6 +269,7 @@ echo "<pre>IP OUTPUT: ".print_r($output,true)."</pre>\n";
         return $output;
     }
 
+
     private function ipQuery2($input) {
         if (empty($input)) {
             return false;
@@ -332,6 +303,7 @@ echo "<pre>IP Results: ".print_r($output, true)."</pre>\n";
         return $output;
     }
 
+
     /**
      * Looks up GeoIP information for given IP.
      *
@@ -356,7 +328,7 @@ echo "<pre>IP Results: ".print_r($output, true)."</pre>\n";
 
         // Check if given IP is an actualy IP:
         if(!self::isIP($ip)) {
-            error_log("Invalid IP passed to ".__METHOD__."()");
+            trigger_error("Invalid IP passed to ".__METHOD__."()");
             return false;
         }
 
@@ -403,25 +375,6 @@ echo "<pre>IP Query Output: ".print_r($output, true)."</pre>\n";
         return $output;
     } // Closes ipQuery().
 
-    /**
-     * Add IP information to local cache.
-     *
-     * Merges given input with this->localCache.
-     *
-     * @todo Verify size of local cache is smaller than this->localCacheMax.
-     *
-     * @param $input array Data being added to localCache.
-     * @return bool Returns true/false upon success.
-     */
-    private function addLocalCache($input) {
-        if (empty($input) || !is_array($input)) {
-            return false;
-        }
-
-        $this->localCache = array_merge($this->localCache, $input);
-
-        return $this->localCache;
-    }
 
     /**
      * Get cached records for given cache key(s).
@@ -566,27 +519,6 @@ echo "<pre>IP Query Output: ".print_r($output, true)."</pre>\n";
         return true;
     }
 
-    /**
-     * Checks given if given IP is part of given subnet range.
-     *
-     * @param $ip Given IP to be verified.
-     * @param $range Subnet to be verified agains.
-     * @return bool Returns true if IP is in subnet. False if not.
-     */
-    private static function isInSubnet($ip, $range) {
-        if (!self::isIP($ip)) {
-            return false;
-        }
-
-        list ($subnet, $bits) = explode('/', $range);
-
-        $ip      = ip2long($ip);
-        $subnet  = ip2long($subnet);
-        $mask    = -1 << (32 - $bits);
-        $subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
-
-        return ($ip & $mask) == $subnet;
-    }
 
     /**
      * Gets current public IP address.
@@ -616,44 +548,6 @@ echo "<pre>IP Query Output: ".print_r($output, true)."</pre>\n";
     }
 
     /**
-     * Verifies that given IP is an actual IP.
-     *
-     * @param $ip IP being verified
-     * @param int $version IP version we are verifying
-     * @return bool Returns true if given IP is a proper IP. False if not.
-     */
-    private static function isIP($ip, $version=4) {
-        if (empty($ip)) {
-            return false;
-        } else if (!in_array($version,[4,6])) {
-            return false;
-        }
-
-        if (strlen($ip) < 7 OR strlen($ip) > 15) {
-            return false;
-        }
-
-        if ($version==4) {
-            $parts = explode('.', $ip);
-            if (empty($parts) OR count($parts) != 4) {
-                return false;
-            }
-
-            foreach ($parts AS $part) {
-                if ($part > 255 OR $part < 0) {
-                    return false;
-                }
-            }
-        }
-        else {
-            trigger_error("Only IPv4 supported in ".__METHOD__."()");
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Generate a cache key based on given $input. (normally an IP)
      *
      * @param $input Given input to create cache key with.
@@ -663,69 +557,5 @@ echo "<pre>IP Query Output: ".print_r($output, true)."</pre>\n";
         return self::cachePre.$input;
     }
 
-
-
-    private function importLocationCSVLoadData($input) {
-        if (empty($input) OR !is_file($input)) {
-            trigger_error("Invalid path to location CSV in ".__METHOD__."()!", E_USER_WARNING);
-            return false;
-        }
-
-        /*
-         * @todo this process will have to be replaced with a manual loop through CSV file.
-         *
-         * Many hosts do not allow LOAD DATA to run. This will allow for more portability.
-         */
-
-        try{
-            $sql  = "LOAD DATA LOCAL INFILE '{$input}'\n";
-            $sql .= "INTO TABLE geoip_location\n";
-            $sql .= "COLUMNS TERMINATED BY ','\n";
-            $sql .= "OPTIONALLY ENCLOSED BY '\"'\n";
-            $sql .= "IGNORE 1 LINES\n";
-            $sql .= "  (geoname_id, locale_code, continent_code, continent_name\n";
-            $sql .= "  , country_iso_code, country_name, subdivision_1_iso_code\n";
-            $sql .= "  , subdivision_1_name, subdivision_2_iso_code, subdivision_2_name\n";
-            $sql .= "  , city_name, metro_code, time_zone);\n";
-            error_log("Load Location Table:\n{$sql}");
-
-            //GDN::SQL()->ConnectionOptions[PDO::MYSQL_ATTR_LOCAL_INFILE] = true;
-            //$output  = GDN::SQL()->Query($sql);
-            $output = $this->runQuery($sql);
-
-        } catch(\Exception $e) {
-            error_log("SQL Error: ".$e->getMessage());
-            return false;
-        }
-
-        return $output;
-    }
-
-    private function importBlockCSVLoadData($input) {
-        if (empty($input) OR !is_file($input)) {
-            trigger_error("Invalid path to block CSV in ".__METHOD__."()!", E_USER_WARNING);
-            return false;
-        }
-
-        try{
-            $sql  = "LOAD DATA LOCAL INFILE '{$input}'\n";
-            $sql .= "INTO TABLE geoip_block\n";
-            $sql .= "COLUMNS TERMINATED BY ','\n";
-            $sql .= "OPTIONALLY ENCLOSED BY '\"'\n";
-            $sql .= "IGNORE 1 LINES\n";
-            $sql .= "(network, geoname_id, registered_country_geoname_id, represented_country_geoname_id\n";
-            $sql .= ", is_anonymous_proxy, is_satellite_provider, postal_code, latitude, longitude);\n";
-            error_log("Load Block Table:\n{$sql}");
-
-            GDN::SQL()->ConnectionOptions[PDO::MYSQL_ATTR_LOCAL_INFILE] = true;
-            $output  = GDN::SQL()->Query($sql);
-
-        } catch(\Exception $e) {
-            error_log("SQL Error: ".$e->getMessage());
-            return false;
-        }
-
-        return $output;
-    }
 
 } // Closes GeoipPlugin.
