@@ -133,7 +133,7 @@ class GeoipPlugin extends Gdn_Plugin {
         }
 
         $userID = Gdn::Session()->User->UserID;
-        if (empty($user)) {
+        if (empty($userID)) {
             return false;
         }
 
@@ -193,8 +193,7 @@ class GeoipPlugin extends Gdn_Plugin {
 
         // Get IP information for given IP list:
         $this->query->get($ipList);
-//echo "<pre>Data ".print_r($data,true)."</pre>\n";
-//echo "<pre>localCache: ".print_r($this->query->localCache,true)."</pre>\n";
+        //echo "<pre>localCache: ".print_r($this->query->localCache,true)."</pre>\n";
 
         return true;
     }
@@ -233,19 +232,31 @@ class GeoipPlugin extends Gdn_Plugin {
             trigger_error("No IP address on record for target userID={$userID} in ".__METHOD__."()!", E_USER_NOTICE);
             return false;
         }
-        //echo "<p>User IP: '{$userIP}'</p>\n";
 
-        $ipInfo = self::ipQuery($userIP,true,true);
+        if ($this->query->isLocalIp($userIP)) {
+
+            $publicIP = $this->query->myIP();
+            if (!$this->query->isIP($publicIP)) {
+                return false;
+            }
+            $userIP = $publicIP;
+        }
+
+//echo "<p>User IP: '{$userIP}'</p>\n";
+//exit(__METHOD__);
+
+        $ipInfo = $this->query->get($userIP);
+        $ipInfo = $ipInfo[$userIP];
         if (empty($ipInfo)) {
-            trigger_error("Failed to get IP info in ".__METHOD__."()");
+            trigger_error("Failed to get IP info in ".__METHOD__."()", E_USER_NOTICE);
             return false;
         }
         //echo "<pre>IP Info ".print_r($ipInfo,true)."</pre>\n";
 
-        GDN::userMetaModel()->setUserMeta($userID, 'geo_country', $ipInfo['country_code']);
+        GDN::userMetaModel()->setUserMeta($userID, 'geo_country', $ipInfo['country_iso_code']);
         GDN::userMetaModel()->setUserMeta($userID, 'geo_latitude', $ipInfo['latitude']);
         GDN::userMetaModel()->setUserMeta($userID, 'geo_longitude', $ipInfo['longitude']);
-        GDN::userMetaModel()->setUserMeta($userID, 'geo_city', utf8_encode($ipInfo['city']));
+        GDN::userMetaModel()->setUserMeta($userID, 'geo_city', utf8_encode($ipInfo['city_name']));
         GDN::userMetaModel()->setUserMeta($userID, 'geo_updated', time());
 
         return true;

@@ -46,6 +46,12 @@ class GeoipQuery {
         return $output;
     }
 
+    /**
+     * Generates SQL query to load GeoIP info.
+     *
+     * @param $input Array list of IPs
+     * @return bool|string
+     */
     private function getSQL($input) {
         if (empty($input)) {
             return false;
@@ -56,7 +62,9 @@ class GeoipQuery {
 
         $sql  = "SELECT\n";
         $sql .= "  B.network,\n";
-        $sql .= "  L.*\n";
+        $sql .= "  L.*,\n";
+        $sql .= "  B.latitude,\n";
+        $sql .= "  B.longitude\n";
         $sql .= "FROM ".self::$blockTableName." AS B\n";
         $sql .= "  LEFT JOIN ".self::$locationTableName." AS L ON B.geoname_id=L.geoname_id\n";
         $sql .= "WHERE\n";
@@ -78,7 +86,7 @@ class GeoipQuery {
      * @param $range Subnet to be verified agains.
      * @return bool Returns true if IP is in subnet. False if not.
      */
-    private static function isInSubnet($ip, $range) {
+    public  static function isInSubnet($ip, $range) {
         if (!self::isIP($ip)) {
             return false;
         }
@@ -100,7 +108,7 @@ class GeoipQuery {
      * @param int $version IP version we are verifying
      * @return bool Returns true if given IP is a proper IP. False if not.
      */
-    private static function isIP($ip, $version=4) {
+    public  static function isIP($ip, $version=4) {
         if (empty($ip)) {
             return false;
         } else if (!in_array($version,[4,6])) {
@@ -184,7 +192,7 @@ class GeoipQuery {
      * @param $input Target cache key(s) to load.
      * @return array|mixed Returns array
      */
-    private function getCache($input) {
+    public  function getCache($input) {
         if (empty($input)) {
             return [];
         } else if (!Gdn::cache()->activeEnabled()) {
@@ -216,7 +224,7 @@ class GeoipQuery {
      * @param $input Given input to create cache key with.
      * @return string Returns requested cache key.
      */
-    private static function cacheKey($input) {
+    public  static function cacheKey($input) {
         if (is_array($input)) {
             $input = serialize($input);
         }
@@ -230,7 +238,7 @@ class GeoipQuery {
      * @param $ip IP to be verified.
      * @return bool Returns true or false.
      */
-    private static function isLocalIP($ip) {
+    public  static function isLocalIP($ip) {
         if (empty($ip) OR !self::isIP($ip)) {
             trigger_error("Invalid IP passed to ".__METHOD__."()", E_USER_NOTICE);
             return false;
@@ -251,7 +259,7 @@ class GeoipQuery {
      *
      * @return string
      */
-    private static function myIP() {
+    public  static function myIP() {
 
         if (!self::isLocalIP($_SERVER['REMOTE_ADDR'])) {
             return $_SERVER['REMOTE_ADDR'];
@@ -277,7 +285,7 @@ class GeoipQuery {
      * @param $input array Array of records containing GeoIP data.
      * @return array Returns array list of IPs
      */
-    private function extractIPList($input, $pointer='_ip') {
+    public  function extractIPList($input, $pointer='_ip') {
         if (empty($input)) {
             return [];
         }
