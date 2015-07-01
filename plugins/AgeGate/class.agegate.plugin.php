@@ -50,16 +50,16 @@ class AgeGatePlugin extends Gdn_Plugin {
 
         $days = array_merge(
             array(0 => T('Day')),
-            array_combine(range(1, 31), range(1,31))
+            array_combine(range(1, 31), range(1, 31))
         );
         $months = array_merge(
             array(0 => T('Month')),
             array_combine(range(1, 12), range(1, 12))
         );
         $years = array_combine(
-                range(C('Plugins.AgeGate.StartYear', date('Y')), C('Plugins.AgeGate.StartYear', date('Y')-100)),
-                range(C('Plugins.AgeGate.StartYear', date('Y')), C('Plugins.AgeGate.StartYear', date('Y')-100))
-            );
+            range(C('Plugins.AgeGate.StartYear', date('Y')), C('Plugins.AgeGate.StartYear', date('Y') - 100)),
+            range(C('Plugins.AgeGate.StartYear', date('Y')), C('Plugins.AgeGate.StartYear', date('Y') - 100))
+        );
         $years = array(0 => T('Year')) + $years;
 
         $minimumAge = C('Plugins.AgeGate.MinimumAge', 0);
@@ -78,7 +78,16 @@ class AgeGatePlugin extends Gdn_Plugin {
                 $minimumAge = $minimumAgeWithConsent;
             }
             echo '<li class="agegate-confirmation js-agegate-confirmation Hidden">';
-            echo $sender->Form->CheckBox('AgeGateConfirmation', sprintf(t('I confirm that I have received consent to join this community.'), $minimumAge));
+            echo $sender->Form->CheckBox(
+                'AgeGateConfirmation',
+                '@'.sprintf(
+                    t(
+                        'I confirm that I have received consent to join this community.',
+                        'Since I\'m under %d years old, I confirm that I have received consent to join this community.'
+                    ),
+                    $minimumAge
+                )
+            );
             echo '</li>';
         }
     }
@@ -112,18 +121,18 @@ class AgeGatePlugin extends Gdn_Plugin {
 
         if ($minimumAgeWithConsent) {
             if ($addConfirmation && $age < $minimumAgeWithConsent && $age >= $minimumAge) {
-                $sender->UserModel->Validation->applyRule('AgeGateConfirmation', 'Required', T('You must receive proper consent to participate in this forum.'));
+                $sender->UserModel->Validation->applyRule('AgeGateConfirmation', 'Required', 'You must confirm you have received consent to register.');
                 return;
             }
             if ($age < $minimumAge) {
                 $sender->UserModel->Validation->addValidationResult('', sprintf("You must be at least %d years old to Register.", $minimumAge));
                 return;
             }
-        } else if ($age < $minimumAge) {
+        } elseif ($age < $minimumAge) {
             if ($addConfirmation) {
-                $sender->UserModel->Validation->applyRule('AgeGateConfirmation', 'Required', T('You must receive proper consent to participate in this forum.'));
+                $sender->UserModel->Validation->applyRule('AgeGateConfirmation', 'Required', 'You must confirm you have received consent to register.');
             } else {
-                $sender->UserModel->Validation->addValidationResult('', sprintf("You must be at least %d years old to Register.", $minimumAge));
+                $sender->UserModel->Validation->addValidationResult('', sprintf("You must be at least %d years old to register.", $minimumAge));
             }
             return;
         }
