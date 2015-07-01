@@ -125,7 +125,7 @@ class AgeGatePlugin extends Gdn_Plugin {
                 return;
             }
             if ($age < $minimumAge) {
-                $sender->UserModel->Validation->addValidationResult('', sprintf("You must be at least %d years old to Register.", $minimumAge));
+                $sender->UserModel->Validation->addValidationResult('', sprintf("You must be at least %d years old to register.", $minimumAge));
                 return;
             }
         } elseif ($age < $minimumAge) {
