@@ -50,7 +50,7 @@ class GeoipImport {
      */
     public function run() {
 
-        ini_set('max_execution_time', 300); //300 seconds = 5 minutes
+        ini_set('max_execution_time', 600);
 
         $oldErrorOn  = ini_set("log_errors", true);
         $oldErrorLog = ini_set("error_log", self::$errorLog);

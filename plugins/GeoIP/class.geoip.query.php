@@ -24,23 +24,40 @@ class GeoipQuery {
 
         // Get Cached Records:
         if ($caching==true) {
-            $cached = GDN::cache()->Get($this->cacheKey($input));
-            if (!empty($cached)) {
-                $this->addLocalCache($cached);
-                return $cached;
-            }
-        }
 
-        // Get SQL Query:
-        $sql     = $this->getSQL($input);
-        $output  = GDN::Database()->Connection()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-        $output  = $this->assocIpsToResults($output, $input);
-        //echo "<pre>OUTPUT IP Results: ".print_r($output, true)."</pre>\n";
+//echo "<pre>Cache Key(s): ".print_r($input,true)."</pre>\n";
+            $cached = $this->getCache($input);
+//echo "<pre>Found Cache Keys: ".print_r(array_keys($cached),true)."</pre>\n";
+
+            // Remove Cached IPs from queryList:
+            $queryList = $this->getQueryList($input, array_keys($cached));
+
+        } else {
+            $queryList = $input;
+        }
+//echo "<pre>Query List: ".print_r($queryList,true)."</pre>\n";
+
+        if (!empty($queryList)) {
+
+            // Get SQL Query:
+            $sql      = $this->getSQL($queryList);
+            $results  = GDN::Database()->Connection()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+            $results  = $this->assocIpsToResults($results, $queryList);
+            //echo "<pre>OUTPUT IP Results: ".print_r($output, true)."</pre>\n";
+
+            // Merge Query Results to Cached Results:
+            $output = array_merge($cached, $results);
+
+        } else {
+            $output = $cached;
+        }
 
         // Store to cache:
         if ($caching == true) {
-            GDN::cache()->store(self::cacheKey($input), $output);
+            //GDN::cache()->store(self::cacheKeySerialize($input), $output);
+            $this->setResponseToCache($output);
         }
+
         $this->addLocalCache($output);
 
         return $output;
@@ -161,7 +178,7 @@ class GeoipQuery {
 
     /**
      * Takes result data array of GeoIP results and adds it's associated
-     * ip from the IP list
+     * ip from the IP list.
      *
      * @param $data Array of GeoIP result data.
      * @param $ips Array of IPs used to produce dataset
@@ -170,6 +187,9 @@ class GeoipQuery {
     private function assocIpsToResults($data, $ips, $options=[]) {
 
         // @todo Should be making list using IPs as first loop, not data array.
+        /* If there is more than one IP in the same range, current methodology breaks. This
+           is why we need to add data to list of IPs and not vice versa.
+        */
 
         $output = [];
         foreach ($data AS $item) {
@@ -187,33 +207,54 @@ class GeoipQuery {
     }
 
     /**
-     * Get cached records for given cache key(s).
+     * Generate a cache key based on given $input. If array is passed, cacheKey()
+     * will generate cache key for all the array elements and return new array.
      *
-     * @param $input Target cache key(s) to load.
-     * @return array|mixed Returns array
+     * @param $input Given input to create cache key with.
+     * @return string Returns requested cache key(s).
      */
-    public  function getCache($input) {
-        if (empty($input)) {
-            return [];
-        } else if (!Gdn::cache()->activeEnabled()) {
-            return [];
-        }
-
-        // Check Local Cache:
-        $local = [];
-        foreach ($input AS $i => $targetItem) {
-            if (isset($this->localCache[$targetItem])) {
-                $local[] = $targetItem;
-                //unset($input[$i]);
+    public  static function cacheKey($input) {
+        if (is_array($input)) {
+            $output = [];
+            foreach ($input AS $item) {
+                $output[] = self::cacheKey($item);
             }
         }
-        //$input = array_values($input); // @todo remove localCache items from input array for optimization...
+        else if(is_string($input) || is_numeric($input)) {
+            $output = self::cachePre.$input;
+        }
+        else {
+            error_log("Invalid INPUT passed to ".__METHOD__."()!");
+            return false;
+        }
 
-        // Get Cached Records:
-        $cached = GDN::cache()->Get($input);
+        return $output;
+    }
 
-        // Merge local and cached records:
-        $output = array_merge($local, $cached);
+    /**
+     * Gets IP from given cache key.
+     *
+     * @param $input
+     * @return array|bool|mixed
+     */
+    public  static function getIpFromKey($input) {
+        if (empty($input)) {
+            error_log("Empty INPUT passed to ".__METHOD__."()");
+            return false;
+        }
+        else if (is_array($input)) {
+            $output = [];
+            foreach ($input AS $item) {
+                $output[] = self::getIpFromKey($item);
+            }
+        }
+        else if(is_string($input) OR is_numeric($input)) {
+            $output = str_replace(self::cachePre, '', $input);
+        }
+        else {
+            error_log("Invalid INPUT passed to ".__METHOD__."()");
+            return false;
+        }
 
         return $output;
     }
@@ -224,11 +265,10 @@ class GeoipQuery {
      * @param $input Given input to create cache key with.
      * @return string Returns requested cache key.
      */
-    public  static function cacheKey($input) {
+    public  static function cacheKeySerialize($input) {
         if (is_array($input)) {
             $input = serialize($input);
         }
-
         return md5(self::cachePre.$input);
     }
 
@@ -294,6 +334,90 @@ class GeoipQuery {
         foreach ($input AS $item) {
             if (isset($item[$pointer])) {
                 $output[] = $item[$pointer];
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Get cached entries for given $input list of IPs
+     *
+     * @param $input List of IPs to be checked.
+     * @param $cleanKeys bool Sets whether or not we need to clean IPs out of returned keys.
+     * @return bool|array Returns array list of cached IP info on success, false on failure.
+     */
+    private function getCache($input, $cleanKeys=true) {
+        if (empty($input)) {
+            error_log("Invalid INPUT Array passed to ".__METHOD__."()");
+            return false;
+        } else if (!is_array($input)) {
+            $input = [$input];
+        }
+
+        // Get Cached Records:
+        $results = GDN::cache()->Get($this->cacheKey($input));
+
+
+        if ($cleanKeys==true) {
+            $output = [];
+            if (is_array($results)) {
+                foreach ($results AS $key => $item) {
+                    if (empty($key) || empty($item)) {
+                        continue;
+                    }
+                    $output[$item['_ip']] = $item;
+                }
+            }
+        } else {
+            $output = $results;
+        }
+
+        return $output;
+    }
+
+    /**
+     * Sets given result data into cache.
+     *
+     * @param $input Given data to cache
+     * @return bool Returns true on success, false on failure.
+     */
+    private function setResponseToCache($input) {
+        if (empty($input) || !is_array($input)) {
+            error_log("Invalid INPUT Array passed to ".__METHOD__."()");
+            return false;
+        }
+
+        // echo "<pre>Target SET Cache: ".print_r($input, true)."</pre>\n";
+        foreach ($input AS $ip => $item) {
+            if (empty($item) OR !$this->isIP($ip)) {
+                continue;
+            }
+            GDN::cache()->store($this->cacheKey($ip), $item);
+        }
+
+        return true;
+    }
+
+    private function getQueryList($list, $removeList) {
+        if (empty($list)) {
+            return [];
+        }
+        else if (!is_array($list) || !is_array($list)) {
+            trigger_error("Invalid INPUT or LIST array passed to ".__METHOD__."()!", E_USER_NOTICE);
+            return false;
+        }
+
+        $output = [];
+        foreach ($list AS $item) {
+
+            // Remove Local IPs:
+            if ($this->isLocalIP($item)) {
+                continue;
+            }
+
+            if (!in_array($item, $removeList)) {
+                $output[] = $item;
             }
         }
 
