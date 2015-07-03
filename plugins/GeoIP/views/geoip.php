@@ -12,6 +12,8 @@
 <div class="Info">
     <p>
         <a href="/plugin/geoip/import">Click here to import GeoIP2-Lite City CSV file into your database.</a>
+        <br/>
+        (this should take couple minutes)
     </p>
 </div>
 
@@ -23,14 +25,14 @@ echo $this->Form->Errors();
     <ul>
         <li>
             <?php
-                echo $this->Form->Label("Log user's GeoIP information upon login.", 'Plugin.GeoIP.doLogin');
-                echo $this->Form->Checkbox("Plugin.GeoIP.doLogin");
+            echo $this->Form->Label("Display flags in discussions.", 'Plugin.GeoIP.doDiscussions');
+            echo $this->Form->Checkbox("Plugin.GeoIP.doDiscussions");
             ?>
         </li>
         <li>
             <?php
-                echo $this->Form->Label("Display flags in discussions.", 'Plugin.GeoIP.doDiscussions');
-                echo $this->Form->Checkbox("Plugin.GeoIP.doDiscussions");
+                echo $this->Form->Label("Log user's GeoIP information upon login.", 'Plugin.GeoIP.doLogin');
+                echo $this->Form->Checkbox("Plugin.GeoIP.doLogin");
             ?>
         </li>
     </ul>

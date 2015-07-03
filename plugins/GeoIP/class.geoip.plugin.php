@@ -100,15 +100,24 @@ class GeoipPlugin extends Gdn_Plugin {
             }
         }
 
-        //$Sender->informMessage(t('Your stuff worked.'));
+        if (!empty($_GET['msg'])
+        && stristr($_SERVER['HTTP_REFERER'],'/plugin/geoip')
+        ) {
+            $Sender->informMessage(t(Gdn::request()->get('msg')), 'Dismissable');
+        }
 
         $Sender->Render($this->GetView('geoip.php'));
     }
 
+
+    /**
+     * Import GeoIP City Lite from Max Mind into MySQL.
+     *
+     * @return bool Returns TRUE on Success, FALSE on failure.
+     */
     public function Controller_import($Sender) {
-
-        echo "<p>Importing GeoIP CSV into MySQL!</p>\n";
-
+        // echo "<p>Importing GeoIP CSV into MySQL!</p>\n";
+/*
         $imported = $this->import();
         if ($imported == false) {
             trigger_error("Failed to Import GeoIP data into MySQL in ".__METHOD__."()!", E_USER_WARNING);
@@ -116,6 +125,21 @@ class GeoipPlugin extends Gdn_Plugin {
         }
 
         exit(__METHOD__);
+*/
+        // Do Import:
+        $imported = $this->import->run();
+        if (!empty($imported)) {
+            $msg = "Imported GeoIP City Lite successfully.";
+        } else {
+            $msg = "Failed to Import GeoIP City Lite";
+        }
+
+        // $redirect = $_SERVER['HTTP_REFERER'] . (stristr($_SERVER['HTTP_REFERER'],'?')?'&':'?') . 'msg='.urlencode($msg);
+        $redirect = "/plugin/geoip?msg=".urlencode($msg);
+        header("Location: {$redirect}");
+        exit();
+
+        return true;
     }
 
 
@@ -199,26 +223,10 @@ class GeoipPlugin extends Gdn_Plugin {
         return true;
     }
 
-    /**
-     * Import GeoIP City Lite from Max Mind into MySQL.
-     *
-     * @return bool Returns TRUE on Success, FALSE on failure.
-     */
+
     private function import() {
-        // Do Import:
-        $imported = $this->import->run();
-        if (!empty($imported)) {
-            $msg = "Imported GeoIP City Lite successfully.";
-        } else {
-            $msg = "Failed to Import GeoIP City Lite";
-        }
-
-        $redirect = $_SERVER['HTTP_REFERER'] . (stristr($_SERVER['HTTP_REFERER'],'?')?'&':'?') . 'msg='.urlencode($msg);
-        header("Location: {$redirect}");
-        exit();
-
-        return true;
     }
+
 
     /**
      * Sets the user GeoIP information to UserMeta data.
