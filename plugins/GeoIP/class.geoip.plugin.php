@@ -100,6 +100,7 @@ class GeoipPlugin extends Gdn_Plugin {
             }
         }
 
+        //$Sender->informMessage(t('Your stuff worked.'));
 
         $Sender->Render($this->GetView('geoip.php'));
     }
@@ -205,9 +206,19 @@ class GeoipPlugin extends Gdn_Plugin {
      */
     private function import() {
         // Do Import:
-        return $this->import->run();;
-    }
+        $imported = $this->import->run();
+        if (!empty($imported)) {
+            $msg = "Imported GeoIP City Lite successfully.";
+        } else {
+            $msg = "Failed to Import GeoIP City Lite";
+        }
 
+        $redirect = $_SERVER['HTTP_REFERER'] . (stristr($_SERVER['HTTP_REFERER'],'?')?'&':'?') . 'msg='.urlencode($msg);
+        header("Location: {$redirect}");
+        exit();
+
+        return true;
+    }
 
     /**
      * Sets the user GeoIP information to UserMeta data.

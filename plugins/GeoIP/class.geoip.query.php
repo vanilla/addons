@@ -23,7 +23,7 @@ class GeoipQuery {
         }
 
         // Get Cached Records:
-        if ($caching==true) {
+        if ($caching == true) {
 
 //echo "<pre>Cache Key(s): ".print_r($input,true)."</pre>\n";
             $cached = $this->getCache($input);
@@ -42,8 +42,10 @@ class GeoipQuery {
             // Get SQL Query:
             $sql      = $this->getSQL($queryList);
             $results  = GDN::Database()->Connection()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-            $results  = $this->assocIpsToResults($results, $queryList);
-            //echo "<pre>OUTPUT IP Results: ".print_r($output, true)."</pre>\n";
+//echo "<pre>Query IP Results: ".print_r($results, true)."</pre>\n";
+            $results  = $this->assocResultsToIps($results, $queryList); // @todo with associate results to IPs for result, not other way around.
+            //$results  = $this->assocIpsToResults($results, $queryList);
+//echo "<pre>Assoc IP Results: ".print_r($results, true)."</pre>\n";
 
             // Merge Query Results to Cached Results:
             $output = array_merge($cached, $results);
@@ -54,7 +56,6 @@ class GeoipQuery {
 
         // Store to cache:
         if ($caching == true) {
-            //GDN::cache()->store(self::cacheKeySerialize($input), $output);
             $this->setResponseToCache($output);
         }
 
@@ -180,27 +181,32 @@ class GeoipQuery {
      * Takes result data array of GeoIP results and adds it's associated
      * ip from the IP list.
      *
+     * NOTE: Since some IPs in IP list might be part of same network. We therefore
+     * need to build the output of this method by adding data to ip list and not
+     * the other way around.
+     *
      * @param $data Array of GeoIP result data.
      * @param $ips Array of IPs used to produce dataset
      * @return array Returns original data array with associated IP from ips list.
      */
-    private function assocIpsToResults($data, $ips, $options=[]) {
-
-        // @todo Should be making list using IPs as first loop, not data array.
-        /* If there is more than one IP in the same range, current methodology breaks. This
-           is why we need to add data to list of IPs and not vice versa.
-        */
+    private function assocResultsToIps($data, $ips) {
 
         $output = [];
-        foreach ($data AS $item) {
-            foreach ($ips AS $ip) {
+        foreach ($ips AS $ip) {
+            if (empty($ip) || !$this->isIP($ip)) {
+                continue;
+            }
+
+            $targetItem = false;
+            foreach ($data AS $item) {
                 if ($this->isInSubnet($ip, $item['network'])) {
-                    $item['_ip'] = $ip;
+                    $targetItem = $item;
                     break;
                 }
             }
 
-            $output[$item['_ip']] = $item;
+            $output[$ip] = $targetItem;
+            $output[$ip]['_ip'] = $ip;
         }
 
         return $output;
@@ -257,19 +263,6 @@ class GeoipQuery {
         }
 
         return $output;
-    }
-
-    /**
-     * Generate a cache key based on given $input. (normally an IP)
-     *
-     * @param $input Given input to create cache key with.
-     * @return string Returns requested cache key.
-     */
-    public  static function cacheKeySerialize($input) {
-        if (is_array($input)) {
-            $input = serialize($input);
-        }
-        return md5(self::cachePre.$input);
     }
 
     /**
@@ -358,7 +351,6 @@ class GeoipQuery {
         // Get Cached Records:
         $results = GDN::cache()->Get($this->cacheKey($input));
 
-
         if ($cleanKeys==true) {
             $output = [];
             if (is_array($results)) {
@@ -379,7 +371,7 @@ class GeoipQuery {
     /**
      * Sets given result data into cache.
      *
-     * @param $input Given data to cache
+     * @param $input array Given data to cache
      * @return bool Returns true on success, false on failure.
      */
     private function setResponseToCache($input) {

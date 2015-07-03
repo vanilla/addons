@@ -430,7 +430,6 @@ class GeoipImport {
 
             $sql  = "INSERT into ".self::$blockTableName."\n";
             $sql .= "(network,start,end,geoname_id,registered_country_geoname_id,represented_country_geoname_id,is_anonymous_proxy,is_satellite_provider,postal_code,latitude,longitude)\n";
-            //$sql .= "(network,geoname_id,registered_country_geoname_id,represented_country_geoname_id,is_anonymous_proxy,is_satellite_provider,postal_code,latitude,longitude)\n";
             $sql .= "VALUES\n";
 
             $j = 0;
@@ -441,10 +440,15 @@ class GeoipImport {
                     continue;
                 }
 
+                $ipStart = ip2long(substr($cells[0], 0, strpos($cells[0],'/')));
+                $ipEnd   = $ipStart + (pow(2, (32 - substr($cells[0], strpos($cells[0],'/')+1)))) - 1;
+
                 $sql .= $j==0 ? "  " : ", ";
                 $sql .= "('".str_replace("'","\\'",$cells[0])."'"
-                    . ", inet_aton(SUBSTRING(network, 1, LOCATE('/',network) -1))"
-                    . ", inet_aton(SUBSTRING(network, 1, LOCATE('/',network) -1)) + pow(2, (32 - CONVERT( SUBSTRING(network, LOCATE('/',network) +1), UNSIGNED) )) -1"
+                    . ", '{$ipStart}'"
+                    . ", '{$ipEnd}'"
+                    //. ", inet_aton(SUBSTRING(network, 1, LOCATE('/',network) -1))" // MySQL calculation of ipStart
+                    //. ", inet_aton(SUBSTRING(network, 1, LOCATE('/',network) -1)) + pow(2, (32 - CONVERT( SUBSTRING(network, LOCATE('/',network) +1), UNSIGNED) )) -1" // MySQL calculation of ipEnd
                     . ",'".str_replace("'","\\'",$cells[1])."'"
                     . ",'".str_replace("'","\\'",$cells[2])."'"
                     . ",'".str_replace("'","\\'",$cells[3])."'"
@@ -480,10 +484,8 @@ class GeoipImport {
 
         $cmd = "ls -1 {$input}";
         exec($cmd, $dirList);
-        // error_log("Scanning dir {$input} for CSV folder.");
 
         foreach ($dirList AS $item) {
-            // error_log("-- {$item}");
             if (is_dir("{$input}/{$item}")) {
                 $output = $item;
                 break;
@@ -498,10 +500,7 @@ class GeoipImport {
             error_log("Invalid INPUT {$input} passed to ".__METHOD__."()");
             return false;
         }
-        //error_log("Checking Table {$input} Exists!");
 
-        //$result = GDN::SQL()->query(sprintf(self::describeQuery, $input));
-        //$result = $this->runQuery();
         $PDO = GDN::Database()->Connection();
         $result = $PDO->query(sprintf(self::describeQuery, $input));
 
