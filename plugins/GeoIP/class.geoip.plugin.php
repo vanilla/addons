@@ -32,13 +32,6 @@ class GeoipPlugin extends Gdn_Plugin {
 
     public function __construct() {
 
-        // Make sure GeoIP tools are installed:
-        /*
-        if (!function_exists('geoip_record_by_name')) {
-            trigger_error("GeoIP lib is not installed on this server!", E_USER_ERROR);
-            return false;
-        }*/
-
         // Instantiate Query Object:
         $this->query  = new GeoipQuery();
 
@@ -223,11 +216,6 @@ class GeoipPlugin extends Gdn_Plugin {
 
         return true;
     }
-
-
-    private function import() {
-    }
-
 
     /**
      * Sets the user GeoIP information to UserMeta data.

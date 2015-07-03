@@ -287,6 +287,11 @@ class GeoipQuery {
             return false;
         }
 
+        // Make sure Input is not in local range of IPs:
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE)) {
+            return false;
+        }
+
         return true;
     }
 
