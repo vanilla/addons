@@ -12,6 +12,13 @@ class GeoipQuery {
     const   cachePre    = 'GeoIP-Plugin_';
 
 
+    /**
+     * Query MySQL database for info on one or many given IPs.
+     *
+     * @param $input array|string IP address or array of IP addresses we want to query for.
+     * @param bool $caching Enables and disables caching.
+     * @return array|bool Returns array of data on success, false on failure.
+     */
     public function get($input, $caching=true) {
         if (empty($input)) {
             return false;
@@ -25,9 +32,8 @@ class GeoipQuery {
         // Get Cached Records:
         if ($caching == true) {
 
-//echo "<pre>Cache Key(s): ".print_r($input,true)."</pre>\n";
+//echo "<pre>Search Cache for Key(s): ".print_r($input,true)."</pre>\n";
             $cached = $this->getCache($input);
-//echo "<pre>Found Cache Keys: ".print_r(array_keys($cached),true)."</pre>\n";
 
             // Remove Cached IPs from queryList:
             $queryList = $this->getQueryList($input, array_keys($cached));
@@ -42,7 +48,6 @@ class GeoipQuery {
             // Get SQL Query:
             $sql      = $this->getSQL($queryList);
             $results  = GDN::Database()->Connection()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-//echo "<pre>Query IP Results: ".print_r($results, true)."</pre>\n";
             $results  = $this->assocResultsToIps($results, $queryList); // @todo with associate results to IPs for result, not other way around.
             //$results  = $this->assocIpsToResults($results, $queryList);
 //echo "<pre>Assoc IP Results: ".print_r($results, true)."</pre>\n";
