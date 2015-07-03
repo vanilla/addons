@@ -231,7 +231,7 @@ class GeoipQuery {
                 $output[] = self::cacheKey($item);
             }
         }
-        else if(is_string($input) || is_numeric($input)) {
+        else if (is_string($input) || is_numeric($input)) {
             $output = self::cachePre.$input;
         }
         else {
@@ -259,7 +259,7 @@ class GeoipQuery {
                 $output[] = self::getIpFromKey($item);
             }
         }
-        else if(is_string($input) OR is_numeric($input)) {
+        else if (is_string($input) OR is_numeric($input)) {
             $output = str_replace(self::cachePre, '', $input);
         }
         else {

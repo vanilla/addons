@@ -6,7 +6,7 @@ require_once 'class.geoip.query.php';
 // Define the plugin:
 $PluginInfo['GeoIP'] = array(
     'Name' => 'Carmen Sandiego (GeoIP)',
-    'Description' => 'Provides Geo IP location functionality. This product includes GeoLite2 data created by MaxMind, available from <a href="http://www.maxmind.com">http://www.maxmind.com</a>.',
+    'Description' => "Provides Geo IP location functionality. This product uses GeoLite2 City data created by <a href=\"http://www.maxmind.com\">MaxMind</a>.",
     'Version' => '0.0.1',
     'RequiredApplications' => array('Vanilla' => '2.0.10'),
     'RequiredTheme' => FALSE,
@@ -20,11 +20,6 @@ $PluginInfo['GeoIP'] = array(
 );
 
 class GeoipPlugin extends Gdn_Plugin {
-
-
-    private $pdo;
-
-
 
     private $query;
     private $import;
@@ -61,8 +56,6 @@ class GeoipPlugin extends Gdn_Plugin {
 
     public function Controller_index($Sender) {
 
-        // echo "<p>Do Login:".C('Plugin.GeoIP.doLogin')."</p>";
-
         $Sender->Permission('Garden.Settings.Manage');
         $Sender->SetData('PluginDescription',$this->GetPluginKey('Description'));
 
@@ -82,11 +75,6 @@ class GeoipPlugin extends Gdn_Plugin {
             $Sender->Form->SetData($ConfigurationModel->Data);
 
         } else {
-
-            // @todo Set proper validation rules.
-            //$ConfigurationModel->Validation->ApplyRule('Plugin.Example.RenderCondition', 'Required');
-            //$ConfigurationModel->Validation->ApplyRule('Plugin.Example.TrimSize', 'Required');
-            //$ConfigurationModel->Validation->ApplyRule('Plugin.Example.TrimSize', 'Integer');
 
             $Saved = $Sender->Form->Save();
             if ($Saved) {
@@ -178,7 +166,7 @@ class GeoipPlugin extends Gdn_Plugin {
         }
 
         // Make sure target IP is in local cache:
-        if (!isset($this->query->localCache[$targetIP])) {
+        if (!isset($this->query->localCache[$targetIP]) || $this->query->isLocalIP($targetIP)) {
             return false;
         }
 
@@ -206,7 +194,9 @@ class GeoipPlugin extends Gdn_Plugin {
         // Create list of IPs from this discussion we want to look up.
         $ipList = [$Args['Discussion']->InsertIPAddress]; // Add discussion IP.
         foreach ($Sender->Data('Comments')->result() as $comment) {
-            if(empty($comment->InsertIPAddress)) continue;
+            if (empty($comment->InsertIPAddress)) {
+                continue;
+            }
             $ipList[] = $comment->InsertIPAddress;
         }
 
@@ -224,13 +214,13 @@ class GeoipPlugin extends Gdn_Plugin {
      * @return bool
      */
     private function setUserMetaGeo($userID) {
-        if (empty($userID) OR !is_numeric($userID)) {
+        if (empty($userID) || !is_numeric($userID)) {
             tigger_error("Invalid UserID passed to ".__METHOD__."()");
             return false;
         }
 
         $userInfo = GDN::UserModel()->GetID($userID);
-        if (empty($userInfo) OR (!is_array($userID) && !is_object($userInfo))) {
+        if (empty($userInfo) || (!is_array($userID) && !is_object($userInfo))) {
             trigger_error("Could not load user info for given UserID={$userID} in ".__METHOD__."()!", E_USER_WARNING);
             return false;
         }
@@ -249,9 +239,6 @@ class GeoipPlugin extends Gdn_Plugin {
             }
             $userIP = $publicIP;
         }
-
-//echo "<p>User IP: '{$userIP}'</p>\n";
-//exit(__METHOD__);
 
         $ipInfo = $this->query->get($userIP);
         $ipInfo = $ipInfo[$userIP];
@@ -277,7 +264,7 @@ class GeoipPlugin extends Gdn_Plugin {
      * @return array|bool Returns array of information or false on failure.
      */
     private function getUserMetaGeo($userID, $field='geo_%') {
-        if (empty($userID) OR !is_numeric($userID)) {
+        if (empty($userID) || !is_numeric($userID)) {
             tigger_error("Invalid UserID passed to ".__METHOD__."()", E_USER_WARNING);
             return false;
         }

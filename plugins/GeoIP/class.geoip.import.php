@@ -88,6 +88,12 @@ class GeoipImport {
     }
 
 
+    /**
+     * Downloads and extracts GeoIP-Lite City CSV database from Maxmind and
+     * returns array with temporary paths of extracted files.
+     *
+     * @return array Returns array with location and block CSV on success, false on failure.
+     */
     private function importDownload() {
 
         // Download Zip:
@@ -100,10 +106,12 @@ class GeoipImport {
 
         // Extract downloaded payload file to get to the CSV files:
         $payloadFiles = $this->extractGeoipCSV($this->downloadZip);
-        if (empty($payloadFiles) OR !is_array($payloadFiles)) {
+        if (empty($payloadFiles) || !is_array($payloadFiles)) {
             error_log("Failed to extract GeoIP CSV file in ".__METHOD__."()");
             return false;
         }
+
+        // SET Files to local properties:
         $this->locationFile = !empty($payloadFiles['location_file']) ? $payloadFiles['location_file'] : false;
         $this->blockFile    = !empty($payloadFiles['block_file'])    ? $payloadFiles['block_file']    : false;
         //error_log("Zip Extracted");
@@ -120,9 +128,14 @@ class GeoipImport {
         //error_log("Zip Content Confirmed ({$this->blockFile}, {$this->locationFile})");
         error_log("Zip Content Confirmed.");
 
-        return true;
+        return array($this->locationFile, $this->blockFile);
     }
 
+    /**
+     * Imports location and block CSV files and loads them into database.
+     *
+     * @return bool Returns true on success, false on failure.
+     */
     private function importData() {
 
         if (!is_file($this->locationFile)) {
@@ -211,6 +224,13 @@ class GeoipImport {
         return $output;
     }
 
+    /**
+     * Extracts downloaded GeoIP-Lite City CSV file and returns path to location and block files.
+     *
+     * @param $input string Path to target ZIP file.
+     * @param string $locale Optional locale to be used.
+     * @return array|bool Returns array of extracted files on success, false on failure.
+     */
     private function extractGeoipCSV($input, $locale='en') {
         if (!is_file($input)) {
             error_log("Invalid Zip file passed for extraction in ".__METHOD__."()");
@@ -306,7 +326,7 @@ class GeoipImport {
      * @return bool
      */
     private function importLocationCSV($input) {
-        if (empty($input) OR !is_file($input)) {
+        if (empty($input) || !is_file($input)) {
             trigger_error("Invalid path to block CSV in ".__METHOD__."()!", E_USER_WARNING);
             return false;
         }
@@ -326,6 +346,10 @@ class GeoipImport {
 
                 $cells = fgetcsv($fh, 1024, ",", '"');
                 if (empty($cells[0])) {
+                    continue;
+                }
+
+                if (!is_numeric($cells[0])) {
                     continue;
                 }
 
@@ -417,7 +441,7 @@ class GeoipImport {
      * @return bool
      */
     private function importBlockCSV($input) {
-        if (empty($input) OR !is_file($input)) {
+        if (empty($input) || !is_file($input)) {
             trigger_error("Invalid path to block CSV in ".__METHOD__."()!", E_USER_WARNING);
             return false;
         }
@@ -447,7 +471,7 @@ class GeoipImport {
                 $sql .= "('".str_replace("'","\\'",$cells[0])."'"
                     . ", '{$ipStart}'"
                     . ", '{$ipEnd}'"
-                    //. ", inet_aton(SUBSTRING(network, 1, LOCATE('/',network) -1))" // MySQL calculation of ipStart
+                    //. ", inet_aton(SUBSTRING(network, 1, LOCATE('/',network) -1))" // MySQL calculation of ipStart (Slower than PHP calculation)
                     //. ", inet_aton(SUBSTRING(network, 1, LOCATE('/',network) -1)) + pow(2, (32 - CONVERT( SUBSTRING(network, LOCATE('/',network) +1), UNSIGNED) )) -1" // MySQL calculation of ipEnd
                     . ",'".str_replace("'","\\'",$cells[1])."'"
                     . ",'".str_replace("'","\\'",$cells[2])."'"
@@ -479,8 +503,15 @@ class GeoipImport {
     }
 
 
-
+    /**
+     * Gets name of directory with payload CSV files and returns it.
+     *
+     * @param $input string Path to extracted ZIP file.
+     * @return string Returns string with name of payload directory
+     */
     private function locateSubDir($input) {
+
+        // @todo Clean this up. There are better ways to go about this.
 
         $cmd = "ls -1 {$input}";
         exec($cmd, $dirList);
@@ -495,8 +526,14 @@ class GeoipImport {
         return $output;
     }
 
-    private function tableExists($input, $maxNameLength=20) {
-        if (empty($input) || !is_string($input) || !strlen($input) > $maxNameLength) {
+    /**
+     * Check to see if target table exists.
+     *
+     * @param $input string Target table name.
+     * @return bool Returns true if table exists, false on failure.
+     */
+    private function tableExists($input) {
+        if (empty($input) || !is_string($input) || !strlen($input) > 24) {
             error_log("Invalid INPUT {$input} passed to ".__METHOD__."()");
             return false;
         }
@@ -508,40 +545,47 @@ class GeoipImport {
         return $output;
     }
 
-    private function tableTruncate($input, $maxNameLength=20) {
-        if (empty($input) || !is_string($input) || !strlen($input) > $maxNameLength) {
+    /**
+     * Truncates target table.
+     *
+     * @param $input string Target table name.
+     * @return bool Returns true on success, false on failure.
+     */
+    private function tableTruncate($input) {
+        if (empty($input) || !is_string($input) || !strlen($input) > 24) {
             error_log("Invalid INPUT {$input} passed to ".__METHOD__."()");
             return false;
         }
-        error_log("TRUNCATing table {$input}");
+        error_log("Truncating table {$input}");
         $result = GDN::SQL()->query(sprintf(self::tuncateQuery, $input));
         $output = empty($result) ? false : true;
 
         return $output;
     }
 
-    private function tableDrop($input, $maxNameLength=20) {
-        if (empty($input) || !is_string($input) || !strlen($input) > $maxNameLength) {
+    /**
+     * Drops target table.
+     *
+     * @param $input string Target table name.
+     * @return bool Returns true on success, false on failure.
+     */
+    private function tableDrop($input) {
+        if (empty($input) || !is_string($input) || !strlen($input) > 24) {
             error_log("Invalid INPUT {$input} passed to ".__METHOD__."()");
             return false;
         }
-
+        error_log("Dropping table {$input}");
         $result = GDN::SQL()->query(sprintf(self::dropTableQuery, $input));
         $output = empty($result) ? false : true;
-        error_log("Dropped table {$input}");
         return $output;
     }
 
     /**
      * Cleans all temporary files used during import process.
      *
-     * @return bool
+     * @return bool Returns true on success, false if user directory does not exist.
      */
     public  function trash() {
-        //unlink($this->blockFile);
-        //unlink($this->locationFile);
-        //rmdir(dirname($this->blockFile));
-        //rmdir(dirname($this->downloadZip));
 
         if (is_dir($this->userDir)) {
             $cmd = "rm -Rf {$this->userDir}";
@@ -553,15 +597,23 @@ class GeoipImport {
     }
 
 
-
+    /**
+     * DEPRICATED: Loads CSV into MySQL table using SQL command "LOAD DATA LOCAL INFILE".
+     *
+     * This methodology is no longer supported on account of many MySQL installation not allowing
+     * this command.
+     *
+     * @param $input string Path to CSV file.
+     * @return bool|PDOStatement Returns PDOStatement returned from query on success, false on failure.
+     */
     private function importLocationCSVLoadData($input) {
-        if (empty($input) OR !is_file($input)) {
+        if (empty($input) || !is_file($input)) {
             trigger_error("Invalid path to location CSV in ".__METHOD__."()!", E_USER_WARNING);
             return false;
         }
 
         /*
-         * @todo this process will have to be replaced with a manual loop through CSV file.
+         * This process has been replaced with a manual loop through CSV file.
          *
          * Many hosts do not allow LOAD DATA to run. This will allow for more portability.
          */
@@ -593,8 +645,17 @@ class GeoipImport {
         return $output;
     }
 
+    /**
+     * DEPRICATED: Loads CSV into MySQL table using SQL command "LOAD DATA LOCAL INFILE".
+     *
+     * This methodology is no longer supported on account of many MySQL installation not allowing
+     * this command.
+     *
+     * @param $input string Path to CSV file.
+     * @return bool|PDOStatement Returns PDOStatement returned from query on success, false on failure.
+     */
     private function importBlockCSVLoadData($input) {
-        if (empty($input) OR !is_file($input)) {
+        if (empty($input) || !is_file($input)) {
             trigger_error("Invalid path to block CSV in ".__METHOD__."()!", E_USER_WARNING);
             return false;
         }
