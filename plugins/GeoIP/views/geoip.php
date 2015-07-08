@@ -10,12 +10,13 @@
 
 
 <div class="Info">
-    <p style="text-transform: uppercase;">Please take note that this plugin is only supported in Linux (for now).</p>
+    <p style="text-transform: uppercase;">* NOTE: Please take note that this plugin is only supported on Linux systems (for now).</p>
+    <p style="text-transform: uppercase;">* NOTE: Please IMPORT CSV file from GeoIP before enabling anything. Not doing so will break pages.</p>
 </div>
 
 <div class="Info">
     <p>
-        <a href="/plugin/geoip/import">&rarr; Click here to IMPORT GeoIP2-Lite City CSV file into your database.</a>
+        <a href="/plugin/geoip/import"><b>&rarr; Click here to IMPORT GeoIP2-Lite City CSV file into your database.</b></a>
         <br/>
         (NOTE: Please only click once. This should take couple minutes)
     </p>
