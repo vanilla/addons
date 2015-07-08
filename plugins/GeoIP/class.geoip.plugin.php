@@ -25,6 +25,12 @@ class GeoipPlugin extends Gdn_Plugin {
     private $import;
 
 
+    /**
+     * Constructor:
+     *
+     * -Loads GeoIPQuery class into local property.
+     * -Loads GeoIPImport class into local property.
+     */
     public function __construct() {
 
         // Instantiate Query Object:
@@ -34,9 +40,11 @@ class GeoipPlugin extends Gdn_Plugin {
         $this->import = new GeoipImport();
     }
 
+    /*
     public function Base_Render_Before($Sender) {
         $Sender->AddJsFile('js/example.js');
     }
+    */
 
     public function AssetModel_StyleCss_Handler($Sender) {
         $Sender->AddCssFile('design/flags.css');
@@ -149,6 +157,29 @@ class GeoipPlugin extends Gdn_Plugin {
         return true;
     }
 
+    public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender, $Args=[]) {
+
+        // Check IF feature is enabled for this plugin:
+        if (C('Plugin.GeoIP.doDiscussions')==false) {
+            return false;
+        }
+
+        // Create list of IPs from this discussion we want to look up.
+        $ipList = [$Args['Discussion']->InsertIPAddress]; // Add discussion IP.
+        foreach ($Sender->Data('Comments')->result() as $comment) {
+            if (empty($comment->InsertIPAddress)) {
+                continue;
+            }
+            $ipList[] = $comment->InsertIPAddress;
+        }
+
+        // Get IP information for given IP list:
+        $this->query->get($ipList);
+        //echo "<pre>localCache: ".print_r($this->query->localCache,true)."</pre>\n";
+
+        return true;
+    }
+
     public function Base_AuthorInfo_Handler($Sender, $Args=[]) {
 
         // Check IF feature is enabled for this plugin:
@@ -174,37 +205,21 @@ class GeoipPlugin extends Gdn_Plugin {
         if (!empty($this->query->localCache[$targetIP])) {
             $countryCode  = strtolower($this->query->localCache[$targetIP]['country_iso_code']);
             $countryName  = $this->query->localCache[$targetIP]['country_name'];
+            $cityName     = $this->query->localCache[$targetIP]['city_name'];
+
+            if (!empty($cityName)) {
+                $imgTitle  = "{$cityName}, {$countryName}";
+            } else {
+                $imgTitle  = "{$countryName}";
+            }
 
             // Echo Image:
             if (!empty($countryCode)) {
-                echo Img("/plugins/GeoIP/design/flags/{$countryCode}.png", ['alt'=>"({$countryName})", 'title'=>$countryName]);
+                echo Img("/plugins/GeoIP/design/flags/{$countryCode}.png", ['alt'=>"({$countryName})", 'title'=> str_replace('"','\"',$imgTitle) ]);
             }
         }
 
         return;
-    }
-
-    public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender, $Args=[]) {
-
-        // Check IF feature is enabled for this plugin:
-        if (C('Plugin.GeoIP.doDiscussions')==false) {
-            return false;
-        }
-
-        // Create list of IPs from this discussion we want to look up.
-        $ipList = [$Args['Discussion']->InsertIPAddress]; // Add discussion IP.
-        foreach ($Sender->Data('Comments')->result() as $comment) {
-            if (empty($comment->InsertIPAddress)) {
-                continue;
-            }
-            $ipList[] = $comment->InsertIPAddress;
-        }
-
-        // Get IP information for given IP list:
-        $this->query->get($ipList);
-        //echo "<pre>localCache: ".print_r($this->query->localCache,true)."</pre>\n";
-
-        return true;
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 class GeoipImport {
-    
+
     private static $csvDownloadURL = "http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip";
 
     private static $blockFileName    = 'GeoLite2-City-Blocks-IPv4.csv';
@@ -27,7 +27,6 @@ class GeoipImport {
 
     public  $baseDir = '/tmp/geoip';
     private $userDir;
-    //private $userDir; // Defined in __get().
 
     private static $errorLog = "/tmp/geoip.log";
 
