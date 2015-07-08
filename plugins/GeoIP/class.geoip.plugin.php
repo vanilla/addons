@@ -56,7 +56,7 @@ class GeoipPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Main control routine for GeoIP.
      *
      * @param $Sender Reference callback object.
      */
@@ -101,7 +101,6 @@ class GeoipPlugin extends Gdn_Plugin {
      * Import GeoIP City Lite from Max Mind into MySQL.
      *
      * Redirects back to plugin index page.
-     *
      */
     public function Controller_import($Sender) {
 
@@ -144,6 +143,11 @@ class GeoipPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Routine executed before a discussion.
+     *
+     * Method builds a list of IPs from discussion and comments and passes them
+     * to Query object.
+     *
      * @param $Sender Reference callback object.
      * @param array $Args Arguments being passed.
      * @return bool Returns true on success, false on failure.
@@ -151,24 +155,20 @@ class GeoipPlugin extends Gdn_Plugin {
     public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender, $Args=[]) {
 
         // Check IF feature is enabled for this plugin:
-        if (C('Plugin.GeoIP.doDiscussions')==false) {
-            return false;
-        }
+        if (C('Plugin.GeoIP.doDiscussions')==true) {
 
-        // Create list of IPs from this discussion we want to look up.
-        $ipList = [$Args['Discussion']->InsertIPAddress]; // Add discussion IP.
-        foreach ($Sender->Data('Comments')->result() as $comment) {
-            if (empty($comment->InsertIPAddress)) {
-                continue;
+            // Create list of IPs from this discussion we want to look up.
+            $ipList = [$Args['Discussion']->InsertIPAddress]; // Add discussion IP.
+            foreach ($Sender->Data('Comments')->result() as $comment) {
+                if (empty($comment->InsertIPAddress)) {
+                    continue;
+                }
+                $ipList[] = $comment->InsertIPAddress;
             }
-            $ipList[] = $comment->InsertIPAddress;
+
+            // Get IP information for given IP list:
+            $this->query->get($ipList);
         }
-
-        // Get IP information for given IP list:
-        $this->query->get($ipList);
-        //echo "<pre>localCache: ".print_r($this->query->localCache,true)."</pre>\n";
-
-        return true;
     }
 
     /**
