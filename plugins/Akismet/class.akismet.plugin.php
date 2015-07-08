@@ -21,7 +21,7 @@ class AkismetPlugin extends Gdn_Plugin {
    /// PROPERTIES ///
 
    /// METHODS ///
-   
+
    /**
     * @return Akismet
     */
@@ -29,48 +29,62 @@ class AkismetPlugin extends Gdn_Plugin {
       static $Akismet;
       if (!$Akismet) {
          $Key = C('Plugins.Akismet.Key', C('Plugins.Akismet.MasterKey'));
-         
+
          if (!$Key)
             return NULL;
-         
+
          $Akismet = new Akismet(Gdn::Request()->Url('/', TRUE), $Key);
-         
+
          $Server = C('Plugins.Akismet.Server');
          if ($Server) {
             $Akismet->setAkismetServer($Server);
          }
       }
-      
+
       return $Akismet;
    }
 
    public function CheckAkismet($RecordType, $Data) {
       $UserID = $this->UserID();
-      
+
       if (!$UserID)
          return FALSE;
 
       $Akismet = self::Akismet();
-      
+
       if (!$Akismet)
          return FALSE;
-      
+
       $Akismet->setCommentAuthor($Data['Username']);
       $Akismet->setCommentAuthorEmail($Data['Email']);
+
+      if (!empty($Data['CommentType'])) {
+         $Akismet->setCommentType($Data['CommentType']);
+      }
+
+      $Locale = Gdn::Locale()->Current();
+      $LocaleParts = preg_split('`(_|-)`', $Locale, 2);
+      if (count($LocaleParts) == 2) {
+         $Akismet->setBlogLang($LocaleParts[0]);
+      } else {
+         $Akismet->setBlogLang($Locale);
+      }
+
+      $Akismet->setBlogCharset(C('Garden.Charset', 'utf-8'));
 
       $Body = ConcatSep("\n\n", GetValue('Name', $Data), GetValue('Body', $Data), GetValue('Story', $Data));
       $Akismet->setCommentContent($Body);
       $Akismet->setUserIP($Data['IPAddress']);
 
       $Result = $Akismet->isCommentSpam();
-      
+
       return $Result;
    }
-   
+
    public function Setup() {
       $this->Structure();
    }
-   
+
    public function Structure() {
       // Get a user for operations.
       $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'Akismet', 'Admin' => 2))->Value('UserID');
@@ -87,7 +101,7 @@ class AkismetPlugin extends Gdn_Plugin {
       }
       SaveToConfig('Plugins.Akismet.UserID', $UserID);
    }
-   
+
    public function UserID() {
       return C('Plugins.Akismet.UserID', NULL);
    }
@@ -115,6 +129,7 @@ class AkismetPlugin extends Gdn_Plugin {
             break;
          case 'Comment':
          case 'Discussion':
+            $Data['CommentType'] = 'forum-post';
          case 'Activity':
          case 'ActivityComment':
             $Result = $this->CheckAkismet($RecordType, $Data);
