@@ -1,10 +1,8 @@
 <?php
 
 class GeoipImport {
-
-
-    //private static $csvDownloadURL = "http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip";
-    private static $csvDownloadURL = "http://deric.ca/geoip/GeoLite2-City-CSV.zip";
+    
+    private static $csvDownloadURL = "http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip";
 
     private static $blockFileName    = 'GeoLite2-City-Blocks-IPv4.csv';
     private static $locationFileName = 'GeoLite2-City-Locations-%s.csv';

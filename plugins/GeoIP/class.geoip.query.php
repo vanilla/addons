@@ -32,7 +32,6 @@ class GeoipQuery {
         // Get Cached Records:
         if ($caching == true) {
 
-//echo "<pre>Search Cache for Key(s): ".print_r($input,true)."</pre>\n";
             $cached = $this->getCache($input);
 
             // Remove Cached IPs from queryList:
@@ -41,7 +40,6 @@ class GeoipQuery {
         } else {
             $queryList = $input;
         }
-//echo "<pre>Query List: ".print_r($queryList,true)."</pre>\n";
 
         if (!empty($queryList)) {
 
@@ -49,8 +47,6 @@ class GeoipQuery {
             $sql      = $this->getSQL($queryList);
             $results  = GDN::Database()->Connection()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
             $results  = $this->assocResultsToIps($results, $queryList); // @todo with associate results to IPs for result, not other way around.
-            //$results  = $this->assocIpsToResults($results, $queryList);
-//echo "<pre>Assoc IP Results: ".print_r($results, true)."</pre>\n";
 
             // Merge Query Results to Cached Results:
             $output = array_merge($cached, $results);
@@ -401,6 +397,13 @@ class GeoipQuery {
         return true;
     }
 
+    /**
+     * Prepares query $list of IPs by removing local/private IPs as well as IPs from $removeList.
+     *
+     * @param $list array Target list of IPs
+     * @param $removeList array  List of IPs to remove from target list.
+     * @return array|bool array Returns target list adjusted.
+     */
     private function getQueryList($list, $removeList) {
         if (empty($list)) {
             return [];
