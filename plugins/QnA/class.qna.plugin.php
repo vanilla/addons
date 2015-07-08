@@ -414,16 +414,12 @@ class QnAPlugin extends Gdn_Plugin {
       }
 
       $Sender->SetData('Answers', $Answers);
+   }
 
-      // Remove the accepted answers from the comments.
-      // Allow this to be skipped via config.
+   public function discussionController_beforeWriteComment_handler($sender, &$args) {
       if (C('QnA.AcceptedAnswers.Filter', TRUE)) {
-         if (isset($Sender->Data['Comments'])) {
-            $Comments = $Sender->Data['Comments']->Result();
-            $Comments = array_filter($Comments, function($Row) {
-               return strcasecmp(GetValue('QnA', $Row), 'accepted');
-            });
-            $Sender->Data['Comments'] = new Gdn_DataSet(array_values($Comments));
+         if (val('QnA', val(('Comment'), $args)) == 'Accepted' && val('RenderComment', $args)) {
+            $args['RenderComment'] = false;
          }
       }
    }
