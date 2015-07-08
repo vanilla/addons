@@ -10,25 +10,28 @@
 
 
 <div class="Info">
+    <p style="text-transform: uppercase;">Please take note that this plugin is only supported in Linux (for now).</p>
+</div>
+
+<div class="Info">
     <p>
-        <a href="/plugin/geoip/import">&rarr; Click here to import GeoIP2-Lite City CSV file into your database.</a>
+        <a href="/plugin/geoip/import">&rarr; Click here to IMPORT GeoIP2-Lite City CSV file into your database.</a>
         <br/>
-        (please only click once)
-        <br/>
-        (this should take couple minutes)
+        (NOTE: Please only click once. This should take couple minutes)
     </p>
 </div>
 
+
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+    echo $this->Form->Open();
+    echo $this->Form->Errors();
 ?>
 
     <ul>
         <li>
             <?php
-            echo $this->Form->Label("Display flags in discussions.", 'Plugin.GeoIP.doDiscussions');
-            echo $this->Form->Checkbox("Plugin.GeoIP.doDiscussions");
+                echo $this->Form->Label("Display flags in discussions.", 'Plugin.GeoIP.doDiscussions');
+                echo $this->Form->Checkbox("Plugin.GeoIP.doDiscussions");
             ?>
         </li>
         <li>
@@ -40,7 +43,7 @@ echo $this->Form->Errors();
     </ul>
 
 <?php
-echo $this->Form->Close('Save');
+    echo $this->Form->Close('Save');
 ?>
 
 

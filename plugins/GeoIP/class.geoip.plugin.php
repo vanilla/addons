@@ -40,16 +40,12 @@ class GeoipPlugin extends Gdn_Plugin {
         $this->import = new GeoipImport();
     }
 
-    /*
-    public function Base_Render_Before($Sender) {
-        $Sender->AddJsFile('js/example.js');
-    }
-    */
-
-    public function AssetModel_StyleCss_Handler($Sender) {
-        $Sender->AddCssFile('design/flags.css');
-    }
-
+    /**
+     * Creates GeoIP page in PluginController and runs dispatch
+     * for sub-methods.
+     *
+     * @param $Sender Reference callback object.
+     */
     public function PluginController_GeoIP_Create($Sender) {
 
         $Sender->Title('Carmen Sandiego Plugin (GeoIP)');
@@ -57,11 +53,13 @@ class GeoipPlugin extends Gdn_Plugin {
         $Sender->Form = new Gdn_Form();
 
         $this->Dispatch($Sender, $Sender->RequestArgs);
-        $this->Render('geoip');
-
-        return true;
     }
 
+    /**
+     *
+     *
+     * @param $Sender Reference callback object.
+     */
     public function Controller_index($Sender) {
 
         $Sender->Permission('Garden.Settings.Manage');
@@ -99,23 +97,14 @@ class GeoipPlugin extends Gdn_Plugin {
         $Sender->Render($this->GetView('geoip.php'));
     }
 
-
     /**
      * Import GeoIP City Lite from Max Mind into MySQL.
      *
-     * @return bool Returns TRUE on Success, FALSE on failure.
+     * Redirects back to plugin index page.
+     *
      */
     public function Controller_import($Sender) {
-        // echo "<p>Importing GeoIP CSV into MySQL!</p>\n";
-/*
-        $imported = $this->import();
-        if ($imported == false) {
-            trigger_error("Failed to Import GeoIP data into MySQL in ".__METHOD__."()!", E_USER_WARNING);
-            return false;
-        }
 
-        exit(__METHOD__);
-*/
         // Do Import:
         $imported = $this->import->run();
         if (!empty($imported)) {
@@ -124,12 +113,9 @@ class GeoipPlugin extends Gdn_Plugin {
             $msg = "Failed to Import GeoIP City Lite";
         }
 
-        // $redirect = $_SERVER['HTTP_REFERER'] . (stristr($_SERVER['HTTP_REFERER'],'?')?'&':'?') . 'msg='.urlencode($msg);
         $redirect = "/plugin/geoip?msg=".urlencode($msg);
         header("Location: {$redirect}");
         exit();
-
-        return true;
     }
 
 
@@ -157,6 +143,11 @@ class GeoipPlugin extends Gdn_Plugin {
         return true;
     }
 
+    /**
+     * @param $Sender Reference callback object.
+     * @param array $Args Arguments being passed.
+     * @return bool Returns true on success, false on failure.
+     */
     public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender, $Args=[]) {
 
         // Check IF feature is enabled for this plugin:
@@ -180,6 +171,13 @@ class GeoipPlugin extends Gdn_Plugin {
         return true;
     }
 
+    /**
+     * Inserts flag and geoip information in a discussion near the name of the author.
+     *
+     * @param $Sender Reference callback object.
+     * @param array $Args Arguments being passed.
+     * @return bool Returns true on success, false on failure.
+     */
     public function Base_AuthorInfo_Handler($Sender, $Args=[]) {
 
         // Check IF feature is enabled for this plugin:
@@ -219,7 +217,7 @@ class GeoipPlugin extends Gdn_Plugin {
             }
         }
 
-        return;
+        return true;
     }
 
     /**
@@ -299,6 +297,5 @@ class GeoipPlugin extends Gdn_Plugin {
 
         return $output;
     }
-
 
 } // Closes GeoipPlugin.
