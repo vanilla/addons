@@ -16,7 +16,7 @@
 
 <div class="Info">
     <p>
-        <a href="/plugin/geoip/import"><b>&rarr; Click here to IMPORT GeoIP2-Lite City CSV file into your database.</b></a>
+        <a href="/plugin/geoip/import"><b>&rarr; Click here to IMPORT GeoIP2-Lite City CSV file into your database. &larr;</b></a>
         <br/>
         (NOTE: Please only click once. This should take couple minutes)
     </p>

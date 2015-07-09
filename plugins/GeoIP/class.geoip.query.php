@@ -2,14 +2,37 @@
 
 class GeoipQuery {
 
+    /**
+     * Local object cache of GeoIP data for certain IPs.
+     *
+     * @var array
+     */
     public  $localCache = [];
-    private $localCacheMax = 100;
 
-    private static $blockTableName       = 'geoip_block';
-    private static $locationTableName    = 'geoip_location';
+    /**
+     * Name of IP-Block tablename
+     *
+     * @var string
+     */
+    private static $blockTableName    = 'geoip_block';
 
+    /**
+     * Name of IP-Location tablename
+     *
+     * @var string
+     */
+    private static $locationTableName = 'geoip_location';
+
+    /**
+     * Cache expiration time.
+     * @var int
+     */
     public  $geoExpTime = 604800; // 604800 = 1 week
-    const   cachePre    = 'GeoIP-Plugin_';
+
+    /**
+     * Prefix for memcache entries.
+     */
+    const   cachePre = 'GeoIP-Plugin_';
 
 
     /**
@@ -44,9 +67,9 @@ class GeoipQuery {
         if (!empty($queryList)) {
 
             // Get SQL Query:
-            $sql      = $this->getSQL($queryList);
-            $results  = GDN::Database()->Connection()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-            $results  = $this->assocResultsToIps($results, $queryList); // @todo with associate results to IPs for result, not other way around.
+            $sql     = $this->getSQL($queryList);
+            $results = GDN::database()->connection()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+            $results = $this->assocResultsToIps($results, $queryList); // @todo with associate results to IPs for result, not other way around.
 
             // Merge Query Results to Cached Results:
             $output = array_merge($cached, $results);
@@ -87,8 +110,8 @@ class GeoipQuery {
         $sql .= "FROM ".self::$blockTableName." AS B\n";
         $sql .= "  LEFT JOIN ".self::$locationTableName." AS L ON B.geoname_id=L.geoname_id\n";
         $sql .= "WHERE\n";
-        foreach ($input AS $i => $ip) {
-            $sql .= ($i==0) ? '   ' : 'OR ';
+        foreach ($input as $i => $ip) {
+            $sql .= ($i == 0) ? '   ' : 'OR ';
             $sql .= "inet_aton('{$ip}') BETWEEN B.start AND B.end\n";
         }
         $sql .= ";\n";
@@ -112,9 +135,9 @@ class GeoipQuery {
 
         list ($subnet, $bits) = explode('/', $range);
 
-        $ip      = ip2long($ip);
-        $subnet  = ip2long($subnet);
-        $mask    = -1 << (32 - $bits);
+        $ip     = ip2long($ip);
+        $subnet = ip2long($subnet);
+        $mask   = -1 << (32 - $bits);
         $subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
 
         return ($ip & $mask) == $subnet;
@@ -138,13 +161,13 @@ class GeoipQuery {
             return false;
         }
 
-        if ($version==4) {
+        if ($version == 4) {
             $parts = explode('.', $ip);
             if (empty($parts) OR count($parts) != 4) {
                 return false;
             }
 
-            foreach ($parts AS $part) {
+            foreach ($parts as $part) {
                 if ($part > 255 OR $part < 0) {
                     return false;
                 }
@@ -193,13 +216,13 @@ class GeoipQuery {
     private function assocResultsToIps($data, $ips) {
 
         $output = [];
-        foreach ($ips AS $ip) {
+        foreach ($ips as $ip) {
             if (empty($ip) || !$this->isIP($ip)) {
                 continue;
             }
 
             $targetItem = false;
-            foreach ($data AS $item) {
+            foreach ($data as $item) {
                 if ($this->isInSubnet($ip, $item['network'])) {
                     $targetItem = $item;
                     break;
@@ -223,7 +246,7 @@ class GeoipQuery {
     public  static function cacheKey($input) {
         if (is_array($input)) {
             $output = [];
-            foreach ($input AS $item) {
+            foreach ($input as $item) {
                 $output[] = self::cacheKey($item);
             }
         }
@@ -251,7 +274,7 @@ class GeoipQuery {
         }
         else if (is_array($input)) {
             $output = [];
-            foreach ($input AS $item) {
+            foreach ($input as $item) {
                 $output[] = self::getIpFromKey($item);
             }
         }
@@ -312,8 +335,8 @@ class GeoipQuery {
         $response = curl_exec($ch);
         curl_close($ch);
 
-        $output  = trim( substr($response, strpos($response,':') + 2) );
-        $output  = strip_tags($output);
+        $output = trim( substr($response, strpos($response,':') + 2) );
+        $output = strip_tags($output);
 
         return $output;
     }
@@ -330,7 +353,7 @@ class GeoipQuery {
         }
 
         $output = [];
-        foreach ($input AS $item) {
+        foreach ($input as $item) {
             if (isset($item[$pointer])) {
                 $output[] = $item[$pointer];
             }
@@ -355,12 +378,12 @@ class GeoipQuery {
         }
 
         // Get Cached Records:
-        $results = GDN::cache()->Get($this->cacheKey($input));
+        $results = GDN::cache()->get($this->cacheKey($input));
 
-        if ($cleanKeys==true) {
+        if ($cleanKeys == true) {
             $output = [];
             if (is_array($results)) {
-                foreach ($results AS $key => $item) {
+                foreach ($results as $key => $item) {
                     if (empty($key) || empty($item)) {
                         continue;
                     }
@@ -387,7 +410,7 @@ class GeoipQuery {
         }
 
         // echo "<pre>Target SET Cache: ".print_r($input, true)."</pre>\n";
-        foreach ($input AS $ip => $item) {
+        foreach ($input as $ip => $item) {
             if (empty($item) OR !$this->isIP($ip)) {
                 continue;
             }
@@ -414,7 +437,7 @@ class GeoipQuery {
         }
 
         $output = [];
-        foreach ($list AS $item) {
+        foreach ($list as $item) {
 
             // Remove Local IPs:
             if ($this->isLocalIP($item)) {

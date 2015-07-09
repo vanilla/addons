@@ -9,9 +9,9 @@ $PluginInfo['GeoIP'] = array(
     'Description' => "Provides Geo IP location functionality. This product uses GeoLite2 City data created by <a href=\"http://www.maxmind.com\">MaxMind</a>.",
     'Version' => '0.0.1',
     'RequiredApplications' => array('Vanilla' => '2.0.10'),
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => FALSE,
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false,
+    'HasLocale' => false,
     'SettingsUrl' => '/plugin/geoip',
     'SettingsPermission' => 'Garden.AdminUser.Only',
     'Author' => "Deric D. Davis",
@@ -21,7 +21,18 @@ $PluginInfo['GeoIP'] = array(
 
 class GeoipPlugin extends Gdn_Plugin {
 
+    /**
+     * GeoIP query classed used to query GeoIP MySQL database.
+     *
+     * @var GeoipQuery class
+     */
     private $query;
+
+    /**
+     * GeoIP import classed used to import CSV into MySQL.
+     *
+     * @var GeoipImport class
+     */
     private $import;
 
 
@@ -44,26 +55,26 @@ class GeoipPlugin extends Gdn_Plugin {
      * Creates GeoIP page in PluginController and runs dispatch
      * for sub-methods.
      *
-     * @param $Sender Reference callback object.
+     * @param $sender Reference callback object.
      */
-    public function PluginController_GeoIP_Create($Sender) {
+    public function pluginController_geoIP_Create($sender) {
 
-        $Sender->Title('Carmen Sandiego Plugin (GeoIP)');
-        $Sender->AddSideMenu('plugin/geoip');
-        $Sender->Form = new Gdn_Form();
+        $sender->Title('Carmen Sandiego Plugin (GeoIP)');
+        $sender->AddSideMenu('plugin/geoip');
+        $sender->Form = new Gdn_Form();
 
-        $this->Dispatch($Sender, $Sender->RequestArgs);
+        $this->Dispatch($sender, $sender->RequestArgs);
     }
 
     /**
      * Main control routine for GeoIP.
      *
-     * @param $Sender Reference callback object.
+     * @param $sender Reference callback object.
      */
-    public function Controller_index($Sender) {
+    public function controller_index($sender) {
 
-        $Sender->Permission('Garden.Settings.Manage');
-        $Sender->SetData('PluginDescription',$this->GetPluginKey('Description'));
+        $sender->Permission('Garden.Settings.Manage');
+        $sender->SetData('PluginDescription',$this->GetPluginKey('Description'));
 
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -73,28 +84,28 @@ class GeoipPlugin extends Gdn_Plugin {
         ));
 
         // Set the model on the form.
-        $Sender->Form->SetModel($ConfigurationModel);
+        $sender->Form->SetModel($ConfigurationModel);
 
         // If seeing the form for the first time...
-        if ($Sender->Form->AuthenticatedPostBack() === false) {
+        if ($sender->Form->AuthenticatedPostBack() === false) {
             // Apply the config settings to the form.
-            $Sender->Form->SetData($ConfigurationModel->Data);
+            $sender->Form->SetData($ConfigurationModel->Data);
 
         } else {
 
-            $Saved = $Sender->Form->Save();
+            $Saved = $sender->Form->Save();
             if ($Saved) {
-                $Sender->StatusMessage = T("Your changes have been saved.");
+                $sender->StatusMessage = T("Your changes have been saved.");
             }
         }
 
         if (!empty($_GET['msg'])
         && stristr($_SERVER['HTTP_REFERER'],'/plugin/geoip')
         ) {
-            $Sender->informMessage(t(Gdn::request()->get('msg')), 'Dismissable');
+            $sender->informMessage(t(Gdn::request()->get('msg')), 'Dismissable');
         }
 
-        $Sender->Render($this->GetView('geoip.php'));
+        $sender->Render($this->GetView('geoip.php'));
     }
 
     /**
@@ -102,7 +113,7 @@ class GeoipPlugin extends Gdn_Plugin {
      *
      * Redirects back to plugin index page.
      */
-    public function Controller_import($Sender) {
+    public function controller_import($sender) {
 
         // Do Import:
         $imported = $this->import->run();
@@ -121,25 +132,22 @@ class GeoipPlugin extends Gdn_Plugin {
     /**
      * Load GeoIP data upon login.
      *
-     * @param $Sender Referencing object
+     * @param $sender Referencing object
      * @param array $Args Arguments provided
      * @return bool Returns true on success, false on failure.
      */
-    public function UserModel_AfterSignIn_Handler($Sender, $Args=[]) {
+    public function userModel_afterSignIn_Handler($sender, $Args=[]) {
 
         // Check IF feature is enabled for this plugin:
-        if (C('Plugin.GeoIP.doLogin')==false) {
-            return false;
+        if (C('Plugin.GeoIP.doLogin') == true) {
+
+            $userID = Gdn::Session()->User->UserID;
+            if (empty($userID)) {
+                return false;
+            }
+
+            $this->setUserMetaGeo($userID);
         }
-
-        $userID = Gdn::Session()->User->UserID;
-        if (empty($userID)) {
-            return false;
-        }
-
-        $this->setUserMetaGeo($userID);
-
-        return true;
     }
 
     /**
@@ -148,18 +156,18 @@ class GeoipPlugin extends Gdn_Plugin {
      * Method builds a list of IPs from discussion and comments and passes them
      * to Query object.
      *
-     * @param $Sender Reference callback object.
+     * @param $sender Reference callback object.
      * @param array $Args Arguments being passed.
      * @return bool Returns true on success, false on failure.
      */
-    public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender, $Args=[]) {
+    public function discussionController_beforeDiscussionDisplay_Handler($sender, $Args=[]) {
 
         // Check IF feature is enabled for this plugin:
-        if (C('Plugin.GeoIP.doDiscussions')==true) {
+        if (C('Plugin.GeoIP.doDiscussions') == true) {
 
             // Create list of IPs from this discussion we want to look up.
-            $ipList = [$Args['Discussion']->InsertIPAddress]; // Add discussion IP.
-            foreach ($Sender->Data('Comments')->result() as $comment) {
+            $ipList = isset($Args['Discussion']->InsertIPAddress) ? [$Args['Discussion']->InsertIPAddress] : []; // Add discussion IP.
+            foreach ($sender->Data('Comments')->result() as $comment) {
                 if (empty($comment->InsertIPAddress)) {
                     continue;
                 }
@@ -174,14 +182,14 @@ class GeoipPlugin extends Gdn_Plugin {
     /**
      * Inserts flag and geoip information in a discussion near the name of the author.
      *
-     * @param $Sender Reference callback object.
+     * @param $sender Reference callback object.
      * @param array $Args Arguments being passed.
      * @return bool Returns true on success, false on failure.
      */
-    public function Base_AuthorInfo_Handler($Sender, $Args=[]) {
+    public function base_authorInfo_Handler($sender, $Args=[]) {
 
         // Check IF feature is enabled for this plugin:
-        if (C('Plugin.GeoIP.doDiscussions')==false) {
+        if (C('Plugin.GeoIP.doDiscussions') == false) {
             return false;
         }
 
@@ -232,7 +240,7 @@ class GeoipPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $userInfo = GDN::UserModel()->GetID($userID);
+        $userInfo = GDN::userModel()->getID($userID);
         if (empty($userInfo) || (!is_array($userID) && !is_object($userInfo))) {
             trigger_error("Could not load user info for given UserID={$userID} in ".__METHOD__."()!", E_USER_WARNING);
             return false;
