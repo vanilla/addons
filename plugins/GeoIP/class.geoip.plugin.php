@@ -76,20 +76,20 @@ class GeoipPlugin extends Gdn_Plugin {
         $sender->Permission('Garden.Settings.Manage');
         $sender->SetData('PluginDescription',$this->GetPluginKey('Description'));
 
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->SetField(array(
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->SetField(array(
             'Plugin.GeoIP.doLogin'       => false,
             'Plugin.GeoIP.doDiscussions' => false,
         ));
 
         // Set the model on the form.
-        $sender->Form->SetModel($ConfigurationModel);
+        $sender->Form->SetModel($configurationModel);
 
         // If seeing the form for the first time...
         if ($sender->Form->AuthenticatedPostBack() === false) {
             // Apply the config settings to the form.
-            $sender->Form->SetData($ConfigurationModel->Data);
+            $sender->Form->SetData($configurationModel->Data);
 
         } else {
 
@@ -99,10 +99,12 @@ class GeoipPlugin extends Gdn_Plugin {
             }
         }
 
-        if (!empty($_GET['msg'])
-        && stristr($_SERVER['HTTP_REFERER'],'/plugin/geoip')
+        $httpReferer = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER', null);
+        $getMsg      = Gdn::request()->get('msg');
+
+        if ($getMsg  && stristr($httpReferer,'/plugin/geoip')
         ) {
-            $sender->informMessage(t(Gdn::request()->get('msg')), 'Dismissable');
+            $sender->informMessage(t($getMsg), 'Dismissable');
         }
 
         $sender->Render($this->GetView('geoip.php'));
@@ -133,10 +135,10 @@ class GeoipPlugin extends Gdn_Plugin {
      * Load GeoIP data upon login.
      *
      * @param $sender Referencing object
-     * @param array $Args Arguments provided
+     * @param array $args Arguments provided
      * @return bool Returns true on success, false on failure.
      */
-    public function userModel_afterSignIn_Handler($sender, $Args = []) {
+    public function userModel_afterSignIn_Handler($sender, $args = []) {
 
         // Check IF feature is enabled for this plugin:
         if (C('Plugin.GeoIP.doLogin') == true) {
@@ -157,17 +159,18 @@ class GeoipPlugin extends Gdn_Plugin {
      * to Query object.
      *
      * @param $sender Reference callback object.
-     * @param array $Args Arguments being passed.
+     * @param array $args Arguments being passed.
      * @return bool Returns true on success, false on failure.
      */
-    public function discussionController_beforeDiscussionDisplay_Handler($sender, $Args = []) {
+    public function discussionController_beforeDiscussionDisplay_Handler($sender, $args = []) {
 
         // Check IF feature is enabled for this plugin:
         if (C('Plugin.GeoIP.doDiscussions') == true) {
 
             // Create list of IPs from this discussion we want to look up.
-            $ipList = isset($Args['Discussion']->InsertIPAddress) ? [$Args['Discussion']->InsertIPAddress] : []; // Add discussion IP.
-            foreach ($sender->Data('Comments')->result() as $comment) {
+            $ipList = property_exists($args['Discussion'], 'InsertIPAddress') && !empty($args['Discussion']->InsertIPAddress) ? [$args['Discussion']->InsertIPAddress] : []; // Add discussion IP.
+
+            foreach ($sender->data('Comments')->result() as $comment) {
                 if (empty($comment->InsertIPAddress)) {
                     continue;
                 }
@@ -183,10 +186,10 @@ class GeoipPlugin extends Gdn_Plugin {
      * Inserts flag and geoip information in a discussion near the name of the author.
      *
      * @param $sender Reference callback object.
-     * @param array $Args Arguments being passed.
+     * @param array $args Arguments being passed.
      * @return bool Returns true on success, false on failure.
      */
-    public function base_authorInfo_Handler($sender, $Args = []) {
+    public function base_authorInfo_Handler($sender, $args = []) {
 
         // Check IF feature is enabled for this plugin:
         if (C('Plugin.GeoIP.doDiscussions') == false) {
@@ -194,10 +197,10 @@ class GeoipPlugin extends Gdn_Plugin {
         }
 
         // Get IP based on context:
-        if (!empty($Args['Comment']->InsertIPAddress)) { // If author is from comment.
-            $targetIP = $Args['Comment']->InsertIPAddress;
-        } else if (!empty($Args['Discussion']->InsertIPAddress)) { // If author is from discussion.
-            $targetIP = $Args['Discussion']->InsertIPAddress;
+        if (!empty($args['Comment']->InsertIPAddress)) { // If author is from comment.
+            $targetIP = $args['Comment']->InsertIPAddress;
+        } else if (!empty($args['Discussion']->InsertIPAddress)) { // If author is from discussion.
+            $targetIP = $args['Discussion']->InsertIPAddress;
         } else {
             return false;
         }
@@ -208,10 +211,17 @@ class GeoipPlugin extends Gdn_Plugin {
         }
 
         // Get Country Code:
-        if (!empty($this->query->localCache[$targetIP])) {
-            $countryCode  = strtolower($this->query->localCache[$targetIP]['country_iso_code']);
-            $countryName  = $this->query->localCache[$targetIP]['country_name'];
-            $cityName     = $this->query->localCache[$targetIP]['city_name'];
+        if (!empty($this->query->localCache[$targetIP]) && is_array($this->query->localCache[$targetIP])) {
+
+            if (!empty($this->query->localCache[$targetIP]['country_iso_code']) && !empty($this->query->localCache[$targetIP]['country_name'])) {
+
+                $countryCode  = strtolower($this->query->localCache[$targetIP]['country_iso_code']);
+                $countryName  = $this->query->localCache[$targetIP]['country_name'];
+                $cityName     = $this->query->localCache[$targetIP]['city_name'];
+
+            } else {
+                return false;
+            }
 
             if (!empty($cityName)) {
                 $imgTitle  = "{$cityName}, {$countryName}";

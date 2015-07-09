@@ -14,7 +14,7 @@ class GeoipImport {
      *
      * @var string
      */
-    private static $blockFileName    = 'GeoLite2-City-Blocks-IPv4.csv';
+    private static $blockFileName = 'GeoLite2-City-Blocks-IPv4.csv';
 
     /**
      * Name of CSV location file.
@@ -28,12 +28,12 @@ class GeoipImport {
      *
      * @var array
      */
-    private static $locationLocales  = ['de','en','es','fr','ja','pt-BR','ru','zh-CN'];
+    private static $locationLocales = ['de','en','es','fr','ja','pt-BR','ru','zh-CN'];
 
     /**
      * Truncate table SQL command.
      */
-    const tuncateQuery  = "TRUNCATE `%s`";
+    const tuncateQuery = "TRUNCATE `%s`";
 
     /**
      * Describe table SQL command.
@@ -50,7 +50,7 @@ class GeoipImport {
      *
      * @var int
      */
-    private static $blockRowsPerQuery    = 2000;
+    private static $blockRowsPerQuery = 2000;
 
     /**
      * Number of rows from location CSV to import per Query
@@ -64,28 +64,28 @@ class GeoipImport {
      *
      * @var int
      */
-    private $blockImportTime      = 0;
+    private $blockImportTime = 0;
 
     /**
      * Time taken to import location CSV file.
      *
      * @var int
      */
-    private $locationImportTime   = 0;
+    private $locationImportTime = 0;
 
     /**
      * Name of IP block table.
      *
      * @var string
      */
-    private static $blockTableName       = 'geoip_block';
+    private static $blockTableName = 'geoip_block';
 
     /**
      * Name of IP location table.
      *
      * @var string
      */
-    private static $locationTableName    = 'geoip_location';
+    private static $locationTableName = 'geoip_location';
 
     /**
      * Path to temp downloaded ZIP file.
@@ -401,7 +401,7 @@ class GeoipImport {
 
                 $output = GDN::SQL()->Query($sql);
 
-            } catch(\Exception $e) {
+            } catch (Exception $e) {
                 error_log("SQL Error: ".$e->getMessage());
                 return false;
             }
@@ -473,7 +473,7 @@ class GeoipImport {
             try {
                 $PDO = GDN::database()->connection();
                 $PDO->query($sql);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 error_log("Failed Query: ".$e->getMessage());
             }
 
@@ -514,7 +514,7 @@ class GeoipImport {
 
                 $output = GDN::SQL()->Query($sql);
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 error_log("SQL Error: ".$e->getMessage());
                 return false;
             }
@@ -733,7 +733,7 @@ class GeoipImport {
             $output = $PDO->query($sql);
 
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             error_log("SQL Error: ".$e->getMessage());
             return false;
         }
@@ -771,7 +771,7 @@ class GeoipImport {
             $PDO = GDN::database()->connection();
             $output = $PDO->query($sql);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             error_log("SQL Error: ".$e->getMessage());
             return false;
         }

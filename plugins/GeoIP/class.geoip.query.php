@@ -14,7 +14,7 @@ class GeoipQuery {
      *
      * @var string
      */
-    private static $blockTableName    = 'geoip_block';
+    private static $blockTableName = 'geoip_block';
 
     /**
      * Name of IP-Location tablename
