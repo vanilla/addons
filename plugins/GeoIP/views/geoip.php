@@ -10,7 +10,7 @@
 
 
 <div class="Info">
-    <p style="text-transform: uppercase;">* NOTE: Please take note that this plugin is only supported on Linux systems (for now).</p>
+    <p style="text-transform: uppercase;">* NOTE: This plugin is very much in Alpha release. It has only been tested on Ubuntu 14.04LTS and is only supported on Linux systems (for now).</p>
     <p style="text-transform: uppercase;">* NOTE: Please IMPORT CSV file from GeoIP before enabling anything. Not doing so will break pages.</p>
     <p style="text-transform: uppercase;">* NOTE: Please use on MemCache enabled systems or page loads will take a couple seconds.</p>
 </div>
