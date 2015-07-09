@@ -77,6 +77,12 @@ class IPBFormatterPlugin extends Gdn_Plugin {
       // Linkify URLs in content
       $Result = Gdn_Format::links($Result);
 
+      // Parsing mentions
+      $Result = Gdn_Format::mentions($Result);
+
+      // Handling emoji
+      $Result = Emoji::instance()->translateToHtml($Result);
+
       // Make sure to clean filter the html in the end.
       $Config = array(
        'anti_link_spam' => array('`.`', ''),
