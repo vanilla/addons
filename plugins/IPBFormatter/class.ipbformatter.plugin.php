@@ -41,6 +41,26 @@ class IPBFormatterPlugin extends Gdn_Plugin {
          $String
       );
 
+      /**
+       * IPB formats some quotes as HTML.  They're converted here for the sake of uniformity in presentation.
+       * Attribute order seems to be standard.  Spacing between the opening of the tag and the first attribute is variable.
+       */
+      $String = preg_replace_callback(
+         '#<blockquote\s+class="ipsBlockquote" data-author="([^"]+)" data-cid="(\d+)" data-time="(\d+)">(.*?)</blockquote>#is',
+         function ($BlockQuotes) {
+            $Author = $BlockQuotes[1];
+            $Cid = $BlockQuotes[2];
+            $Time = $BlockQuotes[3];
+            $QuoteContent = $BlockQuotes[4];
+
+            // $Time will over as a timestamp. Convert it to a date string.
+            $Date = date('F j Y, g:i A', $Time);
+
+            return "[quote name=\"{$Author}\" url=\"{$Cid}\" date=\"{$Date}\"]{$QuoteContent}[/quote]";
+         },
+         $String
+      );
+
       // If there is a really long string, it could cause a stack overflow in the bbcode parser.
       // Not much we can do except try and chop the data down a touch.
 
