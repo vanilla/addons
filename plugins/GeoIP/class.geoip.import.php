@@ -292,7 +292,7 @@ class GeoipImport {
      * @param null $url Optional URL parameter of target payload.
      * @return string
      */
-    private function downloadGeoipZip($url=null) {
+    private function downloadGeoipZip($url = null) {
 
         // Remove time limit for php execution:
         set_time_limit(0);
@@ -327,7 +327,7 @@ class GeoipImport {
      * @param string $locale Optional locale to be used.
      * @return array|bool Returns array of extracted files on success, false on failure.
      */
-    private function extractGeoipCSV($input, $locale='en') {
+    private function extractGeoipCSV($input, $locale = 'en') {
         if (!is_file($input)) {
             error_log("Invalid Zip file passed for extraction in ".__METHOD__."()");
             return false;

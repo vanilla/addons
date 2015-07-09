@@ -42,7 +42,7 @@ class GeoipQuery {
      * @param bool $caching Enables and disables caching.
      * @return array|bool Returns array of data on success, false on failure.
      */
-    public function get($input, $caching=true) {
+    public function get($input, $caching = true) {
         if (empty($input)) {
             return false;
         }
@@ -150,25 +150,25 @@ class GeoipQuery {
      * @param int $version IP version we are verifying
      * @return bool Returns true if given IP is a proper IP. False if not.
      */
-    public  static function isIP($ip, $version=4) {
+    public  static function isIP($ip, $version = 4) {
         if (empty($ip)) {
             return false;
         } else if (!in_array($version,[4,6])) {
             return false;
         }
 
-        if (strlen($ip) < 7 OR strlen($ip) > 15) {
+        if (strlen($ip) < 7 || strlen($ip) > 15) {
             return false;
         }
 
         if ($version == 4) {
             $parts = explode('.', $ip);
-            if (empty($parts) OR count($parts) != 4) {
+            if (empty($parts) || count($parts) != 4) {
                 return false;
             }
 
             foreach ($parts as $part) {
-                if ($part > 255 OR $part < 0) {
+                if ($part > 255 || $part < 0) {
                     return false;
                 }
             }
@@ -278,7 +278,7 @@ class GeoipQuery {
                 $output[] = self::getIpFromKey($item);
             }
         }
-        else if (is_string($input) OR is_numeric($input)) {
+        else if (is_string($input) || is_numeric($input)) {
             $output = str_replace(self::cachePre, '', $input);
         }
         else {
@@ -296,7 +296,7 @@ class GeoipQuery {
      * @return bool Returns true or false.
      */
     public  static function isLocalIP($ip) {
-        if (empty($ip) OR !self::isIP($ip)) {
+        if (empty($ip) || !self::isIP($ip)) {
             trigger_error("Invalid IP passed to ".__METHOD__."()", E_USER_NOTICE);
             return false;
         }
@@ -347,7 +347,7 @@ class GeoipQuery {
      * @param $input array Array of records containing GeoIP data.
      * @return array Returns array list of IPs
      */
-    public  function extractIPList($input, $pointer='_ip') {
+    public  function extractIPList($input, $pointer = '_ip') {
         if (empty($input)) {
             return [];
         }
@@ -369,7 +369,7 @@ class GeoipQuery {
      * @param $cleanKeys bool Sets whether or not we need to clean IPs out of returned keys.
      * @return bool|array Returns array list of cached IP info on success, false on failure.
      */
-    private function getCache($input, $cleanKeys=true) {
+    private function getCache($input, $cleanKeys = true) {
         if (empty($input)) {
             error_log("Invalid INPUT Array passed to ".__METHOD__."()");
             return false;
@@ -411,7 +411,7 @@ class GeoipQuery {
 
         // echo "<pre>Target SET Cache: ".print_r($input, true)."</pre>\n";
         foreach ($input as $ip => $item) {
-            if (empty($item) OR !$this->isIP($ip)) {
+            if (empty($item) || !$this->isIP($ip)) {
                 continue;
             }
             GDN::cache()->store($this->cacheKey($ip), $item);

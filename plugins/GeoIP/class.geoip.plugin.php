@@ -136,7 +136,7 @@ class GeoipPlugin extends Gdn_Plugin {
      * @param array $Args Arguments provided
      * @return bool Returns true on success, false on failure.
      */
-    public function userModel_afterSignIn_Handler($sender, $Args=[]) {
+    public function userModel_afterSignIn_Handler($sender, $Args = []) {
 
         // Check IF feature is enabled for this plugin:
         if (C('Plugin.GeoIP.doLogin') == true) {
@@ -160,7 +160,7 @@ class GeoipPlugin extends Gdn_Plugin {
      * @param array $Args Arguments being passed.
      * @return bool Returns true on success, false on failure.
      */
-    public function discussionController_beforeDiscussionDisplay_Handler($sender, $Args=[]) {
+    public function discussionController_beforeDiscussionDisplay_Handler($sender, $Args = []) {
 
         // Check IF feature is enabled for this plugin:
         if (C('Plugin.GeoIP.doDiscussions') == true) {
@@ -186,7 +186,7 @@ class GeoipPlugin extends Gdn_Plugin {
      * @param array $Args Arguments being passed.
      * @return bool Returns true on success, false on failure.
      */
-    public function base_authorInfo_Handler($sender, $Args=[]) {
+    public function base_authorInfo_Handler($sender, $Args = []) {
 
         // Check IF feature is enabled for this plugin:
         if (C('Plugin.GeoIP.doDiscussions') == false) {
@@ -284,7 +284,7 @@ class GeoipPlugin extends Gdn_Plugin {
      * @param $userID Target user's ID number.
      * @return array|bool Returns array of information or false on failure.
      */
-    private function getUserMetaGeo($userID, $field='geo_%') {
+    private function getUserMetaGeo($userID, $field = 'geo_%') {
         if (empty($userID) || !is_numeric($userID)) {
             tigger_error("Invalid UserID passed to ".__METHOD__."()", E_USER_WARNING);
             return false;
