@@ -20,7 +20,7 @@ Gdn::FactoryInstall('IPBFormatter', 'IPBFormatterPlugin', __FILE__, Gdn::Factory
 
 class IPBFormatterPlugin extends Gdn_Plugin {
    /// Methods ///
-   
+
    public function Format($String) {
       $String = str_replace(array('&quot;', '&#39;', '&#58;', 'Â'), array('"', "'", ':', ''), $String);
       $String = str_replace('<#EMO_DIR#>', 'default', $String);
@@ -54,6 +54,9 @@ class IPBFormatterPlugin extends Gdn_Plugin {
          $Result .= $this->NBBC()->Parse($String);
       }
 
+      // Linkify URLs in content
+      $Result = Gdn_Format::links($Result);
+
       // Make sure to clean filter the html in the end.
       $Config = array(
        'anti_link_spam' => array('`.`', ''),
@@ -85,12 +88,12 @@ class IPBFormatterPlugin extends Gdn_Plugin {
    public function NBBC() {
       if ($this->_NBBC === NULL) {
          require_once PATH_PLUGINS.'/HtmLawed/htmLawed/htmLawed.php';
-         
+
          $Plugin = new NBBCPlugin('BBCodeRelaxed');
          $this->_NBBC = $Plugin->NBBC();
          $this->_NBBC->ignore_newlines = TRUE;
          $this->_NBBC->enable_smileys = FALSE;
-         
+
          $this->_NBBC->AddRule('attachment', array(
             'mode' => BBCODE_MODE_CALLBACK,
             'method' => array($this, "DoAttachment"),
@@ -104,7 +107,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
       }
       return $this->_NBBC;
    }
-   
+
    protected $_Media = NULL;
    public function Media() {
       if ($this->_Media === NULL) {
@@ -114,7 +117,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
          } catch (Exception $Ex) {
             $M = array();
          }
-         
+
          $Media = array();
          foreach ($M as $Key => $Data) {
             foreach ($Data as $Row) {
@@ -125,7 +128,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
       }
       return $this->_Media;
    }
-   
+
    public function DoAttachment($bbcode, $action, $name, $default, $params, $content) {
       $Medias = $this->Media();
       $Parts = explode(':', $default);
@@ -133,14 +136,14 @@ class IPBFormatterPlugin extends Gdn_Plugin {
       if (isset($Medias[$MediaID])) {
          $Media = $Medias[$MediaID];
 //         decho($Media, 'Media');
-         
+
          $Src = htmlspecialchars(Gdn_Upload::Url(GetValue('Path', $Media)));
          $Name = htmlspecialchars(GetValue('Name', $Media));
          return <<<EOT
 <div class="Attachment"><img src="$Src" alt="$Name" /></div>
 EOT;
       }
-      
+
       return '';
    }
 }
