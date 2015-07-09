@@ -131,6 +131,8 @@ class GeoipQuery {
     public  static function isInSubnet($ip, $range) {
         if (!self::isIP($ip)) {
             return false;
+        } else if (!stristr($range, '/')) {
+            return false;
         }
 
         list ($subnet, $bits) = explode('/', $range);
