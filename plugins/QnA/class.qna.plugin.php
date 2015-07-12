@@ -762,7 +762,7 @@ class QnAPlugin extends Gdn_Plugin {
       if (!$Discussion)
          throw NotFoundException('Discussion');
 
-
+      $Sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $Discussion));
 
       // Both '' and 'Discussion' denote a discussion type of discussion.
       if (!GetValue('Type', $Discussion))
