@@ -172,4 +172,31 @@ EOT;
 
       return '';
    }
+
+   /**
+    * Hooks into the GetFormats event from the Advanced Editor plug-in and adds the IPB format.
+    *
+    * @param $sender Instance of EditorPlugin firing the event
+    */
+   public function editorPlugin_getFormats_handler($sender) {
+      $formats =& $sender->EventArguments['formats'];
+
+      $formats[] = 'IPB';
+   }
+
+   /**
+    * Hooks into the GetJSDefinitions event from the Advanced Editor plug-in and adds definitions related to
+    * the IPB format.
+    *
+    * @param $sender Instance of EditorPlugin firing the event
+    */
+   public function editorPlugin_getJSDefinitions_handler($sender) {
+      $definitions =& $sender->EventArguments['definitions'];
+
+      /**
+       * There isn't any currently known help text for the IPB format, so it's an empty string.
+       * If that changes, it can be added in the locale or changed here.
+       */
+      $definitions['ipbHelpText'] = t('editor.ipbHelpText', '');
+   }
 }
