@@ -7,8 +7,8 @@ require_once 'class.geoip.query.php';
 $PluginInfo['GeoIP'] = array(
     'Name' => 'Carmen Sandiego (GeoIP)',
     'Description' => "Provides Geo IP location functionality. This product uses GeoLite2 City data created by <a href=\"http://www.maxmind.com\">MaxMind</a>.",
-    'Version' => '0.0.1',
-    'RequiredApplications' => array('Vanilla' => '2.0.10'),
+    'Version' => '1.0.0',
+    'RequiredApplications' => array('Vanilla' => '2.2'),
     'RequiredTheme' => false,
     'RequiredPlugins' => false,
     'HasLocale' => false,
