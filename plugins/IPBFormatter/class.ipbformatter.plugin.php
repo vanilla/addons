@@ -178,8 +178,8 @@ EOT;
     *
     * @param $sender Instance of EditorPlugin firing the event
     */
-   public function editorPlugin_getFormats_handler($sender) {
-      $formats =& $sender->EventArguments['formats'];
+   public function editorPlugin_getFormats_handler($sender, &$args) {
+      $formats =& $args['formats'];
 
       $formats[] = 'IPB';
    }
@@ -190,8 +190,8 @@ EOT;
     *
     * @param $sender Instance of EditorPlugin firing the event
     */
-   public function editorPlugin_getJSDefinitions_handler($sender) {
-      $definitions =& $sender->EventArguments['definitions'];
+   public function editorPlugin_getJSDefinitions_handler($sender, &$args) {
+      $definitions =& $args['definitions'];
 
       /**
        * There isn't any currently known help text for the IPB format, so it's an empty string.
