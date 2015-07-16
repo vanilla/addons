@@ -46,12 +46,12 @@ class IPBFormatterPlugin extends Gdn_Plugin {
        * Attribute order seems to be standard.  Spacing between the opening of the tag and the first attribute is variable.
        */
       $String = preg_replace_callback(
-         '#<blockquote\s+class="ipsBlockquote" data-author="([^"]+)" data-cid="(\d+)" data-time="(\d+)">(.*?)</blockquote>#is',
+         '#<blockquote\s+(class="ipsBlockquote" )?data-author="([^"]+)" data-cid="(\d+)" data-time="(\d+)">(.*?)</blockquote>#is',
          function ($BlockQuotes) {
-            $Author = $BlockQuotes[1];
-            $Cid = $BlockQuotes[2];
-            $Time = $BlockQuotes[3];
-            $QuoteContent = $BlockQuotes[4];
+            $Author = $BlockQuotes[2];
+            $Cid = $BlockQuotes[3];
+            $Time = $BlockQuotes[4];
+            $QuoteContent = $BlockQuotes[5];
 
             // $Time will over as a timestamp. Convert it to a date string.
             $Date = date('F j Y, g:i A', $Time);
