@@ -165,9 +165,13 @@ class IPBFormatterPlugin extends Gdn_Plugin {
 
          $Src = htmlspecialchars(Gdn_Upload::Url(GetValue('Path', $Media)));
          $Name = htmlspecialchars(GetValue('Name', $Media));
-         return <<<EOT
-<div class="Attachment"><img src="$Src" alt="$Name" /></div>
+         if (GetValue('ImageWidth', $Media)) {
+            return <<<EOT
+<div class="Attachment Image"><img src="$Src" alt="$Name" /></div>
 EOT;
+         } else {
+            return Anchor($Name, $Src, 'Attachment File');
+         }
       }
 
       return '';
