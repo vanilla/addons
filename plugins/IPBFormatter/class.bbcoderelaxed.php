@@ -1,8 +1,9 @@
-<?php if (!defined('APPLICATION')) return;
-ini_set("pcre.recursion_limit", "524");
+<?php  if (!defined('APPLICATION')) return;
+
+ini_set('pcre.recursion_limit', '524');
 
 class BBCodeRelaxed extends BBCode {
-   public function HTMLEncode($string) {
+   public function htmlEncode($string) {
       return $string;
    }
 }

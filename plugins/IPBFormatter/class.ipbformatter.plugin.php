@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
@@ -9,198 +10,203 @@ $PluginInfo['IPBFormatter'] = array(
     'Description' => 'Formats posts imported from Invision Power Board.',
     'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => FALSE,
-    'Author' => "Todd Burry",
+    'RequiredPlugins' => false,
+    'HasLocale' => false,
+    'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com/profile/todd'
 );
 
-Gdn::FactoryInstall('IPBFormatter', 'IPBFormatterPlugin', __FILE__, Gdn::FactorySingleton);
+Gdn::factoryInstall('IPBFormatter', 'IPBFormatterPlugin', __FILE__, Gdn::FactorySingleton);
 
 class IPBFormatterPlugin extends Gdn_Plugin {
-   /// Methods ///
 
-   public function Format($String) {
-      $String = str_replace(array('&quot;', '&#39;', '&#58;', 'Â'), array('"', "'", ':', ''), $String);
-      $String = str_replace('<#EMO_DIR#>', 'default', $String);
-      $String = str_replace('<{POST_SNAPBACK}>', '<span class="SnapBack">»</span>', $String);
+    /**
+     *
+     * @var BBCode
+     */
+    protected $_NBBC;
 
-      // There is an issue with using uppercase code blocks, so they're forced to lowercase here
-      $String = str_replace(array('[CODE]', '[/CODE]'), array('[code]', '[/code]'), $String);
+    protected $_Media = null;
 
-      /**
-       * IPB inserts line break markup tags at line breaks.  They need to be removed in code blocks.
-       * The original newline/line break should be left intact, so whitespace will be preserved in the pre tag.
-       */
-      $String = preg_replace_callback(
-         '/\[code\].*?\[\/code\]/is',
-         function($CodeBlocks) {
-            return str_replace(array('<br />'), array(''), $CodeBlocks[0]);
-         },
-         $String
-      );
+    /// Methods ///
 
-      /**
-       * IPB formats some quotes as HTML.  They're converted here for the sake of uniformity in presentation.
-       * Attribute order seems to be standard.  Spacing between the opening of the tag and the first attribute is variable.
-       */
-      $String = preg_replace_callback(
-         '#<blockquote\s+(class="ipsBlockquote" )?data-author="([^"]+)" data-cid="(\d+)" data-time="(\d+)">(.*?)</blockquote>#is',
-         function ($BlockQuotes) {
-            $Author = $BlockQuotes[2];
-            $Cid = $BlockQuotes[3];
-            $Time = $BlockQuotes[4];
-            $QuoteContent = $BlockQuotes[5];
+    public function format($string) {
+        $string = str_replace(array('&quot;', '&#39;', '&#58;', 'Â'), array('"', "'", ':', ''), $string);
+        $string = str_replace('<#EMO_DIR#>', 'default', $string);
+        $string = str_replace('<{POST_SNAPBACK}>', '<span class="SnapBack">»</span>', $string);
 
-            // $Time will over as a timestamp. Convert it to a date string.
-            $Date = date('F j Y, g:i A', $Time);
+        // There is an issue with using uppercase code blocks, so they're forced to lowercase here
+        $string = str_replace(array('[CODE]', '[/CODE]'), array('[code]', '[/code]'), $string);
 
-            return "[quote name=\"{$Author}\" url=\"{$Cid}\" date=\"{$Date}\"]{$QuoteContent}[/quote]";
-         },
-         $String
-      );
+        /**
+         * IPB inserts line break markup tags at line breaks.  They need to be removed in code blocks.
+         * The original newline/line break should be left intact, so whitespace will be preserved in the pre tag.
+         */
+        $string = preg_replace_callback(
+            '/\[code\].*?\[\/code\]/is',
+            function ($CodeBlocks) {
+                return str_replace(array('<br />'), array(''), $CodeBlocks[0]);
+            },
+            $string
+        );
 
-      // If there is a really long string, it could cause a stack overflow in the bbcode parser.
-      // Not much we can do except try and chop the data down a touch.
+        /**
+         * IPB formats some quotes as HTML.  They're converted here for the sake of uniformity in presentation.
+         * Attribute order seems to be standard.  Spacing between the opening of the tag and the first attribute is variable.
+         */
+        $string = preg_replace_callback(
+            '#<blockquote\s+(class="ipsBlockquote" )?data-author="([^"]+)" data-cid="(\d+)" data-time="(\d+)">(.*?)</blockquote>#is',
+            function ($BlockQuotes) {
+                $Author = $BlockQuotes[2];
+                $Cid = $BlockQuotes[3];
+                $Time = $BlockQuotes[4];
+                $QuoteContent = $BlockQuotes[5];
 
-      // 1. Remove html comments.
-      $String = preg_replace('/<!--(.*)-->/Uis', '', $String);
+                // $Time will over as a timestamp. Convert it to a date string.
+                $Date = date('F j Y, g:i A', $Time);
 
-      // 2. Split the string up into chunks.
-      $Strings = (array)$String;
-      $Result = '';
-      foreach ($Strings as $String) {
-         $Result .= $this->NBBC()->Parse($String);
-      }
+                return "[quote name=\"{$Author}\" url=\"{$Cid}\" date=\"{$Date}\"]{$QuoteContent}[/quote]";
+            },
+            $string
+        );
 
-      // Linkify URLs in content
-      $Result = Gdn_Format::links($Result);
+        // If there is a really long string, it could cause a stack overflow in the bbcode parser.
+        // Not much we can do except try and chop the data down a touch.
 
-      // Parsing mentions
-      $Result = Gdn_Format::mentions($Result);
+        // 1. Remove html comments.
+        $string = preg_replace('/<!--(.*)-->/Uis', '', $string);
 
-      // Handling emoji
-      $Result = Emoji::instance()->translateToHtml($Result);
+        // 2. Split the string up into chunks.
+        $strings = (array)$string;
+        $result = '';
+        foreach ($strings as $string) {
+            $result .= $this->NBBC()->Parse($string);
+        }
 
-      // Make sure to clean filter the html in the end.
-      $Config = array(
-       'anti_link_spam' => array('`.`', ''),
-       'comment' => 1,
-       'cdata' => 3,
-       'css_expression' => 1,
-       'deny_attribute' => 'on*',
-       'elements' => '*-applet-form-input-textarea-iframe-script-style', // object, embed allowed
-       'keep_bad' => 0,
-       'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
-       'valid_xml' => 2
-      );
+        // Linkify URLs in content
+        $result = Gdn_Format::links($result);
 
-      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
-      $Result = htmLawed($Result, $Config, $Spec);
+        // Parsing mentions
+        $result = Gdn_Format::mentions($result);
 
-      return $Result;
-   }
+        // Handling emoji
+        $result = Emoji::instance()->translateToHtml($result);
 
-   /**
-    *
-    * @var BBCode
-    */
-   protected $_NBBC;
+        // Make sure to clean filter the html in the end.
+        $config = array(
+            'anti_link_spam' => array('`.`', ''),
+            'comment' => 1,
+            'cdata' => 3,
+            'css_expression' => 1,
+            'deny_attribute' => 'on*',
+            'elements' => '*-applet-form-input-textarea-iframe-script-style',
+            // object, embed allowed
+            'keep_bad' => 0,
+            'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https',
+            // clsid allowed in class
+            'valid_xml' => 2
+        );
 
-   /**
-    * @return BBCode;
-    */
-   public function NBBC() {
-      if ($this->_NBBC === NULL) {
-         require_once PATH_PLUGINS.'/HtmLawed/htmLawed/htmLawed.php';
+        $spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
+        $result = htmLawed($result, $config, $spec);
 
-         $Plugin = new NBBCPlugin('BBCodeRelaxed');
-         $this->_NBBC = $Plugin->NBBC();
-         $this->_NBBC->ignore_newlines = TRUE;
-         $this->_NBBC->enable_smileys = FALSE;
+        return $result;
+    }
 
-         $this->_NBBC->AddRule('attachment', array(
-            'mode' => BBCODE_MODE_CALLBACK,
-            'method' => array($this, "DoAttachment"),
-            'class' => 'image',
-            'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
-            'end_tag' => BBCODE_PROHIBIT,
-            'content' => BBCODE_PROHIBIT,
-            'plain_start' => "[image]",
-            'plain_content' => Array(),
+    /**
+     * @return BBCode;
+     */
+    public function nbbc() {
+        if ($this->_NBBC === null) {
+            require_once PATH_PLUGINS . '/HtmLawed/htmLawed/htmLawed.php';
+
+            $plugin = new NBBCPlugin('BBCodeRelaxed');
+            $this->_NBBC = $plugin->NBBC();
+            $this->_NBBC->ignore_newlines = true;
+            $this->_NBBC->enable_smileys = false;
+
+            $this->_NBBC->AddRule('attachment', array(
+                'mode' => BBCODE_MODE_CALLBACK,
+                'method' => array($this, "DoAttachment"),
+                'class' => 'image',
+                'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+                'end_tag' => BBCODE_PROHIBIT,
+                'content' => BBCODE_PROHIBIT,
+                'plain_start' => "[image]",
+                'plain_content' => Array(),
             ));
-      }
-      return $this->_NBBC;
-   }
+        }
 
-   protected $_Media = NULL;
-   public function Media() {
-      if ($this->_Media === NULL) {
-         try {
-            $I = Gdn::PluginManager()->GetPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
-            $M = $I->MediaCache();
-         } catch (Exception $Ex) {
-            $M = array();
-         }
+        return $this->_NBBC;
+    }
 
-         $Media = array();
-         foreach ($M as $Key => $Data) {
-            foreach ($Data as $Row) {
-               $Media[$Row->MediaID] = $Row;
+    public function media() {
+        if ($this->_Media === null) {
+            try {
+                $i = Gdn::pluginManager()->getPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
+                $m = $i->mediaCache();
+            } catch (Exception $ex) {
+                $m = array();
             }
-         }
-         $this->_Media = $Media;
-      }
-      return $this->_Media;
-   }
 
-   public function DoAttachment($bbcode, $action, $name, $default, $params, $content) {
-      $Medias = $this->Media();
-      $Parts = explode(':', $default);
-      $MediaID = $Parts[0];
-      if (isset($Medias[$MediaID])) {
-         $Media = $Medias[$MediaID];
-//         decho($Media, 'Media');
+            $media = array();
+            foreach ($m as $key => $data) {
+                foreach ($data as $row) {
+                    $media[$row->MediaID] = $row;
+                }
+            }
+            $this->_Media = $media;
+        }
 
-         $Src = htmlspecialchars(Gdn_Upload::Url(val('Path', $Media)));
-         $Name = htmlspecialchars(val('Name', $Media));
-         if (val('ImageWidth', $Media)) {
-            return <<<EOT
-<div class="Attachment Image"><img src="$Src" alt="$Name" /></div>
+        return $this->_Media;
+    }
+
+    public function DoAttachment($bbcode, $action, $name, $default, $params, $content) {
+        $medias = $this->Media();
+        $parts = explode(':', $default);
+        $mediaID = $parts[0];
+        if (isset($medias[$mediaID])) {
+            $media = $medias[$mediaID];
+
+            $src = htmlspecialchars(Gdn_Upload::url(val('Path', $media)));
+            $name = htmlspecialchars(val('Name', $media));
+            if (val('ImageWidth', $media)) {
+                return <<<EOT
+<div class="Attachment Image"><img src="$src" alt="$name" /></div>
 EOT;
-         } else {
-            return anchor($Name, $Src, 'Attachment File');
-         }
-      }
+            } else {
+                return anchor($name, $src, 'Attachment File');
+            }
+        }
 
-      return '';
-   }
+        return '';
+    }
 
-   /**
-    * Hooks into the GetFormats event from the Advanced Editor plug-in and adds the IPB format.
-    *
-    * @param $sender Instance of EditorPlugin firing the event
-    */
-   public function editorPlugin_getFormats_handler($sender, &$args) {
-      $formats =& $args['formats'];
+    /**
+     * Hooks into the GetFormats event from the Advanced Editor plug-in and adds the IPB format.
+     *
+     * @param $sender Instance of EditorPlugin firing the event
+     */
+    public function editorPlugin_getFormats_handler($sender, &$args) {
+        $formats =& $args['formats'];
 
-      $formats[] = 'IPB';
-   }
+        $formats[] = 'IPB';
+    }
 
-   /**
-    * Hooks into the GetJSDefinitions event from the Advanced Editor plug-in and adds definitions related to
-    * the IPB format.
-    *
-    * @param $sender Instance of EditorPlugin firing the event
-    */
-   public function editorPlugin_getJSDefinitions_handler($sender, &$args) {
-      $definitions =& $args['definitions'];
+    /**
+     * Hooks into the GetJSDefinitions event from the Advanced Editor plug-in and adds definitions related to
+     * the IPB format.
+     *
+     * @param $sender Instance of EditorPlugin firing the event
+     */
+    public function editorPlugin_getJSDefinitions_handler($sender, &$args) {
+        $definitions =& $args['definitions'];
 
-      /**
-       * There isn't any currently known help text for the IPB format, so it's an empty string.
-       * If that changes, it can be added in the locale or changed here.
-       */
-      $definitions['ipbHelpText'] = t('editor.ipbHelpText', '');
-   }
+        /**
+         * There isn't any currently known help text for the IPB format, so it's an empty string.
+         * If that changes, it can be added in the locale or changed here.
+         */
+        $definitions['ipbHelpText'] = t('editor.ipbHelpText', '');
+    }
 }
