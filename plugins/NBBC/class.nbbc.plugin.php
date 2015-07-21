@@ -359,6 +359,12 @@ EOT;
              'plain_link' => Array('_default', '_content')
          ));
 
+          // Prevent unsupported tags from displaying
+          $BBCode->AddRule('size', array());
+          $BBCode->AddRule('table', array());
+          $BBCode->AddRule('tr', array());
+          $BBCode->AddRule('td', array());
+
          $this->EventArguments['BBCode'] = $BBCode;
          $this->FireEvent('AfterNBBCSetup');
          $this->_NBBC = $BBCode;
