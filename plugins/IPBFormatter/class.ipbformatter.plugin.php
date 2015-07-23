@@ -155,17 +155,17 @@ class IPBFormatterPlugin extends Gdn_Plugin {
             $mediaModel = new Gdn_Model('Media');
 
             // Grab a reference to the instance of the current controller
-            $controller = Gdn::Controller();
+            $controller = Gdn::controller();
 
             // Grab the current discussion ID from the current controller
             $discussionID = $controller->data('Discussion.DiscussionID');
 
             // Grab comment data set from the current controller and verify it's populated
-            $comments = $controller->Data('Comments');
+            $comments = $controller->data('Comments');
             $commentIDs = array();
-            if ($comments instanceof Gdn_DataSet && $comments->NumRows()) {
+            if ($comments instanceof Gdn_DataSet && $comments->numRows()) {
                 // Build a collection of comment IDs
-                while ($currentComment = $comments->NextRow()) {
+                while ($currentComment = $comments->nextRow()) {
                     $commentIDs[] = $currentComment->CommentID;
                 }
                 unset($currentComment);
@@ -176,31 +176,31 @@ class IPBFormatterPlugin extends Gdn_Plugin {
              * ForeignTable value of "discussion"
              */
             $mediaStatement = $mediaModel->SQL
-                ->Select('m.*')
-                ->From('Media m')
-                ->BeginWhereGroup()
-                ->Where('m.ForeignID', $discussionID)
-                ->Where('m.ForeignTable', 'discussion')
-                ->EndWhereGroup();
+                ->select('m.*')
+                ->from('Media m')
+                ->beginWhereGroup()
+                ->where('m.ForeignID', $discussionID)
+                ->where('m.ForeignTable', 'discussion')
+                ->endWhereGroup();
 
             // If we have any comment IDs, find attachments related to them too
             if (!empty($commentIDs)) {
                 $mediaStatement
-                    ->OrOp()
-                    ->BeginWhereGroup()
-                    ->WhereIn('m.ForeignID', $commentIDs)
-                    ->Where('m.ForeignTable', 'comment')
-                    ->EndWhereGroup();
+                    ->orOp()
+                    ->beginWhereGroup()
+                    ->whereIn('m.ForeignID', $commentIDs)
+                    ->where('m.ForeignTable', 'comment')
+                    ->endWhereGroup();
             }
 
             // Execute the statement and get the results
-            $mediaRows = $mediaStatement->Get();
+            $mediaRows = $mediaStatement->get();
 
             /**
              * Verify $mediaRows is a valid data set and that it is populated.  Next, iterate through the results and
              * insert elements into our _Media array, using each row's MediaID as the index.
              */
-            if ($mediaRows instanceof Gdn_DataSet && $mediaRows->NumRows()) {
+            if ($mediaRows instanceof Gdn_DataSet && $mediaRows->numRows()) {
                 foreach ($mediaRows->result() as $currentMedia) {
                     $this->_Media[$currentMedia->MediaID] = $currentMedia;
                 }
