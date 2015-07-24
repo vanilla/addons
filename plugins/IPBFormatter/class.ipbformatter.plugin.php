@@ -45,8 +45,8 @@ class IPBFormatterPlugin extends Gdn_Plugin {
          */
         $string = preg_replace_callback(
             '/\[code\].*?\[\/code\]/is',
-            function ($CodeBlocks) {
-                return str_replace(array('<br />'), array(''), $CodeBlocks[0]);
+            function ($codeBlocks) {
+                return str_replace(array('<br />'), array(''), $codeBlocks[0]);
             },
             $string
         );
@@ -57,16 +57,16 @@ class IPBFormatterPlugin extends Gdn_Plugin {
          */
         $string = preg_replace_callback(
             '#<blockquote\s+(class="ipsBlockquote" )?data-author="([^"]+)" data-cid="(\d+)" data-time="(\d+)">(.*?)</blockquote>#is',
-            function ($BlockQuotes) {
-                $Author = $BlockQuotes[2];
-                $Cid = $BlockQuotes[3];
-                $Time = $BlockQuotes[4];
-                $QuoteContent = $BlockQuotes[5];
+            function ($blockQuotes) {
+                $author = $blockQuotes[2];
+                $cid = $blockQuotes[3];
+                $time = $blockQuotes[4];
+                $quoteContent = $blockQuotes[5];
 
                 // $Time will over as a timestamp. Convert it to a date string.
-                $Date = date('F j Y, g:i A', $Time);
+                $date = date('F j Y, g:i A', $time);
 
-                return "[quote name=\"{$Author}\" url=\"{$Cid}\" date=\"{$Date}\"]{$QuoteContent}[/quote]";
+                return "[quote name=\"{$author}\" url=\"{$cid}\" date=\"{$date}\"]{$quoteContent}[/quote]";
             },
             $string
         );
@@ -81,7 +81,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
         $strings = (array)$string;
         $result = '';
         foreach ($strings as $string) {
-            $result .= $this->NBBC()->Parse($string);
+            $result .= $this->NBBC()->parse($string);
         }
 
         // Linkify URLs in content
@@ -141,22 +141,71 @@ class IPBFormatterPlugin extends Gdn_Plugin {
         return $this->_NBBC;
     }
 
+    /**
+     * Build an array of attachment records from the Media table, using the MediaID as each record's index.
+     *
+     * @return array|null
+     */
     public function media() {
         if ($this->_Media === null) {
-            try {
-                $i = Gdn::pluginManager()->getPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
-                $m = $i->mediaCache();
-            } catch (Exception $ex) {
-                $m = array();
+            // Set _Media to a non-null value, so we only do this once.
+            $this->_Media = array();
+
+            // Fire up a basic model, configured for the Media table
+            $mediaModel = new Gdn_Model('Media');
+
+            // Grab a reference to the instance of the current controller
+            $controller = Gdn::controller();
+
+            // Grab the current discussion ID from the current controller
+            $discussionID = $controller->data('Discussion.DiscussionID');
+
+            // Grab comment data set from the current controller and verify it's populated
+            $comments = $controller->data('Comments');
+            $commentIDs = array();
+            if ($comments instanceof Gdn_DataSet && $comments->numRows()) {
+                // Build a collection of comment IDs
+                while ($currentComment = $comments->nextRow()) {
+                    $commentIDs[] = $currentComment->CommentID;
+                }
+                unset($currentComment);
             }
 
-            $media = array();
-            foreach ($m as $key => $data) {
-                foreach ($data as $row) {
-                    $media[$row->MediaID] = $row;
-                }
+            /**
+             * Select all media records with a ForeignID matching the discussion ID and a
+             * ForeignTable value of "discussion"
+             */
+            $mediaStatement = $mediaModel->SQL
+                ->select('m.*')
+                ->from('Media m')
+                ->beginWhereGroup()
+                ->where('m.ForeignID', $discussionID)
+                ->where('m.ForeignTable', 'discussion')
+                ->endWhereGroup();
+
+            // If we have any comment IDs, find attachments related to them too
+            if (!empty($commentIDs)) {
+                $mediaStatement
+                    ->orOp()
+                    ->beginWhereGroup()
+                    ->whereIn('m.ForeignID', $commentIDs)
+                    ->where('m.ForeignTable', 'comment')
+                    ->endWhereGroup();
             }
-            $this->_Media = $media;
+
+            // Execute the statement and get the results
+            $mediaRows = $mediaStatement->get();
+
+            /**
+             * Verify $mediaRows is a valid data set and that it is populated.  Next, iterate through the results and
+             * insert elements into our _Media array, using each row's MediaID as the index.
+             */
+            if ($mediaRows instanceof Gdn_DataSet && $mediaRows->numRows()) {
+                foreach ($mediaRows->result() as $currentMedia) {
+                    $this->_Media[$currentMedia->MediaID] = $currentMedia;
+                }
+                unset($currentMedia);
+            }
         }
 
         return $this->_Media;
