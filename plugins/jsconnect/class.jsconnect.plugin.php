@@ -9,9 +9,9 @@
 $PluginInfo['jsconnect'] = array(
    'Name' => 'Vanilla jsConnect',
    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-   'Version' => '1.4.4',
+   'Version' => '1.4.5',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'MobileFriendly' => TRUE,
+   'MobileFriendly' => true,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
@@ -632,7 +632,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $Model = new Gdn_AuthenticationProviderModel();
             $Model->Delete(array('AuthenticationKey' => $client_id));
          }
-         $Sender->RedirectUrl = '/settings/jsconnect';
+         $Sender->RedirectUrl = url('/settings/jsconnect');
          $Sender->Render('Blank', 'Utility', 'Dashboard');
       } else {
          $Sender->Render('ConfirmDelete', '', 'plugins/jsconnect');
