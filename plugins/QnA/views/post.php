@@ -31,7 +31,6 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 
 		$this->FireEvent('BeforeBodyInput');
 		echo '<div class="P">';
-         $this->Form = new Gdn_Form();
          echo $this->Form->BodyBox('Body', array('Table' => 'Discussion', 'FileUpload' => true));
 		echo '</div>';
 
