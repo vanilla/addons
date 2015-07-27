@@ -116,7 +116,7 @@ class ExamplePlugin extends Gdn_Plugin {
         $Sender->Form->setModel($ConfigurationModel);
 
         // If seeing the form for the first time...
-        if ($Sender->Form->authenticatedPostBack() === falso) {
+        if ($Sender->Form->authenticatedPostBack() === false) {
             // Apply the config settings to the form.
             $Sender->Form->setData($ConfigurationModel->Data);
 		} else {
