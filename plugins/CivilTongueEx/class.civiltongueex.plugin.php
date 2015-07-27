@@ -75,14 +75,14 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param array $Args
      */
     public function activityController_render_before($Sender, $Args) {
-        $User = getValue('User', $Sender);
+        $User = val('User', $Sender);
         if ($User)
-            setValue('About', $User, $this->replace(getValue('About', $User)));
+            setValue('About', $User, $this->replace(val('About', $User)));
 
         if (isset($Sender->Data['Activities'])) {
             $Activities =& $Sender->Data['Activities'];
             foreach ($Activities as &$Row) {
-                setValue('Story', $Row, $this->replace(getValue('Story', $Row)));
+                setValue('Story', $Row, $this->replace(val('Story', $Row)));
 
                 if (isset($Row['Comments'])) {
                     foreach ($Row['Comments'] as &$Comment) {
@@ -104,21 +104,21 @@ class CivilTonguePlugin extends Gdn_Plugin {
                     continue;
                 }
 
-                setValue('Body', $Row, $this->replace(getValue('Body', $Row)));
+                setValue('Body', $Row, $this->replace(val('Body', $Row)));
             }
         }
 
-        $CommentData = getValue('CommentData', $Sender);
+        $CommentData = val('CommentData', $Sender);
         if ($CommentData) {
             $Result =& $CommentData->result();
             foreach ($Result as &$Row) {
-                $Value = $this->replace(getValue('Story', $Row));
+                $Value = $this->replace(val('Story', $Row));
                 setValue('Story', $Row, $Value);
 
-                $Value = $this->replace(getValue('DiscussionName', $Row));
+                $Value = $this->replace(val('DiscussionName', $Row));
                 setValue('DiscussionName', $Row, $Value);
 
-                $Value = $this->replace(getValue('Body', $Row));
+                $Value = $this->replace(val('Body', $Row));
                 setValue('Body', $Row, $Value);
 
             }
@@ -186,7 +186,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
             }
             $r = $discussions->result();
             foreach ($r as &$row) {
-                setValue('Name', $row, $this->replace(getValue('Name', $row)));
+                setValue('Name', $row, $this->replace(val('Name', $row)));
             }
         }
     }
@@ -207,7 +207,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
      */
     public function discussionController_render_before($Sender, $Args) {
         // Process OP
-        $Discussion = getValue('Discussion', $Sender);
+        $Discussion = val('Discussion', $Sender);
         if ($Discussion) {
             $Discussion->Name = $this->replace($Discussion->Name);
             if (isset($Discussion->Body)) {
@@ -305,7 +305,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
     public function setup() {
         // Set default configuration
-        SaveToConfig('Plugins.CivilTongue.Replacement', '****');
+        saveToConfig('Plugins.CivilTongue.Replacement', '****');
     }
 
     /**
