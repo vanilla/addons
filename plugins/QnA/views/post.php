@@ -9,12 +9,12 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
    <?php
 		if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
 			echo Wrap($this->Data('Title'), 'h1', array('class' => 'H'));
-	
+
       echo '<div class="FormWrapper">';
       echo $this->Form->Open();
       echo $this->Form->Errors();
       $this->FireEvent('BeforeFormInputs');
-      
+
       if ($this->ShowCategorySelector === TRUE) {
 			echo '<div class="P">';
 				echo '<div class="Category">';
@@ -23,19 +23,20 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 				echo '</div>';
 			echo '</div>';
       }
-      
+
       echo '<div class="P">';
 			echo $this->Form->Label('Question', 'Name');
 			echo Wrap($this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput')), 'div', array('class' => 'TextBoxWrapper'));
 		echo '</div>';
-		
+
 		$this->FireEvent('BeforeBodyInput');
 		echo '<div class="P">';
-         echo $this->Form->BodyBox('Body', array('Table' => 'Discussion'));
+         $this->Form = new Gdn_Form();
+         echo $this->Form->BodyBox('Body', array('Table' => 'Discussion', 'FileUpload' => true));
 		echo '</div>';
-		
+
 		$this->FireEvent('AfterDiscussionFormOptions');
-		
+
       echo '<div class="Buttons">';
       $this->FireEvent('BeforeFormButtons');
       echo $this->Form->Button((property_exists($this, 'Discussion')) ? 'Save' : 'Ask Question', array('class' => 'Button Primary DiscussionButton'));
