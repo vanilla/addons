@@ -2,357 +2,357 @@
 
 // Define the plugin:
 $PluginInfo['CivilTongueEx'] = array(
-   'Name' => 'Civil Tongue Ex',
-   'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
-   'Version' => '1.0.5',
-   'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'Author' => "Todd Burry",
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
-   'SettingsUrl' => '/dashboard/plugin/tongue',
-	'SettingsPermission' => 'Garden.Settings.Manage'
+    'Name' => 'Civil Tongue Ex',
+    'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
+    'Version' => '1.0.5',
+    'MobileFriendly' => TRUE,
+    'RequiredApplications' => array('Vanilla' => '2.1'),
+    'Author' => "Todd Burry",
+    'AuthorEmail' => 'todd@vanillaforums.com',
+    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
+    'SettingsUrl' => '/dashboard/plugin/tongue',
+    'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
 // 1.0 - Fix empty pattern when list ends in semi-colon, use non-custom permission (2012-03-12 Lincoln)
 
 class CivilTonguePlugin extends Gdn_Plugin {
-   public $Replacement;
+    public $Replacement;
 
-   public function  __construct() {
-      parent::__construct();
-      $this->Replacement = C('Plugins.CivilTongue.Replacement', '');
-   }
+    public function  __construct() {
+        parent::__construct();
+        $this->Replacement = c('Plugins.CivilTongue.Replacement', '');
+    }
 
-   /**
-    * Add settings page to Dashboard sidebar menu.
-    */
-	public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
-      $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Forum', T('Censored Words'), 'plugin/tongue', 'Garden.Settings.Manage', array('class' => 'nav-bad-words'));
-   }
+    /**
+     * Add settings page to Dashboard sidebar menu.
+     */
+    public function base_getAppsettingsMenuItems_handler(&$Sender) {
+        $Menu = $Sender->EventArguments['SideMenu'];
+        $Menu->addLink('Forum', t('Censored Words'), 'plugin/tongue', 'Garden.Settings.Manage', array('class' => 'nav-bad-words'));
+    }
 
-   public function Base_FilterContent_Handler($Sender, $Args) {
-      if (!isset($Args['String']))
-         return;
+    public function base_filterContent_handler($Sender, $Args) {
+        if (!isset($Args['String']))
+            return;
 
-      $Args['String'] = $this->Replace($Args['String']);
-   }
+        $Args['String'] = $this->replace($Args['String']);
+    }
 
-	public function PluginController_Tongue_Create($Sender, $Args = array()) {
-		$Sender->Permission('Garden.Settings.Manage');
-		$Sender->Form = new Gdn_Form();
-		$Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-		$ConfigurationModel->SetField(array('Plugins.CivilTongue.Words', 'Plugins.CivilTongue.Replacement'));
-		$Sender->Form->SetModel($ConfigurationModel);
+    public function pluginController_tongue_create($Sender, $Args = array()) {
+        $Sender->permission('Garden.Settings.Manage');
+        $Sender->Form = new Gdn_Form();
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+        $ConfigurationModel->setField(array('Plugins.CivilTongue.Words', 'Plugins.CivilTongue.Replacement'));
+        $Sender->Form->setModel($ConfigurationModel);
 
-		if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+        if ($Sender->Form->authenticatedPostBack() === FALSE) {
 
-         $Sender->Form->SetData($ConfigurationModel->Data);
-      } else {
-         $Data = $Sender->Form->FormValues();
+            $Sender->Form->setData($ConfigurationModel->Data);
+        } else {
+            $Data = $Sender->Form->formValues();
 
-         if ($Sender->Form->Save() !== FALSE)
-            $Sender->StatusMessage = T("Your settings have been saved.");
-      }
+            if ($Sender->Form->save() !== FALSE)
+                $Sender->StatusMessage = t("Your settings have been saved.");
+        }
 
-		$Sender->AddSideMenu('plugin/tongue');
-		$Sender->SetData('Title', T('Civil Tongue'));
-		$Sender->Render($this->GetView('index.php'));
+        $Sender->addSideMenu('plugin/tongue');
+        $Sender->setData('Title', t('Civil Tongue'));
+        $Sender->render($this->getView('index.php'));
 
-	}
+    }
 
-   public function ProfileController_Render_Before($Sender, $Args) {
-      $this->ActivityController_Render_Before($Sender, $Args);
-      $this->DiscussionsController_Render_Before($Sender, $Args);
-   }
+    public function profileController_render_before($Sender, $Args) {
+        $this->activityController_render_before($Sender, $Args);
+        $this->discussionsController_render_before($Sender, $Args);
+    }
 
-   /**
-    * Clean up activities and activity comments.
-    *
-    * @param Controller $Sender
-    * @param array $Args
-    */
-   public function ActivityController_Render_Before($Sender, $Args) {
-      $User = GetValue('User', $Sender);
-      if ($User)
-         SetValue('About', $User, $this->Replace(GetValue('About', $User)));
+    /**
+     * Clean up activities and activity comments.
+     *
+     * @param Controller $Sender
+     * @param array $Args
+     */
+    public function activityController_render_before($Sender, $Args) {
+        $User = getValue('User', $Sender);
+        if ($User)
+            setValue('About', $User, $this->replace(getValue('About', $User)));
 
-      if (isset($Sender->Data['Activities'])) {
-         $Activities =& $Sender->Data['Activities'];
-         foreach ($Activities as &$Row) {
-            SetValue('Story', $Row, $this->Replace(GetValue('Story', $Row)));
+        if (isset($Sender->Data['Activities'])) {
+            $Activities =& $Sender->Data['Activities'];
+            foreach ($Activities as &$Row) {
+                setValue('Story', $Row, $this->replace(getValue('Story', $Row)));
 
-            if (isset($Row['Comments'])) {
-               foreach ($Row['Comments'] as &$Comment) {
-                  $Comment['Body'] = $this->Replace($Comment['Body']);
-               }
+                if (isset($Row['Comments'])) {
+                    foreach ($Row['Comments'] as &$Comment) {
+                        $Comment['Body'] = $this->replace($Comment['Body']);
+                    }
+                }
+
+                if (val('Headline', $Row)) {
+                    $Row['Headline'] = $this->replace($Row['Headline']);
+                }
             }
+        }
 
-            if (val('Headline', $Row)) {
-               $Row['Headline'] = $this->Replace($Row['Headline']);
+        // Reactions store their data in the Data key.
+        if (isset($Sender->Data['Data']) && is_array($Sender->Data['Data'])) {
+            $Data =& $Sender->Data['Data'];
+            foreach ($Data as &$Row) {
+                if (!is_array($Row) || !isset($Row['Body'])) {
+                    continue;
+                }
+
+                setValue('Body', $Row, $this->replace(getValue('Body', $Row)));
             }
-         }
-      }
+        }
 
-      // Reactions store their data in the Data key.
-      if (isset($Sender->Data['Data']) && is_array($Sender->Data['Data'])) {
-         $Data =& $Sender->Data['Data'];
-         foreach ($Data as &$Row) {
-            if (!is_array($Row) || !isset($Row['Body'])) {
-               continue;
+        $CommentData = getValue('CommentData', $Sender);
+        if ($CommentData) {
+            $Result =& $CommentData->result();
+            foreach ($Result as &$Row) {
+                $Value = $this->replace(getValue('Story', $Row));
+                setValue('Story', $Row, $Value);
+
+                $Value = $this->replace(getValue('DiscussionName', $Row));
+                setValue('DiscussionName', $Row, $Value);
+
+                $Value = $this->replace(getValue('Body', $Row));
+                setValue('Body', $Row, $Value);
+
             }
+        }
 
-            SetValue('Body', $Row, $this->Replace(GetValue('Body', $Row)));
-         }
-      }
+        $Comments = val('Comments', $Sender->Data);
+        if ($Comments) {
+            $Result =& $Comments->result();
+            foreach ($Result as &$Row) {
+                $Value = $this->replace(val('Story', $Row));
+                setValue('Story', $Row, $Value);
 
-      $CommentData = GetValue('CommentData', $Sender);
-      if ($CommentData) {
-         $Result =& $CommentData->Result();
-         foreach ($Result as &$Row) {
-            $Value = $this->Replace(GetValue('Story', $Row));
-            SetValue('Story', $Row, $Value);
+                $Value = $this->replace(val('DiscussionName', $Row));
+                setValue('DiscussionName', $Row, $Value);
 
-            $Value = $this->Replace(GetValue('DiscussionName', $Row));
-            SetValue('DiscussionName', $Row, $Value);
+                $Value = $this->replace(val('Body', $Row));
+                setValue('Body', $Row, $Value);
 
-            $Value = $this->Replace(GetValue('Body', $Row));
-            SetValue('Body', $Row, $Value);
-
-         }
-      }
-
-      $Comments = val('Comments', $Sender->Data);
-      if ($Comments) {
-         $Result =& $Comments->Result();
-         foreach ($Result as &$Row) {
-            $Value = $this->Replace(val('Story', $Row));
-            SetValue('Story', $Row, $Value);
-
-            $Value = $this->Replace(val('DiscussionName', $Row));
-            SetValue('DiscussionName', $Row, $Value);
-
-            $Value = $this->Replace(val('Body', $Row));
-            SetValue('Body', $Row, $Value);
-
-         }
-      }
-
-   }
-
-   /**
-    * Clean up the last title.
-    *
-    * @param CategoriesController $Sender
-    */
-   public function CategoriesController_Render_Before($Sender) {
-      if (isset($Sender->Data['Categories'])) {
-         foreach ($Sender->Data['Categories'] as &$Row) {
-            if (is_array($Row)) {
-               if (isset($Row['LastTitle'])) {
-                  $Row['LastTitle'] = $this->Replace($Row['LastTitle']);
-               }
-            } elseif (is_object($Row)) {
-               if (isset($Row->LastTitle)) {
-                  $Row->LastTitle = $this->Replace($Row->LastTitle);
-               }
             }
-         }
-      }
+        }
 
-      // When category layout is table.
-      $Discussions = val('Discussions', $Sender->Data, false);
-      if ($Discussions) {
-         foreach ($Discussions as &$Discussion) {
-            $Discussion->Name = $this->Replace($Discussion->Name);
-            $Discussion->Body = $this->Replace($Discussion->Body);
-         }
-      }
+    }
 
-   }
+    /**
+     * Clean up the last title.
+     *
+     * @param CategoriesController $Sender
+     */
+    public function categoriesController_render_before($Sender) {
+        if (isset($Sender->Data['Categories'])) {
+            foreach ($Sender->Data['Categories'] as &$Row) {
+                if (is_array($Row)) {
+                    if (isset($Row['LastTitle'])) {
+                        $Row['LastTitle'] = $this->replace($Row['LastTitle']);
+                    }
+                } elseif (is_object($Row)) {
+                    if (isset($Row->LastTitle)) {
+                        $Row->LastTitle = $this->replace($Row->LastTitle);
+                    }
+                }
+            }
+        }
 
-   /**
-    * Cleanup discussions if category layout is Mixed
-    * @param $Sender
-    * @param $Args
-    */
-   public function CategoriesController_Discussions_Render($Sender, $Args) {
+        // When category layout is table.
+        $Discussions = val('Discussions', $Sender->Data, false);
+        if ($Discussions) {
+            foreach ($Discussions as &$Discussion) {
+                $Discussion->Name = $this->replace($Discussion->Name);
+                $Discussion->Body = $this->replace($Discussion->Body);
+            }
+        }
 
-      foreach ($Sender->CategoryDiscussionData as $discussions) {
-         if (!$discussions instanceof Gdn_DataSet) {
-            continue;
-         }
-         $r = $discussions->Result();
-         foreach ($r as &$row) {
-            SetValue('Name', $row, $this->Replace(GetValue('Name', $row)));
-         }
-      }
-   }
+    }
 
-   public function DiscussionsController_Render_Before($Sender, $Args) {
-      $Discussions = val('Discussions', $Sender->Data);
-      foreach ($Discussions as &$Discussion) {
-         $Discussion->Name = $this->Replace($Discussion->Name);
-         $Discussion->Body = $this->Replace($Discussion->Body);
-      }
-   }
+    /**
+     * Cleanup discussions if category layout is Mixed
+     * @param $Sender
+     * @param $Args
+     */
+    public function categoriesController_discussions_render($Sender, $Args) {
 
-   /**
-    * Censor words in discussions / comments.
-    *
-    * @param DiscussionController $Sender Sending Controller.
-    * @param array $Args Sending arguments.
-    */
-   public function DiscussionController_Render_Before($Sender, $Args) {
-      // Process OP
-      $Discussion = GetValue('Discussion', $Sender);
-      if ($Discussion) {
-         $Discussion->Name = $this->Replace($Discussion->Name);
-         if (isset($Discussion->Body)) {
-            $Discussion->Body = $this->Replace($Discussion->Body);
-         }
-      }
-      // Get comments (2.1+)
-      $Comments = $Sender->Data('Comments');
+        foreach ($Sender->CategoryDiscussionData as $discussions) {
+            if (!$discussions instanceof Gdn_DataSet) {
+                continue;
+            }
+            $r = $discussions->result();
+            foreach ($r as &$row) {
+                setValue('Name', $row, $this->replace(getValue('Name', $row)));
+            }
+        }
+    }
 
-      // Backwards compatibility to 2.0.18
-      if (isset($Sender->CommentData))
-         $Comments = $Sender->CommentData->Result();
+    public function discussionsController_render_before($Sender, $Args) {
+        $Discussions = val('Discussions', $Sender->Data);
+        foreach ($Discussions as &$Discussion) {
+            $Discussion->Name = $this->replace($Discussion->Name);
+            $Discussion->Body = $this->replace($Discussion->Body);
+        }
+    }
 
-      // Process comments
-      if ($Comments) {
-         foreach ($Comments as $Comment) {
-            $Comment->Body = $this->Replace($Comment->Body);
-         }
-      }
-      if (val('Title', $Sender->Data)) {
-         $Sender->Data['Title'] = $this->Replace($Sender->Data['Title']);
-      }
-   }
+    /**
+     * Censor words in discussions / comments.
+     *
+     * @param DiscussionController $Sender Sending Controller.
+     * @param array $Args Sending arguments.
+     */
+    public function discussionController_render_before($Sender, $Args) {
+        // Process OP
+        $Discussion = getValue('Discussion', $Sender);
+        if ($Discussion) {
+            $Discussion->Name = $this->replace($Discussion->Name);
+            if (isset($Discussion->Body)) {
+                $Discussion->Body = $this->replace($Discussion->Body);
+            }
+        }
+        // Get comments (2.1+)
+        $Comments = $Sender->Data('Comments');
 
-   /**
-    * Clean up the search results.
-    * @param SearchController $Sender
-    */
-   public function SearchController_Render_Before($Sender) {
-      if (isset($Sender->Data['SearchResults'])) {
-         $Results =& $Sender->Data['SearchResults'];
-         foreach ($Results as &$Row) {
-            $Row['Title'] = $this->Replace($Row['Title']);
-            $Row['Summary'] = $this->Replace($Row['Summary']);
-         }
-      }
-   }
+        // Backwards compatibility to 2.0.18
+        if (isset($Sender->CommentData))
+            $Comments = $Sender->CommentData->result();
 
-   /**
-    * Clean up the search results.
-    * @param RootController $Sender
-    */
-   public function RootController_BestOf_Render($Sender) {
+        // Process comments
+        if ($Comments) {
+            foreach ($Comments as $Comment) {
+                $Comment->Body = $this->replace($Comment->Body);
+            }
+        }
+        if (val('Title', $Sender->Data)) {
+            $Sender->Data['Title'] = $this->replace($Sender->Data['Title']);
+        }
+    }
 
-      if (isset($Sender->Data['Data'])) {
-         foreach ($Sender->Data['Data'] as &$Row) {
-            $Row['Name'] = $this->Replace($Row['Name']);
-            $Row['Body'] = $this->Replace($Row['Body']);
-         }
-      }
-   }
+    /**
+     * Clean up the search results.
+     * @param SearchController $Sender
+     */
+    public function searchController_render_before($Sender) {
+        if (isset($Sender->Data['SearchResults'])) {
+            $Results =& $Sender->Data['SearchResults'];
+            foreach ($Results as &$Row) {
+                $Row['Title'] = $this->replace($Row['Title']);
+                $Row['Summary'] = $this->replace($Row['Summary']);
+            }
+        }
+    }
 
-   public function UtilityController_CivilPatterns_Create($Sender) {
-      $Patterns = $this->GetPatterns();
+    /**
+     * Clean up the search results.
+     * @param RootController $Sender
+     */
+    public function rootController_bestOf_render($Sender) {
 
-      $Text = "What's a person to do? ass";
-      $Result = array();
+        if (isset($Sender->Data['Data'])) {
+            foreach ($Sender->Data['Data'] as &$Row) {
+                $Row['Name'] = $this->replace($Row['Name']);
+                $Row['Body'] = $this->replace($Row['Body']);
+            }
+        }
+    }
 
-      foreach ($Patterns as $Pattern) {
-         $r = preg_replace($Pattern, $this->Replace, $Text);
-         if ($r != $Text)
-            $Result[] = $Pattern;
-      }
+    public function utilityController_civilPatterns_create($Sender) {
+        $Patterns = $this->getPatterns();
 
-      $Sender->SetData('Matches', $Result);
-      $Sender->SetData('Patterns', $Patterns);
-      $Sender->Render('Blank', 'Utility');
-   }
+        $Text = "What's a person to do? ass";
+        $Result = array();
 
-   public function Replace($Text) {
-      $Patterns = $this->GetPatterns();
-      $Result = preg_replace($Patterns, $this->Replacement, $Text);
+        foreach ($Patterns as $Pattern) {
+            $r = preg_replace($Pattern, $this->Replace, $Text);
+            if ($r != $Text)
+                $Result[] = $Pattern;
+        }
+
+        $Sender->setData('Matches', $Result);
+        $Sender->setData('Patterns', $Patterns);
+        $Sender->render('Blank', 'Utility');
+    }
+
+    public function replace($Text) {
+        $Patterns = $this->getPatterns();
+        $Result = preg_replace($Patterns, $this->Replacement, $Text);
 //      $Result = preg_replace_callback($Patterns, function($m) { return $m[0][0].str_repeat('*', strlen($m[0]) - 1); }, $Text);
-      return $Result;
-   }
+        return $Result;
+    }
 
-	public function GetPatterns() {
-		// Get config.
-		static $Patterns = NULL;
+    public function getpatterns() {
+        // Get config.
+        static $Patterns = NULL;
 
-      if ($Patterns === NULL) {
-         $Patterns = array();
-         $Words = C('Plugins.CivilTongue.Words', null);
-         if($Words !== null) {
-            $ExplodedWords = explode(';', $Words);
-            foreach($ExplodedWords as $Word) {
-               if (trim($Word))
-                  $Patterns[] = '`\b' . preg_quote(trim($Word), '`') . '\b`is';
+        if ($Patterns === NULL) {
+            $Patterns = array();
+            $Words = c('Plugins.CivilTongue.Words', null);
+            if ($Words !== null) {
+                $ExplodedWords = explode(';', $Words);
+                foreach ($ExplodedWords as $Word) {
+                    if (trim($Word))
+                        $Patterns[] = '`\b'.preg_quote(trim($Word), '`').'\b`is';
+                }
             }
-         }
-      }
-		return $Patterns;
-	}
+        }
+        return $Patterns;
+    }
 
 
-   public function Setup() {
-      // Set default configuration
-		SaveToConfig('Plugins.CivilTongue.Replacement', '****');
-   }
+    public function setup() {
+        // Set default configuration
+        SaveToConfig('Plugins.CivilTongue.Replacement', '****');
+    }
 
-   /**
-    * Cleanup Emails.
-    *
-    * @param Gdn_Email $Sender
-    */
-   public function Gdn_Email_BeforeSendMail_Handler($Sender) {
-      $Sender->PhpMailer->Subject = $this->Replace($Sender->PhpMailer->Subject);
-      $Sender->PhpMailer->Body = $this->Replace($Sender->PhpMailer->Body);
-      $Sender->PhpMailer->AltBody = $this->Replace($Sender->PhpMailer->AltBody);
-   }
+    /**
+     * Cleanup Emails.
+     *
+     * @param Gdn_Email $Sender
+     */
+    public function gdn_email_beforeSendMail_handler($Sender) {
+        $Sender->PhpMailer->Subject = $this->replace($Sender->PhpMailer->Subject);
+        $Sender->PhpMailer->Body = $this->replace($Sender->PhpMailer->Body);
+        $Sender->PhpMailer->AltBody = $this->replace($Sender->PhpMailer->AltBody);
+    }
 
-   /**
-    * Cleanup Inform messages.
-    *
-    * @param $Sender
-    * @param $Args
-    */
-   public function NotificationsController_InformNotifications_Handler($Sender, &$Args) {
-      $Activities = val('Activities', $Args);
-      foreach ($Activities as $Key => &$Activity) {
-         if (val('Headline', $Activity)) {
-            $Activity['Headline'] = $this->Replace($Activity['Headline']);
-            $Args['Activities'][$Key]['Headline'] = $this->Replace($Args['Activities'][$Key]['Headline']);
-         }
-      }
-   }
+    /**
+     * Cleanup Inform messages.
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function notificationsController_informNotifications_handler($Sender, &$Args) {
+        $Activities = val('Activities', $Args);
+        foreach ($Activities as $Key => &$Activity) {
+            if (val('Headline', $Activity)) {
+                $Activity['Headline'] = $this->replace($Activity['Headline']);
+                $Args['Activities'][$Key]['Headline'] = $this->replace($Args['Activities'][$Key]['Headline']);
+            }
+        }
+    }
 
-   /**
-    * Cleanup poll and poll options.
-    *
-    * @param PollModule $Sender Sending Controller.
-    * @param array $Args Sending arguments.
-    */
-   public function PollModule_AfterLoadPoll_Handler($Sender, &$Args) {
-      if (empty($Args['PollOptions']) || !is_array($Args['PollOptions'])) {
-         return;
-      }
-      if (empty($Args['Poll']) || !is_object($Args['Poll'])) {
-         return;
-      }
-      $Args['Poll']->Name = $this->Replace($Args['Poll']->Name);
+    /**
+     * Cleanup poll and poll options.
+     *
+     * @param PollModule $Sender Sending Controller.
+     * @param array $Args Sending arguments.
+     */
+    public function pollModule_afterLoadPoll_handler($Sender, &$Args) {
+        if (empty($Args['PollOptions']) || !is_array($Args['PollOptions'])) {
+            return;
+        }
+        if (empty($Args['Poll']) || !is_object($Args['Poll'])) {
+            return;
+        }
+        $Args['Poll']->Name = $this->replace($Args['Poll']->Name);
 
-      foreach ($Args['PollOptions'] as &$Option) {
-         $Option['Body'] = $this->Replace($Option['Body']);
-      }
-      $Args['Poll']->Name = $this->Replace($Args['Poll']->Name);
-   }
+        foreach ($Args['PollOptions'] as &$Option) {
+            $Option['Body'] = $this->replace($Option['Body']);
+        }
+        $Args['Poll']->Name = $this->replace($Args['Poll']->Name);
+    }
 }
