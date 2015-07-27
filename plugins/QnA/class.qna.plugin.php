@@ -396,7 +396,8 @@ class QnAPlugin extends Gdn_Plugin {
     * @param $Sender
     * @param $Args
     */
-   public function DiscussionController_BeforeDiscussionRender_Handler($Sender, $Args) {
+   public function DiscussionController_AfterFetchAttachmentViews_Handler($Sender, $Args)
+   {
       if ($Sender->Data('Discussion.QnA'))
          $Sender->CssClass .= ' Question';
 
@@ -414,12 +415,14 @@ class QnAPlugin extends Gdn_Plugin {
       }
 
       $Sender->SetData('Answers', $Answers);
-   }
 
-   public function discussionController_beforeWriteComment_handler($sender, &$args) {
       if (C('QnA.AcceptedAnswers.Filter', TRUE)) {
-         if (val('QnA', val(('Comment'), $args)) == 'Accepted' && val('RenderComment', $args)) {
-            $args['RenderComment'] = false;
+         if (isset($Sender->Data['Comments'])) {
+            $Comments = $Sender->Data['Comments']->Result();
+            $Comments = array_filter($Comments, function ($Row) {
+               return strcasecmp(GetValue('QnA', $Row), 'accepted');
+            });
+            $Sender->Data['Comments'] = new Gdn_DataSet(array_values($Comments));
          }
       }
    }
