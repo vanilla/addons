@@ -163,10 +163,41 @@ EOT;
       . $title . "\n<div class=\"QuoteText\">"
       . $content . "</div>\n</blockquote>\n";
    }
-   
+
+    /**
+     * Perform formatting against a string for the size tag
+     *
+     * @param object $bbCode Instance of NBBC parsing
+     * @param int $action Value of one of NBBC's defined constants.  Typically, this will be BBCODE_CHECK.
+     * @param string $name Name of the tag
+     * @param string $default Value of the _default parameter, from the $params array
+     * @param array $params A standard set parameters related to the tag
+     * @param string $content Value between the open and close tags, if any
+     *
+     * @return string Formatted value
+     */
+   public function doSize($bbCode, $action, $name, $default, $params, $content) {
+       // px and em are invalid modifiers for this value.  Lose 'em.
+       $default = preg_replace('/(px|em)/i', '', $default);
+
+       switch ($default) {
+           case '0': $size = '.5em'; break;
+           case '1': $size = '.67em'; break;
+           case '2': $size = '.83em'; break;
+           default:
+           case '3': $size = '1.0em'; break;
+           case '4': $size = '1.17em'; break;
+           case '5': $size = '1.5em'; break;
+           case '6': $size = '2.0em'; break;
+           case '7': $size = '2.5em'; break;
+       }
+
+       return "<span style=\"font-size:$size\">$content</span>";
+   }
+
    function DoURL($bbcode, $action, $name, $default, $params, $content) {
       if ($action == BBCODE_CHECK) return true;
-      
+
       $url = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
 
       if ($bbcode->IsValidURL($url)) {
@@ -174,14 +205,14 @@ EOT;
             print "ISVALIDURL<br />";
          if ($bbcode->url_targetable !== false && isset($params['target']))
             $target = " target=\"" . htmlspecialchars($params['target']) . "\"";
-         else 
+         else
             $target = "";
-         
+
          if ($bbcode->url_target !== false)
             if (!($bbcode->url_targetable == 'override' && isset($params['target'])))
                $target = " target=\"" . htmlspecialchars($bbcode->url_target) . "\"";
             return '<a href="' . htmlspecialchars($url) . '" rel="nofollow" class="bbcode_url"' . $target . '>' . $content . '</a>';
-      } else 
+      } else
          return htmlspecialchars($params['_tag']) . $content . htmlspecialchars($params['_endtag']);
    }
 
@@ -190,7 +221,7 @@ EOT;
       $Result = $this->NBBC()->Parse($Result);
       return $Result;
    }
-   
+
    protected $_Media = NULL;
    public function Media() {
       if ($this->_Media === NULL) {
@@ -200,7 +231,7 @@ EOT;
          } catch (Exception $Ex) {
             $M = array();
          }
-         
+
          $Media = array();
          foreach ($M as $Key => $Data) {
             foreach ($Data as $Row) {
@@ -214,8 +245,8 @@ EOT;
 
    protected $_NBBC = NULL;
    /**
-    * 
-    * @return BBCode 
+    *
+    * @return BBCode
     */
    public function NBBC() {
       if ($this->_NBBC === NULL) {
@@ -223,7 +254,7 @@ EOT;
          $BBCode = new $this->Class();
          $BBCode->enable_smileys = false;
          $BBCode->SetAllowAmpersand(TRUE);
-         
+
          $BBCode->AddRule('attach', array(
             'mode' => BBCODE_MODE_CALLBACK,
             'method' => array($this, "DoAttachment"),
@@ -248,7 +279,7 @@ EOT;
              'plain_start' => "\n<b>Code:</b>\n",
              'plain_end' => "\n",
          ));
-         
+
 
          $BBCode->AddRule('quote', array('mode' => BBCODE_MODE_CALLBACK,
              'method' => array($this, "DoQuote"),
@@ -274,7 +305,7 @@ EOT;
              'after_endtag' => "sns",
              'plain_start' => "\n",
              'plain_end' => "\n"));
-         
+
          $BBCode->AddRule('img', array(
             'mode' => BBCODE_MODE_CALLBACK,
             'method' => array($this, "DoImage"),
@@ -285,7 +316,7 @@ EOT;
             'plain_start' => "[image]",
             'plain_content' => Array(),
             ));
-         
+
          $BBCode->AddRule('snapback', Array(
              'mode' => BBCODE_MODE_ENHANCED,
              'template' => ' <a href="'.Url('/discussion/comment/{$_content/v}#Comment_{$_content/v}', TRUE).'" class="SnapBack">»</a> ',
@@ -359,8 +390,19 @@ EOT;
              'plain_link' => Array('_default', '_content')
          ));
 
+          /**
+           * Default size tag needs to be a little more flexible.  The original NBBC rule was copied here and the regex
+           * was updated to meet our new criteria.
+           */
+          $BBCode->addRule('size', array(
+              'mode' => BBCODE_MODE_CALLBACK,
+              'allow' => array('_default' => '/^[0-9.]+(em|px)?$/D'),
+              'method' => array($this, 'doSize'),
+              'class' => 'inline',
+              'allow_in' => array('listitem', 'block', 'columns', 'inline', 'link'),
+          ));
+
           // Prevent unsupported tags from displaying
-          $BBCode->AddRule('size', array());
           $BBCode->AddRule('table', array());
           $BBCode->AddRule('tr', array());
           $BBCode->AddRule('td', array());
