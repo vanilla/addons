@@ -341,7 +341,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
     * @param $Sender
     * @param $Args
     */
-   public function messagesController_beforeSingleMessage_handler($Sender, &$Args) {
+   public function messagesController_beforeMessages_handler($Sender, &$Args) {
       foreach ($Args['MessageData'] as &$Message) {
          $body = val("Body", $Message);
          if ($body) {
