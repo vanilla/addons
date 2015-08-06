@@ -336,6 +336,54 @@ class CivilTonguePlugin extends Gdn_Plugin {
    }
 
    /**
+    * Cleanup Private Messages Displayed on the Messages Page.
+    *
+    * @param $Sender
+    * @param $Args
+    */
+   public function messagesController_beforeSingleMessage_handler($Sender, &$Args) {
+      foreach ($Args['MessageData'] as &$Message) {
+         $body = val("Body", $Message);
+         if ($body) {
+            $Message->Body = $this->Replace($body);
+         }
+      }
+   }
+
+
+   /**
+    * Cleanup Private Messages Displayed on the Messages Page.
+    *
+    * @param $Sender
+    * @param $Args
+    */
+   public function messagesController_beforeMessagesAll_handler($Sender, &$Args) {
+      $Conversations = val('Conversations', $Args);
+      foreach ($Conversations as $Key => &$Conversation) {
+         if (val('LastBody', $Conversation)) {
+            $Conversation['LastBody'] = $this->Replace($Conversation['LastBody']);
+            $Args['Conversations'][$Key]['LastBody'] = $this->Replace($Args['Conversations'][$Key]['LastBody']);
+         }
+      }
+   }
+
+   /**
+    * Cleanup Private messages Displayed in the Flyout.
+    *
+    * @param $Sender
+    * @param $Args
+    */
+   public function messagesController_beforeMessagesPopin_handler($Sender, &$Args) {
+      $Conversations = val('Conversations', $Args);
+      foreach ($Conversations as $Key => &$Conversation) {
+         if (val('LastBody', $Conversation)) {
+            $Conversation['LastBody'] = $this->Replace($Conversation['LastBody']);
+            $Args['Conversations'][$Key]['LastBody'] = $this->Replace($Args['Conversations'][$Key]['LastBody']);
+         }
+      }
+   }
+
+   /**
     * Cleanup poll and poll options.
     *
     * @param PollModule $Sender Sending Controller.
