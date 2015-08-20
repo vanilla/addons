@@ -22,7 +22,7 @@ define('JS_TIMEOUT', 24 * 60);
  *  - null: Don't check for security and don't sign the response.
  * @since 1.1b Added the ability to provide a hash algorithm to $Secure.
  */
-function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
+function writeJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
     $User = array_change_key_case($User);
 
     // Error checking.
@@ -43,11 +43,11 @@ function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
             $Error = array('error' => 'invalid_request', 'message' => 'The timestamp parameter is missing or invalid.');
         } elseif (!isset($Request['signature'])) {
             $Error = array('error' => 'invalid_request', 'message' => 'Missing  signature parameter.');
-        } elseif (($Diff = abs($Request['timestamp'] - JsTimestamp())) > JS_TIMEOUT) {
+        } elseif (($Diff = abs($Request['timestamp'] - jsTimestamp())) > JS_TIMEOUT) {
             $Error = array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.');
         } else {
             // Make sure the timestamp hasn't timed out.
-            $Signature = JsHash($Request['timestamp'].$Secret, $Secure);
+            $Signature = jsHash($Request['timestamp'].$Secret, $Secure);
             if ($Signature != $Request['signature'])
                 $Error = array('error' => 'access_denied', 'message' => 'Signature invalid.');
         }
@@ -59,7 +59,7 @@ function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
         if ($Secure === NULL) {
             $Result = $User;
         } else {
-            $Result = SignJsConnect($User, $ClientID, $Secret, $Secure, TRUE);
+            $Result = signJsConnect($User, $ClientID, $Secret, $Secure, TRUE);
         }
     } else {
         $Result = array('name' => '', 'photourl' => '');
@@ -74,7 +74,7 @@ function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
     }
 }
 
-function SignJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = FALSE) {
+function signJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = FALSE) {
     $Data = array_change_key_case($Data);
     ksort($Data);
 
@@ -86,7 +86,7 @@ function SignJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = FALSE
 
     $String = http_build_query($Data, NULL, '&');
 //   echo "$String\n";
-    $Signature = JsHash($String.$Secret, $HashType);
+    $Signature = jsHash($String.$Secret, $HashType);
 
     if ($ReturnData) {
         $Data['client_id'] = $ClientID;
@@ -105,7 +105,7 @@ function SignJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = FALSE
  * @return string
  * @since 1.1b
  */
-function JsHash($String, $Secure = TRUE) {
+function jsHash($String, $Secure = TRUE) {
     if ($Secure === TRUE) {
         $Secure = 'md5';
     }
@@ -122,7 +122,7 @@ function JsHash($String, $Secure = TRUE) {
     }
 }
 
-function JsTimestamp() {
+function jsTimestamp() {
     return time();
 }
 
@@ -134,7 +134,7 @@ function JsTimestamp() {
  * @param string $Secret Your secret.
  * @return string
  */
-function JsSSOString($User, $ClientID, $Secret) {
+function jsSSOString($User, $ClientID, $Secret) {
     if (!isset($User['client_id'])) {
         $User['client_id'] = $ClientID;
     }
