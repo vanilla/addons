@@ -50,7 +50,7 @@ class JsConnectPlugin extends Gdn_Plugin {
          $Target = '/';
 
       $ConnectQuery = array('client_id' => $Provider['AuthenticationKey'], 'Target' => $Target);
-      $Data['Target'] = urlencode(Url('entry/jsconnect', TRUE).'?'.  http_build_query($ConnectQuery));
+        $Data['Target'] = urlencode(Url('entry/jsconnect', TRUE).'?'.http_build_query($ConnectQuery));
       $Data['Redirect'] = $Data['target'] = $Data['redirect'] = $Data['Target'];
 
       $SignInUrl = FormatString(GetValue('SignInUrl', $Provider, ''), $Data);
@@ -182,7 +182,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       }
 
       $qs = static::connectQueryString($provider, $target);
-      $finalTarget = urlencode(Url('/entry/jsconnect', true).'?'.  http_build_query($qs));
+        $finalTarget = urlencode(Url('/entry/jsconnect', true).'?'.http_build_query($qs));
 
       $signInUrl = str_ireplace(
          array('{target}', '{redirect}'),
@@ -210,7 +210,7 @@ class JsConnectPlugin extends Gdn_Plugin {
       }
 
       $qs = static::connectQueryString($provider, $target);
-      $finalTarget = urlencode(Url('/entry/jsconnect', true).'?'.  http_build_query($qs));
+        $finalTarget = urlencode(Url('/entry/jsconnect', true).'?'.http_build_query($qs));
 
       $registerUrl = str_ireplace(
          array('{target}', '{redirect}'),
@@ -337,7 +337,6 @@ class JsConnectPlugin extends Gdn_Plugin {
       }
 
 
-
       // Map all of the standard jsConnect data.
       $Map = array('uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'fullname' => 'FullName');
       foreach ($Map as $Key => $Value) {
@@ -444,7 +443,7 @@ class JsConnectPlugin extends Gdn_Plugin {
          $Sender->AddDefinition('JsAuthenticateUrl', self::ConnectUrl($Provider, TRUE));
          $Sender->AddJsFile('jsconnect.js', 'plugins/jsconnect');
          $Sender->SetData('Title', T('Connecting...'));
-         $Sender->Form->Action = Url('/entry/connect/jsconnect?'.  http_build_query($Get));
+            $Sender->Form->Action = Url('/entry/connect/jsconnect?'.http_build_query($Get));
          $Sender->Form->AddHidden('JsConnect', '');
          $Sender->Form->AddHidden('Target', $Target);
 
