@@ -9,7 +9,7 @@
 $PluginInfo['jsconnect'] = array(
     'Name' => 'Vanilla jsConnect',
     'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-    'Version' => '1.4.6',
+    'Version' => '1.5.0',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
@@ -23,6 +23,15 @@ class JsConnectPlugin extends Gdn_Plugin {
     /// PROPERTIES ///
 
     /// METHODS ///
+
+    public function addControl($key, $item) {
+        // Make sure this isn't called before it's ready.
+        if (!isset(Gdn::controller()->Data['_Controls'])) {
+            throw new Exception("You can't add a control before the controls collection has been initialized.", 500);
+        }
+
+        Gdn::controller()->Data['_Controls'][$key] = $item;
+    }
 
     public static function allConnectButtons($Options = array()) {
         $Result = '';
@@ -554,70 +563,119 @@ class JsConnectPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @param Gdn_Controller $Sender
+     * @param SettingsController $sender
      * @param array $Args
      */
-    protected function settings_addEdit($Sender, $Args) {
-        $client_id = $Sender->Request->Get('client_id');
+    protected function settings_addEdit($sender, $Args) {
+        $client_id = $sender->Request->Get('client_id');
         Gdn::Locale()->SetTranslation('AuthenticationKey', 'Client ID');
         Gdn::Locale()->SetTranslation('AssociationSecret', 'Secret');
         Gdn::Locale()->SetTranslation('AuthenticateUrl', 'Authentication Url');
 
-        $Form = new Gdn_Form();
-        $Sender->Form = $Form;
-        $Model = new Gdn_AuthenticationProviderModel();
+        /* @var Gdn_Form $form */
+        $form = $sender->Form;
+        $model = new Gdn_AuthenticationProviderModel();
+        $form->setModel($model);
 
-        if ($Form->AuthenticatedPostBack()) {
-            if ($Form->GetFormValue('Generate') || $Sender->Request->Post('Generate')) {
-                $Form->SetFormValue('AuthenticationKey', mt_rand());
-                $Form->SetFormValue('AssociationSecret', md5(mt_rand()));
+        if ($form->authenticatedPostBack()) {
+            if ($form->getFormValue('Generate') || $sender->Request->post('Generate')) {
+                $form->setFormValue('AuthenticationKey', mt_rand());
+                $form->setFormValue('AssociationSecret', md5(mt_rand()));
 
-                $Sender->SetFormSaved(FALSE);
+                $sender->setFormSaved(FALSE);
             } else {
-                $Form->ValidateRule('AuthenticationKey', 'ValidateRequired');
-                $Form->ValidateRule('AuthenticationKey', 'regex:`^[a-z0-9_-]+$`i', T('The client id must contain only letters, numbers and dashes.'));
-                $Form->ValidateRule('AssociationSecret', 'ValidateRequired');
-                $Form->ValidateRule('AuthenticateUrl', 'ValidateRequired');
+                $form->validateRule('AuthenticationKey', 'ValidateRequired');
+                $form->validateRule('AuthenticationKey', 'regex:`^[a-z0-9_-]+$`i', T('The client id must contain only letters, numbers and dashes.'));
+                $form->validateRule('AssociationSecret', 'ValidateRequired');
+                $form->validateRule('AuthenticateUrl', 'ValidateRequired');
 
+                $form->setFormValue('AuthenticationSchemeAlias', 'jsconnect');
 
-                $Values = $Form->FormValues();
-
-                $Values = ArrayTranslate($Values, array('Name', 'AuthenticationKey', 'URL', 'AssociationSecret', 'AuthenticateUrl', 'SignInUrl', 'RegisterUrl', 'SignOutUrl', 'IsDefault'));
-                $Values['AuthenticationSchemeAlias'] = 'jsconnect';
-                $Values['AssociationHashMethod'] = 'md5';
-                $Values['Attributes'] = serialize(array('HashType' => $Form->GetFormValue('HashType'), 'TestMode' => $Form->GetFormValue('TestMode'), 'Trusted' => $Form->GetFormValue('Trusted', 0)));
-
-                if ($Form->ErrorCount() == 0) {
-                    $IsDefault = GetValue('IsDefault', $Values);
-                    if ($IsDefault) {
-                        Gdn::SQL()->Put(
-                            'UserAuthenticationProvider',
-                            array('IsDefault' => 0),
-                            array('AuthenticationKey <>' => val('AuthenticationKey', $Values)));
-                    }
-
-
-                    if ($client_id) {
-                        Gdn::SQL()->Put('UserAuthenticationProvider', $Values, array('AuthenticationKey' => $client_id));
-                    } else {
-                        Gdn::SQL()->Options('Ignore', TRUE)->Insert('UserAuthenticationProvider', $Values);
-                    }
-
-                    $Sender->RedirectUrl = Url('/settings/jsconnect');
+                if ($form->save(['ID' => $client_id])) {
+                    $sender->RedirectUrl = url('/settings/jsconnect');
                 }
             }
         } else {
             if ($client_id) {
-                $Provider = self::getProvider($client_id);
-                TouchValue('Trusted', $Provider, 1);
+                $provider = self::getProvider($client_id);
+                touchValue('Trusted', $provider, 1);
             } else {
-                $Provider = array();
+                $provider = array();
             }
-            $Form->SetData($Provider);
+            $form->setData($provider);
         }
 
-        $Sender->SetData('Title', sprintf(T($client_id ? 'Edit %s' : 'Add %s'), T('Connection')));
-        $Sender->Render('Settings_AddEdit', '', 'plugins/jsconnect');
+        // Set up the form controls for editing the connection.
+        $hashTypes = hash_algos();
+        $hashTypes = array_combine($hashTypes, $hashTypes);
+
+        $controls = [
+            'AuthenticationKey' => [
+                'LabelCode' => 'Client ID',
+                'Description' => T('The client ID uniquely identifies the site.', 'The client ID uniquely identifies the site. You can generate a new ID with the button at the bottom of this page.')
+            ],
+            'AssociationSecret' => [
+                'LabelCode' => 'Secret',
+                'Description' => T('The secret secures the sign in process.', 'The secret secures the sign in process. Do <b>NOT</b> give the secret out to anyone.')
+            ],
+            'Name' => [
+                'LabelCode' => 'Site Name',
+                'Description' => T('Enter a short name for the site.', 'Enter a short name for the site. This is displayed on the signin buttons.')
+            ],
+            'AuthenticateUrl' => [
+                'LabelCode' => 'Authentication URL',
+                'Description' => T('The location of the JSONP formatted authentication data.'),
+                'Options' => ['class' => 'InputBox BigInput']
+
+            ],
+            'SignInUrl' => [
+                'LabelCode' => 'Sign In URL',
+                'Description' => T('The url that users use to sign in.').' '.T('Use {target} to specify a redirect.'),
+                'Options' => ['class' => 'InputBox BigInput']
+            ],
+            'RegisterUrl' => [
+                'LabelCode' => 'Registration URL',
+                'Description' => T('The url that users use to register for a new account.'),
+                'Options' => ['class' => 'InputBox BigInput']
+            ],
+            'SignOutUrl' => [
+                'LabelCode' => 'Sign Out URL',
+                'Description' => T('The url that users use to sign out of your site.'),
+                'Options' => ['class' => 'InputBox BigInput']
+            ],
+            'Trusted' => [
+                'Control' => 'checkbox',
+                'LabelCode' => 'This is trusted connection and can sync roles & permissions.'
+            ],
+            'IsDefault' => [
+                'Control' => 'checkbox',
+                'LabelCode' => 'Make this connection your default signin method.'
+            ],
+            'Advanced' => [
+                'Control' => 'callback',
+                'Callback' => function($form) {
+                    return '<h2>'.T('Advanced').'</h2>';
+                }
+            ],
+            'HashType' => [
+                'Control' => 'dropdown',
+                'LabelCode' => 'Hash Algorithm',
+                'Items' => $hashTypes,
+                'Description' => T(
+                    'Choose md5 if you\'re not sure what to choose.',
+                    "You can select a custom hash algorithm to sign your requests. The hash algorithm must also be used in your client library. Choose md5 if you're not sure what to choose."
+                ),
+                'Options' => ['Default' => 'md5']
+            ],
+            'TestMode' => ['Control' => 'checkbox', 'LabelCode' => 'This connection is in test-mode.']
+        ];
+        $sender->setData('_Controls', $controls);
+        $sender->setData('Title', sprintf(T($client_id ? 'Edit %s' : 'Add %s'), T('Connection')));
+
+        // Throw a render event as this plugin so that handlers can call our methods.
+        Gdn::pluginManager()->callEventHandlers($this, __CLASS__, 'addedit', 'render');
+
+        $sender->render('Settings_AddEdit', '', 'plugins/jsconnect');
     }
 
     public function settings_delete($Sender, $Args) {
