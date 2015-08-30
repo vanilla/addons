@@ -25,7 +25,7 @@
 $PluginInfo['FeedDiscussions'] = array(
    'Name' => 'Feed Discussions',
    'Description' => "Automatically creates new discussions based on content imported from supplied RSS feeds.",
-   'Version' => '1.2.1',
+   'Version' => '1.2.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
