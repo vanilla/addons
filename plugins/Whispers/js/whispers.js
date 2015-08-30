@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
 
 
 
-   $('.MultiComplete').livequery(function() {
+   $('.MultiComplete').each(function() {
       $(this).autocomplete(
          gdn.url('/dashboard/user/autocomplete/'),
          {
