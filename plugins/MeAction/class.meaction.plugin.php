@@ -2,7 +2,7 @@
 
 $PluginInfo['MeAction'] = array(
     'Description' => 'Allows IRC-style /me actions in the middle of comments as long as they appear at start of a new line.',
-    'Version' => '1.0',
+    'Version' => '1.1',
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'MobileFriendly' => true,
     'Author' => 'Lincoln Russell',
