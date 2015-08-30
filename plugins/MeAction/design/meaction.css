@@ -1,6 +1,0 @@
-.Message .AuthorAction {
-   font-weight: bold;
-}
-.Message .AuthorAction:before {
-   content: '* ';
-}
