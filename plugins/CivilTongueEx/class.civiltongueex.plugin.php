@@ -75,14 +75,14 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param array $Args
      */
     public function activityController_render_before($Sender, $Args) {
-      $User = GetValue('User', $Sender);
+      $User = val('User', $Sender);
         if ($User)
-         SetValue('About', $User, $this->Replace(GetValue('About', $User)));
+         SetValue('About', $User, $this->replace(val('About', $User)));
 
         if (isset($Sender->Data['Activities'])) {
             $Activities =& $Sender->Data['Activities'];
             foreach ($Activities as &$Row) {
-            SetValue('Story', $Row, $this->Replace(GetValue('Story', $Row)));
+            SetValue('Story', $Row, $this->replace(val('Story', $Row)));
 
                 if (isset($Row['Comments'])) {
                     foreach ($Row['Comments'] as &$Comment) {
@@ -104,21 +104,21 @@ class CivilTonguePlugin extends Gdn_Plugin {
                     continue;
                 }
 
-            SetValue('Body', $Row, $this->Replace(GetValue('Body', $Row)));
+            setValue('Body', $Row, $this->replace(val('Body', $Row)));
             }
         }
 
-      $CommentData = GetValue('CommentData', $Sender);
+      $CommentData = val('CommentData', $Sender);
         if ($CommentData) {
             $Result =& $CommentData->result();
             foreach ($Result as &$Row) {
-            $Value = $this->Replace(GetValue('Story', $Row));
+            $Value = $this->replace(val('Story', $Row));
                 setValue('Story', $Row, $Value);
 
-            $Value = $this->Replace(GetValue('DiscussionName', $Row));
+            $Value = $this->replace(val('DiscussionName', $Row));
                 setValue('DiscussionName', $Row, $Value);
 
-            $Value = $this->Replace(GetValue('Body', $Row));
+            $Value = $this->replace(val('Body', $Row));
                 setValue('Body', $Row, $Value);
 
             }
@@ -186,7 +186,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
             }
             $r = $discussions->result();
             foreach ($r as &$row) {
-            SetValue('Name', $row, $this->Replace(GetValue('Name', $row)));
+            SetValue('Name', $row, $this->replace(val('Name', $row)));
             }
         }
     }
@@ -207,7 +207,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
      */
     public function discussionController_render_before($Sender, $Args) {
         // Process OP
-      $Discussion = GetValue('Discussion', $Sender);
+      $Discussion = val('Discussion', $Sender);
         if ($Discussion) {
             $Discussion->Name = $this->replace($Discussion->Name);
             if (isset($Discussion->Body)) {
@@ -215,7 +215,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
             }
         }
         // Get comments (2.1+)
-        $Comments = $Sender->Data('Comments');
+        $Comments = $Sender->data('Comments');
 
         // Backwards compatibility to 2.0.18
         if (isset($Sender->CommentData))
@@ -345,7 +345,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
       foreach ($Args['MessageData'] as &$message) {
          $body = val("Body", $message);
          if ($body) {
-            $message->Body = $this->Replace($body);
+            $message->Body = $this->replace($body);
          }
       }
    }
@@ -361,8 +361,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
       $conversations = val('Conversations', $Args);
       foreach ($conversations as $key => &$conversation) {
          if (val('LastBody', $conversation)) {
-            $conversation['LastBody'] = $this->Replace($conversation['LastBody']);
-            $Args['Conversations'][$key]['LastBody'] = $this->Replace($Args['Conversations'][$key]['LastBody']);
+            $conversation['LastBody'] = $this->replace($conversation['LastBody']);
+            $Args['Conversations'][$key]['LastBody'] = $this->replace($Args['Conversations'][$key]['LastBody']);
          }
       }
    }
@@ -377,8 +377,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
       $conversations = val('Conversations', $Args);
       foreach ($conversations as $key => &$conversation) {
          if (val('LastBody', $conversation)) {
-            $conversation['LastBody'] = $this->Replace($conversation['LastBody']);
-            $Args['Conversations'][$key]['LastBody'] = $this->Replace($Args['Conversations'][$key]['LastBody']);
+            $conversation['LastBody'] = $this->replace($conversation['LastBody']);
+            $Args['Conversations'][$key]['LastBody'] = $this->replace($Args['Conversations'][$key]['LastBody']);
          }
       }
    }
