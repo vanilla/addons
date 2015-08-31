@@ -1,11 +1,15 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Based on the Civil Tongue plugin.
+ *
+ * @package CivilTongueEx
+ */
 
-// Define the plugin:
 $PluginInfo['CivilTongueEx'] = array(
     'Name' => 'Civil Tongue Ex',
-    'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences. This version of the plugin is based on the Civil Tongue plugin.',
-    'Version' => '1.0.5',
-    'MobileFriendly' => TRUE,
+    'Description' => 'A swear word filter for your forum. Making your forum safer for younger audiences.',
+    'Version' => '1.1',
+    'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -16,9 +20,17 @@ $PluginInfo['CivilTongueEx'] = array(
 
 // 1.0 - Fix empty pattern when list ends in semi-colon, use non-custom permission (2012-03-12 Lincoln)
 
+/**
+ * Class CivilTonguePlugin
+ */
 class CivilTonguePlugin extends Gdn_Plugin {
+
+    /** @var mixed  */
     public $Replacement;
 
+    /**
+     *
+     */
     public function  __construct() {
         parent::__construct();
         $this->Replacement = c('Plugins.CivilTongue.Replacement', '');
@@ -32,6 +44,12 @@ class CivilTonguePlugin extends Gdn_Plugin {
         $Menu->addLink('Forum', t('Censored Words'), 'plugin/tongue', 'Garden.Settings.Manage', array('class' => 'nav-bad-words'));
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
     public function base_filterContent_handler($Sender, $Args) {
         if (!isset($Args['String']))
             return;
@@ -39,6 +57,12 @@ class CivilTonguePlugin extends Gdn_Plugin {
         $Args['String'] = $this->replace($Args['String']);
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param array $Args
+     */
     public function pluginController_tongue_create($Sender, $Args = array()) {
         $Sender->permission('Garden.Settings.Manage');
         $Sender->Form = new Gdn_Form();
@@ -63,6 +87,12 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
     public function profileController_render_before($Sender, $Args) {
         $this->activityController_render_before($Sender, $Args);
         $this->discussionsController_render_before($Sender, $Args);
@@ -103,7 +133,6 @@ class CivilTonguePlugin extends Gdn_Plugin {
                 if (!is_array($Row) || !isset($Row['Body'])) {
                     continue;
                 }
-
                 setValue('Body', $Row, $this->replace(val('Body', $Row)));
             }
         }
@@ -120,7 +149,6 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
                 $Value = $this->replace(val('Body', $Row));
                 setValue('Body', $Row, $Value);
-
             }
         }
 
@@ -191,6 +219,12 @@ class CivilTonguePlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
     public function discussionsController_render_before($Sender, $Args) {
         $Discussions = val('Discussions', $Sender->Data);
         foreach ($Discussions as &$Discussion) {
@@ -215,11 +249,12 @@ class CivilTonguePlugin extends Gdn_Plugin {
             }
         }
         // Get comments (2.1+)
-        $Comments = $Sender->Data('Comments');
+        $Comments = $Sender->data('Comments');
 
         // Backwards compatibility to 2.0.18
-        if (isset($Sender->CommentData))
+        if (isset($Sender->CommentData)) {
             $Comments = $Sender->CommentData->result();
+        }
 
         // Process comments
         if ($Comments) {
@@ -234,6 +269,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
     /**
      * Clean up the search results.
+     *
      * @param SearchController $Sender
      */
     public function searchController_render_before($Sender) {
@@ -248,10 +284,10 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
     /**
      * Clean up the search results.
+     *
      * @param RootController $Sender
      */
     public function rootController_bestOf_render($Sender) {
-
         if (isset($Sender->Data['Data'])) {
             foreach ($Sender->Data['Data'] as &$Row) {
                 $Row['Name'] = $this->replace($Row['Name']);
@@ -260,6 +296,11 @@ class CivilTonguePlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function utilityController_civilPatterns_create($Sender) {
         $Patterns = $this->getPatterns();
 
@@ -268,8 +309,9 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
         foreach ($Patterns as $Pattern) {
             $r = preg_replace($Pattern, $this->Replace, $Text);
-            if ($r != $Text)
+            if ($r != $Text) {
                 $Result[] = $Pattern;
+            }
         }
 
         $Sender->setData('Matches', $Result);
@@ -277,6 +319,12 @@ class CivilTonguePlugin extends Gdn_Plugin {
         $Sender->render('Blank', 'Utility');
     }
 
+    /**
+     *
+     *
+     * @param $Text
+     * @return mixed
+     */
     public function replace($Text) {
         $Patterns = $this->getPatterns();
         $Result = preg_replace($Patterns, $this->Replacement, $Text);
@@ -284,6 +332,11 @@ class CivilTonguePlugin extends Gdn_Plugin {
         return $Result;
     }
 
+    /**
+     *
+     *
+     * @return array
+     */
     public function getpatterns() {
         // Get config.
         static $Patterns = NULL;
@@ -294,15 +347,18 @@ class CivilTonguePlugin extends Gdn_Plugin {
             if ($Words !== null) {
                 $ExplodedWords = explode(';', $Words);
                 foreach ($ExplodedWords as $Word) {
-                    if (trim($Word))
+                    if (trim($Word)) {
                         $Patterns[] = '`\b'.preg_quote(trim($Word), '`').'\b`is';
+                    }
                 }
             }
         }
         return $Patterns;
     }
 
-
+    /**
+     *
+     */
     public function setup() {
         // Set default configuration
         saveToConfig('Plugins.CivilTongue.Replacement', '****');
@@ -331,6 +387,53 @@ class CivilTonguePlugin extends Gdn_Plugin {
             if (val('Headline', $Activity)) {
                 $Activity['Headline'] = $this->replace($Activity['Headline']);
                 $Args['Activities'][$Key]['Headline'] = $this->replace($Args['Activities'][$Key]['Headline']);
+            }
+        }
+    }
+
+    /**
+     * Cleanup private messages displayed on the messages page.
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function messagesController_beforeMessages_handler($Sender, $Args) {
+        foreach ($Args['MessageData'] as &$message) {
+            $body = val("Body", $message);
+            if ($body) {
+                $message->Body = $this->replace($body);
+            }
+        }
+    }
+
+    /**
+     * Cleanup private messages displayed on the messages page.
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function messagesController_beforeMessagesAll_handler($Sender, $Args) {
+        $conversations = val('Conversations', $Args);
+        foreach ($conversations as $key => &$conversation) {
+            if (val('LastBody', $conversation)) {
+                $conversation['LastBody'] = $this->replace($conversation['LastBody']);
+                $Args['Conversations'][$key]['LastBody'] = $this->replace($Args['Conversations'][$key]['LastBody']);
+            }
+        }
+    }
+
+    /**
+     * Cleanup private messages displayed in the flyout.
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function messagesController_beforeMessagesPopin_handler($Sender, $Args) {
+        $conversations = val('Conversations', $Args);
+        foreach ($conversations as $key => &$conversation) {
+            if (val('LastBody', $conversation)) {
+                $conversation['LastBody'] = $this->replace($conversation['LastBody']);
+                $Args['Conversations'][$key]['LastBody'] = $this->replace($Args['Conversations'][$key]['LastBody']);
             }
         }
     }

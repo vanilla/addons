@@ -94,24 +94,21 @@
 ?>
 </div>
 <script type="text/javascript"> 
-   jQuery(document).ready(function($) {
-      
-      // Show drafts delete button on hover
-      // Show options on each row (if present)
-      $('div.ActiveFeeds div.FeedItem').livequery(function() {
-         var row = this;
-         var del = $(row).find('div.DeleteFeed');
-         $(del).hide();
-         $(row).hover(function() {
-            $(del).show();
-            $(row).addClass('Active');
-         }, function() {
-            if (!$(del).find('div.FeedItem').hasClass('ActiveFeed'))
-               $(del).hide();
-               
-            $(row).removeClass('ActiveFeed');
-         });
-      });
-   
-   });
+    jQuery(function ($) {
+
+        // Show drafts delete button on hover
+        // Show options on each row (if present)
+        $('div.ActiveFeeds div.FeedItem').each(function () {
+            var row = $(this);
+            var del = row
+                .find('div.DeleteFeed')
+                .hide();
+
+            row.hover(function () {
+                del.toggle();
+                row.toggleClass('Active');
+            });
+        });
+
+    });
 </script>
