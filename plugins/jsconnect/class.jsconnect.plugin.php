@@ -20,10 +20,14 @@ $PluginInfo['jsconnect'] = array(
 );
 
 class JsConnectPlugin extends Gdn_Plugin {
-    /// PROPERTIES ///
 
-    /// METHODS ///
-
+    /**
+     * Add an element to the controls collection. Used to render settings forms.
+     *
+     * @param string $key
+     * @param array $item
+     * @throws Exception
+     */
     public function addControl($key, $item) {
         // Make sure this isn't called before it's ready.
         if (!isset(Gdn::controller()->Data['_Controls'])) {
