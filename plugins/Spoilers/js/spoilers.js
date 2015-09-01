@@ -49,10 +49,6 @@ jQuery(document).ready(function(){
    SpoilersPlugin.FindAndReplace();
 });
 
-jQuery(document).on('CommentPagingComplete CommentAdded MessageAdded popupReveal', function() {
+jQuery(document).on('CommentPagingComplete CommentAdded MessageAdded PreviewLoaded popupReveal', function() {
    SpoilersPlugin.FindAndReplace();
-});
-
-jQuery(document).on('PreviewLoaded', function() {
-   window.setTimeout(SpoilersPlugin.FindAndReplace, 150);
 });
