@@ -57,7 +57,7 @@ v1.3.2 11Aug2014 - Dane
 $PluginInfo['cleditor'] = array(
    'Name' => 'WYSIWYG (CLEditor)',
    'Description' => 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can enter rich text comments.',
-   'Version' => '1.3.3',
+   'Version' => '1.3.4',
    'Author' => "Mirabilia Media",
    'AuthorEmail' => 'info@mirabiliamedia.com',
    'AuthorUrl' => 'http://mirabiliamedia.com',
@@ -143,12 +143,19 @@ a.PreviewButton {
 </style>
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
+
 		// Make sure the removal of autogrow does not break anything
 		$.fn.autogrow = function(o) { return; }
+
 		// Attach the editor to comment boxes.
-		$("textarea.BodyBox").livequery(function() {
-			var frm = $(this).closest("form");
-			ed = jQuery(this).cleditor({
+		function init() {
+            var BodyBox = $(this);
+            if (BodyBox.closest('.cleditorMain').length) {
+               return;
+            }
+
+			var frm = BodyBox.closest("form");
+			ed = BodyBox.cleditor({
             width:"100%", height:"100%",
             controls: "bold italic strikethrough | font size " +
                     "style | color highlight removeformat | bullets numbering | outdent indent | " +
@@ -162,7 +169,13 @@ a.PreviewButton {
 				frm.find("textarea").hide();
 				e.data.editor.clear();
 			});
-		});
+		}
+
+        $(document).on('EditCommentFormLoaded popupReveal', function () {
+           $('textarea.BodyBox').each(init);
+        });
+        $('textarea.BodyBox').each(init);
+
 	});
 </script>
 EOT
