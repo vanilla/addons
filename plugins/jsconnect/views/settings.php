@@ -3,8 +3,8 @@
     <?php
     echo '<h2>', T('Need More Help?'), '</h2>';
     echo '<ul>';
-    echo '<li>', Anchor(T('jsConnect Documentation'), 'http://vanillaforums.org/docs/jsconnect'), '</li>';
-    echo '<li>', Anchor(T('jsConnect Client Libraries'), 'http://vanillaforums.org/docs/jsconnect#libraries'), '</li>';
+    echo '<li>', Anchor(T('jsConnect Documentation'), 'http://docs.vanillaforums.com/features/sso/jsconnect/'), '</li>';
+    echo '<li>', Anchor(T('jsConnect Client Libraries'), 'http://docs.vanillaforums.com/features/sso/jsconnect/overview/#your-endpoint'), '</li>';
     echo '</ul>';
     ?>
 </div>
