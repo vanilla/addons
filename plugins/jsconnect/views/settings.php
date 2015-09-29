@@ -8,7 +8,7 @@
     echo '</ul>';
     ?>
 </div>
-<h1><?php echo T('JS Connect Settings'); ?></h1>
+<h1><?php echo sprintf(t('%s Settings'), 'jsConnect'); ?></h1>
 <div class="Info">
     <?php echo T('You can connect to multiple sites that support jsConnect.'); ?>
 </div>

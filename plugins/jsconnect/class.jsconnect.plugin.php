@@ -9,7 +9,7 @@
 $PluginInfo['jsconnect'] = array(
     'Name' => 'Vanilla jsConnect',
     'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-    'Version' => '1.5.2',
+    'Version' => '1.5.3',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
@@ -351,20 +351,18 @@ class JsConnectPlugin extends Gdn_Plugin {
 
 
         // Map all of the standard jsConnect data.
-        $Map = array('uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'fullname' => 'FullName');
+        $Map = array('uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'fullname' => 'FullName', 'roles' => 'Roles');
         foreach ($Map as $Key => $Value) {
-            $Form->SetFormValue($Value, GetValue($Key, $JsData, ''));
-        }
-
-        if (isset($JsData['roles'])) {
-            $Form->SetFormValue('Roles', $JsData['roles']);
+            if (array_key_exists($Key, $JsData)) {
+                $Form->SetFormValue($Value, $JsData[$Key]);
+            }
         }
 
         // Now add any extended information that jsConnect might have sent.
         $ExtData = array_diff_key($JsData, $Map);
 
         if (class_exists('SimpleAPIPlugin')) {
-            SimpleAPIPlugin::TranslatePost($ExtData, FALSE);
+            SimpleAPIPlugin::translatePost($ExtData, FALSE);
         }
 
         Gdn::UserModel()->DefineSchema();
