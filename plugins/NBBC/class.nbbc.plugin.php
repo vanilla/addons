@@ -219,7 +219,7 @@ EOT;
    public function Format($Result) {
       $Result = str_replace(array('[CODE]', '[/CODE]'), array('[code]', '[/code]'), $Result);
       $Result = $this->NBBC()->Parse($Result);
-      return $Result;
+      return html_entity_decode($Result);
    }
 
    protected $_Media = NULL;
