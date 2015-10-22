@@ -517,6 +517,9 @@ class QnAPlugin extends Gdn_Plugin {
     * @param array $Args
     */
    public function DiscussionController_QnA_Create($Sender, $Args = array()) {
+      if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+         throw new Exception('Requires POST', 405);
+      }
       $Comment = Gdn::SQL()->GetWhere('Comment', array('CommentID' => $Sender->Request->Get('commentid')))->FirstRow(DATASET_TYPE_ARRAY);
       if (!$Comment)
          throw NotFoundException('Comment');
