@@ -138,9 +138,6 @@ class ResolvedPlugin extends Gdn_Plugin {
      * @return void
      */
     public function discussionController_resolve_create($sender, $args) {
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-           throw new Exception('Requires POST', 405);
-        }
         $sender->permission('Plugins.Resolved.Manage');
         $discussionID = $sender->Request->get('discussionid');
         $resolve = $sender->Request->get('resolve');
@@ -255,9 +252,6 @@ class ResolvedPlugin extends Gdn_Plugin {
      * @return void
      */
     public function discussionsController_unresolved_create($sender, $args) {
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-           throw new Exception('Requires POST', 405);
-        }
         $sender->permission('Plugins.Resolved.Manage');
         $page = val(0, $args, 0);
 
