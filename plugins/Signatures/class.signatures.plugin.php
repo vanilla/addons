@@ -336,16 +336,22 @@ class SignaturesPlugin extends Gdn_Plugin {
      */
 
     public function controller_Modify($Sender) {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
         $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
         $Sender->DeliveryType(DELIVERY_TYPE_DATA);
 
         $UserID = Gdn::Request()->Get('UserID');
-        if ($UserID != Gdn::Session()->UserID)
-            $Sender->Permission(array('Garden.Users.Edit', 'Moderation.Signatures.Edit'), FALSE);
-
+        if ($UserID != Gdn::Session()->UserID) {
+            $Sender->permission(array('Garden.Users.Edit', 'Moderation.Signatures.Edit'), FALSE);
+        } else {
+            $Sender->permission(array('Garden.Profiles.Edit', 'Plugins.Signatures.Edit'));
+        }
         $User = Gdn::UserModel()->GetID($UserID);
-        if (!$User)
+        if (!$User) {
             throw new Exception("No such user '{$UserID}'", 404);
+        }
 
         $Translation = array(
             'Plugin.Signatures.Sig' => 'Body',
