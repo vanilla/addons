@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Spoilers'] = array(
    'Name' => 'Spoilers',
    'Description' => "Users may prevent accidental spoiler by wrapping text in [spoiler] tags. This requires the text to be clicked in order to read it.",
-   'Version' => '1.2',
+   'Version' => '1.3',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE,
@@ -29,6 +29,11 @@ class SpoilersPlugin extends Gdn_Plugin {
    public function __construct() {
       // Whether to handle drawing quotes or leave it up to some other plugin
       $this->RenderSpoilers = C('Plugins.Spoilers.RenderSpoilers',TRUE);
+   }
+
+   public function base_render_before($sender) {
+      $sender->addDefinition('show', t('show'));
+      $sender->addDefinition('hide', t('hide'));
    }
 
    public function AssetModel_StyleCss_Handler($Sender) {
