@@ -367,14 +367,12 @@ class QnAPlugin extends Gdn_Plugin {
          'RecordType' => 'Comment',
          'RecordID' => $CommentID,
          'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
-         'Emailed' => ActivityModel::SENT_PENDING,
-         'Notified' => ActivityModel::SENT_PENDING,
          'Data' => array(
             'Name' => GetValue('Name', $Discussion)
          )
       );
 
-      $ActivityModel->Queue($Activity);
+      $ActivityModel->Queue($Activity, 'DiscussionComment');
    }
 
    /**
