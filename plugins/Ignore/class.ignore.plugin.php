@@ -578,6 +578,8 @@ class IgnorePlugin extends Gdn_Plugin {
          'UserID'          => $ForUserID,
          'ConversationID'  => $Conversations
       ));
+      $conversationModel = new ConversationModel();
+      $conversationModel->countUnread($ForUserID, true);
    }
 
    protected function RemoveIgnore($ForUserID, $IgnoreUserID) {
