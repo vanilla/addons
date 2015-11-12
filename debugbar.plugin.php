@@ -12,18 +12,18 @@ use DebugBar\StandardDebugBar;
 
 // Define the plugin:
 $PluginInfo['debugbar'] = array(
-   'Name' => 'Debug Bar',
-   'Description' => 'The debug bar shows debuggin information at the bottom of the page.',
-   'Version' => '1.0',
-   'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE, // This is an array of plugin names/versions that this plugin requires
-   'HasLocale' => FALSE, // Does this plugin have any locale definitions?
-   'RegisterPermissions' => array('Plugins.Debugger.View' => 'Garden.Settings.View'), // Permissions that should be added to the application. These will be prefixed with "Plugins.PluginName."
-   'Author' => "Todd Burry",
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com',
-   'MobileFriendly' => TRUE,
+    'Name' => 'Debug Bar',
+    'Description' => 'The debug bar shows debuggin information at the bottom of the page.',
+    'Version' => '1.1.0',
+    'RequiredApplications' => false,
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false, // This is an array of plugin names/versions that this plugin requires
+    'HasLocale' => false, // Does this plugin have any locale definitions?
+    'RegisterPermissions' => array('Plugins.Debugger.View' => 'Garden.Settings.View'),
+    'Author' => "Todd Burry",
+    'AuthorEmail' => 'todd@vanillaforums.com',
+    'AuthorUrl' => 'http://vanillaforums.com',
+    'MobileFriendly' => true,
 );
 
 // Install the debugger database.
@@ -48,7 +48,6 @@ class DebugbarPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
      * @return \DebugBar\DebugBar Returns the debug bar instance.
      */
     public function debugBar() {
@@ -72,14 +71,13 @@ class DebugbarPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
      * @param Gdn_Controller $sender
      */
     public function Base_Render_Before($sender) {
         static $called = false;
 
         if ($called)
-           return;
+            return;
 
         $bar = $this->debugBar();
         $bar['time']->stopMeasure('controller');
@@ -95,15 +93,15 @@ class DebugbarPlugin extends Gdn_Plugin {
     }
 
     public function Gdn_Dispatcher_BeforeControllerMethod_Handler($sender) {
-       static $called = false;
+        static $called = false;
 
-       if ($called)
-          return;
+        if ($called)
+            return;
 
-      $bar = $this->debugBar();
-      $bar['time']->stopMeasure('dispatch');
-      $bar['time']->startMeasure('controller', 'Controller');
-      $called = true;
+        $bar = $this->debugBar();
+        $bar['time']->stopMeasure('dispatch');
+        $bar['time']->startMeasure('controller', 'Controller');
+        $called = true;
     }
 
     public function Gdn_PluginManager_AfterStart_Handler($sender) {
@@ -115,6 +113,4 @@ class DebugbarPlugin extends Gdn_Plugin {
             $db->addCollector($this->debugBar());
         }
     }
-
-
 }
