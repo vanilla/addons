@@ -27,11 +27,14 @@ $PluginInfo['debugbar'] = array(
 );
 
 // Install the debugger database.
-$tmp = Gdn::FactoryOverwrite(TRUE);
-Gdn::FactoryInstall(Gdn::AliasDatabase, 'DatabaseDebugbar', __DIR__.'/class.databasedebugbar.php', Gdn::FactorySingleton, array('Database'));
-Gdn::FactoryOverwrite($tmp);
+$tmp = Gdn::factoryOverwrite(true);
+Gdn::factoryInstall(Gdn::AliasDatabase, 'DatabaseDebugbar', __DIR__.'/class.databasedebugbar.php', Gdn::FactorySingleton, array('Database'));
+Gdn::factoryOverwrite($tmp);
 unset($tmp);
 
+/**
+ * Handles integration of the [PHP Debug Bar](http://phpdebugbar.com/) with Vanilla.
+ */
 class DebugbarPlugin extends Gdn_Plugin {
     /// Properties ///
 
@@ -42,12 +45,17 @@ class DebugbarPlugin extends Gdn_Plugin {
 
     /// Methods ///
 
+    /**
+     * Initialize a new instance of the {@link \DebugBarPlugin} class.
+     */
     public function __construct() {
         parent::__construct();
         require_once __DIR__.'/vendor/autoload.php';
     }
 
     /**
+     * Get the debug bar for the application.
+     *
      * @return \DebugBar\DebugBar Returns the debug bar instance.
      */
     public function debugBar() {
@@ -58,33 +66,45 @@ class DebugbarPlugin extends Gdn_Plugin {
         return $this->debugBar;
     }
 
+    /**
+     * Get the javascript script includer for the debug bar.
+     *
+     * @return \DebugBar\JavascriptRenderer Returns the javascript script includer for the debug bar.
+     */
     public function jsRenderer() {
-        $baseurl = Gdn::Request()->WebRoot().'/plugins/debugbar/vendor/maximebf/debugbar/src/DebugBar/Resources';
+        $baseurl = Gdn::request()->assetRoot().'/plugins/debugbar/vendor/maximebf/debugbar/src/DebugBar/Resources';
         return $this->debugBar()->getJavascriptRenderer($baseurl);
     }
 
     /// Event Handlers ///
 
-    public function Base_AfterBody_Handler($sender) {
+    /**
+     * Add the debug bar's javascript after the body.
+     */
+    public function base_afterBody_handler() {
         $body = $this->jsRenderer()->render();
         echo $body;
     }
 
     /**
-     * @param Gdn_Controller $sender
+     * Finish off the controller timing and add the debug bar asset to the page.
+     *
+     * @param Gdn_Controller $sender The event sender.
      */
-    public function Base_Render_Before($sender) {
+    public function base_render_before($sender) {
         static $called = false;
 
-        if ($called)
+        if ($called) {
             return;
+        }
 
         $bar = $this->debugBar();
         $bar['time']->stopMeasure('controller');
         $bar['time']->startMeasure('render', 'Render');
 
-        if (!$sender->Head)
+        if (!$sender->Head) {
             return;
+        }
 
         $head = $this->jsRenderer()->renderHead();
 
@@ -92,11 +112,15 @@ class DebugbarPlugin extends Gdn_Plugin {
         $called = true;
     }
 
-    public function Gdn_Dispatcher_BeforeControllerMethod_Handler($sender) {
+    /**
+     * Start the timing of the controller method.
+     */
+    public function gdn_dispatcher_beforeControllerMethod_handler() {
         static $called = false;
 
-        if ($called)
+        if ($called) {
             return;
+        }
 
         $bar = $this->debugBar();
         $bar['time']->stopMeasure('dispatch');
@@ -104,11 +128,14 @@ class DebugbarPlugin extends Gdn_Plugin {
         $called = true;
     }
 
-    public function Gdn_PluginManager_AfterStart_Handler($sender) {
+    /**
+     * Start the debug bar timings as soon as possible.
+     */
+    public function gdn_pluginManager_afterStart_handler() {
         $bar = $this->debugBar();
         $bar['time']->startMeasure('dispatch', 'Dispatch');
 
-        $db = Gdn::Database();
+        $db = Gdn::database();
         if (method_exists($db, 'addCollector')) {
             $db->addCollector($this->debugBar());
         }
