@@ -30,7 +30,7 @@ class OpenHandler
 
     /**
      * Handles the current request
-     * 
+     *
      * @param array $request Request data
      */
     public function handle($request = null, $echo = true, $sendHeader = true)
@@ -49,10 +49,10 @@ class OpenHandler
 
         if ($sendHeader) {
             $this->debugBar->getHttpDriver()->setHeaders(array(
-                    'Content-Type'=> 'application/json'
+                    'Content-Type' => 'application/json'
                 ));
         }
-        
+
         $response = json_encode(call_user_func(array($this, $op), $request));
         if ($echo) {
             echo $response;

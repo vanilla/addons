@@ -22,7 +22,8 @@ class RedisStorage implements StorageInterface
     protected $hash;
 
     /**
-     * @param string $dirname Directories where to store files
+     * @param  \Predis\Client $redis Redis Client
+     * @param  string $hash
      */
     public function __construct(Client $redis, $hash = 'phpdebugbar')
     {
@@ -31,7 +32,7 @@ class RedisStorage implements StorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function save($id, $data)
     {
@@ -39,7 +40,7 @@ class RedisStorage implements StorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function get($id)
     {
@@ -47,7 +48,7 @@ class RedisStorage implements StorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function find(array $filters = array(), $max = 20, $offset = 0)
     {
@@ -55,7 +56,7 @@ class RedisStorage implements StorageInterface
         foreach ($this->redis->hgetall($this->hash) as $id => $data) {
             if ($data = unserialize($data)) {
                 $meta = $data['__meta'];
-                if (array_keys(array_intersect($meta, $filters)) == array_keys($filters)) {
+                if ($this->filter($meta, $filters)) {
                     $results[] = $meta;
                 }
             }
@@ -64,7 +65,20 @@ class RedisStorage implements StorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Filter the metadata for matches.
+     */
+    protected function filter($meta, $filters)
+    {
+        foreach ($filters as $key => $value) {
+            if (!isset($meta[$key]) || fnmatch($value, $meta[$key]) === false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function clear()
     {

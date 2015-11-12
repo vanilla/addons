@@ -26,7 +26,7 @@ class FileStorage implements StorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function save($id, $data)
     {
@@ -37,7 +37,7 @@ class FileStorage implements StorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function get($id)
     {
@@ -45,7 +45,7 @@ class FileStorage implements StorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function find(array $filters = array(), $max = 20, $offset = 0)
     {
@@ -61,7 +61,7 @@ class FileStorage implements StorageInterface
         }
 
         //Sort the files, newest first
-        usort($files, function($a, $b) {
+        usort($files, function ($a, $b) {
                 return $a['time'] < $b['time'];
             });
 
@@ -70,17 +70,17 @@ class FileStorage implements StorageInterface
         $i = 0;
         foreach ($files as $file) {
             //When filter is empty, skip loading the offset
-            if($i++ < $offset && empty($filters)){
+            if ($i++ < $offset && empty($filters)) {
                 $results[] = null;
                 continue;
             }
             $data = $this->get($file['id']);
             $meta = $data['__meta'];
             unset($data);
-            if (array_keys(array_intersect($meta, $filters)) == array_keys($filters)) {
+            if ($this->filter($meta, $filters)) {
                 $results[] = $meta;
             }
-            if(count($results) >= ($max + $offset)){
+            if (count($results) >= ($max + $offset)) {
                 break;
             }
         }
@@ -89,7 +89,24 @@ class FileStorage implements StorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Filter the metadata for matches.
+     * 
+     * @param  array $meta
+     * @param  array $filters
+     * @return bool
+     */
+    protected function filter($meta, $filters)
+    {
+        foreach ($filters as $key => $value) {
+            if (!isset($meta[$key]) || fnmatch($value, $meta[$key]) === false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -100,6 +117,10 @@ class FileStorage implements StorageInterface
         }
     }
 
+    /**
+     * @param  string $id
+     * @return string 
+     */
     public function makeFilename($id)
     {
         return $this->dirname . basename($id). ".json";

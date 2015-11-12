@@ -18,20 +18,34 @@ use Exception;
 class ExceptionsCollector extends DataCollector implements Renderable
 {
     protected $exceptions = array();
+    protected $chainExceptions = false;
 
     /**
      * Adds an exception to be profiled in the debug bar
-     * 
+     *
      * @param Exception $e
      */
     public function addException(Exception $e)
     {
         $this->exceptions[] = $e;
+        if ($this->chainExceptions && $previous = $e->getPrevious()) {
+            $this->addException($previous);
+        }
+    }
+
+    /**
+     * Configure whether or not all chained exceptions should be shown.
+     *
+     * @param bool $chainExceptions
+     */
+    public function setChainExceptions($chainExceptions = true)
+    {
+        $this->chainExceptions = $chainExceptions;
     }
 
     /**
      * Returns the list of exceptions being profiled
-     * 
+     *
      * @return array[Exception]
      */
     public function getExceptions()
@@ -39,9 +53,6 @@ class ExceptionsCollector extends DataCollector implements Renderable
         return $this->exceptions;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function collect()
     {
         return array(
@@ -52,37 +63,36 @@ class ExceptionsCollector extends DataCollector implements Renderable
 
     /**
      * Returns exception data as an array
-     * 
+     *
      * @param Exception $e
      * @return array
      */
     public function formatExceptionData(Exception $e)
     {
-        $lines = file($e->getFile());
-        $start = $e->getLine() - 4;
-        $lines = array_slice($lines, $start < 0 ? 0 : $start, 7);
+        $filePath = $e->getFile();
+        if ($filePath && file_exists($filePath)) {
+            $lines = file($filePath);
+            $start = $e->getLine() - 4;
+            $lines = array_slice($lines, $start < 0 ? 0 : $start, 7);
+        } else {
+            $lines = array("Cannot open the file ($filePath) in which the exception occurred ");
+        }
 
         return array(
             'type' => get_class($e),
             'message' => $e->getMessage(),
             'code' => $e->getCode(),
-            'file' => $e->getFile(),
+            'file' => $filePath,
             'line' => $e->getLine(),
             'surrounding_lines' => $lines
         );
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
     public function getName()
     {
         return 'exceptions';
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getWidgets()
     {
         return array(

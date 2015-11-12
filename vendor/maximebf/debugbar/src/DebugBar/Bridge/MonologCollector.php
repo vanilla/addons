@@ -10,11 +10,11 @@
 
 namespace DebugBar\Bridge;
 
-use Monolog\Logger;
-use Monolog\Handler\AbstractProcessingHandler;
 use DebugBar\DataCollector\DataCollectorInterface;
-use DebugBar\DataCollector\Renderable;
 use DebugBar\DataCollector\MessagesAggregateInterface;
+use DebugBar\DataCollector\Renderable;
+use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Logger;
 
 /**
  * A monolog handler as well as a data collector
@@ -48,7 +48,7 @@ class MonologCollector extends AbstractProcessingHandler implements DataCollecto
 
     /**
      * Adds logger which messages you want to log
-     * 
+     *
      * @param Logger $logger
      */
     public function addLogger(Logger $logger)
@@ -56,9 +56,6 @@ class MonologCollector extends AbstractProcessingHandler implements DataCollecto
         $logger->pushHandler($this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function write(array $record)
     {
         $this->records[] = array(
@@ -69,17 +66,11 @@ class MonologCollector extends AbstractProcessingHandler implements DataCollecto
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getMessages()
     {
         return $this->records;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function collect()
     {
         return array(
@@ -88,17 +79,11 @@ class MonologCollector extends AbstractProcessingHandler implements DataCollecto
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getWidgets()
     {
         $name = $this->getName();

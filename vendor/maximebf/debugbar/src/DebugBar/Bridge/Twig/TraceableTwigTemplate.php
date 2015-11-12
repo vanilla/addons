@@ -10,8 +10,8 @@
 
 namespace DebugBar\Bridge\Twig;
 
-use Twig_TemplateInterface;
 use Twig_Template;
+use Twig_TemplateInterface;
 
 /**
  * Wraps a Twig_Template to add profiling features
@@ -30,97 +30,66 @@ class TraceableTwigTemplate implements Twig_TemplateInterface
         $this->template = $template;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    public function __call($name, $arguments)
+    {
+        return call_user_func_array(array($this->template, $name), $arguments);
+    }
+
     public function getTemplateName()
     {
         return $this->template->getTemplateName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getEnvironment()
     {
         return $this->template->getEnvironment();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getParent(array $context)
     {
         return $this->template->getParent($context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function isTraitable()
     {
         return $this->template->isTraitable();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function displayParentBlock($name, array $context, array $blocks = array())
     {
         $this->template->displayParentBlock($name, $context, $blocks);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function displayBlock($name, array $context, array $blocks = array())
+    public function displayBlock($name, array $context, array $blocks = array(), $useBlocks = true)
     {
-        $this->template->displayBlock($name, $context, $blocks);
+        $this->template->displayBlock($name, $context, $blocks, $useBlocks);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function renderParentBlock($name, array $context, array $blocks = array())
     {
         return $this->template->renderParentBlock($name, $context, $blocks);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function renderBlock($name, array $context, array $blocks = array())
+    public function renderBlock($name, array $context, array $blocks = array(), $useBlocks = true)
     {
-        return $this->template->renderBlock($name, $context, $blocks);
+        return $this->template->renderBlock($name, $context, $blocks, $useBlocks);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function hasBlock($name)
     {
         return $this->template->hasBlock($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getBlockNames()
     {
         return $this->template->getBlockNames();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getBlocks()
     {
         return $this->template->getBlocks();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function display(array $context, array $blocks = array())
     {
         $start = microtime(true);
@@ -138,9 +107,6 @@ class TraceableTwigTemplate implements Twig_TemplateInterface
         ));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function render(array $context)
     {
         $level = ob_get_level();
@@ -158,11 +124,8 @@ class TraceableTwigTemplate implements Twig_TemplateInterface
         return ob_get_clean();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function clearCache()
     {
-        $this->template->clearCache();
+        Twig_Template::clearCache();
     }
 }

@@ -22,14 +22,15 @@ class PdoStorage implements StorageInterface
     protected $tableName;
 
     protected $sqlQueries = array(
-        'save' => "INSERT INTO %tablename% (id, data, meta_utime, meta_datetime, meta_uri, meta_ip) VALUES (?, ?, ?, ?, ?, ?)",
+        'save' => "INSERT INTO %tablename% (id, data, meta_utime, meta_datetime, meta_uri, meta_ip, meta_method) VALUES (?, ?, ?, ?, ?, ?, ?)",
         'get' => "SELECT data FROM %tablename% WHERE id = ?",
-        'find' => "SELECT data FROM %tablename% %where% LIMIT %limit% OFFSET %offset%",
+        'find' => "SELECT data FROM %tablename% %where% ORDER BY meta_datetime DESC LIMIT %limit% OFFSET %offset%",
         'clear' => "DELETE FROM %tablename%"
     );
 
     /**
-     * @param string $dirname Directories where to store files
+     * @param \PDO $pdo The PDO instance
+     * @param string $tableName
      * @param array $sqlQueries
      */
     public function __construct(PDO $pdo, $tableName = 'phpdebugbar', array $sqlQueries = array())
@@ -41,7 +42,7 @@ class PdoStorage implements StorageInterface
 
     /**
      * Sets the sql queries to be used
-     * 
+     *
      * @param array $queries
      */
     public function setSqlQueries(array $queries)
@@ -50,18 +51,18 @@ class PdoStorage implements StorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function save($id, $data)
     {
         $sql = $this->getSqlQuery('save');
         $stmt = $this->pdo->prepare($sql);
         $meta = $data['__meta'];
-        $stmt->execute(array($id, serialize($data), $meta['utime'], $meta['datetime'], $meta['uri'], $meta['ip']));
+        $stmt->execute(array($id, serialize($data), $meta['utime'], $meta['datetime'], $meta['uri'], $meta['ip'], $meta['method']));
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function get($id)
     {
@@ -73,9 +74,9 @@ class PdoStorage implements StorageInterface
         }
         return null;
     }
-    
+
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function find(array $filters = array(), $max = 20, $offset = 0)
     {
@@ -110,13 +111,20 @@ class PdoStorage implements StorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function clear()
     {
         $this->pdo->exec($this->getSqlQuery('clear'));
     }
 
+    /**
+     * Get a SQL Query for a task, with the variables replaced
+     *
+     * @param  string $name
+     * @param  array  $vars
+     * @return string
+     */
     protected function getSqlQuery($name, array $vars = array())
     {
         $sql = $this->sqlQueries[$name];

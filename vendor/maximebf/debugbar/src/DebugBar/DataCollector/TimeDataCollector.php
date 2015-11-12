@@ -18,12 +18,24 @@ use DebugBar\DebugBarException;
  */
 class TimeDataCollector extends DataCollector implements Renderable
 {
+    /**
+     * @var float
+     */
     protected $requestStartTime;
 
+    /**
+     * @var float
+     */
     protected $requestEndTime;
 
+    /**
+     * @var array
+     */
     protected $startedMeasures = array();
 
+    /**
+     * @var array
+     */
     protected $measures = array();
 
     /**
@@ -43,42 +55,65 @@ class TimeDataCollector extends DataCollector implements Renderable
 
     /**
      * Starts a measure
-     * 
+     *
      * @param string $name Internal name, used to stop the measure
-     * @param string $label Public name
+     * @param string|null $label Public name
+     * @param string|null $collector The source of the collector
      */
-    public function startMeasure($name, $label = null)
+    public function startMeasure($name, $label = null, $collector = null)
     {
         $start = microtime(true);
         $this->startedMeasures[$name] = array(
             'label' => $label ?: $name,
-            'start' => $start
+            'start' => $start,
+            'collector' => $collector
         );
     }
 
     /**
-     * Stops a measure
-     * 
+     * Check a measure exists
+     *
      * @param string $name
+     * @return bool
      */
-    public function stopMeasure($name)
+    public function hasStartedMeasure($name)
+    {
+        return isset($this->startedMeasures[$name]);
+    }
+
+    /**
+     * Stops a measure
+     *
+     * @param string $name
+     * @param array $params
+     * @throws DebugBarException
+     */
+    public function stopMeasure($name, $params = array())
     {
         $end = microtime(true);
-        if (!isset($this->startedMeasures[$name])) {
+        if (!$this->hasStartedMeasure($name)) {
             throw new DebugBarException("Failed stopping measure '$name' because it hasn't been started");
         }
-        $this->addMeasure($this->startedMeasures[$name]['label'], $this->startedMeasures[$name]['start'], $end);
+        $this->addMeasure(
+            $this->startedMeasures[$name]['label'],
+            $this->startedMeasures[$name]['start'],
+            $end,
+            $params,
+            $this->startedMeasures[$name]['collector']
+        );
         unset($this->startedMeasures[$name]);
     }
 
     /**
      * Adds a measure
-     * 
+     *
      * @param string $label
      * @param float $start
      * @param float $end
+     * @param array $params
+     * @param string|null $collector
      */
-    public function addMeasure($label, $start, $end)
+    public function addMeasure($label, $start, $end, $params = array(), $collector = null)
     {
         $this->measures[] = array(
             'label' => $label,
@@ -87,7 +122,9 @@ class TimeDataCollector extends DataCollector implements Renderable
             'end' => $end,
             'relative_end' => $end - $this->requestEndTime,
             'duration' => $end - $start,
-            'duration_str' => $this->formatDuration($end - $start)
+            'duration_str' => $this->getDataFormatter()->formatDuration($end - $start),
+            'params' => $params,
+            'collector' => $collector
         );
     }
 
@@ -95,19 +132,21 @@ class TimeDataCollector extends DataCollector implements Renderable
      * Utility function to measure the execution of a Closure
      *
      * @param string $label
-     * @param Closure $closure
+     * @param \Closure $closure
+     * @param string|null $collector
      */
-    public function measure($label, \Closure $closure)
+    public function measure($label, \Closure $closure, $collector = null)
     {
         $name = spl_object_hash($closure);
-        $this->startMeasure($name, $label);
-        $closure();
-        $this->stopMeasure($name);
+        $this->startMeasure($name, $label, $collector);
+        $result = $closure();
+        $params = is_array($result) ? $result : array();
+        $this->stopMeasure($name, $params);
     }
 
     /**
      * Returns an array of all measures
-     * 
+     *
      * @return array
      */
     public function getMeasures()
@@ -117,7 +156,7 @@ class TimeDataCollector extends DataCollector implements Renderable
 
     /**
      * Returns the request start time
-     * 
+     *
      * @return float
      */
     public function getRequestStartTime()
@@ -127,7 +166,7 @@ class TimeDataCollector extends DataCollector implements Renderable
 
     /**
      * Returns the request end time
-     * 
+     *
      * @return float
      */
     public function getRequestEndTime()
@@ -137,7 +176,7 @@ class TimeDataCollector extends DataCollector implements Renderable
 
     /**
      * Returns the duration of a request
-     * 
+     *
      * @return float
      */
     public function getRequestDuration()
@@ -148,9 +187,6 @@ class TimeDataCollector extends DataCollector implements Renderable
         return microtime(true) - $this->requestStartTime;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function collect()
     {
         $this->requestEndTime = microtime(true);
@@ -162,22 +198,16 @@ class TimeDataCollector extends DataCollector implements Renderable
             'start' => $this->requestStartTime,
             'end' => $this->requestEndTime,
             'duration' => $this->getRequestDuration(),
-            'duration_str' => $this->formatDuration($this->getRequestDuration()),
+            'duration_str' => $this->getDataFormatter()->formatDuration($this->getRequestDuration()),
             'measures' => array_values($this->measures)
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return 'time';
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getWidgets()
     {
         return array(

@@ -19,7 +19,7 @@ class MemoryCollector extends DataCollector implements Renderable
 
     /**
      * Returns the peak memory usage
-     * 
+     *
      * @return integer
      */
     public function getPeakUsage()
@@ -35,29 +35,20 @@ class MemoryCollector extends DataCollector implements Renderable
         $this->peakUsage = memory_get_peak_usage(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function collect()
     {
         $this->updatePeakUsage();
         return array(
             'peak_usage' => $this->peakUsage,
-            'peak_usage_str' => $this->formatBytes($this->peakUsage)
+            'peak_usage_str' => $this->getDataFormatter()->formatBytes($this->peakUsage)
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return 'memory';
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getWidgets()
     {
         return array(

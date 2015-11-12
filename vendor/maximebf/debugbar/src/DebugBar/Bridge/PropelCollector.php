@@ -10,14 +10,15 @@
 
 namespace DebugBar\Bridge;
 
-use Propel;
-use PropelPDO;
-use PropelConfiguration;
 use BasicLogger;
+use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
-use Psr\Log\LoggerInterface;
+use Propel;
+use PropelConfiguration;
+use PropelPDO;
 use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 
 /**
  * A Propel logger which acts as a data collector
@@ -33,7 +34,7 @@ use Psr\Log\LogLevel;
  * PropelCollector::enablePropelProfiling();
  * </code>
  */
-class PropelCollector extends DataCollector implements BasicLogger, Renderable
+class PropelCollector extends DataCollector implements BasicLogger, Renderable, AssetProvider
 {
     protected $logger;
 
@@ -95,73 +96,46 @@ class PropelCollector extends DataCollector implements BasicLogger, Renderable
         return $this->logQueriesToLogger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function emergency($m)
     {
         $this->log($m, Propel::LOG_EMERG);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function alert($m)
     {
         $this->log($m, Propel::LOG_ALERT);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function crit($m)
     {
         $this->log($m, Propel::LOG_CRIT);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function err($m)
     {
         $this->log($m, Propel::LOG_ERR);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function warning($m)
     {
         $this->log($m, Propel::LOG_WARNING);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function notice($m)
     {
         $this->log($m, Propel::LOG_NOTICE);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function info($m)
     {
         $this->log($m, Propel::LOG_INFO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function debug($m)
     {
         $this->log($m, Propel::LOG_DEBUG);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function log($message, $severity = null)
     {
         if (strpos($message, 'DebugPDOStatement::execute') !== false) {
@@ -179,7 +153,7 @@ class PropelCollector extends DataCollector implements BasicLogger, Renderable
 
     /**
      * Converts Propel log levels to PSR log levels
-     * 
+     *
      * @param int $level
      * @return string
      */
@@ -199,7 +173,7 @@ class PropelCollector extends DataCollector implements BasicLogger, Renderable
 
     /**
      * Parse a log line to extract query information
-     * 
+     *
      * @param string $message
      */
     protected function parseAndLogSqlQuery($message)
@@ -217,7 +191,7 @@ class PropelCollector extends DataCollector implements BasicLogger, Renderable
             $memory = (float) $matches[1];
             if ($matches[2] == 'KB') {
                 $memory *= 1024;
-            } else if ($matches[2] == 'MB') {
+            } elseif ($matches[2] == 'MB') {
                 $memory *= 1024 * 1024;
             }
         }
@@ -235,9 +209,6 @@ class PropelCollector extends DataCollector implements BasicLogger, Renderable
         return array($sql, $this->formatDuration($duration));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function collect()
     {
         return array(
@@ -251,17 +222,11 @@ class PropelCollector extends DataCollector implements BasicLogger, Renderable
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return 'propel';
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getWidgets()
     {
         return array(
@@ -275,6 +240,14 @@ class PropelCollector extends DataCollector implements BasicLogger, Renderable
                 "map" => "propel.nb_statements",
                 "default" => 0
             )
+        );
+    }
+
+    public function getAssets()
+    {
+        return array(
+            'css' => 'widgets/sqlqueries/widget.css',
+            'js' => 'widgets/sqlqueries/widget.js'
         );
     }
 }
