@@ -8,6 +8,9 @@
        { "name": "Todd Burry", "email": "todd@vanillaforums.com", "role": "Developer" }
    ],
    "autoload": {
+      "files": [
+         "class.loggercollector.php"
+      ]
    },
    "require": {
        "php": ">=5.3.0",

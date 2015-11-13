@@ -1,11 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e0b78551ec61928bee284b6c441f6680",
-    "content-hash": "e5250995f2b16bc920ce31008267d243",
+    "hash": "d5cc779a52e444bc5101574e8a95a92f",
     "packages": [
         {
             "name": "maximebf/debugbar",

@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     $vendorDir . '/symfony/var-dumper/Resources/functions/dump.php',
+    $baseDir . '/class.loggercollector.php',
 );
