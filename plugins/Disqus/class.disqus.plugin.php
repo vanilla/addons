@@ -1,16 +1,15 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2008-2015 Vanilla Forums Inc.
+ * @license GNU GPLv2
  */
 
-// Define the plugin:
 $PluginInfo['Disqus'] = array(
     'Name' => 'Disqus Sign In',
     'Description' => 'Users may sign into your site using their Disqus account. <b>You must <a href="https://disqus.com/api/applications/register/">register your application with Disqus</a> for this plugin to work.</b>',
-    'Version' => '1.1',
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'MobileFriendly' => TRUE,
+    'Version' => '1.2',
+    'RequiredApplications' => array('Vanilla' => '2.1'),
+    'MobileFriendly' => true,
     'SettingsUrl' => '/dashboard/settings/disqus',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Todd Burry",
@@ -18,39 +17,63 @@ $PluginInfo['Disqus'] = array(
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
 );
 
+/**
+ * Class DisqusPlugin.
+ */
 class DisqusPlugin extends Gdn_Plugin {
-    /* Properties */
 
-    protected $_Provider = NULL;
-    protected $_RedirectUri = NULL;
+    /** @var null  */
+    protected $_Provider = null;
 
-    /* Methods */
+    /** @var null  */
+    protected $_RedirectUri = null;
 
-    public function AccessToken() {
-        $Token = GetValue('fb_access_token', $_COOKIE);
+    /**
+     *
+     *
+     * @return mixed
+     */
+    public function accessToken() {
+        $Token = val('fb_access_token', $_COOKIE);
         return $Token;
     }
 
-    public function Authorize($Query = FALSE) {
-        $Uri = $this->AuthorizeUri($Query);
-        Redirect($Uri);
+    /**
+     *
+     *
+     * @param bool $Query
+     */
+    public function authorize($Query = false) {
+        $Uri = $this->authorizeUri($Query);
+        redirect($Uri);
     }
 
-    public function Provider() {
-        if ($this->_Provider === NULL) {
-            $this->_Provider = Gdn_AuthenticationProviderModel::GetProviderByScheme('disqus');
+    /**
+     *
+     *
+     * @return array|bool|null|stdClass
+     */
+    public function provider() {
+        if ($this->_Provider === null) {
+            $this->_Provider = Gdn_AuthenticationProviderModel::getProviderByScheme('disqus');
         }
 
         return $this->_Provider;
     }
 
-    public function AuthorizeUri($Query = FALSE) {
-        $Provider = $this->Provider();
+    /**
+     *
+     *
+     * @param bool $Query
+     * @return string
+     */
+    public function authorizeUri($Query = FALSE) {
+        $Provider = $this->provider();
         if (!$Provider) {
             return '';
         }
 
-        $RedirectUri = $this->RedirectUri();
+        $RedirectUri = $this->redirectUri();
         if ($Query) {
             $RedirectUri .= '&'.$Query;
         }
@@ -62,30 +85,37 @@ class DisqusPlugin extends Gdn_Plugin {
             'redirect_uri' => $RedirectUri);
 
         $SigninHref = 'https://disqus.com/api/oauth/2.0/authorize/?'.http_build_query($Qs);
+
         return $SigninHref;
     }
 
-    public function RedirectUri($NewValue = NULL) {
-        if ($NewValue !== NULL)
+    /**
+     *
+     *
+     * @param null $NewValue
+     * @return null|string
+     */
+    public function redirectUri($NewValue = null) {
+        if ($NewValue !== null)
             $this->_RedirectUri = $NewValue;
-        elseif ($this->_RedirectUri === NULL) {
-            $RedirectUri = Url('/entry/connect/disqus', TRUE);
-            if (strpos($RedirectUri, '=') !== FALSE) {
+        elseif ($this->_RedirectUri === null) {
+            $RedirectUri = Url('/entry/connect/disqus', true);
+            if (strpos($RedirectUri, '=') !== false) {
                 $p = strrchr($RedirectUri, '=');
                 $Uri = substr($RedirectUri, 0, -strlen($p));
                 $p = urlencode(ltrim($p, '='));
                 $RedirectUri = $Uri.'='.$p;
             }
 
-            $Path = Gdn::Request()->Path();
+            $Path = Gdn::request()->path();
 
-            $Target = GetValue('Target', $_GET, $Path ? $Path : '/');
+            $Target = val('Target', $_GET, $Path ? $Path : '/');
             if (ltrim($Target, '/') == 'entry/signin' || empty($Target))
                 $Target = '/';
             $Args = array('Target' => $Target);
 
 
-            $RedirectUri .= strpos($RedirectUri, '?') === FALSE ? '?' : '&';
+            $RedirectUri .= strpos($RedirectUri, '?') === false ? '?' : '&';
             $RedirectUri .= http_build_query($Args);
             $this->_RedirectUri = $RedirectUri;
         }
@@ -93,128 +123,157 @@ class DisqusPlugin extends Gdn_Plugin {
         return $this->_RedirectUri;
     }
 
-    public function Setup() {
+    /**
+     *
+     *
+     * @throws Gdn_UserException
+     */
+    public function setup() {
         $Error = '';
         if (!function_exists('curl_init')) {
-            $Error = ConcatSep("\n", $Error, 'This plugin requires curl.');
+            $Error = concatSep("\n", $Error, 'This plugin requires curl.');
         }
         if ($Error) {
             throw new Gdn_UserException($Error, 400);
         }
     }
 
-    private function _GetButton() {
-        $Url = $this->AuthorizeUri();
-        return SocialSigninButton('Disqus', $Url, 'icon');
+    /**
+     *
+     *
+     * @return string
+     */
+    private function _getButton() {
+        $Url = $this->authorizeUri();
+        return socialSigninButton('Disqus', $Url, 'icon');
     }
-
-    /* Events */
 
     /**
      * @param Gdn_Controller $Sender
      */
-    public function EntryController_SignIn_Handler($Sender, $Args) {
-        $Provider = $this->Provider();
+    public function entryController_signIn_handler($Sender, $Args) {
+        $Provider = $this->provider();
         if (!$Provider) {
             return;
         }
 
         if (isset($Sender->Data['Methods'])) {
-            $Url = $this->AuthorizeUri();
+            $Url = $this->authorizeUri();
 
             // Add the Disqus method to the controller.
             $Method = array(
                 'Name' => 'Disqus',
-                'SignInHtml' => SocialSigninButton('Disqus', $Url, 'button')
+                'SignInHtml' => socialSigninButton('Disqus', $Url, 'button')
             );
             $Sender->Data['Methods'][] = $Method;
         }
     }
 
-    public function Base_SignInIcons_Handler($Sender, $Args) {
-        $Provider = $this->Provider();
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function base_signInIcons_handler($Sender, $Args) {
+        $Provider = $this->provider();
         if (!$Provider) {
             return;
         }
 
-        echo "\n".$this->_GetButton();
+        echo "\n".$this->_getButton();
     }
 
-    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
-        $Provider = $this->Provider();
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function base_beforeSignInButton_handler($Sender, $Args) {
+        $Provider = $this->provider();
         if (!$Provider) {
             return;
         }
 
-        echo "\n".$this->_GetButton();
+        echo "\n".$this->_getButton();
     }
 
-    public function Base_BeforeSignInLink_Handler($Sender) {
-        $Provider = $this->Provider();
+    /**
+     *
+     *
+     * @param $Sender
+     */
+    public function base_beforeSignInLink_handler($Sender) {
+        $Provider = $this->provider();
         if (!$Provider) {
             return;
         }
 
-        if (!Gdn::Session()->IsValid()) {
-            echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect DisqusConnect'));
+        if (!Gdn::session()->isValid()) {
+            echo "\n".wrap($this->_getButton(), 'li', array('class' => 'Connect DisqusConnect'));
         }
     }
 
     /**
+     *
+     *
      * @param SettingsController $Sender
      * @param type $Args
      */
-    public function SettingsController_Disqus_Create($Sender, $Args) {
-        $Sender->Permission('Garden.Settings.Manage');
+    public function settingsController_disqus_create($Sender, $Args) {
+        $Sender->permission('Garden.Settings.Manage');
 
-        if ($Sender->Form->AuthenticatedPostBack()) {
+        if ($Sender->Form->authenticatedPostBack()) {
             $Model = new Gdn_AuthenticationProviderModel();
-            $Sender->Form->SetFormValue(Gdn_AuthenticationProviderModel::COLUMN_ALIAS, 'disqus');
-            $Sender->Form->SetFormValue(Gdn_AuthenticationProviderModel::COLUMN_NAME, 'Disqus');
-            $Sender->Form->SetModel($Model);
+            $Sender->Form->setFormValue(Gdn_AuthenticationProviderModel::COLUMN_ALIAS, 'disqus');
+            $Sender->Form->setFormValue(Gdn_AuthenticationProviderModel::COLUMN_NAME, 'Disqus');
+            $Sender->Form->setModel($Model);
 
-            if ($Sender->Form->Save(array('PK' => Gdn_AuthenticationProviderModel::COLUMN_ALIAS))) {
-                $Sender->InformMessage(T("Your settings have been saved."));
+            if ($Sender->Form->save(array('PK' => Gdn_AuthenticationProviderModel::COLUMN_ALIAS))) {
+                $Sender->informMessage(t("Your settings have been saved."));
             }
         } else {
-            $Provider = (array)$this->Provider();
-            $Sender->Form->SetData($Provider);
+            $Provider = (array)$this->provider();
+            $Sender->Form->setData($Provider);
         }
 
-        $Sender->AddSideMenu();
-        $Sender->SetData('Title', sprintf(t('%s Settings'), 'Disqus'));
-        $Sender->Render('Settings', '', 'plugins/Disqus');
+        $Sender->addSideMenu();
+        $Sender->setData('Title', sprintf(t('%s Settings'), 'Disqus'));
+        $Sender->render('Settings', '', 'plugins/Disqus');
     }
 
     /**
+     *
+     *
      * @param EntryController $Sender
      * @param array $Args
      */
-    public function Base_ConnectData_Handler($Sender, $Args) {
-        if (GetValue(0, $Args) != 'disqus') {
+    public function base_connectData_handler($Sender, $Args) {
+        if (val(0, $Args) != 'disqus') {
             return;
         }
 
         if (isset($_GET['error'])) {
-            throw new Gdn_UserException(GetValue('error_description', $_GET, T('There was an error connecting to Disqus')));
+            throw new Gdn_UserException(val('error_description', $_GET, t('There was an error connecting to Disqus')));
         }
 
-        $Provider = $this->Provider();
+        $Provider = $this->provider();
         if (!$Provider) {
             throw new Gdn_UserException('The Disqus plugin has not been configured correctly.');
         }
         $AppID = $Provider['AuthenticationKey'];
         $Secret = $Provider['AssociationSecret'];
-        $Code = GetValue('code', $_GET);
+        $Code = val('code', $_GET);
         $Query = '';
-        if ($Sender->Request->Get('display')) {
-            $Query = 'display='.urlencode($Sender->Request->Get('display'));
+        if ($Sender->Request->get('display')) {
+            $Query = 'display='.urlencode($Sender->Request->get('display'));
         }
 
-        $RedirectUri = ConcatSep('&', $this->RedirectUri(), $Query);
+        $RedirectUri = concatSep('&', $this->redirectUri(), $Query);
         $Form = $Sender->Form;
 
-        $AccessToken = $Form->GetFormValue('AccessToken'); //Gdn::Session()->Stash('Disqus.AccessToken', NULL, NULL);
+        $AccessToken = $Form->getFormValue('AccessToken'); //Gdn::Session()->Stash('Disqus.AccessToken', NULL, NULL);
 
         // Get the access token.
         if ($Code && !$AccessToken) {
@@ -231,27 +290,27 @@ class DisqusPlugin extends Gdn_Plugin {
 
             // Get the redirect URI.
             $C = curl_init();
-            curl_setopt($C, CURLOPT_POST, TRUE);
+            curl_setopt($C, CURLOPT_POST, true);
             curl_setopt($C, CURLOPT_POSTFIELDS, $Qs);
-            curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
-            curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($C, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($C, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($C, CURLOPT_URL, $Url);
             $Contents = curl_exec($C);
             $Info = curl_getinfo($C);
 
-            if (strpos(GetValue('content_type', $Info, ''), '/json') !== FALSE) {
-                $Tokens = json_decode($Contents, TRUE);
+            if (strpos(val('content_type', $Info, ''), '/json') !== false) {
+                $Tokens = json_decode($Contents, true);
             } else {
                 parse_str($Contents, $Tokens);
             }
 
-            if (GetValue('error', $Tokens)) {
-                throw new Gdn_UserException('Disqus returned the following error: '.GetValueR('error.message', $Tokens, 'Unknown error.'), 400);
+            if (val('error', $Tokens)) {
+                throw new Gdn_UserException('Disqus returned the following error: '.valr('error.message', $Tokens, 'Unknown error.'), 400);
             }
 
-            $AccessToken = GetValue('access_token', $Tokens);
-            $Expires = GetValue('expires_in', $Tokens, NULL);
-            $Form->AddHidden('AccessToken', $AccessToken);
+            $AccessToken = val('access_token', $Tokens);
+            $Expires = val('expires_in', $Tokens, null);
+            $Form->addHidden('AccessToken', $AccessToken);
         }
 
         if ($AccessToken) {
@@ -264,14 +323,14 @@ class DisqusPlugin extends Gdn_Plugin {
 
             $Url = 'https://disqus.com/api/3.0/users/details.json?'.http_build_query($Qs);
             $C = curl_init();
-            curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
-            curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($C, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($C, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($C, CURLOPT_URL, $Url);
             $Contents = curl_exec($C);
             $Info = curl_getinfo($C);
 
-            if (strpos(GetValue('content_type', $Info, ''), '/json') !== FALSE) {
-                $Profile = json_decode($Contents, TRUE);
+            if (strpos(val('content_type', $Info, ''), '/json') !== false) {
+                $Profile = json_decode($Contents, true);
                 $Profile = $Profile['response'];
             } else {
                 throw new Gdn_UserException('There was an error trying to get your profile information from Disqus.');
@@ -280,12 +339,12 @@ class DisqusPlugin extends Gdn_Plugin {
             throw new Gdn_UserException('There was an error trying to get an access token from Disqus.');
         }
 
-        $Form->SetFormValue('UniqueID', GetValue('id', $Profile));
-        $Form->SetFormValue('Provider', 'disqus');
-        $Form->SetFormValue('ProviderName', 'Disqus');
-        $Form->SetFormValue('FullName', GetValue('name', $Profile));
-        $Form->SetFormValue('Name', GetValue('username', $Profile));
-        $Form->SetFormValue('Photo', GetValueR('avatar.permalink', $Profile));
-        $Sender->SetData('Verified', TRUE);
+        $Form->setFormValue('UniqueID', val('id', $Profile));
+        $Form->setFormValue('Provider', 'disqus');
+        $Form->setFormValue('ProviderName', 'Disqus');
+        $Form->setFormValue('FullName', val('name', $Profile));
+        $Form->setFormValue('Name', val('username', $Profile));
+        $Form->setFormValue('Photo', valr('avatar.permalink', $Profile));
+        $Sender->setData('Verified', true);
     }
 }
