@@ -43,6 +43,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
          echo ' '.$this->Form->Button('Save Draft', array('class' => 'Button Warning DraftButton'));
       }
       echo ' '.$this->Form->Button('Preview', array('class' => 'Button Warning PreviewButton'));
+      echo ' '.anchor(t('Edit'), '#', 'Button WriteButton Hidden')."\n";
       $this->FireEvent('AfterFormButtons');
       echo ' '.Anchor(T('Cancel'), $CancelUrl, 'Button Cancel');
       echo '</div>';
