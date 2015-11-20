@@ -604,7 +604,7 @@ class QnAPlugin extends Gdn_Plugin {
             $Activity = array(
                'ActivityType' => 'AnswerAccepted',
                'NotifyUserID' => $Comment['InsertUserID'],
-               'HeadlineFormat' => '{ActivityUserID,You} accepted {NotifyUserID,your} answer.',
+               'HeadlineFormat' => T('HeadlingFormat.Accepted', '{ActivityUserID,You} accepted {NotifyUserID,your} answer.'),
                'RecordType' => 'Comment',
                'RecordID' => $Comment['CommentID'],
                'Route' => CommentUrl($Comment, '/'),
