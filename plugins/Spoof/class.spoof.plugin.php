@@ -21,7 +21,7 @@ class SpoofPlugin implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       // Clean out entire menu & re-add everything
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Users', T('Spoof'), 'dashboard/user/spoof', 'Garden.Settings.Manage');
+      $Menu->AddLink('Users', T('Spoof'), 'user/spoof', 'Garden.Settings.Manage');
 	}
    
 	/**
@@ -29,7 +29,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 	 */
    public function UserController_Spoof_Create($Sender) {
 		$Sender->Permission('Garden.Settings.Manage');
-      $Sender->AddSideMenu('dashboard/user/spoof');
+      $Sender->AddSideMenu('user/spoof');
 		$this->_SpoofMethod($Sender);
 	}
 	

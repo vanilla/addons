@@ -131,7 +131,7 @@ class SupportTrackerPlugin extends Gdn_Plugin {
       $Discussion = $Args['Discussion'];
       $Args['DiscussionOptions']['DeleteDiscussion'] = array(
          'Label' => T($Discussion->Answered ? 'Unanswered' : 'Answered'), 
-         'Url' => 'vanilla/discussion/answered/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey().'?Target='.urlencode($Sender->SelfUrl.'#Head'), 
+         'Url' => 'discussion/answered/'.$Discussion->DiscussionID.'/'.Gdn::Session()->TransientKey().'?Target='.urlencode($Sender->SelfUrl.'#Head'),
          'Class' => 'Hijack'
       );
    }

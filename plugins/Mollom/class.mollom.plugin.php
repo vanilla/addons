@@ -123,7 +123,7 @@ class MollomPlugin extends Gdn_Plugin {
           'Plugins.Mollom.privateKey' => array()
           ));
 
-      $Sender->AddSideMenu('dashboard/settings/plugins');
+      $Sender->AddSideMenu('settings/plugins');
       $Cf->RenderAll();
    }
 }

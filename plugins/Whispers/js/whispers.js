@@ -13,11 +13,9 @@ jQuery(document).ready(function($) {
 
    $(document).on('click', '#Form_Whisper', toggleWhisperForm);
 
-
-
    $('.MultiComplete').each(function() {
       $(this).autocomplete(
-         gdn.url('/dashboard/user/autocomplete/'),
+         gdn.url('/user/autocomplete/'),
          {
             minChars: 1,
             multiple: true,

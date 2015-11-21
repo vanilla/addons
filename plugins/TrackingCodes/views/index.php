@@ -7,7 +7,7 @@ if (!is_array($TrackingCodes))
 ?>
 <h1><?php echo T('Tracking Codes'); ?></h1>
 <div class="Info"><?php echo T('Tracking codes are added to every page just above the closing &lt;/body&gt; tag. Useful for common tracking code generators like Google Analytics, Hubspot, etc. Add, edit and enable/disable them below.'); ?></div>
-<div class="FilterMenu"><?php echo Anchor(T('Add Tracking Code'), 'dashboard/settings/trackingcodes/edit', 'AddTrackingCode SmallButton'); ?></div>
+<div class="FilterMenu"><?php echo Anchor(T('Add Tracking Code'), 'settings/trackingcodes/edit', 'AddTrackingCode SmallButton'); ?></div>
 <?php if (count($TrackingCodes) > 0) { ?>
 <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable">
    <thead>
@@ -32,9 +32,9 @@ foreach ($TrackingCodes as $Index => $Code) {
       <td class="Alt"><?php echo GetValue('Enabled', $Code) == '1' ? 'Enabled' : 'Disabled'; ?></td>
       <td>
          <?php
-         echo Anchor(T(GetValue('Enabled', $Code) == '1' ? 'Disable' : 'Enable'), '/dashboard/settings/trackingcodes/toggle/'.$Key.'/'.$Session->TransientKey(), 'ToggleCode SmallButton');
-         echo Anchor(T('Edit'), '/dashboard/settings/trackingcodes/edit/'.$Key, 'EditCode SmallButton');
-         echo Anchor(T('Delete'), '/dashboard/settings/trackingcodes/delete/'.$Key.'/'.$Session->TransientKey(), 'PopConfirm SmallButton');
+         echo Anchor(T(GetValue('Enabled', $Code) == '1' ? 'Disable' : 'Enable'), '/settings/trackingcodes/toggle/'.$Key.'/'.$Session->TransientKey(), 'ToggleCode SmallButton');
+         echo Anchor(T('Edit'), '/settings/trackingcodes/edit/'.$Key, 'EditCode SmallButton');
+         echo Anchor(T('Delete'), '/settings/trackingcodes/delete/'.$Key.'/'.$Session->TransientKey(), 'PopConfirm SmallButton');
          ?>
          </div>
       </td>

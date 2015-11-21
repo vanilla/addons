@@ -38,5 +38,5 @@
 </div>-->
 <h3><?php echo T('Permissions'); ?></h3>
 <div class="Info">
-   <?php echo sprintf(T('Define who can upload files on the Roles & Permissions page.', 'Define who can upload and manage files on the <a href="%s">Roles & Permissions</a> page.'), Url('/dashboard/role')); ?>
+   <?php echo sprintf(T('Define who can upload files on the Roles & Permissions page.', 'Define who can upload and manage files on the <a href="%s">Roles & Permissions</a> page.'), Url('/role')); ?>
 </div>

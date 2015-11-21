@@ -16,7 +16,7 @@ echo $Form->Errors();
 <h3><?php echo T('Settings'); ?></h3>
 <ul>
    <li>
-      <?php echo sprintf(T('Locale info file settings.', '<p>When you generate the zip file you can set the information for the locale below.</p> <p>You can download a zip of the locale pack by clicking <a href="%s">here</a>.</p>'), Url("/dashboard/settings/localedeveloper/download")); ?>
+      <?php echo sprintf(T('Locale info file settings.', '<p>When you generate the zip file you can set the information for the locale below.</p> <p>You can download a zip of the locale pack by clicking <a href="%s">here</a>.</p>'), Url("/settings/localedeveloper/download")); ?>
    </li>
    <li>
       <?php
