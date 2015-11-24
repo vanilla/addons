@@ -578,6 +578,12 @@ class IgnorePlugin extends Gdn_Plugin {
    protected function AddIgnore($ForUserID, $IgnoreUserID) {
       $this->SetUserMeta($ForUserID, "Blocked.User.{$IgnoreUserID}", date('Y-m-d H:i:s'));
 
+      Logger::event(
+          'adding_to_ignore',
+          Logger::WARNING,
+          '{ForUserID} failed to ignore {IgnoreUserID}'
+      );
+
       // Remove from conversations
       $Conversations = $this->IgnoreConversations($IgnoreUserID, $ForUserID);
       Gdn::SQL()->Delete('UserConversation', array(
@@ -585,7 +591,13 @@ class IgnorePlugin extends Gdn_Plugin {
          'ConversationID'  => $Conversations
       ));
       $conversationModel = new ConversationModel();
-      $conversationModel->countUnread($ForUserID, true);
+      $c = $conversationModel->countUnread($ForUserID, true);
+      Logger::event(
+          'adding_to_ignore',
+          Logger::WARNING,
+          '{c} conversations to ignore for {ForUserID}'
+      );
+
    }
 
    protected function RemoveIgnore($ForUserID, $IgnoreUserID) {
