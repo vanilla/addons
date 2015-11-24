@@ -38,7 +38,7 @@ class VotingPlugin extends Gdn_Plugin {
 			'Plugins.Voting.ModThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => -20, 'Description' => 'The vote that will remove a post to the moderation queue.')
 		));
 
-     $Sender->AddSideMenu('dashboard/settings/voting');
+     $Sender->AddSideMenu('settings/voting');
      $Sender->SetData('Title', T('Vote Settings'));
      $Sender->ConfigurationModule = $Conf;
      $Conf->RenderAll();
@@ -109,7 +109,7 @@ class VotingPlugin extends Gdn_Plugin {
 		if ($Session->IsValid()) {
 			echo Wrap(Anchor(
 				Wrap(T('Follows')) . Gdn_Format::BigNumber($Discussion->CountBookmarks),
-				'/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
+				'/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
 				'',
 				array('title' => $Title)
 			), 'div', array('class' => 'StatBox FollowsBox'));
@@ -121,7 +121,7 @@ class VotingPlugin extends Gdn_Plugin {
 		if ($Session->IsValid()) {
 			echo Wrap(Anchor(
 				Wrap(T('Votes')) . Gdn_Format::BigNumber($CountVotes),
-				'/vanilla/discussion/votediscussion/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
+				'/discussion/votediscussion/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
 				'',
 				array('title' => T('Vote'))
 			), 'div', array('class' => 'StatBox VotesBox'));

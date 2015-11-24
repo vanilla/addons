@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$CancelUrl = '/vanilla/discussions';
+$CancelUrl = '/discussions';
 if (C('Vanilla.Categories.Use') && is_object($this->Category))
-   $CancelUrl = '/vanilla/categories/'.urlencode($this->Category->UrlCode);
+   $CancelUrl = '/categories/'.urlencode($this->Category->UrlCode);
 
 ?>
 <div id="DiscussionForm" class="FormTitleWrapper DiscussionForm">
@@ -43,6 +43,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
          echo ' '.$this->Form->Button('Save Draft', array('class' => 'Button Warning DraftButton'));
       }
       echo ' '.$this->Form->Button('Preview', array('class' => 'Button Warning PreviewButton'));
+      echo ' '.anchor(t('Edit'), '#', 'Button WriteButton Hidden')."\n";
       $this->FireEvent('AfterFormButtons');
       echo ' '.Anchor(T('Cancel'), $CancelUrl, 'Button Cancel');
       echo '</div>';

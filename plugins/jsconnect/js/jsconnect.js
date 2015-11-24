@@ -133,6 +133,6 @@ $.fn.jsconnect = function(options) {
    }
 };
 
-$('.JsConnect-Container').jsconnect();
+$('.JsConnect-Container').each(function() { $(this).jsconnect(); });
 
 });

@@ -58,7 +58,7 @@ class TouchIconPlugin extends Gdn_Plugin {
     */
    public function SettingsController_TouchIcon_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
-      $Sender->AddSideMenu('dashboard/settings/touchicon');
+      $Sender->AddSideMenu('settings/touchicon');
       $Sender->Title(T('Touch Icon'));
 
       if ($Sender->Form->AuthenticatedPostBack()) {

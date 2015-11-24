@@ -9,13 +9,13 @@
 $PluginInfo['jsconnect'] = array(
     'Name' => 'Vanilla jsConnect',
     'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-    'Version' => '1.5.0',
+    'Version' => '1.5.2',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'SettingsUrl' => '/dashboard/settings/jsconnect',
+    'SettingsUrl' => '/settings/jsconnect',
     'SettingsPermission' => 'Garden.Settings.Manage',
 );
 

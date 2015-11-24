@@ -31,6 +31,11 @@ class SpoilersPlugin extends Gdn_Plugin {
       $this->RenderSpoilers = C('Plugins.Spoilers.RenderSpoilers',TRUE);
    }
 
+   public function base_render_before($sender) {
+      $sender->addDefinition('show', t('show'));
+      $sender->addDefinition('hide', t('hide'));
+   }
+
    public function AssetModel_StyleCss_Handler($Sender) {
       $Sender->AddCssFile('spoilers.css', 'plugins/Spoilers');
    }

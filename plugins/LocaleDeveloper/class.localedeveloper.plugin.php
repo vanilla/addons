@@ -17,7 +17,7 @@ $PluginInfo['LocaleDeveloper'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
    'RequiredApplications' => array('Vanilla' => '2.0.11'),
-   'SettingsUrl' => '/dashboard/settings/localedeveloper',
+   'SettingsUrl' => '/settings/localedeveloper',
    'SettingsPermission' => 'Garden.Site.Manage',
 );
 
@@ -135,7 +135,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
 
       // Add a little pointer to the settings.
       $Text = '<div class="Info">'.
-         sprintf(T('Locale Developer Settings %s.'), Anchor(T('here'), '/dashboard/settings/localedeveloper')).
+         sprintf(T('Locale Developer Settings %s.'), Anchor(T('here'), '/settings/localedeveloper')).
          '</div>';
       $Sender->AddAsset('Content', $Text, 'LocaleDeveloperLink');
    }
