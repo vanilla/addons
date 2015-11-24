@@ -432,6 +432,12 @@ class IgnorePlugin extends Gdn_Plugin {
                   'AutoDismiss HasSprite'
                );
                break;
+
+            default:
+               $Sender->InformMessage(
+                   '<span class="InformSprite Contrast"></span>'.sprintf(T("%s is now on ignore."), $User->Name),
+                   'AutoDismiss HasSprite'
+               );
          }
 
          // Get conversation intersects
