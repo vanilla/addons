@@ -57,8 +57,8 @@ class SignaturesPlugin extends Gdn_Plugin {
         switch ($Sender->Mapper->Version) {
             case '1.0':
                 $Sender->Mapper->AddMap(array(
-                    'signature/get' => 'dashboard/profile/signature/modify',
-                    'signature/set' => 'dashboard/profile/signature/modify',
+                    'signature/get' => 'profile/signature/modify',
+                    'signature/set' => 'profile/signature/modify',
                 ), NULL, array(
                     'signature/get' => array('Signature'),
                     'signature/set' => array('Success'),

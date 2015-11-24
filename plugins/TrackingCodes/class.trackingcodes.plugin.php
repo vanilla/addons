@@ -11,7 +11,7 @@ $PluginInfo['TrackingCodes'] = array(
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
-	'SettingsUrl' => 'dashboard/settings/trackingcodes'
+	'SettingsUrl' => 'settings/trackingcodes'
 );
 
 class TrackingCodesPlugin extends Gdn_Plugin {
@@ -21,7 +21,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
     */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Add-ons', T('Tracking Codes'), 'dashboard/settings/trackingcodes', 'Garden.Settings.Manage');
+      $Menu->AddLink('Add-ons', T('Tracking Codes'), 'settings/trackingcodes', 'Garden.Settings.Manage');
 	}
 	
 	/**
@@ -29,7 +29,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 	 */
 	public function SettingsController_TrackingCodes_Create($Sender) {
 		$Sender->Permission('Garden.Settings.Manage');
-      $Sender->AddSideMenu('dashboard/settings/trackingcodes');
+      $Sender->AddSideMenu('settings/trackingcodes');
 
       $Sender->Title('Tracking Codes');
 		$Action = strtolower(GetValue(0, $Sender->RequestArgs, ''));
@@ -105,7 +105,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
     */
    private function _Edit($Sender) {
 		$Sender->Permission('Garden.Settings.Manage');
-      $Sender->AddSideMenu('dashboard/settings/trackingcodes');
+      $Sender->AddSideMenu('settings/trackingcodes');
       $Sender->AddJsFile('jquery.autogrow.js');
 		$EditIndex = FALSE;
 		$EditKey = GetValue(1, $Sender->RequestArgs);

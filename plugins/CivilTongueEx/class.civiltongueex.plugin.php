@@ -14,7 +14,7 @@ $PluginInfo['CivilTongueEx'] = array(
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
-    'SettingsUrl' => '/dashboard/plugin/tongue',
+    'SettingsUrl' => '/plugin/tongue',
     'SettingsPermission' => 'Garden.Settings.Manage'
 );
 

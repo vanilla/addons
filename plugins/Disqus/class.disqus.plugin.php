@@ -10,7 +10,7 @@ $PluginInfo['Disqus'] = array(
     'Version' => '1.2',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => true,
-    'SettingsUrl' => '/dashboard/settings/disqus',
+    'SettingsUrl' => '/settings/disqus',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
