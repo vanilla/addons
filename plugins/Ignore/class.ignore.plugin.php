@@ -581,22 +581,22 @@ class IgnorePlugin extends Gdn_Plugin {
       Logger::event(
           'adding_to_ignore',
           Logger::WARNING,
-          '{ForUserID} failed to ignore {IgnoreUserID}'
+          $ForUserID  . ' failed to ignore ' . $IgnoreUserID
       );
 
       // Remove from conversations
-      $Conversations = $this->IgnoreConversations($IgnoreUserID, $ForUserID);
-      Gdn::SQL()->Delete('UserConversation', array(
-         'UserID'          => $ForUserID,
-         'ConversationID'  => $Conversations
-      ));
-      $conversationModel = new ConversationModel();
-      $c = $conversationModel->countUnread($ForUserID, true);
-      Logger::event(
-          'adding_to_ignore',
-          Logger::WARNING,
-          '{c} conversations to ignore for {ForUserID}'
-      );
+//      $Conversations = $this->IgnoreConversations($IgnoreUserID, $ForUserID);
+//      Gdn::SQL()->Delete('UserConversation', array(
+//         'UserID'          => $ForUserID,
+//         'ConversationID'  => $Conversations
+//      ));
+//      $conversationModel = new ConversationModel();
+//      $c = $conversationModel->countUnread($ForUserID, true);
+//      Logger::event(
+//          'removing_conversations',
+//          Logger::WARNING,
+//          $c . ' conversations to ignore for ' . $ForUserID
+//      );
 
    }
 
