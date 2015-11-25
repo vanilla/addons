@@ -432,6 +432,12 @@ class IgnorePlugin extends Gdn_Plugin {
                   'AutoDismiss HasSprite'
                );
                break;
+
+            default:
+               $Sender->InformMessage(
+                   '<span class="InformSprite Contrast"></span>'.sprintf(T("%s is now on ignore."), $User->Name),
+                   'AutoDismiss HasSprite'
+               );
          }
 
          // Get conversation intersects
@@ -572,14 +578,18 @@ class IgnorePlugin extends Gdn_Plugin {
    protected function AddIgnore($ForUserID, $IgnoreUserID) {
       $this->SetUserMeta($ForUserID, "Blocked.User.{$IgnoreUserID}", date('Y-m-d H:i:s'));
 
-      // Remove from conversations
-      $Conversations = $this->IgnoreConversations($IgnoreUserID, $ForUserID);
-      Gdn::SQL()->Delete('UserConversation', array(
-         'UserID'          => $ForUserID,
-         'ConversationID'  => $Conversations
-      ));
-      $conversationModel = new ConversationModel();
-      $conversationModel->countUnread($ForUserID, true);
+      // Since the conversation application can be turned off, check if it is there.
+      if(class_exists('ConversationModel')) {
+         // Remove from conversations
+         $Conversations = $this->IgnoreConversations($IgnoreUserID, $ForUserID);
+
+         Gdn::SQL()->Delete('UserConversation', array(
+             'UserID' => $ForUserID,
+             'ConversationID' => $Conversations
+         ));
+         $conversationModel = new ConversationModel();
+         $conversationModel->countUnread($ForUserID, true);
+      }
    }
 
    protected function RemoveIgnore($ForUserID, $IgnoreUserID) {
