@@ -578,35 +578,18 @@ class IgnorePlugin extends Gdn_Plugin {
    protected function AddIgnore($ForUserID, $IgnoreUserID) {
       $this->SetUserMeta($ForUserID, "Blocked.User.{$IgnoreUserID}", date('Y-m-d H:i:s'));
 
-      // Remove from conversations
-      $Conversations = $this->IgnoreConversations($IgnoreUserID, $ForUserID);
-      Logger::event(
-          'adding_to_ignore',
-          Logger::WARNING,
-          $Conversations
-      );
-      Gdn::SQL()->Delete('UserConversation', array(
-         'UserID'          => $ForUserID,
-         'ConversationID'  => $Conversations
-      ));
-      Logger::event(
-          'deleting_conversations',
-          Logger::WARNING,
-          $Conversations
-      );
-      $conversationModel = new ConversationModel();
-      Logger::event(
-          'instanciate_conversation_model',
-          Logger::WARNING,
-          $Conversations
-      );
-      $c = $conversationModel->countUnread($ForUserID, true);
-      Logger::event(
-          'counting_unread_conversations',
-          Logger::WARNING,
-          $c
-      );
+      // Since the conversation application can be turned off, check if it is there.
+      if(class_exists('ConversationModel')) {
+         // Remove from conversations
+         $Conversations = $this->IgnoreConversations($IgnoreUserID, $ForUserID);
 
+         Gdn::SQL()->Delete('UserConversation', array(
+             'UserID' => $ForUserID,
+             'ConversationID' => $Conversations
+         ));
+         $conversationModel = new ConversationModel();
+         $conversationModel->countUnread($ForUserID, true);
+      }
    }
 
    protected function RemoveIgnore($ForUserID, $IgnoreUserID) {
