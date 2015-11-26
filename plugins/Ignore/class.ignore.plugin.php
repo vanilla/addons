@@ -673,7 +673,7 @@ class IgnorePlugin extends Gdn_Plugin {
       if ($IgnoreUserID == $SessionUserID) return self::IGNORE_SELF;
 
       // Avoid a call to the database if the Conversation application is turned off.
-      if (class_exists('ConversationModel')) {
+      if (!class_exists('ConversationModel')) {
          return array();
       }
 
