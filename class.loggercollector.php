@@ -5,22 +5,20 @@
  * @license GPLv2
  */
 
-use DebugBar\DataCollector\MessagesCollector;
-
-
 /**
  * Collects application logged events into a the debug bar.
  */
-class LoggerCollector extends MessagesCollector implements LoggerInterface {
-
+class LoggerCollector implements \LoggerInterface {
+    use \Psr\Log\LoggerAwareTrait;
+    use \Psr\Log\LoggerTrait;
 
     /**
      * Initialize a new instance of a {@link LoggerCollector} class.
      *
-     * @param string $name The name of the collector.
+     * @param PsrLoggerInterface $logger The logger to forward all logs to.
      */
-    public function __construct($name = 'log') {
-        parent::__construct($name);
+    public function __construct(\Psr\Log\LoggerInterface $logger = null) {
+        $this->setLogger($logger);
     }
 
     /**
@@ -28,6 +26,6 @@ class LoggerCollector extends MessagesCollector implements LoggerInterface {
      */
     public function log($level, $message, array $context = []) {
         $message = formatString($message, $context);
-        parent::log($level, $message, $context);
+        $this->logger->log($level, $message, $context);
     }
 }

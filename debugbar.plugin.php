@@ -124,9 +124,8 @@ class DebugbarPlugin extends Gdn_Plugin {
                 $db->addCollector($this->debugBar);
             }
 
-            $this->debugBar->addCollector(new LoggerCollector());
-            $logger = $this->debugBar['log'];
-            Logger::setLogger($this->debugBar['log']);
+            $logger = new LoggerCollector($this->debugBar['messages']);
+            Logger::setLogger($logger);
 
             $this->debugBar->addCollector(new \DebugBar\DataCollector\ConfigCollector([], 'data'));
         }
