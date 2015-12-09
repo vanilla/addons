@@ -73,16 +73,26 @@ class DebugbarPlugin extends Gdn_Plugin {
             return;
         }
 
+        $strings = [];
         foreach ($traces as $info) {
             list($message, $type) = $info;
 
             if ($message instanceof \Exception) {
                 $exceptions->addException($message);
+
+                if ($message instanceof \ErrorException && $type === TRACE_NOTICE) {
+                    // Display notices as messages so devs don't freak out too much.
+                    $str = $message->getMessage().' ('.$message->getFile(). ' line '.$message->getLine().')';
+                    if (!isset($strings[$str])) {
+                        $strings[$str] = true;
+                        $messages->notice($str);
+                    }
+                }
                 continue;
             }
 
             if (!is_string($message)) {
-                $message = $messages->getDataFormatter()->formatVar([$message]);
+                $message = $messages->getDataFormatter()->formatVar($message);
             }
             switch ($type) {
                 case TRACE_ERROR:
@@ -148,6 +158,9 @@ class DebugbarPlugin extends Gdn_Plugin {
      * Add the debug bar's javascript after the body.
      */
     public function base_afterBody_handler() {
+        $bar = $this->debugBar();
+        $this->addTraces($bar['messages'], $bar['exceptions']);
+
         $body = $this->jsRenderer()->render();
         echo $body;
     }
@@ -167,7 +180,6 @@ class DebugbarPlugin extends Gdn_Plugin {
         $bar = $this->debugBar();
         $bar['time']->stopMeasure('controller');
 
-        $this->addTraces($bar['messages'], $bar['exceptions']);
         $bar['data']->setData($sender->Data);
 
 
