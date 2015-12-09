@@ -189,9 +189,15 @@ class DebugbarPlugin extends Gdn_Plugin {
             return;
         }
 
-        $head = $this->jsRenderer()->renderHead();
-
-        $sender->AddAsset('Head', $head, 'debugbar-head');
+        if (val('HTTP_X_REQUESTED_WITH', $_SERVER) === 'XMLHttpRequest') {
+            $path = Gdn::request()->path();
+            if (!in_array($path, ['dashboard/notifications/inform', 'settings/analyticstick.json'])) {
+                $this->debugBar()->sendDataInHeaders();
+            }
+        } else {
+            $head = $this->jsRenderer()->renderHead();
+            $sender->AddAsset('Head', $head, 'debugbar-head');
+        }
         $called = true;
     }
 
