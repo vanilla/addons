@@ -26,6 +26,10 @@ class LoggerCollector implements \LoggerInterface {
      */
     public function log($level, $message, array $context = []) {
         $message = formatString($message, $context);
+
+        if (!empty($context['event'])) {
+            $message = "{$context['event']}: $message";
+        }
         $this->logger->log($level, $message, $context);
     }
 }
