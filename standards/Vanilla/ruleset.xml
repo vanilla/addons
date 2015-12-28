@@ -40,11 +40,11 @@
     <rule ref="Vanilla.NamingConventions.ValidClassBrackets"/>
 
     <!-- Check that file level DocBlock exists and is valid -->
-    <!--Not 2.0 compatible yet. <rule ref="Vanilla.Commenting.FileComment">
+    <rule ref="Vanilla.Commenting.FileComment">
         <exclude name="Vanilla.Commenting.FileComment.DuplicateCopyrightTag" />
     </rule>
     <rule ref="Vanilla.Commenting.ClassComment"/>
-    <rule ref="Vanilla.Commenting.FunctionComment"/>-->
+    <rule ref="Vanilla.Commenting.FunctionComment"/>
 
     <!-- StegosaurusCase class names, underscores allowed -->
     <rul ref="Vanilla.Classes.ValidClassName" />

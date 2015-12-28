@@ -1,4 +1,4 @@
-<?php
+<?php if (!defined('APPLICATION')) exit();
 
 /**
  * Adds 301 redirects for Vanilla from common forum platforms.
@@ -15,20 +15,15 @@
 $PluginInfo['Redirector'] = array(
    'Name' => 'Forum Redirector',
    'Description' => "Adds 301 redirects for Vanilla from common forum platforms. This redirector redirects urls from IPB, phpBB, punBB, smf, vBulletin, and Xenforo",
-   'Version' => '1.1',
+   'Version' => '1.0.1b',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
-   'MobileFriendly' => true,
+   'MobileFriendly' => TRUE,
 );
 
-/**
- * Class RedirectorPlugin
- */
 class RedirectorPlugin extends Gdn_Plugin {
-
-   /** @var array  */
    public static $Files = array(
       'forum' => array('RedirectorPlugin', 'forum_Filter'),
       'forums' => array( // xenforo cateogry
@@ -174,13 +169,6 @@ class RedirectorPlugin extends Gdn_Plugin {
       }
    }
 
-   /**
-    *
-    * 
-    * @param $Filename
-    * @param $Get
-    * @return bool|string
-    */
    public function FilenameRedirect($Filename, $Get) {
       Trace(array('Filename' => $Filename, 'Get' => $Get), 'Testing');
       $Filename = strtolower($Filename);
@@ -296,12 +284,6 @@ class RedirectorPlugin extends Gdn_Plugin {
       return $Result;
    }
 
-   /**
-    *
-    *
-    * @param $Get
-    * @return array
-    */
    public static function forum_Filter(&$Get) {
       if (GetValue('_arg2', $Get) == 'page') {
          // This is a punbb style forum.
@@ -330,6 +312,7 @@ class RedirectorPlugin extends Gdn_Plugin {
     *
     * @return array Mapping of vB parameters
     */
+
    public static function forumdisplay_filter(&$Get) {
       self::VbFriendlyUrlID($Get, 'f');
 
@@ -341,24 +324,12 @@ class RedirectorPlugin extends Gdn_Plugin {
       );
    }
 
-   /**
-    *
-    *
-    * @param $Value
-    * @return null
-    */
    public static function GetNumber($Value) {
       if (preg_match('`(\d+)`', $Value, $Matches))
          return $Matches[1];
       return NULL;
    }
 
-   /**
-    *
-    *
-    * @param $Value
-    * @return array|null
-    */
    public static function IPBPageNumber($Value) {
       if (preg_match('`page__st__(\d+)`i', $Value, $Matches))
          return array('Offset', $Matches[1]);
@@ -384,12 +355,6 @@ class RedirectorPlugin extends Gdn_Plugin {
       return 1;
    }
 
-   /**
-    *
-    *
-    * @param $Value
-    * @return null
-    */
    public static function RemoveID($Value) {
       if (preg_match('`^(\d+)`', $Value, $Matches))
          return $Matches[1];
@@ -431,12 +396,6 @@ class RedirectorPlugin extends Gdn_Plugin {
       );
    }
 
-   /**
-    *
-    *
-    * @param $Value
-    * @return array
-    */
    public static function SmfAction($Value) {
       if (preg_match('`(\w+);(\w+)=(\d+)`', $Value, $M)) {
          switch (strtolower($M[1])) {
@@ -446,13 +405,6 @@ class RedirectorPlugin extends Gdn_Plugin {
       }
    }
 
-   /**
-    *
-    *
-    * @param $Value
-    * @param $Key
-    * @return array
-    */
    public static function SmfOffset($Value, $Key) {
       if (preg_match('`(\d+)\.(\d+)`', $Value, $M)) {
          return array($Key => $M[1], 'Offset' => $M[2]);
@@ -462,12 +414,6 @@ class RedirectorPlugin extends Gdn_Plugin {
       }
    }
 
-   /**
-    *
-    *
-    * @param $Get
-    * @return array
-    */
    public static function topic_Filter(&$Get) {
       if (GetValue('_arg2', $Get) == 'page') {
          // This is a punbb style topic.
@@ -525,12 +471,6 @@ class RedirectorPlugin extends Gdn_Plugin {
       return FALSE;
    }
 
-   /**
-    *
-    *
-    * @param $Value
-    * @return mixed
-    */
    public static function XenforoID($Value) {
       if (preg_match('`(\d+)$`', $Value, $Matches))
          return $Matches[1];
