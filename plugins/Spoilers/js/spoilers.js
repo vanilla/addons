@@ -1,3 +1,7 @@
+/**
+ *
+ */
+
 var SpoilersPlugin = {
    FindAndReplace: function() {
       jQuery('div.UserSpoiler').each(function(i, el) {
@@ -11,6 +15,11 @@ var SpoilersPlugin = {
       },this);
    },
 
+   /**
+    * ReplaceSpoiler: Add the spoiler label to the comment text.
+    * Add Gdn::Controller()->addDefinition('show', 'display') in the class.themehooks.php file of your theme
+    * This plugin needs to be reworked to avoid needing to do this.
+    */
    ReplaceSpoiler: function(Spoiler) {
       // Don't re-event spoilers that are already 'on'
       if (Spoiler.SpoilerFunctioning) return;
