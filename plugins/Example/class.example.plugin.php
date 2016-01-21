@@ -1,6 +1,6 @@
 <?php
 /**
- * An example plugin.
+ * An example plugin that excerpt discussions text.
  *
  * @copyright 2008-2014 Vanilla Forums, Inc.
  * @license GNU GPLv2
@@ -49,6 +49,14 @@ class ExamplePlugin extends Gdn_Plugin {
      */
     public function assetModel_styleCss_handler($Sender) {
         $Sender->addCssFile('example.css', 'plugins/Example');
+    }
+
+    /**
+     * Add javascript file before discussions rendering.
+     *
+     * @param $Sender Sending controller instance
+     */
+    public function discussionsController_render_before($Sender) {
         $Sender->addJsFile('example.js', 'plugins/Example');
     }
 
@@ -109,8 +117,8 @@ class ExamplePlugin extends Gdn_Plugin {
 		$Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
         $ConfigurationModel->setField(array(
-            'Plugin.Example.RenderCondition'     => 'all',
-            'Plugin.Example.TrimSize'      => 100
+            'Plugin.example.RenderCondition'     => 'all',
+            'Plugin.example.TrimSize'      => 100
         ));
 
         // Set the model on the form.
@@ -121,9 +129,9 @@ class ExamplePlugin extends Gdn_Plugin {
             // Apply the config settings to the form.
             $Sender->Form->setData($ConfigurationModel->Data);
 		} else {
-            $ConfigurationModel->Validation->applyRule('Plugin.Example.RenderCondition', 'Required');
-            $ConfigurationModel->Validation->applyRule('Plugin.Example.TrimSize', 'Required');
-            $ConfigurationModel->Validation->applyRule('Plugin.Example.TrimSize', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Plugin.example.RenderCondition', 'Required');
+            $ConfigurationModel->Validation->applyRule('Plugin.example.TrimSize', 'Required');
+            $ConfigurationModel->Validation->applyRule('Plugin.example.TrimSize', 'Integer');
             $Saved = $Sender->Form->save();
             if ($Saved) {
                 $Sender->StatusMessage = t("Your changes have been saved.");
@@ -155,7 +163,7 @@ class ExamplePlugin extends Gdn_Plugin {
      * by default, renders the views/discussions/index.php view. That view contains this line:
      *     <?php include($this->FetchViewLocation('discussions')); ?>
      *
-     * So we look inside views/discussions/discussions.php. We find a loop the calls WriteDiscussion() for each
+     * So we look inside views/discussions/discussions.php. We find a loop that calls WriteDiscussion() for each
      * discussion in the list. WriteDiscussion() fires several events each time it is called. One of those events
      * is called "AfterDiscussionTitle". Since we know that the parent controller context is "DiscussionsController",
      * and that the event's name is "AfterDiscussionTitle", it is easy to see that our handler method should be called
@@ -173,23 +181,34 @@ class ExamplePlugin extends Gdn_Plugin {
          * The 'c' function allows plugins to access the config file. In this call, we're looking for a specific setting
          * called 'Plugin.Example.TrimSize', but defaulting to a value of '100' if the setting cannot be found.
          */
-        $TrimSize = c('Plugin.Example.TrimSize', 100);
+        $TrimSize = c('Plugin.example.TrimSize', 100);
 
         /*
          * We're using this setting to allow conditional display of the excerpts. We have 3 settings: 'all', 'announcements',
          * 'discussions'. They do what you'd expect!
          */
-        $RenderCondition = c('Plugin.Example.RenderCondition', 'all');
+        $RenderCondition = c('Plugin.example.RenderCondition', 'all');
 
         $Type = (val('Announce', $Sender->EventArguments['Discussion']) == '1') ? "announcement" : "discussion";
         $CompareType = $Type.'s';
 
         if ($RenderCondition == "all" || $CompareType == $RenderCondition) {
             /*
-             * Here, we remove any HTML from the Discussion Body, trim it down to a pre-defined length, and then
-             * output it to discussions list inside a div with a class of 'ExampleDescription'
+             * Here, we remove any HTML from the Discussion Body, trim it down to a pre-defined length, re-encode htmlentities
+             * and then output it to discussions list inside a div with a class of 'ExampleDescription'
              */
-            echo wrap(sliceString(strip_tags($Sender->EventArguments['Discussion']->Body),$TrimSize), 'div', array(
+            $discussionBody = htmlentities( // Restore HTML entities
+                sliceString(
+                    html_entity_decode( // Convert HTML entities to single characters before cutting
+                        strip_tags(
+                            $Sender->EventArguments['Discussion']->Body
+                        )
+                    ),
+                    $TrimSize
+                )
+            );
+
+            echo wrap($discussionBody, 'div', array(
                 'class'  => "ExampleDescription"
             ));
         }
@@ -205,8 +224,8 @@ class ExamplePlugin extends Gdn_Plugin {
     public function setup() {
 
         // Set up the plugin's default values
-        saveToConfig('Plugin.Example.TrimSize', 100);
-        saveToConfig('Plugin.Example.RenderCondition', "all");
+        saveToConfig('Plugin.example.TrimSize', 100);
+        saveToConfig('Plugin.example.RenderCondition', "all");
 
         // Trigger database changes
         $this->structure();
@@ -240,8 +259,8 @@ class ExamplePlugin extends Gdn_Plugin {
      * perform cleanup tasks such as deletion of unsued files and folders.
      */
     public function onDisable() {
-        removeFromConfig('Plugin.Example.TrimSize');
-        removeFromConfig('Plugin.Example.RenderCondition');
+        removeFromConfig('Plugin.example.TrimSize');
+        removeFromConfig('Plugin.example.RenderCondition');
 
         // Never delete from the database OnDisable.
         // Usually, you want re-enabling a plugin to be as if it was never off.
