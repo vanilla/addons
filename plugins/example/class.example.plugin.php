@@ -69,7 +69,7 @@ class ExamplePlugin extends Gdn_Plugin {
      * One of the most powerful tools at a plugin developer's fingertips is the ability to freely create
      * methods on other controllers, effectively extending their capabilities. This method creates the
      * Example() method on the PluginController, effectively allowing the plugin to be invoked via the
-     * URL: http://www.yourforum.com/plugin/Example/
+     * URL: http://www.yourforum.com/plugin/example/
      *
      * From here, we can do whatever we like, including turning this plugin into a mini controller and
      * allowing us an easy way of creating a dashboard settings screen.
@@ -117,8 +117,8 @@ class ExamplePlugin extends Gdn_Plugin {
         $sender->permission('Garden.Settings.Manage');
         $sender->setData('PluginDescription',$this->getPluginKey('Description'));
 
-		$Validation = new Gdn_Validation();
-        $configurationModel = new Gdn_ConfigurationModel($Validation);
+		$validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
             'Plugin.Example.RenderCondition'     => 'all',
             'Plugin.Example.TrimSize'      => 100
