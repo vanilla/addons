@@ -45,19 +45,19 @@ class ExamplePlugin extends Gdn_Plugin {
      *
      * This is a good place to put UI stuff like CSS and Javascript inclusions.
      *
-     * @param $Sender Sending controller instance
+     * @param $sender Sending controller instance
      */
-    public function assetModel_styleCss_handler($Sender) {
-        $Sender->addCssFile('example.css', 'plugins/Example');
+    public function assetModel_styleCss_handler($sender) {
+        $sender->addCssFile('example.css', 'plugins/Example');
     }
 
     /**
      * Add javascript file before discussions rendering.
      *
-     * @param $Sender Sending controller instance
+     * @param $sender Sending controller instance
      */
-    public function discussionsController_render_before($Sender) {
-        $Sender->addJsFile('example.js', 'plugins/Example');
+    public function discussionsController_render_before($sender) {
+        $sender->addJsFile('example.js', 'plugins/Example');
     }
 
     /**
@@ -71,18 +71,18 @@ class ExamplePlugin extends Gdn_Plugin {
      * From here, we can do whatever we like, including turning this plugin into a mini controller and
      * allowing us an easy way of creating a dashboard settings screen.
      *
-     * @param $Sender Sending controller instance
+     * @param $sender Sending controller instance
      */
-    public function pluginController_example_create($Sender) {
+    public function pluginController_example_create($sender) {
         /*
          * If you build your views properly, this will be used as the <title> for your page, and for the header
          * in the dashboard. Something like this works well: <h1><?php echo T($this->Data['Title']); ?></h1>
          */
-        $Sender->title('Example Plugin');
-        $Sender->addSideMenu('plugin/example');
+        $sender->title('Example Plugin');
+        $sender->addSideMenu('plugin/example');
 
         // If your sub-pages use forms, this is a good place to get it ready
-        $Sender->Form = new Gdn_Form();
+        $sender->Form = new Gdn_Form();
 
         /*
          * This method does a lot of work. It allows a single method (PluginController::Example() in this case)
@@ -101,45 +101,45 @@ class ExamplePlugin extends Gdn_Plugin {
          * Note: When the URL is accessed without parameters, Controller_Index() is called. This is a good place
          * for a dashboard settings screen.
          */
-        $this->dispatch($Sender, $Sender->RequestArgs);
+        $this->dispatch($sender, $sender->RequestArgs);
     }
 
     /**
      * Always document every method.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function controller_index($Sender) {
+    public function controller_index($sender) {
         // Prevent non-admins from accessing this page
-        $Sender->permission('Garden.Settings.Manage');
-        $Sender->setData('PluginDescription',$this->getPluginKey('Description'));
+        $sender->permission('Garden.Settings.Manage');
+        $sender->setData('PluginDescription',$this->getPluginKey('Description'));
 
 		$Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array(
-            'Plugin.example.RenderCondition'     => 'all',
-            'Plugin.example.TrimSize'      => 100
+        $configurationModel = new Gdn_ConfigurationModel($Validation);
+        $configurationModel->setField(array(
+            'Plugin.Example.RenderCondition'     => 'all',
+            'Plugin.Example.TrimSize'      => 100
         ));
 
         // Set the model on the form.
-        $Sender->Form->setModel($ConfigurationModel);
+        $sender->Form->setModel($configurationModel);
 
         // If seeing the form for the first time...
-        if ($Sender->Form->authenticatedPostBack() === false) {
+        if ($sender->Form->authenticatedPostBack() === false) {
             // Apply the config settings to the form.
-            $Sender->Form->setData($ConfigurationModel->Data);
+            $sender->Form->setData($configurationModel->Data);
 		} else {
-            $ConfigurationModel->Validation->applyRule('Plugin.example.RenderCondition', 'Required');
-            $ConfigurationModel->Validation->applyRule('Plugin.example.TrimSize', 'Required');
-            $ConfigurationModel->Validation->applyRule('Plugin.example.TrimSize', 'Integer');
-            $Saved = $Sender->Form->save();
-            if ($Saved) {
-                $Sender->StatusMessage = t("Your changes have been saved.");
+            $configurationModel->Validation->applyRule('Plugin.Example.RenderCondition', 'Required');
+            $configurationModel->Validation->applyRule('Plugin.Example.TrimSize', 'Required');
+            $configurationModel->Validation->applyRule('Plugin.Example.TrimSize', 'Integer');
+            $saved = $sender->Form->save();
+            if ($saved) {
+                $sender->StatusMessage = t("Your changes have been saved.");
             }
         }
 
         // GetView() looks for files inside plugins/PluginFolderName/views/ and returns their full path. Useful!
-        $Sender->render($this->getView('example.php'));
+        $sender->render($this->getView('example.php'));
     }
 
     /**
@@ -148,11 +148,11 @@ class ExamplePlugin extends Gdn_Plugin {
      * By grabbing a reference to the current SideMenu object we gain access to its methods, allowing us
      * to add a menu link to the newly created /plugin/Example method.
      *
-     * @param $Sender Sending controller instance
+     * @param $sender Sending controller instance
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
-        $Menu = &$Sender->EventArguments['SideMenu'];
-        $Menu->addLink('Add-ons', 'Example', 'plugin/example', 'Garden.Settings.Manage');
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        $menu = &$sender->EventArguments['SideMenu'];
+        $menu->addLink('Add-ons', 'Example', 'plugin/example', 'Garden.Settings.Manage');
     }
 
     /**
@@ -170,10 +170,10 @@ class ExamplePlugin extends Gdn_Plugin {
      *
      *      discussionsController_afterDiscussionTitle_handler()
      */
-    public function discussionsController_afterDiscussionTitle_handler($Sender) {
+    public function discussionsController_afterDiscussionTitle_handler($sender) {
         /*
         echo "<pre>";
-        print_r($Sender->EventArguments['Discussion']);
+        print_r($sender->EventArguments['Discussion']);
         echo "</pre>";
         */
 
@@ -181,18 +181,18 @@ class ExamplePlugin extends Gdn_Plugin {
          * The 'c' function allows plugins to access the config file. In this call, we're looking for a specific setting
          * called 'Plugin.Example.TrimSize', but defaulting to a value of '100' if the setting cannot be found.
          */
-        $TrimSize = c('Plugin.example.TrimSize', 100);
+        $trimSize = c('Plugin.Example.TrimSize', 100);
 
         /*
          * We're using this setting to allow conditional display of the excerpts. We have 3 settings: 'all', 'announcements',
          * 'discussions'. They do what you'd expect!
          */
-        $RenderCondition = c('Plugin.example.RenderCondition', 'all');
+        $renderCondition = c('Plugin.Example.RenderCondition', 'all');
 
-        $Type = (val('Announce', $Sender->EventArguments['Discussion']) == '1') ? "announcement" : "discussion";
-        $CompareType = $Type.'s';
+        $type = (val('Announce', $sender->EventArguments['Discussion']) == '1') ? "announcement" : "discussion";
+        $compareType = $type.'s';
 
-        if ($RenderCondition == "all" || $CompareType == $RenderCondition) {
+        if ($renderCondition == "all" || $compareType == $renderCondition) {
             /*
              * Here, we remove any HTML from the Discussion Body, trim it down to a pre-defined length, re-encode htmlentities
              * and then output it to discussions list inside a div with a class of 'ExampleDescription'
@@ -201,10 +201,10 @@ class ExamplePlugin extends Gdn_Plugin {
                 sliceString(
                     html_entity_decode( // Convert HTML entities to single characters before cutting
                         strip_tags(
-                            $Sender->EventArguments['Discussion']->Body
+                            $sender->EventArguments['Discussion']->Body
                         )
                     ),
-                    $TrimSize
+                    $trimSize
                 )
             );
 
@@ -224,8 +224,8 @@ class ExamplePlugin extends Gdn_Plugin {
     public function setup() {
 
         // Set up the plugin's default values
-        saveToConfig('Plugin.example.TrimSize', 100);
-        saveToConfig('Plugin.example.RenderCondition', "all");
+        saveToConfig('Plugin.Example.TrimSize', 100);
+        saveToConfig('Plugin.Example.RenderCondition', "all");
 
         // Trigger database changes
         $this->structure();
@@ -259,8 +259,8 @@ class ExamplePlugin extends Gdn_Plugin {
      * perform cleanup tasks such as deletion of unsued files and folders.
      */
     public function onDisable() {
-        removeFromConfig('Plugin.example.TrimSize');
-        removeFromConfig('Plugin.example.RenderCondition');
+        removeFromConfig('Plugin.Example.TrimSize');
+        removeFromConfig('Plugin.Example.RenderCondition');
 
         // Never delete from the database OnDisable.
         // Usually, you want re-enabling a plugin to be as if it was never off.
