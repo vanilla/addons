@@ -14,6 +14,7 @@ $PluginInfo['example'] = array(
     'RequiredTheme' => false,
     'RequiredPlugins' => false,
     'HasLocale' => false,
+    'License' => 'GNU GPL2',
     'SettingsUrl' => '/plugin/example',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Vanilla Staff",
