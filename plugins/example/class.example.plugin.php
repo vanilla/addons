@@ -1,6 +1,6 @@
 <?php
 /**
- * An example plugin that excerpt discussions text.
+ * An example plugin.
  *
  * @copyright 2008-2014 Vanilla Forums, Inc.
  * @license GNU GPLv2
@@ -23,6 +23,9 @@ $PluginInfo['example'] = array(
 
 /**
  * Class ExamplePlugin
+ *
+ * This plugin excerpt every discussion/announcement body
+ * before adding it under their title in the discussions list.
  *
  * @see http://docs.vanillaforums.com/developers/plugins
  * @see http://docs.vanillaforums.com/developers/plugins/quickstart
