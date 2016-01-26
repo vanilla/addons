@@ -8,7 +8,7 @@
 
 $PluginInfo['HipChat'] = array(
     'Description' => 'HipChat integration, first version: Posts every new discussion to HipChat. Requires cURL.',
-    'Version' => '0.1',
+    'Version' => '0.2',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'License' => 'GNU GPL2',
     'SettingsUrl' => '/settings/hipchat',
@@ -99,17 +99,41 @@ class HipChatPlugin extends Gdn_Plugin {
      * @param PostController $sender
      * @param array $args
      */
-    public function postController_afterDiscussionSave_handler($sender, $args) {
-        if (!$args['Discussion'] || !$discussionID = val('DiscussionID', $args['Discussion'])) {
+    public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
+        if (!$args['Discussion'] || !$discussionID = val('DiscussionID', $args['Discussion']) || !$args['Insert']) {
             return;
         }
 
         // Prep HipChat message.
         $author = Gdn::userModel()->getID(val('InsertUserID', $args['Discussion']));
-        $message = sprintf('%1$s: %2$s',
+        $message = sprintf(
+            '%1$s: %2$s',
             userAnchor($author),
             anchor(val('Name', $args['Discussion']), discussionUrl($args['Discussion']))
         );
+
+        // Say it.
+        self::sayInHipChat($message);
+    }
+
+    /**
+     * Post every new registration to HipChat.
+     *
+     * @param UserModel $sender
+     * @param array $args
+     */
+    public function userModel_afterInsertUser_handler($sender, $args) {
+        // Determine how to link their name.
+        $name = val('Name', $args['InsertFields']);
+        if (c('Garden.Registration.Method') == 'Approval') {
+            $user = anchor($name, '/user/applicants', '', array('WithDomain' => true));
+            $reason = sliceParagraph(val('DiscoveryText', $args['InsertFields']));
+            $message = sprintf(t('New member: %1$s (%2$s)'), $user, $reason);
+        } else {
+            // Use conservative name linking structure.
+            $user = anchor($name, '/profile/'.$args['InsertUserID'].'/'.$name, '', array('WithDomain' => true));
+            $message = sprintf(t('New member: %1$s'), $user);
+        }
 
         // Say it.
         self::sayInHipChat($message);
