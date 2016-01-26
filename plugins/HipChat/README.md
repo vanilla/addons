@@ -12,6 +12,7 @@ This is an MVP HipChat notification plugin. It delivers notifications to a desig
 ## Forced notifications
 
 * Every new discussion (linked author & title).
+* Every new registration (linked to profile or to applicants list with reason).
 
 ## Optional notifications.
 
