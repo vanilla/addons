@@ -9,7 +9,7 @@
 $PluginInfo['necro'] = array(
     'Name' => 'Necro',
     'Description' => 'Mark discussions raised from the dead.',
-    'Version' => '1.0',
+    'Version' => '1.1',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'License' => 'GNU GPL2',
     'Author' => "Lincoln Russell",
@@ -42,9 +42,9 @@ class NecroPlugin extends Gdn_Plugin {
         $lastPost = strtotime(val('DateLastComment', $args['Discussion']));
         $discussionID = val('DiscussionID', $args['Discussion']);
 
-        if (val('DateRevived', $args['Discussion'])) {
+        if ($revived = val('DateRevived', $args['Discussion'])) {
             // Necro discussion found! Is it alive again?
-            if ($this->isRisen($discussionID)) {
+            if ($this->isRisen($discussionID, $revived)) {
                 $this->unsetNecro($discussionID);
             }
         }
@@ -85,13 +85,14 @@ class NecroPlugin extends Gdn_Plugin {
      * Determine if this discussion has risen from the dead.
      *
      * @param int $discussionID
+     * @param string MySQL datetime.
      * @return bool
      */
-    protected function isRisen($discussionID) {
+    protected function isRisen($discussionID, $revived) {
         $results = Gdn::sql()->select('CommentID', 'count', 'NumComments')
             ->from('Comment')
             ->where('DiscussionID', $discussionID)
-            ->where('DateInserted >', val('DateRevived'))
+            ->where('DateInserted >', $revived)
             ->get()
             ->firstRow();
 
