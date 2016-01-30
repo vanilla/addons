@@ -100,7 +100,13 @@ class HipChatPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
-        if (!$args['Discussion'] || !$discussionID = val('DiscussionID', $args['Discussion']) || !$args['Insert'] || !val('DateInserted', $args['FormPostValues'])) {
+        // Make sure we have a valid discussion.
+        if (!$args['Discussion'] || !val('DiscussionID', $args['Discussion'])) {
+            return;
+        }
+
+        // Only trigger for new discussions.
+        if (!$args['Insert']) {
             return;
         }
 
