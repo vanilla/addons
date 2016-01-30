@@ -100,7 +100,7 @@ class HipChatPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
-        if (!$args['Discussion'] || !$discussionID = val('DiscussionID', $args['Discussion']) || !$args['Insert']) {
+        if (!$args['Discussion'] || !$discussionID = val('DiscussionID', $args['Discussion']) || !$args['Insert'] || !val('DateInserted', $args['FormPostValues'])) {
             return;
         }
 
