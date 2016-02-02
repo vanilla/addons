@@ -383,7 +383,7 @@ class QnAPlugin extends Gdn_Plugin {
       $Discussion =& $Args['Discussion'];
 
       // Mark the question as answered.
-      if (strtolower($Discussion['Type']) == 'question' && !$Discussion['Sink'] && !in_array($Discussion['QnA'], array('Answered', 'Accepted')) && $Discussion['InsertUserID'] != Gdn::Session()->UserID) {
+      if (strtolower($Discussion['Type']) == 'question' && !$Discussion['Sink'] && !in_array($Discussion['QnA'], array('Answered', 'Accepted'))) {
          $Sender->SQL->Set('QnA', 'Answered');
       }
    }
@@ -457,7 +457,7 @@ class QnAPlugin extends Gdn_Plugin {
 
       // Check permissions.
       $CanAccept = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
-      $CanAccept |= Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion) && Gdn::Session()->UserID != GetValue('InsertUserID', $Comment);
+      $CanAccept |= Gdn::Session()->UserID == GetValue('InsertUserID', $Discussion);
 
       if (!$CanAccept)
          return;
@@ -595,7 +595,7 @@ class QnAPlugin extends Gdn_Plugin {
                $Rm = new ReactionModel();
 
                // If there's change, reactions will take care of it
-               $Rm->React('Comment', $Comment['CommentID'], 'AcceptAnswer');
+               $Rm->React('Comment', $Comment['CommentID'], 'AcceptAnswer', NULL, true);
             }
          }
 
@@ -620,12 +620,12 @@ class QnAPlugin extends Gdn_Plugin {
    }
 
    public function DiscussionController_QnAOptions_Create($Sender, $DiscussionID = '', $CommentID = '') {
-      if ($DiscussionID)
-         $this->_DiscussionOptions($Sender, $DiscussionID);
-      elseif ($CommentID)
-         $this->_CommentOptions($Sender, $CommentID);
+    if ($DiscussionID)
+        $this->_DiscussionOptions($Sender, $DiscussionID);
+    elseif ($CommentID)
+        $this->_CommentOptions($Sender, $CommentID);
 
-   }
+}
 
    public function RecalculateDiscussionQnA($Discussion) {
       // Find comments in this discussion with a QnA value.
