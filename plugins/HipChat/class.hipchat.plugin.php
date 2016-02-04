@@ -8,7 +8,7 @@
 
 $PluginInfo['HipChat'] = array(
     'Description' => 'HipChat integration, first version: Posts every new discussion to HipChat. Requires cURL.',
-    'Version' => '0.2',
+    'Version' => '0.3',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'License' => 'GNU GPL2',
     'SettingsUrl' => '/settings/hipchat',
@@ -61,39 +61,6 @@ class HipChatPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Send a notification to a HipChat room.
-     *
-     * @param string $message
-     * @param string $color
-     */
-    protected static function sayInHipChat($message = '', $color = "green") {
-        if (!c('HipChat.Token') || !c('HipChat.Account')) {
-            return;
-        }
-
-        // Prepare our API endpoint.
-        $url = sprintf('https://%1$s.hipchat.com/v2/room/%2$s/notification?auth_token=%3$s',
-            c('HipChat.Account'),
-            c('HipChat.Room'),
-            c('HipChat.Token')
-        );
-
-        $data = ["color" => $color, "message" => $message, "notify" => false, "message_format" => "html"];
-        $data = json_encode($data);
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-
-        curl_exec($ch);
-        curl_close($ch);
-    }
-
-    /**
      * Post every new discussion to HipChat.
      *
      * @param PostController $sender
@@ -119,7 +86,7 @@ class HipChatPlugin extends Gdn_Plugin {
         );
 
         // Say it.
-        self::sayInHipChat($message);
+        HipChat::say($message);
     }
 
     /**
@@ -142,7 +109,7 @@ class HipChatPlugin extends Gdn_Plugin {
         }
 
         // Say it.
-        self::sayInHipChat($message);
+        HipChat::say($message);
     }
 
     /**

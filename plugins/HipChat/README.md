@@ -17,3 +17,9 @@ This is an MVP HipChat notification plugin. It delivers notifications to a desig
 ## Optional notifications.
 
 * None yet.
+
+
+## History
+
+* 0.3: Abstract HipChat model as its own class.
+* 0.2: Add new registrations notification.
