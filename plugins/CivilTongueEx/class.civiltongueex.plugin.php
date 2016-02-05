@@ -439,23 +439,20 @@ class CivilTonguePlugin extends Gdn_Plugin {
     }
 
     /**
-     * Cleanup poll and poll options.
+     * This view gets loaded in via ajax. We need to filter with an event before it's rendered.
      *
-     * @param PollModule $Sender Sending Controller.
-     * @param array $Args Sending arguments.
+     * @param PollModule $sender Poll Module.
+     * @param array $args Sending arguments.
      */
-    public function pollModule_afterLoadPoll_handler($Sender, &$Args) {
-        if (empty($Args['PollOptions']) || !is_array($Args['PollOptions'])) {
-            return;
+    public function pollModule_afterLoadPoll_handler($sender, &$args) {
+        if ($options = val('PollOptions', $args)) {
+            foreach ($options as &$option) {
+                $option['Body'] = $this->replace($option['Body']);
+            }
+            $args['PollOptions'] =  $options;
         }
-        if (empty($Args['Poll']) || !is_object($Args['Poll'])) {
-            return;
+        if ($name = val('Name', val('Poll', $args))) {
+            $args['Poll']->Name = $this->replace($name);
         }
-        $Args['Poll']->Name = $this->replace($Args['Poll']->Name);
-
-        foreach ($Args['PollOptions'] as &$Option) {
-            $Option['Body'] = $this->replace($Option['Body']);
-        }
-        $Args['Poll']->Name = $this->replace($Args['Poll']->Name);
     }
 }
