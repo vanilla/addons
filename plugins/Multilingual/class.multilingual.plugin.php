@@ -1,4 +1,5 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+
 /**
  * Multilingual Plugin
  *
@@ -9,14 +10,14 @@
  */
 
 $PluginInfo['Multilingual'] = array(
-   'Name' => 'Multilingual',
-   'Description' => "Allows use of multiple languages. Users can select their preferred language via a link in the footer, and administrators may embed their forum in different languages in different places.",
-   'Version' => '1.3',
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'MobileFriendly' => TRUE,
-   'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincoln@vanillaforums.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
+    'Name' => 'Multilingual',
+    'Description' => "Allows use of multiple languages. Users can select their preferred language via a link in the footer, and administrators may embed their forum in different languages in different places.",
+    'Version' => '1.3',
+    'RequiredApplications' => array('Vanilla' => '2.0.18'),
+    'MobileFriendly' => true,
+    'Author' => "Lincoln Russell",
+    'AuthorEmail' => 'lincoln@vanillaforums.com',
+    'AuthorUrl' => 'http://lincolnwebs.com'
 );
 
 /* Change Log
@@ -39,129 +40,129 @@ $PluginInfo['Multilingual'] = array(
  * @example <script>var vanilla_embed_locale = 'de-DE';</script>
  */
 class MultilingualPlugin extends Gdn_Plugin {
-   /**
-    * Return the enabled locales suitable for local choosing.
-    *
-    * @return array Returns an array in the form `[locale => localeName]`.
-    */
-   public static function EnabledLocales() {
-      $defaultLocale = Gdn_Locale::Canonicalize(C('Garden.Locale'));
+    /**
+     * Return the enabled locales suitable for local choosing.
+     *
+     * @return array Returns an array in the form `[locale => localeName]`.
+     */
+    public static function enabledLocales() {
+        $defaultLocale = Gdn_Locale::Canonicalize(C('Garden.Locale'));
 
-      $localeModel = new LocaleModel();
-      if (class_exists('Locale')) {
-         $localePacks = $localeModel->EnabledLocalePacks(false);
-         $locales = array();
-         foreach ($localePacks as $locale) {
-            $locales[$locale] = Locale::getDisplayName($locale, $locale);
-         }
-         $defaultName = Locale::getDisplayName($defaultLocale, $defaultLocale);
-      } else {
-         $locales = $localeModel->EnabledLocalePacks(true);
-         $locales = array_column($locales, 'Name', 'Locale');
-         $defaultName = $defaultLocale === 'en' ? 'English' : $defaultLocale;
-      }
-      asort($locales);
+        $localeModel = new LocaleModel();
+        if (class_exists('Locale')) {
+            $localePacks = $localeModel->EnabledLocalePacks(false);
+            $locales = array();
+            foreach ($localePacks as $locale) {
+                $locales[$locale] = Locale::getDisplayName($locale, $locale);
+            }
+            $defaultName = Locale::getDisplayName($defaultLocale, $defaultLocale);
+        } else {
+            $locales = $localeModel->EnabledLocalePacks(true);
+            $locales = array_column($locales, 'Name', 'Locale');
+            $defaultName = $defaultLocale === 'en' ? 'English' : $defaultLocale;
+        }
+        asort($locales);
 
-      if (!array_key_exists($defaultLocale, $locales)) {
-         $locales = array_merge(
-            array($defaultLocale => $defaultName),
-            $locales
-         );
-      }
+        if (!array_key_exists($defaultLocale, $locales)) {
+            $locales = array_merge(
+                array($defaultLocale => $defaultName),
+                $locales
+            );
+        }
 
-      return $locales;
-   }
+        return $locales;
+    }
 
 
-   /**
-    * Set user's preferred locale.
-    *
-    * Moved event from AppStart to AfterAnalyzeRequest to allow Embed to set P3P header first.
-    */
-   public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
-      // Set user preference
-      if ($TempLocale = $this->GetAlternateLocale()) {
-         Gdn::Locale()->Set($TempLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
-      }
-   }
+    /**
+     * Set user's preferred locale.
+     *
+     * Moved event from AppStart to AfterAnalyzeRequest to allow Embed to set P3P header first.
+     */
+    public function gdn_dispatcher_afterAnalyzeRequest_handler($Sender) {
+        // Set user preference
+        if ($TempLocale = $this->getAlternateLocale()) {
+            Gdn::Locale()->Set($TempLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
+        }
+    }
 
-   /**
-    * Show alternate locale options in Foot.
-    */
-   public function Base_Render_Before($Sender) {
-      // Not in Dashboard
-      // Block guests until guest sessions are restored
-      if ($Sender->MasterView == 'admin' || !CheckPermission('Garden.SignIn.Allow'))
-         return;
+    /**
+     * Show alternate locale options in Foot.
+     */
+    public function base_render_before($Sender) {
+        // Not in Dashboard
+        // Block guests until guest sessions are restored
+        if ($Sender->MasterView == 'admin' || !CheckPermission('Garden.SignIn.Allow'))
+            return;
 
-      $Sender->AddModule('LocaleChooserModule');
+        $Sender->AddModule('LocaleChooserModule');
 
-      // Add a simple style
-      $Sender->AddAsset('Head', '<style>.LocaleOption { padding-left: 10px; } .LocaleOptions { padding: 10px; } .Dashboard .LocaleOptions { display: none; }</style>');
-   }
+        // Add a simple style
+        $Sender->AddAsset('Head', '<style>.LocaleOption { padding-left: 10px; } .LocaleOptions { padding: 10px; } .Dashboard .LocaleOptions { display: none; }</style>');
+    }
 
-   /**
-    * Get user preference or queried locale.
-    */
-   protected function GetAlternateLocale() {
-      $Locale = FALSE;
+    /**
+     * Get user preference or queried locale.
+     */
+    protected function getAlternateLocale() {
+        $Locale = false;
 
-      // User preference
-      if (Gdn::Session()->IsValid()) {
-         $Locale = $this->GetUserMeta(Gdn::Session()->UserID, 'Locale', FALSE);
-         $Locale = val('Plugin.Multilingual.Locale', $Locale, FALSE);
-      }
-      // Query string
-      if (!$Locale) {
-         $Locale = $this->ValidateLocale(Gdn::Request()->Get('locale'));
-         if ($Locale) {
-            Gdn::Session()->Stash('Locale', $Locale);
-         }
-      }
-      // Session
-      if (!$Locale) {
-         $Locale = Gdn::Session()->Stash('Locale', '', FALSE);
-      }
+        // User preference
+        if (Gdn::Session()->IsValid()) {
+            $Locale = $this->GetUserMeta(Gdn::Session()->UserID, 'Locale', false);
+            $Locale = val('Plugin.Multilingual.Locale', $Locale, false);
+        }
+        // Query string
+        if (!$Locale) {
+            $Locale = $this->validateLocale(Gdn::Request()->Get('locale'));
+            if ($Locale) {
+                Gdn::Session()->Stash('Locale', $Locale);
+            }
+        }
+        // Session
+        if (!$Locale) {
+            $Locale = Gdn::Session()->Stash('Locale', '', false);
+        }
 
-      return $Locale;
-   }
+        return $Locale;
+    }
 
-   /**
-    * Allow user to set their preferred locale via link-click.
-    */
-   public function ProfileController_SetLocale_Create($Sender, $locale, $TK) {
-      if (!Gdn::Session()->UserID) {
-         throw PermissionException('Garden.SignIn.Allow');
-      }
+    /**
+     * Allow user to set their preferred locale via link-click.
+     */
+    public function profileController_setLocale_create($Sender, $locale, $TK) {
+        if (!Gdn::Session()->UserID) {
+            throw PermissionException('Garden.SignIn.Allow');
+        }
 
-      // Check intent.
-      if (!Gdn::Session()->ValidateTransientKey($TK)) {
-         Redirect($_SERVER['HTTP_REFERER']);
-      }
+        // Check intent.
+        if (!Gdn::Session()->ValidateTransientKey($TK)) {
+            Redirect($_SERVER['HTTP_REFERER']);
+        }
 
-      // If we got a valid locale, save their preference
-      if (isset($locale)) {
-         $locale = $this->ValidateLocale($locale);
-         if ($locale) {
-            $this->SetUserMeta(Gdn::Session()->UserID, 'Locale', $locale);
-         }
-      }
+        // If we got a valid locale, save their preference
+        if (isset($locale)) {
+            $locale = $this->validateLocale($locale);
+            if ($locale) {
+                $this->SetUserMeta(Gdn::Session()->UserID, 'Locale', $locale);
+            }
+        }
 
-      // Back from whence we came.
-      Redirect($_SERVER['HTTP_REFERER']);
-   }
+        // Back from whence we came.
+        Redirect($_SERVER['HTTP_REFERER']);
+    }
 
-   /**
-    * Confirm selected locale is valid and available.
-    *
-    * @param string $Locale Locale code.
-    * @return string Returns the canonical version of the locale on success or an empty string otherwise.
-    */
-   protected function ValidateLocale($Locale) {
-      $canonicalLocale = Gdn_Locale::Canonicalize($Locale);
-      $locales = static::EnabledLocales();
+    /**
+     * Confirm selected locale is valid and available.
+     *
+     * @param string $Locale Locale code.
+     * @return string Returns the canonical version of the locale on success or an empty string otherwise.
+     */
+    protected function validateLocale($Locale) {
+        $canonicalLocale = Gdn_Locale::Canonicalize($Locale);
+        $locales = static::enabledLocales();
 
-      $result = isset($locales[$canonicalLocale]) ? $canonicalLocale : '';
-      return $result;
-   }
+        $result = isset($locales[$canonicalLocale]) ? $canonicalLocale : '';
+        return $result;
+    }
 }
