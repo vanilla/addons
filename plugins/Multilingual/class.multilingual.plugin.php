@@ -12,7 +12,7 @@
 $PluginInfo['Multilingual'] = array(
     'Name' => 'Multilingual',
     'Description' => "Allows use of multiple languages. Users can select their preferred language via a link in the footer, and administrators may embed their forum in different languages in different places.",
-    'Version' => '1.3',
+    'Version' => '1.3.1',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => true,
     'Author' => "Lincoln Russell",
@@ -40,6 +40,11 @@ $PluginInfo['Multilingual'] = array(
  * @example <script>var vanilla_embed_locale = 'de-DE';</script>
  */
 class MultilingualPlugin extends Gdn_Plugin {
+    protected static $overrides = [
+        'nso' => ['Name' => 'Sesotho sa Leboa'],
+        'zu_ZA' => ['Name' => 'isiZulu']
+    ];
+
     /**
      * Return the enabled locales suitable for local choosing.
      *
@@ -53,7 +58,11 @@ class MultilingualPlugin extends Gdn_Plugin {
             $localePacks = $localeModel->EnabledLocalePacks(false);
             $locales = array();
             foreach ($localePacks as $locale) {
-                $locales[$locale] = Locale::getDisplayName($locale, $locale);
+                if (isset(static::$overrides[$locale]['Name'])) {
+                    $locales[$locale] = static::$overrides[$locale]['Name'];
+                } else {
+                    $locales[$locale] = ucwords(Locale::getDisplayName($locale, $locale));
+                }
             }
             $defaultName = Locale::getDisplayName($defaultLocale, $defaultLocale);
         } else {
