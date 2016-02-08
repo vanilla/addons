@@ -512,7 +512,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
             // Grab the user's roles.
             $Roles = Gdn::UserModel()->GetRoles(Gdn::Session()->UserID);
-            $Roles = ConsolidateArrayValuesByKey($Roles, 'Name');
+            $Roles = array_column($Roles, 'Name');
             $User['Roles'] = '';
             if (is_array($Roles) && sizeof($Roles))
                 $User['Roles'] = implode(',', $Roles);
@@ -683,8 +683,6 @@ class JsConnectPlugin extends Gdn_Plugin {
     public function settings_delete($Sender, $Args) {
         $client_id = $Sender->Request->Get('client_id');
         $Provider = self::getProvider($client_id);
-
-        $Sender->Form->InputPrefix = FALSE;
 
         if ($Sender->Form->AuthenticatedPostBack()) {
             if ($Sender->Form->GetFormValue('Yes')) {
