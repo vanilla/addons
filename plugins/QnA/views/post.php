@@ -15,7 +15,7 @@ if (c('Vanilla.Categories.Use') && is_object($this->Category))
       echo $this->Form->errors();
       $this->fireEvent('BeforeFormInputs');
 
-      if ($this->ShowCategorySelector === TRUE) {
+      if ($this->ShowCategorySelector === true) {
 			echo '<div class="P">';
 				echo '<div class="Category">';
 				echo $this->Form->label('Category', 'CategoryID'), ' ';
