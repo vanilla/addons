@@ -9,13 +9,13 @@
  */
 class NewQuestionModule extends Gdn_Module {
 
-   public function assetTarget() {
-      return 'Panel';
-   }
+    public function assetTarget() {
+        return 'Panel';
+    }
 
-   public function toString() {
-      $HasPermission = Gdn::session()->checkPermission('Vanilla.Discussions.Add', true, 'Category', 'any');
-      if ($HasPermission)
-         echo anchor(t('Ask a Question'), '/post/discussion?Type=Question', 'Button BigButton NewQuestion');
-   }
+    public function toString() {
+        $HasPermission = Gdn::session()->checkPermission('Vanilla.Discussions.Add', true, 'Category', 'any');
+        if ($HasPermission)
+            echo anchor(t('Ask a Question'), '/post/discussion?Type=Question', 'Button BigButton NewQuestion');
+    }
 }

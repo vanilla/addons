@@ -7,18 +7,18 @@ echo $this->Form->errors();
 ?>
 
 <div class="P">
-   <?php
-     echo '<i>'.t('Did this answer the question?').'</i>';
-     echo $this->Form->getFormValue('QnA');
-     echo $this->Form->radioList('QnA', $this->data('_QnAs'), array('list' => true));
-   ?>
+    <?php
+    echo '<i>'.t('Did this answer the question?').'</i>';
+    echo $this->Form->getFormValue('QnA');
+    echo $this->Form->radioList('QnA', $this->data('_QnAs'), array('list' => true));
+    ?>
 </div>
 
 <?php
 echo '<div class="Buttons Buttons-Confirm">',
-   $this->Form->button(t('OK')), ' ',
-   $this->Form->button(t('Cancel'), array('type' => 'button', 'class' => 'Button Close')),
-   '</div>';
+    $this->Form->button(t('OK')), ' ',
+    $this->Form->button(t('Cancel'), array('type' => 'button', 'class' => 'Button Close')),
+    '</div>';
 echo $this->Form->close();
 ?>
 </div>
