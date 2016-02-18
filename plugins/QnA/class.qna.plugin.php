@@ -784,7 +784,7 @@ class QnAPlugin extends Gdn_Plugin {
         $Sender->render('DiscussionOptions', '', 'plugins/QnA');
     }
 
-    public function discussionModel_BeforeGet_Handler($Sender, $Args) {
+    public function discussionModel_beforeGet_handler($Sender, $Args) {
         if (Gdn::controller()) {
             $Unanswered = Gdn::controller()->ClassName == 'DiscussionsController' && Gdn::controller()->RequestMethod == 'unanswered';
 
