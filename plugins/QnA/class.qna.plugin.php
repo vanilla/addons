@@ -305,7 +305,7 @@ class QnAPlugin extends Gdn_Plugin {
 //   }
 
     public function base_commentInfo_handler($Sender, $Args) {
-        $Type = GetValue('Type', $Args);
+        $Type = getValue('Type', $Args);
         if ($Type != 'Comment')
             return;
 
@@ -591,7 +591,7 @@ class QnAPlugin extends Gdn_Plugin {
 
                 // Update reactions
                 if ($this->Reactions) {
-                    include_Once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
+                    include_once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
                     $Rm = new ReactionModel();
 
                     // If there's change, reactions will take care of it
@@ -727,7 +727,7 @@ class QnAPlugin extends Gdn_Plugin {
 
                     // Update reactions
                     if ($this->Reactions) {
-                        include_Once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
+                        include_once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
                         $Rm = new ReactionModel();
 
                         // If there's change, reactions will take care of it
