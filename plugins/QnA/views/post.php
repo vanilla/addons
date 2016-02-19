@@ -1,14 +1,16 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) { exit(); } ?>
 $Session = Gdn::session();
 $CancelUrl = '/discussions';
-if (c('Vanilla.Categories.Use') && is_object($this->Category))
+if (c('Vanilla.Categories.Use') && is_object($this->Category)) {
     $CancelUrl = '/categories/'.urlencode($this->Category->UrlCode);
+}
 
 ?>
 <div id="DiscussionForm" class="FormTitleWrapper DiscussionForm">
    <?php
-		if ($this->deliveryType() == DELIVERY_TYPE_ALL)
-			echo wrap($this->data('Title'), 'h1', array('class' => 'H'));
+		if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+		    echo wrap($this->data('Title'), 'h1', array('class' => 'H'));
+		}
 
         echo '<div class="FormWrapper">';
         echo $this->Form->open();

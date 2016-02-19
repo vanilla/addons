@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) { exit(); } ?>
 <h1><?php echo $this->data('Title') ?></h1>
 <div class="">
 <?php
