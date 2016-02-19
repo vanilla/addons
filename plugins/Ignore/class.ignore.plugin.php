@@ -364,7 +364,7 @@ class IgnorePlugin extends Gdn_Plugin {
       if (!$Recipients->NumRows()) return;
 
       $Recipients = $Recipients->ResultArray();
-      $Recipients = ConsolidateArrayValuesByKey($Recipients, 'UserID');
+      $Recipients = array_column($Recipients, 'UserID');
 
       $UserID = Gdn::Session()->UserID;
       foreach ($Recipients as $RecipientID => $Recipient) {
@@ -684,7 +684,7 @@ class IgnorePlugin extends Gdn_Plugin {
          ->Where('UserID', $IgnoreUserID)
          ->Where('Deleted', 0)
          ->Get()->ResultArray();
-      $IgnoreConversationIDs = ConsolidateArrayValuesByKey($IgnoreConversations, 'ConversationID','ConversationID');
+      $IgnoreConversationIDs = array_column($IgnoreConversations, 'ConversationID', 'ConversationID');
       unset($IgnoreConversations);
 
       // Get session user's conversation IDs
@@ -694,7 +694,7 @@ class IgnorePlugin extends Gdn_Plugin {
          ->Where('UserID', $SessionUserID)
          ->Where('Deleted', 0)
          ->Get()->ResultArray();
-      $SessionConversationIDs = ConsolidateArrayValuesByKey($SessionConversations, 'ConversationID','ConversationID');
+      $SessionConversationIDs = array_column($SessionConversations, 'ConversationID', 'ConversationID');
       unset($SessionConversations);
 
       $CommonConversations = array_intersect($IgnoreConversationIDs, $SessionConversationIDs);
