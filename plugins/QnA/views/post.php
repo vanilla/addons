@@ -19,7 +19,7 @@ if (c('Vanilla.Categories.Use') && is_object($this->Category))
             echo '<div class="P">';
                 echo '<div class="Category">';
                 echo $this->Form->label('Category', 'CategoryID'), ' ';
-                echo $this->Form->categoryDropDown('CategoryID', array('Value' => getValue('CategoryID', $this->Category), 'PermFilter' => array('AllowedDiscussionTypes' => 'Question')));
+                echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'PermFilter' => array('AllowedDiscussionTypes' => 'Question')));
                 echo '</div>';
             echo '</div>';
         }
