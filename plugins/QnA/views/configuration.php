@@ -23,7 +23,7 @@ echo $this->Form->errors();
         echo $this->Form->checkBox('QnA.IsPointsAwardEnabled', t('Enables points award. This will gives users points for answering questions.'), $checkBoxAttributes);
     ?></li>
     <li class="PointAwardsInputs"<?php echo $pointsAwardEnabled ? null : ' style="display:none;"'?>><?php
-        echo $this->Form->label(t('Point(s) per answer'), 'QnA.PointsPerAnswer');
+        echo $this->Form->label(t('Point(s) per answer (Only the first user\'s answer to a question will award points)'), 'QnA.PointsPerAnswer');
         echo $this->Form->textBox('QnA.PointsPerAnswer', $textBoxAttributes);
     ?></li>
     <li class="PointAwardsInputs"<?php echo $pointsAwardEnabled ? null : ' style="display:none;"'?>><?php
