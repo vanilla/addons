@@ -17,14 +17,14 @@ if (c('Vanilla.Categories.Use') && is_object($this->Category)) {
         echo $this->Form->errors();
         $this->fireEvent('BeforeFormInputs');
 
-      if ($this->ShowCategorySelector === true) {
-          echo '<div class="P">';
-          echo '<div class="Category">';
-          echo $this->Form->label('Category', 'CategoryID'), ' ';
-          echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'CategoryData' => $this->data('AllowedCategories')));
-          echo '</div>';
-          echo '</div>';
-      }
+       if ($this->ShowCategorySelector === true) {
+           echo '<div class="P">';
+               echo '<div class="Category">';
+               echo $this->Form->label('Category', 'CategoryID'), ' ';
+               echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'CategoryData' => $this->data('AllowedCategories')));
+               echo '</div>';
+           echo '</div>';
+       }
 
         echo '<div class="P">';
             echo $this->Form->label('Question', 'Name');
