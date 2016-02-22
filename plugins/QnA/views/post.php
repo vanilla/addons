@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) { exit(); } ?>
+<?php if (!defined('APPLICATION')) { exit(); } 
 $Session = Gdn::session();
 $CancelUrl = '/discussions';
 if (c('Vanilla.Categories.Use') && is_object($this->Category)) {
