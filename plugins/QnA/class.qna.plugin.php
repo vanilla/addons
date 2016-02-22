@@ -281,7 +281,7 @@ class QnAPlugin extends Gdn_Plugin {
         $sender->title(sprintf(t('%s settings'), t('Q&A')));
         $sender->addSideMenu('settings/QnA');
         $sender->Form = new Gdn_Form();
-        $this->dispatch($sender, $sender->RequestArgs);
+        $this->controller_index($sender);
     }
 
     /**
