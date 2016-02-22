@@ -6,6 +6,6 @@
             } else {
                 $('.PointAwardsInputs').hide().find('input').prop('disabled', true);
             }
-        });
+        }).change();
     });
 })(jQuery);
