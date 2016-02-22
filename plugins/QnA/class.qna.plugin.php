@@ -46,9 +46,9 @@ class QnAPlugin extends Gdn_Plugin {
     public function setup() {
         $this->structure();
 
-        touchConfig('QnA.IsPointsAwardEnabled', false);
-        touchConfig('QnA.PointsPerAnswer', 1);
-        touchConfig('QnA.PointsPerAcceptedAnswer', 1);
+        touchConfig('QnA.Points.Enabled', false);
+        touchConfig('QnA.Points.Answer', 1);
+        touchConfig('QnA.Points.AcceptedAnswer', 1);
     }
 
     public function structure() {
@@ -236,9 +236,9 @@ class QnAPlugin extends Gdn_Plugin {
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
-            'QnA.IsPointsAwardEnabled' => c('QnA.IsPointsAwardEnabled', false),
-            'QnA.PointsPerAnswer' => c('QnA.PointsPerAnswer', 1),
-            'QnA.PointsPerAcceptedAnswer' => c('QnA.PointsPerAcceptedAnswer', 1),
+            'QnA.Points.Enabled' => c('QnA.Points.Enabled', false),
+            'QnA.Points.Answer' => c('QnA.Points.Answer', 1),
+            'QnA.Points.AcceptedAnswer' => c('QnA.Points.AcceptedAnswer', 1),
         ));
         $sender->Form->setModel($configurationModel);
 
@@ -246,20 +246,20 @@ class QnAPlugin extends Gdn_Plugin {
         if ($sender->Form->authenticatedPostBack() === false) {
             $sender->Form->setData($configurationModel->Data);
         } else {
-            $configurationModel->Validation->applyRule('QnA.IsPointsAwardEnabled', 'Boolean');
+            $configurationModel->Validation->applyRule('QnA.Points.Enabled', 'Boolean');
 
-            if ($sender->Form->getFormValue('QnA.IsPointsAwardEnabled')) {
-                $configurationModel->Validation->applyRule('QnA.PointsPerAnswer', 'Required');
-                $configurationModel->Validation->applyRule('QnA.PointsPerAnswer', 'Integer');
+            if ($sender->Form->getFormValue('QnA.Points.Enabled')) {
+                $configurationModel->Validation->applyRule('QnA.Points.Answer', 'Required');
+                $configurationModel->Validation->applyRule('QnA.Points.Answer', 'Integer');
 
-                $configurationModel->Validation->applyRule('QnA.PointsPerAcceptedAnswer', 'Required');
-                $configurationModel->Validation->applyRule('QnA.PointsPerAcceptedAnswer', 'Integer');
+                $configurationModel->Validation->applyRule('QnA.Points.AcceptedAnswer', 'Required');
+                $configurationModel->Validation->applyRule('QnA.Points.AcceptedAnswer', 'Integer');
 
-                if ($sender->Form->getFormValue('QnA.PointsPerAnswer') < 0) {
-                    $sender->Form->setFormValue('QnA.PointsPerAnswer', 0);
+                if ($sender->Form->getFormValue('QnA.Points.Answer') < 0) {
+                    $sender->Form->setFormValue('QnA.Points.Answer', 0);
                 }
-                if ($sender->Form->getFormValue('QnA.PointsPerAcceptedAnswer') < 0) {
-                    $sender->Form->setFormValue('QnA.PointsPerAcceptedAnswer', 0);
+                if ($sender->Form->getFormValue('QnA.Points.AcceptedAnswer') < 0) {
+                    $sender->Form->setFormValue('QnA.Points.AcceptedAnswer', 0);
                 }
             }
 
@@ -649,8 +649,8 @@ class QnAPlugin extends Gdn_Plugin {
                     case 'Accepted':
                         $Change = 1;
 
-                        if (c('QnA.IsPointsAwardEnabled', false) && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
-                            UserModel::givePoints($Comment['InsertUserID'], c('QnA.PointsPerAcceptedAnswer', 1), 'QnA');
+                        if (c('QnA.Points.Enabled', false) && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
+                            UserModel::givePoints($Comment['InsertUserID'], c('QnA.Points.AcceptedAnswer', 1), 'QnA');
                         }
                         break;
 
@@ -1125,19 +1125,21 @@ class QnAPlugin extends Gdn_Plugin {
      * @param $args Event arguments.
      */
     public function commentModel_afterSaveComment_handler($sender, $args) {
-        if (!c('QnA.IsPointsAwardEnabled', false) || !$args['Insert']) {
+        if (!c('QnA.Points.Enabled', false) || !$args['Insert']) {
             return;
         }
 
-        $discussion = (new DiscussionModel())->getID($args['CommentData']['DiscussionID'], DATASET_TYPE_ARRAY);
-        // If the comment is not an answer to a question
-        // or if the question already have an accepted answer
-        // or if the original poster comments on its own question, abort.
-        if ($discussion['Type'] !== 'Question' || $discussion['QnA'] === 'Accepted' || $discussion['InsertUserID'] == GDN::session()->UserID) {
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($args['CommentData']['DiscussionID'], DATASET_TYPE_ARRAY);
+
+        $isCommentAnAnswer = $discussion['Type'] === 'Question';
+        $isQuestionResolved = $discussion['QnA'] === 'Accepted';
+        $isCurrentUserOriginalPoster = $discussion['InsertUserID'] == GDN::session()->UserID;
+        if (!$isCommentAnAnswer || $isQuestionResolved || $isCurrentUserOriginalPoster) {
             return;
         }
 
-        $userAnswersToQuestion = (new CommentModel())->getWhere(array(
+        $userAnswersToQuestion = $sender->getWhere(array(
             'DiscussionID' => $args['CommentData']['DiscussionID'],
             'InsertUserId' => GDN::session()->UserID,
         ));
@@ -1146,6 +1148,6 @@ class QnAPlugin extends Gdn_Plugin {
             return;
         }
 
-        UserModel::givePoints(GDN::session()->UserID, c('QnA.PointsPerAnswer', 1), 'QnA');
+        UserModel::givePoints(GDN::session()->UserID, c('QnA.Points.Answer', 1), 'QnA');
     }
 }
