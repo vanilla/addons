@@ -227,9 +227,11 @@ class CivilTonguePlugin extends Gdn_Plugin {
      */
     public function discussionsController_render_before($Sender, $Args) {
         $Discussions = val('Discussions', $Sender->Data);
-        foreach ($Discussions as &$Discussion) {
-            $Discussion->Name = $this->replace($Discussion->Name);
-            $Discussion->Body = $this->replace($Discussion->Body);
+        if (is_array($Discussions) || $Discussions instanceof \Traversable) {
+            foreach ($Discussions as &$Discussion) {
+                $Discussion->Name = $this->replace($Discussion->Name);
+                $Discussion->Body = $this->replace($Discussion->Body);
+            }
         }
     }
 

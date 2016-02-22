@@ -11,7 +11,7 @@ echo $this->Form->Errors();
 	<li>
 		<?php
          echo $this->Form->Label('Forbidden words', 'Plugins.CivilTongue.Words');
-			echo Wrap(T('Seperate each word with a semi-colon ";"'), 'p');
+			echo Wrap(T('Separate each word with a semi-colon ";"'), 'p');
 			echo $this->Form->TextBox('Plugins.CivilTongue.Words', array('MultiLine' => TRUE));
 		?>
 	</li>
