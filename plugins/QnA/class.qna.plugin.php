@@ -220,19 +220,22 @@ class QnAPlugin extends Gdn_Plugin {
         Gdn::structure()->reset();
     }
 
+    /// EVENTS ///
     /**
-     * Define what to do for the /index page of this plugin.
+     * Create a method called "QnA" on the SettingController.
      *
      * @param $sender Sending controller instance
      */
-    public function controller_index($sender) {
+    public function settingsController_QnA_create($sender) {
         // Prevent non-admins from accessing this page
         $sender->permission('Garden.Settings.Manage');
 
+        $sender->title(sprintf(t('%s settings'), t('Q&A')));
         $sender->setData('PluginDescription', $this->getPluginKey('Description'));
-
         $sender->addJsFile('QnA.js', 'plugins/QnA');
+        $sender->addSideMenu('settings/QnA');
 
+        $sender->Form = new Gdn_Form();
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
@@ -269,19 +272,6 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         $sender->render($this->getView('configuration.php'));
-    }
-
-    /// EVENTS ///
-    /**
-     * Create a method called "QnA" on the SettingController.
-     *
-     * @param $sender Sending controller instance
-     */
-    public function settingsController_QnA_create($sender) {
-        $sender->title(sprintf(t('%s settings'), t('Q&A')));
-        $sender->addSideMenu('settings/QnA');
-        $sender->Form = new Gdn_Form();
-        $this->controller_index($sender);
     }
 
     /**
