@@ -18,13 +18,13 @@ $PluginInfo['RoleTitle'] = array(
 
 class RoleTitlePlugin extends Gdn_Plugin {
 
-   public function DiscussionController_AuthorInfo_Handler($Sender) {
-       $this->_AttachTitle($Sender);
+   public function discussionController_authorInfo_handler($Sender) {
+       $this->_attachTitle($Sender);
    }
 
-    private function _AttachTitle($Sender) {
-        $Object = GetValue('Object', $Sender->EventArguments);
-        $Roles = $Object ? GetValue('Roles', $Object, array()) : FALSE;
+    private function _attachTitle($Sender) {
+        $Object = getValue('Object', $Sender->EventArguments);
+        $Roles = $Object ? getValue('Roles', $Object, array()) : FALSE;
         if (!$Roles) {
             return;
         }
@@ -35,23 +35,23 @@ class RoleTitlePlugin extends Gdn_Plugin {
    /**
     * Inject css classes into the comment containers.
     */
-    public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
-        $this->_InjectCssClass($Sender);
+    public function discussionController_beforeCommentDisplay_handler($Sender) {
+        $this->_injectCssClass($Sender);
     }
 
-    public function PostController_BeforeCommentDisplay_Handler($Sender) {
-        $this->_InjectCssClass($Sender);
+    public function postController_beforeCommentDisplay_handler($Sender) {
+        $this->_injectCssClass($Sender);
     }
 
-    private function _InjectCssClass($Sender) {
-        $Object = GetValue('Object', $Sender->EventArguments);
-        $CssRoles = $Object ? GetValue('Roles', $Object, array()) : FALSE;
+    private function _injectCssClass($Sender) {
+        $Object = getValue('Object', $Sender->EventArguments);
+        $CssRoles = $Object ? getValue('Roles', $Object, array()) : FALSE;
         if (!$CssRoles) {
             return;
         }
 
         foreach ($CssRoles as &$RawRole) {
-            $RawRole = $this->_FormatRoleCss($RawRole);
+            $RawRole = $this->_formatRoleCss($RawRole);
         }
 
         if (count($CssRoles)) {
@@ -63,73 +63,73 @@ class RoleTitlePlugin extends Gdn_Plugin {
     * Add the insert user's roles to the comment data so we can visually
     * identify different roles in the view.
     */
-	public function DiscussionController_Render_Before($Sender) {
-	    $Session = Gdn::Session();
-	    if ($Session->IsValid()) {
+	public function discussionController_render_before($Sender) {
+	    $Session = Gdn::session();
+	    if ($Session->isValid()) {
 	        $JoinUser = array($Session->User);
-	        RoleModel::SetUserRoles($JoinUser, 'UserID');
+	        RoleModel::setUserRoles($JoinUser, 'UserID');
 	    }
 	    if (property_exists($Sender, 'Discussion')) {
 	        $JoinDiscussion = array($Sender->Discussion);
-	        RoleModel::SetUserRoles($JoinDiscussion, 'InsertUserID');
-	        $Comments = $Sender->Data('Comments');
-	        RoleModel::SetUserRoles($Comments->Result(), 'InsertUserID');
+	        RoleModel::setUserRoles($JoinDiscussion, 'InsertUserID');
+	        $Comments = $Sender->data('Comments');
+	        RoleModel::setUserRoles($Comments->result(), 'InsertUserID');
 
-	        $Answers = $Sender->Data('Answers');
+	        $Answers = $Sender->data('Answers');
 	        if (is_array($Answers)) {
-	            RoleModel::SetUserRoles($Answers, 'InsertUserID');
+	            RoleModel::setUserRoles($Answers, 'InsertUserID');
 	        }
 
             // And add the css class to the discussion
             if (is_array($Sender->Discussion->Roles)) {
                 if (count($Sender->Discussion->Roles)) {
-                    $CssRoles = GetValue('Roles', $Sender->Discussion);
+                    $CssRoles = getValue('Roles', $Sender->Discussion);
                     foreach ($CssRoles as &$RawRole) {
-                        $RawRole = $this->_FormatRoleCss($RawRole);
+                        $RawRole = $this->_formatRoleCss($RawRole);
                     }
 
-                    $Sender->Discussion->_CssClass = GetValue('_CssClass', $Sender->Discussion, '').' '.implode(' ',$CssRoles);
+                    $Sender->Discussion->_CssClass = getValue('_CssClass', $Sender->Discussion, '').' '.implode(' ',$CssRoles);
                 }
             }
 	    }
 	}
 
-    public function PostController_Render_Before($Sender) {
-        $Data = $Sender->Data('Comments');
+    public function postController_render_before($Sender) {
+        $Data = $Sender->data('Comments');
         if (is_object($Data)) {
-            RoleModel::SetUserRoles($Data->Result(), 'InsertUserID');
+            RoleModel::setUserRoles($Data->result(), 'InsertUserID');
         }
     }
 
     // Add it to the comment form
-    public function Base_BeforeCommentForm_Handler($Sender) {
-        $CssClass = GetValue('FormCssClass', $Sender->EventArguments, '');
-        $CssRoles = GetValue('Roles', Gdn::Session()->User);
+    public function base_beforeCommentForm_handler($Sender) {
+        $CssClass = getValue('FormCssClass', $Sender->EventArguments, '');
+        $CssRoles = getValue('Roles', Gdn::session()->User);
         if (!is_array($CssRoles)) {
             return;
         }
 
         foreach ($CssRoles as &$RawRole) {
-            $RawRole = $this->_FormatRoleCss($RawRole);
+            $RawRole = $this->_formatRoleCss($RawRole);
         }
 
         $Sender->EventArguments['FormCssClass'] = $CssClass.' '.implode(' ',$CssRoles);
     }
 
 
-    private function _FormatRoleCss($RawRole) {
-        return 'Role_'.str_replace(' ','_', Gdn_Format::AlphaNumeric($RawRole));
+    private function _formatRoleCss($RawRole) {
+        return 'Role_'.str_replace(' ','_', Gdn_Format::alphaNumeric($RawRole));
     }
 
     // Add the roles to the profile body tag
-    public function ProfileController_Render_Before($Sender) {
-        $CssRoles = $Sender->Data('UserRoles');
+    public function profileController_render_before($Sender) {
+        $CssRoles = $Sender->data('UserRoles');
         if (!is_array($CssRoles)) {
             return;
         }
 
         foreach ($CssRoles as &$RawRole) {
-            $RawRole = $this->_FormatRoleCss($RawRole);
+            $RawRole = $this->_formatRoleCss($RawRole);
         }
 
         $Sender->CssClass = trim($Sender->CssClass.' '.implode(' ',$CssRoles));
