@@ -23,8 +23,8 @@ class RoleTitlePlugin extends Gdn_Plugin {
    }
 
     private function attachTitle($sender) {
-        $object = getValue('Object', $sender->EventArguments);
-        $roles = $object ? getValue('Roles', $object, array()) : false;
+        $object = val('Object', $sender->EventArguments);
+        $roles = $object ? val('Roles', $object, array()) : false;
         if (!$roles) {
             return;
         }
@@ -44,8 +44,8 @@ class RoleTitlePlugin extends Gdn_Plugin {
     }
 
     private function injectCssClass($sender) {
-        $object = getValue('Object', $sender->EventArguments);
-        $cssRoles = $object ? getValue('Roles', $object, array()) : false;
+        $object = val('Object', $sender->EventArguments);
+        $cssRoles = $object ? val('Roles', $object, array()) : false;
         if (!$cssRoles) {
             return;
         }
@@ -103,8 +103,8 @@ class RoleTitlePlugin extends Gdn_Plugin {
 
     // Add it to the comment form
     public function base_beforeCommentForm_handler($sender) {
-        $cssClass = getValue('FormCssClass', $sender->EventArguments, '');
-        $cssRoles = getValue('Roles', Gdn::session()->User);
+        $cssClass = val('FormCssClass', $sender->EventArguments, '');
+        $cssRoles = val('Roles', Gdn::session()->User);
         if (!is_array($cssRoles)) {
             return;
         }
