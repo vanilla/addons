@@ -19,10 +19,10 @@ $PluginInfo['RoleTitle'] = array(
 class RoleTitlePlugin extends Gdn_Plugin {
 
    public function discussionController_authorInfo_handler($sender) {
-       $this->_attachTitle($sender);
+       $this->attachTitle($sender);
    }
 
-    private function _attachTitle($sender) {
+    private function attachTitle($sender) {
         $object = getValue('Object', $sender->EventArguments);
         $roles = $object ? getValue('Roles', $object, array()) : false;
         if (!$roles) {
@@ -36,14 +36,14 @@ class RoleTitlePlugin extends Gdn_Plugin {
     * Inject css classes into the comment containers.
     */
     public function discussionController_beforeCommentDisplay_handler($sender) {
-        $this->_injectCssClass($sender);
+        $this->injectCssClass($sender);
     }
 
     public function postController_beforeCommentDisplay_handler($sender) {
-        $this->_injectCssClass($sender);
+        $this->injectCssClass($sender);
     }
 
-    private function _injectCssClass($sender) {
+    private function injectCssClass($sender) {
         $object = getValue('Object', $sender->EventArguments);
         $cssRoles = $object ? getValue('Roles', $object, array()) : false;
         if (!$cssRoles) {
@@ -51,7 +51,7 @@ class RoleTitlePlugin extends Gdn_Plugin {
         }
 
         foreach ($cssRoles as &$rawRole) {
-            $rawRole = $this->_formatRoleCss($rawRole);
+            $rawRole = $this->formatRoleCss($rawRole);
         }
 
         if (count($cssRoles)) {
@@ -85,7 +85,7 @@ class RoleTitlePlugin extends Gdn_Plugin {
                 if (count($sender->Discussion->Roles)) {
                     $cssRoles = getValue('Roles', $sender->Discussion);
                     foreach ($cssRoles as &$rawRole) {
-                        $rawRole = $this->_formatRoleCss($rawRole);
+                        $rawRole = $this->formatRoleCss($rawRole);
                     }
 
                     $sender->Discussion->_CssClass = getValue('_CssClass', $sender->Discussion, '').' '.implode(' ',$cssRoles);
@@ -110,14 +110,14 @@ class RoleTitlePlugin extends Gdn_Plugin {
         }
 
         foreach ($cssRoles as &$rawRole) {
-            $rawRole = $this->_formatRoleCss($rawRole);
+            $rawRole = $this->formatRoleCss($rawRole);
         }
 
         $sender->EventArguments['FormCssClass'] = $cssClass.' '.implode(' ',$cssRoles);
     }
 
 
-    private function _formatRoleCss($rawRole) {
+    private function formatRoleCss($rawRole) {
         return 'Role_'.str_replace(' ','_', Gdn_Format::alphaNumeric($rawRole));
     }
 
@@ -129,7 +129,7 @@ class RoleTitlePlugin extends Gdn_Plugin {
         }
 
         foreach ($cssRoles as &$rawRole) {
-            $rawRole = $this->_formatRoleCss($rawRole);
+            $rawRole = $this->formatRoleCss($rawRole);
         }
 
         $sender->CssClass = trim($sender->CssClass.' '.implode(' ',$cssRoles));
