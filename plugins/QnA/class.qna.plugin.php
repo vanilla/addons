@@ -8,7 +8,7 @@
 $PluginInfo['QnA'] = array(
     'Name' => 'Q&A',
     'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-    'Version' => '1.2.4',
+    'Version' => '1.3',
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'MobileFriendly' => true,
     'SettingsUrl' => '/settings/qna',
