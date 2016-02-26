@@ -9,8 +9,8 @@ $pluginInfo['RoleTitle'] = array(
    'Description' => "Lists users' roles under their name and adds role-specific CSS classes to their comments for theming.",
    'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'MobileFriendly' => TRUE,
-   'RegisterPermissions' => FALSE,
+   'MobileFriendly' => true,
+   'RegisterPermissions' => false,
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincolnwebs@gmail.com',
    'AuthorUrl' => 'http://lincolnwebs.com'
@@ -24,7 +24,7 @@ class RoleTitlePlugin extends Gdn_Plugin {
 
     private function _attachTitle($sender) {
         $object = getValue('Object', $sender->EventArguments);
-        $roles = $object ? getValue('Roles', $object, array()) : FALSE;
+        $roles = $object ? getValue('Roles', $object, array()) : false;
         if (!$roles) {
             return;
         }
@@ -45,7 +45,7 @@ class RoleTitlePlugin extends Gdn_Plugin {
 
     private function _injectCssClass($sender) {
         $object = getValue('Object', $sender->EventArguments);
-        $cssRoles = $object ? getValue('Roles', $object, array()) : FALSE;
+        $cssRoles = $object ? getValue('Roles', $object, array()) : false;
         if (!$cssRoles) {
             return;
         }
