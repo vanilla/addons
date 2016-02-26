@@ -44,6 +44,10 @@ class QnAPlugin extends Gdn_Plugin {
 
     public function setup() {
         $this->structure();
+
+        touchConfig('QnA.Points.Enabled', false);
+        touchConfig('QnA.Points.Answer', 1);
+        touchConfig('QnA.Points.AcceptedAnswer', 1);
     }
 
     public function structure() {
@@ -216,8 +220,79 @@ class QnAPlugin extends Gdn_Plugin {
         Gdn::structure()->reset();
     }
 
+    /**
+     * Define what to do for the /index page of this plugin.
+     *
+     * @param $sender Sending controller instance
+     */
+    public function controller_index($sender) {
+        // Prevent non-admins from accessing this page
+        $sender->permission('Garden.Settings.Manage');
+
+        $sender->setData('PluginDescription', $this->getPluginKey('Description'));
+
+        $sender->addJsFile('QnA.js', 'plugins/QnA');
+
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField(array(
+            'QnA.Points.Enabled' => c('QnA.Points.Enabled', false),
+            'QnA.Points.Answer' => c('QnA.Points.Answer', 1),
+            'QnA.Points.AcceptedAnswer' => c('QnA.Points.AcceptedAnswer', 1),
+        ));
+        $sender->Form->setModel($configurationModel);
+
+        // If seeing the form for the first time...
+        if ($sender->Form->authenticatedPostBack() === false) {
+            $sender->Form->setData($configurationModel->Data);
+        } else {
+            $configurationModel->Validation->applyRule('QnA.Points.Enabled', 'Boolean');
+
+            if ($sender->Form->getFormValue('QnA.Points.Enabled')) {
+                $configurationModel->Validation->applyRule('QnA.Points.Answer', 'Required');
+                $configurationModel->Validation->applyRule('QnA.Points.Answer', 'Integer');
+
+                $configurationModel->Validation->applyRule('QnA.Points.AcceptedAnswer', 'Required');
+                $configurationModel->Validation->applyRule('QnA.Points.AcceptedAnswer', 'Integer');
+
+                if ($sender->Form->getFormValue('QnA.Points.Answer') < 0) {
+                    $sender->Form->setFormValue('QnA.Points.Answer', 0);
+                }
+                if ($sender->Form->getFormValue('QnA.Points.AcceptedAnswer') < 0) {
+                    $sender->Form->setFormValue('QnA.Points.AcceptedAnswer', 0);
+                }
+            }
+
+            if ($sender->Form->save()) {
+                $sender->StatusMessage = t('Your changes have been saved.');
+            }
+        }
+
+        $sender->render($this->getView('configuration.php'));
+    }
 
     /// EVENTS ///
+    /**
+     * Create a method called "QnA" on the SettingController.
+     *
+     * @param $sender Sending controller instance
+     */
+    public function settingsController_QnA_create($sender) {
+        $sender->title(sprintf(t('%s settings'), t('Q&A')));
+        $sender->addSideMenu('settings/QnA');
+        $sender->Form = new Gdn_Form();
+        $this->controller_index($sender);
+    }
+
+    /**
+     * Add a link to the dashboard menu.
+     *
+     * @param $sender Sending controller instance.
+     */
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        $menu = $sender->EventArguments['SideMenu'];
+        $menu->addLink('Add-ons', t('Q&A'), 'settings/QnA', 'Garden.Settings.Manage');
+    }
 
     public function base_addonEnabled_handler($Sender, $Args) {
         switch (strtolower($Args['AddonName'])) {
@@ -594,6 +669,10 @@ class QnAPlugin extends Gdn_Plugin {
 
                     case 'Accepted':
                         $Change = 1;
+
+                        if (c('QnA.Points.Enabled', false) && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
+                            UserModel::givePoints($Comment['InsertUserID'], c('QnA.Points.AcceptedAnswer', 1), 'QnA');
+                        }
                         break;
 
                     default:
@@ -1073,5 +1152,40 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function messageController_afterGetLocationData_handler($Sender, $Args) {
         $Args['ControllerData']['Vanilla/Post/Question'] = t('New Question Form');
+    }
+
+    /**
+     * Hook on AfterSaveComment event.
+     *
+     * Give point(s) to the current user if the right conditions are met.
+     *
+     * @param $sender Sending controller instance.
+     * @param $args Event arguments.
+     */
+    public function commentModel_afterSaveComment_handler($sender, $args) {
+        if (!c('QnA.Points.Enabled', false) || !$args['Insert']) {
+            return;
+        }
+
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($args['CommentData']['DiscussionID'], DATASET_TYPE_ARRAY);
+
+        $isCommentAnAnswer = $discussion['Type'] === 'Question';
+        $isQuestionResolved = $discussion['QnA'] === 'Accepted';
+        $isCurrentUserOriginalPoster = $discussion['InsertUserID'] == GDN::session()->UserID;
+        if (!$isCommentAnAnswer || $isQuestionResolved || $isCurrentUserOriginalPoster) {
+            return;
+        }
+
+        $userAnswersToQuestion = $sender->getWhere(array(
+            'DiscussionID' => $args['CommentData']['DiscussionID'],
+            'InsertUserId' => GDN::session()->UserID,
+        ));
+        // Award point(s) only for the first answer to the question
+        if ($userAnswersToQuestion->count() > 1) {
+            return;
+        }
+
+        UserModel::givePoints(GDN::session()->UserID, c('QnA.Points.Answer', 1), 'QnA');
     }
 }
