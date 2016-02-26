@@ -4,7 +4,7 @@
 // 0.3 - 2011-12-13 - linc - Add class to title span, make injected CSS class Vanilla-like (capitalized, no dashes).
 // 0.2 - 2012-05-21 - mosullivan - Add _CssClass to Discussion object so first comment in list gets the role css.
 
-$pluginInfo['RoleTitle'] = array(
+$PluginInfo['RoleTitle'] = array(
    'Name' => 'Role Titles',
    'Description' => "Lists users' roles under their name and adds role-specific CSS classes to their comments for theming.",
    'Version' => '1.0',
