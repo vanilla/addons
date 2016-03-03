@@ -31,6 +31,7 @@ class PrefixDiscussionFilterPlugin extends Gdn_Plugin {
      * Update the DB structure. Called on /utility/update and when the plugin is enabled
      */
     public function structure() {
+        // Add the new index (`Prefix`, `CategoryID`)
         Gdn::database()->structure()
             ->table('Discussion')
             ->column('Prefix', 'varchar(64)', true, ['index.PrefixCategory'])
