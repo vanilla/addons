@@ -40,37 +40,6 @@ class PrefixDiscussionFilterPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add new filters to the discussion model
-     */
-    public function discussionModel_discussionFilters_handler() {
-        DiscussionModel::addFilterSet('prefix', 'Prefixes');
-        DiscussionModel::addFilter('has-prefix', 'Has prefix', ['d.Prefix IS NOT NULL' => null], 'test', 'prefix');
-        DiscussionModel::addFilter('no-prefix', 'No prefix', ['d.Prefix IS NULL' => null], 'test', 'prefix');
-
-        $currentPrefixes = PrefixDiscussionPlugin::getPrefixes();
-        unset($currentPrefixes['-']);
-
-        $usedPrefixesResult =
-            Gdn::sql()
-                ->select('Prefix')
-                ->from('Discussion')
-                ->where('Prefix IS NOT NULL')
-                ->get()
-                ->resultArray();
-
-        foreach($usedPrefixesResult as $row) {
-            if (!isset($currentPrefixes[$row['Prefix']])) {
-                $currentPrefixes[$row['Prefix']] = $row['Prefix'];
-            }
-        }
-
-        natsort($currentPrefixes);
-        foreach($currentPrefixes as $prefix) {
-            DiscussionModel::addFilter('prefix-'.$this->stringToSlug($prefix), $prefix, ['d.Prefix' => $prefix], 'test2', 'prefix');
-        }
-    }
-
-    /**
      * Transform a string into a slug (URL compatible "token")
      *
      * @param string $prefix Prefix
@@ -99,9 +68,43 @@ class PrefixDiscussionFilterPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add new filters to the discussion model
+     *
+     * @param DiscussionModel $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function discussionModel_discussionFilters_handler($sender, $args) {
+        DiscussionModel::addFilterSet('prefix', 'Prefixes');
+        DiscussionModel::addFilter('has-prefix', 'Has prefix', ['d.Prefix IS NOT NULL' => null], 'test', 'prefix');
+        DiscussionModel::addFilter('no-prefix', 'No prefix', ['d.Prefix IS NULL' => null], 'test', 'prefix');
+
+        $currentPrefixes = PrefixDiscussionPlugin::getPrefixes();
+        unset($currentPrefixes['-']);
+
+        $usedPrefixesResult =
+            Gdn::sql()
+                ->select('Prefix')
+                ->from('Discussion')
+                ->where('Prefix IS NOT NULL')
+                ->get()
+                ->resultArray();
+
+        foreach($usedPrefixesResult as $row) {
+            if (!isset($currentPrefixes[$row['Prefix']])) {
+                $currentPrefixes[$row['Prefix']] = $row['Prefix'];
+            }
+        }
+
+        natsort($currentPrefixes);
+        foreach($currentPrefixes as $prefix) {
+            DiscussionModel::addFilter('prefix-'.$this->stringToSlug($prefix), $prefix, ['d.Prefix' => $prefix], 'test2', 'prefix');
+        }
+    }
+
+    /**
      * Inject the DiscussionsSortFilterModule in in the page
      *
-     * @param DiscussionsController $sender Sending controller instance.
+     * @param object $sender Sending controller instance.
      * @param array $args Event arguments.
      */
     public function base_pageControls_handler($sender, $args) {
