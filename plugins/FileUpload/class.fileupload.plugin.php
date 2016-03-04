@@ -471,7 +471,9 @@ class FileUploadPlugin extends Gdn_Plugin {
 
       $AttachedFilesData = Gdn::Request()->GetValue('AttachedUploads');
       $AllFilesData = Gdn::Request()->GetValue('AllUploads');
-
+      $this->EventArguments['AllFilesData'] = $AllFilesData;
+      $this->EventArguments['CategoryID'] = $Args['Discussion']->CategoryID;
+      $this->fireEvent("InsertDiscussionMedia");
       $this->AttachAllFiles($AttachedFilesData, $AllFilesData, $DiscussionID, 'discussion');
    }
 
