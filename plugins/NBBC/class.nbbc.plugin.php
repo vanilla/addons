@@ -293,11 +293,8 @@ EOT;
          ));
 
          $BBCode->AddRule('spoiler', Array(
-             'simple_start' => "\n" . '<div class="UserSpoiler">
-   <div class="SpoilerTitle">' . T('Spoiler') . ': </div>
-   <div class="SpoilerReveal"></div>
-   <div class="SpoilerText" style="display: none;">',
-             'simple_end' => "</div></div>\n",
+             'simple_start' => "\n<div class=\"Spoiler\">",
+             'simple_end' => "</div>\n",
              'allow_in' => Array('listitem', 'block', 'columns'),
              'before_tag' => "sns",
              'after_tag' => "sns",
