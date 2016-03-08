@@ -23,7 +23,7 @@ $PluginInfo['NBBC'] = array(
 Gdn::FactoryInstall('BBCodeFormatter', 'NBBCPlugin', __FILE__, Gdn::FactorySingleton);
 
 class NBBCPlugin extends Gdn_Plugin {
-   
+
    public $Class = 'BBCode';
 
    /// CONSTRUCTOR ///
@@ -34,17 +34,17 @@ class NBBCPlugin extends Gdn_Plugin {
 
    /// PROPERTIES ///
    /// METHODS ///
-   
+
    public function DoAttachment($bbcode, $action, $name, $default, $params, $content) {
       $Medias = $this->Media();
       $MediaID = $content;
       if (isset($Medias[$MediaID])) {
          $Media = $Medias[$MediaID];
 //         decho($Media, 'Media');
-         
+
          $Src = htmlspecialchars(Gdn_Upload::Url(GetValue('Path', $Media)));
          $Name = htmlspecialchars(GetValue('Name', $Media));
-         
+
          if (GetValue('ImageWidth', $Media)) {
             return <<<EOT
 <div class="Attachment Image"><img src="$Src" alt="$Name" /></div>
@@ -53,7 +53,7 @@ EOT;
             return Anchor($Name, $Src, 'Attachment File');
          }
       }
-      
+
       return Anchor(T('Attachment not found.'), '#', 'Attachment NotFound');
    }
 
@@ -63,12 +63,12 @@ EOT;
       $content = trim($bbcode->UnHTMLEncode(strip_tags($content)));
       if (!$content && $default)
          $content = $default;
-      
+
       if ($bbcode->IsValidUrl($content, false))
          return "<img src=\"" . htmlspecialchars($content) . "\" alt=\""
             . htmlspecialchars(basename($content)) . "\" class=\"bbcode_img\" />";
-      
-      
+
+
 //      if (preg_match("/\\.(?:gif|jpeg|jpg|jpe|png)$/i", $content)) {
 //         if (preg_match("/^[a-zA-Z0-9_][^:]+$/", $content)) {
 //            if (!preg_match("/(?:\\/\\.\\.\\/)|(?:^\\.\\.\\/)|(?:^\\/)/", $content)) {
@@ -128,13 +128,13 @@ EOT;
       if (isset($params['name'])) {
          $username = trim($params['name']);
          $username = html_entity_decode($username, ENT_QUOTES, 'UTF-8');
-         
+
          $User = Gdn::UserModel()->GetByUsername($username);
          if ($User)
             $UserAnchor = UserAnchor($User);
          else
             $UserAnchor = Anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/' . rawurlencode($username));
-         
+
          $title = ConcatSep(' ', $title, $UserAnchor, T('Quote wrote', 'wrote'));
       }
 
@@ -219,7 +219,8 @@ EOT;
    public function Format($Result) {
       $Result = str_replace(array('[CODE]', '[/CODE]'), array('[code]', '[/code]'), $Result);
       $Result = $this->NBBC()->Parse($Result);
-      return $Result;
+      $Mixed = html_entity_decode($Result);
+      return Gdn_Format::html($Mixed);
    }
 
    protected $_Media = NULL;
@@ -417,7 +418,7 @@ EOT;
    }
 
    public function Setup() {
-      
+
    }
 
 }
