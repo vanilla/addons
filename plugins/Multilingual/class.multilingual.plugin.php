@@ -139,7 +139,7 @@ class MultilingualPlugin extends Gdn_Plugin {
     /**
      * Allow user to set their preferred locale via link-click.
      */
-    public function profileController_setLocale_create($Sender, $locale, $TK) {
+    public function profileController_setLocale_create($Sender, $locale, $TK, $appendRedirect = null) {
         if (!Gdn::Session()->UserID) {
             throw PermissionException('Garden.SignIn.Allow');
         }
@@ -157,8 +157,12 @@ class MultilingualPlugin extends Gdn_Plugin {
             }
         }
 
+        $successRedirect = $_SERVER['HTTP_REFERER'];
+        if (count($appendRedirect)) {
+           $successRedirect = (stripos($_SERVER['HTTP_REFERER'], '?') === false) ? $_SERVER['HTTP_REFERER'] . "?localechange=" . $appendRedirect : $_SERVER['HTTP_REFERER'] . "&localechange=" . $appendRedirect;
+        }
         // Back from whence we came.
-        Redirect($_SERVER['HTTP_REFERER']);
+        Redirect($successRedirect);
     }
 
     /**
