@@ -146,7 +146,7 @@ class MultilingualPlugin extends Gdn_Plugin {
 
         // Check intent.
         if (!Gdn::Session()->ValidateTransientKey($TK)) {
-            Redirect($_SERVER['HTTP_REFERER']);
+            safeRedirect($_SERVER['HTTP_REFERER']);
         }
 
         // If we got a valid locale, save their preference
@@ -165,7 +165,7 @@ class MultilingualPlugin extends Gdn_Plugin {
            $successRedirect = (stripos($_SERVER['HTTP_REFERER'], '?') === false) ? $_SERVER['HTTP_REFERER'] . "?localechange=" . $appendRedirect : $_SERVER['HTTP_REFERER'] . "&localechange=" . $appendRedirect;
         }
         // Back from whence we came.
-        Redirect($successRedirect);
+        safeRedirect($successRedirect);
     }
 
     /**
