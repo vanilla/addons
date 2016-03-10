@@ -139,7 +139,7 @@ class MultilingualPlugin extends Gdn_Plugin {
     /**
      * Allow user to set their preferred locale via link-click.
      */
-    public function profileController_setLocale_create($Sender, $locale, $TK, $appendRedirect = null) {
+    public function profileController_setLocale_create($Sender, $locale, $TK) {
         if (!Gdn::Session()->UserID) {
             throw PermissionException('Garden.SignIn.Allow');
         }
@@ -157,12 +157,10 @@ class MultilingualPlugin extends Gdn_Plugin {
             }
         }
 
-        // Create a whitelist of the configured locales or other acceptable variables that you could want to pass;
-        $redirectVariableWhitelist = array_merge(c('EnabledLocale'), array('changed', true, 1));
-
         $successRedirect = $_SERVER['HTTP_REFERER'];
-        if ($appendRedirect && in_array($appendRedirect, $redirectVariableWhitelist)) {
-           $successRedirect = (stripos($_SERVER['HTTP_REFERER'], '?') === false) ? $_SERVER['HTTP_REFERER'] . "?localechange=" . $appendRedirect : $_SERVER['HTTP_REFERER'] . "&localechange=" . $appendRedirect;
+        $target = gdn::request()->get('Target');
+        if ($target) {
+           $successRedirect = $target;
         }
         // Back from whence we came.
         safeRedirect($successRedirect);
