@@ -157,8 +157,11 @@ class MultilingualPlugin extends Gdn_Plugin {
             }
         }
 
+        // Create a whitelist of the configured locales or other acceptable variables that you could want to pass;
+        $redirectVariableWhitelist = array_merge(c('EnabledLocale'), array('changed', true, 1));
+
         $successRedirect = $_SERVER['HTTP_REFERER'];
-        if (count($appendRedirect)) {
+        if ($appendRedirect && in_array($appendRedirect, $redirectVariableWhitelist)) {
            $successRedirect = (stripos($_SERVER['HTTP_REFERER'], '?') === false) ? $_SERVER['HTTP_REFERER'] . "?localechange=" . $appendRedirect : $_SERVER['HTTP_REFERER'] . "&localechange=" . $appendRedirect;
         }
         // Back from whence we came.
