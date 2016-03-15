@@ -23,7 +23,7 @@ $PluginInfo['NBBC'] = array(
 Gdn::FactoryInstall('BBCodeFormatter', 'NBBCPlugin', __FILE__, Gdn::FactorySingleton);
 
 class NBBCPlugin extends Gdn_Plugin {
-   
+
    public $Class = 'BBCode';
 
    /// CONSTRUCTOR ///
@@ -34,17 +34,17 @@ class NBBCPlugin extends Gdn_Plugin {
 
    /// PROPERTIES ///
    /// METHODS ///
-   
+
    public function DoAttachment($bbcode, $action, $name, $default, $params, $content) {
       $Medias = $this->Media();
       $MediaID = $content;
       if (isset($Medias[$MediaID])) {
          $Media = $Medias[$MediaID];
 //         decho($Media, 'Media');
-         
+
          $Src = htmlspecialchars(Gdn_Upload::Url(GetValue('Path', $Media)));
          $Name = htmlspecialchars(GetValue('Name', $Media));
-         
+
          if (GetValue('ImageWidth', $Media)) {
             return <<<EOT
 <div class="Attachment Image"><img src="$Src" alt="$Name" /></div>
@@ -53,7 +53,7 @@ EOT;
             return Anchor($Name, $Src, 'Attachment File');
          }
       }
-      
+
       return Anchor(T('Attachment not found.'), '#', 'Attachment NotFound');
    }
 
@@ -63,12 +63,12 @@ EOT;
       $content = trim($bbcode->UnHTMLEncode(strip_tags($content)));
       if (!$content && $default)
          $content = $default;
-      
+
       if ($bbcode->IsValidUrl($content, false))
          return "<img src=\"" . htmlspecialchars($content) . "\" alt=\""
             . htmlspecialchars(basename($content)) . "\" class=\"bbcode_img\" />";
-      
-      
+
+
 //      if (preg_match("/\\.(?:gif|jpeg|jpg|jpe|png)$/i", $content)) {
 //         if (preg_match("/^[a-zA-Z0-9_][^:]+$/", $content)) {
 //            if (!preg_match("/(?:\\/\\.\\.\\/)|(?:^\\.\\.\\/)|(?:^\\/)/", $content)) {
@@ -128,13 +128,13 @@ EOT;
       if (isset($params['name'])) {
          $username = trim($params['name']);
          $username = html_entity_decode($username, ENT_QUOTES, 'UTF-8');
-         
+
          $User = Gdn::UserModel()->GetByUsername($username);
          if ($User)
             $UserAnchor = UserAnchor($User);
          else
             $UserAnchor = Anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/' . rawurlencode($username));
-         
+
          $title = ConcatSep(' ', $title, $UserAnchor, T('Quote wrote', 'wrote'));
       }
 
@@ -163,6 +163,22 @@ EOT;
       . $title . "\n<div class=\"QuoteText\">"
       . $content . "</div>\n</blockquote>\n";
    }
+
+    /**
+     * Renders spoilers.
+     *
+     * @param object $bbCode Instance of NBBC parsing
+     * @param int $action Value of one of NBBC's defined constants.  Typically, this will be BBCODE_CHECK.
+     * @param string $name Name of the tag
+     * @param string $default Value of the _default parameter, from the $params array
+     * @param array $params A standard set parameters related to the tag
+     * @param string $content Value between the open and close tags, if any
+     *
+     * @return string HTML-formatted spoiler value
+     */
+    public function doSpoiler($bbCode, $action, $name, $default, $params, $content) {
+        return Gdn_Format::spoilerHtml($content);
+    }
 
     /**
      * Perform formatting against a string for the size tag
@@ -291,17 +307,18 @@ EOT;
              'plain_start' => "\n<b>Quote:</b>\n",
              'plain_end' => "\n",
          ));
-
-         $BBCode->AddRule('spoiler', Array(
-             'simple_start' => "\n<div class=\"Spoiler\">",
-             'simple_end' => "</div>\n",
-             'allow_in' => Array('listitem', 'block', 'columns'),
+//
+         $BBCode->AddRule('spoiler', array(
+             'mode' => BBCODE_MODE_CALLBACK,
+             'method' => [$this, "doSpoiler"],
+             'allow_in' => ['listitem', 'block', 'columns'],
              'before_tag' => "sns",
              'after_tag' => "sns",
              'before_endtag' => "sns",
              'after_endtag' => "sns",
              'plain_start' => "\n",
-             'plain_end' => "\n"));
+             'plain_end' => "\n"
+             ));
 
          $BBCode->AddRule('img', array(
             'mode' => BBCODE_MODE_CALLBACK,
@@ -417,7 +434,7 @@ EOT;
    }
 
    public function Setup() {
-      
+
    }
 
 }
