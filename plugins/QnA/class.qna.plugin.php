@@ -38,7 +38,8 @@ class QnAPlugin extends Gdn_Plugin {
             $this->Reactions = true;
         }
 
-        if (Gdn::applicationManager()->checkApplication('Reputation') && c('Plugins.QnA.Badges', true)) {
+        if ((Gdn::applicationManager()->checkApplication('Reputation') || Gdn::pluginManager()->checkPlugin('badges'))
+            && c('Plugins.QnA.Badges', true)) {
             $this->Badges = true;
         }
     }
