@@ -90,8 +90,9 @@ class PrefixDiscussionFilterPlugin extends Gdn_Plugin {
                 ->resultArray();
 
         foreach($usedPrefixesResult as $row) {
-            if (!isset($currentPrefixes[$row['Prefix']])) {
-                $currentPrefixes[$row['Prefix']] = $row['Prefix'];
+            $prefix = $row['Prefix'];
+            if (!isset($currentPrefixes[$prefix])) {
+                $currentPrefixes[$prefix] = $prefix;
             }
         }
 
