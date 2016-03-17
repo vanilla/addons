@@ -77,7 +77,7 @@ class PrefixDiscussionFilterPlugin extends Gdn_Plugin {
      * @param DiscussionModel $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function discussionModel_discussionFilters_handler($sender, $args) {
+    public function discussionModel_initStatic_handler($sender, $args) {
         DiscussionModel::addFilterSet('prefix', 'Prefixes');
         DiscussionModel::addFilter('has-prefix', 'Has prefix', ['d.Prefix IS NOT NULL' => null], 'base-filter', 'prefix');
         DiscussionModel::addFilter('no-prefix', 'No prefix', ['d.Prefix IS NULL' => null], 'base-filter', 'prefix');
