@@ -75,8 +75,8 @@ class PrefixDiscussionFilterPlugin extends Gdn_Plugin {
      */
     public function discussionModel_discussionFilters_handler($sender, $args) {
         DiscussionModel::addFilterSet('prefix', 'Prefixes');
-        DiscussionModel::addFilter('has-prefix', 'Has prefix', ['d.Prefix IS NOT NULL' => null], 'test', 'prefix');
-        DiscussionModel::addFilter('no-prefix', 'No prefix', ['d.Prefix IS NULL' => null], 'test', 'prefix');
+        DiscussionModel::addFilter('has-prefix', 'Has prefix', ['d.Prefix IS NOT NULL' => null], 'base-filter', 'prefix');
+        DiscussionModel::addFilter('no-prefix', 'No prefix', ['d.Prefix IS NULL' => null], 'base-filter', 'prefix');
 
         $currentPrefixes = PrefixDiscussionPlugin::getPrefixes();
         unset($currentPrefixes['-']);
@@ -98,7 +98,7 @@ class PrefixDiscussionFilterPlugin extends Gdn_Plugin {
 
         natsort($currentPrefixes);
         foreach($currentPrefixes as $prefix) {
-            DiscussionModel::addFilter('prefix-'.$this->stringToSlug($prefix), $prefix, ['d.Prefix' => $prefix], 'test2', 'prefix');
+            DiscussionModel::addFilter('prefix-'.$this->stringToSlug($prefix), $prefix, ['d.Prefix' => $prefix], 'prefix-filter', 'prefix');
         }
     }
 
