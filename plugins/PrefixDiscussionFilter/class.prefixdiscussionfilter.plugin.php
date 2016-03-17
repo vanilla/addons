@@ -5,9 +5,9 @@
  */
 $PluginInfo['PrefixDiscussionFilter'] = array(
     'Name' => 'PrefixDiscussion Filter',
-    'Description' => 'Allow filtering of disussions by prefixes',
+    'Description' => 'Allow filtering of disussions by prefixes. This plugin won\'t enable itself unless you are on Vanilla version 2.2.102',
     'Version' => '1.0',
-    'RequiredApplications' => array('Vanilla' => '2.3'),
+    'RequiredApplications' => array('Vanilla' => '2.2'),
     'RequiredPlugins' => array('PrefixDiscussion' => '1.1'),
     'HasLocale' => false,
     'License' => 'GNU GPL2',
@@ -24,6 +24,10 @@ class PrefixDiscussionFilterPlugin extends Gdn_Plugin {
      * Setup is called when plugin is enabled and prepares config and db.
      */
     public function setup() {
+        if (APPLICATION_VERSION < '2.2.102') {
+            throw new Gdn_UserException('APPLICATION_VERSION requirements not met.');
+        }
+
         $this->structure();
     }
 
