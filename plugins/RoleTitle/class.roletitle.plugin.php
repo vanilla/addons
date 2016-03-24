@@ -66,7 +66,7 @@ class RoleTitlePlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function discussionController_beforeCommentDisplay_handler($sender, $args) {
-        $this->injectCssClass($args[$args['type']], $args['cssClass']);
+        $this->injectCssClass($args[$args['Type']], $args['CssClass']);
     }
 
     /**
@@ -76,7 +76,7 @@ class RoleTitlePlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function postController_beforeCommentDisplay_handler($sender, $args) {
-        $this->injectCssClass($args[$args['type']], $args['cssClass']);
+        $this->injectCssClass($args[$args['Type']], $args['CssClass']);
     }
 
     /**
