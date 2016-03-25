@@ -8,7 +8,7 @@
 $PluginInfo['IPBFormatter'] = array(
     'Name' => 'IPB Formatter',
     'Description' => 'Formats posts imported from Invision Power Board.',
-    'Version' => '1.0',
+    'Version' => '1.1',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'RequiredPlugins' => false,
     'HasLocale' => false,
@@ -27,10 +27,17 @@ class IPBFormatterPlugin extends Gdn_Plugin {
      */
     protected $_NBBC;
 
+    /** @var null  */
     protected $_Media = null;
 
     /// Methods ///
 
+    /**
+     *
+     *
+     * @param $string
+     * @return mixed|string
+     */
     public function format($string) {
         $string = str_replace(array('&quot;', '&#39;', '&#58;', 'Â'), array('"', "'", ':', ''), $string);
         $string = str_replace('<#EMO_DIR#>', 'default', $string);
@@ -81,7 +88,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
         $strings = (array)$string;
         $result = '';
         foreach ($strings as $string) {
-            $result .= $this->NBBC()->parse($string);
+            $result .= $this->nbbc()->parse($string);
         }
 
         // Linkify URLs in content
@@ -119,20 +126,20 @@ class IPBFormatterPlugin extends Gdn_Plugin {
      */
     public function nbbc() {
         if ($this->_NBBC === null) {
-            $plugin = new NBBCPlugin('BBCodeRelaxed');
-            $this->_NBBC = $plugin->NBBC();
-            $this->_NBBC->ignore_newlines = true;
-            $this->_NBBC->enable_smileys = false;
+            $plugin = new BBCode();
 
-            $this->_NBBC->AddRule('attachment', array(
+            $this->_NBBC = $plugin->nbbc();
+            $this->_NBBC->setIgnoreNewlines(true);
+
+            $this->_NBBC->addRule('attachment', array(
                 'mode' => BBCODE_MODE_CALLBACK,
                 'method' => array($this, "DoAttachment"),
                 'class' => 'image',
-                'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+                'allow_in' => array('listitem', 'block', 'columns', 'inline', 'link'),
                 'end_tag' => BBCODE_PROHIBIT,
                 'content' => BBCODE_PROHIBIT,
                 'plain_start' => "[image]",
-                'plain_content' => Array(),
+                'plain_content' => array(),
             ));
         }
 
@@ -209,8 +216,19 @@ class IPBFormatterPlugin extends Gdn_Plugin {
         return $this->_Media;
     }
 
-    public function DoAttachment($bbcode, $action, $name, $default, $params, $content) {
-        $medias = $this->Media();
+    /**
+     *
+     *
+     * @param $bbcode
+     * @param $action
+     * @param $name
+     * @param $default
+     * @param $params
+     * @param $content
+     * @return string
+     */
+    public function doAttachment($bbcode, $action, $name, $default, $params, $content) {
+        $medias = $this->media();
         $parts = explode(':', $default);
         $mediaID = $parts[0];
         if (isset($medias[$mediaID])) {
