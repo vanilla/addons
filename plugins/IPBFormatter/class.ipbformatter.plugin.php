@@ -109,7 +109,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
         );
 
         $spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
-        $result = htmLawed($result, $config, $spec);
+        $result = Htmlawed($result, $config, $spec);
 
         return $result;
     }
@@ -119,8 +119,6 @@ class IPBFormatterPlugin extends Gdn_Plugin {
      */
     public function nbbc() {
         if ($this->_NBBC === null) {
-            require_once PATH_PLUGINS . '/HtmLawed/htmLawed/htmLawed.php';
-
             $plugin = new NBBCPlugin('BBCodeRelaxed');
             $this->_NBBC = $plugin->NBBC();
             $this->_NBBC->ignore_newlines = true;
