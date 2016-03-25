@@ -109,7 +109,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
         );
 
         $spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
-        $result = Htmlawed($result, $config, $spec);
+        $result = Htmlawed::filter($result, $config, $spec);
 
         return $result;
     }
