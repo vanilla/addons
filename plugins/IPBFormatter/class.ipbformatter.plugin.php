@@ -132,12 +132,12 @@ class IPBFormatterPlugin extends Gdn_Plugin {
             $this->_NBBC->setIgnoreNewlines(true);
 
             $this->_NBBC->addRule('attachment', array(
-                'mode' => BBCODE_MODE_CALLBACK,
+                'mode' => Nbbc\BBCode::BBCODE_MODE_CALLBACK,
                 'method' => array($this, "DoAttachment"),
                 'class' => 'image',
                 'allow_in' => array('listitem', 'block', 'columns', 'inline', 'link'),
-                'end_tag' => BBCODE_PROHIBIT,
-                'content' => BBCODE_PROHIBIT,
+                'end_tag' => Nbbc\BBCode::BBCODE_PROHIBIT,
+                'content' => Nbbc\BBCode::BBCODE_PROHIBIT,
                 'plain_start' => "[image]",
                 'plain_content' => array(),
             ));
@@ -246,6 +246,15 @@ EOT;
         }
 
         return '';
+    }
+
+    /**
+     * @param $sender
+     * @param $args
+     */
+    public function BBCode_afterBBCodeSetup_handler($sender, $args) {
+        $nbbc = $args['BBCode'];
+        $nbbc->setEscapeContent(false);
     }
 
     /**
