@@ -636,6 +636,11 @@ class QnAPlugin extends Gdn_Plugin {
 
                     case 'Accepted':
                         $Change = 1;
+
+                        if (!$this->Reactions && c('QnA.Points.Enabled', false) && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
+                            UserModel::givePoints($Comment['InsertUserID'], c('QnA.Points.AcceptedAnswer', 1), 'QnA');
+                        }
+
                         break;
 
                     default:
