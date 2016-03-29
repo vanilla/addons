@@ -94,7 +94,7 @@ EOT;
       list($Type, $Code) = explode(';', $default);
       switch ($Type) {
          case 'youtube':
-            return '<div class="Video P"><iframe width="'.$Width.'" height="'.$Height.'" src="http://www.youtube.com/embed/' . $Code . '" frameborder="0" allowfullscreen></iframe></div>';
+            return '<div class="Video P"><iframe width="'.$Width.'" height="'.$Height.'" src="https://www.youtube.com/embed/' . $Code . '" frameborder="0" allowfullscreen></iframe></div>';
          default:
             return $content;
       }
@@ -105,7 +105,7 @@ EOT;
 
        $videoId = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
 
-       return '<div class="Video P"><iframe width="560" height="315" src="http://www.youtube.com/embed/' . $videoId . '" frameborder="0" allowfullscreen></iframe></div>';
+       return '<div class="Video P"><iframe width="560" height="315" src="https://www.youtube.com/embed/' . $videoId . '" frameborder="0" allowfullscreen></iframe></div>';
    }
 
    function DoQuote($bbcode, $action, $name, $default, $params, $content) {
