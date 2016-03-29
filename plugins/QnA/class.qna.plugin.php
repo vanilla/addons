@@ -215,7 +215,7 @@ class QnAPlugin extends Gdn_Plugin {
 
             $points = 3;
             if (c('QnA.Points.Enabled', false)) {
-                $points = c('QnA.Points.AcceptedAnswer', $points);
+                $points = c('QnA.Points.AcceptedAnswer', 1);
             }
 
             // AcceptAnswer
