@@ -213,8 +213,13 @@ class QnAPlugin extends Gdn_Plugin {
 
         if (Gdn::structure()->table('ReactionType')->columnExists('Hidden')) {
 
+            $points = 3;
+            if (c('QnA.Points.Enabled', false)) {
+                $points = c('QnA.Points.AcceptedAnswer', $points);
+            }
+
             // AcceptAnswer
-            $Rm->defineReactionType(array('UrlCode' => 'AcceptAnswer', 'Name' => 'Accept Answer', 'Sort' => 0, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Curation.Manage', 'Hidden' => 1,
+            $Rm->defineReactionType(array('UrlCode' => 'AcceptAnswer', 'Name' => 'Accept Answer', 'Sort' => 0, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => $points, 'Permission' => 'Garden.Curation.Manage', 'Hidden' => 1,
                 'Description' => "When someone correctly answers a question, they are rewarded with this reaction."));
         }
 
@@ -267,7 +272,9 @@ class QnAPlugin extends Gdn_Plugin {
                 }
             }
 
-            if ($sender->Form->save()) {
+            if ($sender->Form->save() !== false) {
+                // Update the AcceptedAnswer point!
+                $this->structureReactions();
                 $sender->StatusMessage = t('Your changes have been saved.');
             }
         }
@@ -629,10 +636,6 @@ class QnAPlugin extends Gdn_Plugin {
 
                     case 'Accepted':
                         $Change = 1;
-
-                        if (c('QnA.Points.Enabled', false) && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
-                            UserModel::givePoints($Comment['InsertUserID'], c('QnA.Points.AcceptedAnswer', 1), 'QnA');
-                        }
                         break;
 
                     default:
