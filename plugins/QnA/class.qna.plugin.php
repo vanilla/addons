@@ -973,13 +973,15 @@ class QnAPlugin extends Gdn_Plugin {
      * @return int
      */
     public function getUnansweredCount() {
-        $Count = Gdn::cache()->get('QnA-UnansweredCount');
-        if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
+        $questionCount = Gdn::cache()->get('QnA-UnansweredCount');
+        if ($questionCount === Gdn_Cache::CACHEOP_FAILURE) {
             Gdn::SQL()->whereIn('QnA', array('Unanswered', 'Rejected'));
-            $Count = Gdn::SQL()->getCount('Discussion', array('Type' => 'Question'));
-            Gdn::cache()->store('QnA-UnansweredCount', $Count, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));
+            $questionCount = Gdn::SQL()->getCount('Discussion', array('Type' => 'Question'));
+            $this->EventArguments['questionCount'] = &$questionCount;
+            $this->fireEvent('unansweredCount');
+            Gdn::cache()->store('QnA-UnansweredCount', $questionCount, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));
         }
-        return $Count;
+        return $questionCount;
     }
 
     /**
