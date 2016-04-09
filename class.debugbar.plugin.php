@@ -78,8 +78,6 @@ class DebugbarPlugin extends Gdn_Plugin {
             list($message, $type) = $info;
 
             if ($message instanceof \Exception) {
-                $exceptions->addException($message);
-
                 if ($message instanceof \ErrorException && $type === TRACE_NOTICE) {
                     // Display notices as messages so devs don't freak out too much.
                     $str = $message->getMessage().' ('.$message->getFile(). ' line '.$message->getLine().')';
@@ -87,6 +85,8 @@ class DebugbarPlugin extends Gdn_Plugin {
                         $strings[$str] = true;
                         $messages->notice($str);
                     }
+                } else {
+                    $exceptions->addException($message);
                 }
                 continue;
             }
