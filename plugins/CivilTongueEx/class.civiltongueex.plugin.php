@@ -441,6 +441,36 @@ class CivilTonguePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Filter content in conversation notifications.
+     *
+     * @param ConversationModel $sender The sending object.
+     * @param array $args
+     */
+    public function conversationModel_afterAdd_handler($sender, &$args) {
+        if (val('Body', $args)) {
+            $args['Body'] = $this->replace($args['Body']);
+        }
+        if (val('Subject', $args)) {
+            $args['Subject'] = $this->replace($args['Subject']);
+        }
+    }
+
+    /**
+     * Filter content in converation message notifications.
+     *
+     * @param ConversationMessageModel $sender The sending object.
+     * @param array $args
+     */
+    public function conversationMessageModel_afterAdd_handler($sender, &$args) {
+        if (val('Body', $args)) {
+            $args['Body'] = $this->replace($args['Body']);
+        }
+        if (val('Subject', $args)) {
+            $args['Subject'] = $this->replace($args['Subject']);
+        }
+    }
+
+    /**
      * This view gets loaded in via ajax. We need to filter with an event before it's rendered.
      *
      * @param PollModule $sender Poll Module.
