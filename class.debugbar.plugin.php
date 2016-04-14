@@ -16,7 +16,7 @@ use DebugBar\DataCollector\ExceptionsCollector;
 $PluginInfo['debugbar'] = array(
     'Name' => 'Debug Bar',
     'Description' => 'The debug bar shows debuggin information at the bottom of the page.',
-    'Version' => '1.1.0',
+    'Version' => '1.1.1',
     'RequiredApplications' => false,
     'RequiredTheme' => false,
     'RequiredPlugins' => false, // This is an array of plugin names/versions that this plugin requires
