@@ -1,11 +1,10 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * A plugin that integrates the php debug bar.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
- * @since 2.0
  */
 
 use DebugBar\DebugBar;
@@ -28,16 +27,10 @@ $PluginInfo['debugbar'] = array(
     'MobileFriendly' => true,
 );
 
-// Install the debugger database.
-$tmp = Gdn::factoryOverwrite(true);
-Gdn::factoryInstall(Gdn::AliasDatabase, 'DatabaseDebugbar', __DIR__.'/class.databasedebugbar.php', Gdn::FactorySingleton, array('Database'));
-Gdn::factoryOverwrite($tmp);
-unset($tmp);
-
 /**
  * Handles integration of the [PHP Debug Bar](http://phpdebugbar.com/) with Vanilla.
  */
-class DebugbarPlugin extends Gdn_Plugin {
+class DebugBarPlugin extends Gdn_Plugin {
     /// Properties ///
 
     /**
@@ -217,16 +210,17 @@ class DebugbarPlugin extends Gdn_Plugin {
         $called = true;
     }
 
-    public function gdn_dispatcher_appStartup_handler() {
-//        $logger = new LoggerCollector();
-//        Logger::setLogger($logger);
-//        $this->debugBar()->addCollector($logger);
-    }
-
     /**
      * Start the debug bar timings as soon as possible.
      */
     public function gdn_pluginManager_afterStart_handler() {
+        // Install the debugger database.
+        $tmp = Gdn::factoryOverwrite(true);
+        Gdn::factoryInstall(Gdn::AliasDatabase, 'DatabaseDebugbar', __DIR__.'/class.databasedebugbar.php', Gdn::FactorySingleton, array('Database'));
+        Gdn::factoryOverwrite($tmp);
+        unset($tmp);
+
+
         $bar = $this->debugBar();
         $bar['time']->startMeasure('dispatch', 'Dispatch');
     }
