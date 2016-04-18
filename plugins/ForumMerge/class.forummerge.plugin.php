@@ -327,7 +327,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
             from '.$NewPrefix.'Conversation
             where Contributors <> ""');
          foreach($Conversations->Result() as $Conversation) {
-            $Contributors = unserialize(GetValue('Contributors', $Conversation));
+            $Contributors = dbdecode(GetValue('Contributors', $Conversation));
             if (!is_array($Contributors))
                continue;
             $UpdatedContributors = array();
@@ -338,7 +338,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
             // c. Update each conversation
             $ConversationID = GetValue('ConversationID', $Conversation);
             Gdn::SQL()->Query('update '.$NewPrefix.'Conversation
-               set Contributors = "'.mysql_real_escape_string(serialize($UpdatedContributors)).'"
+               set Contributors = "'.mysql_real_escape_string(dbencode($UpdatedContributors)).'"
                where ConversationID = '.$ConversationID);
          }
 

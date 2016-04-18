@@ -397,7 +397,7 @@ class WhispersPlugin extends Gdn_Plugin {
          } else {
             if ($WhisperConversationID === TRUE) {
                $Discussion->Attributes['WhisperConversationID'] = $ID;
-               $DiscussionModel->SetProperty($DiscussionID, 'Attributes', serialize($Discussion->Attributes));
+               $DiscussionModel->SetProperty($DiscussionID, 'Attributes', dbencode($Discussion->Attributes));
             }
 
             $LastCommentID = GetValue('LastCommentID', $Discussion);
