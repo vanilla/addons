@@ -164,7 +164,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
         $Result = Gdn::SQL()->GetWhere('UserAuthenticationProvider', $Where)->ResultArray();
         foreach ($Result as &$Row) {
-            $Attributes = unserialize($Row['Attributes']);
+            $Attributes = dbdecode($Row['Attributes']);
             if (is_array($Attributes))
                 $Row = array_merge($Attributes, $Row);
         }

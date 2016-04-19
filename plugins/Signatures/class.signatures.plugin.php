@@ -132,7 +132,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         }
 
         $Sender->GetUserInfo($UserReference, $Username);
-        $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
+        $UserPrefs = dbdecode($Sender->User->Preferences);
         if (!is_array($UserPrefs))
             $UserPrefs = array();
 
