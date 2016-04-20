@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
- 
+
    // Insert a clickable icon list after the textbox
    emotify = function(textbox) {
       // Pick up the emoticons from the def list
@@ -11,7 +11,7 @@ jQuery(document).ready(function($) {
             console.log("Emotify produced invalid JSON.");
          }
       }
-	 
+
       var frm = textbox.parents('form');
       var buts = '';
       var last = '';
@@ -26,7 +26,7 @@ jQuery(document).ready(function($) {
          <a class=\"EmotifyDropdown\"><span>Emoticons</span></a> \
          <div class=\"EmoticonContainer Hidden\">"+buts+"</div> \
          </div>");
-    
+
       frm.find('.EmotifyDropdown').click(function() {
          if ($(this).hasClass('EmotifyDropdownActive'))
             $(this).removeClass('EmotifyDropdownActive');
@@ -36,7 +36,7 @@ jQuery(document).ready(function($) {
          $(this).next().toggle();
          return false;
       });
-    
+
       // Hide emotify options when previewing
       frm.bind("PreviewLoaded", function(e, frm) {
          frm = $(frm);
@@ -44,12 +44,12 @@ jQuery(document).ready(function($) {
          frm.find('.EmotifyDropdown').hide();
          frm.find('.EmoticonContainer').hide();
       });
-    
+
       // Reveal emotify dropdowner when write button clicked
       frm.bind('WriteButtonClick', function(e, frm) {
          $(frm).find('.EmotifyDropdown').show();
       });
-    
+
       // Hide emoticon box when textarea is focused
       textbox.focus(function() {
          var frm = $(this).parents('form');
@@ -68,7 +68,7 @@ jQuery(document).ready(function($) {
          var container = $(this).parents('.EmoticonContainer');
          $(container).hide();
          $(container).prev().removeClass('EmotifyDropdownActive');
-      
+
          // If cleditor is running, update it's contents
          var ed = $(textbox).get(0).editor;
          if (ed) {
@@ -78,7 +78,7 @@ jQuery(document).ready(function($) {
             var Frame = $(ed.$frame).get(0);
             var FrameBody = null;
             var FrameDocument = null;
-        
+
             // DOM
             if (Frame.contentDocument) {
                FrameDocument = Frame.contentDocument;
@@ -104,7 +104,8 @@ jQuery(document).ready(function($) {
       });
    }
    emotify($('.CommentForm .TextBox,.DiscussionForm .TextBox'));
-   $(document).bind('EditCommentFormLoaded', function(e, container) {
-      emotify(container.find('.EditCommentForm .TextBox'));
+   $(document).on('start', function(e) {
+      emotify($('.CommentForm .TextBox', e.target));
+      emotify($('.DiscussionForm .TextBox', e.target));
    });
 });
