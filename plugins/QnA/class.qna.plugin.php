@@ -684,6 +684,9 @@ class QnAPlugin extends Gdn_Plugin {
 
                 $ActivityModel = new ActivityModel();
                 $ActivityModel->save($Activity);
+
+                $this->EventArguments['Activity'] =& $Activity;
+                $this->fireEvent('AfterAccepted');
             }
         }
         redirect("/discussion/comment/{$Comment['CommentID']}#Comment_{$Comment['CommentID']}");
