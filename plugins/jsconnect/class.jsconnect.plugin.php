@@ -697,8 +697,23 @@ class JsConnectPlugin extends Gdn_Plugin {
     }
 
     protected function settings_index($Sender, $Args) {
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField([
+            'Garden.Registration.AutoConnect',
+            'Garden.SignIn.Popup'
+        ]);
+        $Sender->Form->setModel($configurationModel);
+        if ($Sender->Form->authenticatedPostback()) {
+            if ($Sender->Form->save() !== false) {
+                $Sender->informMessage(t('Your settings have been saved.'));
+            }
+        } else {
+            $Sender->Form->setData($configurationModel->Data);
+        }
+
         $Providers = self::getProvider();
-        $Sender->SetData('Providers', $Providers);
-        $Sender->Render('Settings', '', 'plugins/jsconnect');
+        $Sender->setData('Providers', $Providers);
+        $Sender->render('Settings', '', 'plugins/jsconnect');
     }
 }
