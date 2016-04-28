@@ -23,7 +23,7 @@
 
         echo wrap($this->Form->checkBox(
             'Garden.Registration.AutoConnect',
-            'Automatically connect users based on e-mail address.'
+            'Automatically connect to an existing user account if it has the same email address.'
         ), 'p');
         echo wrap($this->Form->checkBox(
             'Garden.SignIn.Popup',
