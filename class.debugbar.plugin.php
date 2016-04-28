@@ -15,7 +15,7 @@ use DebugBar\DataCollector\ExceptionsCollector;
 $PluginInfo['debugbar'] = array(
     'Name' => 'Debug Bar',
     'Description' => 'The debug bar shows debuggin information at the bottom of the page.',
-    'Version' => '1.1.1',
+    'Version' => '1.2.0',
     'RequiredApplications' => false,
     'RequiredTheme' => false,
     'RequiredPlugins' => false, // This is an array of plugin names/versions that this plugin requires
@@ -190,6 +190,7 @@ class DebugBarPlugin extends Gdn_Plugin {
         } else {
             $head = $this->jsRenderer()->renderHead();
             $sender->AddAsset('Head', $head, 'debugbar-head');
+            $sender->addCssFile('debugbar.css', 'plugins/debugbar');
         }
         $called = true;
     }
