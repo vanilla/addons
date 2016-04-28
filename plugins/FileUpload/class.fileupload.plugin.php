@@ -42,8 +42,6 @@ $PluginInfo['FileUpload'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
-include dirname(__FILE__).'/class.mediamodel.php';
-
 class FileUploadPlugin extends Gdn_Plugin {
    /** @var array */
    protected $_MediaCache;
@@ -53,6 +51,11 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function __construct() {
       parent::__construct();
+
+      if (!class_exists('MediaModel')) {
+         require __DIR__.'/class.mediamodel.php';
+      }
+
       $this->_MediaCache = NULL;
       $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
       $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
@@ -223,7 +226,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    protected function PrepareController($Controller) {
-      if (!$this->IsEnabled()) return;
+      if (!$this->isEnabled()) return;
 
       $Controller->AddJsFile('fileupload.js', 'plugins/FileUpload');
       $Controller->AddDefinition('apcavailable',self::ApcAvailable());
@@ -270,7 +273,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    public function DrawAttachFile($Sender) {
-      if (!$this->IsEnabled()) return;
+      if (!$this->isEnabled()) return;
       if (!$this->CanUpload) return;
 
       echo $Sender->FetchView('attach_file', '', 'plugins/FileUpload');
@@ -284,7 +287,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    protected function CacheAttachedMedia($Sender) {
-      if (!$this->IsEnabled()) return;
+      if (!$this->isEnabled()) return;
 
       $Comments = $Sender->Data('Comments');
       $CommentIDList = array();
@@ -367,7 +370,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    protected function AttachUploadsToComment($Controller, $Type = 'comment') {
-      if (!$this->IsEnabled()) return;
+      if (!$this->isEnabled()) return;
 
       //$Type = strtolower($RawType = $Controller->EventArguments['Type']);
       $RawType = ucfirst($Type);
@@ -404,7 +407,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    public function DiscussionController_Download_Create($Sender) {
-      if (!$this->IsEnabled()) return;
+      if (!$this->isEnabled()) return;
       if (!$this->CanDownload) throw PermissionException("File could not be streamed: Access is denied");
 
       list($MediaID) = $Sender->RequestArgs;
@@ -532,7 +535,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    protected function AttachAllFiles($AttachedFilesData, $AllFilesData, $ForeignID, $ForeignTable) {
-      if (!$this->IsEnabled()) return;
+      if (!$this->isEnabled()) return;
 
       // No files attached
       if (!$AttachedFilesData) return;
@@ -734,7 +737,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @param object $Sender
     */
    public function PostController_Upload_Create($Sender) {
-      if (!$this->IsEnabled()) return;
+      if (!$this->isEnabled()) return;
 
       list($FieldName) = $Sender->RequestArgs;
 

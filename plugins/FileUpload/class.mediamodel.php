@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class MediaModel extends VanillaModel {
+class MediaModel extends Gdn_Model {
    public function __construct() {
       parent::__construct('Media');
    }
