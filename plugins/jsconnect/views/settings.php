@@ -15,28 +15,28 @@
 <div class="FilterMenu"><?php
     echo Anchor(T('Add Connection'), '/settings/jsconnect/addedit', 'SmallButton');
 ?></div>
-<h1><?php echo t('Settings'); ?></h1>
-<?php
-    echo '<div class="Info">';
-    echo $this->Form->open();
-    echo $this->Form->errors();
+<div class="Info">
+    <h2>Signing In</h2>
+    <?php
+        echo $this->Form->open();
+        echo $this->Form->errors();
 
-    echo wrap($this->Form->checkBox(
-        'Garden.Registration.AutoConnect',
-        'Automatically connect users based on e-mail address.'
-    ), 'p');
-    echo wrap($this->Form->checkBox(
-        'Garden.SignIn.Popup',
-        'Use popups for sign in pages <small>(not recommended while using SSO)</small>.'
-    ), 'p');
+        echo wrap($this->Form->checkBox(
+            'Garden.Registration.AutoConnect',
+            'Automatically connect users based on e-mail address.'
+        ), 'p');
+        echo wrap($this->Form->checkBox(
+            'Garden.SignIn.Popup',
+            'Use popups for sign in pages <small>(not recommended while using SSO)</small>.'
+        ), 'p');
 
-    echo '<div class="Buttons">';
-    echo $this->Form->button('Save');
-    echo '</div>';
+        echo '<div class="Buttons">';
+        echo $this->Form->button('Save');
+        echo '</div>';
 
-    echo $this->Form->close();
-    echo '</div>';
-?>
+        echo $this->Form->close();
+    ?>
+</div>
 <table class="AltRows">
     <thead>
     <tr>
