@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d5cc779a52e444bc5101574e8a95a92f",
-    "content-hash": "e5250995f2b16bc920ce31008267d243",
+    "hash": "3be23292b13d0c134561148c863a5e60",
+    "content-hash": "adf4a8ab65ea7578f418fc565052cc5f",
     "packages": [
         {
             "name": "maximebf/debugbar",
-            "version": "v1.11.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/maximebf/php-debugbar.git",
-                "reference": "d9302891c1f0a0ac5a4f66725163a00537c6359f"
+                "url": "https://github.com/tburry/php-debugbar.git",
+                "reference": "06e095049b0b5624cd04b76e748dbff996911d09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/d9302891c1f0a0ac5a4f66725163a00537c6359f",
-                "reference": "d9302891c1f0a0ac5a4f66725163a00537c6359f",
+                "url": "https://api.github.com/repos/tburry/php-debugbar/zipball/06e095049b0b5624cd04b76e748dbff996911d09",
+                "reference": "06e095049b0b5624cd04b76e748dbff996911d09",
                 "shasum": ""
             },
             "require": {
@@ -45,7 +45,6 @@
                     "DebugBar\\": "src/DebugBar/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -66,7 +65,10 @@
                 "debug",
                 "debugbar"
             ],
-            "time": "2016-01-22 12:22:23"
+            "support": {
+                "source": "https://github.com/tburry/php-debugbar/tree/master"
+            },
+            "time": "2016-04-28 15:33:42"
         },
         {
             "name": "psr/log",
@@ -232,11 +234,13 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "maximebf/debugbar": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.3.0"
+        "php": ">=5.4.0"
     },
     "platform-dev": []
 }

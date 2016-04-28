@@ -98,6 +98,7 @@ class TraceablePDO extends PDO
         $trace = new TracedStatement($sql);
         $trace->start();
 
+        $errorMode = $this->pdo->getAttribute(PDO::ATTR_ERRMODE);
         $ex = null;
         try {
             $result = call_user_func_array(array($this->pdo, $method), $args);
@@ -105,7 +106,7 @@ class TraceablePDO extends PDO
             $ex = $e;
         }
 
-        if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) !== PDO::ERRMODE_EXCEPTION && $result === false) {
+        if ($errorMode !== PDO::ERRMODE_EXCEPTION && $result === false) {
             $error = $this->pdo->errorInfo();
             $ex = new PDOException($error[2], $error[0]);
         }
@@ -113,7 +114,7 @@ class TraceablePDO extends PDO
         $trace->end($ex);
         $this->addExecutedStatement($trace);
 
-        if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION && $ex !== null) {
+        if ($errorMode === PDO::ERRMODE_EXCEPTION && $ex !== null) {
             throw $ex;
         }
         return $result;

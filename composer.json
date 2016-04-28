@@ -12,9 +12,15 @@
          "class.loggercollector.php"
       ]
    },
+   "repositories": [
+      {
+         "type": "vcs",
+         "url": "https://github.com/tburry/php-debugbar"
+      }
+   ],
    "require": {
-       "php": ">=5.3.0",
-       "maximebf/debugbar": "1.*"
+       "php": ">=5.4.0",
+       "maximebf/debugbar": "dev-master"
    },
    "require-dev": {
    }
