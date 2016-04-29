@@ -15,7 +15,7 @@ use DebugBar\DataCollector\ExceptionsCollector;
 $PluginInfo['debugbar'] = array(
     'Name' => 'Debug Bar',
     'Description' => 'The debug bar shows debuggin information at the bottom of the page.',
-    'Version' => '1.2.0',
+    'Version' => '1.3.0',
     'RequiredApplications' => false,
     'RequiredTheme' => false,
     'RequiredPlugins' => false, // This is an array of plugin names/versions that this plugin requires
@@ -37,12 +37,6 @@ class DebugBarPlugin extends Gdn_Plugin {
      * @var \DebugBar\DebugBar
      */
     protected $debugBar;
-
-
-    /**
-     * @var LoggerCollector
-     */
-    protected $logger;
 
     /// Methods ///
 
@@ -128,7 +122,7 @@ class DebugBarPlugin extends Gdn_Plugin {
             }
 
             $logger = new LoggerCollector($this->debugBar['messages']);
-            Logger::setLogger($logger);
+            Logger::addLogger($logger);
 
             $this->debugBar->addCollector(new \DebugBar\DataCollector\ConfigCollector([], 'data'));
         }
