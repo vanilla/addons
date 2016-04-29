@@ -9,13 +9,14 @@
 
 use DebugBar\DebugBar;
 use DebugBar\DataCollector\MessagesCollector;
-use DebugBar\DataCollector\ExceptionsCollector;
+use Vanilla\DebugBar\ExceptionsCollector;
+use Vanilla\DebugBar\LoggerCollector;
 
 // Define the plugin:
 $PluginInfo['debugbar'] = array(
     'Name' => 'Debug Bar',
     'Description' => 'The debug bar shows debuggin information at the bottom of the page.',
-    'Version' => '1.3.0',
+    'Version' => '1.4.0',
     'RequiredApplications' => false,
     'RequiredTheme' => false,
     'RequiredPlugins' => false, // This is an array of plugin names/versions that this plugin requires
@@ -65,16 +66,7 @@ class DebugBarPlugin extends Gdn_Plugin {
             list($message, $type) = $info;
 
             if ($message instanceof \Exception) {
-                if ($message instanceof \ErrorException && $type === TRACE_NOTICE) {
-                    // Display notices as messages so devs don't freak out too much.
-                    $str = $message->getMessage().' ('.$message->getFile(). ' line '.$message->getLine().')';
-                    if (!isset($strings[$str])) {
-                        $strings[$str] = true;
-                        $messages->notice($str);
-                    }
-                } else {
-                    $exceptions->addException($message);
-                }
+                $exceptions->addException($message);
                 continue;
             }
 
@@ -110,21 +102,20 @@ class DebugBarPlugin extends Gdn_Plugin {
             $this->debugBar = new DebugBar();
 
             $this->debugBar->addCollector(new \DebugBar\DataCollector\PhpInfoCollector());
-            $this->debugBar->addCollector(new \DebugBar\DataCollector\MessagesCollector());
+            $this->debugBar->addCollector(new LoggerCollector('messages'));
             $this->debugBar->addCollector(new \DebugBar\DataCollector\RequestDataCollector());
             $this->debugBar->addCollector(new \DebugBar\DataCollector\TimeDataCollector());
             $this->debugBar->addCollector(new \DebugBar\DataCollector\MemoryCollector());
-            $this->debugBar->addCollector(new \DebugBar\DataCollector\ExceptionsCollector());
+            $this->debugBar->addCollector(new ExceptionsCollector());
 
             $db = Gdn::database();
             if (method_exists($db, 'addCollector')) {
                 $db->addCollector($this->debugBar);
             }
 
-            $logger = new LoggerCollector($this->debugBar['messages']);
-            Logger::addLogger($logger);
-
             $this->debugBar->addCollector(new \DebugBar\DataCollector\ConfigCollector([], 'data'));
+
+            Logger::addLogger($this->debugBar['messages']);
         }
         return $this->debugBar;
     }
@@ -135,8 +126,15 @@ class DebugBarPlugin extends Gdn_Plugin {
      * @return \DebugBar\JavascriptRenderer Returns the javascript script includer for the debug bar.
      */
     public function jsRenderer() {
-        $baseurl = Gdn::request()->assetRoot().'/plugins/debugbar/vendor/maximebf/debugbar/src/DebugBar/Resources';
-        return $this->debugBar()->getJavascriptRenderer($baseurl);
+        $baseUrl = Gdn::request()->assetRoot().'/plugins/debugbar/vendor/maximebf/debugbar/src/DebugBar/Resources';
+        $jsRenderer = $this->debugBar()->getJavascriptRenderer($baseUrl);
+
+        $jsRenderer->addAssets(
+            [],
+            asset('/plugins/debugbar/js/debugbar.js', false, true)
+        );
+
+        return $jsRenderer;
     }
 
     /// Event Handlers ///
@@ -211,12 +209,16 @@ class DebugBarPlugin extends Gdn_Plugin {
     public function gdn_pluginManager_afterStart_handler() {
         // Install the debugger database.
         $tmp = Gdn::factoryOverwrite(true);
-        Gdn::factoryInstall(Gdn::AliasDatabase, 'DatabaseDebugbar', __DIR__.'/class.databasedebugbar.php', Gdn::FactorySingleton, array('Database'));
+        Gdn::factoryInstall(Gdn::AliasDatabase, '\Vanilla\DebugBar\DatabaseDebugBar', __DIR__.'/src/DatabaseDebugBar.php', Gdn::FactorySingleton, array('Database'));
         Gdn::factoryOverwrite($tmp);
         unset($tmp);
 
-
         $bar = $this->debugBar();
-        $bar['time']->startMeasure('dispatch', 'Dispatch');
+        /* @var \DebugBar\DataCollector\TimeDataCollector $timer */
+        $timer = $bar['time'];
+
+        $now = microtime(true);
+        $timer->addMeasure('Bootstrap', val('REQUEST_TIME_FLOAT', $_SERVER, $now), $now);
+        $timer->startMeasure('dispatch', 'Dispatch');
     }
 }

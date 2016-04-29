@@ -8,9 +8,9 @@
        { "name": "Todd Burry", "email": "todd@vanillaforums.com", "role": "Developer" }
    ],
    "autoload": {
-      "files": [
-         "class.loggercollector.php"
-      ]
+      "psr-4": {
+         "Vanilla\\DebugBar\\": "src"
+      }
    },
    "repositories": [
       {

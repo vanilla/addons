@@ -1,16 +1,23 @@
 <?php
+/**
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+namespace Vanilla\DebugBar;
 
 use DebugBar\DataCollector\PDO\TraceablePDO;
 use DebugBar\DataCollector\PDO\PDOCollector;
 
-class DatabaseDebugbar extends Gdn_Database {
+class DatabaseDebugBar extends \Gdn_Database {
     /// Methods ///
 
     /**
      *
-     * @param \DebugBar\DebugBar $debugbar
+     * @param \DebugBar\DebugBar $debugBar
      */
-    public function addCollector($debugbar) {
+    public function addCollector($debugBar) {
         $connection = $this->Connection();
         if (!($connection instanceof TraceablePDO)) {
             $connection = new TraceablePDO($connection);
@@ -18,7 +25,7 @@ class DatabaseDebugbar extends Gdn_Database {
 
             $collector = new PDOCollector();
             $collector->addConnection($connection, 'master');
-            $debugbar->addCollector($collector);
+            $debugBar->addCollector($collector);
         }
 
         $slave = $this->Slave();
