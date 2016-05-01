@@ -21,7 +21,7 @@ $PluginInfo['SteamConnect'] = array(
  * @package   Steam Connect
  * @since     1.0.0
  */
-class SteamPlugin extends Gdn_Plugin {
+class SteamConnectPlugin extends Gdn_Plugin {
     /**
      * This will run when you "Enable" the plugin
      *
