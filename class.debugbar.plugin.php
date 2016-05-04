@@ -26,6 +26,7 @@ $PluginInfo['debugbar'] = array(
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
     'MobileFriendly' => true,
+    'Icon' => 'debugger.png'
 );
 
 /**
