@@ -12,8 +12,16 @@ class MediaModel extends Gdn_Model {
    public function __construct() {
       parent::__construct('Media');
    }
-   
-   public function GetID($MediaID) {
+
+   /**
+    * Get a media row by ID.
+    *
+    * @param int $MediaID The ID of the media entry.
+    * @param bool $DatasetType Not used.
+    * @param array $Options Not used.
+    * @return array|false Returns the media row or **false** if it isn't found.
+    */
+   public function GetID($MediaID, $DatasetType = false, $Options = []) {
       $this->FireEvent('BeforeGetID');
       $Data = $this->SQL
          ->Select('m.*')
@@ -122,8 +130,21 @@ class MediaModel extends Gdn_Model {
 
 		return $Data;
    }
-   
-   public function Delete($Media, $DeleteFile = TRUE) {
+
+   /**
+    * TODO: Refactor into different method to maintain compatibility with base class.
+    *
+    * @param array $Media The media row.
+    * @param array|bool $Options Either a boolean that says whether or not to delete the file or an array with a
+    * **Delete** key.
+    */
+   public function Delete($Media = [], $Options = []) {
+      if (is_bool($Options)) {
+         $DeleteFile = $Options;
+      } else {
+         $DeleteFile = val('Delete', $Options, true);
+      }
+
       $MediaID = FALSE;
       if (is_a($Media, 'stdClass'))
          $Media = (array)$Media;
