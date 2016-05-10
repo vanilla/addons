@@ -109,6 +109,6 @@ class PrefixDiscussionFilterPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function base_pageControls_handler($sender, $args) {
-        echo new DiscussionsSortFilterModule();
+        echo new DiscussionsSortFilterModule(val('CategoryID', $sender, 0), $sender->data('Sort', ''), $sender->data('Filters', []));
     }
 }
