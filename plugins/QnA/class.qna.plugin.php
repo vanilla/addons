@@ -983,13 +983,25 @@ class QnAPlugin extends Gdn_Plugin {
      * @return int
      */
     public function getUnansweredCount() {
-        $Count = Gdn::cache()->get('QnA-UnansweredCount');
-        if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
-            Gdn::SQL()->whereIn('QnA', array('Unanswered', 'Rejected'));
-            $Count = Gdn::SQL()->getCount('Discussion', array('Type' => 'Question'));
-            Gdn::cache()->store('QnA-UnansweredCount', $Count, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));
+        // TODO: Dekludge this when category permissions are refactored (tburry).
+        $cacheKey = Gdn::request()->webRoot().'/QnA-UnansweredCount';
+        $questionCount = Gdn::cache()->get($cacheKey);
+        if ($questionCount === Gdn_Cache::CACHEOP_FAILURE) {
+            $questionCount = null;
+
+            // Check to see if another plugin can handle this.
+            $this->EventArguments['questionCount'] = &$questionCount;
+            $this->fireEvent('unansweredCount');
+
+            if ($questionCount === null) {
+                $questionCount = Gdn::sql()
+                    ->whereIn('QnA', array('Unanswered', 'Rejected'))
+                    ->getCount('Discussion', array('Type' => 'Question'));
+            }
+
+            Gdn::cache()->store($cacheKey, $questionCount, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));
         }
-        return $Count;
+        return $questionCount;
     }
 
     /**
