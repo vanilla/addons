@@ -329,12 +329,14 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function base_discussionTypes_handler($sender, $args) {
-        $args['Types']['Question'] = array(
-            'Singular' => 'Question',
-            'Plural' => 'Questions',
-            'AddUrl' => '/post/question',
-            'AddText' => 'Ask a Question'
-        );
+        if (!C('Plugins.QnA.UseBigButtons')) {
+            $args['Types']['Question'] = array(
+                'Singular' => 'Question',
+                'Plural' => 'Questions',
+                'AddUrl' => '/post/question',
+                'AddText' => 'Ask a Question'
+            );
+        }
     }
 
     /**
