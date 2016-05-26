@@ -568,7 +568,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Parsed = Gdn_Upload::Parse($Name);
 
       // Get actual path to the file.
-      $Path = Gdn_Upload::CopyLocal($SubPath);
+      $upload = new Gdn_UploadImage();
+      $Path = $upload->copyLocal($SubPath);
       if (!file_exists($Path))
          throw NotFoundException('File');
 
