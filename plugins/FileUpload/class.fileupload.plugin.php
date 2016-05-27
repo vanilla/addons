@@ -81,9 +81,9 @@ class FileUploadPlugin extends Gdn_Plugin {
    /**
     * Get instance of MediaModel.
     *
-    * @return object MediaModel
+    * @return MediaModel MediaModel
     */
-   public function MediaModel() {
+   public function mediaModel() {
       static $MediaModel = NULL;
 
       if ($MediaModel === NULL) {
@@ -977,6 +977,23 @@ class FileUploadPlugin extends Gdn_Plugin {
 
       $Sender->SetJSON('Progress', $Progress);
       $Sender->Render($this->GetView('blank.php'));
+   }
+
+   /**
+    * Update Gdn_Media when a discussion is transformed into a comment due to a merge.
+    *
+    * @param object $sender Sending controller instance
+    * @param array $args Event's arguments
+    *
+    * @return mixed
+    */
+   public function base_transformDiscussionToComment_handler($sender, $args) {
+         $this->mediaModel()->reassign(
+             val('DiscussionID', $args['SourceDiscussion']),
+             'discussion',
+             val('CommentID', $args['TargetComment']),
+             'comment'
+         );
    }
 
    public static function ApcAvailable() {
