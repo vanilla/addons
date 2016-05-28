@@ -31,7 +31,7 @@ function writeJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
         if (!isset($Request['client_id'])) {
             $Error = array('error' => 'invalid_request', 'message' => 'The client_id parameter is missing.');
         } elseif ($Request['client_id'] != $ClientID) {
-            $Error = array('error' => 'invalid_client', 'message' => "Unknown client {$Request['client_id']}.");
+            $Error = array('error' => 'invalid_client', 'message' => "Unknown client ".htmlspecialchars($Request['client_id']).".");
         } elseif (!isset($Request['timestamp']) && !isset($Request['signature'])) {
             if (is_array($User) && count($User) > 0) {
                 // This isn't really an error, but we are just going to return public information when no signature is sent.
