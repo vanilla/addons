@@ -34,11 +34,11 @@ class QnAPlugin extends Gdn_Plugin {
     public function __construct() {
         parent::__construct();
 
-        if (Gdn::pluginManager()->checkPlugin('Reactions') && c('Plugins.QnA.Reactions', true)) {
+        if (Gdn::addonManager()->isEnabled('Reactions') && c('Plugins.QnA.Reactions', true)) {
             $this->Reactions = true;
         }
 
-        if ((Gdn::applicationManager()->checkApplication('Reputation') || Gdn::pluginManager()->checkPlugin('badges'))
+        if ((Gdn::addonManager()->isEnabled('Reputation') || Gdn::addonManager()->isEnabled('badges'))
             && c('Plugins.QnA.Badges', true)) {
             $this->Badges = true;
         }
