@@ -337,7 +337,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             throw new Gdn_UserException(sprintf(T('ValidateRequired'), 'client_id'), 400);
         $Provider = self::getProvider($client_id);
         if (!$Provider)
-            throw new Gdn_UserException(sprintf(T('Unknown client: %s.'), $client_id), 400);
+            throw new Gdn_UserException(sprintf(T('Unknown client: %s.'), htmlspecialchars($client_id)), 400);
 
         if (!GetValue('TestMode', $Provider)) {
             if (!$Signature)
