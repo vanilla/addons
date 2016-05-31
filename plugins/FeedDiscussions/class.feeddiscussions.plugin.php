@@ -354,7 +354,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             );
          
          // Post as Minion (if one exists) or the system user
-         if (Gdn::PluginManager()->CheckPlugin('Minion')) {
+         if (Gdn::addonManager()->isEnabled('Minion', \Vanilla\Addon::TYPE_ADDON)) {
             $Minion = Gdn::PluginManager()->GetPluginInstance('MinionPlugin');
             $InsertUserID = $Minion->GetMinionUserID();
          }
