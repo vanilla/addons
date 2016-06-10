@@ -876,6 +876,20 @@ class QnAPlugin extends Gdn_Plugin {
 
         if ($sender->Form->isPostBack()) {
             $sender->DiscussionModel->setField($discussionID, 'Type', $sender->Form->getFormValue('Type'));
+
+            // Update the QnA field.  Default to "Unanswered" for questions. Null the field for other types.
+            $qna = val('QnA', $Discussion);
+            switch ($sender->Form->getFormValue('Type')) {
+                case 'Question':
+                    $sender->DiscussionModel->setField(
+                        $discussionID,
+                        'QnA',
+                        $qna ? $qna : 'Unanswered'
+                    );
+                    break;
+                default:
+                    $sender->DiscussionModel->setField($discussionID, 'QnA', null);
+            }
 //         $Form = new Gdn_Form();
             $sender->Form->setValidationResults($sender->DiscussionModel->validationResults());
 
@@ -903,7 +917,10 @@ class QnAPlugin extends Gdn_Plugin {
 
             if ($Unanswered) {
                 $args['Wheres']['Type'] = 'Question';
-                $sender->SQL->whereIn('d.QnA', array('Unanswered', 'Rejected'));
+                $sender->SQL->beginWhereGroup()
+                    ->where('d.QnA', null)
+                    ->orWhereIn('d.QnA', array('Unanswered', 'Rejected'))
+                    ->endWhereGroup();
                 Gdn::controller()->title('Unanswered Questions');
             } elseif ($QnA = Gdn::request()->get('qna')) {
                 $args['Wheres']['QnA'] = $QnA;
@@ -997,7 +1014,10 @@ class QnAPlugin extends Gdn_Plugin {
 
             if ($questionCount === null) {
                 $questionCount = Gdn::sql()
-                    ->whereIn('QnA', array('Unanswered', 'Rejected'))
+                    ->beginWhereGroup()
+                    ->where('QnA', null)
+                    ->orWhereIn('QnA', array('Unanswered', 'Rejected'))
+                    ->endWhereGroup()
                     ->getCount('Discussion', array('Type' => 'Question'));
             }
 
