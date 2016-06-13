@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<?php Gdn_Theme::assetBegin('Help'); ?>
 <div class="Help Aside">
     <?php
     echo '<h2>', T('Need More Help?'), '</h2>';
@@ -8,13 +9,14 @@
     echo '</ul>';
     ?>
 </div>
-<h1><?php echo sprintf(t('%s Settings'), 'jsConnect'); ?></h1>
+<?php Gdn_Theme::assetEnd(); ?>
+<div class="header-block">
+    <h1><?php echo sprintf(t('%s Settings'), 'jsConnect'); ?></h1>
+    <?php echo Anchor(T('Add Connection'), '/settings/jsconnect/addedit', 'btn btn-primary'); ?>
+</div>
 <div class="Info">
     <?php echo T('You can connect to multiple sites that support jsConnect.'); ?>
 </div>
-<div class="FilterMenu"><?php
-    echo Anchor(T('Add Connection'), '/settings/jsconnect/addedit', 'SmallButton');
-?></div>
 <div class="Info">
     <h2>Signing In</h2>
     <?php
@@ -37,35 +39,37 @@
         echo $this->Form->close();
     ?>
 </div>
-<table class="AltRows">
-    <thead>
-    <tr>
-        <th><?php echo T('Client ID'); ?></th>
-        <th><?php echo T('Site Name'); ?></th>
-        <th><?php echo T('Authentication URL'); ?></th>
-        <th><?php echo T('Test') ?></th>
-        <th>&#160;</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php foreach ($this->Data('Providers') as $Provider): ?>
+<div class="table-wrap">
+    <table class="AltRows">
+        <thead>
         <tr>
-            <td><?php echo htmlspecialchars($Provider['AuthenticationKey']); ?></td>
-            <td><?php echo htmlspecialchars($Provider['Name']); ?></td>
-            <td><?php echo htmlspecialchars($Provider['AuthenticateUrl']); ?></td>
-            <td>
-                <?php
-                echo Anchor(T('Test URL'), str_replace('=?', '=test', JsConnectPlugin::connectUrl($Provider, TRUE)));
-                ?>
-                <div class="JsConnectContainer UserInfo"></div>
-            </td>
-            <td>
-                <?php
-                echo Anchor(T('Edit'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'SmallButton');
-                echo Anchor(T('Delete'), '/settings/jsconnect/delete?client_id='.urlencode($Provider['AuthenticationKey']), 'Popup SmallButton');
-                ?>
-            </td>
+            <th><?php echo T('Client ID'); ?></th>
+            <th><?php echo T('Site Name'); ?></th>
+            <th><?php echo T('Authentication URL'); ?></th>
+            <th><?php echo T('Test') ?></th>
+            <th>&#160;</th>
         </tr>
-    <?php endforeach; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        <?php foreach ($this->Data('Providers') as $Provider): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($Provider['AuthenticationKey']); ?></td>
+                <td><?php echo htmlspecialchars($Provider['Name']); ?></td>
+                <td><?php echo htmlspecialchars($Provider['AuthenticateUrl']); ?></td>
+                <td>
+                    <?php
+                    echo Anchor(T('Test URL'), str_replace('=?', '=test', JsConnectPlugin::connectUrl($Provider, TRUE)));
+                    ?>
+                    <div class="JsConnectContainer UserInfo"></div>
+                </td>
+                <td>
+                    <?php
+                    echo Anchor(T('Edit'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'btn btn-edit');
+                    echo Anchor(T('Delete'), '/settings/jsconnect/delete?client_id='.urlencode($Provider['AuthenticationKey']), 'Popup btn btn-delete');
+                    ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>

@@ -646,11 +646,11 @@ class JsConnectPlugin extends Gdn_Plugin {
                 'Options' => ['class' => 'InputBox BigInput']
             ],
             'Trusted' => [
-                'Control' => 'checkbox',
+                'Control' => 'toggle',
                 'LabelCode' => 'This is trusted connection and can sync roles & permissions.'
             ],
             'IsDefault' => [
-                'Control' => 'checkbox',
+                'Control' => 'toggle',
                 'LabelCode' => 'Make this connection your default signin method.'
             ],
             'Advanced' => [
@@ -669,7 +669,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 ),
                 'Options' => ['Default' => 'md5']
             ],
-            'TestMode' => ['Control' => 'checkbox', 'LabelCode' => 'This connection is in test-mode.']
+            'TestMode' => ['Control' => 'toggle', 'LabelCode' => 'This connection is in test-mode.']
         ];
         $sender->setData('_Controls', $controls);
         $sender->setData('Title', sprintf(T($client_id ? 'Edit %s' : 'Add %s'), T('Connection')));
