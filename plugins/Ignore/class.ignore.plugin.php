@@ -37,7 +37,8 @@ $PluginInfo['Ignore'] = array(
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'Icon' => 'ignore.png'
 );
 
 class IgnorePlugin extends Gdn_Plugin {

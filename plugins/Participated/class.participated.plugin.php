@@ -21,7 +21,8 @@ $PluginInfo['Participated'] = array(
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'Icon' => 'participated-discussions.png'
 );
 
 class ParticipatedPlugin extends Gdn_Plugin {

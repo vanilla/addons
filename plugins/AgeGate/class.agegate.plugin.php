@@ -7,6 +7,7 @@ $PluginInfo['AgeGate'] = array(
     'Author' => "Becky Van Bussel",
     'AuthorEmail' => 'becky@vanillaforums.com',
     'SettingsUrl' => '/settings/agegate', // Url of the plugin's settings page.
+    'Icon' => 'age-gate.png'
 
 );
 

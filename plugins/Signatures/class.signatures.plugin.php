@@ -36,7 +36,8 @@ $PluginInfo['Signatures'] = array(
     'AuthorUrl' => 'http://www.vanillaforums.com',
     'MobileFriendly' => TRUE,
     'SettingsUrl' => '/settings/signatures',
-    'SettingsPermission' => 'Garden.Settings.Manage'
+    'SettingsPermission' => 'Garden.Settings.Manage',
+    'Icon' => 'signatures.png'
 );
 
 class SignaturesPlugin extends Gdn_Plugin {

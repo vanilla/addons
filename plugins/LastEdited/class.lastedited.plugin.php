@@ -19,7 +19,8 @@ $PluginInfo['LastEdited'] = array(
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'Icon' => 'last-edited.png'
 );
 
 class LastEditedPlugin extends Gdn_Plugin {
@@ -29,48 +30,48 @@ class LastEditedPlugin extends Gdn_Plugin {
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
       $Sender->AddCssFile('lastedited.css', 'plugins/LastEdited');
    }
-   
+
    public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
       $this->DrawEdited($Sender);
    }
-   
+
    public function DiscussionController_AfterCommentBody_Handler($Sender) {
       $this->DrawEdited($Sender);
    }
-   
+
    public function PostController_AfterCommentBody_Handler($Sender) {
       $this->DrawEdited($Sender);
    }
-   
+
    protected function DrawEdited($Sender) {
       $Record = $Sender->Data('Discussion');
       if (!$Record)
          $Record = $Sender->Data('Record');
-      
+
       if (!$Record)
          return;
 
       $PermissionCategoryID = GetValue('PermissionCategoryID', $Record);
-      
+
       $Data = $Record;
       $RecordType = 'discussion';
       $RecordID = GetValue('DiscussionID', $Data);
-      
+
       // But override if comment
       if (isset($Sender->EventArguments['Comment']) || GetValue('RecordType', $Record) == 'comment') {
          $Data = $Sender->EventArguments['Comment'];
          $RecordType = 'comment';
          $RecordID = GetValue('CommentID', $Data);
       }
-      
+
       $UserCanEdit = Gdn::Session()->CheckPermission('Vanilla.'.ucfirst($RecordType).'s.Edit', TRUE, 'Category', $PermissionCategoryID);
-      
+
       if (is_null($Data->DateUpdated)) return;
       if (Gdn_Format::ToTimestamp($Data->DateUpdated) <= Gdn_Format::ToTimestamp($Data->DateInserted)) return;
-      
+
       $SourceUserID = $Data->InsertUserID;
       $UpdatedUserID = $Data->UpdateUserID;
-      
+
       $UserData = Gdn::UserModel()->GetID($UpdatedUserID);
       $Edited = array(
          'EditUser'     => GetValue('Name', $UserData, T('Unknown User')),
@@ -78,22 +79,22 @@ class LastEditedPlugin extends Gdn_Plugin {
          'EditLogUrl'   => Url("/log/record/{$RecordType}/{$RecordID}"),
          'EditWord'     => 'at'
       );
-      
+
       $DateUpdateTime = Gdn_Format::ToTimestamp($Data->DateUpdated);
       if (date('ymd', $DateUpdateTime) != date('ymd'))
          $Edited['EditWord'] = 'on';
-      
+
       $Format = T('PostEdited.Plain', 'Post edited by {EditUser} {EditWord} {EditDate}');
       if ($UserCanEdit)
          $Format = T('PostEdited.Log', 'Post edited by {EditUser} {EditWord} {EditDate} (<a href="{EditLogUrl}">log</a>)');
-      
+
       $Display = '<div class="PostEdited">'.FormatString($Format, $Edited).'</div>';
       echo $Display;
-      
+
    }
-   
+
    public function Setup() {
       // Nothing to do!
    }
-   
+
 }

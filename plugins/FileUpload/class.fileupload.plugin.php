@@ -39,7 +39,8 @@ $PluginInfo['FileUpload'] = array(
    //'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'Icon' => 'file-upload.png'
 );
 
 class FileUploadPlugin extends Gdn_Plugin {

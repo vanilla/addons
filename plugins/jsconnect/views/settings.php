@@ -63,10 +63,12 @@
                     <div class="JsConnectContainer UserInfo"></div>
                 </td>
                 <td>
-                    <?php
-                    echo Anchor(T('Edit'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'btn btn-edit');
-                    echo Anchor(T('Delete'), '/settings/jsconnect/delete?client_id='.urlencode($Provider['AuthenticationKey']), 'Popup btn btn-delete');
-                    ?>
+                    <div class="btn-group">
+                        <?php
+                        echo Anchor(T('Edit'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'btn btn-edit');
+                        echo Anchor(T('Delete'), '/settings/jsconnect/delete?client_id='.urlencode($Provider['AuthenticationKey']), 'Popup btn btn-delete');
+                        ?>
+                    </div>
                 </td>
             </tr>
         <?php endforeach; ?>

@@ -17,6 +17,7 @@ $PluginInfo['jsconnect'] = array(
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
     'SettingsUrl' => '/settings/jsconnect',
     'SettingsPermission' => 'Garden.Settings.Manage',
+    'Icon' => 'jsconnect.png'
 );
 
 class JsConnectPlugin extends Gdn_Plugin {

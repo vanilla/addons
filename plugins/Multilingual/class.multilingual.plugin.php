@@ -17,7 +17,8 @@ $PluginInfo['Multilingual'] = array(
     'MobileFriendly' => true,
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
+    'AuthorUrl' => 'http://lincolnwebs.com',
+    'Icon' => 'multilingual.png'
 );
 
 /* Change Log
