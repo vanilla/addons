@@ -284,16 +284,6 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add a link to the dashboard menu.
-     *
-     * @param $sender Sending controller instance.
-     */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Add-ons', t('Q&A'), 'settings/qna', 'Garden.Settings.Manage');
-    }
-
-    /**
      *
      * @param $sender Sending controller instance.
      * @param array $args Event arguments.
