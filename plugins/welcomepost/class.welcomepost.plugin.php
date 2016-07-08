@@ -21,6 +21,37 @@ $PluginInfo['welcomepost'] = [
 class WelcomePostPlugin extends Gdn_Plugin {
 
     /**
+     * Executed when the plugin is enabled.
+     */
+    public function setup() {
+        $this->structure();
+    }
+
+    /**
+     * Create the target category that is needed for this plugin to work.
+     */
+    public function structure() {
+        $category = (array)CategoryModel::instance()->getByCode('welcome');
+        $cachedCategoryID = val('CategoryID', $category, false);
+
+        if (!$cachedCategoryID) {
+            $categoryModel = CategoryModel::instance();
+            $categoryModel->save([
+                'ParentCategoryID' => -1,
+                'Depth' => 1,
+                'InsertUserID' => 1,
+                'UpdateUserID' => 1,
+                'DateInserted' => Gdn_Format::toDateTime(),
+                'DateUpdated' => Gdn_Format::toDateTime(),
+                'Name' => 'Welcome',
+                'UrlCode' => 'welcome',
+                'Description' => 'Introduce yourself to the community!',
+                'PermissionCategoryID' => -1
+            ]);
+        }
+    }
+
+    /**
      * Check whether all condition are met for this plugin to do its magic.
      *
      * @param Gdn_Request $request
