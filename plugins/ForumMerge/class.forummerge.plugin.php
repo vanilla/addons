@@ -226,7 +226,8 @@ class ForumMergePlugin implements Gdn_IPlugin {
            where d.OldID > 0');
          Gdn::SQL()->Query('update '.$NewPrefix.'Discussion d
            set d.UpdateUserID = (SELECT u.UserID from '.$NewPrefix.'User u where u.OldID = d.UpdateUserID)
-           where d.OldID > 0');
+           where d.OldID > 0
+             and d.UpdateUserID is not null');
          Gdn::SQL()->Query('update '.$NewPrefix.'Discussion d
            set d.CategoryID = (SELECT c.CategoryID from '.$NewPrefix.'Category c where c.OldID = d.CategoryID)
            where d.OldID > 0');
@@ -264,7 +265,8 @@ class ForumMergePlugin implements Gdn_IPlugin {
            where c.OldID > 0');
          Gdn::SQL()->Query('update '.$NewPrefix.'Comment c
            set c.UpdateUserID = (SELECT u.UserID from '.$NewPrefix.'User u where u.OldID = c.UpdateUserID)
-           where c.OldID > 0');
+           where c.OldID > 0
+             and c.UpdateUserID is not null');
 
          // Convert imported comments to use new DiscussionIDs
          Gdn::SQL()->Query('update '.$NewPrefix.'Comment c
