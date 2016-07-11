@@ -6,7 +6,7 @@
 
 $PluginInfo['welcomepost'] = [
     'Name' => 'Welcome Post',
-    'Description' => 'Refirect users, after registration, to an "introduce yourself" page that post in a "welcome" category.',
+    'Description' => 'Redirect users, after registration, to an "introduce yourself" page that posts in a "welcome" category.',
     'Version' => '1.0',
     'RequiredApplications' => ['Vanilla' => '2.2'],
     'License' => 'GNU GPL2',
