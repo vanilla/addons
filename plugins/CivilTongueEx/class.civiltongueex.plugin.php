@@ -15,7 +15,8 @@ $PluginInfo['CivilTongueEx'] = array(
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
     'SettingsUrl' => '/plugin/tongue',
-    'SettingsPermission' => 'Garden.Settings.Manage'
+    'SettingsPermission' => 'Garden.Settings.Manage',
+    'License' => 'GNU GPL2'
 );
 
 // 1.0 - Fix empty pattern when list ends in semi-colon, use non-custom permission (2012-03-12 Lincoln)
