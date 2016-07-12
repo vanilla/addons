@@ -48,6 +48,16 @@ class JsConnectPlugin extends Gdn_Plugin {
         return $Result;
     }
 
+    /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        $args['AvailableAddons']['jsconnect']['HasPopupFriendlySettings'] = false;
+    }
+
     public static function connectButton($Provider, $Options = array()) {
         if (!is_array($Provider))
             $Provider = self::getProvider($Provider);

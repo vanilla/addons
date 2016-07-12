@@ -2,6 +2,8 @@
 <?php Gdn_Theme::assetBegin('Help'); ?>
 <div class="Help Aside">
     <?php
+    echo '<h2>'.sprintf(t('About %s'), 'jsConnect').'</h2>';
+    echo T('You can connect to multiple sites that support jsConnect.');
     echo '<h2>', T('Need More Help?'), '</h2>';
     echo '<ul>';
     echo '<li>', Anchor(T('jsConnect Documentation'), 'http://docs.vanillaforums.com/features/sso/jsconnect/'), '</li>';
@@ -12,33 +14,28 @@
 <?php Gdn_Theme::assetEnd(); ?>
 <div class="header-block">
     <h1><?php echo sprintf(t('%s Settings'), 'jsConnect'); ?></h1>
-    <?php echo Anchor(T('Add Connection'), '/settings/jsconnect/addedit', 'btn btn-primary'); ?>
+    <?php echo Anchor(T('Add Connection'), '/settings/jsconnect/addedit', 'btn btn-primary js-modal'); ?>
 </div>
-<div class="Info">
-    <?php echo T('You can connect to multiple sites that support jsConnect.'); ?>
-</div>
-<div class="Info">
-    <h2>Signing In</h2>
-    <?php
-        echo $this->Form->open();
-        echo $this->Form->errors();
+<h2>Signing In</h2>
+<?php
+    echo $this->Form->open();
+    echo $this->Form->errors();
 
-        echo wrap($this->Form->checkBox(
-            'Garden.Registration.AutoConnect',
-            'Automatically connect to an existing user account if it has the same email address.'
-        ), 'p');
-        echo wrap($this->Form->checkBox(
-            'Garden.SignIn.Popup',
-            'Use popups for sign in pages <small>(not recommended while using SSO)</small>.'
-        ), 'p');
+    echo wrap($this->Form->checkBox(
+        'Garden.Registration.AutoConnect',
+        'Automatically connect to an existing user account if it has the same email address.'
+    ), 'p');
+    echo wrap($this->Form->checkBox(
+        'Garden.SignIn.Popup',
+        'Use popups for sign in pages <small>(not recommended while using SSO)</small>.'
+    ), 'p');
 
-        echo '<div class="Buttons">';
-        echo $this->Form->button('Save');
-        echo '</div>';
+    echo '<div class="Buttons">';
+    echo $this->Form->button('Save');
+    echo '</div>';
 
-        echo $this->Form->close();
-    ?>
-</div>
+    echo $this->Form->close();
+?>
 <div class="table-wrap">
     <table class="AltRows">
         <thead>
