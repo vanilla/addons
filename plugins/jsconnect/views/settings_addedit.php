@@ -17,9 +17,9 @@ echo $this->Form->simple($this->data('_Controls'));
 ?>
 
 <?php
-echo '<div class="btn-group">';
+echo '<div class="js-modal-footer form-footer buttons">';
+echo $this->Form->Button('Generate Client ID and Secret', array('Name' => 'Generate', 'class' => 'btn btn-secondary js-generate'));
 echo $this->Form->Button('Save');
-echo $this->Form->Button('Generate Client ID and Secret', array('Name' => 'Generate'));
 echo '</div>';
 
 echo $this->Form->Close();

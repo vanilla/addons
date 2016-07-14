@@ -55,7 +55,9 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function settingsController_beforeAddonList_handler($sender, &$args) {
-        $args['AvailableAddons']['jsconnect']['HasPopupFriendlySettings'] = false;
+        if (val('jsconnect', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['jsconnect']['HasPopupFriendlySettings'] = false;
+        }
     }
 
     public static function connectButton($Provider, $Options = array()) {
@@ -559,6 +561,7 @@ class JsConnectPlugin extends Gdn_Plugin {
     }
 
     public function settingsController_jsConnect_create($Sender, $Args = array()) {
+        $Sender->addJsFile('jsconnect-settings.js', 'plugins/jsconnect');
         $Sender->Permission('Garden.Settings.Manage');
         $Sender->AddSideMenu();
 
@@ -580,6 +583,8 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @param array $Args
      */
     protected function settings_addEdit($sender, $Args) {
+        $sender->addJsFile('jsconnect-settings.js', 'plugins/jsconnect');
+
         $client_id = $sender->Request->Get('client_id');
         Gdn::Locale()->SetTranslation('AuthenticationKey', 'Client ID');
         Gdn::Locale()->SetTranslation('AssociationSecret', 'Secret');
@@ -589,12 +594,13 @@ class JsConnectPlugin extends Gdn_Plugin {
         $form = $sender->Form;
         $model = new Gdn_AuthenticationProviderModel();
         $form->setModel($model);
+        $generate = false;
 
         if ($form->authenticatedPostBack()) {
             if ($form->getFormValue('Generate') || $sender->Request->post('Generate')) {
-                $form->setFormValue('AuthenticationKey', mt_rand());
-                $form->setFormValue('AssociationSecret', md5(mt_rand()));
-
+                $generate = true;
+                $key = mt_rand();
+                $secret = md5(mt_rand());
                 $sender->setFormSaved(FALSE);
             } else {
                 $form->validateRule('AuthenticationKey', 'ValidateRequired');
@@ -687,8 +693,14 @@ class JsConnectPlugin extends Gdn_Plugin {
 
         // Throw a render event as this plugin so that handlers can call our methods.
         Gdn::pluginManager()->callEventHandlers($this, __CLASS__, 'addedit', 'render');
+        if ($generate && $sender->deliveryType() === DELIVERY_TYPE_VIEW) {
+            $sender->setJson('AuthenticationKey', $key);
+            $sender->setJson('AssociationSecret', $secret);
+            $sender->render('Blank', 'Utility', 'Dashboard');
+        } else {
+            $sender->render('Settings_AddEdit', '', 'plugins/jsconnect');
 
-        $sender->render('Settings_AddEdit', '', 'plugins/jsconnect');
+        }
     }
 
     public function settings_delete($Sender, $Args) {
