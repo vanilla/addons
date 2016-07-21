@@ -25,7 +25,6 @@ $PluginInfo['Redirector'] = [
 class RedirectorPlugin extends Gdn_Plugin {
     /**
      *
-     *
      * @var array
      */
     public static $Files = [
@@ -35,64 +34,41 @@ class RedirectorPlugin extends Gdn_Plugin {
         'index.php' => [ // smf
             'board' => [
                 'CategoryID',
-                'Filter' => [
-                    'RedirectorPlugin',
-                    'SmfOffset',
-                ]
+                'Filter' => [__CLASS__, 'smfOffset']
             ],
             'topic' => [
                 'DiscussionID',
-                'Filter' => [
-                    'RedirectorPlugin',
-                    'SmfOffset',
-                ],
+                'Filter' => [__CLASS__, 'smfOffset'],
             ],
             'action' => [
                 '_',
-                'Filter' => [
-                    'RedirectorPlugin',
-                    'SmfAction',
-                ],
+                'Filter' => [__CLASS__, 'smfAction'],
             ],
         ],
-        'forum' => [
-            'RedirectorPlugin',
-            'forum_Filter',
-        ],
+        'forum' => [__CLASS__, 'forum_Filter'],
         'forum.jspa' => [ // jive 4; forums imported as tags
             'forumID' => 'TagID',
             'start' => 'Offset'
         ],
-        'forumdisplay.php' => [ // vBulletin category
-            'RedirectorPlugin',
-            'forumdisplay_Filter',
-        ],
+        'forumdisplay.php' => [__CLASS__, 'forumdisplay_Filter'], // vBulletin category
         'forumindex.jspa' => [ // jive 4 category
              'categoryID' => 'CategoryID',
         ],
         'forums' => [ // xenforo cateogry
             '_arg0' => [
                 'CategoryID',
-                'Filter' => [
-                    'RedirectorPlugin', 'XenforoID'
-                ],
+                'Filter' => [__CLASS__, 'xenforoID'],
             ],
             '_arg1' => [
                 'Page',
-                'Filter' => [
-                    'RedirectorPlugin',
-                    'GetNumber',
-                ]
+                'Filter' => [__CLASS__, 'getNumber']
             ],
         ],
         'member.php' => [ // vBulletin user
             'u' => 'UserID',
             '_arg0' => [
                 'UserID',
-                'Filter' => [
-                    'RedirectorPlugin',
-                    'RemoveID',
-                ],
+                'Filter' => [__CLASS__, 'removeID'],
             ],
         ],
         'memberlist.php' => [ // phpBB user
@@ -101,10 +77,7 @@ class RedirectorPlugin extends Gdn_Plugin {
         'members' => [ // xenforo profile
             '_arg0' => [
                 'UserID',
-                'Filter' => [
-                    'RedirectorPlugin',
-                    'XenforoID'
-                ],
+                'Filter' => [__CLASS__, 'xenforoID'],
             ],
         ],
         'thread.jspa' => [ //jive 4 comment/discussion
@@ -116,34 +89,19 @@ class RedirectorPlugin extends Gdn_Plugin {
         'profile.jspa' => [ //jive4 profile
             'userID' => 'UserID',
         ],
-        'showpost.php' => [ // vBulletin comment
-            'RedirectorPlugin',
-            'showpost_Filter',
-        ],
-        'showthread.php' => [ // vBulletin discussion
-            'RedirectorPlugin',
-            'showthread_Filter',
-        ],
+        'showpost.php' => [__CLASS__, 'showpost_Filter'], // vBulletin comment
+        'showthread.php' => [__CLASS__, 'showthreadFilter'], // vBulletin discussion
         'threads' => [ // xenforo discussion
             '_arg0' => [
                 'DiscussionID',
-                'Filter' => [
-                    'RedirectorPlugin',
-                    'XenforoID',
-                ],
+                'Filter' => [__CLASS__, 'xenforoID'],
             ],
             '_arg1' => [
                 'Page',
-                'Filter' => [
-                    'RedirectorPlugin',
-                    'GetNumber',
-                ],
+                'Filter' => [__CLASS__, 'getNumber'],
             ],
         ],
-        'topic' => [
-            'RedirectorPlugin',
-            'topic_Filter',
-        ],
+        'topic' => [__CLASS__, 'topicFilter'],
         'viewforum.php' => [ // phpBB category
             'f' => 'CategoryID',
             'start' => 'Offset',
@@ -158,7 +116,7 @@ class RedirectorPlugin extends Gdn_Plugin {
     /**
      *
      */
-    public function Gdn_Dispatcher_NotFound_Handler() {
+    public function gdn_Dispatcher_NotFound_Handler() {
         $Path = Gdn::Request()->Path();
         $Get = Gdn::Request()->Get();
         /**
@@ -166,11 +124,11 @@ class RedirectorPlugin extends Gdn_Plugin {
          * by manually parsing the server's QUERY_STRING variable, if available.
          */
         $QueryString = Gdn::Request()->getValueFrom('server', 'QUERY_STRING', false);
-        Trace(['QUERY_STRING' => $QueryString], 'Server Variables');
+        trace(['QUERY_STRING' => $QueryString], 'Server Variables');
         if ($QueryString && preg_match('/(^|&)p\=\/?(showpost\.php|showthread\.php|viewtopic\.php)/i', $QueryString)) {
             // Check for multiple values of p in our URL parameters
             if ($QueryString && preg_match_all('/(^|\?|&)p\=(?P<val>[^&]+)/', $QueryString, $QueryParameters) > 1) {
-                Trace($QueryParameters['val'], 'p Values');
+                trace($QueryParameters['val'], 'p Values');
                 // Assume the first p is Vanilla's path
                 $Path = trim($QueryParameters['val'][0], '/');
                 // The second p is used for our redirects
@@ -178,7 +136,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             }
         }
 
-        Trace(['Path' => $Path, 'Get' => $Get], 'Input');
+        trace(['Path' => $Path, 'Get' => $Get], 'Input');
 
         // Figure out the filename.
         $Parts = explode('/', $Path);
@@ -218,11 +176,11 @@ class RedirectorPlugin extends Gdn_Plugin {
             $i++;
         }
 
-        $Url = $this->FilenameRedirect($Filename, $Get);
+        $Url = $this->filenameRedirect($Filename, $Get);
 
         if ($Url) {
             if (Debug())
-                Trace($Url, "Redirect found");
+                trace($Url, "Redirect found");
             else
                 Redirect($Url, 301);
         }
@@ -235,8 +193,8 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @param $Get
      * @return bool|string
      */
-    public function FilenameRedirect($Filename, $Get) {
-        Trace(['Filename' => $Filename, 'Get' => $Get], 'Testing');
+    public function filenameRedirect($Filename, $Get) {
+        trace(['Filename' => $Filename, 'Get' => $Get], 'Testing');
         $Filename = strtolower($Filename);
         array_change_key_case($Get);
 
@@ -249,7 +207,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             // Use a callback to determine the translation.
             $Row = call_user_func_array($Row, [&$Get]);
         }
-        Trace($Get, 'New Get');
+        trace($Get, 'New Get');
 
         // Translate all of the get parameters into new parameters.
         $Vars = array();
@@ -281,12 +239,12 @@ class RedirectorPlugin extends Gdn_Plugin {
                 $Vars[$Opts[0]] = $Value;
         }
 
-        Trace($Vars, 'Translated Arguments');
+        trace($Vars, 'Translated Arguments');
         // Now let's see what kind of record we have.
         // We'll check the various primary keys in order of importance.
         $Result = false;
         if (isset($Vars['CommentID'])) {
-            Trace("Looking up comment {$Vars['CommentID']}.");
+            trace("Looking up comment {$Vars['CommentID']}.");
 
             $CommentModel = new CommentModel();
             // If a legacy slug is provided (assigned during a merge), attempt to lookup the comment using it
@@ -298,7 +256,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             if ($Comment)
                 $Result = CommentUrl($Comment, '//');
         } elseif (isset($Vars['DiscussionID'])) {
-            Trace("Looking up discussion {$Vars['DiscussionID']}.");
+            trace("Looking up discussion {$Vars['DiscussionID']}.");
 
             $DiscussionModel = new DiscussionModel();
             $DiscussionID = $Vars['DiscussionID'];
@@ -320,9 +278,9 @@ class RedirectorPlugin extends Gdn_Plugin {
             }
 
             if ($Discussion)
-                $Result = DiscussionUrl($Discussion, self::PageNumber($Vars, 'Vanilla.Comments.PerPage'), '//');
+                $Result = DiscussionUrl($Discussion, self::pageNumber($Vars, 'Vanilla.Comments.PerPage'), '//');
         } elseif (isset($Vars['UserID'])) {
-            Trace("Looking up user {$Vars['UserID']}.");
+            trace("Looking up user {$Vars['UserID']}.");
 
             $User = Gdn::UserModel()->GetID($Vars['UserID']);
             if ($User)
@@ -330,10 +288,10 @@ class RedirectorPlugin extends Gdn_Plugin {
         } elseif (isset($Vars['TagID'])) {
             $Tag = TagModel::instance()->GetID($Vars['TagID']);
             if ($Tag) {
-                 $Result = TagUrl($Tag, self::PageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
+                 $Result = TagUrl($Tag, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
             }
         } elseif (isset($Vars['CategoryID'])) {
-            Trace("Looking up category {$Vars['CategoryID']}.");
+            trace("Looking up category {$Vars['CategoryID']}.");
 
             // If a legacy slug is provided (assigned during a merge), attempt to lookup the category ID based on it
             if (isset($Get['legacy']) && Gdn::Structure()->Table('Category')->ColumnExists('ForeignID')) {
@@ -343,7 +301,7 @@ class RedirectorPlugin extends Gdn_Plugin {
                 $Category = CategoryModel::Categories($Vars['CategoryID']);
             }
             if ($Category)
-                $Result = CategoryUrl($Category, self::PageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
+                $Result = CategoryUrl($Category, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
         }
 
         return $Result;
@@ -373,11 +331,11 @@ class RedirectorPlugin extends Gdn_Plugin {
             return [
                 '_arg0' => [
                     'CategoryID',
-                    'Filter' => ['RedirectorPlugin', 'RemoveID'],
+                    'Filter' => [__CLASS__, 'removeID'],
                 ],
                 '_arg1' => [
                     'Page',
-                    'Filter' => ['RedirectorPlugin', 'IPBPageNumber'],
+                    'Filter' => [__CLASS__, 'IPBPageNumber'],
                 ],
             ];
         }
@@ -391,18 +349,18 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @return array Mapping of vB parameters
      */
     public static function forumdisplay_filter(&$Get) {
-        self::VbFriendlyUrlID($Get, 'f');
+        self::vbFriendlyUrlID($Get, 'f');
 
         return [
             'f' => 'CategoryID',
             'page' => 'Page',
             '_arg0' => [
                 'CategoryID',
-                'Filter' => ['RedirectorPlugin', 'RemoveID']
+                'Filter' => [__CLASS__, 'removeID']
             ],
             '_arg1' => [
                 'Page',
-                'Filter' => ['RedirectorPlugin', 'GetNumber']
+                'Filter' => [__CLASS__, 'getNumber']
             ],
         ];
     }
@@ -413,7 +371,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @param $Value
      * @return null
      */
-    public static function GetNumber($Value) {
+    public static function getNumber($Value) {
         if (preg_match('`(\d+)`', $Value, $Matches))
             return $Matches[1];
         return null;
@@ -428,7 +386,7 @@ class RedirectorPlugin extends Gdn_Plugin {
     public static function IPBPageNumber($Value) {
         if (preg_match('`page__st__(\d+)`i', $Value, $Matches))
             return ['Offset', $Matches[1]];
-        return self::GetNumber($Value);
+        return self::getNumber($Value);
     }
 
     /**
@@ -438,14 +396,14 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @param int|string $PageSize The pagesize or the config key of the pagesize.
      * @return int
      */
-    public static function PageNumber($Vars, $PageSize) {
+    public static function pageNumber($Vars, $PageSize) {
         if (isset($Vars['Page']))
             return $Vars['Page'];
         if (isset($Vars['Offset'])) {
             if (is_numeric($PageSize))
-                return PageNumber($Vars['Offset'], $PageSize, false, Gdn::Session()->IsValid());
+                return pageNumber($Vars['Offset'], $PageSize, false, Gdn::Session()->IsValid());
             else
-                return PageNumber($Vars['Offset'], C($PageSize, 30), false, Gdn::Session()->IsValid());
+                return pageNumber($Vars['Offset'], C($PageSize, 30), false, Gdn::Session()->IsValid());
         }
         return 1;
     }
@@ -456,7 +414,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @param $Value
      * @return null
      */
-    public static function RemoveID($Value) {
+    public static function removeID($Value) {
         if (preg_match('`^(\d+)`', $Value, $Matches))
             return $Matches[1];
         return null;
@@ -469,8 +427,8 @@ class RedirectorPlugin extends Gdn_Plugin {
      *
      * @return array Mapping of vB parameters
      */
-    public static function showpost_filter(&$Get) {
-        self::VbFriendlyUrlID($Get, 'p');
+    public static function showpostFilter(&$Get) {
+        self::vbFriendlyUrlID($Get, 'p');
 
         return array(
             'p' => 'CommentID'
@@ -485,8 +443,8 @@ class RedirectorPlugin extends Gdn_Plugin {
      *
      * @return array Mapping of vB parameters
      */
-    public static function showthread_Filter(&$Get) {
-        self::VbFriendlyUrlID($Get, 't');
+    public static function showthreadFilter(&$Get) {
+        self::vbFriendlyUrlID($Get, 't');
 
         return array(
             't' => 'DiscussionID',
@@ -494,11 +452,11 @@ class RedirectorPlugin extends Gdn_Plugin {
             'page' => 'Page',
             '_arg0' => [
                 'DiscussionID',
-                'Filter' => ['RedirectorPlugin', 'RemoveID']
+                'Filter' => [__CLASS__, 'removeID']
             ],
             '_arg1' => [
                 'Page',
-                'Filter' => ['RedirectorPlugin', 'GetNumber']
+                'Filter' => [__CLASS__, 'getNumber']
             ]
         );
     }
@@ -509,7 +467,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @param $Value
      * @return array
      */
-    public static function SmfAction($Value) {
+    public static function smfAction($Value) {
         $result = null;
 
         if (preg_match('`(\w+);(\w+)=(\d+)`', $Value, $M)) {
@@ -528,7 +486,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @param $Key
      * @return array
      */
-    public static function SmfOffset($Value, $Key) {
+    public static function smfOffset($Value, $Key) {
         $result = null;
 
         if (preg_match('/(\d+)\.(\d+)/', $Value, $M)) {
@@ -546,7 +504,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @param $Get
      * @return array
      */
-    public static function topic_Filter(&$Get) {
+    public static function topicFilter(&$Get) {
         if (val('_arg2', $Get) == 'page') {
             // This is a punbb style topic.
             return [
@@ -565,17 +523,11 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'p' => 'CommentID',
                 '_arg0' => [
                     'DiscussionID',
-                    'Filter' => [
-                        'RedirectorPlugin',
-                        'RemoveID',
-                    ],
+                    'Filter' => [__CLASS__, 'removeID'],
                 ],
                 '_arg1' => [
                     'Page',
-                    'Filter' => [
-                        'RedirectorPlugin',
-                        'IPBPageNumber'
-                    ],
+                    'Filter' => [__CLASS__, 'IPBPageNumber'],
                 ],
             ];
         }
@@ -589,7 +541,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      *
      * @return bool True if value saved, False if not (including if value was already set in target parameter)
      */
-    private static function VbFriendlyUrlID(&$Get, $TargetParam) {
+    private static function vbFriendlyUrlID(&$Get, $TargetParam) {
         /**
          * vBulletin 4 added "friendly URLs" that don't pass IDs as a name-value pair.  We need to extract the ID from
          * this format, if we don't already have it.
@@ -622,7 +574,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @param $Value
      * @return mixed
      */
-    public static function XenforoID($value) {
+    public static function xenforoID($value) {
         if (preg_match('/(\d+)$/', $value, $matches)) {
             $value = $matches[1];
         }
