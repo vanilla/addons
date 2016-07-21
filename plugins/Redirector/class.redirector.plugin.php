@@ -45,12 +45,12 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'Filter' => [__CLASS__, 'smfAction'],
             ],
         ],
-        'forum' => [__CLASS__, 'forum_Filter'],
+        'forum' => [__CLASS__, 'forumFilter'],
         'forum.jspa' => [ // jive 4; forums imported as tags
             'forumID' => 'TagID',
             'start' => 'Offset'
         ],
-        'forumdisplay.php' => [__CLASS__, 'forumdisplay_Filter'], // vBulletin category
+        'forumdisplay.php' => [__CLASS__, 'forumDisplayFilter'], // vBulletin category
         'forumindex.jspa' => [ // jive 4 category
              'categoryID' => 'CategoryID',
         ],
@@ -89,7 +89,7 @@ class RedirectorPlugin extends Gdn_Plugin {
         'profile.jspa' => [ //jive4 profile
             'userID' => 'UserID',
         ],
-        'showpost.php' => [__CLASS__, 'showpost_Filter'], // vBulletin comment
+        'showpost.php' => [__CLASS__, 'showpostFilter'], // vBulletin comment
         'showthread.php' => [__CLASS__, 'showthreadFilter'], // vBulletin discussion
         'threads' => [ // xenforo discussion
             '_arg0' => [
@@ -101,6 +101,7 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'Filter' => [__CLASS__, 'getNumber'],
             ],
         ],
+        //'t5' =>
         'topic' => [__CLASS__, 'topicFilter'],
         'viewforum.php' => [ // phpBB category
             'f' => 'CategoryID',
@@ -313,7 +314,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @param $Get
      * @return array
      */
-    public static function forum_Filter(&$Get) {
+    public static function forumFilter(&$Get) {
         if (val('_arg2', $Get) == 'page') {
             // This is a punbb style forum.
             return [
@@ -348,7 +349,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      *
      * @return array Mapping of vB parameters
      */
-    public static function forumdisplay_filter(&$Get) {
+    public static function forumDisplayFilter(&$Get) {
         self::vbFriendlyUrlID($Get, 'f');
 
         return [
