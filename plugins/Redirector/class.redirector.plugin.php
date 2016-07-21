@@ -10,7 +10,7 @@
 // Define the plugin:
 $PluginInfo['Redirector'] = [
     'Name' => 'Forum Redirector',
-    'Description' => 'Adds 301 redirects for Vanilla from common forum platforms. This redirector redirects urls from IPB, phpBB, punBB, smf, vBulletin, and Xenforo',
+    'Description' => 'Adds 301 redirects for Vanilla from common forum platforms. This redirector redirects urls from IPB, phpBB, punBB, smf, vBulletin, Lithium, and Xenforo',
     'Version' => '1.1',
     'RequiredApplications' => ['Vanilla' => '2.1'],
     'Author' => 'Todd Burry',
@@ -101,7 +101,7 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'Filter' => [__CLASS__, 'getNumber'],
             ],
         ],
-        //'t5' =>
+        't5' => [__CLASS__, 't5Filter'], // Lithium
         'topic' => [__CLASS__, 'topicFilter'],
         'viewforum.php' => [ // phpBB category
             'f' => 'CategoryID',
@@ -180,10 +180,11 @@ class RedirectorPlugin extends Gdn_Plugin {
         $Url = $this->filenameRedirect($Filename, $Get);
 
         if ($Url) {
-            if (Debug())
-                trace($Url, "Redirect found");
-            else
+            if (Debug()) {
+                trace($Url, 'Redirect found');
+            } else {
                 Redirect($Url, 301);
+            }
         }
     }
 
@@ -254,8 +255,9 @@ class RedirectorPlugin extends Gdn_Plugin {
             } else {
                 $Comment = $CommentModel->GetID($Vars['CommentID']);
             }
-            if ($Comment)
+            if ($Comment) {
                 $Result = CommentUrl($Comment, '//');
+            }
         } elseif (isset($Vars['DiscussionID'])) {
             trace("Looking up discussion {$Vars['DiscussionID']}.");
 
@@ -278,14 +280,16 @@ class RedirectorPlugin extends Gdn_Plugin {
                 }
             }
 
-            if ($Discussion)
+            if ($Discussion) {
                 $Result = DiscussionUrl($Discussion, self::pageNumber($Vars, 'Vanilla.Comments.PerPage'), '//');
+            }
         } elseif (isset($Vars['UserID'])) {
             trace("Looking up user {$Vars['UserID']}.");
 
             $User = Gdn::UserModel()->GetID($Vars['UserID']);
-            if ($User)
+            if ($User) {
                 $Result = Url(UserUrl($User), '//');
+            }
         } elseif (isset($Vars['TagID'])) {
             $Tag = TagModel::instance()->GetID($Vars['TagID']);
             if ($Tag) {
@@ -301,8 +305,22 @@ class RedirectorPlugin extends Gdn_Plugin {
             } else {
                 $Category = CategoryModel::Categories($Vars['CategoryID']);
             }
-            if ($Category)
-                $Result = CategoryUrl($Category, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
+            if ($Category) {
+                $Result = categoryUrl($Category, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
+            }
+        } elseif (isset($Vars['CategoryCode'])) {
+            trace("Looking up category {$Vars['CategoryCode']}.");
+
+            $category = CategoryModel::instance()->getByCode($Vars['CategoryCode']);
+            if ($category) {
+                $pageNumber = self::pageNumber($Vars, 'Vanilla.Discussions.PerPage');
+                if ($pageNumber > 1) {
+                    $pageParam = '?Page='.$pageNumber;
+                } else {
+                    $pageParam = null;
+                }
+                $Result = categoryUrl($category, '', '//').$pageParam;
+            }
         }
 
         return $Result;
@@ -340,6 +358,53 @@ class RedirectorPlugin extends Gdn_Plugin {
                 ],
             ];
         }
+    }
+
+    /**
+     * Filter parameters properly.
+     *
+     * @param array $get Request parameters
+     * @return array
+     */
+    public static function t5Filter(&$get) {
+        $result = false;
+
+        if (val('_arg0', $get) == 'user' && val('_arg2', $get) == 'user-id') {
+            $result = [
+                '_arg3' => [
+                    'UserID'
+                ],
+            ];
+
+            if (val('_arg3', $get) == 'page') {
+                $result['_arg4'] = 'Page';
+            }
+        } elseif (val('_arg1', $get) == 'bd-p') { // Board = Category
+            $result = [
+                '_arg2' => [
+                    'CategoryCode',
+                    'Filter' => [__CLASS__, 'lithiumCategoryCodeFilter']
+                ],
+            ];
+
+            if (val('_arg3', $get) == 'page') {
+                $result['_arg4'] = 'Page';
+            }
+        } elseif (val('_arg2', $get) == 'm-p') { // Message => Comment
+            $result = [
+                '_arg3' => 'CommentID',
+            ];
+        } elseif (val('_arg2', $get) == 'td-p') { // Thread = Discussion
+            $result = [
+                '_arg3' => 'DiscussionID',
+            ];
+
+            if (val('_arg4', $get) == 'page') {
+                $result['_arg5'] = 'Page';
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -571,9 +636,8 @@ class RedirectorPlugin extends Gdn_Plugin {
 
     /**
      *
-     *
-     * @param $Value
-     * @return mixed
+     * @param $value
+     * @return string
      */
     public static function xenforoID($value) {
         if (preg_match('/(\d+)$/', $value, $matches)) {
@@ -581,5 +645,15 @@ class RedirectorPlugin extends Gdn_Plugin {
         }
 
         return $value;
+    }
+
+    /**
+     * Convert category code from lithium to vanilla.
+     *
+     * @param string $categoryCode
+     * @return string
+     */
+    public static function lithiumCategoryCodeFilter($categoryCode) {
+        return str_replace('_', '-', $categoryCode);
     }
 }
