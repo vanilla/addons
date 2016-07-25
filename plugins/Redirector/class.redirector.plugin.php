@@ -86,7 +86,10 @@ class RedirectorPlugin extends Gdn_Plugin {
         'post' => [ // punbb comment
             '_arg0' => 'CommentID',
         ],
-        'profile.jspa' => [ //jive4 profile
+        'profile' => [ // Ning profile
+            '_arg0' => 'UserNameCode',
+        ],
+        'profile.jspa' => [ // jive4 profile
             'userID' => 'UserID',
         ],
         'showpost.php' => [__CLASS__, 'showpostFilter'], // vBulletin comment
@@ -112,12 +115,13 @@ class RedirectorPlugin extends Gdn_Plugin {
             'p' => 'CommentID',
             'start' => 'Offset',
         ],
+        'xn' => [__CLASS__, 'ningNXFilter'], // Ning
     ];
 
     /**
      *
      */
-    public function gdn_Dispatcher_NotFound_Handler() {
+    public function gdn_dispatcher_notFound_handler() {
         $Path = Gdn::Request()->Path();
         $Get = Gdn::Request()->Get();
         /**
@@ -185,6 +189,19 @@ class RedirectorPlugin extends Gdn_Plugin {
             } else {
                 Redirect($Url, 301);
             }
+        }
+    }
+
+    /*
+     * Treat "user not found" as "dispatcher didn't find correct route"
+     * Needed for ning since they use /profile/NAME
+     *
+     * @param ProfileController $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function profileController_userLoaded_handler($sender, $args) {
+        if (val('User', $sender) === false) {
+            $this->gdn_dispatcher_notFound_handler();
         }
     }
 
@@ -295,6 +312,12 @@ class RedirectorPlugin extends Gdn_Plugin {
             if ($Tag) {
                  $Result = TagUrl($Tag, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
             }
+        } elseif (isset($Vars['GroupID']) && class_exists('GroupModel')) {
+            $groupModel = new GroupModel();
+            $group = $groupModel->GetID($Vars['GroupID']);
+            if ($group) {
+                 $Result = groupUrl($group, null, '//');
+            }
         } elseif (isset($Vars['CategoryID'])) {
             trace("Looking up category {$Vars['CategoryID']}.");
 
@@ -308,18 +331,39 @@ class RedirectorPlugin extends Gdn_Plugin {
             if ($Category) {
                 $Result = categoryUrl($Category, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
             }
-        } elseif (isset($Vars['CategoryCode'])) {
-            trace("Looking up category {$Vars['CategoryCode']}.");
+        }
 
-            $category = CategoryModel::instance()->getByCode($Vars['CategoryCode']);
-            if ($category) {
-                $pageNumber = self::pageNumber($Vars, 'Vanilla.Discussions.PerPage');
-                if ($pageNumber > 1) {
-                    $pageParam = '?Page='.$pageNumber;
-                } else {
-                    $pageParam = null;
+        // Let's try a fallback.
+        if (!$Result) {
+            if (isset($Vars['UserNameCode'])) {
+                trace("Looking up user code[{$Vars['UserNameCode']}].");
+
+                $user = Gdn::userModel()->getWhere(['LegacyNameURLCode' => $Vars['UserNameCode']])->FirstRow();
+                if ($user) {
+                    $Result = url(userUrl($user), '//');
                 }
-                $Result = categoryUrl($category, '', '//').$pageParam;
+            } elseif (isset($Vars['DiscussionNameCode'])) {
+                trace("Looking up user code[{$Vars['DiscussionNameCode']}].");
+
+                $discussionModel = new DiscussionModel();
+
+                $discussion = $discussionModel->getWhere(['LegacyNameURLCode' => $Vars['DiscussionNameCode']])->FirstRow();
+                if ($discussion) {
+                    $Result = discussionUrl($discussion, self::pageNumber($Vars, 'Vanilla.Comments.PerPage'), '//');
+                }
+            } elseif (isset($Vars['CategoryCode'])) {
+                trace("Looking up category {$Vars['CategoryCode']}.");
+
+                $category = CategoryModel::instance()->getByCode($Vars['CategoryCode']);
+                if ($category) {
+                    $pageNumber = self::pageNumber($Vars, 'Vanilla.Discussions.PerPage');
+                    if ($pageNumber > 1) {
+                        $pageParam = '?Page='.$pageNumber;
+                    } else {
+                        $pageParam = null;
+                    }
+                    $Result = categoryUrl($category, '', '//').$pageParam;
+                }
             }
         }
 
@@ -329,17 +373,41 @@ class RedirectorPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Get
+     * @param $get
      * @return array
      */
-    public static function forumFilter(&$Get) {
-        if (val('_arg2', $Get) == 'page') {
+    public static function forumFilter(&$get) {
+        if (val('_arg0', $get) == 'categories') {
+            // This is a ning style forum.
+            return [
+                '_arg1' => 'CategoryCode',
+                'categoryId' => [
+                    'CategoryID',
+                    'Filter' => [__CLASS__, 'ningIDFilter'],
+                ],
+                'page' => 'Page',
+            ];
+        } elseif (val('_arg0', $get) == 'topics') {
+            // This is a ning style forum.
+            return [
+                '_arg1' => 'DiscussionNameCode',
+                'id' => [
+                    'DiscussionID',
+                    'Filter' => [__CLASS__, 'ningIDFilter'],
+                ],
+                'commentId' => [
+                    'CommentID',
+                    'Filter' => [__CLASS__, 'ningIDFilter'],
+                ],
+                'page' => 'Page',
+            ];
+        } elseif (val('_arg2', $get) == 'page') {
             // This is a punbb style forum.
             return [
                 '_arg0' => 'CategoryID',
                 '_arg3' => 'Page',
             ];
-        } elseif (val('_arg1', $Get) == 'page') {
+        } elseif (val('_arg1', $get) == 'page') {
             // This is a bbPress style forum.
             return [
                 '_arg0' => 'CategoryID',
@@ -361,12 +429,44 @@ class RedirectorPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
+     */
+    public static function ningNXFilter($get) {
+        if (val('_arg0', $get) == 'detail') {
+            $details = self::ningIDSplitter($get['_arg1']);
+            if ($details['Type'] == 'Comment') {
+                return [
+                    '_arg1' => [
+                        'CommentID',
+                        'Filter' => [__CLASS__, 'ningIDFilter'],
+                    ]
+                ];
+            } elseif($details['Type'] == 'Topic') {
+                return [
+                    '_arg1' => [
+                        'DiscussionID',
+                        'Filter' => [__CLASS__, 'ningIDFilter'],
+                    ]
+                ];
+            } elseif ($details['Type'] == 'Group') {
+                return [
+                    '_arg1' => [
+                        'GroupID',
+                        'Filter' => [__CLASS__, 'ningIDFilter'],
+                    ]
+                ];
+            }
+        }
+
+    }
+
+    /**
      * Filter parameters properly.
      *
      * @param array $get Request parameters
      * @return array
      */
-    public static function t5Filter(&$get) {
+    public static function t5Filter($get) {
         $result = false;
 
         if (val('_arg0', $get) == 'user' && val('_arg2', $get) == 'user-id') {
@@ -375,21 +475,14 @@ class RedirectorPlugin extends Gdn_Plugin {
                     'UserID'
                 ],
             ];
-
-            if (val('_arg3', $get) == 'page') {
-                $result['_arg4'] = 'Page';
-            }
         } elseif (val('_arg1', $get) == 'bd-p') { // Board = Category
             $result = [
                 '_arg2' => [
                     'CategoryCode',
                     'Filter' => [__CLASS__, 'lithiumCategoryCodeFilter']
                 ],
+                '_arg4' => 'Page',
             ];
-
-            if (val('_arg3', $get) == 'page') {
-                $result['_arg4'] = 'Page';
-            }
         } elseif (val('_arg2', $get) == 'm-p') { // Message => Comment
             $result = [
                 '_arg3' => 'CommentID',
@@ -397,11 +490,8 @@ class RedirectorPlugin extends Gdn_Plugin {
         } elseif (val('_arg2', $get) == 'td-p') { // Thread = Discussion
             $result = [
                 '_arg3' => 'DiscussionID',
+                '_arg5' => 'Page',
             ];
-
-            if (val('_arg4', $get) == 'page') {
-                $result['_arg5'] = 'Page';
-            }
         }
 
         return $result;
@@ -441,6 +531,31 @@ class RedirectorPlugin extends Gdn_Plugin {
         if (preg_match('`(\d+)`', $Value, $Matches))
             return $Matches[1];
         return null;
+    }
+
+    /**
+     * Split a Ning's ID string into its components
+     *
+     * @param $value
+     * @return array [ParentID, IDType, ID]
+     */
+    public static function ningIDSplitter($value) {
+        list($idParent, $type, $id) = explode(':', $value);
+        return [
+            'IdParent' => $idParent,
+            'Type' => $type,
+            'Id' => $id,
+        ];
+    }
+
+    /**
+     * Get ID value from a Ning's ID string.
+     *
+     * @param $value
+     * @return mixed
+     */
+    public static function ningIDFilter($value) {
+        return self::ningIDSplitter($value)['Id'];
     }
 
     /**
