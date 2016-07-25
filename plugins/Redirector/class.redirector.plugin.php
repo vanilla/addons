@@ -441,10 +441,10 @@ class RedirectorPlugin extends Gdn_Plugin {
                         'Filter' => [__CLASS__, 'ningIDFilter'],
                     ]
                 ];
-            } elseif($details['Type'] == 'Comment') {
+            } elseif($details['Type'] == 'Topic') {
                 return [
                     '_arg1' => [
-                        'CommentID',
+                        'DiscussionID',
                         'Filter' => [__CLASS__, 'ningIDFilter'],
                     ]
                 ];
