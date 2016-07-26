@@ -24,7 +24,7 @@ $PluginInfo['postnumbering'] = [
  */
 class PostNumberingPlugin extends Gdn_Plugin {
     /**
-     *
+     * Add numbering index to discussion.
      *
      * @param DiscussionController $sender Sending controller instance.
      * @param array $args Event arguments.
@@ -37,8 +37,8 @@ class PostNumberingPlugin extends Gdn_Plugin {
         );
     }
 
-        /**
-     *
+    /**
+     * Add numbering index to discussion's comments.
      *
      * @param DiscussionController $sender Sending controller instance.
      * @param array $args Event arguments.
