@@ -143,13 +143,13 @@ class SteamConnectPlugin extends Gdn_Plugin {
     public function SettingsController_SteamConnect_Create($Sender) {
         $Sender->Permission('Garden.Settings.Manage');
 
-        $APIKeyDescription =  '<div class="help">'.sprintf(T('A %s is necessary for this plugin to work.'), T('Steam Web API Key')).' '
+        $APIKeyDescription =  '<div class="info">'.sprintf(T('A %s is necessary for this plugin to work.'), T('Steam Web API Key')).' '
             .sprintf(T('Don\'t have a %s?'), T('Steam Web API Key'))
-            .' <a href="http://steamcommunity.com/dev/apikey">'.T('Get one here.').'</a>';
+            .' <a href="http://steamcommunity.com/dev/apikey">'.T('Get one here.').'</a></div>';
 
         $Conf = new ConfigurationModule($Sender);
         $Conf->Initialize(array(
-            'Plugins.SteamConnect.APIKey' => array('Control' => 'TextBox', 'LabelCode' => 'Steam Web API Key', 'Options' => array('class' => 'InputBox BigInput'), 'Description' => $APIKeyDescription)
+            'Plugins.SteamConnect.APIKey' => array('Control' => 'TextBox', 'LabelCode' => 'Steam Web API Key', 'Description' => $APIKeyDescription)
         ));
 
         $Sender->AddSideMenu();

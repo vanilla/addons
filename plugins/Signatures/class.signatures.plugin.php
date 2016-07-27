@@ -636,14 +636,14 @@ EOT;
 
         $Conf = new ConfigurationModule($Sender);
         $Conf->Initialize(array(
+            'Plugins.Signatures.Default.MaxNumberImages' => array('Control' => 'Dropdown', 'LabelCode' => '@'.sprintf(T('Max number of %s'), T('images')), 'Items' => array('Unlimited' => T('Unlimited'), 'None' => T('None'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)),
+            'Plugins.Signatures.Default.MaxLength' => array('Control' => 'TextBox', 'Type' => 'int', 'LabelCode' => '@'.sprintf(T('Max %s length'), T('signature')), 'Options' => array('class' => 'InputBox SmallInput')),
+            'Plugins.Signatures.MaxImageHeight' => array('Control' => 'TextBox', 'LabelCode' => '@'.sprintf(T('Max height of %s'), T('images'))." ".T('in pixels'), 'Options' => array('class' => 'InputBox SmallInput')),
             'Plugins.Signatures.HideGuest' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures for guests'),
             'Plugins.Signatures.HideEmbed' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => true),
             'Plugins.Signatures.HideMobile' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on mobile', 'Default' => true),
             'Plugins.Signatures.AllowEmbeds' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow embedded content', 'Default' => true),
             //'Plugins.Signatures.TextOnly' => array('Control' => 'CheckBox', 'LabelCode' => '@'.sprintf(T('Enforce %s'), T('text-only'))),
-            'Plugins.Signatures.Default.MaxNumberImages' => array('Control' => 'Dropdown', 'LabelCode' => '@'.sprintf(T('Max number of %s'), T('images')), 'Items' => array('Unlimited' => T('Unlimited'), 'None' => T('None'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)),
-            'Plugins.Signatures.Default.MaxLength' => array('Control' => 'TextBox', 'Type' => 'int', 'LabelCode' => '@'.sprintf(T('Max %s length'), T('signature')), 'Options' => array('class' => 'InputBox SmallInput')),
-            'Plugins.Signatures.MaxImageHeight' => array('Control' => 'TextBox', 'LabelCode' => '@'.sprintf(T('Max height of %s'), T('images'))." ".T('in pixels'), 'Options' => array('class' => 'InputBox SmallInput')),
         ));
 
         $this->SetConfigSettingsToDefault('Plugins.Signatures', $this->overriddenConfigSettings);

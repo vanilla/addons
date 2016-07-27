@@ -19,24 +19,33 @@
 <h2>Signing In</h2>
 <?php
     echo $this->Form->open();
-    echo $this->Form->errors();
+    echo $this->Form->errors(); ?>
+    <div class="form-group row">
+        <div class="label-wrap-wide">
+            <?php echo t('Auto Connect'); ?>
+            <?php echo '<div class="info">'.t('Automatically connect to an existing user account if it has the same email address.').'</div>' ?>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $this->Form->toggle('Garden.Registration.AutoConnect'); ?>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="label-wrap-wide">
+            <?php echo t('Use Popup Sign In Pages'); ?>
+            <?php echo '<div class="info">'.t('Use popups for sign in pages (not recommended while using SSO).').'</div>'; ?>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $this->Form->toggle('Garden.SignIn.Popup'); ?>
+        </div>
+    </div>
 
-    echo wrap($this->Form->checkBox(
-        'Garden.Registration.AutoConnect',
-        'Automatically connect to an existing user account if it has the same email address.'
-    ), 'p');
-    echo wrap($this->Form->checkBox(
-        'Garden.SignIn.Popup',
-        'Use popups for sign in pages <small>(not recommended while using SSO)</small>.'
-    ), 'p');
-
-    echo '<div class="Buttons">';
+    <?php echo '<div class="Buttons form-footer">';
     echo $this->Form->button('Save');
     echo '</div>';
 
     echo $this->Form->close();
 ?>
-<div class="table-wrap">
+<div class="table-wrap padded">
     <table class="AltRows">
         <thead>
         <tr>
@@ -62,8 +71,8 @@
                 <td>
                     <div class="btn-group">
                         <?php
-                        echo Anchor(T('Edit'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'btn btn-edit');
-                        echo Anchor(T('Delete'), '/settings/jsconnect/delete?client_id='.urlencode($Provider['AuthenticationKey']), 'Popup btn btn-delete');
+                        echo anchor(dashboardSymbol('edit'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
+                        echo anchor(dashboardSymbol('delete'), '/settings/jsconnect/delete?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete')]);
                         ?>
                     </div>
                 </td>

@@ -38,15 +38,6 @@ class CivilTonguePlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add settings page to Dashboard sidebar menu.
-     */
-    public function base_getAppsettingsMenuItems_handler(&$Sender) {
-        /** @var SiteNavAdapterModule $Menu */
-        $Menu = $Sender->EventArguments['SideMenu'];
-        $Menu->addLink('Forum', t('Censored Words'), 'plugin/tongue', 'Garden.Settings.Manage', array('class' => 'nav-bad-words'));
-    }
-
-    /**
      *
      *
      * @param $Sender
