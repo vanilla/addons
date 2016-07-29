@@ -114,7 +114,7 @@
 		var $local_img_url;	// The URL path to local images (possibly a relative path).
 		var $url_targetable; // If true, [url] tags can accept a target="..." parameter.
 		var $url_target;	// If non-false, [url] tags will use this target and no other.
-		
+
 		var $rule_html;		// The default HTML to output for a [rule] tag.
 
 		var $pre_trim;		// How to trim the whitespace at the start of the input.
@@ -207,7 +207,7 @@
 		//-----------------------------------------------------------------------------
 		// Rule-management:  You can add your own custom tag rules, or use the defaults.
 		// These are basically getter/setter functions that exist for convenience.
-		
+
 		function AddRule($name, $rule) { $this->tag_rules[$name] = $rule; }
 		function RemoveRule($name)     { unset($this->tag_rules[$name]); }
 		function GetRule($name)        { return isset($this->tag_rules[$name])
@@ -224,11 +224,11 @@
 		//-----------------------------------------------------------------------------
 		// Handling for [[wiki]] and [[wiki|Wiki]] links and other replaced items.
 		// These are basically getter/setter functions that exist for convenience.
-		
+
 		function SetWikiURL($url)      { $this->wiki_url = $url; }
 		function GetWikiURL($url)      { return $this->wiki_url; }
 		function GetDefaultWikiURL()   { return '/?page='; }
-		
+
 		function SetLocalImgDir($path) { $this->local_img_dir = $path; }
 		function GetLocalImgDir()      { return $this->local_img_dir; }
 		function GetDefaultLocalImgDir() { return "img"; }
@@ -286,11 +286,23 @@
 			// Use the (faster!) built-in if it's available.
 			if (function_exists("html_entity_decode"))
 				return html_entity_decode($string);
-				
+
 			// Replace numeric entities.
-			$string = preg_replace('~&#x([0-9a-f]+);~ei', 'chr(hexdec("\\1"))', $string);
-			$string = preg_replace('~&#([0-9]+);~e', 'chr("\\1")', $string);
-			
+			$string = preg_replace_callback(
+					'/&#x([0-9a-f]+);/i',
+					function($matches) {
+						return chr(hexdec($matches[1]));
+					},
+					$string
+			);
+			$string = preg_replace_callback(
+					'/&#([0-9]+);/',
+					function($matches) {
+						return chr($matches[1]);
+					},
+					$string
+			);
+
 			// Replace literal entities.
 			$trans_tbl = get_html_translation_table(HTML_ENTITIES);
 			$trans_tbl = array_flip($trans_tbl);
@@ -353,11 +365,11 @@
 			if ($email_too)
 				if (substr($string, 0, 7) == "mailto:")
 					return $this->IsValidEmail(substr($string, 7));
-				
+
 			// Reject all other protocols.
 			return false;
 		}
-		
+
 		// Returns true if the given string is a valid e-mail address.  This allows
 		// everything that RFC821 allows, including e-mail addresses that make no sense.
 		function IsValidEmail($string) {
@@ -479,7 +491,7 @@
 					$BBCode_Profiler->End('ProcessSmileys:rebuild');
 					$BBCode_Profiler->Begin('ProcessSmileys:other');
 				}
-	
+
 				// Split the string so that it consists of alternating pairs of smileys and non-smileys.
 				$BBCode_Profiler->End('ProcessSmileys:other');
 				$BBCode_Profiler->Begin('ProcessSmileys:split');
@@ -639,7 +651,7 @@
 							preg_match("/^([^\\/&?#]+)\\/*(.*)\$/", $token, $matches);
 							$url = "http:/" . "/" . $matches[1] . "/" . $matches[2];
 						}
-						
+
 						// We have a full, complete, and properly-formatted URL, with protocol.
 						// Now we need to apply the $this->url_pattern template to turn it into HTML.
 						$params = @parse_url($url);
@@ -649,7 +661,7 @@
 						$params['text'] = $token;
 						$output[$index] = $this->FillTemplate($this->url_pattern, $params);
 					}
-					
+
 					$is_a_url = !$is_a_url;
 				}
 			}
@@ -733,7 +745,7 @@
 							else $value = "";
 						}
 					}
-					
+
 					// Make sure the resulting value is a printable string.
 					switch (gettype($value)) {
 					case 'boolean': $value = $value ? "true" : "false"; break;
@@ -747,7 +759,7 @@
 					if (strlen(@$matches[3]))
 						$flags = array_flip(str_split($matches[3]));
 					else $flags = Array();
-					
+
 					// If there are flags, process the value according to them.
 					if (!isset($flags['v'])) {
 						if (isset($flags['w']))
@@ -760,19 +772,19 @@
 						else if (isset($flags['u'])) $value = urlencode($value);
 						if      (isset($flags['n'])) $value = $this->nl2br($value);
 					}
-					
+
 					if ($this->debug) {
 						print "<b>FormatInserts:</b> add insert: <tt>" . htmlspecialchars($piece)
 							. "</tt> --&gt; <tt>" . htmlspecialchars($value) . "</tt><br />\n";
 					}
-					
+
 					// Append the value to the output.
 					$result[] = $value;
 				}
-				
+
 				$is_an_insert = !$is_an_insert;
 			}
-			
+
 			return implode("", $result);
 		}
 
@@ -899,12 +911,12 @@
 						$this->Internal_UpdateParamsForMissingEndTag(@$token[BBCODE_STACK_TAG]);
 						$tag_output = $this->DoTag(BBCODE_OUTPUT, $name,
 							@$token[BBCODE_STACK_TAG]['_default'], @$token[BBCODE_STACK_TAG], $tag_body);
-							
+
 						if ($this->debug) {
 							print "<b>Internal_GenerateOutput:</b> push optional-tag's output: <tt>"
 								. htmlspecialchars($tag_output) . "</tt><br />\n";
 						}
-								
+
 						$output = Array(Array(
 							BBCODE_STACK_TOKEN => BBCODE_TEXT,
 							BBCODE_STACK_TAG => false,
@@ -956,7 +968,7 @@
 				if (!in_array($this->root_class, $class_list))
 					return false;
 			}
-			
+
 			if ($this->debug)
 				print "<b>Internal_RewindToClass:</b> rewound to " . ($pos+1) . "<br />\n";
 
@@ -964,7 +976,7 @@
 			// plain text tokens, possibly processing any tags where the end tags
 			// are optional.
 			$output = $this->Internal_GenerateOutput($pos+1);
-			
+
 			// Push the clean tokens back onto the stack.
 			while (count($output)) {
 				$token = array_pop($output);
@@ -976,7 +988,7 @@
 				print "<b>Internal_RewindToClass:</b> stack has " . count($this->stack)
 					. " items now.<br />\n";
 			}
-					
+
 			return true;
 		}
 
@@ -993,7 +1005,7 @@
 			// no way we can possibly match it.
 			if (strlen($tag_name) <= 0)
 				return false;
-			
+
 			// This is where we *would* walk backward from the top of the stack, searching
 			// for the matching start tag for this end tag.  But since we record the
 			// locations of start tags in a separate array indexed by tag name, we don't
@@ -1016,7 +1028,7 @@
 			// If there is no matching start tag, then this is a floating (bad)
 			// end tag, so tell the caller.
 			if ($pos < 0) return false;
-			
+
 			// Okay, we're doing pretty good here.  We need to do whitespace
 			// cleanup for after the start tag and before the end tag, though.  We
 			// do end-tag cleanup by popping, and we do start-tag cleanup by skipping
@@ -1025,7 +1037,7 @@
 			$newpos = $this->Internal_CleanupWSByIteratingPointer(@$this->tag_rules[$tag_name]['after_tag'],
 				$pos+1, $this->stack);
 			$delta = $newpos - ($pos+1);
-			
+
 			if ($this->debug) {
 				print "<b>Internal_FinishTag:</b> whitespace cleanup (rule was \""
 					. @$this->tag_rules[$tag_name]['after_tag']
@@ -1036,12 +1048,12 @@
 			// plain text, and then return it as a string, leaving the start tag on
 			// the top of the stack.
 			$output = $this->Internal_GenerateOutput($newpos);
-			
+
 			// Clean off any whitespace before the end tag that doesn't belong there.
 			$newend = $this->Internal_CleanupWSByIteratingPointer(@$this->tag_rules[$tag_name]['before_endtag'],
 				0, $output);
 			$output = $this->Internal_CollectTextReverse($output, count($output) - 1, $newend);
-			
+
 			if ($this->debug)
 				print "<b>Internal_FinishTag:</b> whitespace cleanup: popping $delta items<br />\n";
 
@@ -1049,7 +1061,7 @@
 			while ($delta-- > 0)
 				array_pop($this->stack);
 			$this->Internal_ComputeCurrentClass();
-			
+
 			if ($this->debug)
 				print "<b>Internal_FinishTag:</b> output: <tt>" . htmlspecialchars($output) . "</tt><br />\n";
 
@@ -1136,7 +1148,7 @@
 				print "<b>Internal_CleanupWSByPoppingStack:</b> array: <tt>" . $this->Internal_DumpStack($array)
 					. "</tt><br />\n";
 			}
-			
+
 			if (count($array) != $oldlen) {
 				// We only recompute the class if something actually changed.
 				$this->Internal_ComputeCurrentClass();
@@ -1333,7 +1345,7 @@
 				}
 
 				switch (@$tag_rule['mode']) {
-				
+
 				default:
 				case BBCODE_MODE_SIMPLE:
 					$result = true;
@@ -1342,7 +1354,7 @@
 				case BBCODE_MODE_ENHANCED:
 					$result = true;
 					break;
-				
+
 				case BBCODE_MODE_INTERNAL:
 					$result = @call_user_func(Array($this, @$tag_rule['method']), BBCODE_CHECK,
 						$tag_name, $default_value, $params, $contents);
@@ -1352,13 +1364,13 @@
 					$result = @call_user_func(Array($this->defaults, @$tag_rule['method']), $this, BBCODE_CHECK,
 						$tag_name, $default_value, $params, $contents);
 					break;
-						
+
 				case BBCODE_MODE_CALLBACK:
 					$result = @call_user_func(@$tag_rule['method'], $this, BBCODE_CHECK,
 						$tag_name, $default_value, $params, $contents);
 					break;
 				}
-				
+
 				if ($this->debug) {
 					print "<b>DoTag:</b> tag <tt>[" . htmlspecialchars($tag_name) . "]</tt> returned "
 						. ($result ? "true" : "false") . "<br />\n";
@@ -1380,7 +1392,7 @@
 					if (!isset($tag_rule['plain_content']))
 						$plain_content = Array('_content');
 					else $plain_content = $tag_rule['plain_content'];
-					
+
 					// Find the requested content, in the order specified.
 					$result = $possible_content = "";
 					foreach ($plain_content as $possible_content) {
@@ -1395,7 +1407,7 @@
 							break;
 						}
 					}
-					
+
 					if ($this->debug) {
 						$content_list = "";
 						foreach ($plain_content as $possible_content)
@@ -1434,7 +1446,7 @@
 					// Construct the plain output using the available content.
 					return $start . $result . $end;
 				}
-				
+
 				switch (@$tag_rule['mode']) {
 
 				default:
@@ -1560,7 +1572,7 @@
 			// we can't find an end tag, in which case we'll have to reject the
 			// start tag as broken.
 			$state = $this->lexer->SaveState();
-			
+
 			$end_tag = $this->lexer->tagmarker . "/" . $tag_name . $this->lexer->end_tagmarker;
 
 			if ($this->debug) {
@@ -1610,7 +1622,7 @@
 				);
 			}
 			$this->lexer->verbatim = false;
-			
+
 			// We've collected a bunch of text for this tag.  Now, make sure it ended on
 			// a valid end tag.
 			if ($token_type == BBCODE_EOI) {
@@ -1637,7 +1649,7 @@
 			$newstart = $this->Internal_CleanupWSByIteratingPointer(@$tag_rule['after_tag'], $start, $this->stack);
 			$this->Internal_CleanupWSByPoppingStack(@$tag_rule['before_endtag'], $this->stack);
 			$this->Internal_CleanupWSByEatingInput(@$tag_rule['after_endtag']);
-			
+
 			// Collect the output from $newstart to the top of the stack, and then
 			// quickly pop off all of those tokens.
 			$content = $this->Internal_CollectText($this->stack, $newstart);
@@ -1647,11 +1659,11 @@
 			}
 			array_splice($this->stack, $start);
 			$this->Internal_ComputeCurrentClass();
-			
+
 			// Clean up whitespace before the start tag (the tag was never pushed
 			// onto the stack itself, so we don't need to remove it).
 			$this->Internal_CleanupWSByPoppingStack(@$tag_rule['before_tag'], $this->stack);
-			
+
 			// Found the end tag, so process this tag immediately with
 			// the contents collected between them.  Note that we do NOT
 			// pass the contents through htmlspecialchars or FixupOutput
@@ -1678,7 +1690,7 @@
 
 		// Called when the parser has read a BBCODE_TAG token.
 		function Internal_ParseStartTagToken() {
-		
+
 			// Tags are somewhat complicated, because they have to do several things
 			// all at once.  First, let's look up what we know about the tag we've
 			// encountered.
@@ -1706,7 +1718,7 @@
 				return;
 			}
 			$tag_rule = $this->tag_rules[$tag_name];
-			
+
 			// We've got a known tag.  See if it's valid inside this class; for example,
 			// it's legal to put an inline tag inside a block tag, but not legal to put a
 			// block tag inside an inline tag.
@@ -1733,7 +1745,7 @@
 					return;
 				}
 			}
-			
+
 			// Okay, this tag is allowed (in theory).  Now we need to see whether it's
 			// a tag that requires an end tag, or whether it's end-tag-optional, or whether
 			// it's end-tag-prohibited.  If it's end-tag-prohibited, then we process it
@@ -1746,7 +1758,7 @@
 				$this->Internal_ProcessIsolatedTag($tag_name, $tag_params, $tag_rule);
 				return;
 			}
-			
+
 			// This tag has a BBCODE_REQUIRED or BBCODE_OPTIONAL end tag, so we have to
 			// push this tag on the stack and defer its processing until we see its end tag.
 
@@ -1770,7 +1782,7 @@
 				);
 				return;
 			}
-	
+
 			if (@$tag_rule['content'] == BBCODE_VERBATIM) {
 				// Verbatim tags have to be handled specially, since they consume successive
 				// input immediately.
@@ -1785,7 +1797,7 @@
 			if (isset($tag_rule['class']))
 				$newclass = $tag_rule['class'];
 			else $newclass = $this->root_class;
-			
+
 			if ($this->debug) {
 				print "<b>Internal_ParseStartTagToken:</b> pushing tag <tt>[" . htmlspecialchars($tag_name)
 					. "]</tt> onto stack; switching to class <tt>" . htmlspecialchars($newclass)
@@ -1848,14 +1860,14 @@
 			$start_tag_node = array_pop($this->stack);
 			$start_tag_params = $start_tag_node[BBCODE_STACK_TAG];
 			$this->Internal_ComputeCurrentClass();
-			
+
 			$this->Internal_CleanupWSByPoppingStack(@$this->tag_rules[$tag_name]['before_tag'], $this->stack);
 			$start_tag_params['_endtag'] = $tag_params['_tag'];
 			$start_tag_params['_hasend'] = true;
 			$output = $this->DoTag(BBCODE_OUTPUT, $tag_name, @$start_tag_params['_default'],
 				$start_tag_params, $contents);
 			$this->Internal_CleanupWSByEatingInput(@$this->tag_rules[$tag_name]['after_endtag']);
-			
+
 			if ($this->debug) {
 				print "<b>Internal_ParseEndTagToken:</b> end tag <tt>[/"
 					. htmlspecialchars($tag_name) . "]</tt> done; push output: <tt>"
@@ -2030,10 +2042,10 @@
 				case BBCODE_NL:
 					// Newlines are really like tags in disguise:  They insert a replaced
 					// element into the output, and are actually more-or-less like plain text.
-		
+
 					if ($this->debug)
 						print "<hr />\n<b>Internal_ParseNewlineToken:</b> got a newline.<br />\n";
-		
+
 					if ($this->ignore_newlines) {
 						if ($this->debug)
 							print "<b>Internal_ParseNewlineToken:</b> push newline as whitespace.<br />\n";
@@ -2063,7 +2075,7 @@
 						// whitespace sitting on top of the stack, remove it so that it doesn't
 						// get outputted.
 						$this->Internal_CleanupWSByPoppingStack("s", $this->stack);
-						
+
 						if ($this->debug)
 							print "<b>Internal_ParseNewlineToken:</b> push newline.<br />\n";
 
@@ -2082,23 +2094,23 @@
 							BBCODE_STACK_TAG => false,
 							BBCODE_STACK_CLASS => $this->current_class,
 						);
-						
+
 						// Any whitespace after a newline is meaningless, so if there's whitespace
 						// lingering on the input after this, remove it now.
 						$this->Internal_CleanupWSByEatingInput("s");
 					}
 					break;
-					
+
 				case BBCODE_TAG:
 					// Use a separate function to handle tags, because they're complicated.
 					$this->Internal_ParseStartTagToken();
 					break;
-					
+
 				case BBCODE_ENDTAG:
 					// Use a separate function to handle end tags, because they're complicated.
 					$this->Internal_ParseEndTagToken();
 					break;
-				
+
 				default:
 					break;
 				}

@@ -343,7 +343,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
                 $ExplodedWords = explode(';', $Words);
                 foreach ($ExplodedWords as $Word) {
                     if (trim($Word)) {
-                        $Patterns[] = '`\b'.preg_quote(trim($Word), '`').'\b`is';
+                        $Patterns[] = '`\b'.preg_quote(trim($Word), '`').'\b`isu';
                     }
                 }
             }
