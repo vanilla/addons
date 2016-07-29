@@ -12,8 +12,6 @@ $PluginInfo['postnumbering'] = [
     'Version' => '1.0',
     'RequiredApplications' => ['Vanilla' => '2.2'],
     'License' => 'GNU GPL2',
-    'SettingsUrl' => '/settings/roletracker',
-    'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => 'Alexandre (DaazKu) Chouinard',
     'AuthorEmail' => 'alexandre.c@vanillaforums.com',
     'AuthorUrl' => 'https://github.com/DaazKu',
