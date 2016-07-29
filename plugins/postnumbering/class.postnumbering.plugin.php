@@ -46,10 +46,13 @@ class PostNumberingPlugin extends Gdn_Plugin {
     public function discussionController_commentInfo_handler($sender, $args) {
         static $number = 2;
 
+        $offset = val('Offset', $sender, 0);
+        $commentNumber = $offset + $number;
+
         echo wrap(
-            anchor('#'.$number, commentUrl($args['Comment'])),
+            anchor('#'.$commentNumber, commentUrl($args['Comment'])),
             'span',
-            ['Class' => 'MItem PostNumbering Num-'.$number]
+            ['Class' => 'MItem PostNumbering Num-'.$commentNumber]
         );
 
         $number += 1;
