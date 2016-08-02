@@ -510,10 +510,8 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @return array Mapping of vB parameters
      */
     public static function showthreadFilter(&$Get) {
-        self::vbFriendlyUrlID($Get, 't');
 
-        return array(
-            't' => 'DiscussionID',
+        $data = array(
             'p' => 'CommentID',
             'page' => 'Page',
             '_arg0' => [
@@ -525,6 +523,17 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'Filter' => [__CLASS__, 'getNumber']
             ]
         );
+
+        if (isset($Get['t'])) {
+            $data['t'] = 'DiscussionID';
+            self::vbFriendlyUrlID($Get, 't');
+        } elseif (isset($Get['p'])) {
+            $data['p'] = 'DiscussionID';
+            $Get['legacy'] = true;
+        }
+
+
+        return $data;
     }
 
     /**
