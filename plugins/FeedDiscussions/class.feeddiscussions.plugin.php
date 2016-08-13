@@ -376,7 +376,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
          $InsertID = $DiscussionModel->Save($DiscussionData);
          
          $this->EventArguments['DiscussionID'] = $InsertID;
-         $this->EventArguments['Vaidation'] = $DiscussionModel->Validation;
+         $this->EventArguments['Validation'] = $DiscussionModel->Validation;
          $this->FireEvent('Published');
          
          // Reset discussion validation
