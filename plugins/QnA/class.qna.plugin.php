@@ -53,6 +53,12 @@ class QnAPlugin extends Gdn_Plugin {
         touchConfig('QnA.Points.AcceptedAnswer', 1);
     }
 
+    public function base_render_before($sender, $args) {
+        if ($sender->MasterView == 'admin') {
+            $sender->addJsFile('QnA.js', 'plugins/QnA');
+        }
+    }
+
     public function structure() {
         Gdn::structure()
             ->table('Discussion');
@@ -239,7 +245,6 @@ class QnAPlugin extends Gdn_Plugin {
 
         $sender->title(sprintf(t('%s settings'), t('Q&A')));
         $sender->setData('PluginDescription', $this->getPluginKey('Description'));
-        $sender->addJsFile('QnA.js', 'plugins/QnA');
         $sender->addSideMenu('settings/QnA');
 
         $sender->Form = new Gdn_Form();

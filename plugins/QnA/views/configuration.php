@@ -5,31 +5,30 @@
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
+$pointsAwardEnabled = c('QnA.Points.Enabled');
+$textBoxAttributes = array();
+$checkBoxAttributes = array(
+    'id' => 'IsPointsAwardEnabled',
+);
+if ($pointsAwardEnabled) {
+    $checkBoxAttributes['checked'] = true;
+} else {
+    $textBoxAttributes['disabled'] = true;
+}
 ?>
 <ul>
-    <li><?php
-        $pointsAwardEnabled = c('QnA.Points.Enabled');
-
-        $textBoxAttributes = array();
-        $checkBoxAttributes = array(
-            'id' => 'IsPointsAwardEnabled',
-        );
-
-        if ($pointsAwardEnabled) {
-            $checkBoxAttributes['checked'] = true;
-        } else {
-            $textBoxAttributes['disabled'] = true;
-        }
-
-        echo $this->Form->checkBox('QnA.Points.Enabled', t('Enables points award. This will gives users points for answering questions.'), $checkBoxAttributes);
+    <li class="form-group row"><?php
+        echo $this->Form->toggle('QnA.Points.Enabled', t('Enables points award. This will gives users points for answering questions.'), $checkBoxAttributes);
     ?></li>
-    <li class="PointAwardsInputs"<?php echo $pointsAwardEnabled ? null : ' style="display:none;"'?>><?php
-        echo $this->Form->label(t('Point(s) per answer (Only the user\'s first answer to a question will award points)'), 'QnA.Points.Answer');
-        echo $this->Form->textBox('QnA.Points.Answer', $textBoxAttributes);
+    <li class="form-group row js-point-awards-inputs"<?php echo $pointsAwardEnabled ? null : ' style="display:none;"'?>><?php
+        echo $this->Form->labelWrap(t('Point(s) per answer (Only the user\'s first answer to a question will award points)'), 'QnA.Points.Answer');
+        echo $this->Form->textBoxWrap('QnA.Points.Answer', $textBoxAttributes);
     ?></li>
-    <li class="PointAwardsInputs"<?php echo $pointsAwardEnabled ? null : ' style="display:none;"'?>><?php
-        echo $this->Form->label(t('Points per accepted answer'), 'QnA.Points.AcceptedAnswer');
-        echo $this->Form->textBox('QnA.Points.AcceptedAnswer', $textBoxAttributes);
+    <li class="form-group row js-point-awards-inputs"<?php echo $pointsAwardEnabled ? null : ' style="display:none;"'?>><?php
+        echo $this->Form->labelWrap(t('Points per accepted answer'), 'QnA.Points.AcceptedAnswer');
+        echo $this->Form->textBoxWrap('QnA.Points.AcceptedAnswer', $textBoxAttributes);
     ?></li>
 </ul>
-<?php echo $this->Form->close('Save');
+<div class="form-footer js-modal-footer">
+    <?php echo $this->Form->close('Save'); ?>
+</div>
