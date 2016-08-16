@@ -2,25 +2,29 @@
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
+<div class="header-block">
+   <h1><?php echo t('Spoof'); ?></h1>
+</div>
 <ul>
-   <li>
+   <li class="form-group row">
       <?php
-      echo $this->Form->Label('Username or UserID to Spoof', 'UserReference');
-      echo $this->Form->TextBox('UserReference');
+      echo $this->Form->labelWrap('Username or UserID to Spoof', 'UserReference');
+      echo $this->Form->textBoxWrap('UserReference');
       ?>
    </li>
-   <li>
+   <li class="form-group row">
       <?php
-      echo $this->Form->Label('Your Email', 'Email');
-      echo $this->Form->TextBox('Email');
+      echo $this->Form->labelWrap('Your Email', 'Email');
+      echo $this->Form->textBoxWrap('Email');
       ?>
    </li>
-   <li>
-      <?php
-      echo $this->Form->Label('Your Password', 'Password');
-      echo $this->Form->Input('Password', 'password');
-      ?>
+   <li class="form-group row">
+      <?php echo $this->Form->labelWrap('Your Password', 'Password'); ?>
+      <div class="input-wrap">
+         <?php echo $this->Form->Input('Password', 'password'); ?>
+      </div>
    </li>
 </ul>
-<?php
-echo $this->Form->Close('Go');
+<div class="form-footer js-modal-footer">
+   <?php echo $this->Form->Close('Go'); ?>
+</div>
