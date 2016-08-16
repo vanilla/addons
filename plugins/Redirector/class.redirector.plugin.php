@@ -11,7 +11,7 @@
 $PluginInfo['Redirector'] = [
     'Name' => 'Forum Redirector',
     'Description' => 'Adds 301 redirects for Vanilla from common forum platforms. This redirector redirects urls from IPB, phpBB, punBB, smf, vBulletin, Lithium, and Xenforo',
-    'Version' => '1.1',
+    'Version' => '1.2',
     'RequiredApplications' => ['Vanilla' => '2.1'],
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -510,10 +510,8 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @return array Mapping of vB parameters
      */
     public static function showthreadFilter(&$Get) {
-        self::vbFriendlyUrlID($Get, 't');
 
-        return array(
-            't' => 'DiscussionID',
+        $data = array(
             'p' => 'CommentID',
             'page' => 'Page',
             '_arg0' => [
@@ -525,6 +523,17 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'Filter' => [__CLASS__, 'getNumber']
             ]
         );
+
+        if (isset($Get['t'])) {
+            $data['t'] = 'DiscussionID';
+            self::vbFriendlyUrlID($Get, 't');
+        } elseif (isset($Get['p'])) {
+            $data['p'] = 'DiscussionID';
+            $Get['legacy'] = true;
+        }
+
+
+        return $data;
     }
 
     /**
