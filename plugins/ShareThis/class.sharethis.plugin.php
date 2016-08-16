@@ -65,15 +65,7 @@ SHARETHIS;
    public function Setup() {
       // Nothing to do here!
    }
-
-   /**
-    * Add to dashboard side menu.
-    */
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-      $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Add-ons', T('ShareThis'), 'plugin/sharethis', 'Garden.Settings.Manage');
-   }
-
+   
    /**
     * Settings page.
     */
