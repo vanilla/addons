@@ -46,10 +46,10 @@ class ReportingPlugin extends Gdn_Plugin {
 
    /**
     * Add to dashboard menu.
+    * @param DashboardNavModule $sender
     */
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-      $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Moderation', T('Community Reporting'), 'plugin/reporting', 'Garden.Settings.Manage');
+   public function dashboardNavModule_init_handler($sender) {
+      $sender->addLinkToSection('Moderation', t('Community Reporting'), 'plugin/reporting', 'moderation.community-reporting');
    }
 
    /**
@@ -58,6 +58,7 @@ class ReportingPlugin extends Gdn_Plugin {
    * @param mixed $Sender
    */
    public function Controller_Index($Sender) {
+      Gdn_Theme::section('Moderation');
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Community Reporting');
       $Sender->AddSideMenu('settings/plugins');
@@ -66,7 +67,7 @@ class ReportingPlugin extends Gdn_Plugin {
       // Check to see if the admin is toggling a feature
       $Feature = GetValue('1', $Sender->RequestArgs);
       $Command = GetValue('2', $Sender->RequestArgs);
-      $TransientKey = GetIncomingValue('TransientKey');
+      $TransientKey = Gdn::request()->get('TransientKey');
       if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
          if (in_array($Feature, array('awesome', 'report'))) {
             SaveToConfig(
