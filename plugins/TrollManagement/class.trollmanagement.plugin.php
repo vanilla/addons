@@ -184,6 +184,10 @@ class TrollManagementPlugin extends Gdn_Plugin {
             }
          }
       }
+      if (!empty($Result)) {
+         // Be sure the the array is properly indexed after unset. (important for json_encode)
+         $Result = array_values($Result);
+      }
    }
 
    /**
