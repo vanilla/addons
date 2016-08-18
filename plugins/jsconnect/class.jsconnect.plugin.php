@@ -643,24 +643,19 @@ class JsConnectPlugin extends Gdn_Plugin {
             ],
             'AuthenticateUrl' => [
                 'LabelCode' => 'Authentication URL',
-                'Description' => T('The location of the JSONP formatted authentication data.'),
-                'Options' => ['class' => 'InputBox BigInput']
-
+                'Description' => T('The location of the JSONP formatted authentication data.')
             ],
             'SignInUrl' => [
                 'LabelCode' => 'Sign In URL',
-                'Description' => T('The url that users use to sign in.').' '.T('Use {target} to specify a redirect.'),
-                'Options' => ['class' => 'InputBox BigInput']
+                'Description' => T('The url that users use to sign in.').' '.T('Use {target} to specify a redirect.')
             ],
             'RegisterUrl' => [
                 'LabelCode' => 'Registration URL',
-                'Description' => T('The url that users use to register for a new account.'),
-                'Options' => ['class' => 'InputBox BigInput']
+                'Description' => T('The url that users use to register for a new account.')
             ],
             'SignOutUrl' => [
                 'LabelCode' => 'Sign Out URL',
-                'Description' => T('The url that users use to sign out of your site.'),
-                'Options' => ['class' => 'InputBox BigInput']
+                'Description' => T('The url that users use to sign out of your site.')
             ],
             'Trusted' => [
                 'Control' => 'toggle',
