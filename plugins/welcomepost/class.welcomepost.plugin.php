@@ -90,12 +90,24 @@ class WelcomePostPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Redirect users to the /post/disussion end point after registration.
+     * Redirect users to the /post/discussion end point after registration.
      */
     public function entryController_registrationSuccessful_handler() {
-        redirect('/post/discussion?welcomepost=true');
+        if (!c('Garden.Registration.ConfirmEmail')) {
+            redirect('/post/discussion?welcomepost=true');
+        }
     }
 
+    /**
+     * Redirect users to the /post/discussion end point after email confirmation.
+     *
+     * @param EntryController $sender Sending controller instance.
+     */
+    public function entryController_render_after($sender) {
+        if ($sender->data('EmailConfirmed')) {
+            echo '<meta http-equiv="Refresh" content="1; url='.url('/post/discussion?welcomepost=true').'">';
+        }
+    }
     /**
      * Add needed resources to the page.
      *
