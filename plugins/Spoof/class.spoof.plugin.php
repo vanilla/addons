@@ -50,7 +50,12 @@ class SpoofPlugin implements Gdn_IPlugin {
 			));
 			$Identity->SetIdentity($SpoofUserID, TRUE);
 		}
-		Redirect('profile');
+		if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
+			$Sender->RedirectUrl = url('profile');
+			$Sender->render('blank', 'utility', 'dashboard');
+		} else {
+			Redirect('profile');
+		}
 	}
 	
 	/**
@@ -62,7 +67,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 		
       $User = GetValue('User', $Sender->EventArguments);
 		if ($User)
-			echo Anchor(T('Spoof'), '/user/autospoof/'.$User->UserID.'/'.Gdn::Session()->TransientKey(), 'PopConfirm SmallButton');
+			echo Anchor(t('Spoof'), '/user/autospoof/'.$User->UserID.'/'.Gdn::Session()->TransientKey(), 'js-modal-confirm btn btn-icon');
 	}
 	
 	/**
