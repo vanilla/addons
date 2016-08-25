@@ -929,6 +929,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         );
 
         if ($ApcAvailable) {
+            $Success = false;
             $UploadStatus = apc_fetch('upload_'.$ApcKey, $Success);
 
             if (!$Success) {
