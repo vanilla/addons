@@ -125,11 +125,12 @@ class MediaModel extends Gdn_Model {
     }
 
     /**
-     * TODO: Refactor into different method to maintain compatibility with base class.
+     *
+     *
+     * @todo Refactor into different method to maintain compatibility with base class.
      *
      * @param array $Media The media row.
      * @param array|bool $Options Either a boolean that says whether or not to delete the file or an array with a
-     * **Delete** key.
      */
     public function delete($Media = [], $Options = []) {
         if (is_bool($Options)) {
@@ -151,8 +152,8 @@ class MediaModel extends Gdn_Model {
         }
         
         if ($MediaID) {
-            $Media = $this->GetID($MediaID);
-            $this->SQL->Delete($this->Name, array('MediaID' => $MediaID), false);
+            $Media = $this->getID($MediaID);
+            $this->SQL->delete($this->Name, array('MediaID' => $MediaID), false);
             
             if ($DeleteFile) {
                 $DirectPath = MediaModel::pathUploads().DS.val('Path',$Media);
@@ -234,23 +235,26 @@ class MediaModel extends Gdn_Model {
      * @return mixed|string
      */
     public static function thumbnailUrl(&$Media) {
-        if (val('ThumbPath', $Media))
+        if (val('ThumbPath', $Media)) {
             return Gdn_Upload::url(ltrim(val('ThumbPath', $Media), '/'));
+        }
         
         $Width = val('ImageWidth', $Media);
         $Height = val('ImageHeight', $Media);
 
         if (!$Width || !$Height) {
-            if ($Height = self::thumbnailHeight())
+            if ($Height = self::thumbnailHeight()) {
                 setValue('ThumbHeight', $Media, $Height);
+            }
             return '/plugins/FileUpload/images/file.png';
         }
 
         $RequiresThumbnail = false;
-        if (self::thumbnailHeight() && $Height > self::thumbnailHeight())
+        if (self::thumbnailHeight() && $Height > self::thumbnailHeight()) {
             $RequiresThumbnail = true;
-        elseif (self::thumbnailWidth() && $Width > self::thumbnailWidth())
+        } elseif (self::thumbnailWidth() && $Width > self::thumbnailWidth()) {
             $RequiresThumbnail = true;
+        }
 
         $Path = ltrim(val('Path', $Media), '/');
         if ($RequiresThumbnail) {
