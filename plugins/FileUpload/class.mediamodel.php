@@ -24,7 +24,7 @@ class MediaModel extends Gdn_Model {
      * @param array $Options Not used.
      * @return array|false Returns the media row or **false** if it isn't found.
      */
-    public function fetID($MediaID, $DatasetType = false, $Options = []) {
+    public function getID($MediaID, $DatasetType = false, $Options = []) {
         $this->fireEvent('BeforeGetID');
         $Data = $this->SQL
             ->select('m.*')
