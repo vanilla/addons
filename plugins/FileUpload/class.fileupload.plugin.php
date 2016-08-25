@@ -198,15 +198,15 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     protected function prepareController($Controller) {
         $Controller->addJsFile('fileupload.js', 'plugins/FileUpload');
-        $Controller->addDefinition('apcavailable',self::apcAvailable());
-        $Controller->addDefinition('uploaderuniq',uniqid(''));
+        $Controller->addDefinition('apcavailable', self::apcAvailable());
+        $Controller->addDefinition('uploaderuniq', uniqid());
 
         $PostMaxSize = Gdn_Upload::unformatFileSize(ini_get('post_max_size'));
         $FileMaxSize = Gdn_Upload::unformatFileSize(ini_get('upload_max_filesize'));
         $ConfigMaxSize = Gdn_Upload::unformatFileSize(c('Garden.Upload.MaxFileSize', '1MB'));
 
         $MaxSize = min($PostMaxSize, $FileMaxSize, $ConfigMaxSize);
-        $Controller->addDefinition('maxuploadsize',$MaxSize);
+        $Controller->addDefinition('maxuploadsize', $MaxSize);
     }
 
     /**
@@ -682,8 +682,8 @@ class FileUploadPlugin extends Gdn_Plugin {
      *
      * @param mixed $MediaID
      * @param mixed $UserID
-     * @param mixed $Absolute. (default: FALSE)
-     * @param mixed $ReturnString. (default: FALSE)
+     * @param mixed $Absolute. (default: false)
+     * @param mixed $ReturnString. (default: false)
      * @return array
      */
     public static function findLocalMediaFolder($MediaID, $UserID, $Absolute = false, $ReturnString = false) {
@@ -701,8 +701,8 @@ class FileUploadPlugin extends Gdn_Plugin {
      *
      *
      * @param mixed $Media
-     * @param mixed $Absolute. (default: FALSE)
-     * @param mixed $ReturnString. (default: FALSE)
+     * @param mixed $Absolute. (default: false)
+     * @param mixed $ReturnString. (default: false)
      * @return array
      */
     public static function findLocalMedia($Media, $Absolute = false, $ReturnString = false) {
