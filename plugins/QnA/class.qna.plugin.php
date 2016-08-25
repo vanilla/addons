@@ -921,7 +921,7 @@ class QnAPlugin extends Gdn_Plugin {
                     ->where('d.QnA', null)
                     ->orWhereIn('d.QnA', array('Unanswered', 'Rejected'))
                     ->endWhereGroup();
-                Gdn::controller()->title('Unanswered Questions');
+                Gdn::controller()->title(t('Unanswered Questions'));
             } elseif ($QnA = Gdn::request()->get('qna')) {
                 $args['Wheres']['QnA'] = $QnA;
             }
