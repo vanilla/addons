@@ -90,7 +90,11 @@ class LastEditedPlugin extends Gdn_Plugin {
         if (is_null($Data->DateUpdated)) {
             return;
         }
-        if (Gdn_Format::toTimestamp($Data->DateUpdated) <= Gdn_Format::toTimestamp($Data->DateInserted)) {
+
+        // Do not show log link if no log would have been generated.
+        $elapsed = Gdn_Format::toTimestamp(val('DateUpdated', $Data)) - Gdn_Format::toTimestamp(val('DateInserted', $Data));
+        $grace = c('Garden.Log.FloodControl', 20) * 60;
+        if ($elapsed < $grace) {
             return;
         }
 
