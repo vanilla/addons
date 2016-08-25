@@ -59,8 +59,9 @@ class FileUploadPlugin extends Gdn_Plugin {
 
         if ($this->CanUpload) {
             $PermissionCategory = CategoryModel::permissionCategory(Gdn::controller()->data('Category'));
-            if (!val('AllowFileUploads', $PermissionCategory, true))
+            if (!val('AllowFileUploads', $PermissionCategory, true)) {
                 $this->CanUpload = false;
+            }
         }
     }
 
@@ -266,6 +267,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         } elseif (isset($Sender->Discussion) && $Sender->Discussion) {
             $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
         }
+
         if (isset($Sender->Comment) && isset($Sender->Comment->CommentID)) {
             $CommentIDList[] = $Sender->Comment->CommentID;
         }
@@ -297,8 +299,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     public function discussionController_afterCommentBody_handler($Sender, $Args) {
         if (isset($Args['Type'])) {
             $this->attachUploadsToComment($Sender, strtolower($Args['Type']));
-        }
-        else {
+        } else {
             $this->attachUploadsToComment($Sender);
         }
     }
@@ -341,7 +342,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     protected function attachUploadsToComment($Controller, $Type = 'comment') {
         $RawType = ucfirst($Type);
 
-        if (StringEndsWith($Controller->RequestMethod, 'Comment', TRUE) && $Type != 'comment') {
+        if (StringEndsWith($Controller->RequestMethod, 'Comment', true) && $Type != 'comment') {
             $Type = 'comment';
             $RawType = 'Comment';
             if (!isset($Controller->Comment)) {
@@ -351,7 +352,9 @@ class FileUploadPlugin extends Gdn_Plugin {
         }
 
         $MediaList = $this->mediaCache();
-        if (!is_array($MediaList)) return;
+        if (!is_array($MediaList)) {
+            return;
+        }
 
         $Param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
         $MediaKey = $Type.'/'.GetValue($Param, GetValue($RawType, $Controller->EventArguments));
@@ -938,7 +941,7 @@ class FileUploadPlugin extends Gdn_Plugin {
 
             $Progress['progress'] = ($UploadStatus['current'] / $UploadStatus['total']) * 100;
             $Progress['total'] = $UploadStatus['total'];
-            $Progress['format_total'] = Gdn_Format::Bytes($Progress['total'],1);
+            $Progress['format_total'] = Gdn_Format::bytes($Progress['total'],1);
             $Progress['cache'] = $UploadStatus;
         }
 
@@ -999,8 +1002,9 @@ class FileUploadPlugin extends Gdn_Plugin {
 
             if (!$Deleted) {
                 $DirectPath = MediaModel::pathUploads().DS.$Media->Path;
-                if (file_exists($DirectPath))
+                if (file_exists($DirectPath)) {
                     $Deleted = @unlink($DirectPath);
+                }
             }
 
             if (!$Deleted) {
