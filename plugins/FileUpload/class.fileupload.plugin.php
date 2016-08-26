@@ -14,7 +14,7 @@
  *  1.8      Added the ability to restrict file uploads per category.
  *  1.8.1    Remove deprecated jQuery functions.
  *  1.8.3    Modified fileupload.js to handle dependency on jquery.popup better.
- *  1.9      Code reformatting. Remove isEnabled().
+ *  1.9      Code reformatting. Remove isEnabled(). Restore attach option on edit comment.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2009-2016 Vanilla Forums, Inc
@@ -224,6 +224,15 @@ class FileUploadPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add "Attach a file" to edit comment form.
+     *
+     * @param $sender
+     */
+    public function postController_afterBodyField_handler($sender) {
+        $this->drawAttachFile($sender);
+    }
+
+    /**
      *
      *
      * @param DiscussionController $Sender
@@ -357,7 +366,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         }
 
         $Param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
-        $MediaKey = $Type.'/'.GetValue($Param, GetValue($RawType, $Controller->EventArguments));
+        $MediaKey = $Type.'/'.val($Param, val($RawType, $Controller->EventArguments));
         if (array_key_exists($MediaKey, $MediaList)) {
             include_once $Controller->fetchViewLocation('fileupload_functions', '', 'plugins/FileUpload');
 
