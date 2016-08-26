@@ -6,8 +6,9 @@
 
 $PluginInfo['welcomepost'] = [
     'Name' => 'Welcome Post',
-    'Description' => 'Redirect users, after registration, to an "introduce yourself" page that posts in a "welcome" category.',
-    'Version' => '1.0',
+    'Description' => 'Redirect users, after registration, to an "introduce yourself" page that posts in a "welcome" category.'
+            .' This plugin does not work with the "approval" registration mode.',
+    'Version' => '1.1',
     'RequiredApplications' => ['Vanilla' => '2.2'],
     'License' => 'GNU GPL2',
     'Author' => 'Alexandre (DaazKu) Chouinard',
