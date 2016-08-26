@@ -387,7 +387,9 @@ class FileUploadPlugin extends Gdn_Plugin {
         }
 
         $Filename = Gdn::request()->filename();
-        if (!$Filename || $Filename == 'default') $Filename = $Media->Name;
+        if (!$Filename || $Filename == 'default') {
+            $Filename = $Media->Name;
+        }
 
         $DownloadPath = combinePaths(array(MediaModel::pathUploads(),val('Path', $Media)));
 
@@ -691,8 +693,9 @@ class FileUploadPlugin extends Gdn_Plugin {
         $FolderID = $MediaID % $DispersionFactor;
         $ReturnArray = array('FileUpload',$FolderID);
 
-        if ($Absolute)
+        if ($Absolute) {
             array_unshift($ReturnArray, MediaModel::pathUploads());
+        }
 
         return ($ReturnString) ? implode(DS,$ReturnArray) : $ReturnArray;
     }
