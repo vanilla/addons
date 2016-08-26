@@ -224,6 +224,15 @@ class FileUploadPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add "Attach a file" to edit comment form.
+     *
+     * @param $sender
+     */
+    public function postController_afterBodyField_handler($sender) {
+        $this->drawAttachFile($sender);
+    }
+
+    /**
      *
      *
      * @param DiscussionController $Sender
@@ -357,7 +366,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         }
 
         $Param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
-        $MediaKey = $Type.'/'.GetValue($Param, GetValue($RawType, $Controller->EventArguments));
+        $MediaKey = $Type.'/'.val($Param, val($RawType, $Controller->EventArguments));
         if (array_key_exists($MediaKey, $MediaList)) {
             include_once $Controller->fetchViewLocation('fileupload_functions', '', 'plugins/FileUpload');
 
