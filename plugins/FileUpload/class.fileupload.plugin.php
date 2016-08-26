@@ -819,10 +819,12 @@ class FileUploadPlugin extends Gdn_Plugin {
             if (!$Handled) {
                 // Build save location
                 $SavePath = MediaModel::pathUploads().$SaveFilename;
-                if (!is_dir(dirname($SavePath)))
+                if (!is_dir(dirname($SavePath))) {
                     @mkdir(dirname($SavePath), 0777, true);
-                if (!is_dir(dirname($SavePath)))
+                }
+                if (!is_dir(dirname($SavePath))) {
                     throw new FileUploadPluginUploadErrorException("Internal error, could not save the file.", 9, $FileName);
+                }
 
                 // Move to permanent location
                 // Use SaveImageAs so that image is rotated if necessary
