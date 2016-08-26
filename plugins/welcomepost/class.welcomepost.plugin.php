@@ -6,8 +6,9 @@
 
 $PluginInfo['welcomepost'] = [
     'Name' => 'Welcome Post',
-    'Description' => 'Redirect users, after registration, to an "introduce yourself" page that posts in a "welcome" category.',
-    'Version' => '1.0',
+    'Description' => 'Redirect users, after registration, to an "introduce yourself" page that posts in a "welcome" category.'
+            .' This plugin does not work with the "approval" registration mode.',
+    'Version' => '1.1',
     'RequiredApplications' => ['Vanilla' => '2.2'],
     'License' => 'GNU GPL2',
     'Author' => 'Alexandre (DaazKu) Chouinard',
@@ -90,12 +91,24 @@ class WelcomePostPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Redirect users to the /post/disussion end point after registration.
+     * Redirect users to the /post/discussion end point after registration.
      */
     public function entryController_registrationSuccessful_handler() {
-        redirect('/post/discussion?welcomepost=true');
+        if (!c('Garden.Registration.ConfirmEmail')) {
+            redirect('/post/discussion?welcomepost=true');
+        }
     }
 
+    /**
+     * Redirect users to the /post/discussion end point after email confirmation.
+     *
+     * @param EntryController $sender Sending controller instance.
+     */
+    public function entryController_render_after($sender) {
+        if ($sender->data('EmailConfirmed')) {
+            echo '<meta http-equiv="Refresh" content="1; url='.url('/post/discussion?welcomepost=true').'">';
+        }
+    }
     /**
      * Add needed resources to the page.
      *
