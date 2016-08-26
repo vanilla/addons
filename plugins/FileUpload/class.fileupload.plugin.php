@@ -14,7 +14,7 @@
  *  1.8      Added the ability to restrict file uploads per category.
  *  1.8.1    Remove deprecated jQuery functions.
  *  1.8.3    Modified fileupload.js to handle dependency on jquery.popup better.
- *  1.9      Code reformatting. Remove isEnabled().
+ *  1.9      Code reformatting. Remove isEnabled(). Restore attach option on edit comment.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2009-2016 Vanilla Forums, Inc
