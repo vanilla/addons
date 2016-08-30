@@ -614,7 +614,7 @@ var GdnUploaders = null;
 
    }
 
-   jQuery(document).ready(function($){
+   $(document).on('contentLoad', function(e) {
       GdnUploaders = new Gdn_Uploaders();
       GdnUploaders.Prepare();
 

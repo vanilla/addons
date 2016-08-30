@@ -28,6 +28,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @var array
      */
     public static $Files = [
+        'archive' => [__CLASS__, 'showthreadFilter'],
         'category.jspa' => [  // jive 4 category
             'categoryID' => 'CategoryID',
         ],
@@ -159,6 +160,8 @@ class RedirectorPlugin extends Gdn_Plugin {
                 $After = array_merge(explode('/', $TryPath));
                 unset($Get[$TryPath]);
                 $Filename = '';
+            } elseif (preg_match('#archive/index\.php$#', $Path) === 1) { // vBulletin archive
+                $Filename = 'archive';
             }
         }
         if (!$Filename) {
@@ -525,7 +528,10 @@ class RedirectorPlugin extends Gdn_Plugin {
         );
 
         if (isset($Get['t'])) {
-            $data['t'] = 'DiscussionID';
+            $data['t'] = [
+                'DiscussionID',
+                'Filter' => [__CLASS__, 'removeID']
+            ];
             self::vbFriendlyUrlID($Get, 't');
         } elseif (isset($Get['p'])) {
             $data['p'] = 'DiscussionID';
