@@ -122,6 +122,10 @@ class ParticipatedPlugin extends Gdn_Plugin {
     * @since 2.1
     */
    public function Base_AfterDiscussionFilters_Handler($Sender) {
+      if (!checkPermission('Garden.SignIn.Allow')) {
+         return;
+      }
+
       // Participated
       $CssClass = 'Participated';
       if (strtolower(Gdn::Controller()->ControllerName) == 'discussionscontroller' && strtolower(Gdn::Controller()->RequestMethod) == 'participated')
