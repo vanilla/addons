@@ -979,6 +979,10 @@ class QnAPlugin extends Gdn_Plugin {
 
         // Be sure to display every unanswered question (ie from groups)
         $categories = CategoryModel::categories();
+
+        $this->EventArguments['Categories'] = &$categories;
+        $this->fireEvent('UnansweredBeforeSetCategories');
+
         $sender->setCategoryIDs(array_keys($categories));
 
         $sender->index(val(0, $args, 'p1'));
