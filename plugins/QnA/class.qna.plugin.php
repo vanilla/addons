@@ -976,6 +976,15 @@ class QnAPlugin extends Gdn_Plugin {
     public function discussionsController_unanswered_create($sender, $args) {
         $sender->View = 'Index';
         $sender->setData('_PagerUrl', 'discussions/unanswered/{Page}');
+
+        // Be sure to display every unanswered question (ie from groups)
+        $categories = CategoryModel::categories();
+
+        $this->EventArguments['Categories'] = &$categories;
+        $this->fireEvent('UnansweredBeforeSetCategories');
+
+        $sender->setCategoryIDs(array_keys($categories));
+
         $sender->index(val(0, $args, 'p1'));
         $this->InUnanswered = true;
     }
@@ -1001,24 +1010,22 @@ class QnAPlugin extends Gdn_Plugin {
         // TODO: Dekludge this when category permissions are refactored (tburry).
         $cacheKey = Gdn::request()->webRoot().'/QnA-UnansweredCount';
         $questionCount = Gdn::cache()->get($cacheKey);
+
         if ($questionCount === Gdn_Cache::CACHEOP_FAILURE) {
-            $questionCount = null;
-
-            // Check to see if another plugin can handle this.
-            $this->EventArguments['questionCount'] = &$questionCount;
-            $this->fireEvent('unansweredCount');
-
-            if ($questionCount === null) {
-                $questionCount = Gdn::sql()
-                    ->beginWhereGroup()
-                    ->where('QnA', null)
-                    ->orWhereIn('QnA', array('Unanswered', 'Rejected'))
-                    ->endWhereGroup()
-                    ->getCount('Discussion', array('Type' => 'Question'));
-            }
+            $questionCount = Gdn::sql()
+                ->beginWhereGroup()
+                ->where('QnA', null)
+                ->orWhereIn('QnA', array('Unanswered', 'Rejected'))
+                ->endWhereGroup()
+                ->getCount('Discussion', array('Type' => 'Question'));
 
             Gdn::cache()->store($cacheKey, $questionCount, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));
         }
+
+        // Check to see if another plugin can handle this.
+        $this->EventArguments['questionCount'] = &$questionCount;
+        $this->fireEvent('unansweredCount');
+
         return $questionCount;
     }
 
