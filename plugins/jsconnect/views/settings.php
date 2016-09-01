@@ -46,14 +46,14 @@
     echo $this->Form->close();
 ?>
 <div class="table-wrap padded">
-    <table class="AltRows">
+    <table class="table-data">
         <thead>
         <tr>
-            <th><?php echo T('Client ID'); ?></th>
-            <th><?php echo T('Site Name'); ?></th>
-            <th><?php echo T('Authentication URL'); ?></th>
-            <th><?php echo T('Test') ?></th>
-            <th>&#160;</th>
+            <th><?php echo t('Client ID'); ?></th>
+            <th><?php echo t('Site Name'); ?></th>
+            <th class="column-md"><?php echo t('Authentication URL'); ?></th>
+            <th><?php echo t('Test') ?></th>
+            <th class="column-sm"><?php echo t('Options') ?></th>
         </tr>
         </thead>
         <tbody>
