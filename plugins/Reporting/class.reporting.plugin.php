@@ -61,7 +61,6 @@ class ReportingPlugin extends Gdn_Plugin {
       Gdn_Theme::section('Moderation');
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Community Reporting');
-      $Sender->AddSideMenu('settings/plugins');
       $Sender->AddCssFile('reporting.css', 'plugins/Reporting');
       
       // Check to see if the admin is toggling a feature
