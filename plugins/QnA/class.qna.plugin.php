@@ -976,6 +976,11 @@ class QnAPlugin extends Gdn_Plugin {
     public function discussionsController_unanswered_create($sender, $args) {
         $sender->View = 'Index';
         $sender->setData('_PagerUrl', 'discussions/unanswered/{Page}');
+
+        // Be sure to display every unanswered question (ie from groups)
+        $categories = CategoryModel::categories();
+        $sender->setCategoryIDs(array_keys($categories));
+
         $sender->index(val(0, $args, 'p1'));
         $this->InUnanswered = true;
     }
