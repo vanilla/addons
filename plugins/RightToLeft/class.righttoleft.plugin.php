@@ -35,7 +35,7 @@ class RightToLeftPlugin extends Gdn_Plugin {
     *
     * @param Gdn_Controller $Sender
     */
-    public function Base_Render_Before(&$Sender) {
+    public function Base_Render_Before($Sender) {
         $currentLocale = substr(Gdn::Locale()->Current(), 0, 2);
 
         if (in_array($currentLocale, $this->rtlLocales)) {

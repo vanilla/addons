@@ -25,7 +25,7 @@ class VotingPlugin extends Gdn_Plugin {
 	/**
 	 * Admin Toggle to turn Voting on/off
 	 */
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Forum', T('Forum'));
       $Menu->AddLink('Forum', T('Voting'), 'settings/voting', 'Garden.Settings.Manage');

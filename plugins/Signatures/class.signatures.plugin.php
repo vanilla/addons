@@ -228,7 +228,7 @@ class SignaturesPlugin extends Gdn_Plugin {
      * @param $Values Signature settings form values
      * @param $Sender Controller
      */
-    public function crossCheckSignature($Values, &$Sender) {
+    public function crossCheckSignature($Values, $Sender) {
         $this->CheckSignatureLength($Values, $Sender);
         $this->CheckNumberOfImages($Values, $Sender);
 
@@ -247,7 +247,7 @@ class SignaturesPlugin extends Gdn_Plugin {
      * @param $Values Signature settings form values
      * @param $Sender Controller
      */
-    public function checkSignatureLength($Values, &$Sender) {
+    public function checkSignatureLength($Values, $Sender) {
         if (C('Plugins.Signatures.MaxLength') && C('Plugins.Signatures.MaxLength') > 0) {
             $Sig = Gdn_Format::To($Values['Plugin.Signatures.Sig'], $Sender->Form->GetFormValue('Format'));
             $TextValue = html_entity_decode(trim(strip_tags($Sig)));
@@ -265,7 +265,7 @@ class SignaturesPlugin extends Gdn_Plugin {
      * @param $Values Signature settings form values
      * @param $Sender Controller
      */
-    public function checkNumberOfImages($Values, &$Sender) {
+    public function checkNumberOfImages($Values, $Sender) {
         if (C('Plugins.Signatures.MaxNumberImages') && C('Plugins.Signatures.MaxNumberImages') !== 'Unlimited') {
             $max = C('Plugins.Signatures.MaxNumberImages');
             $Sig = Gdn_Format::To(val('Plugin.Signatures.Sig', $Values), val('Plugin.Signatures.Format', $Values, C('Garden.InputFormatter')));
@@ -279,7 +279,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         }
     }
 
-    public function setSignatureRules(&$Sender) {
+    public function setSignatureRules($Sender) {
         $rules = array();
         $rulesParams = array();
         $imagesAllowed = true;
