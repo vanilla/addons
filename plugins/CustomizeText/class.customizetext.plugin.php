@@ -23,8 +23,7 @@ $PluginInfo['CustomizeText'] = array(
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
-	'SettingsUrl' => 'settings/customizetext',
-    'HasPopupFriendlySettings' => false
+	'SettingsUrl' => 'settings/customizetext'
 );
 
 class CustomizeTextPlugin extends Gdn_Plugin {
