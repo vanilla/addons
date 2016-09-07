@@ -16,6 +16,7 @@ $PluginInfo['jsconnect'] = array(
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
     'SettingsUrl' => '/settings/jsconnect',
+    'HasPopupFriendlySettings' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Icon' => 'jsconnect.png'
 );
@@ -46,18 +47,6 @@ class JsConnectPlugin extends Gdn_Plugin {
             $Result .= self::connectButton($Provider, $Options);
         }
         return $Result;
-    }
-
-    /**
-     * Opt out of popup settings page on addons page
-     *
-     * @param SettingsController $sender
-     * @param array $args
-     */
-    public function settingsController_beforeAddonList_handler($sender, &$args) {
-        if (val('jsconnect', $args['AvailableAddons'])) {
-            $args['AvailableAddons']['jsconnect']['HasPopupFriendlySettings'] = false;
-        }
     }
 
     public static function connectButton($Provider, $Options = array()) {
