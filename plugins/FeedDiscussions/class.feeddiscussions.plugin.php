@@ -151,9 +151,9 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      */
     public function Controller_Index($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
-      $Sender->Title($this->GetPluginKey('Name'));
+      $Sender->Title($this->GetPluginKey('name'));
       $Sender->AddSideMenu('plugin/feeddiscussions');
-      $Sender->SetData('Description', $this->GetPluginKey('Description'));
+      $Sender->SetData('Description', $this->GetPluginKey('description'));
       $Sender->AddCssFile('feeddiscussions.css', 'plugins/FeedDiscussions');
       
       $Categories = CategoryModel::Categories();
