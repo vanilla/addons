@@ -35,9 +35,9 @@ $Definitions = $Locale->GetDeveloperDefinitions();
 $CountDefinitions = count($Definitions);
 ?>
 <h1><?php echo T('Customize Text'); ?></h1>
-<div class="Info">
+<div class="padded">
    <?php
-		echo 'There are currently <span class="CountDefinitions">'. $CountDefinitions . '</span> text definitions available for editing.';
+		echo 'There are currently <span class="CountDefinitions strong">'. $CountDefinitions . '</span> text definitions available for editing.';
    ?>
 	<p><em><span class="Loading"></span> Searching for more text definitions.</em></p>
 </div>
@@ -65,7 +65,7 @@ jQuery(document).ready(function($) {
 				}
 			}
 		});
-	};		
+	};
 	var urls = <?php echo json_encode($Urls); ?>;
 	crawlUrl(0, urls);
 });
