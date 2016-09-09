@@ -1,114 +1,111 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo T($this->Data['Title']); ?></h1>
-<div class="Info">
-   <?php echo T($this->Data['Description']); ?>
-</div>
-<div class="FilterMenu">
-      <?php
-      echo Anchor(
-         T($this->Plugin->IsEnabled() ? 'Disable' : 'Enable'),
-         $this->Plugin->AutoTogglePath(),
-         'SmallButton'
-      );
-   ?>
+<h1><?php echo t($this->Data['Title']); ?></h1>
+<div class="row form-group">
+    <div class="label-wrap-wide">
+        <?php echo sprintf(t('Enable %s'), t($this->Data['Title'])); ?>
+        <div class="info"><?php echo t($this->Data['Description']); ?></div>
+    </div>
+    <div class="input-wrap-right">
+        <span id="plaintext-toggle">
+            <?php
+            if ($this->Plugin->IsEnabled()) {
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', $this->Plugin->AutoTogglePath()), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+            } else {
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', $this->Plugin->AutoTogglePath()), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+            }
+            ?>
+        </span>
+    </div>
 </div>
 <?php if (!$this->Plugin->IsEnabled()) return; ?>
-<h3>Add a Feed</h3>
+<h2><?php echo t('Add a new Auto Discussion Feed'); ?></h2>
 <div class="AddFeed">
-   <?php 
-      echo $this->Form->Open(array(
-         'action'  => Url('plugin/feeddiscussions/addfeed')
-      ));
-      echo $this->Form->Errors();
-      
-      $Refreshments = array(
-               "1m"  => T("Every Minute"),
-               "5m"  => T("Every 5 Minutes"),
-               "30m" => T("Twice Hourly"),
-               "1h"  => T("Hourly"),
-               "1d"  => T("Daily"),
-               "3d"  => T("Every 3 Days"),
-               "1w"  => T("Weekly"),
-               "2w"  => T("Every 2 Weeks")
-            );
-      
-   ?>
-      <ul>
-         <li>
-            <div class="Info">Add a new Auto Discussion Feed</div>
-         <?php
-            echo $this->Form->Label('Feed URL', 'FeedURL');
-            echo $this->Form->TextBox('FeedURL', array('class' => 'InputBox'));
-         ?></li>
-         <li><?php
-            echo $this->Form->CheckBox('Historical', T('Import Older Posts'), array('value' => '1'));
-         ?></li>
-               
-         <li><?php
-            echo $this->Form->Label('Maximum Polling Frequency', 'Refresh');
-            echo $this->Form->DropDown('Refresh', $Refreshments, array(
-               'value'  => "1d"
-            ));
-         ?></li>
-         
-         <li><?php
-            echo $this->Form->Label('Target Category', 'Category');
-            echo $this->Form->CategoryDropDown('Category');
-         ?></li>
-      </ul>
-   <?php
-      echo $this->Form->Close("Add Feed");
-   ?>
+    <?php
+    echo $this->Form->Open(array(
+        'action'  => Url('plugin/feeddiscussions/addfeed')
+    ));
+    echo $this->Form->Errors();
+
+    $Refreshments = array(
+        "1m"  => T("Every Minute"),
+        "5m"  => T("Every 5 Minutes"),
+        "30m" => T("Twice Hourly"),
+        "1h"  => T("Hourly"),
+        "1d"  => T("Daily"),
+        "3d"  => T("Every 3 Days"),
+        "1w"  => T("Weekly"),
+        "2w"  => T("Every 2 Weeks")
+    );
+
+    ?>
+    <ul>
+        <li class="form-group row">
+            <?php echo $this->Form->labelWrap('Feed URL', 'FeedURL'); ?>
+            <?php echo $this->Form->textBoxWrap('FeedURL', array('class' => 'InputBox')); ?>
+        </li>
+        <li class="form-group row">
+            <div class="input-wrap no-label">
+                <?php echo $this->Form->checkBox('Historical', T('Import Older Posts'), array('value' => '1')); ?>
+            </div>
+        </li>
+
+        <li class="form-group row">
+            <?php echo $this->Form->labelWrap('Maximum Polling Frequency', 'Refresh'); ?>
+            <div class="input-wrap">
+                <?php echo $this->Form->dropDown('Refresh', $Refreshments, array('value'  => "1d")); ?>
+            </div>
+        </li>
+        <li class="form-group row">
+            <?php echo $this->Form->labelWrap('Target Category', 'Category'); ?>
+            <div class="input-wrap">
+                <?php echo $this->Form->CategoryDropDown('Category'); ?>
+            </div>
+        </li>
+    </ul>
+    <div class="form-footer padded-bottom">
+        <?php echo $this->Form->Close("Add Feed"); ?>
+    </div>
 </div>
 
-<h3><?php echo T('Active Feeds'); ?></h3>
+<h2><?php echo T('Active Feeds'); ?></h2>
 <div class="ActiveFeeds">
-<?php
-   $NumFeeds = count($this->Data('Feeds'));
-   if (!$NumFeeds) {
-      echo T("You have no active auto feeds at this time.");
-   } else {
-      echo "<div>".$NumFeeds." ".Plural($NumFeeds,"Active Feed","Active Feeds")."</div>\n";
-      foreach ($this->Data('Feeds') as $FeedURL => $FeedItem) {
-         $LastUpdate = $FeedItem['LastImport'];
-         $CategoryID = $FeedItem['Category'];
-         $Frequency = GetValue($FeedItem['Refresh'], $Refreshments, T('Unknown'));
-         $Category = $this->Data("Categories.{$CategoryID}.Name", 'Root');
-?>
-         <div class="FeedItem">
-            <div class="DeleteFeed">
-               <a href="<?php echo Url('/plugin/feeddiscussions/deletefeed/'.FeedDiscussionsPlugin::EncodeFeedKey($FeedURL)); ?>">Delete this Feed</a>
-            </div>
-            <div class="FeedContent">
-               <div class="FeedItemURL"><?php echo Anchor($FeedURL,$FeedURL); ?></div>
-               <div class="FeedItemInfo">
-                  <span>Updated: <?php echo $LastUpdate; ?></span>
-                  <span>Refresh: <?php echo $Frequency; ?></span>
-                  <span>Category: <?php echo $Category; ?></span>
-               </div>
-            </div>
-         </div>
-<?php
-      }
-   }
-?>
+    <?php
+    $NumFeeds = count($this->Data('Feeds'));
+    if (!$NumFeeds) {
+        echo '<div class="italic padded">'.t("You have no active auto feeds at this time.").'</div>';
+    } else {
+        echo '<div class="italic padded">'.$NumFeeds." ".Plural($NumFeeds, "Active Feed", "Active Feeds").'</div>'; ?>
+        <div class="table-wrap">
+            <table class="table-data">
+                <thead>
+                <tr>
+                    <th class="column-xl"><?php echo t('Feed Url'); ?></th>
+                    <th><?php echo t('Updated'); ?></th>
+                    <th><?php echo t('Refresh'); ?></th>
+                    <th><?php echo t('Category'); ?></th>
+                    <th class="column-sm"><?php echo t('Options'); ?></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
+                foreach ($this->Data('Feeds') as $FeedURL => $FeedItem) {
+                    $LastUpdate = $FeedItem['LastImport'];
+                    $CategoryID = $FeedItem['Category'];
+                    $Frequency = GetValue($FeedItem['Refresh'], $Refreshments, T('Unknown'));
+                    $Category = $this->Data("Categories.{$CategoryID}.Name", 'Root');
+                    ?>
+                    <tr>
+                        <td class="FeedItemURL"><?php echo Anchor($FeedURL,$FeedURL); ?></td>
+                        <td><?php echo $LastUpdate; ?></td>
+                        <td><?php echo $Frequency; ?></td>
+                        <td><?php echo $Category; ?></td>
+                        <td class="DeleteFeed">
+                            <?php echo anchor(dashboardSymbol('delete'), '/plugin/feeddiscussions/deletefeed/'.FeedDiscussionsPlugin::EncodeFeedKey($FeedURL), 'btn btn-icon', ['aria-label' => t('Delete this Feed')]); ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+                </tbody>
+            </table>
+        </div>
+    <?php } ?>
 </div>
-<script type="text/javascript"> 
-    jQuery(function ($) {
-
-        // Show drafts delete button on hover
-        // Show options on each row (if present)
-        $('div.ActiveFeeds div.FeedItem').each(function () {
-            var row = $(this);
-            var del = row
-                .find('div.DeleteFeed')
-                .hide();
-
-            row.hover(function () {
-                del.toggle();
-                row.toggleClass('Active');
-            });
-        });
-
-    });
-</script>
