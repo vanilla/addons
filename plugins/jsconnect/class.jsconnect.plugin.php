@@ -16,7 +16,7 @@ $PluginInfo['jsconnect'] = array(
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
     'SettingsUrl' => '/settings/jsconnect',
-    'HasPopupFriendlySettings' => false,
+    'UsePopupSettings' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Icon' => 'jsconnect.png'
 );
