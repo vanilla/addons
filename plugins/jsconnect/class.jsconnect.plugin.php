@@ -42,10 +42,12 @@ class JsConnectPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
+     *
      * @param array $Options
      * @return string
      */
-    public static function allConnectButtons($Options = array()) {
+    public static function allConnectButtons($Options = []) {
         $Result = '';
 
         $Providers = self::getAllProviders();
