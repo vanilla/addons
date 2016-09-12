@@ -85,8 +85,8 @@ class JsConnectPlugin extends Gdn_Plugin {
         $Data['Target'] = urlencode(url('entry/jsconnect', true).'?'.http_build_query($ConnectQuery));
         $Data['Redirect'] = $Data['target'] = $Data['redirect'] = $Data['Target'];
 
-        $SignInUrl = FormatString(val('SignInUrl', $Provider, ''), $Data);
-        $RegisterUrl = FormatString(val('RegisterUrl', $Provider, ''), $Data);
+        $SignInUrl = formatString(val('SignInUrl', $Provider, ''), $Data);
+        $RegisterUrl = formatString(val('RegisterUrl', $Provider, ''), $Data);
 
         if ($RegisterUrl && !val('NoRegister', $Options)) {
             $RegisterLink = ' '.anchor(sprintf(t('Register with %s', 'Register'), $Provider['Name']), $RegisterUrl, 'Button RegisterLink');
@@ -97,7 +97,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         if (val('NoConnectLabel', $Options)) {
             $ConnectLabel = '';
         } else {
-            $ConnectLabel = '<span class="Username"></span><div class="ConnectLabel TextColor">'.sprintf(T('Sign In with %s'), $Provider['Name']).'</div>';
+            $ConnectLabel = '<span class="Username"></span><div class="ConnectLabel TextColor">'.sprintf(t('Sign In with %s'), $Provider['Name']).'</div>';
         }
 
         if (!C('Plugins.JsConnect.NoGuestCheck')) {
