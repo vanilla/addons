@@ -40,7 +40,7 @@
         </div>
     </div>
     <?php
-    echo '<div class="Buttons form-footer">';
+    echo '<div class="form-footer padded-bottom">';
     echo $this->Form->button('Save');
     echo '</div>';
     echo $this->Form->close();
