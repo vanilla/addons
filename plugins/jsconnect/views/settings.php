@@ -1,20 +1,21 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+
 <?php Gdn_Theme::assetBegin('Help'); ?>
 <div class="Help Aside">
     <?php
     echo '<h2>'.sprintf(t('About %s'), 'jsConnect').'</h2>';
-    echo T('You can connect to multiple sites that support jsConnect.');
-    echo '<h2>', T('Need More Help?'), '</h2>';
+    echo t('You can connect to multiple sites that support jsConnect.');
+    echo '<h2>'.t('Need More Help?').'</h2>';
     echo '<ul>';
-    echo '<li>', Anchor(T('jsConnect Documentation'), 'http://docs.vanillaforums.com/features/sso/jsconnect/'), '</li>';
-    echo '<li>', Anchor(T('jsConnect Client Libraries'), 'http://docs.vanillaforums.com/features/sso/jsconnect/overview/#your-endpoint'), '</li>';
+    echo '<li>'.anchor(t('jsConnect Documentation').'http://docs.vanillaforums.com/features/sso/jsconnect/').'</li>';
+    echo '<li>'.anchor(t('jsConnect Client Libraries').'http://docs.vanillaforums.com/features/sso/jsconnect/overview/#your-endpoint').'</li>';
     echo '</ul>';
     ?>
 </div>
 <?php Gdn_Theme::assetEnd(); ?>
 <div class="header-block">
     <h1><?php echo sprintf(t('%s Settings'), 'jsConnect'); ?></h1>
-    <?php echo Anchor(T('Add Connection'), '/settings/jsconnect/addedit', 'btn btn-primary js-modal'); ?>
+    <?php echo anchor(t('Add Connection'), '/settings/jsconnect/addedit', 'btn btn-primary js-modal'); ?>
 </div>
 <h2>Signing In</h2>
 <?php
@@ -38,11 +39,10 @@
             <?php echo $this->Form->toggle('Garden.SignIn.Popup'); ?>
         </div>
     </div>
-
-    <?php echo '<div class="Buttons form-footer">';
+    <?php
+    echo '<div class="Buttons form-footer">';
     echo $this->Form->button('Save');
     echo '</div>';
-
     echo $this->Form->close();
 ?>
 <div class="table-wrap padded">
@@ -64,7 +64,7 @@
                 <td><?php echo htmlspecialchars($Provider['AuthenticateUrl']); ?></td>
                 <td>
                     <?php
-                    echo Anchor(T('Test URL'), str_replace('=?', '=test', JsConnectPlugin::connectUrl($Provider, TRUE)));
+                    echo anchor(t('Test URL'), str_replace('=?', '=test', JsConnectPlugin::connectUrl($Provider, TRUE)));
                     ?>
                     <div class="JsConnectContainer UserInfo"></div>
                 </td>
