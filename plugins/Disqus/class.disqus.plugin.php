@@ -6,7 +6,7 @@
 
 $PluginInfo['Disqus'] = array(
     'Name' => 'Disqus Sign In',
-    'Description' => 'Users may sign into your site using their Disqus account. <b>You must <a href="https://disqus.com/api/applications/register/">register your application with Disqus</a> for this plugin to work.</b>',
+    'Description' => 'Users may sign into your site using their Disqus account. You must <a href="https://disqus.com/api/applications/register/">register your application with Disqus</a> for this plugin to work.',
     'Version' => '1.2',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => true,
@@ -14,6 +14,7 @@ $PluginInfo['Disqus'] = array(
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
+    'SocialConnect'   => true,
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
 );
 
