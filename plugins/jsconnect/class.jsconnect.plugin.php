@@ -390,7 +390,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         $Sender->SetData('SSOUser', $JsData);
     }
 
-    public function base_getAppSettingsMenuItems_handler(&$Sender) {
+    public function base_getAppSettingsMenuItems_handler($Sender) {
         $Menu = $Sender->EventArguments['SideMenu'];
         $Menu->AddItem('Users', T('Users'));
         $Menu->AddLink('Users', 'jsConnect', 'settings/jsconnect', 'Garden.Settings.Manage', array('class' => 'nav-jsconnect'));

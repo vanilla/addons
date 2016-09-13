@@ -12,7 +12,7 @@ $PluginInfo['Liked'] = array(
 
 class LikedPlugin extends Gdn_Plugin {
 	
-	public function DiscussionController_Render_Before(&$Sender) {
+	public function DiscussionController_Render_Before($Sender) {
       $FB_SDK = <<<EOD
 <div id="fb-root"></div>
 <script>(function(d, s, id) {
@@ -26,7 +26,7 @@ EOD;
       $Sender->AddAsset('Panel', $FB_SDK);
 	}
 	
-	public function DiscussionController_AfterDiscussionBody_Handler(&$Sender) {
+	public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
       echo '<div class="fb-like" data-href="';
       echo Gdn_Url::Request(true, true, true);
       echo '" data-send="false" data-width="450" data-show-faces="false" data-font="lucida grande"></div>';
