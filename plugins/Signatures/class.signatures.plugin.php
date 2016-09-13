@@ -280,7 +280,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         }
     }
 
-    public function setSignatureRules(&$Sender) {
+    public function setSignatureRules($Sender) {
         $rules = array();
         $rulesParams = array();
         $imagesAllowed = true;

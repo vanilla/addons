@@ -5,7 +5,7 @@
     <?php echo sprintf(t('You must register your application with %s for this plugin to work.'), t('Disqus')); ?>
 </div>
 <div class="padded">
-    <?php echo t('The Disqus plugin allows users to sign in using their Disqus account.'); ?>
+    <?php echo t('The Disqus plugin allows users to sign in using their Disqus account. <a href="https://disqus.com/api/applications/register/">Register your application with Disqus.</a>'); ?>
 </div>
 
 <?php
@@ -17,7 +17,9 @@ echo $form->errors();
 echo $form->simple(array(
     'AuthenticationKey' => array('LabelCode' => 'Consumer Key'),
     'AssociationSecret' => array('LabelCode' => 'Consumer Secret')
-));
+)); ?>
 
-echo $form->button('Save');
-echo $form->close();
+<div class="form-footer js-modal-footer">
+<?php echo $form->button('Save');
+echo $form->close(); ?>
+</div>

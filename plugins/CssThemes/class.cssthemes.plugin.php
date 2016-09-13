@@ -198,7 +198,7 @@ class CssThemes extends Gdn_Plugin {
 		return $Result;
 	}
 	
-	public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+	public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
 		$Menu->AddLink('Add-ons', 'Colors', 'plugin/cssthemes', 'Garden.Themes.Manage');
 	}

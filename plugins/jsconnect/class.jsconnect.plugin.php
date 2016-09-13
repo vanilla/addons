@@ -349,7 +349,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         parse_str($JsConnect, $JsData);
 
         // Make sure the data is valid.
-        $client_id = val('client_id', $JsData, GetValue('clientid', $JsData, $Sender->Request->get('client_id'), true), true);
+        $client_id = val('client_id', $JsData, val('clientid', $JsData, $Sender->Request->get('client_id'), true), true);
         $Signature = val('signature', $JsData, false, true);
         $String = val('sigStr', $JsData, false, true); // debugging
         unset($JsData['string']);

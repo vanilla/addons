@@ -37,7 +37,7 @@ class MathJaxPlugin extends Gdn_Plugin {
      *
      * @param DiscussionController $sender
      */
-    public function DiscussionController_Render_Before(&$sender) {
+    public function DiscussionController_Render_Before($sender) {
 
         // Add basic MathJax configuration
         $mathJaxConfig = <<<MATHJAX
