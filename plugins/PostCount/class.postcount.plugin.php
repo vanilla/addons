@@ -26,7 +26,7 @@ $PluginInfo['PostCount'] = array(
 
 class PostCountPlugin extends Gdn_Plugin {
    
-   public function UserInfoModule_OnBasicInfo_Handler(&$Sender) {
+   public function UserInfoModule_OnBasicInfo_Handler($Sender) {
       $User = Gdn::UserModel()->GetID($Sender->User->UserID);
       if ($User) {
          $PostCount = GetValue('CountComments', $User, 0) + GetValue('CountDiscussions', $User, 0);
@@ -35,15 +35,15 @@ class PostCountPlugin extends Gdn_Plugin {
       }
    }
    
-   public function DiscussionController_AuthorInfo_Handler(&$Sender) {
+   public function DiscussionController_AuthorInfo_Handler($Sender) {
       $this->_AttachPostCount($Sender);
    }
    
-   public function PostController_AuthorInfo_Handler(&$Sender) {
+   public function PostController_AuthorInfo_Handler($Sender) {
       $this->_AttachPostCount($Sender);
    }
    
-   protected function _AttachPostCount(&$Sender) {
+   protected function _AttachPostCount($Sender) {
       $User = Gdn::UserModel()->GetID($Sender->EventArguments['Author']->UserID);
       if ($User) {
          $Posts = GetValue('CountComments', $User, 0) + GetValue('CountDiscussions', $User, 0);
