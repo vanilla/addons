@@ -26,7 +26,7 @@ class FacebookIDPlugin extends Gdn_Plugin {
          echo '<dt class="Value">'.T('Facebook ID').'</dt><dd>'.$FacebookID.'</dd>';
       }
    }
-   
+
    /**
     * Show FacebookID on comments.
     */
@@ -36,7 +36,7 @@ class FacebookIDPlugin extends Gdn_Plugin {
 
       if (!isset($Sender->Data['Discussion']))
          return;
-      
+
       if (!$this->FacebookIDs)
          $this->FacebookIDs = $this->GetFacebookIDs(array($Sender->Data['Discussion'], $Sender->Data['Comments']), 'InsertUserID');
 
@@ -45,7 +45,7 @@ class FacebookIDPlugin extends Gdn_Plugin {
       $FacebookID = GetValue($UserID, $this->FacebookIDs, T('n/a'));
       echo '<span>'.T('Facebook ID').': '.$FacebookID.'</span> ';
    }
-   
+
    /**
     * Show FacebookID on discussions (OP).
     */
@@ -72,7 +72,7 @@ class FacebookIDPlugin extends Gdn_Plugin {
          if ($UserID = GetValue($UserIDColumn, $Data))
             $UserIDs[] = $UserID;
          else {
-            $IDs = ConsolidateArrayValuesByKey($Data, $UserIDColumn);
+            $IDs = array_column($Data, $UserIDColumn);
             $UserIDs = array_merge($UserIDs, $IDs);
          }
       }
@@ -83,7 +83,7 @@ class FacebookIDPlugin extends Gdn_Plugin {
          'UserAuthentication',
          array('ProviderKey' => 'facebook'))->ResultArray();
 
-      $Result = ConsolidateArrayValuesByKey($FbIDs, 'UserID', 'ForeignUserKey');
+      $Result = array_column($FbIDs, 'ForeignUserKey', 'UserID');
       return $Result;
    }
 
