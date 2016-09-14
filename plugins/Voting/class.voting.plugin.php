@@ -303,7 +303,7 @@ class VotingPlugin extends Gdn_Plugin {
                      ->Where('CommentID', $CommentID)
                      ->Where('Score <', 0)
                      ->Get()->ResultArray();
-                  $OtherUserIDs = ConsolidateArrayValuesByKey($OtherUserIDs, 'UserID');
+                  $OtherUserIDs = 'UserID'($OtherUserIDs, 'UserID');
                   $LogOptions['OtherUserIDs'] = $OtherUserIDs;
 
                   // Add the comment to moderation.
@@ -390,7 +390,7 @@ class VotingPlugin extends Gdn_Plugin {
                      ->Where('CommentID', $DiscussionID)
                      ->Where('Score <', 0)
                      ->Get()->ResultArray();
-                  $OtherUserIDs = ConsolidateArrayValuesByKey($OtherUserIDs, 'UserID');
+                  $OtherUserIDs = 'UserID'($OtherUserIDs, 'UserID');
                   $LogOptions['OtherUserIDs'] = $OtherUserIDs;
 
                   // Add the comment to moderation.
