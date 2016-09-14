@@ -7,8 +7,8 @@
     echo t('You can connect to multiple sites that support jsConnect.');
     echo '<h2>'.t('Need More Help?').'</h2>';
     echo '<ul>';
-    echo '<li>'.anchor(t('jsConnect Documentation').'http://docs.vanillaforums.com/features/sso/jsconnect/').'</li>';
-    echo '<li>'.anchor(t('jsConnect Client Libraries').'http://docs.vanillaforums.com/features/sso/jsconnect/overview/#your-endpoint').'</li>';
+    echo '<li>'.anchor(t('jsConnect Documentation'), 'http://docs.vanillaforums.com/features/sso/jsconnect/').'</li>';
+    echo '<li>'.anchor(t('jsConnect Client Libraries'), 'http://docs.vanillaforums.com/features/sso/jsconnect/overview/#your-endpoint').'</li>';
     echo '</ul>';
     ?>
 </div>
