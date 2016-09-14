@@ -33,7 +33,7 @@ echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-
             <tr>
                 <th class="column-md"><?php echo t('Name'); ?></th>
                 <th class="column-xl"><?php echo t('Pocket'); ?></th>
-                <th class="column-sm"><?php echo t('Options'); ?></th>
+                <th class="column-sm"></th>
             </tr>
         </thead>
         <tbody>
@@ -70,9 +70,9 @@ echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-
                     }
                     '</td>';
                 echo '<td><pre style="white-space: pre-wrap;">', nl2br(htmlspecialchars(substr($PocketRow['Body'], 0, 200))), '</pre></td>';
-                echo '<td><div class="btn-group">';
-                echo anchor(dashboardSymbol('edit'), "/settings/pockets/edit/{$PocketRow['PocketID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'data-content' => ['cssClass' => 'pockets']]);
-                echo anchor(dashboardSymbol('delete'), "/settings/pockets/delete/{$PocketRow['PocketID']}", 'Popup btn btn-icon', ['aria-label' => t('Delete')]);
+                echo '<td class="options"><div class="btn-group">';
+                echo anchor(dashboardSymbol('edit'), "/settings/pockets/edit/{$PocketRow['PocketID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit'), 'data-content' => ['cssClass' => 'pockets']]);
+                echo anchor(dashboardSymbol('delete'), "/settings/pockets/delete/{$PocketRow['PocketID']}", 'Popup btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                 echo '</div></td>';
                 echo "</tr>\n";
             }

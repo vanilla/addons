@@ -23,7 +23,7 @@ class SpoofPlugin implements Gdn_IPlugin {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Users', T('Spoof'), 'user/spoof', 'Garden.Settings.Manage');
 	}
-   
+
 	/**
 	 * Admin screen for spoofing a user.
 	 */
@@ -32,7 +32,7 @@ class SpoofPlugin implements Gdn_IPlugin {
       $Sender->AddSideMenu('user/spoof');
 		$this->_SpoofMethod($Sender);
 	}
-	
+
 	/**
 	 * Validates the current user's permissions & transientkey and then spoofs
 	 * the userid passed as the first arg and redirects to profile.
@@ -57,50 +57,51 @@ class SpoofPlugin implements Gdn_IPlugin {
 			Redirect('profile');
 		}
 	}
-	
+
 	/**
 	 * Adds a "Spoof" link to the user management list.
 	 */
 	public function UserController_UserListOptions_Handler($Sender) {
 		if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
 			return;
-		
+
       $User = GetValue('User', $Sender->EventArguments);
-		if ($User)
-			echo Anchor(t('Spoof'), '/user/autospoof/'.$User->UserID.'/'.Gdn::Session()->TransientKey(), 'js-modal-confirm btn btn-icon');
+	     if ($User) {
+		    echo anchor(dashboardSymbol('spoof'), '/user/autospoof/'.$User->UserID.'/'.Gdn::Session()->TransientKey(), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Spoof'), 'title' => t('Spoof')]);
+		 }
 	}
-	
+
 	/**
 	 * Adds a "Spoof" link to the site management list.
 	 */
 	public function ManageController_SiteListOptions_Handler($Sender) {
 		if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
 			return;
-		
+
 		$Site = GetValue('Site', $Sender->EventArguments);
 		if ($Site)
 			echo Anchor(T('Spoof'), '/user/autospoof/'.$Site->InsertUserID.'/'.Gdn::Session()->TransientKey(), 'PopConfirm SmallButton');
 	}
-	
+
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
 		if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
 			return;
-		
+
       $SideMenu = $Sender->EventArguments['SideMenu'];
       $ViewingUserID = Gdn::Session()->UserID;
-      
+
       if ($Sender->User->UserID != $ViewingUserID)
          $SideMenu->AddLink('Options', T('Spoof User'), '/user/autospoof/'.$Sender->User->UserID.'/'.Gdn::Session()->TransientKey(), '', array('class' => 'PopConfirm'));
    }
-	
-	
+
+
 	/**
 	 * Creates a spoof login page.
 	 */
 	public function EntryController_Spoof_Create($Sender) {
 		$this->_SpoofMethod($Sender);
 	}
-	
+
 	/**
 	 * Standard method for authenticating an admin and allowing them to spoof a user.
 	 */
@@ -140,5 +141,5 @@ class SpoofPlugin implements Gdn_IPlugin {
    }
 
    public function Setup() {}
-	
+
 }
