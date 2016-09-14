@@ -53,7 +53,7 @@
             <th><?php echo t('Site Name'); ?></th>
             <th class="column-md"><?php echo t('Authentication URL'); ?></th>
             <th><?php echo t('Test') ?></th>
-            <th class="column-sm"><?php echo t('Options') ?></th>
+            <th class="column-sm"></th>
         </tr>
         </thead>
         <tbody>
@@ -71,8 +71,8 @@
                 <td class="options">
                     <div class="btn-group">
                         <?php
-                        echo anchor(dashboardSymbol('edit'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
-                        echo anchor(dashboardSymbol('delete'), '/settings/jsconnect/delete?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete')]);
+                        echo anchor(dashboardSymbol('edit'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
+                        echo anchor(dashboardSymbol('delete'), '/settings/jsconnect/delete?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                         ?>
                     </div>
                 </td>
