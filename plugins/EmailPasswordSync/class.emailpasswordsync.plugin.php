@@ -66,7 +66,7 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
          // Get all of the users with the same email.
          $Email = $Sender->Data('User.Email');
          $Users = Gdn::SQL()->Select('Name')->From('User')->Where('Email', $Email)->Get()->ResultArray();
-         $Names = ConsolidateArrayValuesByKey($Users, 'Name');
+         $Names = array_column($Users, 'Name');
 
          SetValue('Name', $Sender->Data['User'], implode(', ', $Names));
       }
@@ -113,7 +113,7 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
    public function UserModel_BeforeSave_Handler($UserModel, $Args) {
       if (isset($Args['Fields']) && !isset($Args['Fields']['Password']))
          return;
-      
+
       // Grab the current passwordhash for comparison.
       $UserID = GetValueR('FormPostValues.UserID', $Args);
       if ($UserID) {
@@ -163,7 +163,7 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
          sort($Names);
          $EmailUser->Name = implode(', ', $Names);
       }
-      
+
       $this->EventArguments['Users'] = $Users;
       $this->EventArguments['Email'] = $Email;
       $this->FireEvent('PasswordRequestBefore');
