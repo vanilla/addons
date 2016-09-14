@@ -83,7 +83,7 @@
                     <th><?php echo t('Updated'); ?></th>
                     <th><?php echo t('Refresh'); ?></th>
                     <th><?php echo t('Category'); ?></th>
-                    <th class="column-sm"><?php echo t('Options'); ?></th>
+                    <th class="column-sm"></th>
                 </tr>
                 </thead>
                 <tbody>

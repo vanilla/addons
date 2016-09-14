@@ -68,7 +68,7 @@
                     ?>
                     <div class="JsConnectContainer UserInfo"></div>
                 </td>
-                <td>
+                <td class="options">
                     <div class="btn-group">
                         <?php
                         echo anchor(dashboardSymbol('edit'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
