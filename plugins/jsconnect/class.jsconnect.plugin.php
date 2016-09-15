@@ -344,15 +344,14 @@ class JsConnectPlugin extends Gdn_Plugin {
         include_once dirname(__FILE__).'/functions.jsconnect.php';
 
         $Form = $Sender->Form;
-
         $JsConnect = $Form->getFormValue('JsConnect', $Form->getFormValue('Form/JsConnect'));
         parse_str($JsConnect, $JsData);
 
         // Make sure the data is valid.
-        $client_id = val('client_id', $JsData, val('clientid', $JsData, $Sender->Request->get('client_id'), true), true);
-        $Signature = val('signature', $JsData, false, true);
-        $String = val('sigStr', $JsData, false, true); // debugging
-        unset($JsData['string']);
+        $client_id = val('client_id', $JsData, val('clientid', $JsData, $Sender->Request->get('client_id')));
+        $Signature = val('signature', $JsData, false);
+        $String = val('sigStr', $JsData, false); // debugging
+        unset($JsData['client_id'], $JsData['clientid'], $JsData['signature'], $JsData['sigStr'], $JsData['string']);
 
         if (!$client_id) {
             throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'client_id'), 400);
