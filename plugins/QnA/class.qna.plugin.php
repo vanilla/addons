@@ -416,7 +416,7 @@ class QnAPlugin extends Gdn_Plugin {
             return;
         }
 
-        $HeadlineFormat = t('HeadlingFormat.Answer', '{ActivityUserID,user} answered your question: <a href="{Url,html}">{Data.Name,text}</a>');
+        $HeadlineFormat = t('HeadlineFormat.Answer', '{ActivityUserID,user} answered your question: <a href="{Url,html}">{Data.Name,text}</a>');
 
         $Activity = array(
             'ActivityType' => 'Comment',
