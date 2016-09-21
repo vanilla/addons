@@ -105,6 +105,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
             $fp = fopen($Path, 'wb');
             if (!is_resource($fp)) {
                 Logger::error("Could not open {path}.", ['path' => $Path]);
+                continue;
             }
             fwrite($fp, $this->GetFileHeader());
             LocaleModel::WriteDefinitions($fp, $Definition);
