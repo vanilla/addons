@@ -104,4 +104,8 @@ SHARETHIS;
       $Sender->Render('sharethis', '', 'plugins/ShareThis');
    }
 
+    public function discussionController_render_before($sender) {
+        $sender->addCssFile('ShareThis.css', 'plugins/ShareThis');
+    }
 }
+
