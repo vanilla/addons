@@ -10,7 +10,7 @@ echo wrap(t('TouchIconInfo', 'The touch icon appears when you bookmark a website
     'div',
     ['class' => 'alert alert-info padded']);
 echo wrap(img(val('Path', $this->Data)), 'div'); ?>
-<div class="form-group row">
+<div class="form-group">
    <div class="label-wrap">
       <?php
       echo $this->Form->label('Touch Icon', 'TouchIcon');

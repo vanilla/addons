@@ -28,7 +28,7 @@ foreach ($Features as $Feature => $FeatureDesc) {
    $FeatureAction = GetValue($FeatureActionKey, $ReportingData);
 
    ?>
-   <div class="form-group row">
+   <div class="form-group">
       <div class="label-wrap-wide">
          <div class="label">
             <?php echo $FeatureName; ?>

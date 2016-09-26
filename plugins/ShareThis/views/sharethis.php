@@ -9,7 +9,7 @@ echo $this->Form->Errors();
         <?php echo t('If you are using the <a href="http://vanillaforums.com/features/social-connect" target="_blank">Social Connect</a> plugin to allow your community members to sign in with Facebook or Twitter, the ShareThis plugin will automatically retrieve their information for seamless sharing.'); ?>
     </div>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->Label("ShareThis Publisher Number", 'Plugin.ShareThis.PublisherNumber'); ?>
                 <div class="info">
@@ -18,13 +18,13 @@ echo $this->Form->Errors();
             </div>
             <?php echo $this->Form->textBoxWrap('Plugin.ShareThis.PublisherNumber'); ?>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <?php
             echo $this->Form->labelWrap("'via' Handle", 'Plugin.ShareThis.ViaHandle');
             echo $this->Form->textBoxWrap('Plugin.ShareThis.ViaHandle');
             ?>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="input-wrap no-label">
                 <?php echo $this->Form->CheckBox('Plugin.ShareThis.CopyNShare', "Enable 'CopyNShare' functionality"); ?>
             </div>

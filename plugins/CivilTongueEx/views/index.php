@@ -13,7 +13,7 @@ echo '<h2>'.sprintf(t('About %s'), $this->Data('Title')).'</h2>';
 Gdn_Theme::assetEnd();
 ?>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Forbidden words', 'Plugins.CivilTongue.Words');
                 echo wrap(t('Separate each word with a semi-colon ";"'), 'div', ['class' => 'info']); ?>
@@ -22,7 +22,7 @@ Gdn_Theme::assetEnd();
                 <?php echo $this->Form->TextBox('Plugins.CivilTongue.Words', array('MultiLine' => TRUE)); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Replacement word', 'Plugins.CivilTongue.Replacement');
                 echo wrap(t('Enter the word you wish to replace the banned word with.'), 'div', ['class' => 'info']); ?>

@@ -10,7 +10,7 @@ echo $this->Form->Errors();
 </div>
 
 <ul>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->Label('Minimum Age', 'MinimumAge');  ?>
         </div>
@@ -18,7 +18,7 @@ echo $this->Form->Errors();
             <?php echo $this->Form->TextBox('MinimumAge'); ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="input-wrap no-label">
             <?php echo $this->Form->CheckBox('AddConfirmation', 'Allow underage users to register with a confirmation of consent.');  ?>
         </div>
