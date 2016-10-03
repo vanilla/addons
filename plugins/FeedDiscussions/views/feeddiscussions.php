@@ -39,23 +39,23 @@
 
     ?>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <?php echo $this->Form->labelWrap('Feed URL', 'FeedURL'); ?>
             <?php echo $this->Form->textBoxWrap('FeedURL', array('class' => 'InputBox')); ?>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="input-wrap no-label">
                 <?php echo $this->Form->checkBox('Historical', T('Import Older Posts'), array('value' => '1')); ?>
             </div>
         </li>
 
-        <li class="form-group row">
+        <li class="form-group">
             <?php echo $this->Form->labelWrap('Maximum Polling Frequency', 'Refresh'); ?>
             <div class="input-wrap">
                 <?php echo $this->Form->dropDown('Refresh', $Refreshments, array('value'  => "1d")); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <?php echo $this->Form->labelWrap('Target Category', 'Category'); ?>
             <div class="input-wrap">
                 <?php echo $this->Form->CategoryDropDown('Category'); ?>

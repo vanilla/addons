@@ -1,7 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();?>
-
+<h1>Customize Text</h1>
 <?php echo $this->Form->Open(); ?>
-    <h1>Customize Text</h1>
     <script type="text/javascript" language="javascript">
         jQuery(document).ready(function($) {
             if ($.autogrow)
@@ -15,7 +14,7 @@
             });
         });
     </script>
-    <div class="form-group row">
+    <div class="form-group">
         <div class="label-wrap-wide">
             <?php echo 'There are currently '.Wrap($this->Data('CountDefinitions', '0'), 'strong').' definitions available for editing. '; ?>
         </div>
@@ -27,7 +26,7 @@
         <?php echo 'Search for the text you want to customize. Partial searches work. For example: "disc" will return "discussion" and "all discussions", etc. '; ?>
         Popular Searches: <a term="howdy" href="#">Howdy Stranger</a>, <a term="module" href="#">It looks like you're new here...</a>, <a term="disc" href="#">Discussions</a>, <a term="comment" href="#">Comments</a>, <a term="email" href="#">Email</a>.
     </div>
-    <div class="form-group row">
+    <div class="form-group">
         <div class="text-input-button no-grid">
                 <?php
                 echo $this->Form->errors();
@@ -54,7 +53,7 @@ if ($this->Form->GetValue('Keywords', '') != '') {
         if ($DefinitionModified)
             $CSSClass .= " Modified";
 
-        echo '<li class="form-group row">';
+        echo '<li class="form-group">';
         echo '<div class="label-wrap">';
         echo Wrap(Gdn_Format::Text($Key), 'label', array('for' => "Form_{$ElementName}"));
 

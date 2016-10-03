@@ -49,7 +49,7 @@ class ReportingPlugin extends Gdn_Plugin {
     * @param DashboardNavModule $sender
     */
    public function dashboardNavModule_init_handler($sender) {
-      $sender->addLinkToSection('Moderation', t('Community Reporting'), 'plugin/reporting', 'moderation.community-reporting');
+      $sender->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Community Reporting'), 'plugin/reporting', 'moderation.community-reporting');
    }
 
    /**
@@ -62,7 +62,7 @@ class ReportingPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Community Reporting');
       $Sender->AddCssFile('reporting.css', 'plugins/Reporting');
-      
+
       // Check to see if the admin is toggling a feature
       $Feature = GetValue('1', $Sender->RequestArgs);
       $Command = GetValue('2', $Sender->RequestArgs);
@@ -73,7 +73,7 @@ class ReportingPlugin extends Gdn_Plugin {
                'Plugins.Reporting.'.ucfirst($Feature).'Enabled',
                $Command == 'disable' ? FALSE : TRUE
             );
-            
+
             Redirect('plugin/reporting');
          }
       }
@@ -95,7 +95,7 @@ class ReportingPlugin extends Gdn_Plugin {
    public function Controller_Report($Sender) {
       if (!($UserID = Gdn::Session()->UserID))
          throw new Exception(T('Cannot report content while not logged in.'));
-         
+
       $UserName = Gdn::Session()->User->Name;
 
       $Arguments = $Sender->RequestArgs;
@@ -122,10 +122,10 @@ class ReportingPlugin extends Gdn_Plugin {
          if ($Original > strlen($ElementExcerpt))
             $ElementExcerpt .= "...";
       }
-      
+
       if (is_null($ElementTitle))
          $ElementTitle = $ElementExcerpt;
-         
+
       $ElementShortTitle = (strlen($ElementTitle) <= 143) ? $ElementTitle : substr($ElementTitle, 0, 140).'...';
 
       $ElementAuthorID = GetValue('InsertUserID', $ReportElement);
@@ -134,7 +134,7 @@ class ReportingPlugin extends Gdn_Plugin {
 
       $RegardingAction = C('Plugins.Reporting.ReportAction', FALSE);
       $RegardingActionSupplement = C('Plugins.Reporting.ReportActionSupplement', FALSE);
-      
+
       $ReportingData = array(
          'Type'            => 'report',
          'Context'         => $Context,
@@ -154,10 +154,10 @@ class ReportingPlugin extends Gdn_Plugin {
          $RegardingTitle = sprintf(T("Reported: '{RegardingTitle}' by %s"), $ElementAuthorName);
          $ReportingData['Title'] = $RegardingTitle;
          $ReportingData['Reason'] = $Sender->Form->GetValue('Plugin.Reporting.Reason');
-         
+
          $this->EventArguments['Report'] = &$ReportingData;
          $this->FireEvent('BeforeRegarding');
-         
+
          $Regarding = Gdn::Regarding()
             ->That($ReportingData['Context'], $ReportingData['ElementID'], $ReportingData['Element'])
             ->ReportIt()
@@ -183,7 +183,7 @@ class ReportingPlugin extends Gdn_Plugin {
    public function Controller_Awesome($Sender) {
       if (!($UserID = Gdn::Session()->UserID))
          throw new Exception(T('Cannot report content while not logged in.'));
-         
+
       $UserName = Gdn::Session()->User->Name;
 
       $Arguments = $Sender->RequestArgs;
@@ -210,10 +210,10 @@ class ReportingPlugin extends Gdn_Plugin {
          if ($Original > strlen($ElementExcerpt))
             $ElementExcerpt .= "...";
       }
-      
+
       if (is_null($ElementTitle))
          $ElementTitle = $ElementExcerpt;
-      
+
       $ElementShortTitle = (strlen($ElementTitle) <= 143) ? $ElementTitle : substr($ElementTitle, 0, 140).'...';
 
       $ElementAuthorID = GetValue('InsertUserID', $ReportElement);
@@ -256,10 +256,10 @@ class ReportingPlugin extends Gdn_Plugin {
    /*
     * UI injection
     */
-   
+
    /**
     * Create 'Infraction' link for comments in a discussion.
-    * 
+    *
     * Clickable for those who can give infractions, otherwise just a UI marker
     * for regular users.
     */
@@ -267,14 +267,14 @@ class ReportingPlugin extends Gdn_Plugin {
       $Context = $Sender->EventArguments['Type'];
       $Text = FALSE;
       $Style = array();
-      
+
       $Context = strtolower($Sender->EventArguments['Type']);
 
       if ($this->ReportEnabled)
          $this->OutputButton(self::BUTTON_TYPE_REPORT, $Context, $Sender);
       if ($this->AwesomeEnabled)
          $this->OutputButton(self::BUTTON_TYPE_AWESOME, $Context, $Sender);
-      
+
       if ($this->ReportEnabled || $this->AwesomeEnabled)
          $Sender->AddCssFile('reporting.css', 'plugins/Reporting');
    }
@@ -315,9 +315,9 @@ class ReportingPlugin extends Gdn_Plugin {
       $ContainerCSS = $ButtonTitle.'Post';
       $EncodedURL = str_replace('=','-',base64_encode($URL));
       $EventUrl = "plugin/reporting/{$ButtonType}/{$Context}/{$ElementID}/{$EncodedURL}";
-      
+
       //$Sender->EventArguments['CommentOptions'][$ButtonTitle] = array('Label' => $ButtonTitle, 'Url' => "plugin/reporting/{$ButtonType}/{$Context}/{$ElementID}/{$EncodedURL}", $ContainerCSS.' ReportContent Popup');
-      
+
       $SpriteType = "React".ucfirst($ButtonType);
       $Text = Anchor(Sprite($SpriteType, 'ReactSprite').$ButtonTitle, $EventUrl, "ReactButton React {$ContainerCSS} Popup");
       echo Bullet();
@@ -332,7 +332,7 @@ class ReportingPlugin extends Gdn_Plugin {
       $Event = $Sender->MatchEvent(array('report', 'awesome'), '*');
       if ($Event === FALSE)
          return;
-      
+
       $Entity = GetValue('Entity', $Event);
       $RegardingData = GetValue('RegardingData', $Event);
       $RegardingType = GetValue('Type', $RegardingData);
@@ -343,25 +343,25 @@ class ReportingPlugin extends Gdn_Plugin {
          'ReportedTime'          => GetValue('DateInserted', $RegardingData),
          'EntityURL'             => GetValue('ForeignURL', $RegardingData, NULL)
       );
-      
+
       if (!is_null($ReportedReason = GetValue('Comment', $RegardingData, NULL)))
          $ReportInfo['ReportedReason'] = $ReportedReason;
-         
+
       if (!is_null($ReportedContent = GetValue('OriginalContent', $RegardingData, NULL)))
          $ReportInfo['OriginalContent'] = $ReportedContent;
-      
+
       Gdn::Controller()->SetData('RegardingSender', $Sender);
       Gdn::Controller()->SetData('Entity', $Entity);
       Gdn::Controller()->SetData('RegardingData', $RegardingData);
       Gdn::Controller()->SetData('ReportInfo', $ReportInfo);
       echo Gdn::Controller()->FetchView("{$RegardingType}-regarding",'','plugins/Reporting');
    }
-   
+
    public function Gdn_Regarding_RegardingActions_Handler($Sender) {
       $Event = $Sender->MatchEvent('report', '*');
       if ($Event === FALSE)
          return;
-      
+
       // Add buttonz hurr?
    }
 
@@ -372,7 +372,7 @@ class ReportingPlugin extends Gdn_Plugin {
    public function Gdn_RegardingEntity_ReportIt_Create($Sender) {
       return $Sender->ActionIt('Report');
    }
-   
+
    public function Gdn_RegardingEntity_ItsAwesome_Create($Sender) {
       return $Sender->ActionIt('Awesome');
    }
