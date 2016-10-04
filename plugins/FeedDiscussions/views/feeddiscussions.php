@@ -76,7 +76,7 @@
     } else {
         echo '<div class="italic padded">'.$NumFeeds." ".Plural($NumFeeds, "Active Feed", "Active Feeds").'</div>'; ?>
         <div class="table-wrap">
-            <table class="table-data">
+            <table class="table-data js-tj">
                 <thead>
                 <tr>
                     <th class="column-xl"><?php echo t('Feed Url'); ?></th>

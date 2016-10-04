@@ -46,7 +46,7 @@
     echo $this->Form->close();
 ?>
 <div class="table-wrap">
-    <table class="table-data">
+    <table class="table-data js-tj">
         <thead>
         <tr>
             <th><?php echo t('Client ID'); ?></th>
