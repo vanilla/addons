@@ -72,8 +72,10 @@ function writeJsConnect($User, $Request, $ClientID, $Secret, $Secure = true) {
     $Json = json_encode($Result);
 
     if (isset($Request['callback'])) {
+        safeHeader('Content-Type: application/javascript');
         echo "{$Request['callback']}($Json)";
     } else {
+        safeHeader('Content-Type: application/json');
         echo $Json;
     }
 }
