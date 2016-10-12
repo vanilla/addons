@@ -17,9 +17,6 @@ echo $form->errors();
 echo $form->simple(array(
     'AuthenticationKey' => array('LabelCode' => 'Consumer Key'),
     'AssociationSecret' => array('LabelCode' => 'Consumer Secret')
-)); ?>
+));
 
-<div class="form-footer js-modal-footer">
-<?php echo $form->button('Save');
-echo $form->close(); ?>
-</div>
+echo $form->close('Save'); ?>

@@ -29,6 +29,4 @@ if ($pointsAwardEnabled) {
         echo $this->Form->textBoxWrap('QnA.Points.AcceptedAnswer', $textBoxAttributes);
     ?></li>
 </ul>
-<div class="form-footer js-modal-footer">
-    <?php echo $this->Form->close('Save'); ?>
-</div>
+<?php echo $this->Form->close('Save'); ?>

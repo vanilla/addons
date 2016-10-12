@@ -38,7 +38,7 @@
     );
 
     ?>
-    <ul>
+    <ul class="padded-bottom">
         <li class="form-group">
             <?php echo $this->Form->labelWrap('Feed URL', 'FeedURL'); ?>
             <?php echo $this->Form->textBoxWrap('FeedURL', array('class' => 'InputBox')); ?>
@@ -62,9 +62,7 @@
             </div>
         </li>
     </ul>
-    <div class="form-footer padded-bottom">
-        <?php echo $this->Form->Close("Add Feed"); ?>
-    </div>
+    <?php echo $this->Form->Close("Add Feed"); ?>
 </div>
 
 <h2><?php echo T('Active Feeds'); ?></h2>
