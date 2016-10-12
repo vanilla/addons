@@ -32,6 +32,9 @@ class RedirectorPlugin extends Gdn_Plugin {
         'category.jspa' => [  // jive 4 category
             'categoryID' => 'CategoryID',
         ],
+        'categories.aspx' => [ // Fusetalk
+            'catid' => 'CategoryID',
+        ],
         'index.php' => [ // smf
             'board' => [
                 'CategoryID',
@@ -80,6 +83,9 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'UserID',
                 'Filter' => [__CLASS__, 'xenforoID'],
             ],
+        ],
+        'messageview.aspx' => [ // Fusetalk
+            'threadid' => 'DiscussionID',
         ],
         'thread.jspa' => [ //jive 4 comment/discussion
             'threadID' => 'DiscussionID',
