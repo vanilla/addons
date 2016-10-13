@@ -18,6 +18,4 @@ echo wrap(img(val('Path', $this->Data)), 'div'); ?>
    </div>
    <?php echo $this->Form->fileUploadWrap('TouchIcon'); ?>
 </div>
-<div class="js-modal-footer form-footer">
-   <?php echo $this->Form->close('Save'); ?>
-</div>
+<?php echo $this->Form->close('Save'); ?>

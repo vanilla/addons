@@ -1,50 +1,41 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
 
-<?php Gdn_Theme::assetBegin('Help'); ?>
-<div class="Help Aside">
-    <?php
-    echo '<h2>'.sprintf(t('About %s'), 'jsConnect').'</h2>';
-    echo t('You can connect to multiple sites that support jsConnect.');
-    echo '<h2>'.t('Need More Help?').'</h2>';
-    echo '<ul>';
-    echo '<li>'.anchor(t('jsConnect Documentation'), 'http://docs.vanillaforums.com/features/sso/jsconnect/').'</li>';
-    echo '<li>'.anchor(t('jsConnect Client Libraries'), 'http://docs.vanillaforums.com/features/sso/jsconnect/overview/#your-endpoint').'</li>';
-    echo '</ul>';
-    ?>
-</div>
-<?php Gdn_Theme::assetEnd(); ?>
+$links = '<ul>';
+$links .= '<li>'.anchor(t('jsConnect Documentation'), 'http://docs.vanillaforums.com/features/sso/jsconnect/').'</li>';
+$links .= '<li>'.anchor(t('jsConnect Client Libraries'), 'http://docs.vanillaforums.com/features/sso/jsconnect/overview/#your-endpoint').'</li>';
+$links .= '</ul>';
+
+helpAsset(sprintf(t('About %s'), 'jsConnect'), t('You can connect to multiple sites that support jsConnect.'));
+helpAsset(t('Need More Help?'), $links);
+
+?>
 <div class="header-block">
     <h1><?php echo sprintf(t('%s Settings'), 'jsConnect'); ?></h1>
     <?php echo anchor(t('Add Connection'), '/settings/jsconnect/addedit', 'btn btn-primary js-modal'); ?>
 </div>
 <h2 class="subheading-border">Signing In</h2>
 <?php
-    echo $this->Form->open();
-    echo $this->Form->errors(); ?>
-    <div class="form-group">
-        <div class="label-wrap-wide">
-            <?php echo t('Auto Connect'); ?>
-            <?php echo '<div class="info">'.t('Automatically connect to an existing user account if it has the same email address.').'</div>' ?>
-        </div>
-        <div class="input-wrap-right">
-            <?php echo $this->Form->toggle('Garden.Registration.AutoConnect'); ?>
-        </div>
+echo $this->Form->open();
+echo $this->Form->errors(); ?>
+<div class="form-group">
+    <div class="label-wrap-wide">
+        <?php echo t('Auto Connect'); ?>
+        <?php echo '<div class="info">'.t('Automatically connect to an existing user account if it has the same email address.').'</div>' ?>
     </div>
-    <div class="form-group">
-        <div class="label-wrap-wide">
-            <?php echo t('Use Popup Sign In Pages'); ?>
-            <?php echo '<div class="info">'.t('Use popups for sign in pages (not recommended while using SSO).').'</div>'; ?>
-        </div>
-        <div class="input-wrap-right">
-            <?php echo $this->Form->toggle('Garden.SignIn.Popup'); ?>
-        </div>
+    <div class="input-wrap-right">
+        <?php echo $this->Form->toggle('Garden.Registration.AutoConnect'); ?>
     </div>
-    <?php
-    echo '<div class="form-footer">';
-    echo $this->Form->button('Save');
-    echo '</div>';
-    echo $this->Form->close();
-?>
+</div>
+<div class="form-group">
+    <div class="label-wrap-wide">
+        <?php echo t('Use Popup Sign In Pages'); ?>
+        <?php echo '<div class="info">'.t('Use popups for sign in pages (not recommended while using SSO).').'</div>'; ?>
+    </div>
+    <div class="input-wrap-right">
+        <?php echo $this->Form->toggle('Garden.SignIn.Popup'); ?>
+    </div>
+</div>
+<?php echo $this->Form->close('Save'); ?>
 <div class="table-wrap">
     <table class="table-data js-tj">
         <thead>

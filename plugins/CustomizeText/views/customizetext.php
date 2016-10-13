@@ -69,8 +69,5 @@ if ($this->Form->GetValue('Keywords', '') != '') {
         echo '</li>';
     }
     echo '</ul>';
-    echo '<div class="form-footer">';
-    echo $this->Form->Button('Save All');
-    echo '</div>';
 }
-echo $this->Form->Close();
+echo $this->Form->Close('Save All');
