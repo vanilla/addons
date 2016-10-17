@@ -7,6 +7,7 @@ $PluginInfo['CategoryCollapser'] = array(
    'Version' => '1.0.1',
    'Author' => "Vanilla Forums",
    'AuthorUrl' => 'http://vanillaforums.com',
+   'Icon' => 'collapse_categories.png',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'MobileFriendly' => TRUE
 );

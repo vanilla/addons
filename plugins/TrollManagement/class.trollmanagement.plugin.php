@@ -19,6 +19,7 @@ $PluginInfo['TrollManagement'] = array(
    'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'MobileFriendly' => TRUE,
+   'Icon' => 'troll_management.png',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'

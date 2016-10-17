@@ -6,6 +6,7 @@ $PluginInfo['Liked'] = array(
    'Description' => 'Adds the facebook like feature to your discussions.',
    'Version' => '1.6',
    'Author' => "Gary Mardell",
+   'Icon' => 'liked.png',
    'AuthorEmail' => 'gary@vanillaplugins.com',
    'AuthorUrl' => 'http://garymardell.co.uk'
 );
