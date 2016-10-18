@@ -169,18 +169,10 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param CategoriesController $Sender
      */
     public function categoriesController_render_before($Sender) {
-        if (isset($Sender->Data['Categories'])) {
-            foreach ($Sender->Data['Categories'] as &$Row) {
-                if (is_array($Row)) {
-                    if (isset($Row['LastTitle'])) {
-                        $Row['LastTitle'] = $this->replace($Row['LastTitle']);
-                    }
-                } elseif (is_object($Row)) {
-                    if (isset($Row->LastTitle)) {
-                        $Row->LastTitle = $this->replace($Row->LastTitle);
-                    }
-                }
-            }
+        $categoryTree = $Sender->data('CategoryTree');
+        if ($categoryTree) {
+            $this->sanitizeCategories($categoryTree);
+            $Sender->setData('CategoryTree', $categoryTree);
         }
 
         // When category layout is table.
@@ -191,7 +183,17 @@ class CivilTonguePlugin extends Gdn_Plugin {
                 $Discussion->Body = $this->replace($Discussion->Body);
             }
         }
+    }
 
+    protected function sanitizeCategories(array &$categories) {
+        foreach ($categories as &$row) {
+            if (isset($row['LastTitle'])) {
+                $row['LastTitle'] = $this->replace($row['LastTitle']);
+            }
+            if (!empty($row['Children'])) {
+                $this->sanitizeCategories($row['Children']);
+            }
+        }
     }
 
     /**
