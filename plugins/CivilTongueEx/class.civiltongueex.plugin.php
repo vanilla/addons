@@ -482,4 +482,105 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $args['Poll']->Name = $this->replace($name);
         }
     }
+
+    /**
+     * Replace bad words in the group list
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function groupsController_beforeGroupLists_handler($sender, $args) {
+        $sections = ['MyGroups', 'NewGroups', 'Groups'];
+
+        foreach($sections as $section) {
+            $groups = $sender->data($section);
+            if ($groups) {
+                foreach($groups as &$group) {
+                    $group['Name'] = $this->replace($group['Name']);
+                    $group['Description'] = $this->replace($group['Description']);
+                }
+                $sender->setData($section, $groups);
+            }
+        }
+    }
+
+    /**
+     * Replace bad words in the group browsing list
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function groupsController_beforeBrowseGroupList_handler($sender, $args) {
+        $groups = $sender->data('Groups');
+        if ($groups) {
+            foreach($groups as &$group) {
+                $group['Name'] = $this->replace($group['Name']);
+                $group['Description'] = $this->replace($group['Description']);
+            }
+            $sender->setData('Groups', $groups);
+        }
+    }
+
+    /**
+     * Replace bad words in the group view and the events list
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function base_groupLoaded_handler($sender, $args) {
+        $args['Group']['Name'] = $this->replace($args['Group']['Name']);
+        $args['Group']['Description'] = $this->replace($args['Group']['Description']);
+    }
+
+    /**
+     * Replace bad words in the event list of a group
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function groupController_groupEventsLoaded_handler($sender, $args) {
+        $events = &$args['Events'];
+        foreach($events as &$event) {
+            $event['Name'] = $this->replace($event['Name']);
+            $event['Body'] = $this->replace($event['Body']);
+            $event['Location'] = $this->replace($event['Location']);
+        }
+    }
+
+    /**
+     * Replace bad words in the events list
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function eventsController_eventsLoaded_handler($sender, $args) {
+        $sections = ['UpcomingEvents', 'RecentEvents'];
+
+        foreach($sections as $section) {
+            $events = &$args[$section];
+            foreach($events as &$event) {
+                $event['Name'] = $this->replace($event['Name']);
+                $event['Body'] = $this->replace($event['Body']);
+                $event['Location'] = $this->replace($event['Location']);
+            }
+            unset($events, $event);
+        }
+    }
+
+    /**
+     * Replace bad words in the event view
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function eventController_eventLoaded_handler($sender, $args) {
+        $args['Event']['Name'] = $this->replace($args['Event']['Name']);
+        $args['Event']['Body'] = $this->replace($args['Event']['Body']);
+        $args['Event']['Location'] = $this->replace($args['Event']['Location']);
+
+        if (isset($args['Group'])) {
+            $args['Group']['Name'] = $this->replace($args['Group']['Name']);
+            $args['Group']['Description'] = $this->replace($args['Group']['Description']);
+        }
+    }
 }
