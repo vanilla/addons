@@ -20,6 +20,7 @@ $PluginInfo['ShareThis'] = array(
    'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
+   'Icon' => 'sharethis.png',
    'Author' => "Brendan Sera-Shriar a.k.a digibomb",
    'AuthorEmail' => 'brendan@vanillaforums.com',
    'AuthorUrl' => 'http://www.dropthedigibomb.com'

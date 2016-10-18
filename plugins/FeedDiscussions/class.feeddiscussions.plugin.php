@@ -29,6 +29,7 @@ $PluginInfo['FeedDiscussions'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
+   'Icon' => 'feed_discussions.png',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'

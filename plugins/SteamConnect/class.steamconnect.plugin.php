@@ -9,6 +9,7 @@ $PluginInfo['SteamConnect'] = array(
     'Author'          => "Becky Van Bussel",
     'AuthorEmail'     => 'becky@vanillaforums.com',
     'AuthorUrl'       => 'http://vanillaforums.com',
+    'Icon'            => 'steam_connect.png',
     'SettingsUrl'     => '/settings/steamconnect',
     'SocialConnect'   => true,
     'SettingsPermission' => 'Garden.Settings.Manage'

@@ -12,6 +12,7 @@ $PluginInfo['Disqus'] = array(
     'MobileFriendly' => true,
     'SettingsUrl' => '/settings/disqus',
     'SettingsPermission' => 'Garden.Settings.Manage',
+    'Icon' => 'disqus_sign_in.png',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'SocialConnect'   => true,

@@ -10,6 +10,7 @@ $PluginInfo['TouchIcon'] = array(
    'AuthorUrl' => 'http://lincolnwebs.com',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
+   'Icon' => 'touch_icon.png',
    'SettingsUrl' => '/settings/touchicon',
    'SettingsPermission' => 'Garden.Settings.Manage'
 );
