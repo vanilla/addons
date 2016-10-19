@@ -1,106 +1,121 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
+ */
 
-$PluginInfo['AuthorSelector'] = array(
-   'Name' => 'Author Selector',
-   'Description' => "Allows administrators to change the author of a discussion.",
-   'Version' => '1.1',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'MobileFriendly' => TRUE,
-   'Icon' => 'author_selector.png',
-   'Author' => "Matt Lincoln Russell",
-   'AuthorEmail' => 'lincolnwebs@gmail.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
-);
+$PluginInfo['AuthorSelector'] = [
+    'Name' => 'Author Selector',
+    'Description' => "Allows administrators to change the author of a discussion.",
+    'Version' => '1.2',
+    'RequiredApplications' => ['Vanilla' => '2.2'],
+    'MobileFriendly' => true,
+    'License' => 'GNU GPLv2',
+    'Icon' => 'author_selector.png',
+    'Author' => "Lincoln Russell",
+    'AuthorEmail' => 'lincolnwebs@gmail.com',
+    'AuthorUrl' => 'http://lincolnwebs.com'
+];
 
+/**
+ * Class AuthorSelectorPlugin
+ */
 class AuthorSelectorPlugin extends Gdn_Plugin {
-   /** None. */
-   public function Setup() { }
 
-   /**
-    * Allow admin to Change Author via discussion options.
-    */
-   public function Base_DiscussionOptions_Handler($Sender, $Args) {
-      $Discussion = $Args['Discussion'];
-      if (Gdn::Session()->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID)) {
-         $Label = T('Change Author');
-         $Url = "/discussion/author?discussionid={$Discussion->DiscussionID}";
-         // Deal with inconsistencies in how options are passed
-         if (isset($Sender->Options)) {
-            $Sender->Options .= Wrap(Anchor($Label, $Url, 'ChangeAuthor'), 'li');
-         }
-         else {
-            $Args['DiscussionOptions']['ChangeAuthor'] = array(
-               'Label' => $Label,
-               'Url' => $Url,
-               'Class' => 'ChangeAuthor'
-            );
-         }
-      }
-   }
+    /**
+     * Allow admin to Change Author via discussion options.
+     */
+    public function base_discussionOptions_handler($Sender, $Args) {
+        $Discussion = $Args['Discussion'];
+        if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID)) {
+            $Label = t('Change Author');
+            $Url = "/discussion/author?discussionid={$Discussion->DiscussionID}";
 
-   /**
-    * Handle discussion option menu Change Author action.
-    */
-   public function DiscussionController_Author_Create($Sender, $Args) {
-      $DiscussionID = $Sender->Request->Get('discussionid');
-      $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
-      if (!$Discussion)
-         throw NotFoundException('Discussion');
-
-      // Check edit permission
-      $Sender->Permission('Vanilla.Discussions.Edit', TRUE, 'Category', $Discussion->PermissionCategoryID);
-
-      if ($Sender->Form->AuthenticatedPostBack()) {
-         // Change the author
-         $Name = $Sender->Form->GetFormValue('Author', '');
-         $UserModel = new UserModel();
-         if (trim($Name) != '') {
-            $User = $UserModel->GetByUsername(trim($Name));
-            if (is_object($User)) {
-               if ($Discussion->InsertUserID == $User->UserID)
-                  $Sender->Form->AddError('That user is already the discussion author.');
-               else {
-                  // Change discussion InsertUserID
-                  $Sender->DiscussionModel->SetField($DiscussionID, 'InsertUserID', $User->UserID);
-                  // Update users' discussion counts
-                  $Sender->DiscussionModel->UpdateUserDiscussionCount($Discussion->InsertUserID);
-                  $Sender->DiscussionModel->UpdateUserDiscussionCount($User->UserID, TRUE); // Increment
-                  // Go to the updated discussion
-                  Redirect(DiscussionUrl($Discussion));
-               }
+            // Deal with inconsistencies in how options are passed
+            if (isset($Sender->Options)) {
+                $Sender->Options .= wrap(anchor($Label, $Url, 'ChangeAuthor'), 'li');
             }
             else {
-               $Sender->Form->AddError('No user with that name was found.');
+                $Args['DiscussionOptions']['ChangeAuthor'] = ['Label' => $Label, 'Url' => $Url, 'Class' => 'ChangeAuthor'];
             }
-         }
-      }
-      else {
-         // Form to change the author
-         $Sender->SetData('Title', $Discussion->Name);
-      }
+        }
+    }
 
-      $Sender->Render('changeauthor', '', 'plugins/AuthorSelector');
-   }
+    /**
+     * Handle discussion option menu Change Author action.
+     */
+    public function discussionController_author_create($Sender) {
+        $DiscussionID = $Sender->Request->get('discussionid');
+        $Discussion = $Sender->DiscussionModel->getID($DiscussionID);
+        if (!$Discussion) {
+            throw NotFoundException('Discussion');
+        }
 
-   /**
-    * Add Javascript files required for autocomplete / username token.
-    *
-    * @param $Sender
-    */
-   protected function AddJsFiles($Sender) {
-      $Sender->AddJsFile('jquery.tokeninput.js');
-      $Sender->AddJsFile('authorselector.js', 'plugins/AuthorSelector');
-   }
+        // Check edit permission
+        $Sender->permission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID);
 
-   public function DiscussionsController_Render_Before($Sender) {
-      $this->AddJsFiles($Sender);
-   }
+        if ($Sender->Form->authenticatedPostBack()) {
+            // Change the author
+            $Name = $Sender->Form->getFormValue('Author', '');
+            $UserModel = new UserModel();
+            if (trim($Name) != '') {
+                $User = $UserModel->getByUsername(trim($Name));
+                if (is_object($User)) {
+                    if ($Discussion->InsertUserID == $User->UserID)
+                        $Sender->Form->addError('That user is already the discussion author.');
+                    else {
+                        // Change discussion InsertUserID
+                        $Sender->DiscussionModel->setField($DiscussionID, 'InsertUserID', $User->UserID);
 
-   public function DiscussionController_Render_Before($Sender) {
-      $this->AddJsFiles($Sender);
-   }
+                        // Update users' discussion counts
+                        $Sender->DiscussionModel->updateUserDiscussionCount($Discussion->InsertUserID);
+                        $Sender->DiscussionModel->updateUserDiscussionCount($User->UserID, true); // Increment
 
-   public function CategoriesController_Render_Before($Sender) {
-      $this->AddJsFiles($Sender);
-   }
+                        // Go to the updated discussion
+                        redirect(discussionUrl($Discussion));
+                    }
+                }
+                else {
+                    $Sender->Form->addError('No user with that name was found.');
+                }
+            }
+        }
+        else {
+            // Form to change the author
+            $Sender->setData('Title', $Discussion->Name);
+        }
+
+        $Sender->render('changeauthor', '', 'plugins/AuthorSelector');
+    }
+
+    /**
+     * Add Javascript files required for autocomplete / username token.
+     *
+     * @param Gdn_Controller $Sender
+     */
+    protected function addJsFiles($Sender) {
+        $Sender->addJsFile('jquery.tokeninput.js');
+        $Sender->addJsFile('authorselector.js', 'plugins/AuthorSelector');
+    }
+
+    /**
+     * @param DiscussionController $Sender
+     */
+    public function discussionsController_render_before($Sender) {
+        $this->addJsFiles($Sender);
+    }
+
+    /**
+     * @param DiscussionController $Sender
+     */
+    public function discussionController_render_before($Sender) {
+        $this->addJsFiles($Sender);
+    }
+
+    /**
+     * @param CategoriesController $Sender
+     */
+    public function categoriesController_render_before($Sender) {
+        $this->addJsFiles($Sender);
+    }
 }

@@ -1,9 +1,6 @@
-jQuery(document).ready(function($) {
-
-    $.fn.userTokenInput = function() {
+var authorSelector = {
+    start: function($author) {
         /// Author tag token input.
-        var $author = $(this);
-
         var author = $author.val();
         if (author && author.length) {
             author = author.split(",");
@@ -25,8 +22,10 @@ jQuery(document).ready(function($) {
             animateDropdown: false,
             tokenLimit: 1
         });
-    };
+    }
+}
 
-    // Enable multicomplete on selected inputs
-    $('.MultiComplete').userTokenInput();
+// Initiate on our global event.
+$(document).on('contentLoad', function(e) {
+    authorSelector.start($('.MultiComplete', e.target));
 });
