@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) { exit(); } 
+<?php if (!defined('APPLICATION')) { exit(); }
 $Session = Gdn::session();
 $CancelUrl = '/discussions';
 if (c('Vanilla.Categories.Use') && is_object($this->Category)) {
@@ -18,10 +18,15 @@ if (c('Vanilla.Categories.Use') && is_object($this->Category)) {
         $this->fireEvent('BeforeFormInputs');
 
         if ($this->ShowCategorySelector === true) {
+            $options = [
+                'Value' => val('CategoryID', $this->Category),
+                'IncludeNull' => true,
+                'PermFilter' => array('AllowedDiscussionTypes' => 'Question'),
+            ];
             echo '<div class="P">';
                 echo '<div class="Category">';
                 echo $this->Form->label('Category', 'CategoryID'), ' ';
-                echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'PermFilter' => array('AllowedDiscussionTypes' => 'Question')));
+                echo $this->Form->categoryDropDown('CategoryID', $options);
                 echo '</div>';
             echo '</div>';
         }
