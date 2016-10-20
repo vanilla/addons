@@ -491,6 +491,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
     /**
      * Replace bad words in the group list
      *
+     * Vanilla's proprietary group plugin hook.
+     *
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
      */
@@ -512,6 +514,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
     /**
      * Replace bad words in the group browsing list
      *
+     * Vanilla's proprietary group plugin hook.
+     *
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
      */
@@ -529,6 +533,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
     /**
      * Replace bad words in the group view and the events list
      *
+     * Vanilla's proprietary group plugin hook.
+     *
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
      */
@@ -539,6 +545,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
     /**
      * Replace bad words in the event list of a group
+     *
+     * Vanilla's proprietary group plugin hook.
      *
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
@@ -554,6 +562,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
     /**
      * Replace bad words in the events list
+     *
+     * Vanilla's proprietary group plugin hook.
      *
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
@@ -574,6 +584,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
     /**
      * Replace bad words in the event view
+     *
+     * Vanilla's proprietary group plugin hook.
      *
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
