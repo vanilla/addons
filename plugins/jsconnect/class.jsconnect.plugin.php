@@ -691,7 +691,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             'Advanced' => [
                 'Control' => 'callback',
                 'Callback' => function($form) {
-                    return '<h2 class="subheading-border">'.t('Advanced').'</h2>';
+                    return subheading(t('Advanced'));
                 }
             ],
             'HashType' => [

@@ -8,34 +8,33 @@ $links .= '</ul>';
 helpAsset(sprintf(t('About %s'), 'jsConnect'), t('You can connect to multiple sites that support jsConnect.'));
 helpAsset(t('Need More Help?'), $links);
 
+echo heading(sprintf(t('%s Settings'), 'jsConnect'), t('Add Connection'), '/settings/jsconnect/addedit', 'btn btn-primary js-modal');
 ?>
-<div class="header-block">
-    <h1><?php echo sprintf(t('%s Settings'), 'jsConnect'); ?></h1>
-    <?php echo anchor(t('Add Connection'), '/settings/jsconnect/addedit', 'btn btn-primary js-modal'); ?>
-</div>
-<h2 class="subheading-border">Signing In</h2>
-<?php
-echo $this->Form->open();
-echo $this->Form->errors(); ?>
-<div class="form-group">
-    <div class="label-wrap-wide">
-        <?php echo t('Auto Connect'); ?>
-        <?php echo '<div class="info">'.t('Automatically connect to an existing user account if it has the same email address.').'</div>' ?>
+<section>
+    <?php
+    echo subheading(t('Signing In'));
+    echo $this->Form->open();
+    echo $this->Form->errors(); ?>
+    <div class="form-group">
+        <div class="label-wrap-wide">
+            <?php echo t('Auto Connect'); ?>
+            <?php echo '<div class="info">'.t('Automatically connect to an existing user account if it has the same email address.').'</div>' ?>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $this->Form->toggle('Garden.Registration.AutoConnect'); ?>
+        </div>
     </div>
-    <div class="input-wrap-right">
-        <?php echo $this->Form->toggle('Garden.Registration.AutoConnect'); ?>
+    <div class="form-group">
+        <div class="label-wrap-wide">
+            <?php echo t('Use Popup Sign In Pages'); ?>
+            <?php echo '<div class="info">'.t('Use popups for sign in pages (not recommended while using SSO).').'</div>'; ?>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $this->Form->toggle('Garden.SignIn.Popup'); ?>
+        </div>
     </div>
-</div>
-<div class="form-group">
-    <div class="label-wrap-wide">
-        <?php echo t('Use Popup Sign In Pages'); ?>
-        <?php echo '<div class="info">'.t('Use popups for sign in pages (not recommended while using SSO).').'</div>'; ?>
-    </div>
-    <div class="input-wrap-right">
-        <?php echo $this->Form->toggle('Garden.SignIn.Popup'); ?>
-    </div>
-</div>
-<?php echo $this->Form->close('Save'); ?>
+    <?php echo $this->Form->close('Save'); ?>
+</section>
 <div class="table-wrap">
     <table class="table-data js-tj">
         <thead>
