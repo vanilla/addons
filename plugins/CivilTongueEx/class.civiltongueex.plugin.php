@@ -169,18 +169,10 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param CategoriesController $Sender
      */
     public function categoriesController_render_before($Sender) {
-        if (isset($Sender->Data['Categories'])) {
-            foreach ($Sender->Data['Categories'] as &$Row) {
-                if (is_array($Row)) {
-                    if (isset($Row['LastTitle'])) {
-                        $Row['LastTitle'] = $this->replace($Row['LastTitle']);
-                    }
-                } elseif (is_object($Row)) {
-                    if (isset($Row->LastTitle)) {
-                        $Row->LastTitle = $this->replace($Row->LastTitle);
-                    }
-                }
-            }
+        $categoryTree = $Sender->data('CategoryTree');
+        if ($categoryTree) {
+            $this->sanitizeCategories($categoryTree);
+            $Sender->setData('CategoryTree', $categoryTree);
         }
 
         // When category layout is table.
@@ -191,7 +183,22 @@ class CivilTonguePlugin extends Gdn_Plugin {
                 $Discussion->Body = $this->replace($Discussion->Body);
             }
         }
+    }
 
+    /**
+     * Recursively replace the LastTitle field in a category tree.
+     *
+     * @param array $categories
+     */
+    protected function sanitizeCategories(array &$categories) {
+        foreach ($categories as &$row) {
+            if (isset($row['LastTitle'])) {
+                $row['LastTitle'] = $this->replace($row['LastTitle']);
+            }
+            if (!empty($row['Children'])) {
+                $this->sanitizeCategories($row['Children']);
+            }
+        }
     }
 
     /**
@@ -478,6 +485,119 @@ class CivilTonguePlugin extends Gdn_Plugin {
         }
         if ($name = val('Name', val('Poll', $args))) {
             $args['Poll']->Name = $this->replace($name);
+        }
+    }
+
+    /**
+     * Replace bad words in the group list
+     *
+     * Vanilla's proprietary group plugin hook.
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function groupsController_beforeGroupLists_handler($sender, $args) {
+        $sections = ['MyGroups', 'NewGroups', 'Groups'];
+
+        foreach ($sections as $section) {
+            $groups = $sender->data($section);
+            if ($groups) {
+                foreach ($groups as &$group) {
+                    $group['Name'] = $this->replace($group['Name']);
+                    $group['Description'] = $this->replace($group['Description']);
+                }
+                $sender->setData($section, $groups);
+            }
+        }
+    }
+
+    /**
+     * Replace bad words in the group browsing list
+     *
+     * Vanilla's proprietary group plugin hook.
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function groupsController_beforeBrowseGroupList_handler($sender, $args) {
+        $groups = $sender->data('Groups');
+        if ($groups) {
+            foreach ($groups as &$group) {
+                $group['Name'] = $this->replace($group['Name']);
+                $group['Description'] = $this->replace($group['Description']);
+            }
+            $sender->setData('Groups', $groups);
+        }
+    }
+
+    /**
+     * Replace bad words in the group view and the events list
+     *
+     * Vanilla's proprietary group plugin hook.
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function base_groupLoaded_handler($sender, $args) {
+        $args['Group']['Name'] = $this->replace($args['Group']['Name']);
+        $args['Group']['Description'] = $this->replace($args['Group']['Description']);
+    }
+
+    /**
+     * Replace bad words in the event list of a group
+     *
+     * Vanilla's proprietary group plugin hook.
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function groupController_groupEventsLoaded_handler($sender, $args) {
+        $events = &$args['Events'];
+        foreach ($events as &$event) {
+            $event['Name'] = $this->replace($event['Name']);
+            $event['Body'] = $this->replace($event['Body']);
+            $event['Location'] = $this->replace($event['Location']);
+        }
+    }
+
+    /**
+     * Replace bad words in the events list
+     *
+     * Vanilla's proprietary group plugin hook.
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function eventsController_eventsLoaded_handler($sender, $args) {
+        $sections = ['UpcomingEvents', 'RecentEvents'];
+
+        foreach ($sections as $section) {
+            $events = &$args[$section];
+            foreach ($events as &$event) {
+                $event['Name'] = $this->replace($event['Name']);
+                $event['Body'] = $this->replace($event['Body']);
+                $event['Location'] = $this->replace($event['Location']);
+            }
+            unset($events, $event);
+        }
+    }
+
+    /**
+     * Replace bad words in the event view
+     *
+     * Vanilla's proprietary group plugin hook.
+     *
+     * @param SettingsController $sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function eventController_eventLoaded_handler($sender, $args) {
+        $args['Event']['Name'] = $this->replace($args['Event']['Name']);
+        $args['Event']['Body'] = $this->replace($args['Event']['Body']);
+        $args['Event']['Location'] = $this->replace($args['Event']['Location']);
+
+        if (isset($args['Group'])) {
+            $args['Group']['Name'] = $this->replace($args['Group']['Name']);
+            $args['Group']['Description'] = $this->replace($args['Group']['Description']);
         }
     }
 }
