@@ -185,6 +185,11 @@ class CivilTonguePlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Recursively replace the LastTitle field in a category tree.
+     *
+     * @param array $categories
+     */
     protected function sanitizeCategories(array &$categories) {
         foreach ($categories as &$row) {
             if (isset($row['LastTitle'])) {
@@ -492,10 +497,10 @@ class CivilTonguePlugin extends Gdn_Plugin {
     public function groupsController_beforeGroupLists_handler($sender, $args) {
         $sections = ['MyGroups', 'NewGroups', 'Groups'];
 
-        foreach($sections as $section) {
+        foreach ($sections as $section) {
             $groups = $sender->data($section);
             if ($groups) {
-                foreach($groups as &$group) {
+                foreach ($groups as &$group) {
                     $group['Name'] = $this->replace($group['Name']);
                     $group['Description'] = $this->replace($group['Description']);
                 }
@@ -513,7 +518,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
     public function groupsController_beforeBrowseGroupList_handler($sender, $args) {
         $groups = $sender->data('Groups');
         if ($groups) {
-            foreach($groups as &$group) {
+            foreach ($groups as &$group) {
                 $group['Name'] = $this->replace($group['Name']);
                 $group['Description'] = $this->replace($group['Description']);
             }
@@ -540,7 +545,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
      */
     public function groupController_groupEventsLoaded_handler($sender, $args) {
         $events = &$args['Events'];
-        foreach($events as &$event) {
+        foreach ($events as &$event) {
             $event['Name'] = $this->replace($event['Name']);
             $event['Body'] = $this->replace($event['Body']);
             $event['Location'] = $this->replace($event['Location']);
@@ -556,9 +561,9 @@ class CivilTonguePlugin extends Gdn_Plugin {
     public function eventsController_eventsLoaded_handler($sender, $args) {
         $sections = ['UpcomingEvents', 'RecentEvents'];
 
-        foreach($sections as $section) {
+        foreach ($sections as $section) {
             $events = &$args[$section];
-            foreach($events as &$event) {
+            foreach ($events as &$event) {
                 $event['Name'] = $this->replace($event['Name']);
                 $event['Body'] = $this->replace($event['Body']);
                 $event['Location'] = $this->replace($event['Location']);
