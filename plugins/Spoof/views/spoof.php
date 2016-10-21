@@ -1,10 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 echo $this->Form->Open();
 echo $this->Form->Errors();
+echo heading(t('Spoof'));
 ?>
-<div class="header-block">
-   <h1><?php echo t('Spoof'); ?></h1>
-</div>
 <ul>
    <li class="form-group">
       <?php
