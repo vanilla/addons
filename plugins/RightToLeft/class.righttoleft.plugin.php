@@ -15,6 +15,7 @@ $PluginInfo['RightToLeft'] = array(
     'Version' => '1.0.1',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => TRUE,
+    'Icon' => 'right_to_left.png',
     'Author' => 'Becky Van Bussel',
     'AuthorEmail' => 'becky@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/'

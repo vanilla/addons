@@ -13,6 +13,7 @@ $PluginInfo['Resolved'] = array(
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RegisterPermissions' => array('Plugins.Resolved.Manage'),
     'MobileFriendly' => true,
+    'Icon' => 'resolved_discussions.png',
     'Author' => "Matt Lincoln Russell",
     'AuthorEmail' => 'lincolnwebs@gmail.com',
     'AuthorUrl' => 'http://lincolnwebs.com'

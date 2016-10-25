@@ -18,6 +18,7 @@ $PluginInfo['Reporting'] = array(
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
    'RegisterPermissions' => FALSE,
+   'Icon' => 'community_reporting.png',
    'SettingsUrl' => '/plugin/reporting',
    'SettingsPermission' => 'Garden.Users.Manage',
    'Author' => "Tim Gunter",

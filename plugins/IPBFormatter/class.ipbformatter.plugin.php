@@ -12,6 +12,7 @@ $PluginInfo['IPBFormatter'] = array(
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'RequiredPlugins' => false,
     'HasLocale' => false,
+    'Icon' => 'ipb.png',
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com/profile/todd'
