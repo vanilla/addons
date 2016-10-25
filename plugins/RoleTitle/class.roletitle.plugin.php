@@ -6,6 +6,7 @@ $PluginInfo['RoleTitle'] = [
    'RequiredApplications' => ['Vanilla' => '2.0.18'],
    'MobileFriendly' => true,
    'RegisterPermissions' => false,
+   'Icon' => 'role_titles.png',
    'Author' => 'Matt Lincoln Russell',
    'AuthorEmail' => 'lincolnwebs@gmail.com',
    'AuthorUrl' => 'http://lincolnwebs.com'

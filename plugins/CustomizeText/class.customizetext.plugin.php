@@ -23,6 +23,7 @@ $PluginInfo['CustomizeText'] = array(
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
+   'Icon' => 'custom_text.png',
    'SettingsUrl' => 'settings/customizetext',
    'UsePopupSettings' => false
 );

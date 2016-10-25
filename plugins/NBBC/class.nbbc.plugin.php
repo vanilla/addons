@@ -15,6 +15,7 @@ $PluginInfo['NBBC'] = array(
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
     'HasLocale' => FALSE,
+    'Icon' => 'nbbc.png',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com/profile/todd'
