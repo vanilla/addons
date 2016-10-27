@@ -62,7 +62,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @return array
      */
     public static function getTrolls() {
-        if (is_null(seld::$trolls)) {
+        if (is_null(self::$trolls)) {
             self::$trolls = c('Plugins.TrollManagement.Cache');
             if (!is_array(self::$trolls)) {
                 self::$trolls = [];
@@ -127,7 +127,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
         }
 
         $cookieFingerprint = val('__vnf', $_COOKIE, null);
-        $databaseFingerprint = val('Fingerprint', Gdn::Session()->User, null);
+        $databaseFingerprint = val('Fingerprint', Gdn::session()->User, null);
         $expires = time() + 60 * 60 * 24 * 256; // Expire one year from now
 
         // Cookie and user record both empty, assign both
