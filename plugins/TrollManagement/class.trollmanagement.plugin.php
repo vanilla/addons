@@ -36,6 +36,8 @@ $PluginInfo['TrollManagement'] = array(
  */
 class TrollManagementPlugin extends Gdn_Plugin {
 
+    static $trolls = null;
+
     /**
      * Setup: on enable
      */
@@ -60,16 +62,24 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @return array
      */
     public static function getTrolls() {
-        static $trolls = null;
-
-        if (is_null($trolls)) {
-            $trolls = c('Plugins.TrollManagement.Cache');
-            if (!is_array($trolls)) {
-                $trolls = [];
+        if (is_null(seld::$trolls)) {
+            self::$trolls = c('Plugins.TrollManagement.Cache');
+            if (!is_array(self::$trolls)) {
+                self::$trolls = [];
             }
         }
 
-        return $trolls;
+        return self::$trolls;
+    }
+
+    /**
+     * Save list of current troll IDs to config.
+     *
+     * @param array $trolls
+     */
+    public static function setTrolls($trolls) {
+        saveToConfig('Plugins.TrollManagement.Cache', $trolls);
+        self::$trolls = $trolls;
     }
 
     /**
@@ -88,21 +98,18 @@ class TrollManagementPlugin extends Gdn_Plugin {
             throw PermissionException('Javascript');
         }
 
-        $trolls = c('Plugins.TrollManagement.Cache');
-        if (!is_array($trolls)) {
-            $trolls = [];
-        }
+        $trolls = self::getTrolls();
 
         // Toggle troll value in DB
         if (in_array($trollUserID, $trolls)) {
-            Gdn::SQL()->update('User', ['Troll' => 0], ['UserID' => $trollUserID])->put();
+            Gdn::sql()->update('User', ['Troll' => 0], ['UserID' => $trollUserID])->put();
             unset($trolls[array_search($trollUserID, $trolls)]);
         } else {
-            Gdn::SQL()->Update('User', ['Troll' => 1], ['UserID' => $trollUserID])->put();
+            Gdn::sql()->update('User', ['Troll' => 1], ['UserID' => $trollUserID])->put();
             $trolls[] = $trollUserID;
         }
 
-        saveToConfig('Plugins.TrollManagement.Cache', $trolls);
+        self::setTrolls($trolls);
 
         $sender->jsonTarget('', '', 'Refresh');
         $sender->render('Blank', 'Utility', 'Dashboard');
@@ -126,7 +133,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
         // Cookie and user record both empty, assign both
         if (empty($cookieFingerprint) && empty($databaseFingerprint)) {
             $databaseFingerprint = uniqid();
-            Gdn::SQL()->update('User', ['Fingerprint' => $databaseFingerprint], ['UserID' => Gdn::session()->UserID])->put();
+            Gdn::sql()->update('User', ['Fingerprint' => $databaseFingerprint], ['UserID' => Gdn::session()->UserID])->put();
             safeCookie('__vnf', $databaseFingerprint, $expires);
             return;
         }
@@ -136,7 +143,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
 
             // If the cookie disagrees with the database, update the database
             if ($databaseFingerprint != $cookieFingerprint) {
-                Gdn::SQL()->update('User', ['Fingerprint' => $cookieFingerprint], ['UserID' => Gdn::session()->UserID])->put();
+                Gdn::sql()->update('User', ['Fingerprint' => $cookieFingerprint], ['UserID' => Gdn::session()->UserID])->put();
             }
 
         // If only the user record exists, propagate it to the cookie
@@ -217,8 +224,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
      */
     private function _cleanDataSet($sender, $dataEventArgument) {
         // Don't do anything if there are no trolls
-        $trolls = C('Plugins.TrollManagement.Cache');
-        if (!is_array($trolls) || !count($trolls)) {
+        $trolls = self::getTrolls();
+        if (!count($trolls)) {
             return;
         }
 
@@ -239,7 +246,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
                     setValue($result[$index], 'IsTroll', true);
                 } else {
                     // Remove it unless it belongs to the current user
-                    if (Gdn::Session()->UserID != val('InsertUserID', $row)) {
+                    if (Gdn::session()->UserID != val('InsertUserID', $row)) {
                         unset($result[$index]);
                     }
                 }
@@ -287,8 +294,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
         }
 
         // Don't do anything if there are no trolls
-        $trolls = C('Plugins.TrollManagement.Cache');
-        if (!is_array($trolls) || !count($trolls)) {
+        $trolls = self::getTrolls();
+        if (!count($trolls)) {
             return;
         }
 
@@ -297,9 +304,9 @@ class TrollManagementPlugin extends Gdn_Plugin {
 
         if (in_array($insertUserID, $trolls)) {
             if ($style === 'message') {
-                echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: -4px 0 8px; background: rgba(0, 0, 0, 0.05); color: #d00; font-size: 11px;">' . T('Troll.Content', '<b>Troll</b> <ul> <li>This user has been marked as a troll.</li> <li>Their content is only visible to moderators and the troll.</li> <li>This message does not appear for the troll.</li></ul>') . '</div>';
+                echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: -4px 0 8px; background: rgba(0, 0, 0, 0.05); color: #d00; font-size: 11px;">' . t('Troll.Content', '<b>Troll</b> <ul> <li>This user has been marked as a troll.</li> <li>Their content is only visible to moderators and the troll.</li> <li>This message does not appear for the troll.</li></ul>') . '</div>';
             } else {
-                echo '<span class="Tag Tag-Troll" title="' . T('This user has been marked as a troll.') . '">Troll</span>';
+                echo '<span class="Tag Tag-Troll" title="' . t('This user has been marked as a troll.') . '">Troll</span>';
             }
         }
     }
@@ -310,8 +317,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param CommentModel $sender
      */
     public function commentModel_beforeUpdateCommentCount_handler($sender) {
-        $trolls = C('Plugins.TrollManagement.Cache');
-        if (!is_array($trolls) || !count($trolls)) {
+        $trolls = self::getTrolls();
+        if (!count($trolls)) {
             return;
         }
 
@@ -327,8 +334,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param DiscussionModel $sender
      */
     public function discussionModel_beforeSaveDiscussion_handler($sender) {
-        $trolls = C('Plugins.TrollManagement.Cache');
-        if (!is_array($trolls) || !count($trolls)) {
+        $trolls = self::getTrolls();
+        if (!count($trolls)) {
             return;
         }
 
@@ -346,17 +353,17 @@ class TrollManagementPlugin extends Gdn_Plugin {
     public function profileController_beforeUserInfo_handler($sender) {
         if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
             $userID = $sender->User->UserID;
-            $trolls = C('Plugins.TrollManagement.Cache');
 
-            if (!is_array($trolls) || !count($trolls)) {
+            $trolls = self::getTrolls();
+            if (!count($trolls)) {
                 return;
             }
 
             if (in_array($userID, $trolls)) {
                 echo '
             <div class="Hero Warning">
-               <h3>' . T('Troll') . '</h3>
-               ' . T('This user has been marked as a troll.') . '
+               <h3>' . t('Troll') . '</h3>
+               ' . t('This user has been marked as a troll.') . '
             </div>';
             }
         }
@@ -370,16 +377,16 @@ class TrollManagementPlugin extends Gdn_Plugin {
     public function profileController_beforeProfileOptions_handler($sender) {
         if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
             $userID = $sender->User->UserID;
-            $trolls = C('Plugins.TrollManagement.Cache');
 
-            if (!is_array($trolls) || !count($trolls)) {
+            $trolls = self::getTrolls();
+            if (!count($trolls)) {
                 return;
             }
 
             $troll = in_array($userID, $trolls) ? 1 : 0;
 
             $sender->EventArguments['ProfileOptions']['TrollToggle'] = [
-                'Text' => T(($troll) ? 'Unmark as Troll' : 'Mark as Troll'),
+                'Text' => t(($troll) ? 'Unmark as Troll' : 'Mark as Troll'),
                 'Url' => '/user/marktroll?userid=' . $userID . '&troll=' . (int) (!$troll),
                 'CssClass' => 'Hijack Button-Troll'
             ];
