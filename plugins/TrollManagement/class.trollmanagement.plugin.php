@@ -1,8 +1,28 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 
 /**
+ * @copyright 2010-2016 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ */
+
+$PluginInfo['TrollManagement'] = array(
+    'Name' => 'Troll Management',
+    'Description' => "Allows you to mark users as trolls, making it so that only they can see their comments & discussions. They essentially become invisible to other users and eventually just leave because no-one responds to them.",
+    'Version' => '1.2.1',
+    'RequiredApplications' => array('Vanilla' => '2.0.17'),
+    'MobileFriendly' => true,
+    'Icon' => 'troll_management.png',
+    'Author' => "Mark O'Sullivan",
+    'AuthorEmail' => 'mark@vanillaforums.com',
+    'AuthorUrl' => 'http://vanillaforums.com'
+);
+
+/**
+ * Troll Management Features
+ *
  * TODO:
  * Verify that activity feed works properly with/without troll content. Added new event to core to get it working.
+ *
  * Add additional troll management options:
  *  - Disemvoweler
  *  - Troll Annoyances (slow page loading times, random over capacity errors, form submission failures, etc).
@@ -11,300 +31,359 @@
  *  - Sink troll comments by default
  *  - Custom per-troll punishments
  *  - Speed optimizations (add troll state to user attributes, and return from troll specific functions quickly when possible).
+ *
+ * @author Mark O'Sullivan <mark@vanillaforums.com>
  */
-
-$PluginInfo['TrollManagement'] = array(
-   'Name' => 'Troll Management',
-   'Description' => "Allows you to mark users as trolls, making it so that only they can see their comments & discussions. They essentially become invisible to other users and eventually just leave because no-one responds to them.",
-   'Version' => '1.2',
-   'RequiredApplications' => array('Vanilla' => '2.0.17'),
-   'MobileFriendly' => TRUE,
-   'Icon' => 'troll_management.png',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
-);
-
 class TrollManagementPlugin extends Gdn_Plugin {
 
-   public function Setup() {
-      $this->Structure();
-   }
+    /**
+     * Setup: on enable
+     */
+    public function setup() {
+        $this->structure();
+    }
 
-   public function Structure() {
-      Gdn::Structure()
-         ->Table('User')
-         ->Column('Troll', 'int', '0')
-         ->Column('Fingerprint', 'varchar(50)', null, 'index')
-         ->Set();
-   }
+    /**
+     * Database structure: on update
+     */
+    public function structure() {
+        Gdn::structure()
+            ->table('User')
+            ->column('Troll', 'int', '0')
+            ->column('Fingerprint', 'varchar(50)', null, 'index')
+            ->set();
+    }
 
-   /**
-    * Validates the current user's permissions & transientkey and then marks a user as a troll.
-    * @param Gdn_Controller $Sender
-    */
-   public function UserController_MarkTroll_Create($Sender, $UserID, $Troll = TRUE) {
-      $Sender->Permission('Garden.Moderation.Manage');
+    /**
+     * Get list of current troll user IDs.
+     *
+     * @return array
+     */
+    public static function getTrolls() {
+        static $trolls = null;
 
-      $TrollUserID = $UserID;
-
-      // Validate the transient key && permissions
-      // Make sure we are posting back.
-      if (!$Sender->Request->IsAuthenticatedPostBack()) {
-         throw PermissionException('Javascript');
-      }
-
-      $Trolls = C('Plugins.TrollManagement.Cache');
-      if (!is_array($Trolls)) {
-         $Trolls = array();
-      }
-
-      // Toggle troll value in DB
-      if (in_array($TrollUserID, $Trolls)) {
-         Gdn::SQL()->Update('User', array('Troll' => 0), array('UserID' => $TrollUserID))->Put();
-         unset($Trolls[array_search($TrollUserID, $Trolls)]);
-      } else {
-         Gdn::SQL()->Update('User', array('Troll' => 1), array('UserID' => $TrollUserID))->Put();
-         $Trolls[] = $TrollUserID;
-      }
-
-      SaveToConfig('Plugins.TrollManagement.Cache', $Trolls);
-
-      $Sender->JsonTarget('', '', 'Refresh');
-      $Sender->Render('Blank', 'Utility', 'Dashboard');
-   }
-
-   /**
-    * Fingerprint the user.
-    */
-   public function Base_Render_Before($Sender) {
-      // Don't do anything if the user isn't signed in.
-      if (!Gdn::Session()->IsValid())
-         return;
-
-      $CookieValue = GetValue('__vnf', $_COOKIE, '');
-      $FingerprintValue = GetValue('Fingerprint', Gdn::Session()->User, '');
-      $Expires = time()+60*60*24*256; // Expire one year from now
-      if ($CookieValue != '') {
-         // Update the user fingerprint in the db if it does not match
-         if ($FingerprintValue != $CookieValue)
-            Gdn::SQL()->Update('User', array('Fingerprint' => $CookieValue), array('UserID' => Gdn::Session()->UserID))->Put();
-      } else if ($FingerprintValue != '') {
-         if ($FingerprintValue != $CookieValue)
-            setcookie('__vnf', $FingerprintValue, $Expires, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''));
-      } else if ($CookieValue == '' && $FingerprintValue == '') {
-         // Neither were set, so set them both.
-         $FingerprintValue = uniqid();
-         Gdn::SQL()->Update('User', array('Fingerprint' => $FingerprintValue), array('UserID' => Gdn::Session()->UserID))->Put();
-         setcookie('__vnf', $FingerprintValue, $Expires, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''));
-      }
-   }
-
-   /**
-    * Hide counters on profile of trolls unless viewer is a moderator.
-    */
-   public function ProfileController_UserLoaded_Handler($Sender) {
-      if (GetValueR('User.Troll', $Sender) && !Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-         SaveToConfig('Vanilla.Profile.ShowCounts', false, false);
-      }
-   }
-
-   /**
-    * Display shared accounts on the user profiles for admins.
-    */
-   public function ProfileController_Render_Before($Sender) {
-      if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
-         return;
-
-      if (!property_exists($Sender, 'User'))
-         return;
-
-      // Get the current user's fingerprint value
-      $FingerprintValue = GetValue('Fingerprint', $Sender->User);
-      if (!$FingerprintValue)
-         return;
-
-      // Display all accounts that share that fingerprint value
-      $SharedFingerprintModule = new SharedFingerprintModule($Sender);
-      $SharedFingerprintModule->GetData(GetValueR('User.UserID', $Sender), $FingerprintValue);
-      $Sender->AddModule($SharedFingerprintModule);
-   }
-
-   /**
-    * Attach to the Discussion model and remove all records by trolls (unless the current user is a troll)
-    */
-   public function DiscussionModel_AfterAddColumns_Handler($Sender) {
-      $this->_CleanDataSet($Sender, 'Data');
-   }
-
-   /**
-    * Attach to the Comment model and remove all records by trolls (unless the current user is a troll)
-    */
-   public function CommentModel_AfterGet_Handler($Sender) {
-      $this->_CleanDataSet($Sender, 'Comments');
-   }
-
-   /**
-    * Attach to the Activity model and remove all records by trolls (unless the current user is a troll)
-    */
-   public function ActivityModel_AfterGet_Handler($Sender) {
-      $this->_CleanDataSet($Sender, 'Data');
-   }
-
-   /**
-    * Look in the sender eventarguments for a dataset to clean of troll content.
-    */
-   private function _CleanDataSet($Sender, $DataEventArgument) {
-      // Don't do anything if there are no trolls
-      $Trolls = C('Plugins.TrollManagement.Cache');
-      if (!is_array($Trolls))
-         return;
-
-      if (!array_key_exists($DataEventArgument, $Sender->EventArguments))
-         return;
-
-      // Examine the data, and remove any rows that belong to the trolls
-      $Data = &$Sender->EventArguments[$DataEventArgument];
-      $Result = &$Data->Result();
-      $IsAdmin = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
-      foreach ($Result as $Index => $Row) {
-         if (in_array(GetValue('InsertUserID', $Row), $Trolls)) {
-            if ($IsAdmin) {
-               if (is_array($Row))
-                  $Result[$Index]['IsTroll'] = TRUE;
-               else {
-                  $Row->IsTroll = TRUE;
-                  $Result[$Index] = $Row;
-               }
-            } else {
-               // Remove all troll posts for all non-trolls, but if current
-               // user is troll, remove other troll posts, but keep own.
-               if (Gdn::Session()->UserID != GetValue('InsertUserID', $Row)) {
-                  unset($Result[$Index]);
-               }
+        if (is_null($trolls)) {
+            $trolls = c('Plugins.TrollManagement.Cache');
+            if (!is_array($trolls)) {
+                $trolls = [];
             }
-         }
-      }
-      if (!empty($Result)) {
-         // Be sure the the array is properly indexed after unset. (important for json_encode)
-         $Result = array_values($Result);
-      }
-   }
+        }
 
-   /**
-    * Identify troll discussions for admins.
-    */
-   public function Base_BeforeDiscussionContent_Handler($Sender) {
-      // $this->_ShowAdmin($Sender, 'Discussion');
-   }
+        return $trolls;
+    }
 
-   /**
-    * Identify troll comments for admins.
-    */
-   public function Base_BeforeCommentBody_Handler($Sender) {
-      // Note that for DiscussionController, the IsTroll var is not being set.
-      $this->_ShowAdmin($Sender, 'Object');
-   }
+    /**
+     * Validates the current user's permissions & transientkey and then marks a user as a troll.
+     *
+     * @param UserController $sender
+     */
+    public function userController_markTroll_create($sender, $userID, $troll = true) {
+        $sender->permission('Garden.Moderation.Manage');
 
-   public function Base_BeforeDiscussionMeta_Handler($Sender, $Args) {
-      $this->_ShowAdmin($Sender, 'Discussion', 'tag');
-   }
+        $trollUserID = $userID;
 
-   private function _ShowAdmin($Sender, $EventArgumentName, $Style = 'message') {
-      // Don't do anything if there are no trolls
-      $Trolls = C('Plugins.TrollManagement.Cache');
-      if (!is_array($Trolls)) {
-         return;
-      }
+        // Validate the transient key && permissions
+        // Make sure we are posting back.
+        if (!$sender->Request->isAuthenticatedPostBack()) {
+            throw PermissionException('Javascript');
+        }
 
-      $Object = $Sender->EventArguments[$EventArgumentName];
-      $ViewingUserID = Gdn::Session()->UserID;
-      $InsertUserID = GetValue('InsertUserID', $Object);
+        $trolls = c('Plugins.TrollManagement.Cache');
+        if (!is_array($trolls)) {
+            $trolls = [];
+        }
 
-      // Don't do anything if this is a troll
-      if (in_array($ViewingUserID, $Trolls))
-         return;
+        // Toggle troll value in DB
+        if (in_array($trollUserID, $trolls)) {
+            Gdn::SQL()->update('User', ['Troll' => 0], ['UserID' => $trollUserID])->put();
+            unset($trolls[array_search($trollUserID, $trolls)]);
+        } else {
+            Gdn::SQL()->Update('User', ['Troll' => 1], ['UserID' => $trollUserID])->put();
+            $trolls[] = $trollUserID;
+        }
 
-      // Don't do anything if the user is not admin (sanity check).
-      if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
-         return;
+        saveToConfig('Plugins.TrollManagement.Cache', $trolls);
 
-      if (in_array($InsertUserID, $Trolls)) {
-         if ($Style === 'message')
-            echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: -4px 0 8px; background: rgba(0, 0, 0, 0.05); color: #d00; font-size: 11px;">'.T('Troll.Content', '<b>Troll</b> <ul> <li>This user has been marked as a troll.</li> <li>Their content is only visible to moderators and the troll.</li> <li>This message does not appear for the troll.</li></ul>').'</div>';
-         else
-            echo '<span class="Tag Tag-Troll" title="'. T('This user has been marked as a troll.') .'">Troll</span>';
-      }
-   }
+        $sender->jsonTarget('', '', 'Refresh');
+        $sender->render('Blank', 'Utility', 'Dashboard');
+    }
 
-   /**
-    * Do not let troll comments bump discussions.
-    */
-   public function CommentModel_BeforeUpdateCommentCount_Handler($Sender) {
-      $Trolls = C('Plugins.TrollManagement.Cache');
-      if (!is_array($Trolls))
-         return;
+    /**
+     * Fingerprint the user.
+     *
+     * @param Gdn_Controller $sender
+     */
+    public function base_render_before($sender) {
+        // Don't do anything if the user isn't signed in.
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
 
-      if (in_array(Gdn::Session()->UserID, $Trolls))
-         $Sender->EventArguments['Discussion']['Sink'] = TRUE;
-   }
+        $cookieFingerprint = val('__vnf', $_COOKIE, null);
+        $databaseFingerprint = val('Fingerprint', Gdn::Session()->User, null);
+        $expires = time() + 60 * 60 * 24 * 256; // Expire one year from now
 
-   /**
-    * Auto-sink troll discussions.
-    */
-   public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender) {
-      $Trolls = C('Plugins.TrollManagement.Cache');
-      if (!is_array($Trolls))
-         return;
+        // Cookie and user record both empty, assign both
+        if (empty($cookieFingerprint) && empty($databaseFingerprint)) {
+            $databaseFingerprint = uniqid();
+            Gdn::SQL()->update('User', ['Fingerprint' => $databaseFingerprint], ['UserID' => Gdn::session()->UserID])->put();
+            safeCookie('__vnf', $databaseFingerprint, $expires);
+            return;
+        }
 
-      if (in_array(Gdn::Session()->UserID, $Trolls))
-         $Sender->EventArguments['FormPostValues']['Sink'] = 1;
-   }
+        // If the cookie exists...
+        if (!empty($cookieFingerprint)) {
 
-   /**
-    * If user has been marked as troll, write a message at the top of their
-    * profile for only site admins to read.
-    *
-    * @param ProfileController $Sender
-    */
-   public function ProfileController_BeforeUserInfo_Handler($Sender) {
-      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-         $UserID        = $Sender->User->UserID;
-         $Trolls        = C('Plugins.TrollManagement.Cache');
-         $ViewingUserID = Gdn::Session()->UserID;
+            // If the cookie disagrees with the database, update the database
+            if ($databaseFingerprint != $cookieFingerprint) {
+                Gdn::SQL()->update('User', ['Fingerprint' => $cookieFingerprint], ['UserID' => Gdn::session()->UserID])->put();
+            }
 
-         if (!is_array($Trolls)) {
-            $Trolls = array();
-         }
+        // If only the user record exists, propagate it to the cookie
+        } else if (!empty($databaseFingerprint)) {
 
-         if (is_array($Trolls)
-            && $ViewingUserID != $UserID
-            && in_array($UserID, $Trolls)) {
-            echo '
+            // Propagate it to the cookie
+            safeCookie('__vnf', $databaseFingerprint, $expires);
+        }
+
+    }
+
+    /**
+     * Hide counters on profile of trolls unless viewer is a moderator.
+     *
+     * @param ProfileController $sender
+     */
+    public function profileController_userLoaded_handler($sender) {
+        if (valr('User.Troll', $sender) && !Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            saveToConfig('Vanilla.Profile.ShowCounts', false, false);
+        }
+    }
+
+    /**
+     * Display shared accounts on the user profiles for moderators.
+     *
+     * @param ProfileController $sender
+     */
+    public function profileController_render_before($sender) {
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            return;
+        }
+
+        if (!property_exists($sender, 'User')) {
+            return;
+        }
+
+        // Get the current user's fingerprint value
+        $databaseFingerprint = val('Fingerprint', $sender->User);
+        if (!$databaseFingerprint) {
+            return;
+        }
+
+        // Display all accounts that share that fingerprint value
+        $sharedFingerprintModule = new SharedFingerprintModule($sender);
+        $sharedFingerprintModule->getData(valr('User.UserID', $sender), $databaseFingerprint);
+        $sender->addModule($sharedFingerprintModule);
+    }
+
+    /**
+     * Attach to the Discussion model and remove all records by trolls (unless the current user is a troll)
+     *
+     * @param DiscussionModel $sender
+     */
+    public function discussionModel_afterAddColumns_handler($sender) {
+        $this->_cleanDataSet($sender, 'Data');
+    }
+
+    /**
+     * Attach to the Comment model and remove all records by trolls (unless the current user is a troll)
+     *
+     * @param CommentModel $sender
+     */
+    public function commentModel_afterGet_handler($sender) {
+        $this->_cleanDataSet($sender, 'Comments');
+    }
+
+    /**
+     * Attach to the Activity model and remove all records by trolls (unless the current user is a troll)
+     *
+     * @param ActivityModel $sender
+     */
+    public function activityModel_afterGet_handler($sender) {
+        $this->_cleanDataSet($sender, 'Data');
+    }
+
+    /**
+     * Look in the sender event arguments for a dataset to clean of troll content.
+     */
+    private function _cleanDataSet($sender, $dataEventArgument) {
+        // Don't do anything if there are no trolls
+        $trolls = C('Plugins.TrollManagement.Cache');
+        if (!is_array($trolls) || !count($trolls)) {
+            return;
+        }
+
+        if (!array_key_exists($dataEventArgument, $sender->EventArguments)) {
+            return;
+        }
+
+        // Examine the data, and remove any rows that belong to the trolls
+        $data = &$sender->EventArguments[$dataEventArgument];
+        $result = &$data->result();
+        $isPrivileged = Gdn::session()->checkPermission('Garden.Moderation.Manage');
+        foreach ($result as $index => $row) {
+            // If this is a troll post...
+            if (in_array(val('InsertUserID', $row), $trolls)) {
+
+                if ($isPrivileged) {
+                    // Mark as a troll post for moderators
+                    setValue($result[$index], 'IsTroll', true);
+                } else {
+                    // Remove it unless it belongs to the current user
+                    if (Gdn::Session()->UserID != val('InsertUserID', $row)) {
+                        unset($result[$index]);
+                    }
+                }
+            }
+        }
+
+        if (!empty($result)) {
+            // Be sure the the array is properly indexed after unset. (important for json_encode)
+            $result = array_values($result);
+        }
+    }
+
+    /**
+     * Identify troll comments for moderators.
+     *
+     * @param type $sender
+     */
+    public function base_beforeCommentBody_handler($sender) {
+        // Note that for DiscussionController, the IsTroll var is not being set.
+        $this->_showAdmin($sender, 'Object');
+    }
+
+    /**
+     * Identify troll discussions for moderators.
+     *
+     * @param type $sender
+     */
+    public function base_beforeDiscussionMeta_handler($sender) {
+        $this->_showAdmin($sender, 'Discussion', 'tag');
+    }
+
+    /**
+     * Display troll warning on comments and discussions for moderators to see.
+     *
+     * @param Gdn_Controller $sender
+     * @param string $eventArgumentName
+     * @param string $style optional. "message" or "tag"
+     * @return void
+     */
+    private function _showAdmin($sender, $eventArgumentName, $style = 'message') {
+
+        // Don't do anything if the user is not admin (sanity check).
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            return;
+        }
+
+        // Don't do anything if there are no trolls
+        $trolls = C('Plugins.TrollManagement.Cache');
+        if (!is_array($trolls) || !count($trolls)) {
+            return;
+        }
+
+        $object = $sender->EventArguments[$eventArgumentName];
+        $insertUserID = val('InsertUserID', $object);
+
+        if (in_array($insertUserID, $trolls)) {
+            if ($style === 'message') {
+                echo '<div style="display: block; line-height: 1.2; padding: 8px; margin: -4px 0 8px; background: rgba(0, 0, 0, 0.05); color: #d00; font-size: 11px;">' . T('Troll.Content', '<b>Troll</b> <ul> <li>This user has been marked as a troll.</li> <li>Their content is only visible to moderators and the troll.</li> <li>This message does not appear for the troll.</li></ul>') . '</div>';
+            } else {
+                echo '<span class="Tag Tag-Troll" title="' . T('This user has been marked as a troll.') . '">Troll</span>';
+            }
+        }
+    }
+
+    /**
+     * Do not let troll comments bump discussions.
+     *
+     * @param CommentModel $sender
+     */
+    public function commentModel_beforeUpdateCommentCount_handler($sender) {
+        $trolls = C('Plugins.TrollManagement.Cache');
+        if (!is_array($trolls) || !count($trolls)) {
+            return;
+        }
+
+        // Pretend the discussion is sunk
+        if (in_array(Gdn::session()->UserID, $trolls)) {
+            $sender->EventArguments['Discussion']['Sink'] = true;
+        }
+    }
+
+    /**
+     * Auto-sink troll discussions.
+     *
+     * @param DiscussionModel $sender
+     */
+    public function discussionModel_beforeSaveDiscussion_handler($sender) {
+        $trolls = C('Plugins.TrollManagement.Cache');
+        if (!is_array($trolls) || !count($trolls)) {
+            return;
+        }
+
+        if (in_array(Gdn::session()->UserID, $trolls)) {
+            $sender->EventArguments['FormPostValues']['Sink'] = 1;
+        }
+    }
+
+    /**
+     * If user has been marked as troll, write a message at the top of their
+     * profile for moderators to read.
+     *
+     * @param ProfileController $sender
+     */
+    public function profileController_beforeUserInfo_handler($sender) {
+        if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $userID = $sender->User->UserID;
+            $trolls = C('Plugins.TrollManagement.Cache');
+
+            if (!is_array($trolls) || !count($trolls)) {
+                return;
+            }
+
+            if (in_array($userID, $trolls)) {
+                echo '
             <div class="Hero Warning">
-               <h3>'. T('Troll') .'</h3>
-               '. T('This user has been marked as a troll.') .'
+               <h3>' . T('Troll') . '</h3>
+               ' . T('This user has been marked as a troll.') . '
             </div>';
-         }
-      }
-   }
+            }
+        }
+    }
 
-   public function ProfileController_BeforeProfileOptions_Handler($Sender) {
-      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-         $UserID        = $Sender->User->UserID;
-         $Trolls        = C('Plugins.TrollManagement.Cache');
+    /**
+     * Add option to remove troll status from users
+     *
+     * @param ProfileController $sender
+     */
+    public function profileController_beforeProfileOptions_handler($sender) {
+        if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $userID = $sender->User->UserID;
+            $trolls = C('Plugins.TrollManagement.Cache');
 
-         if (!is_array($Trolls)) {
-            $Trolls = array();
-         }
+            if (!is_array($trolls) || !count($trolls)) {
+                return;
+            }
 
-         $troll = in_array($UserID, $Trolls) ? 1 : 0;
+            $troll = in_array($userID, $trolls) ? 1 : 0;
 
-         $Sender->EventArguments['ProfileOptions']['TrollToggle'] = array(
-            'Text' => T(($troll) ? 'Unmark as Troll' : 'Mark as Troll'),
-            'Url' => '/user/marktroll?userid='.$UserID.'&troll='.(int)(!$troll),
-            'CssClass' => 'Hijack Button-Troll'
-         );
-      }
-   }
+            $sender->EventArguments['ProfileOptions']['TrollToggle'] = [
+                'Text' => T(($troll) ? 'Unmark as Troll' : 'Mark as Troll'),
+                'Url' => '/user/marktroll?userid=' . $userID . '&troll=' . (int) (!$troll),
+                'CssClass' => 'Hijack Button-Troll'
+            ];
+        }
+    }
+
 }
