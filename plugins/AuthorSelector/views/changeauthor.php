@@ -1,18 +1,18 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="FormTitleWrapper ChangeAuthorForm">
    <?php
-   echo Wrap($this->Data('Title'), 'h1', array('class' => 'H'));
+   echo wrap($this->data('Title'), 'h1', ['class' => 'H']);
 
    echo '<div class="FormWrapper">';
-   echo $this->Form->Open();
-   echo $this->Form->Errors();
+   echo $this->Form->open();
+   echo $this->Form->errors();
 
    echo '<div class="P">';
-   echo $this->Form->Label('New Author', 'Author');
-   echo Wrap($this->Form->TextBox('Author', array('class' => 'MultiComplete')), 'div', array('class' => 'TextBoxWrapper'));
+   echo $this->Form->label('New Author', 'Author');
+   echo wrap($this->Form->textBox('Author', ['class' => 'MultiComplete']), 'div', ['class' => 'TextBoxWrapper']);
    echo '</div>';
 
-   echo $this->Form->Close('Change Author', '', array('class' => 'Button Primary'));
+   echo $this->Form->close('Change Author', '', ['class' => 'Button Primary']);
    echo '</div>';
    ?>
 </div>
