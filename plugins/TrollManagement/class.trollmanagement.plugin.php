@@ -243,7 +243,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
 
                 if ($isPrivileged) {
                     // Mark as a troll post for moderators
-                    setValue($result[$index], 'IsTroll', true);
+                    setValue('IsTroll', $result[$index], true);
                 } else {
                     // Remove it unless it belongs to the current user
                     if (Gdn::session()->UserID != val('InsertUserID', $row)) {
