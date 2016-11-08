@@ -202,14 +202,14 @@ class ParticipatedPlugin extends Gdn_Plugin {
 /**
  *
  *
- * @param array $Params
- * @param object $Smarty
+ * @param array $params
+ * @param object $smarty
  * @return string
  */
-function smarty_function_participated_link($Params, &$Smarty) {
-    $Wrap = val('wrap', $Params, 'li');
+function smarty_function_participated_link($params, &$smarty) {
+    $wrap = val('wrap', $params, 'li');
     return Gdn_Theme::link('/discussions/participated',
-        val('text', $Params, t('Participated')),
-        val('format', $Params, wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
+        val('text', $params, t('Participated')),
+        val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap)));
 }
 
