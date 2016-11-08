@@ -212,4 +212,3 @@ function smarty_function_participated_link($params, &$smarty) {
         val('text', $params, t('Participated')),
         val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap)));
 }
-
