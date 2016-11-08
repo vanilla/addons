@@ -200,10 +200,10 @@ class ParticipatedPlugin extends Gdn_Plugin {
 }
 
 /**
+ * This function returns the link to the "participated" page
  *
- *
- * @param array $params
- * @param object $smarty
+ * @param array $params The parameters passed into the function.
+ * @param Smarty $smarty The smarty object rendering the template.
  * @return string
  */
 function smarty_function_participated_link($params, &$smarty) {
