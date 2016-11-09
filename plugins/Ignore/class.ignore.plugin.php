@@ -397,7 +397,7 @@ class IgnorePlugin extends Gdn_Plugin {
       $UserID = GetValue('UserID', $User);
 
       // Set title and mode
-      $IgnoreRestricted = $this->IgnoreIsRestricted($UserID);
+      $IgnoreRestricted = $this->IgnoreIsRestricted();
       $UserIgnored = $this->Ignored($UserID);
       $Mode = $UserIgnored ? 'unset' : 'set';
       $ActionText = T($Mode == 'set' ? 'Ignore' : 'Unignore');
@@ -646,19 +646,29 @@ class IgnorePlugin extends Gdn_Plugin {
 
    /**
     * Is this user forbidden from using ignore?
+    *
+    * @param int|null $userID ID for the user to verify ignore permissions for. Current user if none specified.
+    * @return bool|string IgnorePlugin::IGNORE_RESTRICTED if user cannot ignore, otherwise false.
     */
-   public function IgnoreIsRestricted($UserID = NULL) {
+   public function ignoreIsRestricted($userID = NULL) {
       // Guests cant ignore
-      if (!Gdn::Session()->IsValid()) return TRUE;
+      if (!Gdn::session()->isValid()) {
+         return self::IGNORE_RESTRICTED;
+      }
 
-      if (is_null($UserID))
-         $UserID = Gdn::Session()->UserID;
+      if (is_null($userID)) {
+         $userID = Gdn::session()->UserID;
+      }
 
-      if (is_null($UserID)) return TRUE;
+      if (is_null($userID)) {
+         return self::IGNORE_RESTRICTED;
+      }
 
-      $IgnoreRestricted = $this->GetUserMeta($UserID, 'Plugin.Ignore.Forbidden');
-      $IgnoreRestricted = GetValue('Plugin.Ignore.Forbidden', $IgnoreRestricted, FALSE);
-      if ($IgnoreRestricted) return TRUE;
+      $isRestricted = $this->getUserMeta($userID, 'Plugin.Ignore.Forbidden');
+      $isRestricted = val('Plugin.Ignore.Forbidden', $isRestricted, FALSE);
+      if ($isRestricted) {
+         return self::IGNORE_RESTRICTED;
+      }
 
       return FALSE;
    }
