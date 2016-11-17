@@ -9,7 +9,30 @@ helpAsset(sprintf(t('About %s'), 'jsConnect'), t('You can connect to multiple si
 helpAsset(t('Need More Help?'), $links);
 
 echo heading(sprintf(t('%s Settings'), 'jsConnect'), t('Add Connection'), '/settings/jsconnect/addedit', 'btn btn-primary js-modal');
+
+$inTestMode = [];
+foreach ($this->Data('Providers') as $Provider) {
+    if ($Provider['TestMode']) {
+        $inTestMode[] = $Provider;
+    }
+}
 ?>
+
+<?php if (count($inTestMode) > 0): ?>
+<div class="alert alert-warning padded"><?echo t('Providers in test mode.', 'The following providers are in test mode:'); ?>
+    <ul>
+    <?php foreach ($inTestMode as $testProvider): ?>
+        <li><?php echo anchor(
+            $testProvider['Name'],
+            '/settings/jsconnect/addedit?client_id='.urlencode($testProvider['AuthenticationKey']),
+            'js-modal',
+            ['aria-label' => t('Edit'), 'title' => t('Edit')]
+        ); ?></li>
+    <?php endforeach; ?>
+    </ul>
+</div>
+<?php endif; ?>
+
 <section>
     <?php
     echo subheading(t('Signing In'));
