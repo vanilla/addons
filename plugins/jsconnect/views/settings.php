@@ -9,7 +9,25 @@ helpAsset(sprintf(t('About %s'), 'jsConnect'), t('You can connect to multiple si
 helpAsset(t('Need More Help?'), $links);
 
 echo heading(sprintf(t('%s Settings'), 'jsConnect'), t('Add Connection'), '/settings/jsconnect/addedit', 'btn btn-primary js-modal');
+
+$inTestMode = [];
+foreach ($this->Data('Providers') as $Provider) {
+    if ($Provider['TestMode']) {
+        $inTestMode[] = $Provider;
+    }
+}
 ?>
+
+<?php if (count($inTestMode) > 0): ?>
+<div class="alert alert-warning padded"><?php echo t('Providers in test mode.', 'The following providers are in test mode and are not secure.  Incoming connections will be accepted without verifying the source.'); ?>
+    <ul>
+    <?php foreach ($inTestMode as $testProvider): ?>
+        <li><?php echo $testProvider['Name']; ?></li>
+    <?php endforeach; ?>
+    </ul>
+</div>
+<?php endif; ?>
+
 <section>
     <?php
     echo subheading(t('Signing In'));
