@@ -19,7 +19,7 @@ foreach ($this->Data('Providers') as $Provider) {
 ?>
 
 <?php if (count($inTestMode) > 0): ?>
-<div class="alert alert-warning padded"><?echo t('Providers in test mode.', 'The following providers are in test mode:'); ?>
+<div class="alert alert-warning padded"><?php echo t('Providers in test mode.', 'The following providers are in test mode:'); ?>
     <ul>
     <?php foreach ($inTestMode as $testProvider): ?>
         <li><?php echo anchor(
