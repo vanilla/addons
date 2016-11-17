@@ -19,15 +19,10 @@ foreach ($this->Data('Providers') as $Provider) {
 ?>
 
 <?php if (count($inTestMode) > 0): ?>
-<div class="alert alert-warning padded"><?php echo t('Providers in test mode.', 'The following providers are in test mode:'); ?>
+<div class="alert alert-warning padded"><?php echo t('Providers in test mode.', 'The following providers are in test mode and are not secure.  Incoming connections will be accepted without verifying the source.'); ?>
     <ul>
     <?php foreach ($inTestMode as $testProvider): ?>
-        <li><?php echo anchor(
-            $testProvider['Name'],
-            '/settings/jsconnect/addedit?client_id='.urlencode($testProvider['AuthenticationKey']),
-            'js-modal',
-            ['aria-label' => t('Edit'), 'title' => t('Edit')]
-        ); ?></li>
+        <li><?php echo $testProvider['Name']; ?></li>
     <?php endforeach; ?>
     </ul>
 </div>
