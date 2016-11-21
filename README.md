@@ -5,6 +5,12 @@ The `plugins` folder is what this repository is all about. It holds open source 
 
 Individual plugins should have their own license and README. Please start issues by prefixing the issue title with the addon name.
 
+### Installing
+
+To install an addon, all you have to do is put the addon's folder under the `plugins` directory.
+
+*On Vanilla >= 2.3 you also have to remove `cache/addon.php` for it to be detected.*
+
 ### Contributing
 
 We use the same [Contributors Agreement](http://vanillaforums.org/contributors) for this repository as our [main Vanilla repo](https://github.com/vanilla/vanilla). Requires a vanillaforums.org account.
