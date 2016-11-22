@@ -370,7 +370,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add option to remove troll status from users
+     * Add toggle option to add/remove troll status from users
      *
      * @param ProfileController $sender
      */
