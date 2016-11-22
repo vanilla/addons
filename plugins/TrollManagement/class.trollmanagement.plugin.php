@@ -379,9 +379,6 @@ class TrollManagementPlugin extends Gdn_Plugin {
             $userID = $sender->User->UserID;
 
             $trolls = self::getTrolls();
-            if (!count($trolls)) {
-                return;
-            }
 
             $troll = in_array($userID, $trolls) ? 1 : 0;
 
