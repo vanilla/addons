@@ -9,7 +9,7 @@ Individual plugins should have their own license and README. Please start issues
 
 To install an addon, all you have to do is put the addon's folder under the `plugins` directory.
 
-*On Vanilla >= 2.3 you also have to remove `cache/addon.php` for it to be detected.*
+*On Vanilla >= 2.4 you also have to remove `cache/addon.php` for it to be detected.*
 
 ### Contributing
 
