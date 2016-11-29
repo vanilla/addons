@@ -29,7 +29,7 @@
     display: inline-block;
     height: 16px;
     width: 16px;
-    background: url('http://cdn.vanillaforums.com/images/famfamfam.png') 0 0 no-repeat transparent;
+    background: url('https://images.v-cdn.net/famfamfam.png') 0 0 no-repeat transparent;
     background-position: 16px 16px;
     vertical-align: top;
     margin: 2px 4px 0 0;
@@ -120,7 +120,7 @@
    display: inline-block;
    min-height: 14px;
    min-width: 14px;
-   background: url('http://cdn.vanillaforums.com/images/sprites-14-000.png') 0 0 no-repeat transparent;
+   background: url('https://images.v-cdn.net/sprites-14-000.png') 0 0 no-repeat transparent;
    background-position: 14px 14px;
    vertical-align: top;
    margin: 4px 0 0 0;
