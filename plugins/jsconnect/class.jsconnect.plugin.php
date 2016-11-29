@@ -108,7 +108,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             }
             $Result .=
                 '<div class="JsConnect-Connect"><a class="ConnectLink">'
-                .img('https://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.ssl.cf1.rackcdn.com/images/usericon_50.png', ['class' => 'ProfilePhotoSmall UserPhoto'])
+                .img('https://images.v-cdn.net/usericon_50.png', ['class' => 'ProfilePhotoSmall UserPhoto'])
                 .$ConnectLabel
                 .'</a></div>';
 
