@@ -123,8 +123,12 @@ class QnAPlugin extends Gdn_Plugin {
             }
 
             if ($sender->Form->save() !== false) {
-                // Update the AcceptedAnswer point!
-                $this->structureReactions();
+                // Update the AcceptAnswer reaction points.
+                try {
+                    Gdn::sql()->update('ReactionType', ['Points' => c('QnA.Points.AcceptedAnswer')], ['UrlCode' => 'AcceptAnswer'])->put();
+                } catch(Exception $e) {
+                    // Do nothing; no reaction was found to update so just press on.
+                }
                 $sender->StatusMessage = t('Your changes have been saved.');
             }
         }
@@ -133,7 +137,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Trigger reaction or badge creation if those addons are enabled later.
      *
      * @param $sender Sending controller instance.
      * @param array $args Event arguments.
@@ -142,11 +146,11 @@ class QnAPlugin extends Gdn_Plugin {
         switch (strtolower($args['AddonName'])) {
             case 'reactions':
                 $this->Reactions = true;
-                $this->structureReactions();
+                $this->structure();
                 break;
-            case 'reputation':
+            case 'badges':
                 $this->Badges = true;
-                $this->structureBadges();
+                $this->structure();
                 break;
         }
     }
