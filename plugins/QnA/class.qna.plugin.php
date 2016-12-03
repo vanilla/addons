@@ -75,7 +75,7 @@ class QnAPlugin extends Gdn_Plugin {
      * Database updates.
      */
     public function structure() {
-        include dirname(__FILE__).'/structure.php';
+        include __DIR__.'/structure.php';
     }
 
     /**
