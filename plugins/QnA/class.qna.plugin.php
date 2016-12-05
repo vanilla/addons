@@ -1,14 +1,14 @@
-<?php if (!defined('APPLICATION')) { exit(); }
+<?php
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @copyright 2008-2016 Vanilla Forums Inc.
+ * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
 // Define the plugin:
 $PluginInfo['QnA'] = array(
     'Name' => 'Q&A',
     'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-    'Version' => '1.3',
+    'Version' => '1.3.1',
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'MobileFriendly' => true,
     'SettingsUrl' => '/settings/qna',
@@ -25,13 +25,16 @@ $PluginInfo['QnA'] = array(
  * and 'Ask Question' into "separate" forms each with own big button in Panel.
  */
 class QnAPlugin extends Gdn_Plugin {
-    /// PROPERTIES ///
 
+    /** @var bool|array  */
     protected $Reactions = false;
+
+    /** @var bool|array  */
     protected $Badges = false;
 
-    /// METHODS ///
-
+    /**
+     * QnAPlugin constructor.
+     */
     public function __construct() {
         parent::__construct();
 
@@ -45,6 +48,9 @@ class QnAPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Run once on enable.
+     */
     public function setup() {
         $this->structure();
 
@@ -53,187 +59,25 @@ class QnAPlugin extends Gdn_Plugin {
         touchConfig('QnA.Points.AcceptedAnswer', 1);
     }
 
+    /**
+     * Add Javascript.
+     *
+     * @param $sender
+     * @param $args
+     */
     public function base_render_before($sender, $args) {
         if ($sender->MasterView == 'admin') {
             $sender->addJsFile('QnA.js', 'plugins/QnA');
         }
     }
 
+    /**
+     * Database updates.
+     */
     public function structure() {
-        Gdn::structure()
-            ->table('Discussion');
-
-        $QnAExists = Gdn::structure()->columnExists('QnA');
-        $DateAcceptedExists = Gdn::structure()->columnExists('DateAccepted');
-
-        Gdn::structure()
-            ->column('QnA', array('Unanswered', 'Answered', 'Accepted', 'Rejected'), null, 'index')
-            ->column('DateAccepted', 'datetime', true) // The
-            ->column('DateOfAnswer', 'datetime', true) // The time to answer an accepted question.
-            ->set();
-
-        Gdn::structure()
-            ->table('Comment')
-            ->column('QnA', array('Accepted', 'Rejected'), null)
-            ->column('DateAccepted', 'datetime', true)
-            ->column('AcceptedUserID', 'int', true)
-            ->set();
-
-        Gdn::structure()
-            ->table('User')
-            ->column('CountAcceptedAnswers', 'int', '0')
-            ->set();
-
-        Gdn::SQL()->replace(
-            'ActivityType',
-            array('AllowComments' => '0', 'RouteCode' => 'question', 'Notify' => '1', 'Public' => '0', 'ProfileHeadline' => '', 'FullHeadline' => ''),
-            array('Name' => 'QuestionAnswer'), true);
-        Gdn::SQL()->replace(
-            'ActivityType',
-            array('AllowComments' => '0', 'RouteCode' => 'answer', 'Notify' => '1', 'Public' => '0', 'ProfileHeadline' => '', 'FullHeadline' => ''),
-            array('Name' => 'AnswerAccepted'), true);
-
-        if ($QnAExists && !$DateAcceptedExists) {
-            // Default the date accepted to the accepted answer's date.
-            $Px = Gdn::database()->DatabasePrefix;
-            $Sql = "update {$Px}Discussion d set DateAccepted = (select min(c.DateInserted) from {$Px}Comment c where c.DiscussionID = d.DiscussionID and c.QnA = 'Accepted')";
-            Gdn::SQL()->query($Sql, 'update');
-            Gdn::SQL()->update('Discussion')
-                ->set('DateOfAnswer', 'DateAccepted', false, false)
-                ->put();
-
-            Gdn::SQL()->update('Comment c')
-                ->join('Discussion d', 'c.CommentID = d.DiscussionID')
-                ->set('c.DateAccepted', 'c.DateInserted', false, false)
-                ->set('c.AcceptedUserID', 'd.InsertUserID', false, false)
-                ->where('c.QnA', 'Accepted')
-                ->where('c.DateAccepted', null)
-                ->put();
-        }
-
-        $this->structureReactions();
-        $this->structureBadges();
+        include __DIR__.'/structure.php';
     }
 
-    /**
-     * Define all of the structure related to badges.
-     */
-    public function structureBadges() {
-        // Define 'Answer' badges
-        if (!$this->Badges || !class_exists('BadgeModel')) {
-            return;
-        }
-
-        $BadgeModel = new BadgeModel();
-
-        // Answer Counts
-        $BadgeModel->define(array(
-            'Name' => 'First Answer',
-            'Slug' => 'answer',
-            'Type' => 'UserCount',
-            'Body' => 'Answering questions is a great way to show your support for a community!',
-            'Photo' => 'http://badges.vni.la/100/answer.png',
-            'Points' => 2,
-            'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-            'Threshold' => 1,
-            'Class' => 'Answerer',
-            'Level' => 1,
-            'CanDelete' => 0
-        ));
-        $BadgeModel->define(array(
-            'Name' => '5 Answers',
-            'Slug' => 'answer-5',
-            'Type' => 'UserCount',
-            'Body' => 'Your willingness to share knowledge has definitely been noticed.',
-            'Photo' => 'http://badges.vni.la/100/answer-2.png',
-            'Points' => 3,
-            'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-            'Threshold' => 5,
-            'Class' => 'Answerer',
-            'Level' => 2,
-            'CanDelete' => 0
-        ));
-        $BadgeModel->define(array(
-            'Name' => '25 Answers',
-            'Slug' => 'answer-25',
-            'Type' => 'UserCount',
-            'Body' => 'Looks like you&rsquo;re starting to make a name for yourself as someone who knows the score!',
-            'Photo' => 'http://badges.vni.la/100/answer-3.png',
-            'Points' => 5,
-            'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-            'Threshold' => 25,
-            'Class' => 'Answerer',
-            'Level' => 3,
-            'CanDelete' => 0
-        ));
-        $BadgeModel->define(array(
-            'Name' => '50 Answers',
-            'Slug' => 'answer-50',
-            'Type' => 'UserCount',
-            'Body' => 'Why use Google when we could just ask you?',
-            'Photo' => 'http://badges.vni.la/100/answer-4.png',
-            'Points' => 10,
-            'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-            'Threshold' => 50,
-            'Class' => 'Answerer',
-            'Level' => 4,
-            'CanDelete' => 0
-        ));
-        $BadgeModel->define(array(
-            'Name' => '100 Answers',
-            'Slug' => 'answer-100',
-            'Type' => 'UserCount',
-            'Body' => 'Admit it, you read Wikipedia in your spare time.',
-            'Photo' => 'http://badges.vni.la/100/answer-5.png',
-            'Points' => 15,
-            'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-            'Threshold' => 100,
-            'Class' => 'Answerer',
-            'Level' => 5,
-            'CanDelete' => 0
-        ));
-        $BadgeModel->define(array(
-            'Name' => '250 Answers',
-            'Slug' => 'answer-250',
-            'Type' => 'UserCount',
-            'Body' => 'Is there *anything* you don&rsquo;t know?',
-            'Photo' => 'http://badges.vni.la/100/answer-6.png',
-            'Points' => 20,
-            'Attributes' => array('Column' => 'CountAcceptedAnswers'),
-            'Threshold' => 250,
-            'Class' => 'Answerer',
-            'Level' => 6,
-            'CanDelete' => 0
-        ));
-    }
-
-    /**
-     * Define all of the structure related to reactions.
-     */
-    public function structureReactions() {
-        // Define 'Accept' reaction
-        if (!$this->Reactions) {
-            return;
-        }
-
-        $Rm = new ReactionModel();
-
-        if (Gdn::structure()->table('ReactionType')->columnExists('Hidden')) {
-
-            $points = 3;
-            if (c('QnA.Points.Enabled', false)) {
-                $points = c('QnA.Points.AcceptedAnswer', 1);
-            }
-
-            // AcceptAnswer
-            $Rm->defineReactionType(array('UrlCode' => 'AcceptAnswer', 'Name' => 'Accept Answer', 'Sort' => 0, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => $points, 'Permission' => 'Garden.Curation.Manage', 'Hidden' => 1,
-                'Description' => "When someone correctly answers a question, they are rewarded with this reaction."));
-        }
-
-        Gdn::structure()->reset();
-    }
-
-    /// EVENTS ///
     /**
      * Create a method called "QnA" on the SettingController.
      *
@@ -279,8 +123,12 @@ class QnAPlugin extends Gdn_Plugin {
             }
 
             if ($sender->Form->save() !== false) {
-                // Update the AcceptedAnswer point!
-                $this->structureReactions();
+                // Update the AcceptAnswer reaction points.
+                try {
+                    Gdn::sql()->update('ReactionType', ['Points' => c('QnA.Points.AcceptedAnswer')], ['UrlCode' => 'AcceptAnswer'])->put();
+                } catch(Exception $e) {
+                    // Do nothing; no reaction was found to update so just press on.
+                }
                 $sender->StatusMessage = t('Your changes have been saved.');
             }
         }
@@ -289,6 +137,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Trigger reaction or badge creation if those addons are enabled later.
      *
      * @param $sender Sending controller instance.
      * @param array $args Event arguments.
@@ -297,16 +146,17 @@ class QnAPlugin extends Gdn_Plugin {
         switch (strtolower($args['AddonName'])) {
             case 'reactions':
                 $this->Reactions = true;
-                $this->structureReactions();
+                $this->structure();
                 break;
-            case 'reputation':
+            case 'badges':
                 $this->Badges = true;
-                $this->structureBadges();
+                $this->structure();
                 break;
         }
     }
 
     /**
+     *
      *
      * @param $sender Sending controller instance.
      * @param array $args Event arguments.
@@ -320,6 +170,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
      *
      * @param $sender Sending controller instance.
      * @param array $args Event arguments.
@@ -356,6 +207,7 @@ class QnAPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param DiscussionController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
@@ -379,6 +231,7 @@ class QnAPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param CommentModel $sender Sending controller instance.
      * @param array $args Event arguments.
      */
@@ -396,6 +249,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
      *
      * @param CommentModel $sender Sending controller instance.
      * @param array $args Event arguments.
@@ -435,6 +289,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
      *
      * @param CommentModel $sender Sending controller instance.
      * @param array $args Event arguments.
@@ -555,6 +410,7 @@ class QnAPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param DiscussionController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
@@ -565,6 +421,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
      *
      * @param DiscussionController $sender Sending controller instance.
      * @param array $args Event arguments.
@@ -692,6 +549,7 @@ class QnAPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param DiscussionController $sender Sending controller instance.
      * @param string|int $discussionID Identifier of the discussion
      * @param string|int $commentID Identifier of the comment.
@@ -739,6 +597,7 @@ class QnAPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param string|int $userID User identifier
      */
     public function recalculateUserQnA($userID) {
@@ -747,6 +606,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
      *
      * @param $sender controller instance.
      * @param int|string $commentID Identifier of the comment.
@@ -849,6 +709,7 @@ class QnAPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param $sender controller instance.
      * @param int|string $discussionID Identifier of the discussion.
      *
@@ -904,6 +765,7 @@ class QnAPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param DiscussionModel $sender Sending controller instance.
      * @param array $args Event arguments.
      */
@@ -926,6 +788,7 @@ class QnAPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param DiscussionModel $sender Sending controller instance.
      * @param array $args Event arguments.
      */
@@ -936,7 +799,11 @@ class QnAPlugin extends Gdn_Plugin {
         }
     }
 
-    /* New Html method of adding to discussion filters */
+    /**
+     * New Html method of adding to discussion filters.
+     *
+     * @param $sender
+     */
     public function base_afterDiscussionFilters_handler($sender) {
         $Count = Gdn::cache()->get('QnA-UnansweredCount');
         if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
@@ -950,7 +817,9 @@ class QnAPlugin extends Gdn_Plugin {
             .'</li>';
     }
 
-    /* Old Html method of adding to discussion filters */
+    /**
+     * Old Html method of adding to discussion filters.
+     */
     public function discussionsController_afterDiscussionTabs_handler() {
         if (stringEndsWith(Gdn::request()->path(), '/unanswered', true)) {
             $CssClass = ' class="Active"';
@@ -969,6 +838,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
      *
      * @param DiscussionsController $sender Sending controller instance.
      * @param array $args Event arguments.
@@ -991,6 +861,7 @@ class QnAPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param DiscussionsController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
@@ -1002,7 +873,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Return the number of unanswered questions
+     * Return the number of unanswered questions.
      *
      * @return int
      */
@@ -1074,6 +945,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
      *
      * @param $sender Sending controller instance.
      * @param array $args Event arguments.
