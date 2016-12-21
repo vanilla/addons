@@ -125,7 +125,13 @@ class QnAPlugin extends Gdn_Plugin {
             if ($sender->Form->save() !== false) {
                 // Update the AcceptAnswer reaction points.
                 try {
-                    Gdn::sql()->update('ReactionType', ['Points' => c('QnA.Points.AcceptedAnswer')], ['UrlCode' => 'AcceptAnswer'])->put();
+                    if ($this->Reactions) {
+                        $reactionModel = new ReactionModel();
+                        $reactionModel->save([
+                            'UrlCode' => 'AcceptAnswer',
+                            'Points' => c('QnA.Points.AcceptedAnswer'),
+                        ]);
+                    }
                 } catch(Exception $e) {
                     // Do nothing; no reaction was found to update so just press on.
                 }
@@ -491,10 +497,6 @@ class QnAPlugin extends Gdn_Plugin {
 
                     case 'Accepted':
                         $Change = 1;
-
-                        if (!$this->Reactions && c('QnA.Points.Enabled', false) && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
-                            UserModel::givePoints($Comment['InsertUserID'], c('QnA.Points.AcceptedAnswer', 1), 'QnA');
-                        }
                         break;
 
                     default:
@@ -505,6 +507,11 @@ class QnAPlugin extends Gdn_Plugin {
                             $Change = -1;
                         }
                         break;
+                }
+
+                $nbsPoint = $Change * (int)c('QnA.Points.AcceptedAnswer', 1);
+                if ($nbsPoint && !$this->Reactions && c('QnA.Points.Enabled', false) && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
+                    UserModel::givePoints($Comment['InsertUserID'], $nbsPoint, 'QnA');
                 }
             }
 
@@ -622,22 +629,22 @@ class QnAPlugin extends Gdn_Plugin {
             throw notFoundException('Comment');
         }
 
-        $Discussion = $sender->DiscussionModel->getID(val('DiscussionID', $Comment));
+        $Discussion = $sender->DiscussionModel->getID(val('DiscussionID', $Comment), DATASET_TYPE_ARRAY);
 
         $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $Discussion));
 
         if ($sender->Form->authenticatedPostBack()) {
-            $QnA = $sender->Form->getFormValue('QnA');
-            if (!$QnA) {
-                $QnA = null;
+            $newQnA = $sender->Form->getFormValue('QnA');
+            if (!$newQnA) {
+                $newQnA = null;
             }
 
             $CurrentQnA = val('QnA', $Comment);
 
-            if ($CurrentQnA != $QnA) {
-                $Set = array('QnA' => $QnA);
+            if ($CurrentQnA != $newQnA) {
+                $Set = array('QnA' => $newQnA);
 
-                if ($QnA == 'Accepted') {
+                if ($newQnA == 'Accepted') {
                     $Set['DateAccepted'] = Gdn_Format::toDateTime();
                     $Set['AcceptedUserID'] = Gdn::session()->UserID;
                 } else {
@@ -649,12 +656,12 @@ class QnAPlugin extends Gdn_Plugin {
                 $sender->Form->setValidationResults($sender->CommentModel->validationResults());
 
                 // Determine QnA change
-                if ($Comment['QnA'] != $QnA) {
+                if ($CurrentQnA != $newQnA) {
                     $Change = 0;
-                    switch ($QnA) {
+                    switch ($newQnA) {
                         case 'Rejected':
                             $Change = -1;
-                            if ($Comment['QnA'] != 'Accepted') {
+                            if ($CurrentQnA != 'Accepted') {
                                 $Change = 0;
                             }
                             break;
@@ -664,13 +671,18 @@ class QnAPlugin extends Gdn_Plugin {
                             break;
 
                         default:
-                            if ($Comment['QnA'] == 'Rejected') {
+                            if ($CurrentQnA == 'Rejected') {
                                 $Change = 0;
                             }
-                            if ($Comment['QnA'] == 'Accepted') {
+                            if ($CurrentQnA == 'Accepted') {
                                 $Change = -1;
                             }
                             break;
+                    }
+
+                    $nbsPoint = $Change * (int)c('QnA.Points.AcceptedAnswer', 1);
+                    if ($nbsPoint && !$this->Reactions && c('QnA.Points.Enabled', false) && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
+                        UserModel::givePoints($Comment['InsertUserID'], $nbsPoint, 'QnA');
                     }
                 }
 
@@ -1077,12 +1089,12 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Give point(s) to the current user if the right conditions are met.
+     * Give point(s) to users for their first answer on an answered question!
      *
      * @param CommentModel $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function commentModel_afterSaveComment_handler($sender, $args) {
+    public function base_afterSaveComment_handler($sender, $args) {
         if (!c('QnA.Points.Enabled', false) || !$args['Insert']) {
             return;
         }
@@ -1097,10 +1109,10 @@ class QnAPlugin extends Gdn_Plugin {
             return;
         }
 
-        $userAnswersToQuestion = $sender->getWhere(array(
+        $userAnswersToQuestion = $sender->getWhere([
             'DiscussionID' => $args['CommentData']['DiscussionID'],
-            'InsertUserId' => GDN::session()->UserID,
-        ));
+            'InsertUserID' => $args['CommentData']['InsertUserID'],
+        ]);
         // Award point(s) only for the first answer to the question
         if ($userAnswersToQuestion->count() > 1) {
             return;
