@@ -1089,7 +1089,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Give point(s) to users for their first answer on an answered question!
+     * Give point(s) to users for their first answer on an unanswered question!
      *
      * @param CommentModel $sender Sending controller instance.
      * @param array $args Event arguments.
