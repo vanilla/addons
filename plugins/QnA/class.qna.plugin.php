@@ -526,8 +526,10 @@ class QnAPlugin extends Gdn_Plugin {
                     include_once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
                     $Rm = new ReactionModel();
 
+                    // Assume that the reaction is done by the question's owner
+                    $questionOwner = $Discussion['InsertUserID'];
                     // If there's change, reactions will take care of it
-                    $Rm->react('Comment', $Comment['CommentID'], 'AcceptAnswer', null, true);
+                    $Rm->react('Comment', $Comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
                 }
             }
 
@@ -698,8 +700,10 @@ class QnAPlugin extends Gdn_Plugin {
                         include_once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
                         $Rm = new ReactionModel();
 
+                        // Assume that the reaction is done by the question's owner
+                        $questionOwner = $Discussion['InsertUserID'];
                         // If there's change, reactions will take care of it
-                        $Rm->react('Comment', $Comment['CommentID'], 'AcceptAnswer');
+                        $Rm->react('Comment', $Comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
                     }
                 }
             }
