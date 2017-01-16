@@ -91,6 +91,19 @@ class WelcomePostPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add needed resources to the page.
+     *
+     * @param PostController $sender Sending controller instance.
+     * @param array $args Event's arguments.
+     */
+    public function postController_render_before($sender, $args) {
+        if (!$this->isWelcomePostActive($sender->Request, $categoryID)) {
+            return;
+        }
+        $sender->addCssFile('welcomepost.css', 'plugins/welcomepost');
+    }
+
+    /**
      * Redirect users to the /post/discussion end point after registration.
      */
     public function entryController_registrationSuccessful_handler($sender, $args) {
