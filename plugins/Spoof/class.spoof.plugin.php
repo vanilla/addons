@@ -66,10 +66,16 @@ class SpoofPlugin implements Gdn_IPlugin {
 		if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
 			return;
 
-      $User = GetValue('User', $Sender->EventArguments);
-	     if ($User) {
-		    echo anchor(dashboardSymbol('spoof'), '/user/autospoof/'.$User->UserID.'/'.Gdn::Session()->TransientKey(), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Spoof'), 'title' => t('Spoof')]);
-		 }
+		$User = GetValue('User', $Sender->EventArguments);
+		if ($User) {
+			$attr = [
+				'aria-label' => t('Spoof'),
+				'title' => t('Spoof'),
+				'data-follow-link' => 'true'
+			];
+			$class = 'js-modal-confirm btn btn-icon';
+			echo anchor(dashboardSymbol('spoof'), '/user/autospoof/'.$User->UserID.'/'.Gdn::Session()->TransientKey(), $class, $attr);
+		}
 	}
 
 	/**
