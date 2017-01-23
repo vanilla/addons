@@ -91,11 +91,39 @@ class WelcomePostPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add needed resources to the page.
+     *
+     * @param PostController $sender Sending controller instance.
+     * @param array $args Event's arguments.
+     */
+    public function postController_render_before($sender, $args) {
+        if (!$this->isWelcomePostActive($sender->Request, $categoryID)) {
+            return;
+        }
+        $sender->addCssFile('welcomepost.css', 'plugins/welcomepost');
+    }
+
+    /**
      * Redirect users to the /post/discussion end point after registration.
      */
-    public function entryController_registrationSuccessful_handler() {
+    public function entryController_registrationSuccessful_handler($sender, $args) {
         if (!c('Garden.Registration.ConfirmEmail')) {
             redirect('/post/discussion?welcomepost=true');
+        }
+    }
+
+    /**
+     * When connecting through SSO, redirect user to the Welcome Post page.
+     *
+     * @param UserModel $sender
+     * @param UserModel $args
+     */
+    public function userModel_afterSignIn_handler($sender, $args) {
+        $target = (Gdn::request()->get('Target')) ? '&Target='.Gdn::request()->get('Target') : null;
+        // AfterSignIn event is fired in several places, the InsertUserID
+        // argument is only passed in the connect script.
+        if (val('InsertUserID', $args)) {
+            redirect('/post/discussion?welcomepost=true'.$target);
         }
     }
 
@@ -109,20 +137,17 @@ class WelcomePostPlugin extends Gdn_Plugin {
             echo '<meta http-equiv="Refresh" content="1; url='.url('/post/discussion?welcomepost=true').'">';
         }
     }
-    /**
-     * Add needed resources to the page.
-     *
-     * @param PostController $sender Sending controller instance.
-     * @param array $args Event's arguments.
-     */
-    public function postController_render_before($sender, $args) {
-        if (!$this->isWelcomePostActive($sender->Request, $categoryID)) {
-            return;
-        }
 
-        $sender->addDefinition('WelcomePostPopupMessage', t('Please introduce yourself to the community!'));
-        $sender->addJsFile('welcomepost.js', 'plugins/welcomepost');
-        $sender->addCssFile('welcomepost.css', 'plugins/welcomepost');
+    /**
+     * Inject the appropriate Welcome Post instructions if this is a Welcome Post form.
+     *
+     * @param PostController $sender
+     * @param PostController $args
+     */
+    public function postController_beforeFormInputs_handler($sender, $args) {
+        if ($this->isWelcomePostActive($sender->Request, $categoryID)) {
+            echo t('WelcomePostInstruction', 'Say \'Hello\' to the rest of the community. If you\'re feeling too shy, press \'Skip\'');
+        }
     }
 
     /**
@@ -138,8 +163,19 @@ class WelcomePostPlugin extends Gdn_Plugin {
             return;
         }
 
+        // Change the title of the Welcome Post
+        $sender->title(t('Welcome to the Community'));
+
+        // Change the text on the Cancel button
+        Gdn::locale()->setTranslation('Cancel', t('Skip'));
+
+        //Skipping will bring you to where you were going
+        $cancelURL = ($sender->Request->get('Target')) ? $sender->Request->get('Target') : c('Routes.DefaultController', '/');
+        $sender->setData('_CancelUrl', $cancelURL);
+
         $username = val('Name', Gdn::session()->User, 'Unknown');
 
+        // Force post to be in the "Welcome" category
         $sender->ShowCategorySelector = false;
         $sender->Form->addHidden('CategoryID', $categoryID);
 
