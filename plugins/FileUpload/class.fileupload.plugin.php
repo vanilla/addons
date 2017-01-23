@@ -109,11 +109,8 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     public function pluginController_fileUpload_create($Sender) {
         $Sender->title('FileUpload');
-        $Sender->addSideMenu('plugin/fileupload');
         Gdn_Theme::section('Dashboard');
         $Sender->Form = new Gdn_Form();
-
-        $this->enableSlicing($Sender);
         $this->dispatch($Sender, $Sender->RequestArgs);
     }
 
@@ -171,7 +168,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         }
 
         $Sender->setJSON('Delete', $Delete);
-        $Sender->render($this->getView('blank.php'));
+        $Sender->render($Sender->fetchViewLocation('blank', '', 'plugins/FileUpload'));
     }
 
     /**
