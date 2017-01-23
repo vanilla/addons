@@ -508,15 +508,10 @@ class QnAPlugin extends Gdn_Plugin {
                         }
                         break;
                 }
-
-                $nbsPoint = $Change * (int)c('QnA.Points.AcceptedAnswer', 1);
-                if ($nbsPoint && !$this->Reactions && c('QnA.Points.Enabled', false) && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
-                    UserModel::givePoints($Comment['InsertUserID'], $nbsPoint, 'QnA');
-                }
             }
 
             // Apply change effects
-            if ($Change) {
+            if ($Change && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
                 // Update the user
                 $UserID = val('InsertUserID', $Comment);
                 $this->recalculateUserQnA($UserID);
@@ -530,6 +525,11 @@ class QnAPlugin extends Gdn_Plugin {
                     $questionOwner = $Discussion['InsertUserID'];
                     // If there's change, reactions will take care of it
                     $Rm->react('Comment', $Comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
+                } else {
+                    $nbsPoint = $Change * (int)c('QnA.Points.AcceptedAnswer', 1);
+                    if ($nbsPoint && c('QnA.Points.Enabled', false)) {
+                        UserModel::givePoints($Comment['InsertUserID'], $nbsPoint, 'QnA');
+                    }
                 }
             }
 
@@ -681,16 +681,10 @@ class QnAPlugin extends Gdn_Plugin {
                             }
                             break;
                     }
-
-                    $nbsPoint = $Change * (int)c('QnA.Points.AcceptedAnswer', 1);
-                    if ($nbsPoint && !$this->Reactions && c('QnA.Points.Enabled', false) && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
-                        UserModel::givePoints($Comment['InsertUserID'], $nbsPoint, 'QnA');
-                    }
                 }
 
                 // Apply change effects
-                if ($Change) {
-
+                if ($Change && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
                     // Update the user
                     $UserID = val('InsertUserID', $Comment);
                     $this->recalculateUserQnA($UserID);
@@ -704,6 +698,11 @@ class QnAPlugin extends Gdn_Plugin {
                         $questionOwner = $Discussion['InsertUserID'];
                         // If there's change, reactions will take care of it
                         $Rm->react('Comment', $Comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
+                    } else {
+                        $nbsPoint = $Change * (int)c('QnA.Points.AcceptedAnswer', 1);
+                        if ($nbsPoint && c('QnA.Points.Enabled', false)) {
+                            UserModel::givePoints($Comment['InsertUserID'], $nbsPoint, 'QnA');
+                        }
                     }
                 }
             }
