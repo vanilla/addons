@@ -220,17 +220,16 @@ class CivilTonguePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Censor words in /discussions
      *
-     *
-     * @param $Sender
-     * @param $Args
+     * @param DiscussionsController $sender
      */
-    public function discussionsController_render_before($Sender, $Args) {
-        $Discussions = val('Discussions', $Sender->Data);
-        if (is_array($Discussions) || $Discussions instanceof \Traversable) {
-            foreach ($Discussions as &$Discussion) {
-                $Discussion->Name = $this->replace($Discussion->Name);
-                $Discussion->Body = $this->replace($Discussion->Body);
+    public function discussionsController_render_before($sender) {
+        $discussions = $sender->data('Discussions', []);
+        if (is_array($discussions) || $discussions instanceof \Traversable) {
+            foreach ($discussions as &$discussion) {
+                $discussion->Name = $this->replace($discussion->Name);
+                $discussion->Body = $this->replace($discussion->Body);
             }
         }
     }
