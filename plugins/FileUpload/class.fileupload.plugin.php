@@ -24,7 +24,7 @@
 $PluginInfo['FileUpload'] = [
     'Description' => 'Images and files may be attached to discussions and comments.',
     'Version' => '1.9',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
+    'RequiredApplications' => ['Vanilla' => '2.3.102'],
     'MobileFriendly' => true,
     'RegisterPermissions' => [
         'Plugins.Attachments.Upload.Allow' => 'Garden.Profiles.Edit',
