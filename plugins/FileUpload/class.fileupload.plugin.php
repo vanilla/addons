@@ -865,7 +865,6 @@ class FileUploadPlugin extends Gdn_Plugin {
                 'ImageHeight' => $ImageHeight,
                 'InsertUserID' => Gdn::session()->UserID,
                 'DateInserted' => date('Y-m-d H:i:s'),
-                'StorageMethod' => 'local',
                 'Path' => $SaveFilename
             );
             $MediaID = $this->mediaModel()->save($Media);
@@ -1058,26 +1057,6 @@ class FileUploadPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function structure() {
-        Gdn::structure()->table('Media')
-            ->primaryKey('MediaID')
-            ->column('Name', 'varchar(255)')
-            ->column('Type', 'varchar(128)')
-            ->column('Size', 'int(11)')
-            ->column('ImageWidth', 'usmallint', null)
-            ->column('ImageHeight', 'usmallint', null)
-            ->column('StorageMethod', 'varchar(24)', 'local')
-            ->column('Path', 'varchar(255)')
-
-            ->column('ThumbWidth', 'usmallint', null)
-            ->column('ThumbHeight', 'usmallint', null)
-            ->column('ThumbPath', 'varchar(255)', null)
-
-            ->column('InsertUserID', 'int(11)')
-            ->column('DateInserted', 'datetime')
-            ->column('ForeignID', 'int(11)', true)
-            ->column('ForeignTable', 'varchar(24)', true)
-            ->set();
-
         Gdn::structure()->table('Category')
             ->column('AllowFileUploads', 'tinyint(1)', '1')
             ->set();
