@@ -157,18 +157,26 @@ if ($this->Reactions && class_exists('ReactionModel')) {
         }
 
         // AcceptAnswer
-        $Rm->defineReactionType([
-            'UrlCode' => 'AcceptAnswer',
-            'Name' => 'Accept Answer',
-            'Sort' => 0,
-            'Class' => 'Positive',
-            'IncrementColumn' => 'Score',
-            'IncrementValue' => 5,
-            'Points' => $points,
-            'Permission' => 'Garden.Curation.Manage',
-            'Hidden' => 1,
-            'Description' => "When someone correctly answers a question, they are rewarded with this reaction."
-        ]);
+        $record = $Rm->getWhere(['UrlCode' => 'AcceptAnswer']);
+        if (!$record) {
+            $result = $Rm->defineReactionType([
+                'UrlCode' => 'AcceptAnswer',
+                'Name' => 'Accept Answer',
+                'Sort' => 0,
+                'Class' => 'Positive',
+                'IncrementColumn' => 'Score',
+                'IncrementValue' => 5,
+                'Points' => $points,
+                'Permission' => 'Garden.Curation.Manage',
+                'Hidden' => 1,
+                'Description' => "When someone correctly answers a question, they are rewarded with this reaction."
+            ]);
+        } else {
+            $Rm->save([
+                'UrlCode' => 'AcceptAnswer',
+                'Points' => $points,
+            ]);
+        }
     }
 
     Gdn::structure()->reset();
