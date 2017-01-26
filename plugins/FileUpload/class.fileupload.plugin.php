@@ -24,7 +24,7 @@
 $PluginInfo['FileUpload'] = [
     'Description' => 'Images and files may be attached to discussions and comments.',
     'Version' => '1.9',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
+    'RequiredApplications' => ['Vanilla' => '2.3.102'],
     'MobileFriendly' => true,
     'RegisterPermissions' => [
         'Plugins.Attachments.Upload.Allow' => 'Garden.Profiles.Edit',
@@ -49,10 +49,6 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     public function __construct() {
         parent::__construct();
-
-        if (!class_exists('MediaModel')) {
-            require __DIR__.'/class.mediamodel.php';
-        }
 
         $this->_MediaCache = null;
         $this->CanUpload = checkPermission('Plugins.Attachments.Upload.Allow');
@@ -281,7 +277,7 @@ class FileUploadPlugin extends Gdn_Plugin {
 
         if (count($CommentIDList)) {
             $DiscussionID = $Sender->data('Discussion.DiscussionID');
-            $MediaData = $this->mediaModel()->preloadDiscussionMedia($DiscussionID, $CommentIDList);
+            $MediaData = $this->preloadDiscussionMedia($DiscussionID, $CommentIDList);
         } else {
             $MediaData = false;
         }
@@ -398,7 +394,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             $Filename = $Media->Name;
         }
 
-        $DownloadPath = combinePaths(array(MediaModel::pathUploads(),val('Path', $Media)));
+        $DownloadPath = combinePaths(array(self::pathUploads(),val('Path', $Media)));
 
         if (in_array(strtolower(pathinfo($Filename, PATHINFO_EXTENSION)), array('bmp', 'gif', 'jpg', 'jpeg', 'png'))) {
             $ServeMode = 'inline';
@@ -587,8 +583,8 @@ class FileUploadPlugin extends Gdn_Plugin {
 
         $Options = array();
 
-        $ThumbHeight = MediaModel::thumbnailHeight();
-        $ThumbWidth = MediaModel::thumbnailWidth();
+        $ThumbHeight = self::thumbnailHeight();
+        $ThumbWidth = self::thumbnailWidth();
 
         if (!$ThumbHeight || $SHeight < $ThumbHeight) {
             $Height = $SHeight;
@@ -612,7 +608,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         $ThumbParsed = Gdn_UploadImage::saveImageAs($Path, $TargetPath, $Height, $Width, $Options);
 
         // Cleanup if we're using a scratch copy
-        if ($ThumbParsed['Type'] != '' || $Path != MediaModel::pathUploads().'/'.$SubPath) {
+        if ($ThumbParsed['Type'] != '' || $Path != self::pathUploads().'/'.$SubPath) {
             @unlink($Path);
         }
 
@@ -673,7 +669,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         }
 
         $FileParts = pathinfo($Media->Name);
-        $SourceFilePath = combinePaths(array($this->pathUploads(),$Media->Path));
+        $SourceFilePath = combinePaths(array(self::pathUploads(), $Media->Path));
         $NewFilePath = combinePaths(array($TestFolder,$Media->MediaID.'.'.$FileParts['extension']));
         $Success = rename($SourceFilePath, $NewFilePath);
         if (!$Success) {
@@ -701,7 +697,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         $ReturnArray = array('FileUpload',$FolderID);
 
         if ($Absolute) {
-            array_unshift($ReturnArray, MediaModel::pathUploads());
+            array_unshift($ReturnArray, self::pathUploads());
         }
 
         return ($ReturnString) ? implode(DS,$ReturnArray) : $ReturnArray;
@@ -828,7 +824,7 @@ class FileUploadPlugin extends Gdn_Plugin {
 
             if (!$Handled) {
                 // Build save location
-                $SavePath = MediaModel::pathUploads().$SaveFilename;
+                $SavePath = self::pathUploads().$SaveFilename;
                 if (!is_dir(dirname($SavePath))) {
                     @mkdir(dirname($SavePath), 0777, true);
                 }
@@ -869,7 +865,6 @@ class FileUploadPlugin extends Gdn_Plugin {
                 'ImageHeight' => $ImageHeight,
                 'InsertUserID' => Gdn::session()->UserID,
                 'DateInserted' => date('Y-m-d H:i:s'),
-                'StorageMethod' => 'local',
                 'Path' => $SaveFilename
             );
             $MediaID = $this->mediaModel()->save($Media);
@@ -883,7 +878,7 @@ class FileUploadPlugin extends Gdn_Plugin {
                 'FormatFilesize' => Gdn_Format::bytes($FileSize,1),
                 'ProgressKey' => $Sender->ApcKey ? $Sender->ApcKey : '',
                 'Thumbnail' => base64_encode(MediaThumbnail($Media)),
-                'FinalImageLocation' => Url(MediaModel::url($Media)),
+                'FinalImageLocation' => Url(self::url($Media)),
                 'Parsed' => $Parsed
             );
         } catch (FileUploadPluginUploadErrorException $e) {
@@ -1013,7 +1008,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             $this->fireEvent('TrashFile');
 
             if (!$Deleted) {
-                $DirectPath = MediaModel::pathUploads().DS.$Media->Path;
+                $DirectPath = self::pathUploads().DS.$Media->Path;
                 if (file_exists($DirectPath)) {
                     $Deleted = @unlink($DirectPath);
                 }
@@ -1062,29 +1057,199 @@ class FileUploadPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function structure() {
-        Gdn::structure()->table('Media')
-            ->primaryKey('MediaID')
-            ->column('Name', 'varchar(255)')
-            ->column('Type', 'varchar(128)')
-            ->column('Size', 'int(11)')
-            ->column('ImageWidth', 'usmallint', null)
-            ->column('ImageHeight', 'usmallint', null)
-            ->column('StorageMethod', 'varchar(24)', 'local')
-            ->column('Path', 'varchar(255)')
-
-            ->column('ThumbWidth', 'usmallint', null)
-            ->column('ThumbHeight', 'usmallint', null)
-            ->column('ThumbPath', 'varchar(255)', null)
-
-            ->column('InsertUserID', 'int(11)')
-            ->column('DateInserted', 'datetime')
-            ->column('ForeignID', 'int(11)', true)
-            ->column('ForeignTable', 'varchar(24)', true)
-            ->set();
-
         Gdn::structure()->table('Category')
             ->column('AllowFileUploads', 'tinyint(1)', '1')
             ->set();
+    }
+
+    /**
+     *
+     *
+     * @param $discussionID
+     * @param $commentIDList
+     * @return Gdn_DataSet
+     * @throws Exception
+     */
+    public function preloadDiscussionMedia($discussionID, $commentIDList) {
+        $this->fireEvent('BeforePreloadDiscussionMedia');
+
+        $data = Gdn::sql()
+            ->select('m.*')
+            ->from('Media m')
+            ->beginWhereGroup()
+                ->where('m.ForeignID', $discussionID)
+                ->where('m.ForeignTable', 'discussion')
+            ->endWhereGroup()
+            ->orOp()
+            ->beginWhereGroup()
+                ->whereIn('m.ForeignID', $commentIDList)
+                ->where('m.ForeignTable', 'comment')
+            ->endWhereGroup()
+            ->get();
+
+        // Assign image heights/widths where necessary.
+        $data2 = $data->result();
+        foreach ($data2 as &$row) {
+            if ($row->ImageHeight === null || $row->ImageWidth === null) {
+                list($row->ImageWidth, $row->ImageHeight) = self::getImageSize(self::pathUploads().'/'.ltrim($row->Path, '/'));
+                $this->mediaModel()->update(
+                    [
+                        'ImageWidth' => $row->ImageWidth,
+                        'ImageHeight' => $row->ImageHeight,
+                    ],
+                    ['MediaID' => $row->MediaID]
+                );
+            }
+        }
+
+		return $data;
+    }
+
+    /**
+     * If passed path leads to an image, return size
+     *
+     * @param string $path Path to file.
+     * @return array [0] => Height, [1] => Width.
+     */
+    public static function getImageSize($path) {
+        // Static FireEvent for intercepting non-local files.
+        Gdn::pluginManager()
+            ->fireAs('Gdn_Upload')
+            ->fireEvent('CopyLocal',[
+                'Path' => &$path,
+                'Parsed' => Gdn_Upload::parse($path),
+            ]);
+
+        if (!in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), ['gif', 'jpg', 'jpeg', 'png'])) {
+            return [0, 0];
+        }
+
+        $imageSize = @getimagesize($path);
+        if (is_array($imageSize)) {
+            if (!in_array($imageSize[2], [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+                return [0, 0];
+            }
+
+            return [$imageSize[0], $imageSize[1]];
+        }
+
+        return [0, 0];
+    }
+
+    /**
+     * Return path to upload folder.
+     *
+     * @return string Path to upload folder.
+     */
+    public static function pathUploads() {
+        if (defined('PATH_LOCAL_UPLOADS')) {
+            return PATH_LOCAL_UPLOADS;
+        }
+
+        return PATH_UPLOADS;
+    }
+
+    /**
+     * Get thumbnail height.
+     *
+     * @return int
+     */
+    public static function thumbnailHeight() {
+        static $height = false;
+
+        if ($height === false) {
+            $height = c('Plugins.FileUpload.ThumbnailHeight', 128);
+        }
+
+        return $height;
+    }
+
+    /**
+     * Get thumbnail width.
+     *
+     * @return int
+     */
+    public static function thumbnailWidth() {
+        static $width = false;
+
+        if ($width === false) {
+            $width = c('Plugins.FileUpload.ThumbnailWidth', 256);
+        }
+
+        return $width;
+    }
+
+    /**
+     *
+     *
+     * @param $media
+     * @return mixed|string
+     */
+    public static function thumbnailUrl(&$media) {
+        $thumbPath = val('ThumbPath', $media);
+        if ($thumbPath) {
+            return Gdn_Upload::url(ltrim($thumbPath, '/'));
+        }
+
+        $width = val('ImageWidth', $media);
+        $height = val('ImageHeight', $media);
+
+        if (!$width || !$height) {
+            if ($height = self::thumbnailHeight()) {
+                setValue('ThumbHeight', $media, $height);
+            }
+            return '/plugins/FileUpload/images/file.png';
+        }
+
+        $requiresThumbnail = false;
+        if (self::thumbnailHeight() && $height > self::thumbnailHeight()) {
+            $requiresThumbnail = true;
+        } elseif (self::thumbnailWidth() && $width > self::thumbnailWidth()) {
+            $requiresThumbnail = true;
+        }
+
+        $path = ltrim(val('Path', $media), '/');
+        if ($requiresThumbnail) {
+            $result = url('/utility/thumbnail/'.val('MediaID', $media, 'x').'/'.$path, true);
+        } else {
+            $result = Gdn_Upload::url($path);
+        }
+
+        return $result;
+    }
+
+    /**
+     *
+     *
+     * @param $media
+     * @return mixed|string
+     */
+    public static function url($media) {
+        static $useDownloadUrl = null;
+
+        if ($useDownloadUrl === null) {
+            $useDownloadUrl = c('Plugins.FileUpload.UseDownloadUrl');
+        }
+
+        if (is_string($media)) {
+            $subPath = $media;
+            if (method_exists('Gdn_Upload', 'Url')) {
+                $url = Gdn_Upload::url("$subPath");
+            } else {
+                $url = "/uploads/$subPath";
+            }
+        } elseif ($useDownloadUrl) {
+            $url = '/discussion/download/'.val('MediaID', $media).'/'.rawurlencode(val('Name', $media));
+        } else {
+            $subPath = ltrim(val('Path', $media), '/');
+            if (method_exists('Gdn_Upload', 'Url')) {
+                $url = Gdn_Upload::url("$subPath");
+            } else {
+                $url = "/uploads/$subPath";
+            }
+        }
+
+        return $url;
     }
 }
 
