@@ -170,7 +170,7 @@ class WelcomePostPlugin extends Gdn_Plugin {
         Gdn::locale()->setTranslation('Cancel', t('Skip'));
 
         //Skipping will bring you to where you were going
-        $cancelURL = ($sender->Request->get('Target')) ? $sender->Request->get('Target') : c('Routes.DefaultController', '/');
+        $cancelURL = ($sender->Request->get('Target')) ? $sender->Request->get('Target') : '/';
         $sender->setData('_CancelUrl', $cancelURL);
 
         $username = val('Name', Gdn::session()->User, 'Unknown');
