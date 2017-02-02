@@ -172,6 +172,7 @@ class WelcomePostPlugin extends Gdn_Plugin {
 
         //Skipping will bring you to where you were going
         $cancelURL = (Gdn::request()->get('Target')) ? Gdn::request()->get('Target') : '/';
+        $cancelURL = (isSafeUrl($cancelURL)) ? $cancelURL : null;
         $sender->setData('_CancelUrl', $cancelURL);
 
         $username = val('Name', Gdn::session()->User, 'Unknown');
