@@ -533,12 +533,14 @@ class QnAPlugin extends Gdn_Plugin {
                 }
             }
 
+            $headlineFormat = t('HeadlineFormat.AcceptAnswer', '{ActivityUserID,You} accepted {NotifyUserID,your} answer.');
+
             // Record the activity.
             if ($QnA == 'Accepted') {
                 $Activity = array(
                     'ActivityType' => 'AnswerAccepted',
                     'NotifyUserID' => $Comment['InsertUserID'],
-                    'HeadlineFormat' => '{ActivityUserID,You} accepted {NotifyUserID,your} answer.',
+                    'HeadlineFormat' => $headlineFormat,
                     'RecordType' => 'Comment',
                     'RecordID' => $Comment['CommentID'],
                     'Route' => commentUrl($Comment, '/'),
