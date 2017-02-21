@@ -7,8 +7,8 @@
 
 $PluginInfo['jsconnect'] = [
     'Name' => 'Vanilla jsConnect',
-    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://vanillaforums.org/docs/jsconnect">documentation</a> for details.',
-    'Version' => '1.5.4',
+    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://docs.vanillaforums.com/help/sso/jsconnect/">documentation</a> for details.',
+    'Version' => '1.5.5',
     'RequiredApplications' => ['Vanilla' => '2.1'],
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
@@ -137,7 +137,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             }
         }
 
-        if (StringBeginsWith($target, '/entry/signin')) {
+        if (stringBeginsWith($target, '/entry/signin')) {
             $target = '/';
         }
 
@@ -176,7 +176,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $Query['Target'] = '/'.ltrim(Gdn::request()->path(), '/');
         }
 
-        if (StringBeginsWith($Query['Target'], '/entry/signin')) {
+        if (stringBeginsWith($Query['Target'], '/entry/signin')) {
             $Query['Target'] = '/';
         }
 
@@ -245,7 +245,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         }
 
         $qs = static::connectQueryString($provider, $target);
-        $finalTarget = urlencode(Url('/entry/jsconnect', true).'?'.http_build_query($qs));
+        $finalTarget = urlencode(url('/entry/jsconnect', true).'?'.http_build_query($qs));
 
         $signInUrl = str_ireplace(
             ['{target}', '{redirect}'],
@@ -363,7 +363,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
         if (!val('TestMode', $Provider)) {
             if (!$Signature) {
-                throw new Gdn_UserException(sprintf(T('ValidateRequired'), 'signature'), 400);
+                throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'signature'), 400);
             }
 
             // Validate the signature.
@@ -378,7 +378,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         $Map = ['uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'fullname' => 'FullName', 'roles' => 'Roles'];
         foreach ($Map as $Key => $Value) {
             if (array_key_exists($Key, $JsData)) {
-                $Form->SetFormValue($Value, $JsData[$Key]);
+                $Form->setFormValue($Value, $JsData[$Key]);
             }
         }
 
@@ -430,9 +430,9 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @param $Args
      */
     public function base_render_before($Sender, $Args) {
-        if (!Gdn::Session()->UserID) {
-            $Sender->AddJSFile('jsconnect.js', 'plugins/jsconnect');
-            $Sender->AddCssFile('jsconnect.css', 'plugins/jsconnect');
+        if (!Gdn::session()->UserID) {
+            $Sender->addJSFile('jsconnect.js', 'plugins/jsconnect');
+            $Sender->addCssFile('jsconnect.css', 'plugins/jsconnect');
         }
     }
 
@@ -541,7 +541,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             }
 
             if (!$User['PhotoUrl'] && function_exists('UserPhotoDefaultUrl')) {
-                $User['PhotoUrl'] = Url(UserPhotoDefaultUrl(Gdn::session()->User), true);
+                $User['PhotoUrl'] = url(userPhotoDefaultUrl(Gdn::session()->User), true);
             }
         } else {
             $User = [];
@@ -627,7 +627,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $sender->setFormSaved(false);
             } else {
                 $form->validateRule('AuthenticationKey', 'ValidateRequired');
-                $form->validateRule('AuthenticationKey', 'regex:`^[a-z0-9_-]+$`i', T('The client id must contain only letters, numbers and dashes.'));
+                $form->validateRule('AuthenticationKey', 'regex:`^[a-z0-9_-]+$`i', t('The client id must contain only letters, numbers and dashes.'));
                 $form->validateRule('AssociationSecret', 'ValidateRequired');
                 $form->validateRule('AuthenticateUrl', 'ValidateRequired');
 
@@ -698,7 +698,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 'Control' => 'dropdown',
                 'LabelCode' => 'Hash Algorithm',
                 'Items' => $hashTypes,
-                'Description' => T(
+                'Description' => t(
                     'Choose md5 if you\'re not sure what to choose.',
                     "You can select a custom hash algorithm to sign your requests. The hash algorithm must also be used in your client library. Choose md5 if you're not sure what to choose."
                 ),
@@ -707,7 +707,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             'TestMode' => ['Control' => 'toggle', 'LabelCode' => 'This connection is in test-mode.']
         ];
         $sender->setData('_Controls', $controls);
-        $sender->setData('Title', sprintf(T($client_id ? 'Edit %s' : 'Add %s'), T('Connection')));
+        $sender->setData('Title', sprintf(t($client_id ? 'Edit %s' : 'Add %s'), t('Connection')));
 
         // Throw a render event as this plugin so that handlers can call our methods.
         Gdn::pluginManager()->callEventHandlers($this, __CLASS__, 'addedit', 'render');
