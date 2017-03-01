@@ -249,27 +249,33 @@ class RedirectorPlugin extends Gdn_Plugin {
             if ($Value !== null)
                 $Vars[$Opts[0]] = $Value;
         }
-
         trace($Vars, 'Translated Arguments');
         // Now let's see what kind of record we have.
         // We'll check the various primary keys in order of importance.
         $Result = false;
+
         if (isset($Vars['CommentID'])) {
             trace("Looking up comment {$Vars['CommentID']}.");
-
             $CommentModel = new CommentModel();
             // If a legacy slug is provided (assigned during a merge), attempt to lookup the comment using it
             if (isset($Get['legacy']) && Gdn::Structure()->Table('Comment')->ColumnExists('ForeignID')) {
-                $Comment = $CommentModel->GetWhere(['ForeignID' => $Get['legacy'] . '-' . $Vars['CommentID']])->FirstRow();
+                $Comment = $CommentModel->GetWhere(['ForeignID' => $Vars['CommentID']])->FirstRow();
+
             } else {
                 $Comment = $CommentModel->GetID($Vars['CommentID']);
             }
             if ($Comment) {
                 $Result = CommentUrl($Comment, '//');
+            } else {
+                // vBulletin, defaulting to discussions (foreign ID) when showthread.php?p=xxxx returns no comment
+                $Vars['DiscussionID'] = $Vars['CommentID'];
+                unset($Vars['CommentID']);
+                $Get['legacy'] = true;
             }
-        } elseif (isset($Vars['DiscussionID'])) {
+        }
+        // Splitting the if statement to default to discussions (foreign ID) when showthread.php?p=xxxx returns no comment
+        if (isset($Vars['DiscussionID'])) {
             trace("Looking up discussion {$Vars['DiscussionID']}.");
-
             $DiscussionModel = new DiscussionModel();
             $DiscussionID = $Vars['DiscussionID'];
             $Discussion = false;
@@ -277,7 +283,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             if (is_numeric($DiscussionID)) {
                 // If a legacy slug is provided (assigned during a merge), attempt to lookup the discussion using it
                 if (isset($Get['legacy']) && Gdn::Structure()->Table('Discussion')->ColumnExists('ForeignID')) {
-                    $Discussion = $DiscussionModel->GetWhere(['ForeignID' => $Get['legacy'] . '-' . $DiscussionID])->FirstRow();
+                    $Discussion = $DiscussionModel->GetWhere(['ForeignID' => $DiscussionID])->FirstRow();
                 } else {
                     $Discussion = $DiscussionModel->GetID($Vars['DiscussionID']);
                 }
@@ -519,7 +525,6 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @return array Mapping of vB parameters
      */
     public static function showthreadFilter(&$Get) {
-
         $data = array(
             'p' => 'CommentID',
             'page' => 'Page',
@@ -539,13 +544,9 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'Filter' => [__CLASS__, 'removeID']
             ];
             self::vbFriendlyUrlID($Get, 't');
-        } elseif (isset($Get['p'])) {
-            $data['p'] = 'DiscussionID';
-            $Get['legacy'] = true;
         }
-
-
         return $data;
+
     }
 
     /**
