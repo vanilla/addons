@@ -270,6 +270,7 @@ class RedirectorPlugin extends Gdn_Plugin {
                 // vBulletin, defaulting to discussions (foreign ID) when showthread.php?p=xxxx returns no comment
                 $Vars['DiscussionID'] = $Vars['CommentID'];
                 unset($Vars['CommentID']);
+                $Get['legacy'] = true;
             }
         }
         // Splitting the if statement to default to discussions (foreign ID) when showthread.php?p=xxxx returns no comment
@@ -543,9 +544,6 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'Filter' => [__CLASS__, 'removeID']
             ];
             self::vbFriendlyUrlID($Get, 't');
-        } elseif (isset($Get['p'])) {
-            $data['p'] = 'CommentID';
-            $Get['legacy'] = true;
         }
         return $data;
 
