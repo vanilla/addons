@@ -1,9 +1,10 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * This file contains the client code for Vanilla jsConnect single sign on.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @version 2.0
+ * @copyright 2008-2017 Vanilla Forums, Inc.
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
@@ -12,130 +13,133 @@ define('JS_TIMEOUT', 24 * 60);
 /**
  * Write the jsConnect string for single sign on.
  *
- * @param array $User An array containing information about the currently signed on user. If no user is signed in then this should be an empty array.
- * @param array $Request An array of the $_GET request.
- * @param string $ClientID The string client ID that you set up in the jsConnect settings page.
- * @param string $Secret The string secred that you set up in the jsConnect settings page.
- * @param string|bool $Secure Whether or not to check for security. This is one of these values.
+ * @param array $user An array containing information about the currently signed on user. If no user is signed in then this should be an empty array.
+ * @param array $request An array of the $_GET request.
+ * @param string $clientID The string client ID that you set up in the jsConnect settings page.
+ * @param string $secret The string secret that you set up in the jsConnect settings page.
+ * @param string|bool $secure Whether or not to check for security. This is one of these values.
  *  - true: Check for security and sign the response with an md5 hash.
  *  - false: Don't check for security, but sign the response with an md5 hash.
  *  - string: Check for security and sign the response with the given hash algorithm. See hash_algos() for what your server can support.
  *  - null: Don't check for security and don't sign the response.
- * @since 1.1b Added the ability to provide a hash algorithm to $Secure.
+ * @since 1.1b Added the ability to provide a hash algorithm to $secure.
  */
-function writeJsConnect($User, $Request, $ClientID, $Secret, $Secure = true) {
-    $User = array_change_key_case($User);
+function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
+    $user = array_change_key_case($user);
 
     // Error checking.
-    if ($Secure) {
+    if ($secure) {
         // Check the client.
-        if (!isset($Request['client_id'])) {
-            $Error = ['error' => 'invalid_request', 'message' => 'The client_id parameter is missing.'];
-        } elseif ($Request['client_id'] != $ClientID) {
-            $Error = ['error' => 'invalid_client', 'message' => "Unknown client {$Request['client_id']}."];
-        } elseif (!isset($Request['timestamp']) && !isset($Request['signature'])) {
-
-            if (is_array($User) && count($User) > 0) {
+        if (!isset($request['v'])) {
+            $error = array('error' => 'invalid_request', 'message' => 'Missing the v parameter.');
+        } elseif ($request['v'] !== '2') {
+            $error = array('error' => 'invalid_request', 'message' => "Unsupported version {$request['v']}.");
+        } elseif (!isset($request['client_id'])) {
+            $error = array('error' => 'invalid_request', 'message' => 'The client_id parameter is missing.');
+        } elseif ($request['client_id'] != $clientID) {
+            $error = array('error' => 'invalid_client', 'message' => "Unknown client {$request['client_id']}.");
+        } elseif (!isset($request['timestamp']) && !isset($request['sig'])) {
+            if (is_array($user) && count($user) > 0) {
                 // This isn't really an error, but we are just going to return public information when no signature is sent.
-                $Error = ['name' => $User['name'], 'photourl' => @$User['photourl']];
+                $error = array('name' => (string)@$user['name'], 'photourl' => @$user['photourl'], 'signedin' => true);
             } else {
-                $Error = ['name' => '', 'photourl' => ''];
+                $error = array('name' => '', 'photourl' => '');
             }
-
-        } elseif (!isset($Request['timestamp']) || !is_numeric($Request['timestamp'])) {
-            $Error = ['error' => 'invalid_request', 'message' => 'The timestamp parameter is missing or invalid.'];
-        } elseif (!isset($Request['signature'])) {
-            $Error = ['error' => 'invalid_request', 'message' => 'Missing  signature parameter.'];
-        } elseif (($Diff = abs($Request['timestamp'] - jsTimestamp())) > JS_TIMEOUT) {
-            $Error = ['error' => 'invalid_request', 'message' => 'The timestamp is invalid.'];
+        } elseif (!isset($request['timestamp']) || !is_numeric($request['timestamp'])) {
+            $error = array('error' => 'invalid_request', 'message' => 'The timestamp parameter is missing or invalid.');
+        } elseif (!isset($request['sig'])) {
+            $error = array('error' => 'invalid_request', 'message' => 'Missing sig parameter.');
+        } // Make sure the timestamp hasn't timedout
+        elseif (abs($request['timestamp'] - JsTimestamp()) > JS_TIMEOUT) {
+            $error = array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.');
+        } elseif (!isset($request['nonce'])) {
+            $error = array('error' => 'invalid_request', 'message' => 'Missing nonce parameter.');
+        } elseif (!isset($request['ip'])) {
+            $error = array('error' => 'invalid_request', 'message' => 'Missing ip parameter.');
         } else {
-            // Make sure the timestamp hasn't timed out.
-            $Signature = jsHash($Request['timestamp'].$Secret, $Secure);
-            if ($Signature != $Request['signature']) {
-                $Error = ['error' => 'access_denied', 'message' => 'Signature invalid.'];
+            $signature = jsHash($request['ip'].$request['nonce'].$request['timestamp'].$secret, $secure);
+            if ($signature != $request['sig']) {
+                $error = array('error' => 'access_denied', 'message' => 'Signature invalid.');
             }
         }
     }
 
-    if (isset($Error)) {
-        $Result = $Error;
-    } elseif (is_array($User) && count($User) > 0) {
-        if ($Secure === null) {
-            $Result = $User;
+    if (isset($error)) {
+        $result = $error;
+    } elseif (is_array($user) && count($user) > 0) {
+        if ($secure === null) {
+            $result = $user;
         } else {
-            $Result = signJsConnect($User, $ClientID, $Secret, $Secure, true);
+            $user['ip'] = $request['ip'];
+            $user['nonce'] = $request['nonce'];
+            $result = signJsConnect($user, $clientID, $secret, $secure, true);
+            $result['v'] = '2';
         }
     } else {
-        $Result = ['name' => '', 'photourl' => ''];
+        $result = array('name' => '', 'photourl' => '');
     }
 
-    $Json = json_encode($Result);
+    $json = json_encode($result);
 
-    if (isset($Request['callback'])) {
-        safeHeader('Content-Type: application/javascript');
-        echo "{$Request['callback']}($Json)";
+    if (isset($request['callback'])) {
+        echo "{$request['callback']}($json)";
     } else {
-        safeHeader('Content-Type: application/json');
-        echo $Json;
+        echo $json;
     }
 }
 
 /**
  *
  *
- * @param $Data
- * @param $ClientID
- * @param $Secret
- * @param $HashType
- * @param bool $ReturnData
+ * @param $data
+ * @param $clientID
+ * @param $secret
+ * @param $hashType
+ * @param bool $returnData
  * @return array|string
  */
-function signJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = false) {
-    $Data = array_change_key_case($Data);
-    ksort($Data);
+function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false) {
+    $normalizedData = array_change_key_case($data);
+    ksort($normalizedData);
 
-    foreach ($Data as $Key => $Value) {
-        if ($Value === null) {
-            $Data[$Key] = '';
+    foreach ($normalizedData as $Key => $value) {
+        if ($value === null) {
+            $normalizedData[$Key] = '';
         }
     }
 
-    $String = http_build_query($Data, null, '&');
-//   echo "$String\n";
-    $Signature = jsHash($String.$Secret, $HashType);
-
-    if ($ReturnData) {
-        $Data['client_id'] = $ClientID;
-        $Data['signature'] = $Signature;
-//      $Data['string'] = $String;
-        return $Data;
+    $stringifiedData = http_build_query($normalizedData, null, '&');
+    $signature = jsHash($stringifiedData.$secret, $hashType);
+    if ($returnData) {
+        $normalizedData['client_id'] = $clientID;
+        $normalizedData['sig'] = $signature;
+        return $normalizedData;
     } else {
-        return $Signature;
+        return $signature;
     }
 }
 
 /**
  * Return the hash of a string.
  *
- * @param string $String The string to hash.
- * @param string|bool $Secure The hash algorithm to use. TRUE means md5.
+ * @param string $string The string to hash.
+ * @param string|bool $secure The hash algorithm to use. true means md5.
  * @return string
- * @since 1.1b
  */
-function jsHash($String, $Secure = true) {
-    if ($Secure === true) {
-        $Secure = 'md5';
+function jsHash($string, $secure = true) {
+    if ($secure === true) {
+        $secure = 'md5';
     }
 
-    switch ($Secure) {
+    switch ($secure) {
         case 'sha1':
-            return sha1($String);
+            return sha1($string);
             break;
         case 'md5':
         case false:
-            return md5($String);
+            return md5($string);
         default:
-            return hash($Secure, $String);
+            return hash($secure, $string);
     }
 }
 
@@ -149,23 +153,22 @@ function jsTimestamp() {
 }
 
 /**
- * Generate an SSO string suitible for passing in the url for embedded SSO.
+ * Generate an SSO string suitable for passing in the url for embedded SSO.
  *
- * @param array $User The user to sso.
- * @param string $ClientID Your client ID.
- * @param string $Secret Your secret.
+ * @param array $user The user to sso.
+ * @param string $clientID Your client ID.
+ * @param string $secret Your secret.
  * @return string
  */
-function jsSSOString($User, $ClientID, $Secret) {
-    if (!isset($User['client_id'])) {
-        $User['client_id'] = $ClientID;
+function jsSSOString($user, $clientID, $secret) {
+    if (!isset($user['client_id'])) {
+        $user['client_id'] = $clientID;
     }
 
-    $String = base64_encode(json_encode($User));
-    $Timestamp = time();
-    $Hash = hash_hmac('sha1', "$String $Timestamp", $Secret);
+    $string = base64_encode(json_encode($user));
+    $timestamp = time();
+    $hash = hash_hmac('sha1', "$string $timestamp", $secret);
 
-    $Result = "$String $Hash $Timestamp hmacsha1";
-
-    return $Result;
+    $result = "$string $hash $timestamp hmacsha1";
+    return $result;
 }
