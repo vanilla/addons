@@ -300,29 +300,6 @@ class CivilTonguePlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Sender
-     */
-    public function utilityController_civilPatterns_create($Sender) {
-        $Patterns = $this->getPatterns();
-
-        $Text = "What's a person to do? ass";
-        $Result = array();
-
-        foreach ($Patterns as $Pattern) {
-            $r = preg_replace($Pattern, $this->Replace, $Text);
-            if ($r != $Text) {
-                $Result[] = $Pattern;
-            }
-        }
-
-        $Sender->setData('Matches', $Result);
-        $Sender->setData('Patterns', $Patterns);
-        $Sender->render('Blank', 'Utility');
-    }
-
-    /**
-     *
-     *
      * @param $Text
      * @return mixed
      */
