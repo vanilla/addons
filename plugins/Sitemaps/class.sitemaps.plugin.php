@@ -31,7 +31,7 @@ class SitemapsPlugin extends Gdn_Plugin {
 
    /// Methods ///
 
-   public function buildCategorySiteMap($urlCode, &$urls) {
+   public function BuildCategorySiteMap($urlCode, &$urls) {
       $category = CategoryModel::categories($urlCode);
       if (!$category)
          throw notFoundException();
@@ -99,7 +99,7 @@ class SitemapsPlugin extends Gdn_Plugin {
 
    /// Event Handlers ///
 
-   public function settingsController_Sitemaps_Create($sender) {
+   public function SettingsController_Sitemaps_Create($sender) {
       $sender->permission('Garden.Settings.Manage');
       $sender->setData('Title', t('Sitemap Settings'));
       $sender->addSideMenu();
@@ -109,7 +109,7 @@ class SitemapsPlugin extends Gdn_Plugin {
    /**
     * @param Gdn_Controller $sender
     */
-   public function utilityController_Robots_Create($sender) {
+   public function UtilityController_Robots_Create($sender) {
       // Clear the session to mimic a crawler.
       Gdn::session()->UserID = 0;
       Gdn::session()->User = false;
@@ -152,29 +152,29 @@ class SitemapsPlugin extends Gdn_Plugin {
       $sender->render('SiteMapIndex', '', 'plugins/Sitemaps');
    }
 
-   public function UtilityController_SiteMap_Create($sender, $Args = []) {
+   public function utilityController_SiteMap_Create($sender, $Args = []) {
       Gdn::session()->start(0, false, false);
       $sender->deliveryMethod(DELIVERY_METHOD_XHTML);
       $sender->deliveryType(DELIVERY_TYPE_VIEW);
       $sender->setHeader('Content-Type', 'text/xml');
 
-      $Arg = StringEndsWith(val(0, $Args), '.xml', true, true);
-      $Parts = explode('-', $Arg, 2);
-      $Type = strtolower($Parts[0]);
-      $Arg = val(1, $Parts, '');
+      $arg = stringEndsWith(val(0, $Args), '.xml', true, true);
+      $parts = explode('-', $arg, 2);
+      $type = strtolower($parts[0]);
+      $arg = val(1, $parts, '');
 
       $urls = [];
-      switch ($Type) {
+      switch ($type) {
          case 'category':
             // Build the category site map.
-            $this->buildCategorySiteMap($Arg, $urls);
+            $this->buildCategorySiteMap($arg, $urls);
             break;
          default:
             // See if a plugin can build the sitemap.
-            $this->EventArguments['Type'] = $Type;
-            $this->EventArguments['Arg'] = $Arg;
+            $this->EventArguments['Type'] = $type;
+            $this->EventArguments['Arg'] = $arg;
             $this->EventArguments['Urls'] =& $urls;
-            $this->fireEvent('SiteMap'.ucfirst($Type));
+            $this->fireEvent('SiteMap'.ucfirst($type));
             break;
       }
 
