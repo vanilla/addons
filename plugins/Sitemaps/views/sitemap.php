@@ -1,33 +1,38 @@
 <?php if (!defined('APPLICATION')) exit;
+$SPACE = '  ';
+
 echo '<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-';
 
-
-$Total = 0;
-foreach ($this->Data('Urls') as $Url) {
-   $PageCount = GetValue('PageCount', $Url, 1);
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+$total = 0;
+foreach ($this->Data('Urls') as $url) {
+   $PageCount = val('PageCount', $url, 1);
    
    for ($i = 1; $i <= $PageCount; $i++) {
-      $Loc = str_replace('{Page}', 'p'.$i, $Url['Loc']);
+      $loc = str_replace('{Page}', 'p'.$i, $url['Loc']);
+      echo PHP_EOL . $SPACE . '<url>' . PHP_EOL;
+      echo str_repeat($SPACE, 2) . '<loc>'.$loc.'</loc>' . PHP_EOL;
+
+      if( val('LastMod', $url) ){
+         echo str_repeat($SPACE, 2) . '<lastmod>'.gmdate('c', strtotime($url['LastMod'])).'</lastmod>' . PHP_EOL;
+      }
+
+      if( val('ChangeFreq', $url) ){
+         echo str_repeat($SPACE, 2) . '<changefreq>'.$url['ChangeFreq'].'<changefreq>' . PHP_EOL;
+      }
+      if( val('Priority', $url) ) {
+         echo str_repeat($SPACE, 2) . '<priority>'.$url['Priority'].'</priority>' . PHP_EOL;
+      }
+      echo $SPACE . "</url>" . PHP_EOL;
+      $total++;
       
-      echo '<url>';
-      echo '<loc>'.$Loc.'</loc>';
-      if (GetValue('LastMod', $Url))
-         echo '<lastmod>'.gmdate('c', strtotime($Url['LastMod'])).'</lastmod>';
-      if (GetValue('ChangeFreq', $Url))
-         echo '<changefreq>'.$Url['ChangeFreq'].'<changefreq>';
-      if (GetValue('Priority', $Url))
-         echo '<priority>'.$Url['Priority'].'</priority>';
-      echo "</url>\n";
-      $Total++;
-      
-      if ($Total >= 50000)
+      if( $total >= 50000 ) {
          break;
+      }
    }
    
-   if ($Total >= 50000) {
+   if( $total >= 50000 ) {
       break;
    }
 }
-echo '</urlset>';
+echo '</urlset>' . PHP_EOL;
