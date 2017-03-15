@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit;
-echo 'Sitemap: '.Url('/sitemapindex.xml', TRUE)."\n";
+echo 'Sitemap: '.url('/sitemapindex.xml', true) . PHP_EOL;
 
 // TODO: Make this a settings page
-$Default = 'User-agent: *
+$default = 'User-agent: *
 Disallow: /entry/
 Disallow: /messages/
 Disallow: /profile/comments/
 Disallow: /profile/discussions/
 Disallow: /search/';
 
-echo C('Sitemap.Robots.Rules', $Default);
+echo c('Sitemap.Robots.Rules', $default);
