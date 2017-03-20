@@ -31,7 +31,7 @@ class SitemapsPlugin extends Gdn_Plugin {
 
    /// Methods ///
 
-   public function BuildCategorySiteMap($urlCode, &$urls) {
+   public function buildCategorySiteMap($urlCode, &$urls) {
       $category = CategoryModel::categories($urlCode);
       if (!$category)
          throw notFoundException();
@@ -86,11 +86,11 @@ class SitemapsPlugin extends Gdn_Plugin {
       }
    }
 
-   public function Setup() {
-      $this->Structure();
+   public function setup() {
+      $this->structure();
    }
 
-   public function Structure() {
+   public function structure() {
       Gdn::router()->setRoute('sitemapindex.xml', '/utility/sitemapindex.xml', 'Internal');
       Gdn::router()->setRoute('sitemap-(.+)', '/utility/sitemap/$1', 'Internal');
       Gdn::router()->setRoute('robots.txt', '/utility/robots', 'Internal');
@@ -99,7 +99,7 @@ class SitemapsPlugin extends Gdn_Plugin {
 
    /// Event Handlers ///
 
-   public function SettingsController_Sitemaps_Create($sender) {
+   public function settingsController_Sitemaps_Create($sender) {
       $sender->permission('Garden.Settings.Manage');
       $sender->setData('Title', t('Sitemap Settings'));
       $sender->addSideMenu();
@@ -109,7 +109,7 @@ class SitemapsPlugin extends Gdn_Plugin {
    /**
     * @param Gdn_Controller $sender
     */
-   public function UtilityController_Robots_Create($sender) {
+   public function utilityController_Robots_Create($sender) {
       // Clear the session to mimic a crawler.
       Gdn::session()->UserID = 0;
       Gdn::session()->User = false;
@@ -120,11 +120,32 @@ class SitemapsPlugin extends Gdn_Plugin {
       $sender->render('Robots', '', 'plugins/Sitemaps');
    }
 
+
+    /**
+     *
+     *
+     * Also filter down categories to current node or hub.
+     *
+     * @param DiscussionsController $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function sitemapsPlugin_siteMapBeforeDisplayCategories_handler($sender, $args) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
+        $subcommunityCategoryIDs = $this->getCategoryIDs();
+
+        $args['Categories'] = array_intersect_key($args['Categories'], array_flip($subcommunityCategoryIDs));
+    }
+
+
+
    /**
     * @param Gdn_Controller $sender
     * @param type $Args
     */
-   public function utilityController_SiteMapIndex_Create($sender  ) {
+   public function utilityController_SiteMapIndex_Create($sender) {
       // Clear the session to mimic a crawler.
       Gdn::session()->start(0, false, false);
       $sender->deliveryMethod(DELIVERY_METHOD_XHTML);
@@ -134,7 +155,10 @@ class SitemapsPlugin extends Gdn_Plugin {
       $siteMaps = [];
 
       if (class_exists('CategoryModel')) {
-         $Categories = CategoryModel::categories();
+        $Categories = CategoryModel::categories();
+        $sender->EventArguments['Categories'] = &$categories;
+        $sender->fireEvent('siteMapBeforeDisplayCategories');
+
          foreach ($Categories as $category) {
             if (!$category['PermsDiscussionsView'] || $category['CategoryID'] < 0 || $category['CountDiscussions'] == 0)
                continue;
