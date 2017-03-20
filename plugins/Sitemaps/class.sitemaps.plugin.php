@@ -121,25 +121,6 @@ class SitemapsPlugin extends Gdn_Plugin {
    }
 
 
-    /**
-     *
-     *
-     * Also filter down categories to current node or hub.
-     *
-     * @param DiscussionsController $sender Sending controller instance.
-     * @param array $args Event arguments.
-     */
-    public function sitemapsPlugin_siteMapBeforeDisplayCategories_handler($sender, $args) {
-        if (!SubCommunityModel::getCurrent()) {
-            return;
-        }
-
-        $subcommunityCategoryIDs = $this->getCategoryIDs();
-
-        $args['Categories'] = array_intersect_key($args['Categories'], array_flip($subcommunityCategoryIDs));
-    }
-
-
 
    /**
     * @param Gdn_Controller $sender
@@ -157,7 +138,7 @@ class SitemapsPlugin extends Gdn_Plugin {
       if (class_exists('CategoryModel')) {
         $Categories = CategoryModel::categories();
         $sender->EventArguments['Categories'] = &$categories;
-        $sender->fireEvent('siteMapBeforeDisplayCategories');
+        $this->fireEvent('siteMapCategories');
 
          foreach ($Categories as $category) {
             if (!$category['PermsDiscussionsView'] || $category['CategoryID'] < 0 || $category['CountDiscussions'] == 0)
