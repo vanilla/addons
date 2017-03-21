@@ -11,12 +11,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 // Define the plugin:
-$PluginInfo['Sitemaps'] = array(
+$PluginInfo['Sitemaps'] = [
     'Name' => 'Sitemaps',
     'Description' => "Creates an XML sitemap based on http://www.sitemaps.org.",
     'Version' => '2.0.1',
     'MobileFriendly' => true,
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
+    'RequiredApplications' => ['Vanilla' => '2.0.18'],
     'RequiredTheme' => false,
     'RequiredPlugins' => false,
     'HasLocale' => true,
@@ -27,7 +27,7 @@ $PluginInfo['Sitemaps'] = array(
     'SettingsUrl' => '/settings/sitemaps',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Icon' => 'site-maps.png'
-);
+];
 
 class SitemapsPlugin extends Gdn_Plugin {
 
@@ -63,11 +63,11 @@ class SitemapsPlugin extends Gdn_Plugin {
         $Now = time();
 
         for ($i = $From; $i >= $To; $i = strtotime('-1 month', $i)) {
-            $Url = array(
+            $Url = [
                 'Loc' => url('/categories/archives/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'/'.gmdate('Y-m', $i), true),
                 'LastMod' => '',
                 'ChangeFreq' => ''
-            );
+            ];
 
             $LastMod = strtotime('last day of this month', $i);
             if ($LastMod > $Now) {
@@ -80,11 +80,11 @@ class SitemapsPlugin extends Gdn_Plugin {
 
         // If there are no links then just link to the category.
         if (count($Urls) === 0) {
-            $Url = array(
+            $Url = [
                 'Loc' => categoryUrl($Category),
                 'LastMode' => '',
                 'ChangeFreq' => ''
-            );
+            ];
             $Urls[] = $Url;
 
         }
@@ -135,7 +135,7 @@ class SitemapsPlugin extends Gdn_Plugin {
         $Sender->deliveryType(DELIVERY_TYPE_VIEW);
         $Sender->setHeader('Content-Type', 'text/xml');
 
-        $SiteMaps = array();
+        $SiteMaps = [];
 
         if (class_exists('CategoryModel')) {
             $Categories = CategoryModel::categories();
@@ -144,12 +144,12 @@ class SitemapsPlugin extends Gdn_Plugin {
                     continue;
                 }
 
-                $SiteMap = array(
+                $SiteMap = [
                     'Loc' => url('/sitemap-category-'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'.xml', true),
                     'LastMod' => $Category['DateLastComment'],
                     'ChangeFreq' => '',
                     'Priority' => ''
-                );
+                ];
                 $SiteMaps[] = $SiteMap;
             }
         }
@@ -157,7 +157,7 @@ class SitemapsPlugin extends Gdn_Plugin {
         $Sender->render('SiteMapIndex', '', 'plugins/Sitemaps');
     }
 
-    public function utilityController_siteMap_create($Sender, $Args = array()) {
+    public function utilityController_siteMap_create($Sender, $Args = []) {
         Gdn::session()->start(0, false, false);
         $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
         $Sender->deliveryType(DELIVERY_TYPE_VIEW);
@@ -168,7 +168,7 @@ class SitemapsPlugin extends Gdn_Plugin {
         $Type = strtolower($Parts[0]);
         $Arg = getValue(1, $Parts, '');
 
-        $Urls = array();
+        $Urls = [];
         switch ($Type) {
             case 'category':
                 // Build the category site map.
