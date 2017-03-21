@@ -166,7 +166,7 @@ class SitemapsPlugin extends Gdn_Plugin {
         $Arg = stringEndsWith(GetValue(0, $Args), '.xml', true, true);
         $Parts = explode('-', $Arg, 2);
         $Type = strtolower($Parts[0]);
-        $Arg = getValue(1, $Parts, '');
+        $Arg = val(1, $Parts, '');
 
         $Urls = [];
         switch ($Type) {

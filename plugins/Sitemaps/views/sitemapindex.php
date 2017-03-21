@@ -7,13 +7,13 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
 foreach ($this->data('SiteMaps') as $SiteMap) {
     echo '<sitemap>';
     echo '<loc>'.$SiteMap['Loc'].'</loc>';
-    if (getValue('LastMod', $SiteMap)) {
+    if (val('LastMod', $SiteMap)) {
         echo '<lastmod>'.date('c', strtotime($SiteMap['LastMod'])).'</lastmod>';
     }
-    if (getValue('ChangeFreq', $SiteMap)) {
+    if (val('ChangeFreq', $SiteMap)) {
         echo '<changefreq>'.$SiteMap['ChangeFreq'].'<changefreq>';
     }
-    if (getValue('Priority', $SiteMap)) {
+    if (val('Priority', $SiteMap)) {
         echo '<priority>'.$SiteMap['Priority'].'</priority>';
     }
     echo "</sitemap>\n";
