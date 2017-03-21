@@ -124,9 +124,9 @@ class SitemapsPlugin extends Gdn_Plugin {
 
    /**
     * @param Gdn_Controller $sender
-    * @param type $Args
+    * @param type $args
     */
-   public function utilityController_SiteMapIndex_Create($sender) {
+   public function utilityController_SiteMapIndex_Create($sender, $args = []) {
       // Clear the session to mimic a crawler.
       Gdn::session()->start(0, false, false);
       $sender->deliveryMethod(DELIVERY_METHOD_XHTML);
@@ -136,11 +136,12 @@ class SitemapsPlugin extends Gdn_Plugin {
       $siteMaps = [];
 
       if (class_exists('CategoryModel')) {
-        $Categories = CategoryModel::categories();
-        $sender->EventArguments['Categories'] = &$categories;
+        $categories = CategoryModel::categories();
+
+        $this->EventArguments['Categories'] = &$categories;
         $this->fireEvent('siteMapCategories');
 
-         foreach ($Categories as $category) {
+         foreach ($categories as $category) {
             if (!$category['PermsDiscussionsView'] || $category['CategoryID'] < 0 || $category['CountDiscussions'] == 0)
                continue;
 
