@@ -5,19 +5,19 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
 
 
 $Total = 0;
-foreach ($this->Data('Urls') as $Url) {
-   $PageCount = GetValue('PageCount', $Url, 1);
+foreach ($this->data('Urls') as $Url) {
+   $PageCount = getValue('PageCount', $Url, 1);
    
    for ($i = 1; $i <= $PageCount; $i++) {
       $Loc = str_replace('{Page}', 'p'.$i, $Url['Loc']);
       
       echo '<url>';
       echo '<loc>'.$Loc.'</loc>';
-      if (GetValue('LastMod', $Url))
+      if (getValue('LastMod', $Url))
          echo '<lastmod>'.gmdate('c', strtotime($Url['LastMod'])).'</lastmod>';
-      if (GetValue('ChangeFreq', $Url))
+      if (getValue('ChangeFreq', $Url))
          echo '<changefreq>'.$Url['ChangeFreq'].'<changefreq>';
-      if (GetValue('Priority', $Url))
+      if (getValue('Priority', $Url))
          echo '<priority>'.$Url['Priority'].'</priority>';
       echo "</url>\n";
       $Total++;

@@ -3,14 +3,14 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ';
 
-foreach ($this->Data('SiteMaps') as $SiteMap) {
+foreach ($this->data('SiteMaps') as $SiteMap) {
    echo '<sitemap>';
    echo '<loc>'.$SiteMap['Loc'].'</loc>';
-   if (GetValue('LastMod', $SiteMap))
+   if (getValue('LastMod', $SiteMap))
       echo '<lastmod>'.date('c', strtotime($SiteMap['LastMod'])).'</lastmod>';
-   if (GetValue('ChangeFreq', $SiteMap))
+   if (getValue('ChangeFreq', $SiteMap))
       echo '<changefreq>'.$SiteMap['ChangeFreq'].'<changefreq>';
-   if (GetValue('Priority', $SiteMap))
+   if (getValue('Priority', $SiteMap))
       echo '<priority>'.$SiteMap['Priority'].'</priority>';
    echo "</sitemap>\n";
 }
