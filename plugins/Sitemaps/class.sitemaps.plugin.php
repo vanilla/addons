@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) {
+    exit();
+}
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -10,175 +12,178 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Sitemaps'] = array(
-   'Name' => 'Sitemaps',
-   'Description' => "Creates an XML sitemap based on http://www.sitemaps.org.",
-   'Version' => '2.0.1',
-   'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => TRUE,
-   'RegisterPermissions' => FALSE,
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com',
-   'SettingsUrl' => '/settings/sitemaps',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Icon' => 'site-maps.png'
+    'Name' => 'Sitemaps',
+    'Description' => "Creates an XML sitemap based on http://www.sitemaps.org.",
+    'Version' => '2.0.1',
+    'MobileFriendly' => TRUE,
+    'RequiredApplications' => array('Vanilla' => '2.0.18'),
+    'RequiredTheme' => FALSE,
+    'RequiredPlugins' => FALSE,
+    'HasLocale' => TRUE,
+    'RegisterPermissions' => FALSE,
+    'Author' => "Tim Gunter",
+    'AuthorEmail' => 'tim@vanillaforums.com',
+    'AuthorUrl' => 'http://www.vanillaforums.com',
+    'SettingsUrl' => '/settings/sitemaps',
+    'SettingsPermission' => 'Garden.Settings.Manage',
+    'Icon' => 'site-maps.png'
 );
 
 class SitemapsPlugin extends Gdn_Plugin {
 
-   /// Methods ///
+    /// Methods ///
 
-   public function buildCategorySiteMap($UrlCode, &$Urls) {
-      $Category = CategoryModel::categories($UrlCode);
-      if (!$Category)
-         throw notFoundException();
+    public function buildCategorySiteMap($UrlCode, &$Urls) {
+        $Category = CategoryModel::categories($UrlCode);
+        if (!$Category) {
+            throw notFoundException();
+        }
 
-      // Get the min/max dates for the sitemap.
-      $Row = Gdn::sql()
-         ->select('DateInserted', 'min', 'MinDate')
-         ->select('DateInserted', 'max', 'MaxDate')
-         ->from('Discussion')
-         ->where('CategoryID', $Category['CategoryID'])
-         ->get()->firstRow(DATASET_TYPE_ARRAY);
+        // Get the min/max dates for the sitemap.
+        $Row = Gdn::sql()
+            ->select('DateInserted', 'min', 'MinDate')
+            ->select('DateInserted', 'max', 'MaxDate')
+            ->from('Discussion')
+            ->where('CategoryID', $Category['CategoryID'])
+            ->get()->firstRow(DATASET_TYPE_ARRAY);
 
-      if ($Row) {
-         $From = strtotime('first day of this month 00:00:00', strtotime($Row['MaxDate']));
-         $To = strtotime('first day of this month 00:00:00', strtotime($Row['MinDate']));
+        if ($Row) {
+            $From = strtotime('first day of this month 00:00:00', strtotime($Row['MaxDate']));
+            $To = strtotime('first day of this month 00:00:00', strtotime($Row['MinDate']));
 
-         if (!$From || !$To) {
+            if (!$From || !$To) {
+                $From = -1;
+                $To = 0;
+            }
+        } else {
             $From = -1;
             $To = 0;
-         }
-      } else {
-         $From = -1;
-         $To = 0;
-      }
+        }
 
-      $Now = time();
+        $Now = time();
 
-      for ($i = $From; $i >= $To; $i = strtotime('-1 month', $i)) {
-         $Url = array(
-            'Loc' => url('/categories/archives/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'/'.gmdate('Y-m', $i), TRUE),
-            'LastMod' => '',
-            'ChangeFreq' => ''
-         );
-
-         $LastMod = strtotime('last day of this month', $i);
-         if ($LastMod > $Now)
-            $LastMod = $Now;
-         $Url['LastMod'] = gmdate('c', $LastMod);
-
-         $Urls[] = $Url;
-      }
-
-      // If there are no links then just link to the category.
-      if (count($Urls) === 0) {
-         $Url = array(
-            'Loc' => categoryUrl($Category),
-            'LastMode' => '',
-            'ChangeFreq' => ''
-         );
-         $Urls[] = $Url;
-
-      }
-   }
-
-   public function setup() {
-      $this->structure();
-   }
-
-   public function structure() {
-      Gdn::router()->setRoute('sitemapindex.xml', '/utility/sitemapindex.xml', 'Internal');
-      Gdn::router()->setRoute('sitemap-(.+)', '/utility/sitemap/$1', 'Internal');
-      Gdn::router()->setRoute('robots.txt', '/utility/robots', 'Internal');
-   }
-
-
-   /// Event Handlers ///
-
-   public function settingsController_sitemaps_create($Sender) {
-      $Sender->permission('Garden.Settings.Manage');
-      $Sender->setData('Title', t('Sitemap Settings'));
-      $Sender->addSideMenu();
-      $Sender->render('Settings', '', 'plugins/Sitemaps');
-   }
-
-   /**
-    * @param Gdn_Controller $Sender
-    */
-   public function utilityController_robots_create($Sender) {
-      // Clear the session to mimic a crawler.
-      Gdn::session()->UserID = 0;
-      Gdn::session()->User = FALSE;
-      $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
-      $Sender->deliveryType(DELIVERY_TYPE_VIEW);
-      $Sender->setHeader('Content-Type', 'text/plain');
-
-      $Sender->render('Robots', '', 'plugins/Sitemaps');
-   }
-
-   /**
-    * @param Gdn_Controller $Sender
-    * @param type $Args
-    */
-   public function utilityController_siteMapIndex_create($Sender  ) {
-      // Clear the session to mimic a crawler.
-      Gdn::session()->start(0, FALSE, FALSE);
-      $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
-      $Sender->deliveryType(DELIVERY_TYPE_VIEW);
-      $Sender->setHeader('Content-Type', 'text/xml');
-
-      $SiteMaps = array();
-
-      if (class_exists('CategoryModel')) {
-         $Categories = CategoryModel::categories();
-         foreach ($Categories as $Category) {
-            if (!$Category['PermsDiscussionsView'] || $Category['CategoryID'] < 0 || $Category['CountDiscussions'] == 0)
-               continue;
-
-            $SiteMap = array(
-                'Loc' => url('/sitemap-category-'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'.xml', TRUE),
-                'LastMod' => $Category['DateLastComment'],
-                'ChangeFreq' => '',
-                'Priority' => ''
+        for ($i = $From; $i >= $To; $i = strtotime('-1 month', $i)) {
+            $Url = array(
+                'Loc' => url('/categories/archives/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'/'.gmdate('Y-m', $i), TRUE),
+                'LastMod' => '',
+                'ChangeFreq' => ''
             );
-            $SiteMaps[] = $SiteMap;
-         }
-      }
-      $Sender->setData('SiteMaps', $SiteMaps);
-      $Sender->render('SiteMapIndex', '', 'plugins/Sitemaps');
-   }
 
-   public function utilityController_siteMap_create($Sender, $Args = array()) {
-      Gdn::session()->start(0, FALSE, FALSE);
-      $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
-      $Sender->deliveryType(DELIVERY_TYPE_VIEW);
-      $Sender->setHeader('Content-Type', 'text/xml');
+            $LastMod = strtotime('last day of this month', $i);
+            if ($LastMod > $Now) {
+                $LastMod = $Now;
+            }
+            $Url['LastMod'] = gmdate('c', $LastMod);
 
-      $Arg = stringEndsWith(GetValue(0, $Args), '.xml', TRUE, TRUE);
-      $Parts = explode('-', $Arg, 2);
-      $Type = strtolower($Parts[0]);
-      $Arg = getValue(1, $Parts, '');
+            $Urls[] = $Url;
+        }
 
-      $Urls = array();
-      switch ($Type) {
-         case 'category':
-            // Build the category site map.
-            $this->buildCategorySiteMap($Arg, $Urls);
-            break;
-         default:
-            // See if a plugin can build the sitemap.
-            $this->EventArguments['Type'] = $Type;
-            $this->EventArguments['Arg'] = $Arg;
-            $this->EventArguments['Urls'] =& $Urls;
-            $this->fireEvent('SiteMap'.ucfirst($Type));
-            break;
-      }
+        // If there are no links then just link to the category.
+        if (count($Urls) === 0) {
+            $Url = array(
+                'Loc' => categoryUrl($Category),
+                'LastMode' => '',
+                'ChangeFreq' => ''
+            );
+            $Urls[] = $Url;
 
-      $Sender->setData('Urls', $Urls);
-      $Sender->render('SiteMap', '', 'plugins/Sitemaps');
-   }
+        }
+    }
+
+    public function setup() {
+        $this->structure();
+    }
+
+    public function structure() {
+        Gdn::router()->setRoute('sitemapindex.xml', '/utility/sitemapindex.xml', 'Internal');
+        Gdn::router()->setRoute('sitemap-(.+)', '/utility/sitemap/$1', 'Internal');
+        Gdn::router()->setRoute('robots.txt', '/utility/robots', 'Internal');
+    }
+
+
+    /// Event Handlers ///
+
+    public function settingsController_sitemaps_create($Sender) {
+        $Sender->permission('Garden.Settings.Manage');
+        $Sender->setData('Title', t('Sitemap Settings'));
+        $Sender->addSideMenu();
+        $Sender->render('Settings', '', 'plugins/Sitemaps');
+    }
+
+    /**
+     * @param Gdn_Controller $Sender
+     */
+    public function utilityController_robots_create($Sender) {
+        // Clear the session to mimic a crawler.
+        Gdn::session()->UserID = 0;
+        Gdn::session()->User = FALSE;
+        $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
+        $Sender->deliveryType(DELIVERY_TYPE_VIEW);
+        $Sender->setHeader('Content-Type', 'text/plain');
+
+        $Sender->render('Robots', '', 'plugins/Sitemaps');
+    }
+
+    /**
+     * @param Gdn_Controller $Sender
+     * @param type $Args
+     */
+    public function utilityController_siteMapIndex_create($Sender) {
+        // Clear the session to mimic a crawler.
+        Gdn::session()->start(0, FALSE, FALSE);
+        $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
+        $Sender->deliveryType(DELIVERY_TYPE_VIEW);
+        $Sender->setHeader('Content-Type', 'text/xml');
+
+        $SiteMaps = array();
+
+        if (class_exists('CategoryModel')) {
+            $Categories = CategoryModel::categories();
+            foreach ($Categories as $Category) {
+                if (!$Category['PermsDiscussionsView'] || $Category['CategoryID'] < 0 || $Category['CountDiscussions'] == 0) {
+                    continue;
+                }
+
+                $SiteMap = array(
+                    'Loc' => url('/sitemap-category-'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'.xml', TRUE),
+                    'LastMod' => $Category['DateLastComment'],
+                    'ChangeFreq' => '',
+                    'Priority' => ''
+                );
+                $SiteMaps[] = $SiteMap;
+            }
+        }
+        $Sender->setData('SiteMaps', $SiteMaps);
+        $Sender->render('SiteMapIndex', '', 'plugins/Sitemaps');
+    }
+
+    public function utilityController_siteMap_create($Sender, $Args = array()) {
+        Gdn::session()->start(0, FALSE, FALSE);
+        $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
+        $Sender->deliveryType(DELIVERY_TYPE_VIEW);
+        $Sender->setHeader('Content-Type', 'text/xml');
+
+        $Arg = stringEndsWith(GetValue(0, $Args), '.xml', TRUE, TRUE);
+        $Parts = explode('-', $Arg, 2);
+        $Type = strtolower($Parts[0]);
+        $Arg = getValue(1, $Parts, '');
+
+        $Urls = array();
+        switch ($Type) {
+            case 'category':
+                // Build the category site map.
+                $this->buildCategorySiteMap($Arg, $Urls);
+                break;
+            default:
+                // See if a plugin can build the sitemap.
+                $this->EventArguments['Type'] = $Type;
+                $this->EventArguments['Arg'] = $Arg;
+                $this->EventArguments['Urls'] =& $Urls;
+                $this->fireEvent('SiteMap'.ucfirst($Type));
+                break;
+        }
+
+        $Sender->setData('Urls', $Urls);
+        $Sender->render('SiteMap', '', 'plugins/Sitemaps');
+    }
 }

@@ -1,4 +1,5 @@
-<?php if (!defined('APPLICATION')) exit;
+<?php if (!defined('APPLICATION')) { exit; }
+
 echo 'Sitemap: '.url('/sitemapindex.xml', TRUE)."\n";
 
 // TODO: Make this a settings page
