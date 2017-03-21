@@ -5,8 +5,8 @@
     A site map is an <a href="http://en.wikipedia.org/wiki/XML">xml</a> file that search engines can use to help index
     your site.
     <ul>
-        <li>Your main site map is located here: <?php echo Gdn_Format::links(Url('/sitemapindex.xml', TRUE)); ?>.</li>
-        <li>Your <?php echo anchor('robots.txt', url('/robots.txt', TRUE)) ?> file contains the location of this site
+        <li>Your main site map is located here: <?php echo Gdn_Format::links(Url('/sitemapindex.xml', true)); ?>.</li>
+        <li>Your <?php echo anchor('robots.txt', url('/robots.txt', true)) ?> file contains the location of this site
             map so that search engines that are aware of your site will know where to look.
         </li>
     </ul>

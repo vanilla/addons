@@ -15,12 +15,12 @@ $PluginInfo['Sitemaps'] = array(
     'Name' => 'Sitemaps',
     'Description' => "Creates an XML sitemap based on http://www.sitemaps.org.",
     'Version' => '2.0.1',
-    'MobileFriendly' => TRUE,
+    'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => TRUE,
-    'RegisterPermissions' => FALSE,
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false,
+    'HasLocale' => true,
+    'RegisterPermissions' => false,
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com',
@@ -64,7 +64,7 @@ class SitemapsPlugin extends Gdn_Plugin {
 
         for ($i = $From; $i >= $To; $i = strtotime('-1 month', $i)) {
             $Url = array(
-                'Loc' => url('/categories/archives/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'/'.gmdate('Y-m', $i), TRUE),
+                'Loc' => url('/categories/archives/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'/'.gmdate('Y-m', $i), true),
                 'LastMod' => '',
                 'ChangeFreq' => ''
             );
@@ -116,7 +116,7 @@ class SitemapsPlugin extends Gdn_Plugin {
     public function utilityController_robots_create($Sender) {
         // Clear the session to mimic a crawler.
         Gdn::session()->UserID = 0;
-        Gdn::session()->User = FALSE;
+        Gdn::session()->User = false;
         $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
         $Sender->deliveryType(DELIVERY_TYPE_VIEW);
         $Sender->setHeader('Content-Type', 'text/plain');
@@ -130,7 +130,7 @@ class SitemapsPlugin extends Gdn_Plugin {
      */
     public function utilityController_siteMapIndex_create($Sender) {
         // Clear the session to mimic a crawler.
-        Gdn::session()->start(0, FALSE, FALSE);
+        Gdn::session()->start(0, false, false);
         $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
         $Sender->deliveryType(DELIVERY_TYPE_VIEW);
         $Sender->setHeader('Content-Type', 'text/xml');
@@ -145,7 +145,7 @@ class SitemapsPlugin extends Gdn_Plugin {
                 }
 
                 $SiteMap = array(
-                    'Loc' => url('/sitemap-category-'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'.xml', TRUE),
+                    'Loc' => url('/sitemap-category-'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'.xml', true),
                     'LastMod' => $Category['DateLastComment'],
                     'ChangeFreq' => '',
                     'Priority' => ''
@@ -158,12 +158,12 @@ class SitemapsPlugin extends Gdn_Plugin {
     }
 
     public function utilityController_siteMap_create($Sender, $Args = array()) {
-        Gdn::session()->start(0, FALSE, FALSE);
+        Gdn::session()->start(0, false, false);
         $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
         $Sender->deliveryType(DELIVERY_TYPE_VIEW);
         $Sender->setHeader('Content-Type', 'text/xml');
 
-        $Arg = stringEndsWith(GetValue(0, $Args), '.xml', TRUE, TRUE);
+        $Arg = stringEndsWith(GetValue(0, $Args), '.xml', true, true);
         $Parts = explode('-', $Arg, 2);
         $Type = strtolower($Parts[0]);
         $Arg = getValue(1, $Parts, '');

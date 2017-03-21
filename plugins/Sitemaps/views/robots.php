@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) { exit; }
 
-echo 'Sitemap: '.url('/sitemapindex.xml', TRUE)."\n";
+echo 'Sitemap: '.url('/sitemapindex.xml', true)."\n";
 
 // TODO: Make this a settings page
 $Default = 'User-agent: *
