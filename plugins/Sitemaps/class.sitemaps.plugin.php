@@ -124,10 +124,10 @@ class SitemapsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @param Gdn_Controller $Sender
-     * @param type $Args
+     * @param UtilityController $Sender Sending controller instance
+     * @param array $args Event's arguments
      */
-    public function utilityController_siteMapIndex_create($Sender) {
+    public function utilityController_siteMapIndex_create($Sender, $args) {
         // Clear the session to mimic a crawler.
         Gdn::session()->start(0, false, false);
         $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
@@ -138,6 +138,10 @@ class SitemapsPlugin extends Gdn_Plugin {
 
         if (class_exists('CategoryModel')) {
             $Categories = CategoryModel::categories();
+
+            $this->EventArguments['Categories'] = &$categories;
+            $this->fireEvent('siteMapCategories');
+
             foreach ($Categories as $Category) {
                 if (!$Category['PermsDiscussionsView'] || $Category['CategoryID'] < 0 || $Category['CountDiscussions'] == 0) {
                     continue;
@@ -156,13 +160,17 @@ class SitemapsPlugin extends Gdn_Plugin {
         $Sender->render('SiteMapIndex', '', 'plugins/Sitemaps');
     }
 
-    public function utilityController_siteMap_create($Sender, $Args = []) {
+    /**
+     * @param UtilityController $Sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function utilityController_siteMap_create($Sender, $Args) {
         Gdn::session()->start(0, false, false);
         $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
         $Sender->deliveryType(DELIVERY_TYPE_VIEW);
         $Sender->setHeader('Content-Type', 'text/xml');
 
-        $Arg = stringEndsWith(GetValue(0, $Args), '.xml', true, true);
+        $Arg = stringEndsWith(val(0, $Args), '.xml', true, true);
         $Parts = explode('-', $Arg, 2);
         $Type = strtolower($Parts[0]);
         $Arg = val(1, $Parts, '');
