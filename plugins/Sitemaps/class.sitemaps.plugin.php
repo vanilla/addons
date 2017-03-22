@@ -125,9 +125,9 @@ class SitemapsPlugin extends Gdn_Plugin {
 
     /**
      * @param Gdn_Controller $Sender
-     * @param type $Args
+     * @param type $args
      */
-    public function utilityController_siteMapIndex_create($Sender, $args = []) {
+    public function utilityController_siteMapIndex_create($Sender, $args) {
         // Clear the session to mimic a crawler.
         Gdn::session()->start(0, false, false);
         $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
