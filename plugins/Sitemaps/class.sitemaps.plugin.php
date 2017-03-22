@@ -124,8 +124,8 @@ class SitemapsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @param Gdn_Controller $Sender
-     * @param type $args
+     * @param UtilityController $Sender Sending controller instance
+     * @param array $args Event's arguments
      */
     public function utilityController_siteMapIndex_create($Sender, $args) {
         // Clear the session to mimic a crawler.
@@ -160,7 +160,11 @@ class SitemapsPlugin extends Gdn_Plugin {
         $Sender->render('SiteMapIndex', '', 'plugins/Sitemaps');
     }
 
-    public function utilityController_siteMap_create($Sender, $Args = []) {
+    /**
+     * @param UtilityController $Sender Sending controller instance
+     * @param array $args Event's arguments
+     */
+    public function utilityController_siteMap_create($Sender, $Args) {
         Gdn::session()->start(0, false, false);
         $Sender->deliveryMethod(DELIVERY_METHOD_XHTML);
         $Sender->deliveryType(DELIVERY_TYPE_VIEW);
