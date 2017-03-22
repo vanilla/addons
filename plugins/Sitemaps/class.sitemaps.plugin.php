@@ -170,7 +170,7 @@ class SitemapsPlugin extends Gdn_Plugin {
         $Sender->deliveryType(DELIVERY_TYPE_VIEW);
         $Sender->setHeader('Content-Type', 'text/xml');
 
-        $Arg = stringEndsWith(GetValue(0, $Args), '.xml', true, true);
+        $Arg = stringEndsWith(val(0, $Args), '.xml', true, true);
         $Parts = explode('-', $Arg, 2);
         $Type = strtolower($Parts[0]);
         $Arg = val(1, $Parts, '');
