@@ -10,5 +10,9 @@ Each community generates a /sitemapindex.xml page, containing a site map for eac
 
 Each category has its own sitemap, containing links to each discussion. Again, the limit is 50,000 urls.
 
+## Filtering results
+
+If you need to filter out the results, there is an event (siteMapCategories) after the categories are fetched to filter out the results.
+
 ---
 Copyright &copy; 2017 [Vanilla Forums](http://vanillaforums.com).
