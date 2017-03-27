@@ -27,9 +27,6 @@ class DisqusPlugin extends Gdn_Plugin {
     /** @var null  */
     protected $_Provider = null;
 
-    /** @var null  */
-    protected $_RedirectUri = null;
-
     /**
      *
      *
@@ -75,54 +72,15 @@ class DisqusPlugin extends Gdn_Plugin {
             return '';
         }
 
-        $RedirectUri = $this->redirectUri();
-        if ($Query) {
-            $RedirectUri .= '&'.$Query;
-        }
-
         $Qs = array(
             'client_id' => $Provider['AuthenticationKey'],
             'scope' => 'read',
             'response_type' => 'code',
-            'redirect_uri' => $RedirectUri);
+        );
 
         $SigninHref = 'https://disqus.com/api/oauth/2.0/authorize/?'.http_build_query($Qs);
 
         return $SigninHref;
-    }
-
-    /**
-     *
-     *
-     * @param null $NewValue
-     * @return null|string
-     */
-    public function redirectUri($NewValue = null) {
-        if ($NewValue !== null)
-            $this->_RedirectUri = $NewValue;
-        elseif ($this->_RedirectUri === null) {
-            $RedirectUri = Url('/entry/connect/disqus', true);
-            if (strpos($RedirectUri, '=') !== false) {
-                $p = strrchr($RedirectUri, '=');
-                $Uri = substr($RedirectUri, 0, -strlen($p));
-                $p = urlencode(ltrim($p, '='));
-                $RedirectUri = $Uri.'='.$p;
-            }
-
-            $Path = Gdn::request()->path();
-
-            $Target = val('Target', $_GET, $Path ? $Path : '/');
-            if (ltrim($Target, '/') == 'entry/signin' || empty($Target))
-                $Target = '/';
-            $Args = array('Target' => $Target);
-
-
-            $RedirectUri .= strpos($RedirectUri, '?') === false ? '?' : '&';
-            $RedirectUri .= http_build_query($Args);
-            $this->_RedirectUri = $RedirectUri;
-        }
-
-        return $this->_RedirectUri;
     }
 
     /**
@@ -272,7 +230,6 @@ class DisqusPlugin extends Gdn_Plugin {
             $Query = 'display='.urlencode($Sender->Request->get('display'));
         }
 
-        $RedirectUri = concatSep('&', $this->redirectUri(), $Query);
         $Form = $Sender->Form;
 
         $AccessToken = $Form->getFormValue('AccessToken'); //Gdn::Session()->Stash('Disqus.AccessToken', NULL, NULL);
@@ -284,7 +241,6 @@ class DisqusPlugin extends Gdn_Plugin {
                 'grant_type' => 'authorization_code',
                 'client_id' => $AppID,
                 'client_secret' => $Secret,
-                'redirect_uri' => $RedirectUri,
                 'code' => $Code
             );
 
