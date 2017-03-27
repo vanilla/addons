@@ -15,4 +15,5 @@ Each category has its own sitemap, containing links to each discussion. Again, t
 If you need to filter out the results, there is an event (siteMapCategories) after the categories are fetched to filter out the results.
 
 ---
-Copyright &copy; 2017 [Vanilla Forums](http://vanillaforums.com).
+
+Copyright &copy; 2009-2017 Vanilla Forums Inc.
