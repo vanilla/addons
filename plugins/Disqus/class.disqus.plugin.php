@@ -241,7 +241,8 @@ class DisqusPlugin extends Gdn_Plugin {
                 'grant_type' => 'authorization_code',
                 'client_id' => $AppID,
                 'client_secret' => $Secret,
-                'code' => $Code
+                'code' => $Code,
+                'redirect_uri' => url('/entry/connect/disqus', true),
             );
 
             $Url = 'https://disqus.com/api/oauth/2.0/access_token/'; //.http_build_query($Qs);
