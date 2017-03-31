@@ -1,202 +1,254 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+/**
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2009-2017 Vanilla Forums Inc.
+ * @license GPLv2
+ */
 
 // Define the plugin:
-$PluginInfo['Participated'] = array(
-   'Name' => 'Participated Discussions',
-   'Description' => "Users may view a list of all discussions they have commented on. This is a more user-friendly version of an 'auto-subscribe' option.",
-   'Version' => '1.1.1',
-   'MobileFriendly' => TRUE,
-   'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => TRUE,
-   'RegisterPermissions' => FALSE,
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com',
-   'Icon' => 'participated-discussions.png'
-);
+$PluginInfo['Participated'] = [
+    'Name' => 'Participated Discussions',
+    'Description' => 'Users may view a list of all discussions they have commented on. This is a more user-friendly version of an auto-subscribe option.',
+    'Version' => '1.1.1',
+    'MobileFriendly' => true,
+    'RequiredApplications' => false,
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false,
+    'HasLocale' => true,
+    'RegisterPermissions' => false,
+    'Author' => 'Tim Gunter',
+    'AuthorEmail' => 'tim@vanillaforums.com',
+    'AuthorUrl' => 'http://www.vanillaforums.com',
+    'Icon' => 'participated-discussions.png'
+];
 
 class ParticipatedPlugin extends Gdn_Plugin {
 
-   protected $Participated = NULL;
-   protected $CountParticipated = NULL;
+    /** @var int|null  */
+    protected $countParticipated = null;
 
-   protected function GetCountParticipated() {
-      if (is_null($this->CountParticipated)) {
-         $DiscussionModel = new DiscussionModel();
-         try {
-            $this->CountParticipated = $DiscussionModel->GetCountParticipated(NULL);
-         } catch (Exception $e) {
-            $this->CountParticipated = FALSE;
-         }
-      }
-      return $this->CountParticipated;
-   }
+    /**
+     * Get the current user's total participated discussions.
+     *
+     * @return int|bool|null
+     */
+    protected function getCountParticipated() {
+        if ($this->countParticipated === null) {
+            $discussionModel = new DiscussionModel();
+            try {
+                $this->countParticipated = $discussionModel->getCountParticipated(null);
+            } catch (Exception $e) {
+                $this->countParticipated = false;
+            }
+        }
+        return $this->countParticipated;
+    }
 
-   /**
-    * Gets list of discussions user has commented on.
-    *
-    * @return DataSet
-    */
-   public function DiscussionModel_GetParticipated_Create($Sender) {
-      $UserID = GetValue(0, $Sender->EventArguments);
-      $Offset = GetValue(1, $Sender->EventArguments);
-      $Limit = GetValue(2, $Sender->EventArguments);
+    /**
+     * Gets list of discussions user has commented on.
+     *
+     * @param DiscussionModel $sender
+     * @throws Exception if user is not logged in.
+     * @return Gdn_DataSet
+     */
+    public function discussionModel_getParticipated_create($sender) {
+        $userID = val(0, $sender->EventArguments);
+        $offset = val(1, $sender->EventArguments);
+        $limit = val(2, $sender->EventArguments);
 
-      if (is_null($UserID)) {
-         if (!Gdn::Session()->IsValid()) throw new Exception(T("Could not get participated discussions for non logged-in user."));
-         $UserID = Gdn::Session()->UserID;
-      }
+        if ($userID === null) {
+            if (!Gdn::session()->isValid()) {
+                throw new Exception(t('Could not get participated discussions for non logged-in user.'));
+            }
+            $userID = Gdn::session()->UserID;
+        }
 
-      $Sender->SQL->Reset();
-      $Sender->DiscussionSummaryQuery();
+        $sender->SQL->reset();
+        $sender->discussionSummaryQuery();
 
-      $Data = $Sender->SQL->Select('d.*')
-         ->Select('w.UserID', '', 'WatchUserID')
-         ->Select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
-         ->Select('w.CountComments', '', 'CountCommentWatch')
-         ->Join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$UserID, 'left')
-         ->Join('Comment c','d.DiscussionID = c.DiscussionID')
-         ->Where('c.InsertUserID', $UserID)
-         ->GroupBy('c.DiscussionID')
-         ->OrderBy('d.DateLastComment', 'desc')
-         ->Limit($Limit, $Offset)
-         ->Get();
+        $data = $sender->SQL->select('d.*')
+            ->select('w.UserID', '', 'WatchUserID')
+            ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
+            ->select('w.CountComments', '', 'CountCommentWatch')
+            ->join('UserDiscussion w', "d.DiscussionID = w.DiscussionID and w.UserID = {$userID}", 'left')
+            ->join('Comment c','d.DiscussionID = c.DiscussionID')
+            ->where('c.InsertUserID', $userID)
+            ->groupBy('c.DiscussionID')
+            ->orderBy('d.DateLastComment', 'desc')
+            ->limit($limit, $offset)
+            ->get();
 
-      $Sender->AddDiscussionColumns($Data);
+        $sender->addDiscussionColumns($data);
 
-      return $Data;
-   }
+        return $data;
+    }
 
-   /**
-    * Gets number of discussions user has commented on.
-    *
-    * @return int
-    */
-   public function DiscussionModel_GetCountParticipated_Create($Sender) {
+    /**
+     * Gets number of discussions user has commented on.
+     *
+     * @param DiscussionModel $sender
+     * @throws Exception if user is not logged in.
+     * @return int|false
+     */
+    public function discussionModel_getCountParticipated_create($sender) {
+        $userID = val(0, $sender->EventArguments);
 
-      $UserID = GetValue(0, $Sender->EventArguments);
+        if ($userID === null) {
+            if (!Gdn::session()->isValid()) {
+                throw new Exception(t('Could not get participated discussions for non logged-in user.'));
+            }
+            $userID = Gdn::session()->UserID;
+        }
 
-      if (is_null($UserID)) {
-         if (!Gdn::Session()->IsValid()) throw new Exception(T("Could not get participated discussions for non logged-in user."));
-         $UserID = Gdn::Session()->UserID;
-      }
+        $count = Gdn::sql()->select('c.DiscussionID','distinct','NumDiscussions')
+            ->from('Comment c')
+            ->where('c.InsertUserID', $userID)
+            ->groupBy('c.DiscussionID')
+            ->get();
 
-      $Count = Gdn::SQL()->Select('c.DiscussionID','DISTINCT','NumDiscussions')
-         ->From('Comment c')
-         ->Where('c.InsertUserID', $UserID)
-         ->GroupBy('c.DiscussionID')
-         ->Get();
+        $result = ($count instanceof Gdn_Dataset) ? $count->numRows() : false;
+        return $result;
+    }
 
-      return ($Count instanceof Gdn_Dataset) ? $Count->NumRows() : FALSE;
-   }
+    /**
+     * Add navigation tab.
+     *
+     * @deprecated
+     * @param mixed $sender
+     */
+    public function addParticipatedTab($sender) {
+        $myParticipated = t('Participated Discussions');
+        $attributes = [];
 
-   /**
-    * Add navigation tab (DEPRECATED).
-    */
-   public function AddParticipatedTab($Sender) {
-      $MyParticipated = T('Participated Discussions');
-      echo ' <li '.(($Sender->RequestMethod == 'participated') ? ' class="Active"' : '').'>'.Anchor($MyParticipated, '/discussions/participated', 'MyParticipated TabLink').'</li> ';
-   }
-   public function DiscussionsController_AfterDiscussionTabs_Handler($Sender) {
-      $this->AddParticipatedTab($Sender);
-   }
-   public function CategoriesController_AfterDiscussionTabs_Handler($Sender) {
-      $this->AddParticipatedTab($Sender);
-   }
-   public function DraftsController_AfterDiscussionTabs_Handler($Sender) {
-      $this->AddParticipatedTab($Sender);
-   }
+        if ($sender->RequestMethod == 'participated') {
+            $attributes['class'] = 'Active';
+        }
 
-   /**
-    * New navigation menu item.
-    *
-    * @since 2.1
-    */
-   public function Base_AfterDiscussionFilters_Handler($Sender) {
-      if (!checkPermission('Garden.SignIn.Allow')) {
-         return;
-      }
+        $result = wrap(
+            anchor($myParticipated, '/discussions/participated', 'MyParticipated TabLink'),
+            'li',
+            $attributes
+        );
+        echo $result;
+    }
 
-      // Participated
-      $CssClass = 'Participated';
-      if (strtolower(Gdn::Controller()->ControllerName) == 'discussionscontroller' && strtolower(Gdn::Controller()->RequestMethod) == 'participated')
-         $CssClass .= ' Active';
-      echo '<li class="'.$CssClass.'">'.Anchor(Sprite('SpParticipated').T('Participated'), '/discussions/participated').'</li>';
-   }
+    /**
+     * Handle the AfterDiscussionTabs event on /discussions pages.
+     *
+     * @param DiscussionsController $sender
+     */
+    public function discussionsController_afterDiscussionTabs_handler($sender) {
+        $this->addParticipatedTab($sender);
+    }
 
-   /**
-    * Create paginated list of discussions user has participated in.
-    */
-   public function DiscussionsController_Participated_Create($Sender, $Args = array()) {
-      $Sender->Permission('Garden.SignIn.Allow');
-      Gdn_Theme::Section('DiscussionList');
+    /**
+     * Handle the AfterDiscussionTabs event on /categories pages.
+     *
+     * @param CategoriesController $sender
+     */
+    public function categoriesController_afterDiscussionTabs_handler($sender) {
+        $this->addParticipatedTab($sender);
+    }
 
-      $Page = GetValue(0, $Args);
-      $Limit = GetValue(1, $Args);
+    /**
+     * Handle the AfterDiscussionTabs event on /drafts pages.
+     *
+     * @param DraftsController $sender
+     */
+    public function draftsController_afterDiscussionTabs_handler($sender) {
+        $this->addParticipatedTab($sender);
+    }
 
-      // Set criteria & get discussions data
-      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
-      $DiscussionModel = new DiscussionModel();
+    /**
+     * New navigation menu item.
+     *
+     * @since 2.1
+     * @param mixed $sender
+     */
+    public function base_afterDiscussionFilters_handler($sender) {
+        if (!Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
+            return;
+        }
 
-      $Sender->DiscussionData = $DiscussionModel->GetParticipated(Gdn::Session()->UserID, $Offset, $Limit);
-      $Sender->SetData('Discussions', $Sender->DiscussionData);
+        // Participated
+        $cssClass = 'Participated';
+        $controller = strtolower(Gdn::controller()->ControllerName);
+        $method = strtolower(Gdn::controller()->RequestMethod);
+        if ($controller == 'discussionscontroller' && $method == 'participated') {
+            $cssClass .= ' Active';
+        }
 
-      //Set view
-      $Sender->View = 'index';
-      if (C('Vanilla.Discussions.Layout') === 'table') {
-         $Sender->View = 'table';
-      }
+        $result = wrap(
+        anchor(sprite('SpParticipated').t('Participated'), '/discussions/participated'),
+            'li', ['class' => $cssClass]
+        );
+        echo $result;
+    }
 
-      // Build a pager
-      $PagerFactory = new Gdn_PagerFactory();
-      $Sender->EventArguments['PagerType'] = 'Pager';
-      $Sender->FireEvent('BeforeBuildParticipatedPager');
-      $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $Sender);
-      $Sender->Pager->ClientID = 'Pager';
-      $Sender->Pager->Configure(
-         $Offset,
-         $Limit,
-         FALSE,
-         'discussions/participated/{Page}'
-      );
-      $Sender->SetData('CountDiscussions', false); // force prev/next pager
-      $Sender->FireEvent('AfterBuildParticipatedPager');
+    /**
+     * Create paginated list of discussions user has participated in.
+     *
+     * @param DiscussionsController $sender
+     * @param array $args
+     */
+    public function discussionsController_participated_create($sender, $args) {
+        $sender->permission('Garden.SignIn.Allow');
+        Gdn_Theme::section('DiscussionList');
 
-      // Deliver JSON data if necessary
-      if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL) {
-         $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
-         $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
-         $Sender->View = 'discussions';
-      }
+        $page = val(0, $args);
 
-      $Sender->SetData('_PagerUrl', 'discussions/participated/{Page}');
-      $Sender->SetData('_Page', $Page);
-      $Sender->SetData('_Limit', $Limit);
+        // Set criteria & get discussions data
+        list($offset, $limit) = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
+        $discussionModel = new DiscussionModel();
 
-      // Add modules
-      $Sender->AddModule('NewDiscussionModule');
-      $Sender->AddModule('DiscussionFilterModule');
-      $Sender->AddModule('CategoriesModule');
-      $Sender->AddModule('BookmarkedModule');
+        $sender->DiscussionData = $discussionModel->getParticipated(Gdn::session()->UserID, $offset, $limit);
+        $sender->setData('Discussions', $sender->DiscussionData);
 
-      $Sender->Title(T('Participated Discussions'));
-      $Sender->SetData('Breadcrumbs', array(array('Name' => T('Participated Discussions'), 'Url' => '/discussions/participated')));
-      $Sender->Render();
-   }
+        //Set view
+        $sender->View = 'index';
+        if (c('Vanilla.Discussions.Layout') === 'table') {
+            $sender->View = 'table';
+        }
 
-   public function Setup() {
-      // Nothing to do here!
-   }
+        // Build a pager
+        $pagerFactory = new Gdn_PagerFactory();
+        $sender->EventArguments['PagerType'] = 'Pager';
+        $sender->fireEvent('BeforeBuildParticipatedPager');
+        $sender->Pager = $pagerFactory->getPager($sender->EventArguments['PagerType'], $sender);
+        $sender->Pager->ClientID = 'Pager';
+        $sender->Pager->configure(
+            $offset,
+            $limit,
+            false,
+            'discussions/participated/{Page}'
+        );
+        $sender->setData('CountDiscussions', false); // force prev/next pager
+        $sender->fireEvent('AfterBuildParticipatedPager');
+
+        // Deliver JSON data if necessary
+        if ($sender->deliveryType() != DELIVERY_TYPE_ALL) {
+            $sender->setJson('LessRow', $sender->Pager->toString('less'));
+            $sender->setJson('MoreRow', $sender->Pager->toString('more'));
+            $sender->View = 'discussions';
+        }
+
+        $sender->setData('_PagerUrl', 'discussions/participated/{Page}');
+        $sender->setData('_Page', $page);
+        $sender->setData('_Limit', $limit);
+
+        // Add modules
+        $sender->addModule('NewDiscussionModule');
+        $sender->addModule('DiscussionFilterModule');
+        $sender->addModule('CategoriesModule');
+        $sender->addModule('BookmarkedModule');
+
+        $sender->title(t('Participated Discussions'));
+        $sender->setData(
+            'Breadcrumbs',
+            [['Name' => t('Participated Discussions'), 'Url' => '/discussions/participated']]
+        );
+        $sender->render();
+    }
 }
 
 /**
@@ -208,7 +260,10 @@ class ParticipatedPlugin extends Gdn_Plugin {
  */
 function smarty_function_participated_link($params, &$smarty) {
     $wrap = val('wrap', $params, 'li');
-    return Gdn_Theme::link('/discussions/participated',
+    $result = Gdn_Theme::link(
+        '/discussions/participated',
         val('text', $params, t('Participated')),
-        val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap)));
+        val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap))
+    );
+    return $result;
 }
