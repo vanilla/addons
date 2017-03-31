@@ -28,7 +28,9 @@ class ParticipatedPlugin extends Gdn_Plugin {
     protected $countParticipated = null;
 
     /**
-     * @return bool|null
+     * Get the current user's total participated discussions.
+     *
+     * @return int|bool|null
      */
     protected function getCountParticipated() {
         if ($this->countParticipated === null) {
@@ -45,7 +47,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
     /**
      * Gets list of discussions user has commented on.
      *
-     * @param array $args
+     * @param DiscussionModel $sender
      * @throws Exception if user is not logged in.
      * @return Gdn_DataSet
      */
@@ -64,7 +66,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
         $sender->SQL->reset();
         $sender->discussionSummaryQuery();
 
-        $data = $sender->SQL->Select('d.*')
+        $data = $sender->SQL->select('d.*')
             ->select('w.UserID', '', 'WatchUserID')
             ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->select('w.CountComments', '', 'CountCommentWatch')
@@ -85,7 +87,6 @@ class ParticipatedPlugin extends Gdn_Plugin {
      * Gets number of discussions user has commented on.
      *
      * @param DiscussionModel $sender
-     * @param array $args
      * @throws Exception if user is not logged in.
      * @return int|false
      */
@@ -116,7 +117,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
      * @param mixed $sender
      */
     public function addParticipatedTab($sender) {
-        $myParticipated = T('Participated Discussions');
+        $myParticipated = t('Participated Discussions');
         $attributes = [];
 
         if ($sender->RequestMethod == 'participated') {
@@ -124,7 +125,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
         }
 
         $result = wrap(
-            Anchor($myParticipated, '/discussions/participated', 'MyParticipated TabLink'),
+            anchor($myParticipated, '/discussions/participated', 'MyParticipated TabLink'),
             'li',
             $attributes
         );
@@ -132,6 +133,8 @@ class ParticipatedPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Handle the AfterDiscussionTabs event on /discussions pages.
+     *
      * @param DiscussionsController $sender
      */
     public function discussionsController_afterDiscussionTabs_handler($sender) {
@@ -139,6 +142,8 @@ class ParticipatedPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Handle the AfterDiscussionTabs event on /categories pages.
+     *
      * @param CategoriesController $sender
      */
     public function categoriesController_afterDiscussionTabs_handler($sender) {
@@ -146,6 +151,8 @@ class ParticipatedPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Handle the AfterDiscussionTabs event on /drafts pages.
+     *
      * @param DraftsController $sender
      */
     public function draftsController_afterDiscussionTabs_handler($sender) {
@@ -165,8 +172,8 @@ class ParticipatedPlugin extends Gdn_Plugin {
 
         // Participated
         $cssClass = 'Participated';
-        $controller = strtolower(Gdn::Controller()->ControllerName);
-        $method = strtolower(Gdn::Controller()->RequestMethod);
+        $controller = strtolower(Gdn::controller()->ControllerName);
+        $method = strtolower(Gdn::controller()->RequestMethod);
         if ($controller == 'discussionscontroller' && $method == 'participated') {
             $cssClass .= ' Active';
         }
@@ -191,7 +198,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
         $page = val(0, $args);
 
         // Set criteria & get discussions data
-        list($offset, $limit) = offsetLimit($page, C('Vanilla.Discussions.PerPage', 30));
+        list($offset, $limit) = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
         $discussionModel = new DiscussionModel();
 
         $sender->DiscussionData = $discussionModel->getParticipated(Gdn::session()->UserID, $offset, $limit);
