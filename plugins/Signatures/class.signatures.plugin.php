@@ -289,7 +289,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
         if ($maxNumberImages !== 'Unlimited') {
 
-            if (is_int($maxNumberImages) && $maxNumberImages > 0) {]
+            if (is_int($maxNumberImages) && $maxNumberImages > 0) {
                 $rulesParams['maxImages'] = $maxNumberImages;
                 $rules[] = FormatString(T('Use up to {maxImages,plural,%s image, %s images}.'), $rulesParams);
             } else {
