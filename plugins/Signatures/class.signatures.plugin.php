@@ -22,15 +22,15 @@
  * @package Addons
  */
 
-$PluginInfo['Signatures'] = array(
+$PluginInfo['Signatures'] = [
     'Name' => 'Signatures',
     'Description' => 'Users may create custom signatures that appear after each of their comments.',
     'Version' => '1.6.1',
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
+    'RequiredApplications' => ['Vanilla' => '2.0.18'],
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
     'HasLocale' => TRUE,
-    'RegisterPermissions' => array('Plugins.Signatures.Edit' => 1),
+    'RegisterPermissions' => ['Plugins.Signatures.Edit' => 1],
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com',
@@ -38,7 +38,7 @@ $PluginInfo['Signatures'] = array(
     'SettingsUrl' => '/settings/signatures',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Icon' => 'signatures.png'
-);
+];
 
 class SignaturesPlugin extends Gdn_Plugin {
     public $Disabled = FALSE;
@@ -46,7 +46,7 @@ class SignaturesPlugin extends Gdn_Plugin {
     /**
      * @var array List of config settings can be overridden by sessions in other plugins
      */
-    private $overriddenConfigSettings = array('MaxNumberImages', 'MaxLength');
+    private $overriddenConfigSettings = ['MaxNumberImages', 'MaxLength'];
 
 
     /**
@@ -57,13 +57,13 @@ class SignaturesPlugin extends Gdn_Plugin {
     public function simpleApiPlugin_mapper_handler($Sender) {
         switch ($Sender->Mapper->Version) {
             case '1.0':
-                $Sender->Mapper->addMap(array(
+                $Sender->Mapper->addMap([
                     'signature/get' => 'profile/signature/modify',
                     'signature/set' => 'profile/signature/modify',
-                ), NULL, array(
-                    'signature/get' => array('Signature'),
-                    'signature/set' => array('Success'),
-                ));
+                ], NULL, [
+                    'signature/get' => ['Signature'],
+                    'signature/set' => ['Success'],
+                ]);
                 break;
         }
     }
@@ -82,9 +82,9 @@ class SignaturesPlugin extends Gdn_Plugin {
         $ViewingUserID = Gdn::session()->UserID;
 
         if ($Sender->User->UserID == $ViewingUserID) {
-            $SideMenu->addLink('Options', sprite('SpSignatures').' '.t('Signature Settings'), '/profile/signature', FALSE, array('class' => 'Popup'));
+            $SideMenu->addLink('Options', sprite('SpSignatures').' '.t('Signature Settings'), '/profile/signature', FALSE, ['class' => 'Popup']);
         } else {
-            $SideMenu->addLink('Options', sprite('SpSignatures').' '.t('Signature Settings'), userUrl($Sender->User, '', 'signature'), array('Garden.Users.Edit', 'Moderation.Signatures.Edit'), array('class' => 'Popup'));
+            $SideMenu->addLink('Options', sprite('SpSignatures').' '.t('Signature Settings'), userUrl($Sender->User, '', 'signature'), ['Garden.Users.Edit', 'Moderation.Signatures.Edit'], ['class' => 'Popup']);
         }
     }
 
@@ -97,7 +97,7 @@ class SignaturesPlugin extends Gdn_Plugin {
     public function profileController_beforeProfileOptions_handler($Sender, $Args) {
         $CanEditProfiles = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
         if (checkPermission('Moderation.Signatures.Edit') && !$CanEditProfiles) {
-            $Args['ProfileOptions'][] = array('Text' => sprite('SpSignatures').' '.t('Signature Settings'), 'Url' => userUrl($Sender->User, '', 'signature'));
+            $Args['ProfileOptions'][] = ['Text' => sprite('SpSignatures').' '.t('Signature Settings'), 'Url' => userUrl($Sender->User, '', 'signature')];
         }
     }
 
@@ -115,13 +115,13 @@ class SignaturesPlugin extends Gdn_Plugin {
 
 
     public function controller_index($Sender) {
-        $Sender->permission(array(
+        $Sender->permission([
             'Garden.Profiles.Edit'
-        ));
+        ]);
 
         $Args = $Sender->RequestArgs;
         if (sizeof($Args) < 2) {
-            $Args = array_merge($Args, array(0, 0));
+            $Args = array_merge($Args, [0, 0]);
         } elseif (sizeof($Args) > 2) {
             $Args = array_slice($Args, 0, 2);
         }
@@ -138,22 +138,22 @@ class SignaturesPlugin extends Gdn_Plugin {
         $Sender->getUserInfo($UserReference, $Username);
         $UserPrefs = dbdecode($Sender->User->Preferences);
         if (!is_array($UserPrefs)) {
-            $UserPrefs = array();
+            $UserPrefs = [];
         }
 
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigArray = array(
+        $ConfigArray = [
             'Plugin.Signatures.Sig' => NULL,
             'Plugin.Signatures.HideAll' => NULL,
             'Plugin.Signatures.HideImages' => NULL,
             'Plugin.Signatures.HideMobile' => NULL,
             'Plugin.Signatures.Format' => NULL
-        );
+        ];
         $SigUserID = $ViewingUserID = Gdn::session()->UserID;
 
         if ($Sender->User->UserID != $ViewingUserID) {
-            $Sender->permission(array('Garden.Users.Edit', 'Moderation.Signatures.Edit'), FALSE);
+            $Sender->permission(['Garden.Users.Edit', 'Moderation.Signatures.Edit'], FALSE);
             $SigUserID = $Sender->User->UserID;
             $canEditSignatures = true;
         }
@@ -282,15 +282,15 @@ class SignaturesPlugin extends Gdn_Plugin {
             } else {
                 if ($numMatches > $max) {
                     $Sender->Form->addError('@'.formatString('You are only allowed {maxImages,plural,%s image,%s images}.',
-                            array('maxImages' => $max)));
+                            ['maxImages' => $max]));
                 }
             }
         }
     }
 
     public function setSignatureRules($Sender) {
-        $rules = array();
-        $rulesParams = array();
+        $rules = [];
+        $rulesParams = [];
         $imagesAllowed = true;
 
 
@@ -300,17 +300,17 @@ class SignaturesPlugin extends Gdn_Plugin {
                 $imagesAllowed = false;
             } else {
                 $rulesParams['maxImages'] = c('Plugins.Signatures.MaxNumberImages');
-                $rules[] = formatString(T('Use up to {maxImages,plural,%s image, %s images}.'), $rulesParams);
+                $rules[] = formatString(t('Use up to {maxImages,plural,%s image, %s images}.'), $rulesParams);
             }
         }
         if ($imagesAllowed && c('Plugins.Signatures.MaxImageHeight') && c('Plugins.Signatures.MaxImageHeight') > 0) {
             $rulesParams['maxImageHeight'] = c('Plugins.Signatures.MaxImageHeight');
-            $rules[] = formatString(T('Images will be scaled to a maximum height of {maxImageHeight}px.'), $rulesParams);
+            $rules[] = formatString(t('Images will be scaled to a maximum height of {maxImageHeight}px.'), $rulesParams);
 
         }
         if (c('Plugins.Signatures.MaxLength') && c('Plugins.Signatures.MaxLength') > 0) {
             $rulesParams['maxLength'] = c('Plugins.Signatures.MaxLength');
-            $rules[] = formatString(T('Signatures can be up to {maxLength} characters long.'), $rulesParams);
+            $rules[] = formatString(t('Signatures can be up to {maxLength} characters long.'), $rulesParams);
         }
 
         $Sender->setData('SignatureRules', implode(' ', $rules));
@@ -324,9 +324,9 @@ class SignaturesPlugin extends Gdn_Plugin {
      * @param string $Delimiter
      */
     public function stripLineBreaks(&$Text, $Delimiter = ' ') {
-        $Text = str_replace(array("\r\n", "\r"), "\n", $Text);
+        $Text = str_replace(["\r\n", "\r"], "\n", $Text);
         $lines = explode("\n", $Text);
-        $new_lines = array();
+        $new_lines = [];
         foreach ($lines as $i => $line) {
             $line = trim($line);
             if (!empty($line)) {
@@ -353,25 +353,25 @@ class SignaturesPlugin extends Gdn_Plugin {
 
         $UserID = Gdn::request()->get('UserID');
         if ($UserID != Gdn::session()->UserID) {
-            $Sender->permission(array('Garden.Users.Edit', 'Moderation.Signatures.Edit'), FALSE);
+            $Sender->permission(['Garden.Users.Edit', 'Moderation.Signatures.Edit'], FALSE);
         } else {
-            $Sender->permission(array('Garden.Profiles.Edit', 'Plugins.Signatures.Edit'));
+            $Sender->permission(['Garden.Profiles.Edit', 'Plugins.Signatures.Edit']);
         }
         $User = Gdn::userModel()->getID($UserID);
         if (!$User) {
             throw new Exception("No such user '{$UserID}'", 404);
         }
 
-        $Translation = array(
+        $Translation = [
             'Plugin.Signatures.Sig' => 'Body',
             'Plugin.Signatures.Format' => 'Format',
             'Plugin.Signatures.HideAll' => 'HideAll',
             'Plugin.Signatures.HideImages' => 'HideImages',
             'Plugin.Signatures.HideMobile' => 'HideMobile'
-        );
+        ];
 
         $UserMeta = $this->getUserMeta($UserID, '%');
-        $SigData = array();
+        $SigData = [];
         foreach ($Translation as $TranslationField => $TranslationShortcut) {
             $SigData[$TranslationShortcut] = getValue($TranslationField, $UserMeta, NULL);
         }
@@ -441,7 +441,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         static $Signatures = NULL;
 
         if (is_null($Signatures)) {
-            $Signatures = array();
+            $Signatures = [];
 
             // Short circuit if not needed.
             if ($this->hide()) {
@@ -450,7 +450,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
             $Discussion = $Sender->data('Discussion');
             $Comments = $Sender->data('Comments');
-            $UserIDList = array();
+            $UserIDList = [];
 
             if ($Discussion) {
                 $UserIDList[GetValue('InsertUserID', $Discussion)] = 1;
@@ -476,7 +476,7 @@ class SignaturesPlugin extends Gdn_Plugin {
                             $Format = c('Garden.InputFormatter');
                         }
 
-                        $Signatures[$UserID] = array($Sig, $Format);
+                        $Signatures[$UserID] = [$Sig, $Format];
                     }
                 }
             }
@@ -516,7 +516,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 }
 EOT;
 
-            $sender->Head->addTag('style', array('_sort' => 100), $style);
+            $sender->Head->addTag('style', ['_sort' => 100], $style);
         }
     }
 
@@ -560,10 +560,10 @@ EOT;
             $SigFormat = c('Garden.InputFormatter');
         }
 
-        $this->EventArguments = array(
+        $this->EventArguments = [
             'UserID' => $SourceUserID,
             'Signature' => &$Signature
-        );
+        ];
         $this->fireEvent('BeforeDrawSignature');
 
         $SigClasses = '';
@@ -583,28 +583,28 @@ EOT;
             // universal config to make sure no URLs are turned into embeds.
             if (!C('Plugins.Signatures.AllowEmbeds', true)) {
                 $originalEnableUrlEmbeds = c('Garden.Format.DisableUrlEmbeds', false);
-                saveToConfig(array(
+                saveToConfig([
                     'Garden.Format.DisableUrlEmbeds' => true
-                ), null, array(
+                ], null, [
                     'Save' => false
-                ));
+                ]);
             }
 
             $UserSignature = Gdn_Format::to($Signature, $SigFormat)."<!-- $SigFormat -->";
 
             // Restore original config.
             if (!C('Plugins.Signatures.AllowEmbeds', true)) {
-                saveToConfig(array(
+                saveToConfig([
                     'Garden.Format.DisableUrlEmbeds' => $originalEnableUrlEmbeds
-                ), null, array(
+                ], null, [
                     'Save' => false
-                ));
+                ]);
             }
 
-            $this->EventArguments = array(
+            $this->EventArguments = [
                 'UserID' => $SourceUserID,
                 'String' => &$UserSignature
-            );
+            ];
 
             $this->fireEvent('FilterContent');
 
@@ -641,7 +641,7 @@ EOT;
     protected function _stripOnly($str, $tags, $stripContent = false) {
         $content = '';
         if (!is_array($tags)) {
-            $tags = (strpos($str, '>') !== false ? explode('>', str_replace('<', '', $tags)) : array($tags));
+            $tags = (strpos($str, '>') !== false ? explode('>', str_replace('<', '', $tags)) : [$tags]);
             if (end($tags) == '') {
                 array_pop($tags);
             }
@@ -672,16 +672,15 @@ EOT;
         $Sender->permission('Garden.Settings.Manage');
 
         $Conf = new ConfigurationModule($Sender);
-        $Conf->initialize(array(
-            'Plugins.Signatures.Default.MaxNumberImages' => array('Control' => 'Dropdown', 'LabelCode' => '@'.sprintf(t('Max number of %s'), t('images')), 'Items' => array('Unlimited' => t('Unlimited'), 'None' => t('None'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)),
-            'Plugins.Signatures.Default.MaxLength' => array('Control' => 'TextBox', 'Type' => 'int', 'LabelCode' => '@'.sprintf(t('Max %s length'), t('signature')), 'Options' => array('class' => 'InputBox SmallInput')),
-            'Plugins.Signatures.MaxImageHeight' => array('Control' => 'TextBox', 'LabelCode' => '@'.sprintf(t('Max height of %s'), t('images'))." ".t('in pixels'), 'Options' => array('class' => 'InputBox SmallInput')),
-            'Plugins.Signatures.HideGuest' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures for guests'),
-            'Plugins.Signatures.HideEmbed' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => true),
-            'Plugins.Signatures.HideMobile' => array('Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on mobile', 'Default' => true),
-            'Plugins.Signatures.AllowEmbeds' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow embedded content', 'Default' => true),
-            //'Plugins.Signatures.TextOnly' => array('Control' => 'CheckBox', 'LabelCode' => '@'.sprintf(t('Enforce %s'), t('text-only'))),
-        ));
+        $Conf->initialize([
+            'Plugins.Signatures.Default.MaxNumberImages' => ['Control' => 'Dropdown', 'LabelCode' => '@'.sprintf(t('Max number of %s'), t('images')), 'Items' => ['Unlimited' => t('Unlimited'), 'None' => t('None'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5]],
+            'Plugins.Signatures.Default.MaxLength' => ['Control' => 'TextBox', 'Type' => 'int', 'LabelCode' => '@'.sprintf(t('Max %s length'), t('signature')), 'Options' => ['class' => 'InputBox SmallInput']],
+            'Plugins.Signatures.MaxImageHeight' => ['Control' => 'TextBox', 'LabelCode' => '@'.sprintf(t('Max height of %s'), t('images'))." ".t('in pixels'), 'Options' => ['class' => 'InputBox SmallInput']],
+            'Plugins.Signatures.HideGuest' => ['Control' => 'CheckBox', 'LabelCode' => 'Hide signatures for guests'],
+            'Plugins.Signatures.HideEmbed' => ['Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => true],
+            'Plugins.Signatures.HideMobile' => ['Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on mobile', 'Default' => true],
+            'Plugins.Signatures.AllowEmbeds' => ['Control' => 'CheckBox', 'LabelCode' => 'Allow embedded content', 'Default' => true],
+        ]);
 
         $this->setConfigSettingsToDefault('Plugins.Signatures', $this->overriddenConfigSettings);
 
