@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) { exit(); }
 
 /**
  * Signatures Plugin
@@ -74,8 +74,9 @@ class SignaturesPlugin extends Gdn_Plugin {
      * @param $Sender
      */
     public function profileController_afterAddSideMenu_handler($Sender) {
-        if (!CheckPermission('Garden.SignIn.Allow'))
+        if (!CheckPermission('Garden.SignIn.Allow')) {
             return;
+        }
 
         $SideMenu = $Sender->EventArguments['SideMenu'];
         $ViewingUserID = Gdn::session()->UserID;
@@ -95,8 +96,9 @@ class SignaturesPlugin extends Gdn_Plugin {
      */
     public function profileController_beforeProfileOptions_handler($Sender, $Args) {
         $CanEditProfiles = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
-        if (checkPermission('Moderation.Signatures.Edit') && !$CanEditProfiles)
+        if (checkPermission('Moderation.Signatures.Edit') && !$CanEditProfiles) {
             $Args['ProfileOptions'][] = array('Text' => sprite('SpSignatures').' '.t('Signature Settings'), 'Url' => userUrl($Sender->User, '', 'signature'));
+        }
     }
 
     /**
@@ -118,10 +120,11 @@ class SignaturesPlugin extends Gdn_Plugin {
         ));
 
         $Args = $Sender->RequestArgs;
-        if (sizeof($Args) < 2)
+        if (sizeof($Args) < 2) {
             $Args = array_merge($Args, array(0, 0));
-        elseif (sizeof($Args) > 2)
+        } elseif (sizeof($Args) > 2) {
             $Args = array_slice($Args, 0, 2);
+        }
 
         list($UserReference, $Username) = $Args;
 
@@ -134,8 +137,9 @@ class SignaturesPlugin extends Gdn_Plugin {
 
         $Sender->getUserInfo($UserReference, $Username);
         $UserPrefs = dbdecode($Sender->User->Preferences);
-        if (!is_array($UserPrefs))
+        if (!is_array($UserPrefs)) {
             $UserPrefs = array();
+        }
 
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
@@ -158,8 +162,9 @@ class SignaturesPlugin extends Gdn_Plugin {
         $Sender->setData('Plugin-Signatures-ForceEditing', ($SigUserID == Gdn::session()->UserID) ? FALSE : $Sender->User->Name);
         $UserMeta = $this->getUserMeta($SigUserID, '%');
 
-        if ($Sender->Form->authenticatedPostBack() === FALSE && is_array($UserMeta))
+        if ($Sender->Form->authenticatedPostBack() === FALSE && is_array($UserMeta)) {
             $ConfigArray = array_merge($ConfigArray, $UserMeta);
+        }
 
         $ConfigurationModel->setField($ConfigArray);
 
@@ -200,8 +205,9 @@ class SignaturesPlugin extends Gdn_Plugin {
 
                         switch ($Key) {
                             case 'Format':
-                                if (strcasecmp($UserMetaValue, 'Raw') == 0)
-                                    $UserMetaValue = NULL; // don't allow raw signatures.
+                                if (strcasecmp($UserMetaValue, 'Raw') == 0) {
+                                    $UserMetaValue = NULL;
+                                } // don't allow raw signatures.
                                 break;
                         }
 
@@ -273,9 +279,11 @@ class SignaturesPlugin extends Gdn_Plugin {
             $numMatches = preg_match_all('/<img/i', $Sig);
             if (c('Plugins.Signatures.MaxNumberImages') === 'None' && $numMatches > 0) {
                 $Sender->Form->addError('Images not allowed');
-            } else if ($numMatches > $max) {
-                $Sender->Form->addError('@'.formatString('You are only allowed {maxImages,plural,%s image,%s images}.',
-                        array('maxImages' => $max)));
+            } else {
+                if ($numMatches > $max) {
+                    $Sender->Form->addError('@'.formatString('You are only allowed {maxImages,plural,%s image,%s images}.',
+                            array('maxImages' => $max)));
+                }
             }
         }
     }
@@ -364,8 +372,9 @@ class SignaturesPlugin extends Gdn_Plugin {
 
         $UserMeta = $this->getUserMeta($UserID, '%');
         $SigData = array();
-        foreach ($Translation as $TranslationField => $TranslationShortcut)
+        foreach ($Translation as $TranslationField => $TranslationShortcut) {
             $SigData[$TranslationShortcut] = getValue($TranslationField, $UserMeta, NULL);
+        }
 
         $Sender->setData('Signature', $SigData);
 
@@ -384,17 +393,21 @@ class SignaturesPlugin extends Gdn_Plugin {
             if ($Sender->Form->errorCount() == 0) {
                 foreach ($Translation as $TranslationField => $TranslationShortcut) {
                     $UserMetaValue = $Sender->Form->getValue($TranslationShortcut, NULL);
-                    if (is_null($UserMetaValue)) continue;
+                    if (is_null($UserMetaValue)) {
+                        continue;
+                    }
 
-                    if ($TranslationShortcut == 'Body' && empty($UserMetaValue))
+                    if ($TranslationShortcut == 'Body' && empty($UserMetaValue)) {
                         $UserMetaValue = NULL;
+                    }
 
                     $Key = $this->trimMetaKey($TranslationField);
 
                     switch ($Key) {
                         case 'Format':
-                            if (strcasecmp($UserMetaValue, 'Raw') == 0)
-                                $UserMetaValue = NULL; // don't allow raw signatures.
+                            if (strcasecmp($UserMetaValue, 'Raw') == 0) {
+                                $UserMetaValue = NULL;
+                            } // don't allow raw signatures.
                             break;
                     }
 
@@ -417,8 +430,9 @@ class SignaturesPlugin extends Gdn_Plugin {
 //         decho($UserSigData);
         }
 
-        if (!is_null($SigKey))
+        if (!is_null($SigKey)) {
             return getValue($SigKey, $UserSigData, $Default);
+        }
 
         return $UserSigData;
     }
@@ -430,19 +444,23 @@ class SignaturesPlugin extends Gdn_Plugin {
             $Signatures = array();
 
             // Short circuit if not needed.
-            if ($this->hide()) return $Signatures;
+            if ($this->hide()) {
+                return $Signatures;
+            }
 
             $Discussion = $Sender->data('Discussion');
             $Comments = $Sender->data('Comments');
             $UserIDList = array();
 
-            if ($Discussion)
+            if ($Discussion) {
                 $UserIDList[GetValue('InsertUserID', $Discussion)] = 1;
+            }
 
             if ($Comments && $Comments->numRows()) {
                 $Comments->dataSeek(-1);
-                while ($Comment = $Comments->nextRow())
+                while ($Comment = $Comments->nextRow()) {
                     $UserIDList[GetValue('InsertUserID', $Comment)] = 1;
+                }
             }
 
             if (sizeof($UserIDList)) {
@@ -465,8 +483,9 @@ class SignaturesPlugin extends Gdn_Plugin {
 
         }
 
-        if (!is_null($RequestUserID))
+        if (!is_null($RequestUserID)) {
             return getValue($RequestUserID, $Signatures, $Default);
+        }
 
         return $Signatures;
     }
@@ -474,8 +493,9 @@ class SignaturesPlugin extends Gdn_Plugin {
 
     /** Deprecated in 2.1. */
     public function base_afterCommentBody_handler($Sender) {
-        if ($this->Disabled)
+        if ($this->Disabled) {
             return;
+        }
 
         $this->drawSignature($Sender);
     }
@@ -502,35 +522,43 @@ EOT;
 
     /** New call for 2.1. */
     public function discussionController_afterDiscussionBody_handler($Sender) {
-        if ($this->Disabled)
+        if ($this->Disabled) {
             return;
+        }
         $this->drawSignature($Sender);
     }
 
     protected function drawSignature($Sender) {
-        if ($this->hide()) return;
+        if ($this->hide()) {
+            return;
+        }
 
-        if (isset($Sender->EventArguments['Discussion']))
+        if (isset($Sender->EventArguments['Discussion'])) {
             $Data = $Sender->EventArguments['Discussion'];
+        }
 
-        if (isset($Sender->EventArguments['Comment']))
+        if (isset($Sender->EventArguments['Comment'])) {
             $Data = $Sender->EventArguments['Comment'];
+        }
 
         $SourceUserID = getValue('InsertUserID', $Data);
         $User = Gdn::userModel()->getID($SourceUserID, DATASET_TYPE_ARRAY);
-        if (getValue('HideSignature', $User, FALSE))
+        if (getValue('HideSignature', $User, FALSE)) {
             return;
+        }
 
 
         $Signature = $this->signatures($Sender, $SourceUserID);
 
-        if (is_array($Signature))
+        if (is_array($Signature)) {
             list($Signature, $SigFormat) = $Signature;
-        else
+        } else {
             $SigFormat = c('Garden.InputFormatter');
+        }
 
-        if (!$SigFormat)
+        if (!$SigFormat) {
             $SigFormat = c('Garden.InputFormatter');
+        }
 
         $this->EventArguments = array(
             'UserID' => $SourceUserID,
@@ -542,8 +570,9 @@ EOT;
         if (!is_null($Signature)) {
             $HideImages = $this->userPreferences('Plugin.Signatures.HideImages', FALSE);
 
-            if ($HideImages)
+            if ($HideImages) {
                 $SigClasses .= 'HideImages ';
+            }
 
             // Don't show empty sigs
             if ($Signature == '') {
@@ -586,20 +615,25 @@ EOT;
     }
 
     protected function hide() {
-        if ($this->Disabled)
+        if ($this->Disabled) {
             return TRUE;
+        }
 
-        if (!Gdn::session()->isValid() && c('Plugins.Signatures.HideGuest'))
+        if (!Gdn::session()->isValid() && c('Plugins.Signatures.HideGuest')) {
             return TRUE;
+        }
 
-        if (strcasecmp(Gdn::controller()->RequestMethod, 'embed') == 0 && c('Plugin.Signatures.HideEmbed', TRUE))
+        if (strcasecmp(Gdn::controller()->RequestMethod, 'embed') == 0 && c('Plugin.Signatures.HideEmbed', TRUE)) {
             return TRUE;
+        }
 
-        if ($this->userPreferences('Plugin.Signatures.HideAll', FALSE))
+        if ($this->userPreferences('Plugin.Signatures.HideAll', FALSE)) {
             return TRUE;
+        }
 
-        if (isMobile() && (c('Plugins.Signatures.HideMobile', TRUE) || $this->userPreferences('Plugin.Signatures.HideMobile', FALSE)))
+        if (isMobile() && (c('Plugins.Signatures.HideMobile', TRUE) || $this->userPreferences('Plugin.Signatures.HideMobile', FALSE))) {
             return TRUE;
+        }
 
         return FALSE;
     }
@@ -608,11 +642,14 @@ EOT;
         $content = '';
         if (!is_array($tags)) {
             $tags = (strpos($str, '>') !== false ? explode('>', str_replace('<', '', $tags)) : array($tags));
-            if (end($tags) == '') array_pop($tags);
+            if (end($tags) == '') {
+                array_pop($tags);
+            }
         }
         foreach ($tags as $tag) {
-            if ($stripContent)
+            if ($stripContent) {
                 $content = '(.+</'.$tag.'[^>]*>|)';
+            }
             $str = preg_replace('#</?'.$tag.'[^>]*>'.$content.'#is', '', $str);
         }
         return $str;
