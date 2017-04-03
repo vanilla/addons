@@ -67,8 +67,10 @@ class ParticipatedPlugin extends Gdn_Plugin {
         $sender->SQL->select('d.*')
             ->from('UserDiscussion ud')
             ->join('Discussion d', 'ud.DiscussionID = d.DiscussionID')
+            ->join('Comment c', 'ud.DiscussionID = c.DiscussionID and c.InsertUserID = ud.UserID')
             ->where('ud.UserID', $userID)
             ->where('ud.Participated', 1)
+            ->groupBy('d.DiscussionID')
             ->orderBy('d.DateLastComment', 'desc')
             ->limit($limit, $offset);
 
