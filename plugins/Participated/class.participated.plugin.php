@@ -64,21 +64,25 @@ class ParticipatedPlugin extends Gdn_Plugin {
         }
 
         $sender->SQL->reset();
-        $sender->discussionSummaryQuery();
-
-        $data = $sender->SQL->select('d.*')
-            ->select('w.UserID', '', 'WatchUserID')
-            ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
-            ->select('w.CountComments', '', 'CountCommentWatch')
-            ->join('UserDiscussion w', "d.DiscussionID = w.DiscussionID and w.UserID = {$userID}", 'left')
-            ->join('Comment c','d.DiscussionID = c.DiscussionID')
-            ->where('c.InsertUserID', $userID)
-            ->groupBy('c.DiscussionID')
+        $sender->SQL->select('d.*')
+            ->from('UserDiscussion ud')
+            ->join('Discussion d', 'ud.DiscussionID = d.DiscussionID')
+            ->join('Comment c', 'ud.DiscussionID = c.DiscussionID and c.InsertUserID = ud.UserID')
+            ->where('ud.UserID', $userID)
+            ->where('ud.Participated', 1)
+            ->groupBy('d.DiscussionID')
             ->orderBy('d.DateLastComment', 'desc')
-            ->limit($limit, $offset)
-            ->get();
+            ->limit($limit, $offset);
 
+        $permissions = DiscussionModel::categoryPermissions();
+        if ($permissions !== true) {
+            $sender->SQL->where('d.CategoryID', $permissions);
+        }
+
+        $data = $sender->SQL->get();
         $sender->addDiscussionColumns($data);
+        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+        CategoryModel::joinCategories($data);
 
         return $data;
     }
