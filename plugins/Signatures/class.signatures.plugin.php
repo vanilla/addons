@@ -181,8 +181,8 @@ class SignaturesPlugin extends Gdn_Plugin {
             $Values = $Sender->Form->formValues();
 
             if ($canEditSignatures) {
-                $Values['Plugin.Signatures.Sig'] = getValue('Body', $Values, null);
-                $Values['Plugin.Signatures.Format'] = getValue('Format', $Values, null);
+                $Values['Plugin.Signatures.Sig'] = val('Body', $Values, null);
+                $Values['Plugin.Signatures.Format'] = val('Format', $Values, null);
             }
 
             //$this->stripLineBreaks($Values['Plugin.Signatures.Sig']);
@@ -218,8 +218,8 @@ class SignaturesPlugin extends Gdn_Plugin {
             }
         } else {
             // Load form data.
-            $Data['Body'] = getValue('Plugin.Signatures.Sig', $Data);
-            $Data['Format'] = getValue('Plugin.Signatures.Format', $Data) ?: Gdn_Format::defaultFormat();
+            $Data['Body'] = val('Plugin.Signatures.Sig', $Data);
+            $Data['Format'] = val('Plugin.Signatures.Format', $Data) ?: Gdn_Format::defaultFormat();
 
             // Apply the config settings to the form.
             $Sender->Form->setData($Data);
@@ -241,8 +241,8 @@ class SignaturesPlugin extends Gdn_Plugin {
 
         // Validate the signature.
         if (function_exists('ValidateSignature')) {
-            $Sig = trim(getValue('Plugin.Signatures.Sig', $Values));
-            if (validateRequired($Sig) && !ValidateSignature($Sig, getValue('Plugin.Signatures.Format', $Values))) {
+            $Sig = trim(val('Plugin.Signatures.Sig', $Values));
+            if (validateRequired($Sig) && !ValidateSignature($Sig, val('Plugin.Signatures.Format', $Values))) {
                 $Sender->Form->addError('Signature invalid.');
             }
         }
@@ -373,7 +373,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         $UserMeta = $this->getUserMeta($UserID, '%');
         $SigData = [];
         foreach ($Translation as $TranslationField => $TranslationShortcut) {
-            $SigData[$TranslationShortcut] = getValue($TranslationField, $UserMeta, null);
+            $SigData[$TranslationShortcut] = val($TranslationField, $UserMeta, null);
         }
 
         $Sender->setData('Signature', $SigData);
@@ -392,7 +392,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
             if ($Sender->Form->errorCount() == 0) {
                 foreach ($Translation as $TranslationField => $TranslationShortcut) {
-                    $UserMetaValue = $Sender->Form->getValue($TranslationShortcut, null);
+                    $UserMetaValue = $Sender->Form->val($TranslationShortcut, null);
                     if (is_null($UserMetaValue)) {
                         continue;
                     }
@@ -431,7 +431,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         }
 
         if (!is_null($SigKey)) {
-            return getValue($SigKey, $UserSigData, $Default);
+            return val($SigKey, $UserSigData, $Default);
         }
 
         return $UserSigData;
@@ -469,9 +469,9 @@ class SignaturesPlugin extends Gdn_Plugin {
 
                 if (is_array($DataSignatures)) {
                     foreach ($DataSignatures as $UserID => $UserSig) {
-                        $Sig = getValue($this->makeMetaKey('Sig'), $UserSig);
+                        $Sig = val($this->makeMetaKey('Sig'), $UserSig);
                         if (isset($Formats[$UserID])) {
-                            $Format = getValue($this->makeMetaKey('Format'), $Formats[$UserID], c('Garden.InputFormatter'));
+                            $Format = val($this->makeMetaKey('Format'), $Formats[$UserID], c('Garden.InputFormatter'));
                         } else {
                             $Format = c('Garden.InputFormatter');
                         }
@@ -484,7 +484,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         }
 
         if (!is_null($RequestUserID)) {
-            return getValue($RequestUserID, $Signatures, $Default);
+            return val($RequestUserID, $Signatures, $Default);
         }
 
         return $Signatures;
@@ -541,9 +541,9 @@ EOT;
             $Data = $Sender->EventArguments['Comment'];
         }
 
-        $SourceUserID = getValue('InsertUserID', $Data);
+        $SourceUserID = val('InsertUserID', $Data);
         $User = Gdn::userModel()->getID($SourceUserID, DATASET_TYPE_ARRAY);
-        if (getValue('HideSignature', $User, false)) {
+        if (val('HideSignature', $User, false)) {
             return;
         }
 
