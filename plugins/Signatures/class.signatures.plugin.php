@@ -392,7 +392,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
             if ($Sender->Form->errorCount() == 0) {
                 foreach ($Translation as $TranslationField => $TranslationShortcut) {
-                    $UserMetaValue = $Sender->Form->val($TranslationShortcut, null);
+                    $UserMetaValue = $Sender->Form->GetValue($TranslationShortcut, null);
                     if (is_null($UserMetaValue)) {
                         continue;
                     }
