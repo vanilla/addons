@@ -284,15 +284,17 @@ class SignaturesPlugin extends Gdn_Plugin {
         $rules = array();
         $rulesParams = array();
         $imagesAllowed = true;
+        $maxNumberImages = c('Plugins.Signatures.MaxNumberImages', 'Unlimited');
 
 
-        if (C('Plugins.Signatures.MaxNumberImages', 'Unlimited') !== 'Unlimited') {
-            if (C('Plugins.Signatures.MaxNumberImages') === 'None') {
+        if ($maxNumberImages !== 'Unlimited') {
+
+            if (is_int($maxNumberImages) && $maxNumberImages > 0) {]
+                $rulesParams['maxImages'] = $maxNumberImages;
+                $rules[] = FormatString(T('Use up to {maxImages,plural,%s image, %s images}.'), $rulesParams);
+            } else {
                 $rules[] = T('Images not allowed.');
                 $imagesAllowed = false;
-            } else {
-                $rulesParams['maxImages'] = C('Plugins.Signatures.MaxNumberImages');
-                $rules[] = FormatString(T('Use up to {maxImages,plural,%s image, %s images}.'), $rulesParams);
             }
         }
         if ($imagesAllowed && C('Plugins.Signatures.MaxImageHeight') && C('Plugins.Signatures.MaxImageHeight') > 0) {
