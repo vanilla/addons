@@ -15,7 +15,7 @@
    <?php echo $this->Form->errors(); ?>
    <ul>
       <?php
-      if (isset($this->Data['Plugin-Signatures-ForceEditing']) && $this->Data['Plugin-Signatures-ForceEditing'] != FALSE) {
+      if (isset($this->Data['Plugin-Signatures-ForceEditing']) && $this->Data['Plugin-Signatures-ForceEditing'] != false) {
          ?>
          <div class="Warning"><?php echo sprintf(t("You are editing %s's signature"),$this->Data['Plugin-Signatures-ForceEditing']); ?></div>
       <?php
@@ -58,7 +58,7 @@
    <li>
       <?php
       echo $this->Form->checkBox('Plugin.Signatures.HideAll','Hide signatures always');
-      if (!C('Plugins.Signatures.HideMobile', TRUE)) {
+      if (!C('Plugins.Signatures.HideMobile', true)) {
          echo $this->Form->checkBox('Plugin.Signatures.HideMobile',"Hide signatures on my mobile device");
       }
       echo $this->Form->checkBox('Plugin.Signatures.HideImages','Strip images out of signatures');
