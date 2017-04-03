@@ -674,8 +674,8 @@ EOT;
         $Conf = new ConfigurationModule($Sender);
         $Conf->initialize([
             'Plugins.Signatures.Default.MaxNumberImages' => ['Control' => 'Dropdown', 'LabelCode' => '@'.sprintf(t('Max number of %s'), t('images')), 'Items' => ['Unlimited' => t('Unlimited'), 'None' => t('None'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5]],
-            'Plugins.Signatures.Default.MaxLength' => ['Control' => 'TextBox', 'Type' => 'int', 'LabelCode' => '@'.sprintf(t('Max %s length'), t('signature')), 'Options' => ['class' => 'InputBox SmallInput']],
-            'Plugins.Signatures.MaxImageHeight' => ['Control' => 'TextBox', 'LabelCode' => '@'.sprintf(t('Max height of %s'), t('images'))." ".t('in pixels'), 'Options' => ['class' => 'InputBox SmallInput']],
+            'Plugins.Signatures.Default.MaxLength' => ['Control' => 'TextBox', 'Type' => 'int','Description' => 'Leave blank for no limit.', 'LabelCode' => '@'.sprintf(t('Max %s length'), t('signature')), 'Options' => ['class' => 'InputBox SmallInput', 'type' => 'number', 'min' => '1']],
+            'Plugins.Signatures.MaxImageHeight' => ['Control' => 'TextBox', 'Description' => 'Only enter number, no "px" needed.', 'LabelCode' => '@'.sprintf(t('Max height of %s'), t('images'))." ".t('in pixels'), 'Options' => ['class' => 'InputBox SmallInput', 'type' => 'number', 'min' => '0']],
             'Plugins.Signatures.HideGuest' => ['Control' => 'CheckBox', 'LabelCode' => 'Hide signatures for guests'],
             'Plugins.Signatures.HideEmbed' => ['Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => true],
             'Plugins.Signatures.HideMobile' => ['Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on mobile', 'Default' => true],
