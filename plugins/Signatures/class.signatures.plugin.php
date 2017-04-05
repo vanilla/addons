@@ -185,8 +185,6 @@ class SignaturesPlugin extends Gdn_Plugin {
                 $Values['Plugin.Signatures.Format'] = val('Format', $Values, null);
             }
 
-            //$this->stripLineBreaks($Values['Plugin.Signatures.Sig']);
-
             $FrmValues = array_intersect_key($Values, $ConfigArray);
 
             if (sizeof($FrmValues)) {
@@ -427,7 +425,6 @@ class SignaturesPlugin extends Gdn_Plugin {
         if (is_null($UserSigData)) {
             $UserSigData = $this->getUserMeta(Gdn::session()->UserID, '%');
 
-//         decho($UserSigData);
         }
 
         if (!is_null($SigKey)) {
@@ -688,7 +685,6 @@ EOT;
         $Sender->setData('Title', sprintf(t('%s Settings'), t('Signature')));
         $Sender->ConfigurationModule = $Conf;
         $Conf->renderAll();
-//      $Sender->render('Settings', '', 'plugins/AmazonS3');
     }
 
     /**
