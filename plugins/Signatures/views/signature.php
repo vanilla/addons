@@ -16,7 +16,7 @@
       ?>
 
       <li>
-         <?php if (!C('Plugins.Signatures.AllowEmbeds', true)): ?>
+         <?php if (!c('Signatures.Allow.Embeds', true)): ?>
             <div class="Info">
                <?php echo t('Video embedding has been disabled.', 'Video embedding has been disabled. URLs will not translate to their embedded equivalent.'); ?>
             </div>
@@ -50,7 +50,7 @@
    <li>
       <?php
       echo $this->Form->checkBox('Plugin.Signatures.HideAll','Hide signatures always');
-      if (!C('Plugins.Signatures.HideMobile', true)) {
+      if (!c('Signatures.Hide.Mobile', true)) {
          echo $this->Form->checkBox('Plugin.Signatures.HideMobile',"Hide signatures on my mobile device");
       }
       echo $this->Form->checkBox('Plugin.Signatures.HideImages','Strip images out of signatures');
