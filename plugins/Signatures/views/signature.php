@@ -2,13 +2,6 @@
 <div class="FormTitleWrapper">
 <?php
    echo $this->Form->open();
-
-   // Normalize no image config setting
-   if (c('Plugins.Signatures.MaxNumberImages') === 0 || c('Plugins.Signatures.MaxNumberImages') === '0') {
-      saveToConfig('Plugins.Signatures.MaxNumberImages', 'None');
-   }
-
-
 ?>
 <h1 class="H"><?php echo t('Signatures'); ?></h1>
 <h2 class="H"><?php echo t('My Signature'); ?></h2>
@@ -41,7 +34,6 @@
                }
 
                echo $this->Form->bodyBox('Body');
-   //            echo wrap($this->Form->textBox('Plugin.Signatures.Sig', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
             } else {
                echo t("You don't have permission to use a signature.");
             } ?>
