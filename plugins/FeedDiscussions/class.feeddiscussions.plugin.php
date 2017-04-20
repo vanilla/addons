@@ -22,18 +22,18 @@
  */
 
 // Define the plugin:
-$PluginInfo['FeedDiscussions'] = array(
+$PluginInfo['FeedDiscussions'] = [
     'Name' => 'Feed Discussions',
     'Description' => "Automatically creates new discussions based on content imported from supplied RSS feeds.",
     'Version' => '1.2.2',
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
+    'RequiredApplications' => ['Vanilla' => '2.0.18'],
     'HasLocale' => true,
     'RegisterPermissions' => false,
     'Icon' => 'feed_discussions.png',
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'
-);
+];
 
 class FeedDiscussionsPlugin extends Gdn_Plugin {
 
@@ -115,17 +115,17 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
 
             $Historical = (bool)GetValue('Historical', $FeedData, false);
             $Delay = getValue('Refresh', $FeedData);
-            $DelayStr = '+'.str_replace(array(
+            $DelayStr = '+'.str_replace([
                     'm',
                     'h',
                     'd',
                     'w'
-                ), array(
+                ], [
                     'minutes',
                     'hours',
                     'days',
                     'weeks'
-                ), $Delay);
+                ], $Delay);
             $DelayMinTime = strtotime($DelayStr, $LastImport);
             if (
                 ($LastImport && time() > $DelayMinTime) ||                  // We've imported before, and this article was published since then
@@ -183,11 +183,11 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
 
             // Grab posted values and merge with defaults
             $FormPostValues = $Sender->Form->formValues();
-            $Defaults = array(
+            $Defaults = [
                 'Historical' => 1,
                 'Refresh' => '1d',
                 'Category' => -1
-            );
+            ];
             $FormPostValues = array_merge($Defaults, $FormPostValues);
 
             try {
@@ -207,9 +207,9 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
 
                 // Check feed is valid RSS:
                 $Pr = new ProxyRequest();
-                $FeedRSS = $Pr->request(array(
+                $FeedRSS = $Pr->request([
                     'URL' => $FeedURL
-                ));
+                ]);
 
                 if (!$FeedRSS) {
                     throw new Exception("The Feed URL you supplied is not available");
@@ -225,13 +225,13 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                     throw new Exception("The Feed URL you supplied is not an RSS stream");
                 }
 
-                $this->addFeed($FeedURL, array(
+                $this->addFeed($FeedURL, [
                     'Historical' => $FormPostValues['Historical'],
                     'Refresh' => $FormPostValues['Refresh'],
                     'Category' => $FeedCategoryID,
                     'Added' => date('Y-m-d H:i:s'),
                     'LastImport' => "never"
-                ));
+                ]);
                 $Sender->informMessage(sprintf(t("Feed has been added"), $FeedURL));
                 $Sender->Form->clearInputs();
 
@@ -268,8 +268,8 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             $FeedArray = $this->getUserMeta(0, "Feed.%");
 
             //die('feeds');
-            $this->FeedList = array();
-            $this->RawFeedList = array();
+            $this->FeedList = [];
+            $this->RawFeedList = [];
 
             foreach ($FeedArray as $FeedMetaKey => $FeedItem) {
                 $DecodedFeedItem = json_decode($FeedItem, true);
@@ -290,9 +290,9 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
 
     protected function pollFeed($FeedURL, $LastImportDate) {
         $Pr = new ProxyRequest();
-        $FeedRSS = $Pr->request(array(
+        $FeedRSS = $Pr->request([
             'URL' => $FeedURL
-        ));
+        ]);
 
         if (!$FeedRSS) {
             return false;
@@ -344,9 +344,9 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                 continue;
             }
 
-            $ExistingDiscussion = $DiscussionModel->getWhere(array(
+            $ExistingDiscussion = $DiscussionModel->getWhere([
                 'ForeignID' => $FeedItemID
-            ));
+            ]);
 
             if ($ExistingDiscussion && $ExistingDiscussion->numRows()) {
                 continue;
@@ -370,13 +370,13 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             $ParsedStoryBody = $StoryBody;
             $ParsedStoryBody = '<div class="AutoFeedDiscussion">'.$ParsedStoryBody.'</div> <br /><div class="AutoFeedSource">Source: '.$FeedItemGUID.'</div>';
 
-            $DiscussionData = array(
+            $DiscussionData = [
                 'Name' => $StoryTitle,
                 'Format' => 'Html',
                 'CategoryID' => $Feed['Category'],
                 'ForeignID' => substr($FeedItemID, 0, 30),
                 'Body' => $ParsedStoryBody
-            );
+            ];
 
             // Post as Minion (if one exists) or the system user
             if (Gdn::addonManager()->isEnabled('Minion', \Vanilla\Addon::TYPE_ADDON)) {
@@ -410,10 +410,10 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
         }
 
         $FeedKey = self::encodeFeedKey($FeedURL);
-        $this->updateFeed($FeedKey, array(
+        $this->updateFeed($FeedKey, [
             'LastImport' => date('Y-m-d H:i:s'),
             'LastPublishDate' => date('c', $FeedLastPublishTime)
-        ));
+        ]);
     }
 
     public function replaceBadURLs($Matches) {
@@ -437,7 +437,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
         $Feed = $this->getFeed($FeedKey);
 
         if (!is_array($FeedOptionKey)) {
-            $FeedOptionKey = array($FeedOptionKey => $FeedOptionValue);
+            $FeedOptionKey = [$FeedOptionKey => $FeedOptionValue];
         }
 
         $Feed = array_merge($Feed, $FeedOptionKey);

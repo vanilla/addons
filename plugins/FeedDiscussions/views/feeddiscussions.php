@@ -9,9 +9,9 @@
         <span id="plaintext-toggle">
             <?php
             if ($this->Plugin->isEnabled()) {
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', $this->Plugin->autoTogglePath()), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', $this->Plugin->autoTogglePath()), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
             } else {
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', $this->Plugin->autoTogglePath()), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', $this->Plugin->autoTogglePath()), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
             }
             ?>
         </span>
@@ -23,12 +23,12 @@
 <h2><?php echo t('Add a new Auto Discussion Feed'); ?></h2>
 <div class="AddFeed">
     <?php
-    echo $this->Form->open(array(
+    echo $this->Form->open([
         'action' => url('plugin/feeddiscussions/addfeed')
-    ));
+    ]);
     echo $this->Form->errors();
 
-    $Refreshments = array(
+    $Refreshments = [
         "1m" => t("Every Minute"),
         "5m" => t("Every 5 Minutes"),
         "30m" => t("Twice Hourly"),
@@ -37,24 +37,24 @@
         "3d" => t("Every 3 Days"),
         "1w" => t("Weekly"),
         "2w" => t("Every 2 Weeks")
-    );
+    ];
 
     ?>
     <ul class="padded-bottom">
         <li class="form-group">
             <?php echo $this->Form->labelWrap('Feed URL', 'FeedURL'); ?>
-            <?php echo $this->Form->textBoxWrap('FeedURL', array('class' => 'InputBox')); ?>
+            <?php echo $this->Form->textBoxWrap('FeedURL', ['class' => 'InputBox']); ?>
         </li>
         <li class="form-group">
             <div class="input-wrap no-label">
-                <?php echo $this->Form->checkBox('Historical', t('Import Older Posts'), array('value' => '1')); ?>
+                <?php echo $this->Form->checkBox('Historical', t('Import Older Posts'), ['value' => '1']); ?>
             </div>
         </li>
 
         <li class="form-group">
             <?php echo $this->Form->labelWrap('Maximum Polling Frequency', 'Refresh'); ?>
             <div class="input-wrap">
-                <?php echo $this->Form->dropDown('Refresh', $Refreshments, array('value' => "1d")); ?>
+                <?php echo $this->Form->dropDown('Refresh', $Refreshments, ['value' => "1d"]); ?>
             </div>
         </li>
         <li class="form-group">
