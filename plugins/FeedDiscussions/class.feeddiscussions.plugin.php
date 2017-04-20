@@ -108,13 +108,13 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
         foreach ($this->getFeeds() as $FeedURL => $FeedData) {
             Gdn::controller()->setData("{$FeedURL}", $FeedData);
             // Check feed here
-            $LastImport = getValue('LastImport', $FeedData) == 'never' ? null : strtotime(getValue('LastImport', $FeedData));
+            $LastImport = val('LastImport', $FeedData) == 'never' ? null : strtotime(val('LastImport', $FeedData));
             if (is_null($LastImport)) {
-                $LastImport = strtotime(getValue('Added', $FeedData, 0));
+                $LastImport = strtotime(val('Added', $FeedData, 0));
             }
 
-            $Historical = (bool)GetValue('Historical', $FeedData, false);
-            $Delay = getValue('Refresh', $FeedData);
+            $Historical = (bool)val('Historical', $FeedData, false);
+            $Delay = val('Refresh', $FeedData);
             $DelayStr = '+'.str_replace([
                     'm',
                     'h',
@@ -191,7 +191,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             $FormPostValues = array_merge($Defaults, $FormPostValues);
 
             try {
-                $FeedURL = getValue('FeedURL', $FormPostValues, null);
+                $FeedURL = val('FeedURL', $FormPostValues, null);
                 if (empty($FeedURL)) {
                     throw new Exception("You must supply a valid Feed URL");
                 }
@@ -200,7 +200,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                     throw new Exception("The Feed URL you supplied is already part of an Active Feed");
                 }
 
-                $FeedCategoryID = getValue('Category', $FormPostValues);
+                $FeedCategoryID = val('Category', $FormPostValues);
                 if (!array_key_exists($FeedCategoryID, $Categories)) {
                     throw new Exception("You need to select a Category");
                 }
@@ -220,7 +220,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                     throw new Exception("The Feed URL you supplied is not valid XML");
                 }
 
-                $Channel = getValue('channel', $RSSData, false);
+                $Channel = val('channel', $RSSData, false);
                 if (!$Channel) {
                     throw new Exception("The Feed URL you supplied is not an RSS stream");
                 }
@@ -250,7 +250,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      * @param $Sender
      */
     public function controller_DeleteFeed($Sender) {
-        $FeedKey = getValue(1, $Sender->RequestArgs, null);
+        $FeedKey = val(1, $Sender->RequestArgs, null);
         if (!is_null($FeedKey) && $this->haveFeed($FeedKey)) {
             $Feed = $this->getFeed($FeedKey, true);
             $FeedURL = $Feed['URL'];
@@ -273,7 +273,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
 
             foreach ($FeedArray as $FeedMetaKey => $FeedItem) {
                 $DecodedFeedItem = json_decode($FeedItem, true);
-                $FeedURL = getValue('URL', $DecodedFeedItem, null);
+                $FeedURL = val('URL', $DecodedFeedItem, null);
                 $FeedKey = self::encodeFeedKey($FeedURL);
 
                 if (is_null($FeedURL)) {
@@ -303,7 +303,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $Channel = getValue('channel', $RSSData, false);
+        $Channel = val('channel', $RSSData, false);
         if (!$Channel) {
             return false;
         }
@@ -317,19 +317,19 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
         $DiscussionModel = new DiscussionModel();
         $DiscussionModel->SpamCheck = false;
 
-        $LastPublishDate = getValue('LastPublishDate', $Feed, date('c'));
+        $LastPublishDate = val('LastPublishDate', $Feed, date('c'));
         $LastPublishTime = strtotime($LastPublishDate);
 
         $FeedLastPublishTime = 0;
-        foreach (getValue('item', $Channel) as $Item) {
-            $FeedItemGUID = trim((string)GetValue('guid', $Item));
+        foreach (val('item', $Channel) as $Item) {
+            $FeedItemGUID = trim((string)val('guid', $Item));
             if (empty($FeedItemGUID)) {
                 trace('guid is not set in each item of the RSS.  Will attempt to use link as unique identifier.');
-                $FeedItemGUID = getValue('link', $Item);
+                $FeedItemGUID = val('link', $Item);
             }
             $FeedItemID = substr(md5($FeedItemGUID), 0, 30);
 
-            $ItemPubDate = (string)GetValue('pubDate', $Item, null);
+            $ItemPubDate = (string)val('pubDate', $Item, null);
             if (is_null($ItemPubDate)) {
                 $ItemPubTime = time();
             } else {
@@ -363,8 +363,8 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                 continue;
             }
 
-            $StoryTitle = array_shift($Trash = explode("\n", (string)GetValue('title', $Item)));
-            $StoryBody = (string)GetValue('description', $Item);
+            $StoryTitle = array_shift($Trash = explode("\n", (string)val('title', $Item)));
+            $StoryBody = (string)val('description', $Item);
             $StoryPublished = date("Y-m-d H:i:s", $ItemPubTime);
 
             $ParsedStoryBody = $StoryBody;
