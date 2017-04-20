@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) { exit(); } ?>
 <h1><?php echo t($this->Data['Title']); ?></h1>
 <div class="row form-group">
     <div class="label-wrap-wide">
@@ -17,24 +17,26 @@
         </span>
     </div>
 </div>
-<?php if (!$this->Plugin->IsEnabled()) return; ?>
+<?php if (!$this->Plugin->IsEnabled()) {
+    return;
+} ?>
 <h2><?php echo t('Add a new Auto Discussion Feed'); ?></h2>
 <div class="AddFeed">
     <?php
     echo $this->Form->Open(array(
-        'action'  => Url('plugin/feeddiscussions/addfeed')
+        'action' => Url('plugin/feeddiscussions/addfeed')
     ));
     echo $this->Form->Errors();
 
     $Refreshments = array(
-        "1m"  => T("Every Minute"),
-        "5m"  => T("Every 5 Minutes"),
+        "1m" => T("Every Minute"),
+        "5m" => T("Every 5 Minutes"),
         "30m" => T("Twice Hourly"),
-        "1h"  => T("Hourly"),
-        "1d"  => T("Daily"),
-        "3d"  => T("Every 3 Days"),
-        "1w"  => T("Weekly"),
-        "2w"  => T("Every 2 Weeks")
+        "1h" => T("Hourly"),
+        "1d" => T("Daily"),
+        "3d" => T("Every 3 Days"),
+        "1w" => T("Weekly"),
+        "2w" => T("Every 2 Weeks")
     );
 
     ?>
@@ -52,7 +54,7 @@
         <li class="form-group">
             <?php echo $this->Form->labelWrap('Maximum Polling Frequency', 'Refresh'); ?>
             <div class="input-wrap">
-                <?php echo $this->Form->dropDown('Refresh', $Refreshments, array('value'  => "1d")); ?>
+                <?php echo $this->Form->dropDown('Refresh', $Refreshments, array('value' => "1d")); ?>
             </div>
         </li>
         <li class="form-group">
@@ -93,7 +95,7 @@
                     $Category = $this->Data("Categories.{$CategoryID}.Name", 'Root');
                     ?>
                     <tr>
-                        <td class="FeedItemURL"><?php echo Anchor($FeedURL,$FeedURL); ?></td>
+                        <td class="FeedItemURL"><?php echo Anchor($FeedURL, $FeedURL); ?></td>
                         <td><?php echo $LastUpdate; ?></td>
                         <td><?php echo $Frequency; ?></td>
                         <td><?php echo $Category; ?></td>
