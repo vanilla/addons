@@ -43,10 +43,10 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
     /**
      * Set up appmenu link
      */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+    public function base_getAppSettingsMenuItems_handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
-        $Menu->AddItem('Forum', T('Forum'));
-        $Menu->AddLink('Forum', T('Feed Discussions'), 'plugin/feeddiscussions', 'Garden.Settings.Manage');
+        $Menu->addItem('Forum', t('Forum'));
+        $Menu->addLink('Forum', t('Feed Discussions'), 'plugin/feeddiscussions', 'Garden.Settings.Manage');
     }
 
     /**
@@ -54,21 +54,21 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-        if ($this->IsEnabled()) {
-            if ($this->CheckFeeds(false)) {
-                $Sender->AddJsFile('feeddiscussions.js', 'plugins/FeedDiscussions');
+    public function discussionController_beforeDiscussionRender_handler($Sender) {
+        if ($this->isEnabled()) {
+            if ($this->checkFeeds(false)) {
+                $Sender->addJsFile('feeddiscussions.js', 'plugins/FeedDiscussions');
             }
 
-            $Sender->AddCssFile('feeddiscussions.css', 'plugins/FeedDiscussions');
+            $Sender->addCssFile('feeddiscussions.css', 'plugins/FeedDiscussions');
         }
     }
 
     /**
      * Act as a mini dispatcher for API requests to the plugin app
      */
-    public function PluginController_FeedDiscussions_Create($Sender) {
-        $this->Dispatch($Sender, $Sender->RequestArgs);
+    public function pluginController_feedDiscussions_create($Sender) {
+        $this->dispatch($Sender, $Sender->RequestArgs);
     }
 
     /**
@@ -77,11 +77,11 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      * This method handles the internally re-dispatched call generated when a user clicks
      * the 'Enable' or 'Disable' button within the dashboard settings page for Feed Discussions.
      */
-    public function Controller_Toggle($Sender) {
-        $Sender->Permission('Garden.Settings.Manage');
+    public function controller_Toggle($Sender) {
+        $Sender->permission('Garden.Settings.Manage');
 
         // Handle Enabled/Disabled toggling
-        $this->AutoToggle($Sender);
+        $this->autoToggle($Sender);
     }
 
     /**
@@ -89,11 +89,11 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function Controller_CheckFeeds($Sender) {
-        $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
-        $Sender->DeliveryType(DELIVERY_TYPE_DATA);
-        $this->CheckFeeds();
-        $Sender->Render();
+    public function controller_CheckFeeds($Sender) {
+        $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
+        $Sender->deliveryType(DELIVERY_TYPE_DATA);
+        $this->checkFeeds();
+        $Sender->render();
     }
 
     /**
@@ -102,19 +102,19 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      * @param bool $AutoImport
      * @return bool|int
      */
-    public function CheckFeeds($AutoImport = true) {
-        Gdn::Controller()->SetData("AutoImport", $AutoImport);
+    public function checkFeeds($AutoImport = true) {
+        Gdn::controller()->setData("AutoImport", $AutoImport);
         $NeedToPoll = 0;
-        foreach ($this->GetFeeds() as $FeedURL => $FeedData) {
-            Gdn::Controller()->SetData("{$FeedURL}", $FeedData);
+        foreach ($this->getFeeds() as $FeedURL => $FeedData) {
+            Gdn::controller()->setData("{$FeedURL}", $FeedData);
             // Check feed here
-            $LastImport = GetValue('LastImport', $FeedData) == 'never' ? null : strtotime(GetValue('LastImport', $FeedData));
+            $LastImport = getValue('LastImport', $FeedData) == 'never' ? null : strtotime(getValue('LastImport', $FeedData));
             if (is_null($LastImport)) {
-                $LastImport = strtotime(GetValue('Added', $FeedData, 0));
+                $LastImport = strtotime(getValue('Added', $FeedData, 0));
             }
 
             $Historical = (bool)GetValue('Historical', $FeedData, false);
-            $Delay = GetValue('Refresh', $FeedData);
+            $Delay = getValue('Refresh', $FeedData);
             $DelayStr = '+'.str_replace(array(
                     'm',
                     'h',
@@ -135,7 +135,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             ) {
                 if ($AutoImport) {
                     $NeedToPoll = $NeedToPoll | 1;
-                    $this->PollFeed($FeedURL, $LastImport);
+                    $this->pollFeed($FeedURL, $LastImport);
                 } else {
                     return true;
                 }
@@ -143,7 +143,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
         }
         $NeedToPoll = (bool)$NeedToPoll;
         if ($NeedToPoll && $AutoImport) {
-            Gdn::Controller()->StatusCode(201);
+            Gdn::controller()->statusCode(201);
         }
 
         return $NeedToPoll;
@@ -154,18 +154,18 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function Controller_Index($Sender) {
-        $Sender->Permission('Garden.Settings.Manage');
-        $Sender->Title($this->GetPluginKey('name'));
-        $Sender->AddSideMenu('plugin/feeddiscussions');
-        $Sender->SetData('Description', $this->GetPluginKey('description'));
-        $Sender->AddCssFile('feeddiscussions.css', 'plugins/FeedDiscussions');
+    public function controller_Index($Sender) {
+        $Sender->permission('Garden.Settings.Manage');
+        $Sender->title($this->getPluginKey('name'));
+        $Sender->addSideMenu('plugin/feeddiscussions');
+        $Sender->setData('Description', $this->getPluginKey('description'));
+        $Sender->addCssFile('feeddiscussions.css', 'plugins/FeedDiscussions');
 
-        $Categories = CategoryModel::Categories();
-        $Sender->SetData('Categories', $Categories);
-        $Sender->SetData('Feeds', $this->GetFeeds());
+        $Categories = CategoryModel::categories();
+        $Sender->setData('Categories', $Categories);
+        $Sender->setData('Feeds', $this->getFeeds());
 
-        $Sender->Render('feeddiscussions', '', 'plugins/FeedDiscussions');
+        $Sender->render('feeddiscussions', '', 'plugins/FeedDiscussions');
     }
 
     /**
@@ -173,16 +173,16 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function Controller_AddFeed($Sender) {
+    public function controller_AddFeed($Sender) {
 
-        $Categories = CategoryModel::Categories();
-        $Sender->SetData('Categories', $Categories);
+        $Categories = CategoryModel::categories();
+        $Sender->setData('Categories', $Categories);
 
         // Do addfeed stuff here;
-        if ($Sender->Form->AuthenticatedPostback()) {
+        if ($Sender->Form->authenticatedPostback()) {
 
             // Grab posted values and merge with defaults
-            $FormPostValues = $Sender->Form->FormValues();
+            $FormPostValues = $Sender->Form->formValues();
             $Defaults = array(
                 'Historical' => 1,
                 'Refresh' => '1d',
@@ -191,23 +191,23 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             $FormPostValues = array_merge($Defaults, $FormPostValues);
 
             try {
-                $FeedURL = GetValue('FeedURL', $FormPostValues, null);
+                $FeedURL = getValue('FeedURL', $FormPostValues, null);
                 if (empty($FeedURL)) {
                     throw new Exception("You must supply a valid Feed URL");
                 }
 
-                if ($this->HaveFeed($FeedURL, false)) {
+                if ($this->haveFeed($FeedURL, false)) {
                     throw new Exception("The Feed URL you supplied is already part of an Active Feed");
                 }
 
-                $FeedCategoryID = GetValue('Category', $FormPostValues);
+                $FeedCategoryID = getValue('Category', $FormPostValues);
                 if (!array_key_exists($FeedCategoryID, $Categories)) {
                     throw new Exception("You need to select a Category");
                 }
 
                 // Check feed is valid RSS:
                 $Pr = new ProxyRequest();
-                $FeedRSS = $Pr->Request(array(
+                $FeedRSS = $Pr->request(array(
                     'URL' => $FeedURL
                 ));
 
@@ -220,28 +220,28 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                     throw new Exception("The Feed URL you supplied is not valid XML");
                 }
 
-                $Channel = GetValue('channel', $RSSData, false);
+                $Channel = getValue('channel', $RSSData, false);
                 if (!$Channel) {
                     throw new Exception("The Feed URL you supplied is not an RSS stream");
                 }
 
-                $this->AddFeed($FeedURL, array(
+                $this->addFeed($FeedURL, array(
                     'Historical' => $FormPostValues['Historical'],
                     'Refresh' => $FormPostValues['Refresh'],
                     'Category' => $FeedCategoryID,
                     'Added' => date('Y-m-d H:i:s'),
                     'LastImport' => "never"
                 ));
-                $Sender->InformMessage(sprintf(T("Feed has been added"), $FeedURL));
-                $Sender->Form->ClearInputs();
+                $Sender->informMessage(sprintf(t("Feed has been added"), $FeedURL));
+                $Sender->Form->clearInputs();
 
             } catch (Exception $e) {
-                $Sender->Form->AddError(T($e->getMessage()));
+                $Sender->Form->addError(T($e->getMessage()));
             }
         }
 
-        // Redirect('/plugin/feeddiscussions/');
-        $this->Controller_Index($Sender);
+        // redirect('/plugin/feeddiscussions/');
+        $this->controller_Index($Sender);
     }
 
     /**
@@ -249,23 +249,23 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function Controller_DeleteFeed($Sender) {
-        $FeedKey = GetValue(1, $Sender->RequestArgs, null);
-        if (!is_null($FeedKey) && $this->HaveFeed($FeedKey)) {
-            $Feed = $this->GetFeed($FeedKey, true);
+    public function controller_DeleteFeed($Sender) {
+        $FeedKey = getValue(1, $Sender->RequestArgs, null);
+        if (!is_null($FeedKey) && $this->haveFeed($FeedKey)) {
+            $Feed = $this->getFeed($FeedKey, true);
             $FeedURL = $Feed['URL'];
 
-            $this->RemoveFeed($FeedKey);
-            $Sender->InformMessage(sprintf(T("Feed has been removed"), $FeedURL));
+            $this->removeFeed($FeedKey);
+            $Sender->informMessage(sprintf(t("Feed has been removed"), $FeedURL));
         }
 
-        // Redirect('/plugin/feeddiscussions/');
-        $this->Controller_Index($Sender);
+        // redirect('/plugin/feeddiscussions/');
+        $this->controller_Index($Sender);
     }
 
-    protected function GetFeeds($Raw = false, $Regen = false) {
+    protected function getFeeds($Raw = false, $Regen = false) {
         if (is_null($this->FeedList) || $Regen) {
-            $FeedArray = $this->GetUserMeta(0, "Feed.%");
+            $FeedArray = $this->getUserMeta(0, "Feed.%");
 
             //die('feeds');
             $this->FeedList = array();
@@ -273,11 +273,11 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
 
             foreach ($FeedArray as $FeedMetaKey => $FeedItem) {
                 $DecodedFeedItem = json_decode($FeedItem, true);
-                $FeedURL = GetValue('URL', $DecodedFeedItem, null);
-                $FeedKey = self::EncodeFeedKey($FeedURL);
+                $FeedURL = getValue('URL', $DecodedFeedItem, null);
+                $FeedKey = self::encodeFeedKey($FeedURL);
 
                 if (is_null($FeedURL)) {
-                    //$this->RemoveFeed($FeedKey);
+                    //$this->removeFeed($FeedKey);
                     continue;
                 }
 
@@ -288,9 +288,9 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
         return ($Raw) ? $this->RawFeedList : $this->FeedList;
     }
 
-    protected function PollFeed($FeedURL, $LastImportDate) {
+    protected function pollFeed($FeedURL, $LastImportDate) {
         $Pr = new ProxyRequest();
-        $FeedRSS = $Pr->Request(array(
+        $FeedRSS = $Pr->request(array(
             'URL' => $FeedURL
         ));
 
@@ -303,7 +303,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $Channel = GetValue('channel', $RSSData, false);
+        $Channel = getValue('channel', $RSSData, false);
         if (!$Channel) {
             return false;
         }
@@ -312,20 +312,20 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $Feed = $this->GetFeed($FeedURL, false);
+        $Feed = $this->getFeed($FeedURL, false);
 
         $DiscussionModel = new DiscussionModel();
         $DiscussionModel->SpamCheck = false;
 
-        $LastPublishDate = GetValue('LastPublishDate', $Feed, date('c'));
+        $LastPublishDate = getValue('LastPublishDate', $Feed, date('c'));
         $LastPublishTime = strtotime($LastPublishDate);
 
         $FeedLastPublishTime = 0;
-        foreach (GetValue('item', $Channel) as $Item) {
+        foreach (getValue('item', $Channel) as $Item) {
             $FeedItemGUID = trim((string)GetValue('guid', $Item));
             if (empty($FeedItemGUID)) {
-                Trace('guid is not set in each item of the RSS.  Will attempt to use link as unique identifier.');
-                $FeedItemGUID = GetValue('link', $Item);
+                trace('guid is not set in each item of the RSS.  Will attempt to use link as unique identifier.');
+                $FeedItemGUID = getValue('link', $Item);
             }
             $FeedItemID = substr(md5($FeedItemGUID), 0, 30);
 
@@ -344,11 +344,11 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                 continue;
             }
 
-            $ExistingDiscussion = $DiscussionModel->GetWhere(array(
+            $ExistingDiscussion = $DiscussionModel->getWhere(array(
                 'ForeignID' => $FeedItemID
             ));
 
-            if ($ExistingDiscussion && $ExistingDiscussion->NumRows()) {
+            if ($ExistingDiscussion && $ExistingDiscussion->numRows()) {
                 continue;
             }
 
@@ -357,7 +357,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             $this->EventArguments['FeedURL'] = $FeedURL;
             $this->EventArguments['Feed'] = &$Feed;
             $this->EventArguments['Item'] = &$Item;
-            $this->FireEvent('FeedItem');
+            $this->fireEvent('FeedItem');
 
             if (!$this->EventArguments['Publish']) {
                 continue;
@@ -380,10 +380,10 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
 
             // Post as Minion (if one exists) or the system user
             if (Gdn::addonManager()->isEnabled('Minion', \Vanilla\Addon::TYPE_ADDON)) {
-                $Minion = Gdn::PluginManager()->GetPluginInstance('MinionPlugin');
-                $InsertUserID = $Minion->GetMinionUserID();
+                $Minion = Gdn::pluginManager()->getPluginInstance('MinionPlugin');
+                $InsertUserID = $Minion->getMinionUserID();
             } else {
-                $InsertUserID = Gdn::UserModel()->GetSystemUserID();
+                $InsertUserID = Gdn::userModel()->getSystemUserID();
             }
 
             $DiscussionData[$DiscussionModel->DateInserted] = $StoryPublished;
@@ -393,48 +393,48 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             $DiscussionData[$DiscussionModel->UpdateUserID] = $InsertUserID;
 
             $this->EventArguments['FeedDiscussion'] = &$DiscussionData;
-            $this->FireEvent('Publish');
+            $this->fireEvent('Publish');
 
             if (!$this->EventArguments['Publish']) {
                 continue;
             }
 
-            $InsertID = $DiscussionModel->Save($DiscussionData);
+            $InsertID = $DiscussionModel->save($DiscussionData);
 
             $this->EventArguments['DiscussionID'] = $InsertID;
             $this->EventArguments['Validation'] = $DiscussionModel->Validation;
-            $this->FireEvent('Published');
+            $this->fireEvent('Published');
 
             // Reset discussion validation
-            $DiscussionModel->Validation->Results(true);
+            $DiscussionModel->Validation->results(true);
         }
 
-        $FeedKey = self::EncodeFeedKey($FeedURL);
-        $this->UpdateFeed($FeedKey, array(
+        $FeedKey = self::encodeFeedKey($FeedURL);
+        $this->updateFeed($FeedKey, array(
             'LastImport' => date('Y-m-d H:i:s'),
             'LastPublishDate' => date('c', $FeedLastPublishTime)
         ));
     }
 
-    public function ReplaceBadURLs($Matches) {
+    public function replaceBadURLs($Matches) {
         $MatchedURL = $Matches[0];
         $FixedURL = array_pop($Trash = explode("/*", $MatchedURL));
         return 'href="'.$FixedURL.'"';
     }
 
-    protected function AddFeed($FeedURL, $Feed) {
-        $FeedKey = self::EncodeFeedKey($FeedURL);
+    protected function addFeed($FeedURL, $Feed) {
+        $FeedKey = self::encodeFeedKey($FeedURL);
 
         $Feed['URL'] = $FeedURL;
         $EncodedFeed = json_encode($Feed);
-        $this->SetUserMeta(0, "Feed.{$FeedKey}", $EncodedFeed);
+        $this->setUserMeta(0, "Feed.{$FeedKey}", $EncodedFeed);
 
         // regenerate the internal feed list
-        $this->GetFeeds(true, true);
+        $this->getFeeds(true, true);
     }
 
-    protected function UpdateFeed($FeedKey, $FeedOptionKey, $FeedOptionValue = null) {
-        $Feed = $this->GetFeed($FeedKey);
+    protected function updateFeed($FeedKey, $FeedOptionKey, $FeedOptionValue = null) {
+        $Feed = $this->getFeed($FeedKey);
 
         if (!is_array($FeedOptionKey)) {
             $FeedOptionKey = array($FeedOptionKey => $FeedOptionValue);
@@ -443,23 +443,23 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
         $Feed = array_merge($Feed, $FeedOptionKey);
 
         $EncodedFeed = json_encode($Feed);
-        $this->SetUserMeta(0, "Feed.{$FeedKey}", $EncodedFeed);
+        $this->setUserMeta(0, "Feed.{$FeedKey}", $EncodedFeed);
 
         // regenerate the internal feed list
-        $this->GetFeeds(true, true);
+        $this->getFeeds(true, true);
     }
 
-    protected function RemoveFeed($FeedKey, $PreEncoded = true) {
-        $FeedKey = (!$PreEncoded) ? self::EncodeFeedKey($FeedKey) : $FeedKey;
-        $this->SetUserMeta(0, "Feed.{$FeedKey}", null);
+    protected function removeFeed($FeedKey, $PreEncoded = true) {
+        $FeedKey = (!$PreEncoded) ? self::encodeFeedKey($FeedKey) : $FeedKey;
+        $this->setUserMeta(0, "Feed.{$FeedKey}", null);
 
         // regenerate the internal feed list
-        $this->GetFeeds(true, true);
+        $this->getFeeds(true, true);
     }
 
-    protected function GetFeed($FeedKey, $PreEncoded = true) {
-        $FeedKey = (!$PreEncoded) ? self::EncodeFeedKey($FeedKey) : $FeedKey;
-        $Feeds = $this->GetFeeds(true);
+    protected function getFeed($FeedKey, $PreEncoded = true) {
+        $FeedKey = (!$PreEncoded) ? self::encodeFeedKey($FeedKey) : $FeedKey;
+        $Feeds = $this->getFeeds(true);
 
         if (array_key_exists($FeedKey, $Feeds)) {
             return $Feeds[$FeedKey];
@@ -468,20 +468,20 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
         return null;
     }
 
-    protected function HaveFeed($FeedKey, $PreEncoded = true) {
-        $FeedKey = (!$PreEncoded) ? self::EncodeFeedKey($FeedKey) : $FeedKey;
-        $Feed = $this->GetFeed($FeedKey);
+    protected function haveFeed($FeedKey, $PreEncoded = true) {
+        $FeedKey = (!$PreEncoded) ? self::encodeFeedKey($FeedKey) : $FeedKey;
+        $Feed = $this->getFeed($FeedKey);
         if (!empty($Feed)) {
             return true;
         }
         return false;
     }
 
-    public static function EncodeFeedKey($Key) {
+    public static function encodeFeedKey($Key) {
         return md5($Key);
     }
 
-    public function Setup() {
+    public function setup() {
         // Nothing to do here!
     }
 }
