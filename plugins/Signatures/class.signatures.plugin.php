@@ -108,7 +108,7 @@ class SignaturesPlugin extends Gdn_Plugin {
      */
     public function profileController_signature_create($Sender) {
         $Sender->permission('Garden.SignIn.Allow');
-        $Sender->title('Signature Settings');
+        $Sender->title(t('Signature Settings'));
 
         $this->dispatch($Sender);
     }
