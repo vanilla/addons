@@ -108,7 +108,7 @@ class SignaturesPlugin extends Gdn_Plugin {
      */
     public function profileController_signature_create($Sender) {
         $Sender->permission('Garden.SignIn.Allow');
-        $Sender->title('Signature Settings');
+        $Sender->title(t('Signature Settings'));
 
         $this->dispatch($Sender);
     }
@@ -296,7 +296,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
         if (c('Plugins.Signatures.MaxNumberImages', 'Unlimited') !== 'Unlimited') {
             if (c('Plugins.Signatures.MaxNumberImages') === 'None') {
-                $rules[] = t('Images not allowed.');
+                $rules[] = t('Images not allowed').'.';
                 $imagesAllowed = false;
             } else {
                 $rulesParams['maxImages'] = c('Plugins.Signatures.MaxNumberImages');
