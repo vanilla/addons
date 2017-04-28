@@ -17,6 +17,7 @@ $PluginInfo['Redirector'] = [
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
     'MobileFriendly' => true,
+    'License' => 'GNU GPL2',
 ];
 
 /**
