@@ -15,7 +15,8 @@ $PluginInfo['Resolved'] = array(
     'MobileFriendly' => true,
     'Author' => "Matt Lincoln Russell",
     'AuthorEmail' => 'lincolnwebs@gmail.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
+    'AuthorUrl' => 'http://lincolnwebs.com',
+    'License' => 'GNU GPLv2'
 );
 
 /**

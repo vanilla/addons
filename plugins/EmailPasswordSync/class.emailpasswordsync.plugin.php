@@ -12,7 +12,8 @@ $PluginInfo['EmailPasswordSync'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'License' => 'GNU GPLv2'
 );
 
 class MultipleEmailsPlugin extends Gdn_Plugin {

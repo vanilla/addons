@@ -7,7 +7,8 @@ $PluginInfo['MeAction'] = array(
     'MobileFriendly' => true,
     'Author' => 'Lincoln Russell',
     'AuthorEmail' => 'lincoln@vanillaforums.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
+    'AuthorUrl' => 'http://lincolnwebs.com',
+    'License' => 'GNU GPLv2'
 );
 
 class MeActionPlugin extends Gdn_Plugin {

@@ -15,7 +15,8 @@ $PluginInfo['Minify'] = array(
    'Version' => '1.0.3b',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'License' => 'GNU GPLv2'
 );
 
 class MinifyPlugin extends Gdn_Plugin {

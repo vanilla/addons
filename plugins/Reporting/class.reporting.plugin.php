@@ -22,7 +22,8 @@ $PluginInfo['Reporting'] = array(
    'SettingsPermission' => 'Garden.Users.Manage',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'License' => 'GNU GPLv2'
 );
 
 class ReportingPlugin extends Gdn_Plugin {

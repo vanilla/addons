@@ -10,7 +10,8 @@ $PluginInfo['Spoof'] = array(
    'Version' => '1.2',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+   'AuthorUrl' => 'http://vanillaforums.com',
+   'License' => 'GNU GPLv2'
 );
 
 class SpoofPlugin implements Gdn_IPlugin {

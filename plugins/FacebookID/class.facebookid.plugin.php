@@ -9,6 +9,7 @@ $PluginInfo['FacebookID'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
    'RegisterPermissions' => array('Plugins.FacebookID.View'),
+   'License' => 'GNU GPLv2'
 );
 
 class FacebookIDPlugin extends Gdn_Plugin {

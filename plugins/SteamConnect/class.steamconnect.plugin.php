@@ -10,7 +10,8 @@ $PluginInfo['SteamConnect'] = array(
     'AuthorEmail' => 'becky@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
     'SettingsUrl' => '/settings/steamconnect',
-    'SettingsPermission' => 'Garden.Settings.Manage'
+    'SettingsPermission' => 'Garden.Settings.Manage',
+    'License' => 'GNU GPLv2'
 );
 
 /**

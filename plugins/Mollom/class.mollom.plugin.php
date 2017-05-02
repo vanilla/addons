@@ -13,7 +13,8 @@ $PluginInfo['Mollom'] = array(
    'SettingsUrl' => '/settings/mollom',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => 'Lincoln Russell',
-   'AuthorEmail' => 'lincoln@vanillaforums.com'
+   'AuthorEmail' => 'lincoln@vanillaforums.com',
+   'License' => 'GNU GPLv2'
 );
 
 class MollomPlugin extends Gdn_Plugin {

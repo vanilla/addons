@@ -22,7 +22,8 @@ $PluginInfo['vBulletinCompatibility'] = array(
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
-   'Hidden' => TRUE
+   'Hidden' => TRUE,
+   'License' => 'GNU GPLv2'
 );
 
 class VbulletinCompatibilityPlugin extends Gdn_Plugin {

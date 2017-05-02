@@ -31,7 +31,8 @@ $PluginInfo['FeedDiscussions'] = array(
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'License' => 'GNU GPLv2'
 );
 
 class FeedDiscussionsPlugin extends Gdn_Plugin {

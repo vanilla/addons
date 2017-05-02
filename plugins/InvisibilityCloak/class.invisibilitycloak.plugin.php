@@ -6,7 +6,8 @@ $PluginInfo['InvisibilityCloak'] = array(
    'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincoln@vanillaforums.com'
+   'AuthorEmail' => 'lincoln@vanillaforums.com',
+   'License' => 'GNU GPLv2'
 );
 
 class InvisibilityCloakPlugin extends Gdn_Plugin {

@@ -11,7 +11,8 @@ $PluginInfo['TouchIcon'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'SettingsUrl' => '/settings/touchicon',
-   'SettingsPermission' => 'Garden.Settings.Manage'
+   'SettingsPermission' => 'Garden.Settings.Manage',
+   'License' => 'GNU GPLv2'
 );
 
 class TouchIconPlugin extends Gdn_Plugin {
