@@ -14,7 +14,8 @@ $PluginInfo['Disqus'] = array(
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'License' => 'GNU GPLv2'
 );
 
 /**

@@ -23,7 +23,8 @@ $PluginInfo['Sitemaps'] = array(
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
    'SettingsUrl' => '/settings/sitemaps',
-   'SettingsPermission' => 'Garden.Settings.Manage'
+   'SettingsPermission' => 'Garden.Settings.Manage',
+   'License' => 'GNU GPLv2'
 );
 
 class SitemapsPlugin extends Gdn_Plugin {

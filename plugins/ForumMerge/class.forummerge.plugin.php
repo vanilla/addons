@@ -8,7 +8,8 @@ $PluginInfo['ForumMerge'] = array(
    'Description' => 'Merge another Vanilla 2 forum into this one.',
    'Version' => '1.1',
    'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincoln@vanillaforums.com'
+   'AuthorEmail' => 'lincoln@vanillaforums.com',
+   'License' => 'GNU GPLv2'
 );
 
 /**

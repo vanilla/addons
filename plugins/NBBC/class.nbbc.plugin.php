@@ -17,7 +17,8 @@ $PluginInfo['NBBC'] = array(
     'HasLocale' => FALSE,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com/profile/todd'
+    'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
+    'License' => 'GNU GPLv2'
 );
 
 Gdn::FactoryInstall('BBCodeFormatter', 'NBBCPlugin', __FILE__, Gdn::FactorySingleton);

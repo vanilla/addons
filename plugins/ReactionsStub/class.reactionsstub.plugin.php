@@ -10,7 +10,8 @@ $PluginInfo['ReactionsStub'] = array(
    'HasLocale' => FALSE,
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'License' => 'GNU GPLv2'
 );
 
 class ReactionsStubPlugin extends Gdn_Plugin {

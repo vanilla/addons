@@ -17,7 +17,8 @@ $PluginInfo['CloudflareSupport'] = array(
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'License' => 'GNU GPLv2'
 );
 
 /**

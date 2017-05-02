@@ -13,7 +13,8 @@ $PluginInfo['Whispers'] = array(
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'RegisterPermissions' => array('Plugins.Whispers.Allow' => 'Garden.Moderation.Manage')
+   'RegisterPermissions' => array('Plugins.Whispers.Allow' => 'Garden.Moderation.Manage'),
+   'License' => 'GNU GPLv2'
 );
 
 class WhispersPlugin extends Gdn_Plugin {

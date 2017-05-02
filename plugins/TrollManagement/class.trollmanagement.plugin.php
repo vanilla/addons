@@ -21,7 +21,8 @@ $PluginInfo['TrollManagement'] = array(
    'MobileFriendly' => TRUE,
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+   'AuthorUrl' => 'http://vanillaforums.com',
+   'License' => 'GNU GPLv2'
 );
 
 class TrollManagementPlugin extends Gdn_Plugin {

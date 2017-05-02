@@ -11,7 +11,8 @@ $PluginInfo['TrackingCodes'] = array(
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
-	'SettingsUrl' => 'settings/trackingcodes'
+   'SettingsUrl' => 'settings/trackingcodes',
+   'License' => 'GNU GPLv2'
 );
 
 class TrackingCodesPlugin extends Gdn_Plugin {
