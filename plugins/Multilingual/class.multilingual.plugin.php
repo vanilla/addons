@@ -18,7 +18,8 @@ $PluginInfo['Multilingual'] = array(
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
     'AuthorUrl' => 'http://lincolnwebs.com',
-    'Icon' => 'multilingual.png'
+    'Icon' => 'multilingual.png',
+    'License' => 'GNU GPLv2'
 );
 
 /* Change Log

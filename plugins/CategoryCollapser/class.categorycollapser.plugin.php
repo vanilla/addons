@@ -9,7 +9,8 @@ $PluginInfo['CategoryCollapser'] = array(
    'AuthorUrl' => 'http://vanillaforums.com',
    'Icon' => 'collapse_categories.png',
    'RequiredApplications' => array('Vanilla' => '2.1'),
-   'MobileFriendly' => TRUE
+   'MobileFriendly' => TRUE,
+   'License' => 'GNU GPLv2'
 );
 
 class CategoryCollapserPlugin extends Gdn_Plugin {

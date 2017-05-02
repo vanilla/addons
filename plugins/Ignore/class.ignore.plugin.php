@@ -38,7 +38,8 @@ $PluginInfo['Ignore'] = array(
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
-   'Icon' => 'ignore.png'
+   'Icon' => 'ignore.png',
+   'License' => 'GNU GPLv2'
 );
 
 class IgnorePlugin extends Gdn_Plugin {

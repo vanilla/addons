@@ -18,7 +18,8 @@ $PluginInfo['Buttons'] = array(
    'RequiredPlugins' => FALSE,
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'License' => 'GNU GPLv2'
 );
 
 class ButtonsPlugin extends Gdn_Plugin {

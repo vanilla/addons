@@ -9,7 +9,8 @@ $PluginInfo['RoleTitle'] = [
    'Icon' => 'role_titles.png',
    'Author' => 'Matt Lincoln Russell',
    'AuthorEmail' => 'lincolnwebs@gmail.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
+   'AuthorUrl' => 'http://lincolnwebs.com',
+   'License' => 'GNU GPLv2'
 ];
 
 class RoleTitlePlugin extends Gdn_Plugin {

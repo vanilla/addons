@@ -11,7 +11,8 @@ $PluginInfo['SubmarineDiscussions'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'MobileFriendly' => TRUE,
    'SettingsUrl' => '/settings/submarinediscussions',
-   'SettingsPermission' => 'Garden.Settings.Manage'
+   'SettingsPermission' => 'Garden.Settings.Manage',
+   'License' => 'GNU GPLv2'
 );
 
 class SubmarineDiscussionsPlugin extends Gdn_Plugin {

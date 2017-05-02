@@ -33,7 +33,8 @@ $PluginInfo['FileUpload'] = [
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com',
-    'Icon' => 'file-upload.png'
+    'Icon' => 'file-upload.png',
+    'License' => 'GNU GPLv2'
 ];
 
 /**

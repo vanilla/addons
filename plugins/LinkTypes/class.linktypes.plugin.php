@@ -12,7 +12,8 @@ $PluginInfo['LinkTypes'] = array(
    'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincoln@vanillaforums.com'
+   'AuthorEmail' => 'lincoln@vanillaforums.com',
+    'License' => 'GNU GPLv2'
 );
 
 class LinkTypesPlugin extends Gdn_Plugin {

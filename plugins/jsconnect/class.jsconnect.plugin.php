@@ -17,7 +17,8 @@ $PluginInfo['jsconnect'] = [
     'SettingsUrl' => '/settings/jsconnect',
     'UsePopupSettings' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'jsconnect.png'
+    'Icon' => 'jsconnect.png',
+    'License' => 'GNU GPLv2'
 ];
 
 /**

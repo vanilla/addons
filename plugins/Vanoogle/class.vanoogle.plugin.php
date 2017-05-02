@@ -26,7 +26,8 @@ $PluginInfo["Vanoogle"] = array(
     "SettingsUrl" => "/settings/vanoogle",
     "SettingsPermission" => "Garden.Settings.Manage",
     "AuthorUrl" => "http://blog.canofsleep.com",
-    "RequiredApplications" => array("Vanilla" => "2.0.17") // This needs to be bumped when Vanilla releases with my contributed changes
+    "RequiredApplications" => array("Vanilla" => "2.0.17"), // This needs to be bumped when Vanilla releases with my contributed changes
+    'License' => 'GNU GPLv2'
 );
 
 /**

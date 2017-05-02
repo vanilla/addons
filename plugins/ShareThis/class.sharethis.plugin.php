@@ -23,7 +23,8 @@ $PluginInfo['ShareThis'] = array(
    'Icon' => 'sharethis.png',
    'Author' => "Brendan Sera-Shriar a.k.a digibomb",
    'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://www.dropthedigibomb.com'
+   'AuthorUrl' => 'http://www.dropthedigibomb.com',
+   'License' => 'GNU GPLv2'
 );
 
 

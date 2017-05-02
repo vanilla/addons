@@ -25,7 +25,8 @@ $PluginInfo['CustomizeText'] = array(
    'AuthorUrl' => 'http://vanillaforums.com',
    'Icon' => 'custom_text.png',
    'SettingsUrl' => 'settings/customizetext',
-   'UsePopupSettings' => false
+   'UsePopupSettings' => false,
+   'License' => 'GNU GPLv2'
 );
 
 class CustomizeTextPlugin extends Gdn_Plugin {

@@ -9,7 +9,8 @@ $PluginInfo['InvisibilityCloak'] = array(
     'Version' => '1.0',
     'RequiredApplications' => ['Vanilla' => '2.1'],
     'Author' => "Lincoln Russell",
-    'AuthorEmail' => 'lincoln@vanillaforums.com'
+    'AuthorEmail' => 'lincoln@vanillaforums.com',
+    'License' => 'GNU GPLv2'
 );
 
 /**

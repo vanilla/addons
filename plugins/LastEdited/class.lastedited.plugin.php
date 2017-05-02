@@ -15,7 +15,8 @@ $PluginInfo['LastEdited'] = [
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com',
-    'Icon' => 'last-edited.png'
+    'Icon' => 'last-edited.png',
+    'License' => 'GNU GPLv2'
 ];
 
 /**

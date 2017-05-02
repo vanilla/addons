@@ -8,7 +8,8 @@ $PluginInfo['Bump'] = [
     'MobileFriendly' => true,
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincolnwebs@gmail.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
+    'AuthorUrl' => 'http://lincolnwebs.com',
+    'License' => 'GNU GPLv2'
 ];
 
 class BumpPlugin extends Gdn_Plugin {

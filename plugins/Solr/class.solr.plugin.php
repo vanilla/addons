@@ -14,6 +14,7 @@ $PluginInfo['Solr'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
    'SettingsUrl' => '/settings/solr',
+   'License' => 'GNU GPLv2'
 );
 
 class SolrPlugin extends Gdn_Plugin {

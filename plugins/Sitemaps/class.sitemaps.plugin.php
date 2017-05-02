@@ -25,7 +25,8 @@ $PluginInfo['Sitemaps'] = [
     'AuthorUrl' => 'http://www.vanillaforums.com',
     'SettingsUrl' => '/settings/sitemaps',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'site-maps.png'
+    'Icon' => 'site-maps.png',
+    'License' => 'GNU GPLv2'
 ];
 
 class SitemapsPlugin extends Gdn_Plugin {

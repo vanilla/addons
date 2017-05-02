@@ -16,7 +16,8 @@ $PluginInfo['StopAutoDraft'] = array(
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
-   'Icon' => 'stop_auto_draft.png'
+   'Icon' => 'stop_auto_draft.png',
+   'License' => 'GNU GPLv2'
 );
 
 class StopAutoDraftPlugin extends Gdn_Plugin {

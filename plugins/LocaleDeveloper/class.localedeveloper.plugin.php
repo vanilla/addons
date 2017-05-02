@@ -19,6 +19,7 @@ $PluginInfo['LocaleDeveloper'] = array(
     'RequiredApplications' => array('Vanilla' => '2.0.11'),
     'SettingsUrl' => '/settings/localedeveloper',
     'SettingsPermission' => 'Garden.Site.Manage',
+    'License' => 'GNU GPLv2'
 );
 
 class LocaleDeveloperPlugin extends Gdn_Plugin {
