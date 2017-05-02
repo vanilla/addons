@@ -16,7 +16,8 @@ $PluginInfo['Resolved'] = array(
     'Icon' => 'resolved_discussions.png',
     'Author' => "Matt Lincoln Russell",
     'AuthorEmail' => 'lincolnwebs@gmail.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
+    'AuthorUrl' => 'http://lincolnwebs.com',
+    'License' => 'GNU GPLv2'
 );
 
 /**

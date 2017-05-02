@@ -19,7 +19,8 @@ $PluginInfo['Participated'] = [
     'Author' => 'Tim Gunter',
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com',
-    'Icon' => 'participated-discussions.png'
+    'Icon' => 'participated-discussions.png',
+    'License' => 'GNU GPLv2'
 ];
 
 class ParticipatedPlugin extends Gdn_Plugin {

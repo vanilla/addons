@@ -16,7 +16,8 @@ $PluginInfo['Disqus'] = array(
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'SocialConnect'   => true,
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'License' => 'GNU GPLv2'
 );
 
 /**

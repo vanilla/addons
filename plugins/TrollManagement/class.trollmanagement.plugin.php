@@ -14,7 +14,8 @@ $PluginInfo['TrollManagement'] = array(
     'Icon' => 'troll_management.png',
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com'
+    'AuthorUrl' => 'http://vanillaforums.com',
+    'License' => 'GNU GPLv2'
 );
 
 /**

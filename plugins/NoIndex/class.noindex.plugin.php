@@ -8,7 +8,8 @@ $PluginInfo['NoIndex'] = array(
    'MobileFriendly' => TRUE,
    'Author' => "Lincoln Russell",
    'AuthorEmail' => 'lincolnwebs@gmail.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
+   'AuthorUrl' => 'http://lincolnwebs.com',
+   'License' => 'GNU GPLv2'
 );
 
 /**

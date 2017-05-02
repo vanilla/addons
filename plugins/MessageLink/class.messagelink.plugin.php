@@ -8,7 +8,8 @@ $PluginInfo['MessageLink'] = array(
    'MobileFriendly' => TRUE,
    'Author' => "Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
+   'AuthorUrl' => 'http://lincolnwebs.com',
+   'License' => 'GNU GPLv2'
 );
 
 class MessageLinkPlugin extends Gdn_Plugin {

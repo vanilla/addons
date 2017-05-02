@@ -12,7 +12,8 @@ $PluginInfo['SteamConnect'] = array(
     'Icon'            => 'steam_connect.png',
     'SettingsUrl'     => '/settings/steamconnect',
     'SocialConnect'   => true,
-    'SettingsPermission' => 'Garden.Settings.Manage'
+    'SettingsPermission' => 'Garden.Settings.Manage',
+    'License' => 'GNU GPLv2'
 );
 
 /**

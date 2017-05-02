@@ -22,7 +22,8 @@ $PluginInfo['CssThemes'] = array(
    'SettingsPermission' => 'Garden.Themes.Manage', // The permission required to view the SettingsUrl.
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://toddburry.com'
+   'AuthorUrl' => 'http://toddburry.com',
+   'License' => 'GNU GPLv2'
 );
 
 $tmp = Gdn::FactoryOverwrite(TRUE);

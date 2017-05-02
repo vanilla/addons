@@ -21,7 +21,8 @@ $PluginInfo['SMFCompatibility'] = array(
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
-   'License' => 'Simple Machines license'
+   'License' => 'Simple Machines license',
+   'License' => 'GNU GPLv2'
 );
 
 Gdn::FactoryInstall('BBCodeFormatter', 'SMFCompatibilityPlugin', __FILE__, Gdn::FactorySingleton);

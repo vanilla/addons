@@ -18,7 +18,8 @@ $PluginInfo['Voting'] = array(
    'AuthorUrl' => 'http://markosullivan.ca',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'SettingsUrl' => '/settings/voting',
-   'SettingsPermission' => 'Garden.Settings.Manage'
+   'SettingsPermission' => 'Garden.Settings.Manage',
+   'License' => 'GNU GPLv2'
 );
 
 class VotingPlugin extends Gdn_Plugin {

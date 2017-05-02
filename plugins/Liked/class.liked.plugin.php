@@ -8,7 +8,8 @@ $PluginInfo['Liked'] = array(
    'Author' => "Gary Mardell",
    'Icon' => 'liked.png',
    'AuthorEmail' => 'gary@vanillaplugins.com',
-   'AuthorUrl' => 'http://garymardell.co.uk'
+   'AuthorUrl' => 'http://garymardell.co.uk',
+   'License' => 'GNU GPLv2'
 );
 
 class LikedPlugin extends Gdn_Plugin {

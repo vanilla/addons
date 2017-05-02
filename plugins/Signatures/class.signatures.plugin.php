@@ -37,7 +37,8 @@ $PluginInfo['Signatures'] = [
     'MobileFriendly' => true,
     'SettingsUrl' => '/settings/signatures',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'signatures.png'
+    'Icon' => 'signatures.png',
+    'License' => 'GNU GPLv2'
 ];
 
 class SignaturesPlugin extends Gdn_Plugin {

@@ -18,7 +18,8 @@ $PluginInfo['RightToLeft'] = array(
     'Icon' => 'right_to_left.png',
     'Author' => 'Becky Van Bussel',
     'AuthorEmail' => 'becky@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/'
+    'AuthorUrl' => 'http://www.vanillaforums.org/',
+    'License' => 'GNU GPLv2'
 );
 
 class RightToLeftPlugin extends Gdn_Plugin {

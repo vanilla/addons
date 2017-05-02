@@ -15,7 +15,8 @@ $PluginInfo['QnA'] = array(
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'Icon' => 'qna.png'
+    'Icon' => 'qna.png',
+    'License' => 'GNU GPLv2'
 );
 
 /**
