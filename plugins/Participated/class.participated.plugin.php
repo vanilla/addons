@@ -65,6 +65,9 @@ class ParticipatedPlugin extends Gdn_Plugin {
 
         $sender->SQL->reset();
         $sender->SQL->select('d.*')
+            ->select('ud.DateLastViewed, ud.Dismissed, ud.Bookmarked')
+            ->select('ud.UserID', '', 'WatchUserID')
+            ->select('ud.CountComments', '', 'CountCommentWatch')
             ->from('UserDiscussion ud')
             ->join('Discussion d', 'ud.DiscussionID = d.DiscussionID')
             ->join('Comment c', 'ud.DiscussionID = c.DiscussionID and c.InsertUserID = ud.UserID')
