@@ -1,0 +1,19 @@
+{
+    "name": "Multilingual",
+    "description": "Allows use of multiple languages. Users can select their preferred language via a link in the footer, and administrators may embed their forum in different languages in different places.",
+    "version": "1.3.1",
+    "mobileFriendly": true,
+    "icon": "multilingual.png",
+    "key": "multilingual",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

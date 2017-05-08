@@ -1,20 +1,5 @@
 <?php if (!defined('APPLICATION')) exit;
 
-$PluginInfo['SteamConnect'] = array(
-    'Name'            => "Steam Connect",
-    'Description'     => "Allow users to sign in with their Steam Account. Requires &lsquo;OpenID&rsquo; plugin to be enabled first.",
-    'Version'         => '1.0.0',
-    'RequiredPlugins' => array('OpenID' => '0.1a'),
-    'MobileFriendly'  => TRUE,
-    'Author'          => "Becky Van Bussel",
-    'AuthorEmail'     => 'becky@vanillaforums.com',
-    'AuthorUrl'       => 'http://vanillaforums.com',
-    'Icon'            => 'steam_connect.png',
-    'SettingsUrl'     => '/settings/steamconnect',
-    'SocialConnect'   => true,
-    'SettingsPermission' => 'Garden.Settings.Manage'
-);
-
 /**
  * Steam Connect Plugin
  *

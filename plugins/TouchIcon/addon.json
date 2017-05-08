@@ -1,0 +1,21 @@
+{
+    "name": "Touch Icon",
+    "description": "Adds option to upload a touch icon for Apple iDevices.",
+    "version": "1.1",
+    "mobileFriendly": true,
+    "icon": "touch_icon.png",
+    "settingsUrl": "/settings/touchicon",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "touchicon",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Matt Lincoln Russell",
+            "email": "lincoln@vanillaforums.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

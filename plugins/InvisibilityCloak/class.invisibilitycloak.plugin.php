@@ -3,15 +3,6 @@
  * @copyright 2014-2016 Vanilla Forums, Inc.
  */
 
-$PluginInfo['InvisibilityCloak'] = array(
-    'Name' => 'Invisibility Cloak',
-    'Description' => 'Hide your forum from the prying eyes of search engines and bots while you set it up.',
-    'Version' => '1.0',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'Author' => "Lincoln Russell",
-    'AuthorEmail' => 'lincoln@vanillaforums.com'
-);
-
 /**
  * Class InvisibilityCloakPlugin
  */

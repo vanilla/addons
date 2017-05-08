@@ -4,20 +4,6 @@
  * @license GNU GPLv2
  */
 
-$PluginInfo['LastEdited'] = [
-    'Name' => 'Last Edited',
-    'Description' => 'Appends "Post edited by [User] at [Time]" to the end of edited posts and links to change log.',
-    'Version' => '1.2',
-    'MobileFriendly' => true,
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'HasLocale' => true,
-    'RegisterPermissions' => false,
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com',
-    'Icon' => 'last-edited.png'
-];
-
 /**
  * Class LastEditedPlugin
  */

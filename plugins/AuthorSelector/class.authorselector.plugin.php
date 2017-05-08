@@ -4,19 +4,6 @@
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
-$PluginInfo['AuthorSelector'] = [
-    'Name' => 'Author Selector',
-    'Description' => "Allows administrators to change the author of a discussion.",
-    'Version' => '1.2',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'MobileFriendly' => true,
-    'License' => 'GNU GPLv2',
-    'Icon' => 'author_selector.png',
-    'Author' => "Lincoln Russell",
-    'AuthorEmail' => 'lincolnwebs@gmail.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
-];
-
 /**
  * Class AuthorSelectorPlugin
  */

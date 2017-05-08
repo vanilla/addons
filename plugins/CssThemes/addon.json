@@ -1,0 +1,18 @@
+{
+    "description": "The Css Theme plugin caches css files and allows the colors to be themed in the application.",
+    "version": "1.0",
+    "requiredTheme": false,
+    "hasLocale": true,
+    "registerPermissions": false,
+    "settingsUrl": "/plugin/cssthemes",
+    "settingsPermission": "Garden.Themes.Manage",
+    "key": "cssthemes",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://toddburry.com"
+        }
+    ]
+}

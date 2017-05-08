@@ -21,20 +21,6 @@
  * @package Addons
  */
 
-// Define the plugin:
-$PluginInfo['FeedDiscussions'] = [
-    'Name' => 'Feed Discussions',
-    'Description' => "Automatically creates new discussions based on content imported from supplied RSS feeds.",
-    'Version' => '1.2.2',
-    'RequiredApplications' => ['Vanilla' => '2.0.18'],
-    'HasLocale' => true,
-    'RegisterPermissions' => false,
-    'Icon' => 'feed_discussions.png',
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-];
-
 class FeedDiscussionsPlugin extends Gdn_Plugin {
 
     protected $FeedList    = null;

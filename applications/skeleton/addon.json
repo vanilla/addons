@@ -1,0 +1,19 @@
+{
+    "description": "Skeleton is just a sample 'skeleton' of all the folders and files you need to get started with a new application. You can copy this folder, rename it to whatever you like, and start building an application all your own.",
+    "version": "1.0",
+    "registerPermissions": false,
+    "setupController": "setup",
+    "allowEnable": false,
+    "license": "Your choice of license",
+    "key": "skeleton",
+    "type": "addon",
+    "priority": 10,
+    "name": "Skeleton",
+    "authors": [
+        {
+            "name": "Your Name",
+            "email": "Your Email",
+            "homepage": "http://your.domain.com"
+        }
+    ]
+}

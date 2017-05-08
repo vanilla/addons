@@ -5,21 +5,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
-// Define the plugin:
-$PluginInfo['CloudflareSupport'] = array(
-   'Description' => 'This plugin modifies the Request object to work with Cloudflare.',
-   'Version' => '1.2.3',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => FALSE,
-   'SettingsUrl' => FALSE,
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 /**
  * Cloudflare Support Plugin
  *

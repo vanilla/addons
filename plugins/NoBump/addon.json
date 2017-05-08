@@ -1,0 +1,18 @@
+{
+    "name": "No Bump",
+    "description": "Allows moderators to add a comment without bumping a discussion.",
+    "version": "1.0",
+    "mobileFriendly": true,
+    "key": "nobump",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincolnwebs@gmail.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

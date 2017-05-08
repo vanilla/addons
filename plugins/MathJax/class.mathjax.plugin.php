@@ -5,16 +5,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
-$PluginInfo['MathJax'] = array(
-    'Description' => 'This plugin enables MathJax syntax in discussions and comments.',
-    'Version' => '1.1',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'MobileFriendly' => TRUE,
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 /**
  * MathJax Plugin
  *

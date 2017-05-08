@@ -5,19 +5,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['IPBFormatter'] = array(
-    'Name' => 'IPB Formatter',
-    'Description' => 'Formats posts imported from Invision Power Board.',
-    'Version' => '1.1',
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'RequiredPlugins' => false,
-    'HasLocale' => false,
-    'Icon' => 'ipb.png',
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com/profile/todd'
-);
-
 Gdn::factoryInstall('IPBFormatter', 'IPBFormatterPlugin', __FILE__, Gdn::FactorySingleton);
 
 class IPBFormatterPlugin extends Gdn_Plugin {

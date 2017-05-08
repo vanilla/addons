@@ -17,18 +17,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-$PluginInfo["Vanoogle"] = array(
-    "Name" => "Vanoogle",
-    "Description" => "A google search plugin for vanilla 2+",
-    "Version" => "1.2",
-    "Author" => "Dan Dumont",
-    "AuthorEmail" => "ddumont@gmail.com",
-    "SettingsUrl" => "/settings/vanoogle",
-    "SettingsPermission" => "Garden.Settings.Manage",
-    "AuthorUrl" => "http://blog.canofsleep.com",
-    "RequiredApplications" => array("Vanilla" => "2.0.17") // This needs to be bumped when Vanilla releases with my contributed changes
-);
-
 /**
  * Vanoogle seearch plugin for Vanilla
  * @author ddumont@gmail.com

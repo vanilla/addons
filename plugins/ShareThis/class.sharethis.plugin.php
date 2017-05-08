@@ -8,25 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['ShareThis'] = array(
-   'Name' => 'ShareThis',
-   'Description' => 'Adds ShareThis (http://sharethis.com) buttons below discussions.',
-   'Version' => '1.2',
-   'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/plugin/sharethis',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'HasLocale' => TRUE,
-   'RegisterPermissions' => FALSE,
-   'Icon' => 'sharethis.png',
-   'Author' => "Brendan Sera-Shriar a.k.a digibomb",
-   'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://www.dropthedigibomb.com'
-);
-
-
 class ShareThisPlugin extends Gdn_Plugin {
    /**
     * Show buttons after OP message body.

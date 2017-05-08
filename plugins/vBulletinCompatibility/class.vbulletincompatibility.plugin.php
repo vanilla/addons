@@ -8,23 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['vBulletinCompatibility'] = array(
-   'Name' => 'vBulletin Compatibility Mode',
-   'Description' => "This plugin hooks into Garden and applies tweaks to help ease the transition from vBulleting to Vanilla.",
-   'Version' => '1.0',
-   'MobileFriendly' => TRUE,
-   'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE, 
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => FALSE,
-   'RegisterPermissions' => FALSE,
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com',
-   'Hidden' => TRUE
-);
-
 class VbulletinCompatibilityPlugin extends Gdn_Plugin {
    
    public function __construct() {

@@ -3,17 +3,6 @@
 /**
  * 1.2 - mosullivan - 2011-08-30 - Added "Spoof" button to various screens for admins.
  */
-// Define the plugin:
-$PluginInfo['Spoof'] = array(
-   'Name' => 'Spoof',
-   'Description' => 'Administrators may "spoof" other users, meaning they temporarily sign in as that user. Helpful for debugging permission problems.',
-   'Version' => '1.2',
-   'Icon' => 'spoof.png',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
-);
-
 class SpoofPlugin implements Gdn_IPlugin {
 
 	/**

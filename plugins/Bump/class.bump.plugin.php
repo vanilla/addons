@@ -1,16 +1,5 @@
 <?php
 
-$PluginInfo['Bump'] = [
-    'Name' => 'Bump',
-    'Description' => "Allows moderators to bump a discussion without commenting.",
-    'Version' => '1.0',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'MobileFriendly' => true,
-    'Author' => "Lincoln Russell",
-    'AuthorEmail' => 'lincolnwebs@gmail.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
-];
-
 class BumpPlugin extends Gdn_Plugin {
     /**
      * Add bump option to discussion options.
