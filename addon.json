@@ -1,0 +1,21 @@
+{
+    "name": "Debug Bar",
+    "description": "The debug bar shows debuggin information at the bottom of the page.",
+    "version": "1.4.0",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "registerPermissions": {
+        "Plugins.Debugger.View": "Garden.Settings.View"
+    },
+    "mobileFriendly": true,
+    "icon": "debugger.png",
+    "key": "debugbar",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ]
+}

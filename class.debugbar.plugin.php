@@ -12,23 +12,6 @@ use DebugBar\DataCollector\MessagesCollector;
 use Vanilla\DebugBar\ExceptionsCollector;
 use Vanilla\DebugBar\LoggerCollector;
 
-// Define the plugin:
-$PluginInfo['debugbar'] = array(
-    'Name' => 'Debug Bar',
-    'Description' => 'The debug bar shows debuggin information at the bottom of the page.',
-    'Version' => '1.4.0',
-    'RequiredApplications' => false,
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false, // This is an array of plugin names/versions that this plugin requires
-    'HasLocale' => false, // Does this plugin have any locale definitions?
-    'RegisterPermissions' => array('Plugins.Debugger.View' => 'Garden.Settings.View'),
-    'Author' => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com',
-    'MobileFriendly' => true,
-    'Icon' => 'debugger.png'
-);
-
 /**
  * Handles integration of the [PHP Debug Bar](http://phpdebugbar.com/) with Vanilla.
  */
