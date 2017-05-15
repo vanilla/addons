@@ -118,16 +118,18 @@ class SpoofPlugin implements Gdn_IPlugin {
       $UserReference = $Sender->Form->GetValue('UserReference', '');
       $Email = $Sender->Form->GetValue('Email', '');
       $Password = $Sender->Form->GetValue('Password', '');
+
       if ($UserReference != '' && $Email != '' && $Password != '') {
          $UserModel = Gdn::UserModel();
          $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
-			// if (1 == 1) {
-         if (is_object($UserData) && $UserData->Admin) {
+
+         if (is_object($UserData) && $UserModel->checkPermission($UserData->UserID, 'Garden.Settings.Manage')) {
 				if (is_numeric($UserReference)) {
 					$SpoofUser = $UserModel->GetID($UserReference);
 				} else {
 				   $SpoofUser = $UserModel->GetByUsername($UserReference);
 				}
+
 				if ($SpoofUser) {
 					$Identity = new Gdn_CookieIdentity();
 					$Identity->Init(array(
@@ -136,7 +138,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 						'Domain' => Gdn::Config('Garden.Cookie.Domain')
 					));
 					$Identity->SetIdentity($SpoofUser->UserID, TRUE);
-	            Redirect('profile');
+	                Redirect('profile');
 				} else {
 					$Sender->Form->AddError('Failed to find requested user.');
 				}
@@ -144,6 +146,7 @@ class SpoofPlugin implements Gdn_IPlugin {
             $Sender->Form->AddError('Bad Credentials');
          }
       }
+
       $Sender->Render(PATH_PLUGINS . DS . 'Spoof' . DS . 'views' . DS . 'spoof.php');
    }
 
