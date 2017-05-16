@@ -305,7 +305,11 @@ class QnAPlugin extends Gdn_Plugin {
 
         // Mark the question as answered.
         if (strtolower($Discussion['Type']) == 'question' && !$Discussion['Sink'] && !in_array($Discussion['QnA'], array('Answered', 'Accepted'))) {
-            $sender->SQL->set('QnA', 'Answered');
+            if($args['Counts']['CountComments'] > 0) {
+                $sender->SQL->set('QnA', 'Answered');
+            } else {
+                $sender->SQL->set('QnA', 'Unanswered');
+            }
         }
     }
 
