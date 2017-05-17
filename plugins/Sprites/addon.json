@@ -1,0 +1,19 @@
+{
+    "name": "Sprites",
+    "description": "Adds sprites (icons) to all menus and nav buttons throughout Vanilla.",
+    "version": "1.0",
+    "mobileFriendly": true,
+    "requiredTheme": false,
+    "key": "sprites",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

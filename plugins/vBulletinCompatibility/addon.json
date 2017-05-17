@@ -1,0 +1,19 @@
+{
+    "name": "vBulletin Compatibility Mode",
+    "description": "This plugin hooks into Garden and applies tweaks to help ease the transition from vBulleting to Vanilla.",
+    "version": "1.0",
+    "mobileFriendly": true,
+    "requiredTheme": false,
+    "hasLocale": false,
+    "registerPermissions": false,
+    "hidden": true,
+    "key": "vbulletincompatibility",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

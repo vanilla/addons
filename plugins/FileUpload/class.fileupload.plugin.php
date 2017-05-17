@@ -21,21 +21,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
-$PluginInfo['FileUpload'] = [
-    'Description' => 'Images and files may be attached to discussions and comments.',
-    'Version' => '1.9',
-    'RequiredApplications' => ['Vanilla' => '2.3.102'],
-    'MobileFriendly' => true,
-    'RegisterPermissions' => [
-        'Plugins.Attachments.Upload.Allow' => 'Garden.Profiles.Edit',
-        'Plugins.Attachments.Download.Allow' => 'Garden.Profiles.Edit'
-    ],
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com',
-    'Icon' => 'file-upload.png'
-];
-
 /**
  * Class FileUploadPlugin
  */

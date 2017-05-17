@@ -1,17 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
 /**
- * @var $PluginInfo Array of data about the plugin.
- */
-$PluginInfo['ForumMerge'] = array(
-   'Name' => 'Forum Merge',
-   'Description' => 'Merge another Vanilla 2 forum into this one.',
-   'Version' => '1.1',
-   'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincoln@vanillaforums.com'
-);
-
-/**
  * Forum Merge plugin.
  *
  * @todo Allow multiple merges by resetting OldID to NULL before run.

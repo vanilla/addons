@@ -1,0 +1,19 @@
+{
+    "name": "Message Link",
+    "description": "Adds a link to message the author of each discussion and comment.",
+    "version": "1.2",
+    "mobileFriendly": true,
+    "key": "messagelink",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2",
+        "conversations": ">=2.2"
+    }
+}

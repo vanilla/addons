@@ -1,0 +1,19 @@
+{
+    "name": "Post Count",
+    "description": "Shows each user's comment total by their name in each comment.",
+    "version": "1.0.3",
+    "mobileFriendly": true,
+    "requiredTheme": false,
+    "hasLocale": true,
+    "registerPermissions": false,
+    "icon": "post_count.png",
+    "key": "postcount",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

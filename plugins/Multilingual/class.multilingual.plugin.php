@@ -9,18 +9,6 @@
  * @package Addons
  */
 
-$PluginInfo['Multilingual'] = array(
-    'Name' => 'Multilingual',
-    'Description' => "Allows use of multiple languages. Users can select their preferred language via a link in the footer, and administrators may embed their forum in different languages in different places.",
-    'Version' => '1.3.1',
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'MobileFriendly' => true,
-    'Author' => "Lincoln Russell",
-    'AuthorEmail' => 'lincoln@vanillaforums.com',
-    'AuthorUrl' => 'http://lincolnwebs.com',
-    'Icon' => 'multilingual.png'
-);
-
 /* Change Log
    1.0 - Make MobileFriendly //Lincoln 2012-01-13
    1.1 - Move locale setting to later in startup for Embed //Lincoln 2012-02-22

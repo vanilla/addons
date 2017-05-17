@@ -1,0 +1,18 @@
+{
+    "name": "Solr Search",
+    "description": "Allows Vanilla's search functionality to use solr instead of MySQL fulltext search.",
+    "version": "1.0b",
+    "settingsUrl": "/settings/solr",
+    "key": "solr",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

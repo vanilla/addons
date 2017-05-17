@@ -1,0 +1,16 @@
+{
+    "name": "Link Types",
+    "description": "Open external URLs in a new tab.",
+    "version": "1.0",
+    "key": "linktypes",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

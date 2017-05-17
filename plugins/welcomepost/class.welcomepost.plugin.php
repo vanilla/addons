@@ -4,18 +4,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-$PluginInfo['welcomepost'] = [
-    'Name' => 'Welcome Post',
-    'Description' => 'Redirect users, after registration, to an "introduce yourself" page that posts in a "welcome" category.'
-            .' This plugin does not work with the "approval" registration mode.',
-    'Version' => '1.1',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'License' => 'GNU GPL2',
-    'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com',
-    'AuthorUrl' => 'https://github.com/DaazKu',
-];
-
 /**
  * Class WelcomePostPlugin
  */

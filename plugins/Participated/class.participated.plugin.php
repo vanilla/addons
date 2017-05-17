@@ -5,23 +5,6 @@
  * @license GPLv2
  */
 
-// Define the plugin:
-$PluginInfo['Participated'] = [
-    'Name' => 'Participated Discussions',
-    'Description' => 'Users may view a list of all discussions they have commented on. This is a more user-friendly version of an auto-subscribe option.',
-    'Version' => '1.1.1',
-    'MobileFriendly' => true,
-    'RequiredApplications' => false,
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'HasLocale' => true,
-    'RegisterPermissions' => false,
-    'Author' => 'Tim Gunter',
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com',
-    'Icon' => 'participated-discussions.png'
-];
-
 class ParticipatedPlugin extends Gdn_Plugin {
 
     /** @var int|null  */

@@ -1,18 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
-// Define the plugin:
-$PluginInfo['Liked'] = array(
-   'Name' => 'Liked',
-   'Description' => 'Adds the facebook like feature to your discussions.',
-   'Version' => '1.6',
-   'Author' => "Gary Mardell",
-   'Icon' => 'liked.png',
-   'AuthorEmail' => 'gary@vanillaplugins.com',
-   'AuthorUrl' => 'http://garymardell.co.uk'
-);
-
 class LikedPlugin extends Gdn_Plugin {
-	
+
 	public function DiscussionController_Render_Before($Sender) {
       $FB_SDK = <<<EOD
 <div id="fb-root"></div>
@@ -26,7 +15,7 @@ class LikedPlugin extends Gdn_Plugin {
 EOD;
       $Sender->AddAsset('Panel', $FB_SDK);
 	}
-	
+
 	public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
       echo '<div class="fb-like" data-href="';
       echo Gdn_Url::Request(true, true, true);

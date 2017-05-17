@@ -1,0 +1,15 @@
+{
+    "name": "Stop Auto Draft",
+    "description": "Comments are auto-saved as a user types. This plugin disables that feature so that drafts are only saved if the \"Save Draft\" button is clicked.",
+    "version": "1.1",
+    "icon": "stop_auto_draft.png",
+    "key": "stopautodraft",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://markosullivan.ca"
+        }
+    ]
+}

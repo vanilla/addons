@@ -8,17 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['StopAutoDraft'] = array(
-   'Name' => 'Stop Auto Draft',
-   'Description' => 'Comments are auto-saved as a user types. This plugin disables that feature so that drafts are only saved if the "Save Draft" button is clicked.',
-   'Version' => '1.1',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca',
-   'Icon' => 'stop_auto_draft.png'
-);
-
 class StopAutoDraftPlugin extends Gdn_Plugin {
 
    public function DiscussionController_Render_Before($Sender) {

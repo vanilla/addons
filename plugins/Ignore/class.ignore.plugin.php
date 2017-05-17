@@ -25,22 +25,6 @@
  * @package Addons
  */
 
-$PluginInfo['Ignore'] = array(
-   'Description' => 'This plugin allows users to ignore others, filtering their comments out of discussions.',
-   'Version' => '1.4.0',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'MobileFriendly' => TRUE,
-   'HasLocale' => FALSE,
-   'SettingsUrl' => FALSE,
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com',
-   'Icon' => 'ignore.png'
-);
-
 class IgnorePlugin extends Gdn_Plugin {
 
    const IGNORE_SELF = 'self';

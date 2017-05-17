@@ -4,20 +4,6 @@
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
-// Define the plugin:
-$PluginInfo['QnA'] = array(
-    'Name' => 'Q&A',
-    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-    'Version' => '1.3.1',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'MobileFriendly' => true,
-    'SettingsUrl' => '/settings/qna',
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'Icon' => 'qna.png'
-);
-
 /**
  * Adds Question & Answer format to Vanilla.
  *

@@ -1,0 +1,14 @@
+{
+    "name": "Minify",
+    "description": "DEPRECATED. Analyzes each page request for Javascript and CSS files, merging and minifying them where applicable.",
+    "version": "1.0.3b",
+    "key": "minify",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://markosullivan.ca"
+        }
+    ]
+}

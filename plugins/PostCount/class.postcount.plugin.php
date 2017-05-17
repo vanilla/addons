@@ -8,23 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['PostCount'] = array(
-   'Name' => 'Post Count',
-   'Description' => "Shows each user's comment total by their name in each comment.",
-   'Version' => '1.0.3',
-   'MobileFriendly' => TRUE,
-   'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE, 
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => TRUE,
-   'RegisterPermissions' => FALSE,
-   'Icon' => 'post_count.png',
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 class PostCountPlugin extends Gdn_Plugin {
    
    public function UserInfoModule_OnBasicInfo_Handler($Sender) {

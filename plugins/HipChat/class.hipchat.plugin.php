@@ -6,16 +6,6 @@
  * @license GNU GPLv2
  */
 
-$PluginInfo['HipChat'] = array(
-    'Description' => 'HipChat integration, first version: Posts every new discussion to HipChat. Requires cURL.',
-    'Version' => '0.3',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'License' => 'GNU GPL2',
-    'SettingsUrl' => '/settings/hipchat',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => "Lincoln Russell"
-);
-
 /**
  * Class HipChatPlugin.
  */
