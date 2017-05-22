@@ -1,0 +1,20 @@
+{
+    "name": "Submarine Discussions",
+    "description": "Allows users to start discussions sunk at bottom of list.",
+    "version": "1.0",
+    "mobileFriendly": true,
+    "settingsUrl": "/settings/submarinediscussions",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "submarinediscussions",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Matt Lincoln Russell",
+            "email": "lincoln@vanillaforums.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.17"
+    }
+}

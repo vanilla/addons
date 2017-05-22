@@ -8,19 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['Voting'] = array(
-   'Name' => 'Voting',
-   'Description' => 'DEPRECATED. Upgrade to Reactions. Allows users to vote for comments and discussions. Administrators get unlimited votes.',
-   'Version' => '1.1.4',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca',
-   'RequiredApplications' => array('Vanilla' => '2.0.17'),
-   'SettingsUrl' => '/settings/voting',
-   'SettingsPermission' => 'Garden.Settings.Manage'
-);
-
 class VotingPlugin extends Gdn_Plugin {
 	/**
 	 * Admin Toggle to turn Voting on/off

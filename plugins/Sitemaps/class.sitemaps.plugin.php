@@ -9,25 +9,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['Sitemaps'] = [
-    'Name' => 'Sitemaps',
-    'Description' => "Creates an XML sitemap based on http://www.sitemaps.org.",
-    'Version' => '2.0.1',
-    'MobileFriendly' => true,
-    'RequiredApplications' => ['Vanilla' => '2.0.18'],
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'HasLocale' => true,
-    'RegisterPermissions' => false,
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com',
-    'SettingsUrl' => '/settings/sitemaps',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'site-maps.png'
-];
-
 class SitemapsPlugin extends Gdn_Plugin {
 
     /// Methods ///

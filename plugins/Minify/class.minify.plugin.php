@@ -8,16 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['Minify'] = array(
-   'Name' => 'Minify',
-   'Description' => 'DEPRECATED. Analyzes each page request for Javascript and CSS files, merging and minifying them where applicable.',
-   'Version' => '1.0.3b',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
-);
-
 class MinifyPlugin extends Gdn_Plugin {
    
    /** @var string Subfolder that Vanilla lives in */

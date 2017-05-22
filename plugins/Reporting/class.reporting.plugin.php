@@ -8,24 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['Reporting'] = array(
-   'Name' => 'Community Reporting',
-   'Description' => 'Allows users to report comments and discussions for content violations or awesomeness.',
-   'Version' => '1.0.3',
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => FALSE,
-   'RegisterPermissions' => FALSE,
-   'Icon' => 'community_reporting.png',
-   'SettingsUrl' => '/plugin/reporting',
-   'SettingsPermission' => 'Garden.Users.Manage',
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 class ReportingPlugin extends Gdn_Plugin {
 
    const BUTTON_TYPE_REPORT = 'report';

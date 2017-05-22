@@ -8,19 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['LocaleDeveloper'] = array(
-    'Name' => 'Locale Developer',
-    'Description' => 'Contains useful functions for locale developers. When you enable this plugin go to its settings page to change your options. This plugin is maintained at http://github.com/vanillaforums/Addons',
-    'Version' => '1.1.1',
-    'Author' => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
-    'RequiredApplications' => array('Vanilla' => '2.0.11'),
-    'SettingsUrl' => '/settings/localedeveloper',
-    'SettingsPermission' => 'Garden.Site.Manage',
-);
-
 class LocaleDeveloperPlugin extends Gdn_Plugin {
     public $LocalePath;
 

@@ -1,20 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-// Define the plugin:
-$PluginInfo['TouchIcon'] = array(
-   'Name' => 'Touch Icon',
-   'Description' => 'Adds option to upload a touch icon for Apple iDevices.',
-   'Version' => '1.1',
-   'Author' => "Matt Lincoln Russell",
-   'AuthorEmail' => 'lincoln@vanillaforums.com',
-   'AuthorUrl' => 'http://lincolnwebs.com',
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'MobileFriendly' => TRUE,
-   'Icon' => 'touch_icon.png',
-   'SettingsUrl' => '/settings/touchicon',
-   'SettingsPermission' => 'Garden.Settings.Manage'
-);
-
 class TouchIconPlugin extends Gdn_Plugin {
 
    /**

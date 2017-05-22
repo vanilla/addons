@@ -1,0 +1,19 @@
+{
+    "name": "Vanoogle",
+    "description": "A google search plugin for vanilla 2+",
+    "version": "1.2",
+    "settingsUrl": "/settings/vanoogle",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "vanoogle",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Dan Dumont",
+            "email": "ddumont@gmail.com",
+            "homepage": "http://blog.canofsleep.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.17"
+    }
+}

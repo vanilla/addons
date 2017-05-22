@@ -5,21 +5,6 @@
  * @since 1.1.2b Fixed ConnectUrl to examine given url for existing querystring params and concatenate query params appropriately.
  */
 
-$PluginInfo['jsconnect'] = [
-    'Name' => 'Vanilla jsConnect',
-    'Description' => 'Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href="http://docs.vanillaforums.com/help/sso/jsconnect/">documentation</a> for details.',
-    'Version' => '1.5.5',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'MobileFriendly' => true,
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'SettingsUrl' => '/settings/jsconnect',
-    'UsePopupSettings' => false,
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'jsconnect.png'
-];
-
 /**
  * Class JsConnectPlugin
  */

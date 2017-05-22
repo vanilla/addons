@@ -7,20 +7,9 @@ if (!defined('APPLICATION'))
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
-
-// Define the plugin:
-$PluginInfo['RightToLeft'] = array(
-    'Name' => 'Right to Left (RTL) Support',
-    'Description' => "Adds a css stub to pages with some tweaks for right-to-left (rtl) languages and adds 'rtl' to body css class.",
-    'Version' => '1.0.1',
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'MobileFriendly' => TRUE,
-    'Icon' => 'right_to_left.png',
-    'Author' => 'Becky Van Bussel',
-    'AuthorEmail' => 'becky@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/'
-);
-
+/**
+ * Class RightToLeftPlugin
+ */
 class RightToLeftPlugin extends Gdn_Plugin {
 
     /**
