@@ -10,20 +10,6 @@
 * See the "license.txt" file for details of the Simple Machines license.          *
 **********************************************************************************/
 
-$PluginInfo['SMFCompatibility'] = array(
-   'Name' => 'SMF Compatibility',
-   'Description' => 'Adds some compatibility functionality for forums imported from SMF.',
-   'Version' => '1.1',
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => FALSE,
-   'Author' => "Todd Burry",
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
-   'License' => 'Simple Machines license'
-);
-
 Gdn::FactoryInstall('BBCodeFormatter', 'SMFCompatibilityPlugin', __FILE__, Gdn::FactorySingleton);
 
 class SMFCompatibilityPlugin extends Gdn_Plugin {

@@ -1,0 +1,19 @@
+{
+    "name": "Right to Left (RTL) Support",
+    "description": "Adds a css stub to pages with some tweaks for right-to-left (rtl) languages and adds 'rtl' to body css class.",
+    "version": "1.0.1",
+    "mobileFriendly": true,
+    "icon": "right_to_left.png",
+    "key": "righttoleft",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Becky Van Bussel",
+            "email": "becky@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

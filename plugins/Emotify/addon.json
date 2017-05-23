@@ -1,0 +1,19 @@
+{
+    "name": "Emotify :)",
+    "description": "Replaces <a href=\"http://en.wikipedia.org/wiki/Emoticon\">emoticons</a> (smilies) with friendly pictures.",
+    "version": "2.0.5.1",
+    "mobileFriendly": true,
+    "license": "GPL v2",
+    "key": "emotify",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://vanillaforums.org"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

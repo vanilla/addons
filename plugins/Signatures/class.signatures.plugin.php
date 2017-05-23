@@ -22,24 +22,6 @@
  * @package Addons
  */
 
-$PluginInfo['Signatures'] = [
-    'Name' => 'Signatures',
-    'Description' => 'Users may create custom signatures that appear after each of their comments.',
-    'Version' => '1.6.1',
-    'RequiredApplications' => ['Vanilla' => '2.0.18'],
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'HasLocale' => true,
-    'RegisterPermissions' => ['Plugins.Signatures.Edit' => 1],
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com',
-    'MobileFriendly' => true,
-    'SettingsUrl' => '/settings/signatures',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'signatures.png'
-];
-
 class SignaturesPlugin extends Gdn_Plugin {
     public $Disabled = false;
 
@@ -111,7 +93,7 @@ class SignaturesPlugin extends Gdn_Plugin {
      */
     public function profileController_signature_create($Sender) {
         $Sender->permission('Garden.SignIn.Allow');
-        $Sender->title('Signature Settings');
+        $Sender->title(t('Signature Settings'));
 
         $this->dispatch($Sender);
     }

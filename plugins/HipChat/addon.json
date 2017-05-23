@@ -1,0 +1,17 @@
+{
+    "description": "HipChat integration, first version: Posts every new discussion to HipChat. Requires cURL.",
+    "version": "0.3",
+    "license": "GNU GPL2",
+    "settingsUrl": "/settings/hipchat",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "hipchat",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}

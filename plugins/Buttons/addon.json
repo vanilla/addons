@@ -1,0 +1,19 @@
+{
+    "name": "Buttons",
+    "description": "Adds colors to all of the buttons throughout Vanilla.",
+    "version": "1.0",
+    "mobileFriendly": true,
+    "requiredTheme": false,
+    "key": "buttons",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

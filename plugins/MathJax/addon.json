@@ -1,0 +1,17 @@
+{
+    "description": "This plugin enables MathJax syntax in discussions and comments.",
+    "version": "1.1",
+    "mobileFriendly": true,
+    "key": "mathjax",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

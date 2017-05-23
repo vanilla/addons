@@ -1,0 +1,15 @@
+{
+    "name": "Liked",
+    "description": "Adds the facebook like feature to your discussions.",
+    "version": "1.6",
+    "icon": "liked.png",
+    "key": "liked",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Gary Mardell",
+            "email": "gary@vanillaplugins.com",
+            "homepage": "http://garymardell.co.uk"
+        }
+    ]
+}

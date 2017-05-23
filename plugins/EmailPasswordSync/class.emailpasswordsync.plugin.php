@@ -4,17 +4,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
-// Define the plugin:
-$PluginInfo['EmailPasswordSync'] = array(
-   'Name' => 'Email Password Sync',
-   'Description' => 'Synchronizes passwords when users with the same email/password combos change their passwords.',
-   'Version' => '1.0b',
-   'RequiredApplications' => array('Vanilla' => '2.0.17'),
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
-);
-
 class MultipleEmailsPlugin extends Gdn_Plugin {
    /// Properties
    protected $_OldPasswordHash;

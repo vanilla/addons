@@ -6,21 +6,6 @@
  * @license GNU GPLv2
  */
 
-// Define the plugin:
-$PluginInfo['example'] = array(
-    'Description' => 'Provides an example Development Pattern for Vanilla 2 plugins by demonstrating how to insert discussion body excerpts into the discussions list.',
-    'Version' => '1.1',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'HasLocale' => false,
-    'License' => 'GNU GPL2',
-    'SettingsUrl' => '/plugin/example',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => "Vanilla Staff",
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 /**
  * Class ExamplePlugin
  *
