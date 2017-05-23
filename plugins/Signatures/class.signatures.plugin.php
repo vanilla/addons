@@ -665,29 +665,24 @@ EOT;
     }
 
     public function structure() {
-        $maxNumberImages = c('Plugins.Signatures.Default.MaxNumberImages', 0);
-        $maxImageHeight = c('Plugins.Signatures.MaxImageHeight', false);
-        $maxTextLength = c('Plugins.Signatures.Default.MaxLength', false);
-        $hideGuest = c('Plugins.Signatures.HideGuest', false);
-        $hideEmbed = c('Plugins.Signatures.HideEmbed', true);
-        $hideMobile = c('Plugins.Signatures.HideMobile', true);
-        $allowEmbeds = c('Plugins.Signatures.AllowEmbeds', true);
+        saveToConfig('Signatures.Images.MaxNumber', c('Plugins.Signatures.Default.MaxNumberImages'));
+        saveToConfig('Signatures.Images.MaxHeight', c('Plugins.Signatures.MaxImageHeight'));
+        saveToConfig('Signatures.Text.MaxLength', c('Plugins.Signatures.Default.MaxLength'));
+        saveToConfig('Signatures.Hide.Guest', c('Plugins.Signatures.HideGuest'));
+        saveToConfig('Signatures.Hide.Embed', c('Plugins.Signatures.HideEmbed', true));
+        saveToConfig('Signatures.Hide.Mobile', c('Plugins.Signatures.HideMobile', true));
+        saveToConfig('Signatures.Allow.Embeds', c('Plugins.Signatures.AllowEmbeds', true));
 
-        removeFromConfig('Plugins.Signatures.Default.MaxNumberImages');
-        removeFromConfig('Plugins.Signatures.MaxImageHeight');
-        removeFromConfig('Plugins.Signatures.Default.MaxLength');
-        removeFromConfig('Plugins.Signatures.HideGuest');
-        removeFromConfig('Plugins.Signatures.HideEmbed');
-        removeFromConfig('Plugins.Signatures.HideMobile');
-        removeFromConfig('Plugins.Signatures.AllowEmbeds');
 
-        saveToConfig('Signatures.Images.MaxNumber', $maxNumberImages);
-        saveToConfig('Signatures.Images.MaxHeight', $maxImageHeight);
-        saveToConfig('Signatures.Text.MaxLength', $maxTextLength);
-        saveToConfig('Signatures.Hide.Guest', $hideGuest);
-        saveToConfig('Signatures.Hide.Embed', $hideEmbed);
-        saveToConfig('Signatures.Hide.Mobile', $hideMobile);
-        saveToConfig('Signatures.Allow.Embeds', $allowEmbeds);
+        removeFromConfig([
+            'Plugins.Signatures.Default.MaxNumberImages',
+            'Plugins.Signatures.MaxImageHeight',
+            'Plugins.Signatures.Default.MaxLength',
+            'Plugins.Signatures.HideGuest',
+            'Plugins.Signatures.HideEmbed',
+            'Plugins.Signatures.HideMobile',
+            'Plugins.Signatures.AllowEmbeds',
+        ]);
 
         // Make sure the theme revision exists in the database.
         $revisionID = c('Plugins.CustomTheme.LiveRevisionID');
@@ -703,10 +698,8 @@ EOT;
         $Sender->addCssFile('signature.css', 'plugins/Signatures');
     }
 
-
     public function settingsController_signatures_create($Sender) {
         $Sender->permission('Garden.Settings.Manage');
-
 
         $maxNumberImages = self::getMaximumNumberOfImages();
         $maxImageHeight = self::getMaximumImageHeight();
@@ -715,7 +708,6 @@ EOT;
         $hideEmbed = self::getHideEmbed();
         $hideMobile = self::getHideMobile();
         $allowEmbeds = self::getAllowEmbeds();
-
 
         $Conf = new ConfigurationModule($Sender);
         $Conf->initialize([
@@ -759,6 +751,14 @@ EOT;
         }
     }
 
+
+    /**
+     * If we're passed an integer as a string, we get it back as a real integer.
+     * If we get another value, we get it back as the original value.
+     *
+     * @param string $int
+     * @return mixed
+     */
     private function formatInteger($int) {
         if (is_string($int) && is_numeric($int) && is_int($int)) {
             $int = intval($int);
@@ -767,9 +767,12 @@ EOT;
         return $int;
     }
 
-    /*
+    /**
      * Make sure we get valid integer from form. Allow "null" as a valid value.
+     *
      * @param mixed $num
+     * @param null $fallback
+     * @return mixed
      */
     private function getPositiveIntOrFallback($num, $fallback = null) {
 
@@ -782,9 +785,9 @@ EOT;
         }
     }
 
-    /*
+    /**
      * Get number of images
-     * Returns false, positive int, 'Unlimited', or 'None'
+     * Returns mixed False, positive int, 'Unlimited', or 'None'
      */
     private function getMaximumNumberOfImages() {
         $max = self::Unlimited;
@@ -803,10 +806,23 @@ EOT;
         return $max;
     }
 
+
+    /**
+     * Make sure we get a valid value for Image Height. fall back is 0 if
+     * the config value is not a positive int.
+     *
+     * @return mixed
+     */
     private function getMaximumImageHeight() {
         return self::getPositiveIntOrFallback(c('Signatures.Images.MaxHeight', 0));
     }
 
+    /**
+     * Make sure we get a valid value for text length. fall back is 0 if
+     * the config value is not a positive int.
+     *
+     * @return mixed
+     */
     private function getMaximumTextLength() {
         return self::getPositiveIntOrFallback(c('Signatures.Text.MaxLength', 0));
     }
