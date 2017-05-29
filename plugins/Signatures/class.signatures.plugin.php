@@ -733,22 +733,6 @@ EOT;
         }
     }
 
-
-    /**
-     * If we're passed an integer as a string, we get it back as a real integer.
-     * If we get another value, we get it back as the original value.
-     *
-     * @param string $int
-     * @return mixed
-     */
-    private function formatInteger($int) {
-        if (is_string($int) && is_numeric($int) && is_int($int)) {
-            $int = intval($int);
-        }
-
-        return $int;
-    }
-
     /**
      * Make sure we get valid integer from form. Allow "null" as a valid value.
      *
@@ -757,10 +741,8 @@ EOT;
      * @return mixed
      */
     private function getPositiveIntOrFallback($num, $fallback = null) {
-
-        $num = self::formatInteger($num);
-
-        if (is_int($num) && $num > 0) {
+        $num = (int)$num;
+        if (filter_var($num, FILTER_VALIDATE_INT) && $num > 0) {
             return $num;
         } else {
             return $fallback;
