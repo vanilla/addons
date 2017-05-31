@@ -8,19 +8,6 @@
   Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 
-$PluginInfo['NBBC'] = array(
-    'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.1.0',
-    'RequiredApplications' => array('Vanilla' => '2.0.2'),
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => FALSE,
-    'Icon' => 'nbbc.png',
-    'Author' => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com/profile/todd'
-);
-
 Gdn::FactoryInstall('BBCodeFormatter', 'NBBCPlugin', __FILE__, Gdn::FactorySingleton);
 
 class NBBCPlugin extends Gdn_Plugin {

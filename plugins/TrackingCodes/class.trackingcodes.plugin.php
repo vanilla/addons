@@ -2,18 +2,6 @@
 
 // 0.2 - 2011-09-07 - mosullivan - Added InjectCssClass, Optimized querying.
 
-$PluginInfo['TrackingCodes'] = array(
-   'Name' => 'Tracking Codes',
-   'Description' => "Allows you to add custom script tags &amp; code at the very bottom of every page of Vanilla. Useful for common tracking code generators like Google Analytics, Hubspot, etc.",
-   'Version' => '1',
-   'RequiredApplications' => array('Vanilla' => '2.0.17'),
-   'MobileFriendly' => TRUE,
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com',
-	'SettingsUrl' => 'settings/trackingcodes'
-);
-
 class TrackingCodesPlugin extends Gdn_Plugin {
    
    /**

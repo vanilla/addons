@@ -15,19 +15,6 @@
  * Blacklist known "problem translations" that are in buttons or wreck page layout.
  */
 
-$PluginInfo['CustomizeText'] = array(
-   'Name' => 'Customize Text',
-   'Description' => "Allows administrators to edit the text throughout their forum.",
-   'Version' => '1.2',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com',
-   'Icon' => 'custom_text.png',
-   'SettingsUrl' => 'settings/customizetext',
-   'UsePopupSettings' => false
-);
-
 class CustomizeTextPlugin extends Gdn_Plugin {
    
    public function __construct() {

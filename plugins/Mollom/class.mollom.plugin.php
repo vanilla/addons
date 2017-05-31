@@ -4,23 +4,11 @@
  * @license GNU GPL2
  */
 
-// Define the plugin:
-$PluginInfo['Mollom'] = array(
-   'Name' => 'Mollom',
-   'Description' => 'Mollom spam protection integration for Vanilla.',
-   'Version' => '1.0b',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'SettingsUrl' => '/settings/mollom',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Author' => 'Lincoln Russell',
-   'AuthorEmail' => 'lincoln@vanillaforums.com'
-);
-
 class MollomPlugin extends Gdn_Plugin {
    /// PROPERTIES ///
 
    /// METHODS ///
-   
+
    /**
     * @return Akismet
     */
@@ -38,7 +26,7 @@ class MollomPlugin extends Gdn_Plugin {
          return FALSE;
 
       $Mollom = self::Mollom();
-      
+
       if (!$Mollom)
          return FALSE;
 
@@ -52,11 +40,11 @@ class MollomPlugin extends Gdn_Plugin {
       ));
       return ($Result['spamClassification'] == 'spam') ? true : false;
    }
-   
+
    public function Setup() {
       $this->Structure();
    }
-   
+
    public function Structure() {
       // Get a user for operations.
       $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'Mollom', 'Admin' => 2))->Value('UserID');
@@ -73,7 +61,7 @@ class MollomPlugin extends Gdn_Plugin {
       }
       SaveToConfig('Plugins.Mollom.UserID', $UserID);
    }
-   
+
    public function UserID() {
       return C('Plugins.Mollom.UserID', NULL);
    }

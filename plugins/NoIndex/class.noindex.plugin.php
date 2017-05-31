@@ -1,16 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['NoIndex'] = array(
-   'Name' => 'No Index',
-   'Description' => "Allows moderators & curators to mark a discussion as noindex/noarchive.",
-   'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'MobileFriendly' => TRUE,
-   'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincolnwebs@gmail.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
-);
-
 /**
  * Class NoIndexPlugin.
  *

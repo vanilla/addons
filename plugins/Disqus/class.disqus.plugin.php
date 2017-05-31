@@ -4,21 +4,6 @@
  * @license GNU GPLv2
  */
 
-$PluginInfo['Disqus'] = array(
-    'Name' => 'Disqus Sign In',
-    'Description' => 'Users may sign into your site using their Disqus account. You must <a href="https://disqus.com/api/applications/register/">register your application with Disqus</a> for this plugin to work.',
-    'Version' => '1.2',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'MobileFriendly' => true,
-    'SettingsUrl' => '/settings/disqus',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'disqus_sign_in.png',
-    'Author' => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'SocialConnect'   => true,
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
-);
-
 /**
  * Class DisqusPlugin.
  */
@@ -26,9 +11,6 @@ class DisqusPlugin extends Gdn_Plugin {
 
     /** @var null  */
     protected $_Provider = null;
-
-    /** @var null  */
-    protected $_RedirectUri = null;
 
     /**
      *
@@ -75,54 +57,15 @@ class DisqusPlugin extends Gdn_Plugin {
             return '';
         }
 
-        $RedirectUri = $this->redirectUri();
-        if ($Query) {
-            $RedirectUri .= '&'.$Query;
-        }
-
         $Qs = array(
             'client_id' => $Provider['AuthenticationKey'],
             'scope' => 'read',
             'response_type' => 'code',
-            'redirect_uri' => $RedirectUri);
+        );
 
         $SigninHref = 'https://disqus.com/api/oauth/2.0/authorize/?'.http_build_query($Qs);
 
         return $SigninHref;
-    }
-
-    /**
-     *
-     *
-     * @param null $NewValue
-     * @return null|string
-     */
-    public function redirectUri($NewValue = null) {
-        if ($NewValue !== null)
-            $this->_RedirectUri = $NewValue;
-        elseif ($this->_RedirectUri === null) {
-            $RedirectUri = Url('/entry/connect/disqus', true);
-            if (strpos($RedirectUri, '=') !== false) {
-                $p = strrchr($RedirectUri, '=');
-                $Uri = substr($RedirectUri, 0, -strlen($p));
-                $p = urlencode(ltrim($p, '='));
-                $RedirectUri = $Uri.'='.$p;
-            }
-
-            $Path = Gdn::request()->path();
-
-            $Target = val('Target', $_GET, $Path ? $Path : '/');
-            if (ltrim($Target, '/') == 'entry/signin' || empty($Target))
-                $Target = '/';
-            $Args = array('Target' => $Target);
-
-
-            $RedirectUri .= strpos($RedirectUri, '?') === false ? '?' : '&';
-            $RedirectUri .= http_build_query($Args);
-            $this->_RedirectUri = $RedirectUri;
-        }
-
-        return $this->_RedirectUri;
     }
 
     /**
@@ -272,7 +215,6 @@ class DisqusPlugin extends Gdn_Plugin {
             $Query = 'display='.urlencode($Sender->Request->get('display'));
         }
 
-        $RedirectUri = concatSep('&', $this->redirectUri(), $Query);
         $Form = $Sender->Form;
 
         $AccessToken = $Form->getFormValue('AccessToken'); //Gdn::Session()->Stash('Disqus.AccessToken', NULL, NULL);
@@ -284,8 +226,8 @@ class DisqusPlugin extends Gdn_Plugin {
                 'grant_type' => 'authorization_code',
                 'client_id' => $AppID,
                 'client_secret' => $Secret,
-                'redirect_uri' => $RedirectUri,
-                'code' => $Code
+                'code' => $Code,
+                'redirect_uri' => url('/entry/connect/disqus', true),
             );
 
             $Url = 'https://disqus.com/api/oauth/2.0/access_token/'; //.http_build_query($Qs);

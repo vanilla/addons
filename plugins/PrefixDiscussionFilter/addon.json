@@ -1,0 +1,20 @@
+{
+    "name": "PrefixDiscussion Filter",
+    "description": "Allow filtering of disussions by prefixes.",
+    "version": "1.0",
+    "hasLocale": false,
+    "license": "GNU GPL2",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "prefixdiscussionfilter",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "prefixdiscussion": ">=1.1",
+        "vanilla": ">=2.2.102"
+    }
+}

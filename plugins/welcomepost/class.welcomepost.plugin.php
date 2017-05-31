@@ -4,18 +4,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-$PluginInfo['welcomepost'] = [
-    'Name' => 'Welcome Post',
-    'Description' => 'Redirect users, after registration, to an "introduce yourself" page that posts in a "welcome" category.'
-            .' This plugin does not work with the "approval" registration mode.',
-    'Version' => '1.1',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'License' => 'GNU GPL2',
-    'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com',
-    'AuthorUrl' => 'https://github.com/DaazKu',
-];
-
 /**
  * Class WelcomePostPlugin
  */
@@ -108,7 +96,8 @@ class WelcomePostPlugin extends Gdn_Plugin {
      */
     public function entryController_registrationSuccessful_handler($sender, $args) {
         if (!c('Garden.Registration.ConfirmEmail')) {
-            redirect('/post/discussion?welcomepost=true');
+            $target = (Gdn::request()->post('Target')) ? '&Target='.Gdn::request()->post('Target') : null;
+            redirect('/post/discussion?welcomepost=true'.$target);
         }
     }
 
@@ -119,7 +108,7 @@ class WelcomePostPlugin extends Gdn_Plugin {
      * @param UserModel $args
      */
     public function userModel_afterSignIn_handler($sender, $args) {
-        $target = (Gdn::request()->get('Target')) ? '&Target='.Gdn::request()->get('Target') : null;
+        $target = (Gdn::request()->post('Target')) ? '&Target='.Gdn::request()->post('Target') : null;
         // AfterSignIn event is fired in several places, the InsertUserID
         // argument is only passed in the connect script.
         if (val('InsertUserID', $args)) {
@@ -170,7 +159,8 @@ class WelcomePostPlugin extends Gdn_Plugin {
         Gdn::locale()->setTranslation('Cancel', t('Skip'));
 
         //Skipping will bring you to where you were going
-        $cancelURL = ($sender->Request->get('Target')) ? $sender->Request->get('Target') : c('Routes.DefaultController', '/');
+        $cancelURL = (Gdn::request()->get('Target')) ? Gdn::request()->get('Target') : '/';
+        $cancelURL = (isSafeUrl($cancelURL)) ? $cancelURL : null;
         $sender->setData('_CancelUrl', $cancelURL);
 
         $username = val('Name', Gdn::session()->User, 'Unknown');

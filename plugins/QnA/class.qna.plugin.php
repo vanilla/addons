@@ -4,20 +4,6 @@
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
-// Define the plugin:
-$PluginInfo['QnA'] = array(
-    'Name' => 'Q&A',
-    'Description' => "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-    'Version' => '1.3.1',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'MobileFriendly' => true,
-    'SettingsUrl' => '/settings/qna',
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'Icon' => 'qna.png'
-);
-
 /**
  * Adds Question & Answer format to Vanilla.
  *
@@ -305,7 +291,11 @@ class QnAPlugin extends Gdn_Plugin {
 
         // Mark the question as answered.
         if (strtolower($Discussion['Type']) == 'question' && !$Discussion['Sink'] && !in_array($Discussion['QnA'], array('Answered', 'Accepted'))) {
-            $sender->SQL->set('QnA', 'Answered');
+            if($args['Counts']['CountComments'] > 0) {
+                $sender->SQL->set('QnA', 'Answered');
+            } else {
+                $sender->SQL->set('QnA', 'Unanswered');
+            }
         }
     }
 
@@ -533,12 +523,14 @@ class QnAPlugin extends Gdn_Plugin {
                 }
             }
 
+            $headlineFormat = t('HeadlineFormat.AcceptAnswer', '{ActivityUserID,You} accepted {NotifyUserID,your} answer.');
+
             // Record the activity.
             if ($QnA == 'Accepted') {
                 $Activity = array(
                     'ActivityType' => 'AnswerAccepted',
                     'NotifyUserID' => $Comment['InsertUserID'],
-                    'HeadlineFormat' => '{ActivityUserID,You} accepted {NotifyUserID,your} answer.',
+                    'HeadlineFormat' => $headlineFormat,
                     'RecordType' => 'Comment',
                     'RecordID' => $Comment['CommentID'],
                     'Route' => commentUrl($Comment, '/'),

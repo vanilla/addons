@@ -1,16 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['NoBump'] = array(
-   'Name' => 'No Bump',
-   'Description' => "Allows moderators to add a comment without bumping a discussion.",
-   'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'MobileFriendly' => TRUE,
-   'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincolnwebs@gmail.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
-);
-
 class NoBumpPlugin extends Gdn_Plugin {
    /**
     * Add 'No Bump' option to new discussion form.

@@ -55,6 +55,9 @@ class Pocket {
     /** $var string Pocket type */
     public $Type;
 
+    /** $var string Whether the pocket is in test mode. */
+    public $TestMode = false;
+
     /** $var bool Whether to disable the pocket for embedded comments. * */
     public $EmbeddedNever = false;
 
@@ -71,6 +74,17 @@ class Pocket {
      */
     public function __construct($Location = '') {
         $this->Location = $Location;
+    }
+
+    /**
+     * The Disabled field used to have 3 states: enabled, disabled, or testing. Testing has since branched out
+     * into its own field: TestMode. We need to check both places to see if a pocket is in test mode.
+     *
+     * @param $pocket
+     * @return bool
+     */
+    public static function inTestMode($pocket) {
+        return (val('Disabled', $pocket) === Pocket::TESTING) || (val('TestMode', $pocket) === 1);
     }
 
     /**
@@ -97,14 +111,12 @@ class Pocket {
             return false;
         }
 
-        // Check to see if the pocket is enabled.
-        switch ($this->Disabled) {
-            case Pocket::DISABLED:
-                return false;
-            case Pocket::TESTING:
-                if (!checkPermission('Plugins.Pockets.Manage'))
-                    return false;
-                break;
+        if ($this->Disabled === Pocket::DISABLED) {
+            return false;
+        }
+
+        if (self::inTestMode($this) && !checkPermission('Plugins.Pockets.Manage')) {
+            return false;
         }
 
         // Check to see if the page matches.
@@ -165,6 +177,7 @@ class Pocket {
         $this->Type = val('Type', $Data, Pocket::TYPE_DEFAULT);
         $this->EmbeddedNever = val('EmbeddedNever', $Data);
         $this->ShowInDashboard = val('ShowInDashboard', $Data);
+        $this->TestMode = val('TestMode', $Data);
 
         // parse the frequency.
         $Repeat = $Data['Repeat'];

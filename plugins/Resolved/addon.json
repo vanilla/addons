@@ -1,0 +1,22 @@
+{
+    "name": "Resolved Discussions",
+    "description": "Adds an option to mark discussions as Resolved with custom permission. Resolved discussions are Closed to new participants, however additional posts by the OP unresolve it. Only users with the custom permission see its Resolved status.",
+    "version": "1.2.1",
+    "registerPermissions": [
+        "Plugins.Resolved.Manage"
+    ],
+    "mobileFriendly": true,
+    "icon": "resolved_discussions.png",
+    "key": "resolved",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Matt Lincoln Russell",
+            "email": "lincolnwebs@gmail.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

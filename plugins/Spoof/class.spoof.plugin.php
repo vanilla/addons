@@ -3,17 +3,6 @@
 /**
  * 1.2 - mosullivan - 2011-08-30 - Added "Spoof" button to various screens for admins.
  */
-// Define the plugin:
-$PluginInfo['Spoof'] = array(
-   'Name' => 'Spoof',
-   'Description' => 'Administrators may "spoof" other users, meaning they temporarily sign in as that user. Helpful for debugging permission problems.',
-   'Version' => '1.2',
-   'Icon' => 'spoof.png',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
-);
-
 class SpoofPlugin implements Gdn_IPlugin {
 
 	/**
@@ -118,16 +107,18 @@ class SpoofPlugin implements Gdn_IPlugin {
       $UserReference = $Sender->Form->GetValue('UserReference', '');
       $Email = $Sender->Form->GetValue('Email', '');
       $Password = $Sender->Form->GetValue('Password', '');
+
       if ($UserReference != '' && $Email != '' && $Password != '') {
          $UserModel = Gdn::UserModel();
          $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
-			// if (1 == 1) {
-         if (is_object($UserData) && $UserData->Admin) {
+
+         if (is_object($UserData) && $UserModel->checkPermission($UserData->UserID, 'Garden.Settings.Manage')) {
 				if (is_numeric($UserReference)) {
 					$SpoofUser = $UserModel->GetID($UserReference);
 				} else {
 				   $SpoofUser = $UserModel->GetByUsername($UserReference);
 				}
+
 				if ($SpoofUser) {
 					$Identity = new Gdn_CookieIdentity();
 					$Identity->Init(array(
@@ -136,7 +127,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 						'Domain' => Gdn::Config('Garden.Cookie.Domain')
 					));
 					$Identity->SetIdentity($SpoofUser->UserID, TRUE);
-	            Redirect('profile');
+	                Redirect('profile');
 				} else {
 					$Sender->Form->AddError('Failed to find requested user.');
 				}
@@ -144,6 +135,7 @@ class SpoofPlugin implements Gdn_IPlugin {
             $Sender->Form->AddError('Bad Credentials');
          }
       }
+
       $Sender->Render(PATH_PLUGINS . DS . 'Spoof' . DS . 'views' . DS . 'spoof.php');
    }
 

@@ -1,0 +1,18 @@
+{
+    "description": "Provides an example Reaction bar to allow local-install theming.",
+    "version": "1.0",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "key": "reactionsstub",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}
