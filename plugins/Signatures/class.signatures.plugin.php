@@ -237,7 +237,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         if (function_exists('ValidateSignature')) {
             $Sig = trim(GetValue('Plugin.Signatures.Sig', $Values));
             if (ValidateRequired($Sig) && !ValidateSignature($Sig, GetValue('Plugin.Signatures.Format', $Values))) {
-                $Sender->Form->AddError('Signature invalid.');
+                $Sender->Form->AddError(t('Signature invalid.'));
             }
         }
     }
@@ -272,9 +272,9 @@ class SignaturesPlugin extends Gdn_Plugin {
             $Sig = Gdn_Format::To(val('Plugin.Signatures.Sig', $Values), val('Plugin.Signatures.Format', $Values, C('Garden.InputFormatter')));
             $numMatches = preg_match_all('/<img/i', $Sig);
             if (C('Plugins.Signatures.MaxNumberImages') === 'None' && $numMatches > 0) {
-                $Sender->Form->AddError('Images not allowed');
+                $Sender->Form->AddError(t('Images not allowed'));
             } else if ($numMatches > $max) {
-                $Sender->Form->AddError('@'.FormatString('You are only allowed {maxImages,plural,%s image,%s images}.',
+                $Sender->Form->AddError('@'.FormatString(t('You are only allowed {maxImages,plural,%s image,%s images}.'),
                         array('maxImages' => $max)));
             }
         }
@@ -377,7 +377,7 @@ class SignaturesPlugin extends Gdn_Plugin {
                 $Sig = $Sender->Form->GetFormValue('Body');
                 $Format = $Sender->Form->GetFormValue('Format');
                 if (ValidateRequired($Sig) && !ValidateSignature($Sig, $Format)) {
-                    $Sender->Form->AddError('Signature invalid.');
+                    $Sender->Form->AddError(t('Signature invalid.'));
                 }
             }
 
