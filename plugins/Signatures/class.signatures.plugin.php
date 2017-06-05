@@ -220,9 +220,9 @@ class SignaturesPlugin extends Gdn_Plugin {
 
         // Validate the signature.
         if (function_exists('ValidateSignature')) {
-            $Sig = trim(val('Plugin.Signatures.Sig', $Values));
-            if (validateRequired($Sig) && !ValidateSignature($Sig, val('Plugin.Signatures.Format', $Values))) {
-                $Sender->Form->addError('Signature invalid.');
+            $Sig = trim(GetValue('Plugin.Signatures.Sig', $Values));
+            if (ValidateRequired($Sig) && !ValidateSignature($Sig, GetValue('Plugin.Signatures.Format', $Values))) {
+                $Sender->Form->AddError(t('Signature invalid.'));
             }
         }
     }
@@ -255,16 +255,15 @@ class SignaturesPlugin extends Gdn_Plugin {
      */
     public function checkNumberOfImages($Values, &$Sender) {
         $maxImages = self::getMaximumNumberOfImages();
+        $max = c('Plugins.Signatures.MaxNumberImages');
         if ($maxImages !== 'Unlimited') {
             $Sig = Gdn_Format::to(val('Plugin.Signatures.Sig', $Values), val('Plugin.Signatures.Format', $Values, c('Garden.InputFormatter')));
             $numMatches = preg_match_all('/<img/i', $Sig);
-
-            if($maxImages === 'None' && $numMatches > 0) {
-                $Sender->Form->addError('Images not allowed');
-            } elseif (is_int($maxImages) && $numMatches > $maxImages) {
-                $Sender->Form->addError('@'.formatString('You are only allowed {maxImages,plural,%s image,%s images}.',
-                        ['maxImages' => $maxImages]));
-
+            if (C('Plugins.Signatures.MaxNumberImages') === 'None' && $numMatches > 0) {
+                $Sender->Form->AddError(t('Images not allowed.'));
+            } else if ($numMatches > $max) {
+                $Sender->Form->AddError('@'.FormatString(t('You are only allowed {maxImages,plural,%s image,%s images}.'),
+                        array('maxImages' => $max)));
             }
         }
     }
@@ -367,10 +366,10 @@ class SignaturesPlugin extends Gdn_Plugin {
 
             // Validate the signature.
             if (function_exists('ValidateSignature')) {
-                $Sig = $Sender->Form->getFormValue('Body');
-                $Format = $Sender->Form->getFormValue('Format');
-                if (validateRequired($Sig) && !ValidateSignature($Sig, $Format)) {
-                    $Sender->Form->addError('Signature invalid.');
+                $Sig = $Sender->Form->GetFormValue('Body');
+                $Format = $Sender->Form->GetFormValue('Format');
+                if (ValidateRequired($Sig) && !ValidateSignature($Sig, $Format)) {
+                    $Sender->Form->AddError(t('Signature invalid.'));
                 }
             }
 
