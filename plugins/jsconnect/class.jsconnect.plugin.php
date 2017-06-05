@@ -10,6 +10,8 @@
  */
 class JsConnectPlugin extends Gdn_Plugin {
 
+    const NONCE_EXPIRATION = 5 * 60;
+
     /**
      * Add an element to the controls collection. Used to render settings forms.
      *
@@ -151,8 +153,24 @@ class JsConnectPlugin extends Gdn_Plugin {
 
         if ($Secure) {
             include_once dirname(__FILE__).'/functions.jsconnect.php';
+            $nonceModel = new UserAuthenticationNonceModel();
+            $nonce = uniqid('jsconnect_', true);
+            $nonceModel->insert(['Nonce' => $nonce, 'Token' => 'jsConnect']);
+
+            $Query['ip'] = Gdn::request()->ipAddress();
+            $Query['nonce'] = $nonce;
             $Query['timestamp'] = jsTimestamp();
-            $Query['signature'] = jsHash(($Query['timestamp']).$Provider['AssociationSecret'], val('HashType', $Provider));
+
+            // v2 compatible sig
+            $Query['sig'] = jsHash(
+                $Query['ip'].$Query['nonce'].$Query['timestamp'].$Provider['AssociationSecret'],
+                val('HashType', $Provider)
+            );
+            // v1 compatible sig
+            $Query['signature'] = jsHash(
+                $Query['timestamp'].$Provider['AssociationSecret'],
+                val('HashType', $Provider)
+            );
         }
 
         if (($Target = Gdn::request()->get('Target'))) {
@@ -165,7 +183,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $Query['Target'] = '/';
         }
 
-        $Result = $Url.(strpos($Url, '?') === false ? '?' : '&').http_build_query($Query);
+        $Result = $Url.(strpos($Url, '?') === false ? '?' : '&').'v=2&'.http_build_query($Query);
         if ($Callback) {
             $Result .= '&callback=?';
         }
@@ -333,10 +351,12 @@ class JsConnectPlugin extends Gdn_Plugin {
         parse_str($JsConnect, $JsData);
 
         // Make sure the data is valid.
+        $version = val('v', $JsData, null);
         $client_id = val('client_id', $JsData, val('clientid', $JsData, $Sender->Request->get('client_id')));
-        $Signature = val('signature', $JsData, false);
+        $Signature = val('sig', $JsData, val('signature', $JsData, false));
         $String = val('sigStr', $JsData, false); // debugging
-        unset($JsData['client_id'], $JsData['clientid'], $JsData['signature'], $JsData['sigStr'], $JsData['string']);
+        unset($JsData['v'], $JsData['client_id'], $JsData['clientid'], $JsData['signature'], $JsData['sig'],
+                $JsData['sigStr'], $JsData['string']);
 
         if (!$client_id) {
             throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'client_id'), 400);
@@ -351,13 +371,47 @@ class JsConnectPlugin extends Gdn_Plugin {
                 throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'signature'), 400);
             }
 
+            if ($version === '2') {
+                // Verify IP Address.
+                if (Gdn::request()->ipAddress() !== val('ip', $JsData, null)) {
+                    throw new Gdn_UserException(t('IP address invalid.'), 400);
+                }
+
+                // Verify nonce.
+                $nonceModel = new UserAuthenticationNonceModel();
+                $nonce = val('nonce', $JsData, null);
+                if ($nonce === null) {
+                    throw new Gdn_UserException(t('Nonce not found.'), 400);
+                }
+
+                // Grab the nonce from the session's stash.
+                $foundNonce = Gdn::session()->stash('jsConnectNonce', '', false);
+                $grabbedFromStash = (bool)$foundNonce;
+                if (!$grabbedFromStash) {
+                    $foundNonce = $nonceModel->getWhere(['Nonce' => $nonce])->firstRow(DATASET_TYPE_ARRAY);
+                }
+                if (!$foundNonce) {
+                    throw new Gdn_UserException(t('Nonce not found.'), 400);
+                }
+
+                // Clear nonce from the database.
+                $nonceModel->delete(['Nonce' => $nonce]);
+                if (strtotime($foundNonce['Timestamp']) < time() - self::NONCE_EXPIRATION) {
+                    throw new Gdn_UserException(t('Nonce expired.'), 400);
+                }
+
+                if (!$grabbedFromStash) {
+                    // Stash nonce in case we post back!
+                    Gdn::session()->stash('jsConnectNonce', $foundNonce);
+                }
+            }
+
             // Validate the signature.
             $CalculatedSignature = signJsConnect($JsData, $client_id, val('AssociationSecret', $Provider), val('HashType', $Provider, 'md5'));
             if ($CalculatedSignature != $Signature) {
                 throw new Gdn_UserException(t("Signature invalid."), 400);
             }
         }
-
 
         // Map all of the standard jsConnect data.
         $Map = ['uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'fullname' => 'FullName', 'roles' => 'Roles'];
@@ -418,6 +472,9 @@ class JsConnectPlugin extends Gdn_Plugin {
         if (!Gdn::session()->UserID) {
             $Sender->addJSFile('jsconnect.js', 'plugins/jsconnect');
             $Sender->addCssFile('jsconnect.css', 'plugins/jsconnect');
+        } else {
+            // Unset the nonce!
+            Gdn::session()->stash('jsConnectNonce');
         }
     }
 
@@ -434,6 +491,9 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @throws /Exception Throws an exception when the jsConnect provider is not found.
      */
     public function entryController_jsConnect_create($Sender, $Action = '', $Target = '') {
+        // Clear the nonce from the stash if any!
+        Gdn::session()->stash('jsConnectNonce');
+
         $Sender->setData('_NoMessages', true);
 
         if ($Action) {
