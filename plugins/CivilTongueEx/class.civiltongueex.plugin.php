@@ -384,8 +384,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function activityModel_beforeSave_handler($Sender, &$Args) {
-        $activity = val('Activity', $Args);
+    public function activityModel_beforeSave_handler($sender, &$args) {
+        $activity = val('Activity', $args);
         setValue('Story', $activity, $this->replace(val('Story', $activity)));
     }
 
