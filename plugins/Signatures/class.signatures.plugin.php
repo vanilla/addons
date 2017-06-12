@@ -282,7 +282,7 @@ class SignaturesPlugin extends Gdn_Plugin {
                 $rulesParams['maxImages'] = $MaxNumberImages;
                 $rules[] = formatString(t('Use up to {maxImages,plural,%s image, %s images}.'), $rulesParams);
             } else {
-                $rules[] = t('Images not allowed.');
+                $rules[] = t('Images not allowed');
                 $imagesAllowed = false;
             }
         }
