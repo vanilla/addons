@@ -523,7 +523,7 @@ class QnAPlugin extends Gdn_Plugin {
                 }
             }
 
-            $headlineFormat = t('HeadlineFormat.AcceptAnswer', '{ActivityUserID,You} accepted {NotifyUserID,your} answer.');
+            $headlineFormat = t('HeadlineFormat.AcceptAnswer', '{ActivityUserID,You} accepted {NotifyUserID,your} answer to a question: <a href="{Url,html}">{Data.Name,text}</a>');
 
             // Record the activity.
             if ($QnA == 'Accepted') {
@@ -536,6 +536,9 @@ class QnAPlugin extends Gdn_Plugin {
                     'Route' => commentUrl($Comment, '/'),
                     'Emailed' => ActivityModel::SENT_PENDING,
                     'Notified' => ActivityModel::SENT_PENDING,
+                    'Data' => array(
+                        'Name' => val('Name', $Discussion)
+                    )
                 );
 
                 $ActivityModel = new ActivityModel();
