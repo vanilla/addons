@@ -523,7 +523,7 @@ class QnAPlugin extends Gdn_Plugin {
                 }
             }
 
-            $headlineFormat = t('HeadlineFormat.AcceptAnswer', '{ActivityUserID,You} accepted {NotifyUserID,your} answer to question: <a href="{Url,html}">{Data.Name,text}</a>');
+            $headlineFormat = t('HeadlineFormat.AcceptAnswer', '{ActivityUserID,You} accepted {NotifyUserID,your} answer to a question: <a href="{Url,html}">{Data.Name,text}</a>');
 
             // Record the activity.
             if ($QnA == 'Accepted') {
