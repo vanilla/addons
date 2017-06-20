@@ -228,21 +228,33 @@ class SignaturesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Checks signature length against Plugins.Signatures.MaxLength
+     * Determine if signature exceeds configured character limit.
      *
-     * @param $Values Signature settings form values
-     * @param $Sender Controller
+     * @param array $fields Signature settings form values
+     * @param ProfileController $sender
      */
-    public function checkSignatureLength($Values, &$Sender) {
+    public function checkSignatureLength($fields, &$sender) {
+        if (!property_exists($sender, 'Form') || !($sender->Form instanceof Gdn_Form)) {
+            return;
+        }
 
-
-        if (!is_null(self::getMaximumTextLength())) {
-            $Sig = Gdn_Format::to($Values['Plugin.Signatures.Sig'], $Sender->Form->getFormValue('Format'));
-            $TextValue = html_entity_decode(trim(strip_tags($Sig)));
+        $maxLength = self::getMaximumTextLength();
+        if ($maxLength !== null && $maxLength > 0) {
+            $maxLength = intval($maxLength);
+            $format = config('Plugin.Signatures.Format', Gdn_Format::defaultFormat());
+            $body = val('Plugin.Signatures.Sig', $fields, '');
+            $formatted = Gdn_Format::to($body, $format);
+            $plainText = trim(Gdn_format::text($formatted));
 
             // Validate the amount of text.
-            if (strlen($TextValue) > c('Plugins.Signatures.MaxLength')) {
-                $Sender->Form->addError(sprintf(t('ValidateLength'), t('Signature'), (strlen($TextValue) - c('Plugins.Signatures.MaxLength'))));
+            $length = strlen($plainText);
+            $difference = $length - $maxLength;
+            if ($difference > 0) {
+                $sender->Form->addError(sprintf(
+                    t('ValidateLength'),
+                    t('Signature'),
+                    $difference
+                ));
             }
         }
     }
