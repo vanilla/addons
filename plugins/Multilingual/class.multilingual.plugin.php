@@ -135,7 +135,7 @@ class MultilingualPlugin extends Gdn_Plugin {
 
         // Check intent.
         if (!Gdn::Session()->ValidateTransientKey($TK)) {
-            safeRedirect($_SERVER['HTTP_REFERER']);
+            redirectTo($_SERVER['HTTP_REFERER']);
         }
 
         // If we got a valid locale, save their preference
@@ -152,7 +152,7 @@ class MultilingualPlugin extends Gdn_Plugin {
            $successRedirect = $target;
         }
         // Back from whence we came.
-        safeRedirect($successRedirect);
+        redirectTo($successRedirect);
     }
 
     /**

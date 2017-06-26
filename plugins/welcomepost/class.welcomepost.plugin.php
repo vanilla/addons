@@ -97,7 +97,7 @@ class WelcomePostPlugin extends Gdn_Plugin {
     public function entryController_registrationSuccessful_handler($sender, $args) {
         if (!c('Garden.Registration.ConfirmEmail')) {
             $target = (Gdn::request()->post('Target')) ? '&Target='.Gdn::request()->post('Target') : null;
-            redirect('/post/discussion?welcomepost=true'.$target);
+            redirectTo('/post/discussion?welcomepost=true'.$target, 302, false);
         }
     }
 
@@ -112,7 +112,7 @@ class WelcomePostPlugin extends Gdn_Plugin {
         // AfterSignIn event is fired in several places, the InsertUserID
         // argument is only passed in the connect script.
         if (val('InsertUserID', $args)) {
-            redirect('/post/discussion?welcomepost=true'.$target);
+            redirectTo('/post/discussion?welcomepost=true'.$target, 302, false);
         }
     }
 

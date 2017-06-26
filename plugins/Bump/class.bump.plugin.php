@@ -47,6 +47,6 @@ class BumpPlugin extends Gdn_Plugin {
 
         // Update DateLastComment & redirect
         $sender->DiscussionModel->setProperty($discussionID, 'DateLastComment', Gdn_Format::toDateTime());
-        redirect(discussionUrl($discussion));
+        redirectTo(discussionUrl($discussion), 302, false);
     }
 }

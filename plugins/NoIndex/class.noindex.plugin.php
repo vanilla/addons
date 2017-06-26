@@ -48,7 +48,7 @@ class NoIndexPlugin extends Gdn_Plugin {
 
       // Update DateLastComment & redirect
       $Sender->DiscussionModel->SetProperty($DiscussionID, 'NoIndex', $NoIndex);
-      Redirect(DiscussionUrl($Discussion));
+      redirectTo(DiscussionUrl($Discussion), 302, false);
    }
 
     /**
