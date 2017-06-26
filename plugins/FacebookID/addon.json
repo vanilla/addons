@@ -16,5 +16,6 @@
     ],
     "require": {
         "vanilla": ">=2.0.18"
-    }
+    },
+	"icon": "facebook_id.png"
 }

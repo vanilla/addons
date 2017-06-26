@@ -14,5 +14,6 @@
     ],
     "require": {
         "vanilla": ">=2.2"
-    }
+    },
+	"icon": "post_numbering.png"
 }

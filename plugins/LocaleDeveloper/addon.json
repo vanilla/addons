@@ -15,5 +15,6 @@
     ],
     "require": {
         "vanilla": ">=2.0.11"
-    }
+    },
+	"icon": "locale_developer.png"
 }
