@@ -3,7 +3,7 @@
     "description": "Adds 301 redirects for Vanilla from common forum platforms. This redirector redirects urls from IPB, phpBB, punBB, smf, vBulletin, Lithium, and Xenforo",
     "version": "1.2.1",
     "mobileFriendly": true,
-    "icon" => "redirector.png",
+    "icon": "redirector.png",
     "license": "GNU GPL2",
     "key": "redirector",
     "type": "addon",
