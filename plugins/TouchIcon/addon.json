@@ -1,7 +1,7 @@
 {
     "name": "Touch Icon",
     "description": "Adds option to upload a touch icon for Apple iDevices.",
-    "version": "1.1",
+    "version": "1.1.1",
     "mobileFriendly": true,
     "icon": "touch_icon.png",
     "settingsUrl": "/settings/touchicon",
@@ -16,6 +16,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.0.18"
+        "vanilla": ">=2.4.202"
     }
 }

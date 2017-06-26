@@ -1,7 +1,7 @@
 {
     "name": "Community Reporting",
     "description": "Allows users to report comments and discussions for content violations or awesomeness.",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "requiredTheme": false,
     "hasLocale": false,
     "registerPermissions": false,
@@ -18,6 +18,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.0.18"
+        "vanilla": ">=2.4.202"
     }
 }

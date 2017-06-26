@@ -1,7 +1,7 @@
 {
     "name": "No Index",
     "description": "Allows moderators & curators to mark a discussion as noindex/noarchive.",
-    "version": "1.0",
+    "version": "1.0.1",
     "mobileFriendly": true,
     "key": "noindex",
     "type": "addon",
@@ -13,6 +13,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1"
+        "vanilla": ">=2.4.202"
     }
 }

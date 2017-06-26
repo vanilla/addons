@@ -1,7 +1,7 @@
 {
     "name": "Voting",
     "description": "DEPRECATED. Upgrade to Reactions. Allows users to vote for comments and discussions. Administrators get unlimited votes.",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "settingsUrl": "/settings/voting",
     "settingsPermission": "Garden.Settings.Manage",
     "key": "voting",
@@ -14,6 +14,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.0.17"
+        "vanilla": ">=2.4.202"
     }
 }
