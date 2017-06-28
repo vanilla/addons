@@ -226,7 +226,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             }
         }
 
-        // redirect('/plugin/feeddiscussions/');
+        // redirectTo('/plugin/feeddiscussions/', 302, false);
         $this->controller_Index($Sender);
     }
 
@@ -245,7 +245,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             $Sender->informMessage(sprintf(t("Feed has been removed"), $FeedURL));
         }
 
-        // redirect('/plugin/feeddiscussions/');
+        // redirectTo('/plugin/feeddiscussions/', 302, false);
         $this->controller_Index($Sender);
     }
 

@@ -1,7 +1,7 @@
 {
     "name": "Tracking Codes",
     "description": "Allows you to add custom script tags &amp; code at the very bottom of every page of Vanilla. Useful for common tracking code generators like Google Analytics, Hubspot, etc.",
-    "version": "1",
+    "version": "1.1",
     "mobileFriendly": true,
     "settingsUrl": "settings/trackingcodes",
     "key": "trackingcodes",
@@ -14,6 +14,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.0.17"
+        "vanilla": ">=2.4"
     }
 }

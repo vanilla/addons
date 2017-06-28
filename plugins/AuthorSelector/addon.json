@@ -1,7 +1,7 @@
 {
     "name": "Author Selector",
     "description": "Allows administrators to change the author of a discussion.",
-    "version": "1.2",
+    "version": "1.2.1",
     "mobileFriendly": true,
     "license": "GNU GPLv2",
     "icon": "author_selector.png",
@@ -15,6 +15,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.2"
+        "vanilla": ">=2.4"
     }
 }

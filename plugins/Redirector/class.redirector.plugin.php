@@ -180,7 +180,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             if (Debug()) {
                 trace($Url, 'Redirect found');
             } else {
-                Redirect($Url, 301);
+                redirectTo($Url, 301, false);
             }
         }
     }

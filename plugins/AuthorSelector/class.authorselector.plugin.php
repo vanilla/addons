@@ -59,7 +59,7 @@ class AuthorSelectorPlugin extends Gdn_Plugin {
                         $Sender->DiscussionModel->updateUserDiscussionCount($User->UserID, true); // Increment
 
                         // Go to the updated discussion
-                        redirect(discussionUrl($Discussion));
+                        redirectTo(discussionUrl($Discussion), 302, false);
                     }
                 }
                 else {
