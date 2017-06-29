@@ -362,7 +362,7 @@ class IgnorePlugin extends Gdn_Plugin {
 
    /**
     *
-    * @param Controller $Sender
+    * @param UserController $Sender
     */
    public function UserController_Ignore_Create($Sender) {
       $Sender->Permission('Garden.SignIn.Allow');
@@ -447,7 +447,7 @@ class IgnorePlugin extends Gdn_Plugin {
                         '<span class="InformSprite Brightness"></span>'.sprintf(T("%s is no longer on ignore."), $User->Name),
                         'AutoDismiss HasSprite'
                      );
-                     $Sender->redirectTo('/profile/ignore', false);
+                     $Sender->setRedirectTo('/profile/ignore', false);
                   }
 
                   break;

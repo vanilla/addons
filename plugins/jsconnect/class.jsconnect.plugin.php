@@ -769,15 +769,15 @@ class JsConnectPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Sender
-     * @param $Args
+     * @param SettingsController $Sender
+     * @param array $Args
      */
     public function settings_delete($Sender, $Args) {
         $client_id = $Sender->Request->get('client_id');
         if ($Sender->Form->authenticatedPostBack()) {
             $Model = new Gdn_AuthenticationProviderModel();
             $Model->delete(['AuthenticationKey' => $client_id]);
-            $Sender->redirectTo('/settings/jsconnect', false);
+            $Sender->setRedirectTo('/settings/jsconnect', false);
             $Sender->render('Blank', 'Utility', 'Dashboard');
         }
     }
