@@ -44,7 +44,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 			$Sender->RedirectUrl = url('profile');
 			$Sender->render('blank', 'utility', 'dashboard');
 		} else {
-			redirectTo('profile', 302, false);
+			redirectTo('profile');
 		}
 	}
 
@@ -127,7 +127,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 						'Domain' => Gdn::Config('Garden.Cookie.Domain')
 					));
 					$Identity->SetIdentity($SpoofUser->UserID, TRUE);
-	                redirectTo('profile', 302, false);
+	                redirectTo('profile');
 				} else {
 					$Sender->Form->AddError('Failed to find requested user.');
 				}

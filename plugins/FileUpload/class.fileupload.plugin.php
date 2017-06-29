@@ -563,7 +563,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             }
 
             $Url = Asset('/plugins/FileUpload/images/file.png');
-            redirectTo($Url, 301, false);
+            redirectTo($Url, 301);
         }
 
         $Options = array();

@@ -57,7 +57,7 @@ class ReportingPlugin extends Gdn_Plugin {
                $Command == 'disable' ? FALSE : TRUE
             );
 
-            redirectTo('plugin/reporting', 302, false);
+            redirectTo('plugin/reporting');
          }
       }
 
