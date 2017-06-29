@@ -26,6 +26,8 @@ class SpoofPlugin implements Gdn_IPlugin {
 	/**
 	 * Validates the current user's permissions & transientkey and then spoofs
 	 * the userid passed as the first arg and redirects to profile.
+     *
+     * @param UserController $Sender
 	 */
 	public function UserController_AutoSpoof_Create($Sender) {
 		$SpoofUserID = GetValue('0', $Sender->RequestArgs);
@@ -41,7 +43,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 			$Identity->SetIdentity($SpoofUserID, TRUE);
 		}
 		if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
-			$Sender->RedirectUrl = url('profile');
+			$Sender->setRedirectTo('profile', false);
 			$Sender->render('blank', 'utility', 'dashboard');
 		} else {
 			redirectTo('profile', 302, false);

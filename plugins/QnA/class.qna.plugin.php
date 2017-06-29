@@ -757,11 +757,8 @@ class QnAPlugin extends Gdn_Plugin {
                 default:
                     $sender->DiscussionModel->setField($discussionID, 'QnA', null);
             }
-//         $Form = new Gdn_Form();
             $sender->Form->setValidationResults($sender->DiscussionModel->validationResults());
 
-//         if ($sender->DeliveryType() == DELIVERY_TYPE_ALL || $Redirect)
-//            $sender->RedirectUrl = Gdn::Controller()->Request->PathAndQuery();
             Gdn::controller()->jsonTarget('', '', 'Refresh');
         } else {
             $sender->Form->setData($Discussion);

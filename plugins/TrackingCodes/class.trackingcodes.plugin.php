@@ -90,6 +90,8 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 
    /**
     * Form to edit an existing code.
+    *
+    * @param SettingsController $Sender
     */
    private function _Edit($Sender) {
 		$Sender->Permission('Garden.Settings.Manage');
@@ -134,7 +136,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 
 			SaveToConfig('Plugins.TrackingCodes.All', $TrackingCodes);
          $Sender->InformMessage(T('Your changes have been saved.'));
-			$Sender->RedirectUrl = Url('settings/trackingcodes');
+			$Sender->setRedirectTo('settings/trackingcodes', false);
       }
 
       $Sender->Render('edit', '', 'plugins/TrackingCodes');
