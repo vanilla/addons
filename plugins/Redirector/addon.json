@@ -16,5 +16,6 @@
     ],
     "require": {
         "vanilla": ">=2.4"
-    }
+    },
+    "icon": "redirector.png"
 }

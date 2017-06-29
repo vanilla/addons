@@ -14,5 +14,6 @@
     ],
     "require": {
         "vanilla": ">=2.1"
-    }
+    },
+	"icon": "mollom.png"
 }

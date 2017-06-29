@@ -15,5 +15,6 @@
     "require": {
         "vanilla": ">=2.2",
         "conversations": ">=2.2"
-    }
+    },
+	"icon": "message_link.png"
 }

@@ -14,5 +14,6 @@
     ],
     "require": {
         "vanilla": ">=2.4"
-    }
+    },
+	"icon": "welcome_post.png"
 }
