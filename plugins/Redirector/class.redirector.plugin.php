@@ -7,20 +7,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['Redirector'] = [
-    'Name' => 'Forum Redirector',
-    'Description' => 'Adds 301 redirects for Vanilla from common forum platforms. This redirector redirects urls from IPB, phpBB, punBB, smf, vBulletin, Lithium, and Xenforo',
-    'Version' => '1.2.1',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com',
-    'MobileFriendly' => true,
-    'License' => 'GNU GPL2',
-    'Icon' => 'redirector.png'
-];
-
 /**
  * Class RedirectorPlugin
  */
@@ -194,7 +180,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             if (Debug()) {
                 trace($Url, 'Redirect found');
             } else {
-                Redirect($Url, 301);
+                redirectTo($Url, 301, false);
             }
         }
     }

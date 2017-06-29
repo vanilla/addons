@@ -563,7 +563,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             }
 
             $Url = Asset('/plugins/FileUpload/images/file.png');
-            Redirect($Url, 301);
+            redirectTo($Url, 301, false);
         }
 
         $Options = array();
@@ -605,7 +605,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         }
 
         $Url = $ThumbParsed['Url'];
-        redirect($Url, 301);
+        redirectTo($Url, 301, false);
     }
 
     /**

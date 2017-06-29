@@ -3,7 +3,7 @@
 // 0.2 - 2011-09-07 - mosullivan - Added InjectCssClass, Optimized querying.
 
 class TrackingCodesPlugin extends Gdn_Plugin {
-   
+
    /**
     * Adds dashboard menu option.
     */
@@ -11,7 +11,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Add-ons', T('Tracking Codes'), 'settings/trackingcodes', 'Garden.Settings.Manage');
 	}
-	
+
 	/**
 	 * Tracking codes management page.
 	 */
@@ -34,7 +34,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 		else
 			$Sender->Render('index', '', 'plugins/TrackingCodes');
 	}
-   
+
    /**
     * Delete a code.
     */
@@ -47,7 +47,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 			$TrackingCodes = C('Plugins.TrackingCodes.All');
 			if (!is_array($TrackingCodes))
 				$TrackingCodes = array();
-	
+
 			if ($Key !== FALSE)
 				foreach ($TrackingCodes as $Index => $Code) {
 					if ($Key == GetValue('Key', $Code, FALSE)) {
@@ -57,10 +57,10 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 					}
 				}
       }
-      
-      Redirect('settings/trackingcodes');
+
+      redirectTo('settings/trackingcodes', 302, false);
    }
-   
+
    /**
     * Toggle a tracking code's state.
     */
@@ -73,7 +73,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 			$TrackingCodes = C('Plugins.TrackingCodes.All');
 			if (!is_array($TrackingCodes))
 				$TrackingCodes = array();
-	
+
 			if ($Key !== FALSE)
 				foreach ($TrackingCodes as $Index => $Code) {
 					if ($Key == GetValue('Key', $Code, FALSE)) {
@@ -84,10 +84,10 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 					}
 				}
       }
-      
-      Redirect('settings/trackingcodes');
+
+      redirectTo('settings/trackingcodes', 302, false);
    }
-   
+
    /**
     * Form to edit an existing code.
     */
@@ -110,7 +110,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 					break;
 				}
 			}
-			
+
       if (!$Sender->Form->AuthenticatedPostBack()) {
 			// Set defaults
 			if ($Sender->Code)
@@ -121,7 +121,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 			$ValuesToSave['Key'] = GetValue('Key', $FormValues, '');
 			if ($ValuesToSave['Key'] == '')
 				$ValuesToSave['Key'] = time().Gdn::Session()->UserID; // create a new unique id for the item
-				
+
 			$ValuesToSave['Name'] = GetValue('Name', $FormValues, '');
 			$ValuesToSave['Code'] = GetValue('Code', $FormValues, '');
 			$ValuesToSave['Enabled'] = GetValue('Enabled', $FormValues, '');
@@ -132,22 +132,22 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 				$TrackingCodes[] = $ValuesToSave;
 			}
 
-			SaveToConfig('Plugins.TrackingCodes.All', $TrackingCodes);	
+			SaveToConfig('Plugins.TrackingCodes.All', $TrackingCodes);
          $Sender->InformMessage(T('Your changes have been saved.'));
 			$Sender->RedirectUrl = Url('settings/trackingcodes');
       }
-		
+
       $Sender->Render('edit', '', 'plugins/TrackingCodes');
    }
-	
-	
+
+
 	/**
 	 * Dump all of the tracking codes to the page if *not* in admin master view.
 	 */
 	public function Base_AfterBody_Handler($Sender) {
 		if ($Sender->MasterView == 'admin')
 			return;
-		
+
 		$TrackingCodes = C('Plugins.TrackingCodes.All');
 		if (!is_array($TrackingCodes))
 			$TrackingCodes = array();

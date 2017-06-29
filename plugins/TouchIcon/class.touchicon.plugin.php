@@ -94,7 +94,7 @@ class TouchIconPlugin extends Gdn_Plugin {
     */
    public function UtilityController_ShowTouchIcon_Create($Sender) {
       $Redirect = $this->getIconUrl();
-      Redirect($Redirect, 302);
+      redirectTo($Redirect, 302, false);
       exit();
    }
 }

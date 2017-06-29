@@ -1,7 +1,7 @@
 {
     "name": "Bump",
     "description": "Allows moderators to bump a discussion without commenting.",
-    "version": "1.0",
+    "version": "1.0.1",
     "mobileFriendly": true,
     "key": "bump",
     "type": "addon",
@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1"
+        "vanilla": ">=2.4"
     },
     "icon": "bump.png"
 }

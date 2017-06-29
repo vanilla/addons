@@ -29,7 +29,7 @@ class DisqusPlugin extends Gdn_Plugin {
      */
     public function authorize($Query = false) {
         $Uri = $this->authorizeUri($Query);
-        redirect($Uri);
+        redirectTo($Uri, 302, false);
     }
 
     /**
