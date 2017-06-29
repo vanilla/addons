@@ -501,7 +501,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $Sender->addDefinition('CheckPopup', true);
 
                 $Target = $Sender->Form->getFormValue('Target', '/');
-                $Sender->redirectTo($Target, false);
+                $Sender->setRedirectTo($Target, false);
 
                 $Sender->render('JsConnect', '', 'plugins/jsconnect');
             } else {
@@ -679,7 +679,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $form->setFormValue('AuthenticationSchemeAlias', 'jsconnect');
 
                 if ($form->save(['ID' => $client_id])) {
-                    $sender->redirectTo('/settings/jsconnect', false);
+                    $sender->setRedirectTo('/settings/jsconnect', false);
                 }
             }
         } else {
