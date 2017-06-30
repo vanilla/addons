@@ -136,7 +136,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 
 			SaveToConfig('Plugins.TrackingCodes.All', $TrackingCodes);
          $Sender->InformMessage(T('Your changes have been saved.'));
-			$Sender->setRedirectTo('settings/trackingcodes', false);
+			$Sender->setRedirectTo('settings/trackingcodes');
       }
 
       $Sender->Render('edit', '', 'plugins/TrackingCodes');
