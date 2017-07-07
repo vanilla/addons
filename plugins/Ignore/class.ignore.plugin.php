@@ -447,7 +447,7 @@ class IgnorePlugin extends Gdn_Plugin {
                         '<span class="InformSprite Brightness"></span>'.sprintf(T("%s is no longer on ignore."), $User->Name),
                         'AutoDismiss HasSprite'
                      );
-                     $Sender->setRedirectTo('/profile/ignore', false);
+                     $Sender->setRedirectTo('/profile/ignore');
                   }
 
                   break;

@@ -679,7 +679,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $form->setFormValue('AuthenticationSchemeAlias', 'jsconnect');
 
                 if ($form->save(['ID' => $client_id])) {
-                    $sender->setRedirectTo('/settings/jsconnect', false);
+                    $sender->setRedirectTo('/settings/jsconnect');
                 }
             }
         } else {
@@ -777,7 +777,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         if ($Sender->Form->authenticatedPostBack()) {
             $Model = new Gdn_AuthenticationProviderModel();
             $Model->delete(['AuthenticationKey' => $client_id]);
-            $Sender->setRedirectTo('/settings/jsconnect', false);
+            $Sender->setRedirectTo('/settings/jsconnect');
             $Sender->render('Blank', 'Utility', 'Dashboard');
         }
     }

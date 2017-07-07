@@ -43,7 +43,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 			$Identity->SetIdentity($SpoofUserID, TRUE);
 		}
 		if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
-			$Sender->setRedirectTo('profile', false);
+			$Sender->setRedirectTo('profile');
 			$Sender->render('blank', 'utility', 'dashboard');
 		} else {
 			redirectTo('profile', 302, false);
