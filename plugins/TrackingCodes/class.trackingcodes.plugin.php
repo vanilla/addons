@@ -58,7 +58,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 				}
       }
 
-      redirectTo('settings/trackingcodes', 302, false);
+      redirectTo('settings/trackingcodes');
    }
 
    /**
@@ -85,7 +85,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 				}
       }
 
-      redirectTo('settings/trackingcodes', 302, false);
+      redirectTo('settings/trackingcodes');
    }
 
    /**

@@ -35,7 +35,7 @@ class VotingPlugin extends Gdn_Plugin {
       if (Gdn::Session()->ValidateTransientKey(GetValue(0, $Sender->RequestArgs)))
          SaveToConfig('Plugins.Voting.Enabled', C('Plugins.Voting.Enabled') ? FALSE : TRUE);
 
-      redirectTo('settings/voting', 302, false);
+      redirectTo('settings/voting');
    }
 
 	/**
@@ -508,7 +508,7 @@ class VotingPlugin extends Gdn_Plugin {
    * Don't let the users access the category management screens.
    public function SettingsController_Render_Before($Sender) {
       if (strpos(strtolower($Sender->RequestMethod), 'categor') > 0)
-         redirectTo($Sender->Routes['DefaultPermission'], 302, false);
+         redirectTo($Sender->Routes['DefaultPermission']);
    }
    */
 
