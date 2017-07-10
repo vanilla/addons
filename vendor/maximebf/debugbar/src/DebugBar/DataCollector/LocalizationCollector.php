@@ -37,10 +37,10 @@ class LocalizationCollector extends DataCollector implements Renderable
 
     public function collect()
     {
-        return array(
+        return [
           'locale' => $this->getLocale(),
           'domain' => $this->getDomain(),
-        );
+        ];
     }
 
     public function getName()
@@ -50,15 +50,15 @@ class LocalizationCollector extends DataCollector implements Renderable
 
     public function getWidgets()
     {
-        return array(
-            'domain' => array(
+        return [
+            'domain' => [
                 'icon' => 'bookmark',
                 'map'  => 'localization.domain',
-            ),
-            'locale' => array(
+            ],
+            'locale' => [
                 'icon' => 'flag',
                 'map'  => 'localization.locale',
-            )
-        );
+            ]
+        ];
     }
 }

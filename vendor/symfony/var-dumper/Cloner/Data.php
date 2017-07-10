@@ -87,7 +87,7 @@ class Data
      */
     public function dump(DumperInterface $dumper)
     {
-        $refs = array(0);
+        $refs = [0];
         $this->dumpItem($dumper, new Cursor(), $refs, $this->data[0][0]);
     }
 
@@ -142,10 +142,10 @@ class Data
                     if ($cut >= 0) {
                         $cut += count($children);
                     }
-                    $children = array();
+                    $children = [];
                 }
             } else {
-                $children = array();
+                $children = [];
             }
             switch ($item->type) {
                 case Stub::TYPE_STRING:

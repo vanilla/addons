@@ -21,7 +21,7 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
  */
 abstract class AbstractCloner implements ClonerInterface
 {
-    public static $defaultCasters = array(
+    public static $defaultCasters = [
         'Symfony\Component\VarDumper\Caster\CutStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
         'Symfony\Component\VarDumper\Caster\CutArrayStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castCutArray',
         'Symfony\Component\VarDumper\Caster\ConstStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
@@ -113,15 +113,15 @@ abstract class AbstractCloner implements ClonerInterface
         ':stream' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castStream',
         ':stream-context' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castStreamContext',
         ':xml' => 'Symfony\Component\VarDumper\Caster\XmlResourceCaster::castXml',
-    );
+    ];
 
     protected $maxItems = 2500;
     protected $maxString = -1;
     protected $useExt;
 
-    private $casters = array();
+    private $casters = [];
     private $prevErrorHandler;
-    private $classInfo = array();
+    private $classInfo = [];
     private $filter = 0;
 
     /**
@@ -241,10 +241,10 @@ abstract class AbstractCloner implements ClonerInterface
         if (isset($this->classInfo[$class])) {
             $classInfo = $this->classInfo[$class];
         } else {
-            $classInfo = array(
+            $classInfo = [
                 new \ReflectionClass($class),
-                array_reverse(array($class => $class) + class_parents($class) + class_implements($class) + array('*' => '*')),
-            );
+                array_reverse([$class => $class] + class_parents($class) + class_implements($class) + ['*' => '*']),
+            ];
 
             $this->classInfo[$class] = $classInfo;
         }
@@ -272,7 +272,7 @@ abstract class AbstractCloner implements ClonerInterface
      */
     protected function castResource(Stub $stub, $isNested)
     {
-        $a = array();
+        $a = [];
         $res = $stub->value;
         $type = $stub->class;
 

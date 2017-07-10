@@ -12,12 +12,12 @@ class TraceablePDO extends PDO
 {
     protected $pdo;
 
-    protected $executedStatements = array();
+    protected $executedStatements = [];
 
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
-        $this->pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('DebugBar\DataCollector\PDO\TraceablePDOStatement', array($this)));
+        $this->pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS, ['DebugBar\DataCollector\PDO\TraceablePDOStatement', [$this]]);
     }
 
     public function beginTransaction()
@@ -60,7 +60,7 @@ class TraceablePDO extends PDO
         return $this->pdo->lastInsertId($name);
     }
 
-    public function prepare($sql, $driver_options = array())
+    public function prepare($sql, $driver_options = [])
     {
         return $this->pdo->prepare($sql, $driver_options);
     }
@@ -101,7 +101,7 @@ class TraceablePDO extends PDO
         $errorMode = $this->pdo->getAttribute(PDO::ATTR_ERRMODE);
         $ex = null;
         try {
-            $result = call_user_func_array(array($this->pdo, $method), $args);
+            $result = call_user_func_array([$this->pdo, $method], $args);
         } catch (PDOException $e) {
             $ex = $e;
         }
@@ -192,6 +192,6 @@ class TraceablePDO extends PDO
 
     public function __call($name, $args)
     {
-        return call_user_func_array(array($this->pdo, $name), $args);
+        return call_user_func_array([$this->pdo, $name], $args);
     }
 }

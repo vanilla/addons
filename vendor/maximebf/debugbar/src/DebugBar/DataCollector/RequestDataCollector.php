@@ -17,8 +17,8 @@ class RequestDataCollector extends DataCollector implements Renderable
 {
     public function collect()
     {
-        $vars = array('_GET', '_POST', '_SESSION', '_COOKIE', '_SERVER');
-        $data = array();
+        $vars = ['_GET', '_POST', '_SESSION', '_COOKIE', '_SERVER'];
+        $data = [];
 
         foreach ($vars as $var) {
             if (isset($GLOBALS[$var])) {
@@ -36,13 +36,13 @@ class RequestDataCollector extends DataCollector implements Renderable
 
     public function getWidgets()
     {
-        return array(
-            "request" => array(
+        return [
+            "request" => [
                 "icon" => "tags",
                 "widget" => "PhpDebugBar.Widgets.VariableListWidget",
                 "map" => "request",
                 "default" => "{}"
-            )
-        );
+            ]
+        ];
     }
 }

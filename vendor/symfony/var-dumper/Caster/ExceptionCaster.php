@@ -23,7 +23,7 @@ class ExceptionCaster
 {
     public static $srcContext = 1;
     public static $traceArgs = true;
-    public static $errorTypes = array(
+    public static $errorTypes = [
         E_DEPRECATED => 'E_DEPRECATED',
         E_USER_DEPRECATED => 'E_USER_DEPRECATED',
         E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
@@ -39,7 +39,7 @@ class ExceptionCaster
         E_USER_WARNING => 'E_USER_WARNING',
         E_USER_NOTICE => 'E_USER_NOTICE',
         E_STRICT => 'E_STRICT',
-    );
+    ];
 
     public static function castError(\Error $e, array $a, Stub $stub, $isNested, $filter = 0)
     {
@@ -67,11 +67,11 @@ class ExceptionCaster
 
         if (isset($a[$xPrefix.'previous'], $a[$xPrefix.'trace'])) {
             $b = (array) $a[$xPrefix.'previous'];
-            array_unshift($b[$xPrefix.'trace'], array(
+            array_unshift($b[$xPrefix.'trace'], [
                 'function' => 'new '.get_class($a[$xPrefix.'previous']),
                 'file' => $b[$prefix.'file'],
                 'line' => $b[$prefix.'line'],
-            ));
+            ]);
             $a[$xPrefix.'trace'] = new TraceStub($b[$xPrefix.'trace'], false, 0, -1 - count($a[$xPrefix.'trace']->value));
         }
 
@@ -89,13 +89,13 @@ class ExceptionCaster
         $stub->handle = 0;
         $frames = $trace->value;
 
-        $a = array();
+        $a = [];
         $j = count($frames);
         if (0 > $i = $trace->sliceOffset) {
             $i = max(0, $j + $i);
         }
         if (!isset($trace->value[$i])) {
-            return array();
+            return [];
         }
         $lastCall = isset($frames[$i]['function']) ? ' ==> '.(isset($frames[$i]['class']) ? $frames[0]['class'].$frames[$i]['type'] : '').$frames[$i]['function'].'()' : '';
 
@@ -103,12 +103,12 @@ class ExceptionCaster
             $call = isset($frames[$i]['function']) ? (isset($frames[$i]['class']) ? $frames[$i]['class'].$frames[$i]['type'] : '').$frames[$i]['function'].'()' : '???';
 
             $a[Caster::PREFIX_VIRTUAL.$j.'. '.$call.$lastCall] = new FrameStub(
-                array(
+                [
                     'object' => isset($frames[$i]['object']) ? $frames[$i]['object'] : null,
                     'class' => isset($frames[$i]['class']) ? $frames[$i]['class'] : null,
                     'type' => isset($frames[$i]['type']) ? $frames[$i]['type'] : null,
                     'function' => isset($frames[$i]['function']) ? $frames[$i]['function'] : null,
-                ) + $frames[$i - 1],
+                ] + $frames[$i - 1],
                 $trace->keepArgs,
                 true
             );
@@ -116,12 +116,12 @@ class ExceptionCaster
             $lastCall = ' ==> '.$call;
         }
         $a[Caster::PREFIX_VIRTUAL.$j.'. {main}'.$lastCall] = new FrameStub(
-            array(
+            [
                 'object' => null,
                 'class' => null,
                 'type' => null,
                 'function' => '{main}',
-            ) + $frames[$i - 1],
+            ] + $frames[$i - 1],
             $trace->keepArgs,
             true
         );
@@ -189,15 +189,15 @@ class ExceptionCaster
             $trace = $a[$xPrefix.'trace'];
             unset($a[$xPrefix.'trace']); // Ensures the trace is always last
         } else {
-            $trace = array();
+            $trace = [];
         }
 
         if (!($filter & Caster::EXCLUDE_VERBOSE)) {
-            array_unshift($trace, array(
+            array_unshift($trace, [
                 'function' => $xClass ? 'new '.$xClass : null,
                 'file' => $a[Caster::PREFIX_PROTECTED.'file'],
                 'line' => $a[Caster::PREFIX_PROTECTED.'line'],
-            ));
+            ]);
             $a[$xPrefix.'trace'] = new TraceStub($trace);
         }
         if (empty($a[$xPrefix.'previous'])) {
@@ -210,7 +210,7 @@ class ExceptionCaster
 
     private static function extractSource(array $srcArray, $line, $srcContext)
     {
-        $src = array();
+        $src = [];
 
         for ($i = $line - 1 - $srcContext; $i <= $line - 1 + $srcContext; ++$i) {
             $src[] = (isset($srcArray[$i]) ? $srcArray[$i] : '')."\n";

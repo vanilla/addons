@@ -32,11 +32,11 @@ class LoggerCollector extends MessagesCollector {
             $context = $message + $context;
             $message = '{...}';
         }
-        $row = array(
+        $row = [
             'message' => $message,
             'label' => $level,
             'time' => microtime(true)
-        );
+        ];
 
         if (!empty($context['event'])) {
             $row['event'] = $context['event'];
@@ -59,17 +59,17 @@ class LoggerCollector extends MessagesCollector {
 
     public function getWidgets() {
         $name = $this->getName();
-        return array(
-            "$name" => array(
+        return [
+            "$name" => [
                 'icon' => 'list-alt',
                 "widget" => "PhpDebugBar.Widgets.VanillaLoggerWidget",
                 "map" => "$name.messages",
                 "default" => "[]"
-            ),
-            "$name:badge" => array(
+            ],
+            "$name:badge" => [
                 "map" => "$name.count",
                 "default" => "null"
-            )
-        );
+            ]
+        ];
     }
 }

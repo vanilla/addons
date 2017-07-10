@@ -29,7 +29,7 @@ class StubCaster
             $stub->handle = $c->handle;
             $stub->cut = $c->cut;
 
-            return array();
+            return [];
         }
     }
 
@@ -43,7 +43,7 @@ class StubCaster
         if ($isNested) {
             $stub->cut += count($a);
 
-            return array();
+            return [];
         }
 
         return $a;
@@ -56,7 +56,7 @@ class StubCaster
             $stub->handle = 0;
             $stub->value = null;
 
-            $a = array();
+            $a = [];
 
             if ($c->value) {
                 foreach (array_keys($c->value) as $k) {

@@ -29,7 +29,7 @@ class MonologCollector extends AbstractProcessingHandler implements DataCollecto
 {
     protected $name;
 
-    protected $records = array();
+    protected $records = [];
 
     /**
      * @param Logger $logger
@@ -58,12 +58,12 @@ class MonologCollector extends AbstractProcessingHandler implements DataCollecto
 
     protected function write(array $record)
     {
-        $this->records[] = array(
+        $this->records[] = [
             'message' => $record['formatted'],
             'is_string' => true,
             'label' => strtolower($record['level_name']),
             'time' => $record['datetime']->format('U')
-        );
+        ];
     }
 
     public function getMessages()
@@ -73,10 +73,10 @@ class MonologCollector extends AbstractProcessingHandler implements DataCollecto
 
     public function collect()
     {
-        return array(
+        return [
             'count' => count($this->records),
             'records' => $this->records
-        );
+        ];
     }
 
     public function getName()
@@ -87,17 +87,17 @@ class MonologCollector extends AbstractProcessingHandler implements DataCollecto
     public function getWidgets()
     {
         $name = $this->getName();
-        return array(
-            $name => array(
+        return [
+            $name => [
                 "icon" => "suitcase",
                 "widget" => "PhpDebugBar.Widgets.MessagesWidget",
                 "map" => "$name.records",
                 "default" => "[]"
-            ),
-            "$name:badge" => array(
+            ],
+            "$name:badge" => [
                 "map" => "$name.count",
                 "default" => "null"
-            )
-        );
+            ]
+        ];
     }
 }

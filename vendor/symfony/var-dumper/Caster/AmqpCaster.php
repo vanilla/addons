@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class AmqpCaster
 {
-    private static $flags = array(
+    private static $flags = [
         AMQP_DURABLE => 'AMQP_DURABLE',
         AMQP_PASSIVE => 'AMQP_PASSIVE',
         AMQP_EXCLUSIVE => 'AMQP_EXCLUSIVE',
@@ -35,14 +35,14 @@ class AmqpCaster
         AMQP_MULTIPLE => 'AMQP_MULTIPLE',
         AMQP_NOWAIT => 'AMQP_NOWAIT',
         AMQP_REQUEUE => 'AMQP_REQUEUE',
-    );
+    ];
 
-    private static $exchangeTypes = array(
+    private static $exchangeTypes = [
         AMQP_EX_TYPE_DIRECT => 'AMQP_EX_TYPE_DIRECT',
         AMQP_EX_TYPE_FANOUT => 'AMQP_EX_TYPE_FANOUT',
         AMQP_EX_TYPE_TOPIC => 'AMQP_EX_TYPE_TOPIC',
         AMQP_EX_TYPE_HEADERS => 'AMQP_EX_TYPE_HEADERS',
-    );
+    ];
 
     public static function castConnection(\AMQPConnection $c, array $a, Stub $stub, $isNested)
     {
@@ -55,7 +55,7 @@ class AmqpCaster
             $timeout = $c->getTimeout();
         }
 
-        $a += array(
+        $a += [
             $prefix.'isConnected' => $c->isConnected(),
             $prefix.'login' => $c->getLogin(),
             $prefix.'password' => $c->getPassword(),
@@ -63,7 +63,7 @@ class AmqpCaster
             $prefix.'port' => $c->getPort(),
             $prefix.'vhost' => $c->getVhost(),
             $prefix.'readTimeout' => $timeout,
-        );
+        ];
 
         return $a;
     }
@@ -72,13 +72,13 @@ class AmqpCaster
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
-        $a += array(
+        $a += [
             $prefix.'isConnected' => $c->isConnected(),
             $prefix.'channelId' => $c->getChannelId(),
             $prefix.'prefetchSize' => $c->getPrefetchSize(),
             $prefix.'prefetchCount' => $c->getPrefetchCount(),
             $prefix.'connection' => $c->getConnection(),
-        );
+        ];
 
         return $a;
     }
@@ -87,13 +87,13 @@ class AmqpCaster
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
-        $a += array(
+        $a += [
             $prefix.'name' => $c->getName(),
             $prefix.'flags' => self::extractFlags($c->getFlags()),
             $prefix.'arguments' => $c->getArguments(),
             $prefix.'connection' => $c->getConnection(),
             $prefix.'channel' => $c->getChannel(),
-        );
+        ];
 
         return $a;
     }
@@ -102,14 +102,14 @@ class AmqpCaster
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
-        $a += array(
+        $a += [
             $prefix.'name' => $c->getName(),
             $prefix.'flags' => self::extractFlags($c->getFlags()),
             $prefix.'type' => isset(self::$exchangeTypes[$c->getType()]) ? new ConstStub(self::$exchangeTypes[$c->getType()], $c->getType()) : $c->getType(),
             $prefix.'arguments' => $c->getArguments(),
             $prefix.'channel' => $c->getChannel(),
             $prefix.'connection' => $c->getConnection(),
-        );
+        ];
 
         return $a;
     }
@@ -119,10 +119,10 @@ class AmqpCaster
         $prefix = Caster::PREFIX_VIRTUAL;
 
         if (!($filter & Caster::EXCLUDE_VERBOSE)) {
-            $a += array($prefix.'body' => $c->getBody());
+            $a += [$prefix.'body' => $c->getBody()];
         }
 
-        $a += array(
+        $a += [
             $prefix.'routingKey' => $c->getRoutingKey(),
             $prefix.'deliveryTag' => $c->getDeliveryTag(),
             $prefix.'deliveryMode' => new ConstStub($c->getDeliveryMode().(2 === $c->getDeliveryMode() ? ' (persistent)' : ' (non-persistent)'), $c->getDeliveryMode()),
@@ -140,14 +140,14 @@ class AmqpCaster
             $prefix.'replyTo' => $c->getReplyTo(),
             $prefix.'correlationId' => $c->getCorrelationId(),
             $prefix.'headers' => $c->getHeaders(),
-        );
+        ];
 
         return $a;
     }
 
     private static function extractFlags($flags)
     {
-        $flagsArray = array();
+        $flagsArray = [];
 
         foreach (self::$flags as $value => $name) {
             if ($flags & $value) {
@@ -156,7 +156,7 @@ class AmqpCaster
         }
 
         if (!$flagsArray) {
-            $flagsArray = array('AMQP_NOPARAM');
+            $flagsArray = ['AMQP_NOPARAM'];
         }
 
         return new ConstStub(implode('|', $flagsArray), $flags);

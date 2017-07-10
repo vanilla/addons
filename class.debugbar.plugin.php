@@ -193,7 +193,7 @@ class DebugBarPlugin extends Gdn_Plugin {
     public function gdn_pluginManager_afterStart_handler() {
         // Install the debugger database.
         $tmp = Gdn::factoryOverwrite(true);
-        Gdn::factoryInstall(Gdn::AliasDatabase, '\Vanilla\DebugBar\DatabaseDebugBar', __DIR__.'/src/DatabaseDebugBar.php', Gdn::FactorySingleton, array('Database'));
+        Gdn::factoryInstall(Gdn::AliasDatabase, '\Vanilla\DebugBar\DatabaseDebugBar', __DIR__.'/src/DatabaseDebugBar.php', Gdn::FactorySingleton, ['Database']);
         Gdn::factoryOverwrite($tmp);
         unset($tmp);
 

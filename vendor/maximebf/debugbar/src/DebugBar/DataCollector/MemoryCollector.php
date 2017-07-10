@@ -38,10 +38,10 @@ class MemoryCollector extends DataCollector implements Renderable
     public function collect()
     {
         $this->updatePeakUsage();
-        return array(
+        return [
             'peak_usage' => $this->peakUsage,
             'peak_usage_str' => $this->getDataFormatter()->formatBytes($this->peakUsage)
-        );
+        ];
     }
 
     public function getName()
@@ -51,13 +51,13 @@ class MemoryCollector extends DataCollector implements Renderable
 
     public function getWidgets()
     {
-        return array(
-            "memory" => array(
+        return [
+            "memory" => [
                 "icon" => "cogs",
                 "tooltip" => "Memory Usage",
                 "map" => "memory.peak_usage_str",
                 "default" => "'0B'"
-            )
-        );
+            ]
+        ];
     }
 }

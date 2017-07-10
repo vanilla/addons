@@ -76,7 +76,7 @@ class Caster
      *
      * @return array The filtered array
      */
-    public static function filter(array $a, $filter, array $listedProperties = array())
+    public static function filter(array $a, $filter, array $listedProperties = [])
     {
         foreach ($a as $k => $v) {
             $type = self::EXCLUDE_STRICT & $filter;

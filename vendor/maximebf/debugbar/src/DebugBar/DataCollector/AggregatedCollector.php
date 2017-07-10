@@ -31,7 +31,7 @@ class AggregatedCollector implements DataCollectorInterface, ArrayAccess
 
     protected $sort;
 
-    protected $collectors = array();
+    protected $collectors = [];
 
     /**
      * @param string $name
@@ -102,7 +102,7 @@ class AggregatedCollector implements DataCollectorInterface, ArrayAccess
 
     public function collect()
     {
-        $aggregate = array();
+        $aggregate = [];
         foreach ($this->collectors as $collector) {
             $data = $collector->collect();
             if ($this->mergeProperty !== null) {

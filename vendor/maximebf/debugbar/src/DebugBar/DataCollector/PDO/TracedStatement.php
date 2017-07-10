@@ -37,7 +37,7 @@ class TracedStatement
      * @param integer $memoryUsage
      * @param \Exception $e
      */
-    public function __construct($sql, array $params = array(), $preparedId = null)
+    public function __construct($sql, array $params = [], $preparedId = null)
     {
         $this->sql = $sql;
         $this->parameters = $this->checkParameters($params);
@@ -131,7 +131,7 @@ class TracedStatement
      */
     public function getParameters()
     {
-        $params = array();
+        $params = [];
         foreach ($this->parameters as $name => $param) {
             $params[$name] = htmlentities($param, ENT_QUOTES, 'UTF-8', false);
         }

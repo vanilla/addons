@@ -31,12 +31,12 @@ class TimeDataCollector extends DataCollector implements Renderable
     /**
      * @var array
      */
-    protected $startedMeasures = array();
+    protected $startedMeasures = [];
 
     /**
      * @var array
      */
-    protected $measures = array();
+    protected $measures = [];
 
     /**
      * @param float $requestStartTime
@@ -63,11 +63,11 @@ class TimeDataCollector extends DataCollector implements Renderable
     public function startMeasure($name, $label = null, $collector = null)
     {
         $start = microtime(true);
-        $this->startedMeasures[$name] = array(
+        $this->startedMeasures[$name] = [
             'label' => $label ?: $name,
             'start' => $start,
             'collector' => $collector
-        );
+        ];
     }
 
     /**
@@ -88,7 +88,7 @@ class TimeDataCollector extends DataCollector implements Renderable
      * @param array $params
      * @throws DebugBarException
      */
-    public function stopMeasure($name, $params = array())
+    public function stopMeasure($name, $params = [])
     {
         $end = microtime(true);
         if (!$this->hasStartedMeasure($name)) {
@@ -113,9 +113,9 @@ class TimeDataCollector extends DataCollector implements Renderable
      * @param array $params
      * @param string|null $collector
      */
-    public function addMeasure($label, $start, $end, $params = array(), $collector = null)
+    public function addMeasure($label, $start, $end, $params = [], $collector = null)
     {
-        $this->measures[] = array(
+        $this->measures[] = [
             'label' => $label,
             'start' => $start,
             'relative_start' => $start - $this->requestStartTime,
@@ -125,7 +125,7 @@ class TimeDataCollector extends DataCollector implements Renderable
             'duration_str' => $this->getDataFormatter()->formatDuration($end - $start),
             'params' => $params,
             'collector' => $collector
-        );
+        ];
     }
 
     /**
@@ -140,7 +140,7 @@ class TimeDataCollector extends DataCollector implements Renderable
         $name = spl_object_hash($closure);
         $this->startMeasure($name, $label, $collector);
         $result = $closure();
-        $params = is_array($result) ? $result : array();
+        $params = is_array($result) ? $result : [];
         $this->stopMeasure($name, $params);
     }
 
@@ -194,13 +194,13 @@ class TimeDataCollector extends DataCollector implements Renderable
             $this->stopMeasure($name);
         }
 
-        return array(
+        return [
             'start' => $this->requestStartTime,
             'end' => $this->requestEndTime,
             'duration' => $this->getRequestDuration(),
             'duration_str' => $this->getDataFormatter()->formatDuration($this->getRequestDuration()),
             'measures' => array_values($this->measures)
-        );
+        ];
     }
 
     public function getName()
@@ -210,19 +210,19 @@ class TimeDataCollector extends DataCollector implements Renderable
 
     public function getWidgets()
     {
-        return array(
-            "time" => array(
+        return [
+            "time" => [
                 "icon" => "clock-o",
                 "tooltip" => "Request Duration",
                 "map" => "time.duration_str",
                 "default" => "'0ms'"
-            ),
-            "timeline" => array(
+            ],
+            "timeline" => [
                 "icon" => "tasks",
                 "widget" => "PhpDebugBar.Widgets.TimelineWidget",
                 "map" => "time",
                 "default" => "{}"
-            )
-        );
+            ]
+        ];
     }
 }

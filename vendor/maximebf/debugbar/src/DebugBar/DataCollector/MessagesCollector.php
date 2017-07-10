@@ -20,9 +20,9 @@ class MessagesCollector extends AbstractLogger implements DataCollectorInterface
 {
     protected $name;
 
-    protected $messages = array();
+    protected $messages = [];
 
-    protected $aggregates = array();
+    protected $aggregates = [];
 
     protected $dataFormater;
 
@@ -67,12 +67,12 @@ class MessagesCollector extends AbstractLogger implements DataCollectorInterface
             $message = $this->getDataFormatter()->formatVar($message);
             $isString = false;
         }
-        $this->messages[] = array(
+        $this->messages[] = [
             'message' => $message,
             'is_string' => $isString,
             'label' => $label,
             'time' => microtime(true)
-        );
+        ];
     }
 
     /**
@@ -107,7 +107,7 @@ class MessagesCollector extends AbstractLogger implements DataCollectorInterface
         return $messages;
     }
 
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
         $this->addMessage($message, $level);
     }
@@ -117,16 +117,16 @@ class MessagesCollector extends AbstractLogger implements DataCollectorInterface
      */
     public function clear()
     {
-        $this->messages = array();
+        $this->messages = [];
     }
 
     public function collect()
     {
         $messages = $this->getMessages();
-        return array(
+        return [
             'count' => count($messages),
             'messages' => $messages
-        );
+        ];
     }
 
     public function getName()
@@ -137,17 +137,17 @@ class MessagesCollector extends AbstractLogger implements DataCollectorInterface
     public function getWidgets()
     {
         $name = $this->getName();
-        return array(
-            "$name" => array(
+        return [
+            "$name" => [
                 'icon' => 'list-alt',
                 "widget" => "PhpDebugBar.Widgets.MessagesWidget",
                 "map" => "$name.messages",
                 "default" => "[]"
-            ),
-            "$name:badge" => array(
+            ],
+            "$name:badge" => [
                 "map" => "$name.count",
                 "default" => "null"
-            )
-        );
+            ]
+        ];
     }
 }

@@ -29,20 +29,20 @@ class VarCloner extends AbstractCloner
         $len = 1;                       // Length of $queue
         $pos = 0;                       // Number of cloned items past the first level
         $refs = 0;                      // Hard references counter
-        $queue = array(array($var));    // This breadth-first queue is the return value
-        $arrayRefs = array();           // Map of queue indexes to stub array objects
-        $hardRefs = array();            // Map of original zval hashes to stub objects
-        $objRefs = array();             // Map of original object handles to their stub object couterpart
-        $resRefs = array();             // Map of original resource handles to their stub object couterpart
-        $values = array();              // Map of stub objects' hashes to original values
+        $queue = [[$var]];    // This breadth-first queue is the return value
+        $arrayRefs = [];           // Map of queue indexes to stub array objects
+        $hardRefs = [];            // Map of original zval hashes to stub objects
+        $objRefs = [];             // Map of original object handles to their stub object couterpart
+        $resRefs = [];             // Map of original resource handles to their stub object couterpart
+        $values = [];              // Map of stub objects' hashes to original values
         $maxItems = $this->maxItems;
         $maxString = $this->maxString;
-        $cookie = (object) array();     // Unique object used to detect hard references
+        $cookie = (object) [];     // Unique object used to detect hard references
         $gid = uniqid(mt_rand(), true); // Unique string used to detect the special $GLOBALS variable
         $a = null;                      // Array cast for nested structures
         $stub = null;                   // Stub capturing the main properties of an original item value
                                         // or null if the original value is used directly
-        $zval = array(                  // Main properties of the current value
+        $zval = [                  // Main properties of the current value
             'type' => null,
             'zval_isref' => null,
             'zval_hash' => null,
@@ -50,7 +50,7 @@ class VarCloner extends AbstractCloner
             'object_class' => null,
             'object_handle' => null,
             'resource_type' => null,
-        );
+        ];
         if (!self::$hashMask) {
             self::initHashMask();
         }
@@ -128,7 +128,7 @@ class VarCloner extends AbstractCloner
                             // Happens with copies of $GLOBALS
                             if (isset($v[$gid])) {
                                 unset($v[$gid]);
-                                $a = array();
+                                $a = [];
                                 foreach ($v as $gk => &$gv) {
                                     $a[$gk] = &$gv;
                                 }
@@ -273,7 +273,7 @@ class VarCloner extends AbstractCloner
 
     private static function initHashMask()
     {
-        $obj = (object) array();
+        $obj = (object) [];
         self::$hashOffset = 16 - PHP_INT_SIZE;
         self::$hashMask = -1;
 
@@ -281,7 +281,7 @@ class VarCloner extends AbstractCloner
             self::$hashOffset += 16;
         } else {
             // check if we are nested in an output buffering handler to prevent a fatal error with ob_start() below
-            $obFuncs = array('ob_clean', 'ob_end_clean', 'ob_flush', 'ob_end_flush', 'ob_get_contents', 'ob_get_flush');
+            $obFuncs = ['ob_clean', 'ob_end_clean', 'ob_flush', 'ob_end_flush', 'ob_get_contents', 'ob_get_flush'];
             foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
                 if (isset($frame['function'][0]) && !isset($frame['class']) && 'o' === $frame['function'][0] && in_array($frame['function'], $obFuncs)) {
                     $frame['line'] = 0;

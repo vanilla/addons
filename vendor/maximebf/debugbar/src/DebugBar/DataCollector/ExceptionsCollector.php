@@ -17,7 +17,7 @@ use Exception;
  */
 class ExceptionsCollector extends DataCollector implements Renderable
 {
-    protected $exceptions = array();
+    protected $exceptions = [];
     protected $chainExceptions = false;
 
     /**
@@ -55,10 +55,10 @@ class ExceptionsCollector extends DataCollector implements Renderable
 
     public function collect()
     {
-        return array(
+        return [
             'count' => count($this->exceptions),
-            'exceptions' => array_map(array($this, 'formatExceptionData'), $this->exceptions)
-        );
+            'exceptions' => array_map([$this, 'formatExceptionData'], $this->exceptions)
+        ];
     }
 
     /**
@@ -75,17 +75,17 @@ class ExceptionsCollector extends DataCollector implements Renderable
             $start = $e->getLine() - 4;
             $lines = array_slice($lines, $start < 0 ? 0 : $start, 7);
         } else {
-            $lines = array("Cannot open the file ($filePath) in which the exception occurred ");
+            $lines = ["Cannot open the file ($filePath) in which the exception occurred "];
         }
 
-        return array(
+        return [
             'type' => get_class($e),
             'message' => $e->getMessage(),
             'code' => $e->getCode(),
             'file' => $filePath,
             'line' => $e->getLine(),
             'surrounding_lines' => $lines
-        );
+        ];
     }
 
     public function getName()
@@ -95,17 +95,17 @@ class ExceptionsCollector extends DataCollector implements Renderable
 
     public function getWidgets()
     {
-        return array(
-            'exceptions' => array(
+        return [
+            'exceptions' => [
                 'icon' => 'bug',
                 'widget' => 'PhpDebugBar.Widgets.ExceptionsWidget',
                 'map' => 'exceptions.exceptions',
                 'default' => '[]'
-            ),
-            'exceptions:badge' => array(
+            ],
+            'exceptions:badge' => [
                 'map' => 'exceptions.count',
                 'default' => 'null'
-            )
-        );
+            ]
+        ];
     }
 }
