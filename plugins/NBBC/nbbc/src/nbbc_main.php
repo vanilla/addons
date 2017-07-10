@@ -93,7 +93,7 @@
 		var $start_time, $total_times;
 		
 		function BBCode_Profiler()
-			{ $start_time = Array(); $total_times = Array(); }
+			{ $start_time = []; $total_times = []; }
 
 		function Now()
 			{ list($usec, $sec) = explode(" ", microtime());

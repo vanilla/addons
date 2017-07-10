@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 // ajax request common pages to fill the locale file with translations to edit.
-$Urls = array(
+$Urls = [
 	'/vanilla/discussions/index',
 	'/vanilla/discussions/bookmarked',
 	'/vanilla/discussions/mine',
@@ -28,7 +28,7 @@ $Urls = array(
 	'/dashboard/entry/signin',
 	'/dashboard/entry/register',
 	'/dashboard/entry/passwordrequest'
-);
+];
 array_map('Url', $Urls);
 $Locale = Gdn::Locale();
 $Definitions = $Locale->GetDeveloperDefinitions();

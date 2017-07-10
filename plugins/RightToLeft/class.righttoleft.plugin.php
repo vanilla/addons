@@ -15,7 +15,7 @@ class RightToLeftPlugin extends Gdn_Plugin {
     /**
     * @var array $rtlLocales List the locales that are rtl.
     */
-    protected $rtlLocales = array('ar', 'fa', 'he', 'ku', 'ps', 'sd', 'ug', 'ur', 'yi');
+    protected $rtlLocales = ['ar', 'fa', 'he', 'ku', 'ps', 'sd', 'ug', 'ur', 'yi'];
 
    /**
     * Add the rtl stylesheets to the page.

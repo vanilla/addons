@@ -44,7 +44,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	 * Return an array of emoticons.
 	 */
 	public static function GetEmoticons() {
-		return array(
+		return [
 			':)]' => '100',
 			';))' => '71',
 			':)>-' => '67',
@@ -189,7 +189,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
 			':bz' => '115',
 			':ar!' => 'pirate'
 //			'[..]' => 'transformer'
-		);
+		];
 	}
 	
 	/**
@@ -211,7 +211,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
       $BBCode = $Args['BBCode'];
       $BBCode->smiley_url = SmartAsset('/plugins/Emotify/design/images');
       
-      $Smileys = array();
+      $Smileys = [];
       foreach (self::GetEmoticons() as $Text => $Filename) {
          $Smileys[$Text]= $Filename.'.gif';
       }
@@ -243,7 +243,7 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	private function _EmotifySetup($Sender) {
 		$Sender->AddJsFile('emotify.js', 'plugins/Emotify');  
 		// Deliver the emoticons to the page.
-      $Emoticons = array();
+      $Emoticons = [];
       foreach ($this->GetEmoticons() as $i => $gif) {
          if (!isset($Emoticons[$gif]))
             $Emoticons[$gif] = $i;

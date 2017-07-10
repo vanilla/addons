@@ -209,7 +209,7 @@ class RedirectorPlugin extends Gdn_Plugin {
         trace($Get, 'New Get');
 
         // Translate all of the get parameters into new parameters.
-        $Vars = array();
+        $Vars = [];
         foreach ($Get as $Key => $Value) {
             if (!isset($Row[$Key]))
                 continue;
@@ -499,9 +499,9 @@ class RedirectorPlugin extends Gdn_Plugin {
     public static function showpostFilter(&$Get) {
         self::vbFriendlyUrlID($Get, 'p');
 
-        return array(
+        return [
             'p' => 'CommentID'
-        );
+        ];
 
     }
 
@@ -513,7 +513,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @return array Mapping of vB parameters
      */
     public static function showthreadFilter(&$Get) {
-        $data = array(
+        $data = [
             'p' => 'CommentID',
             'page' => 'Page',
             '_arg0' => [
@@ -524,7 +524,7 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'Page',
                 'Filter' => [__CLASS__, 'getNumber']
             ]
-        );
+        ];
 
         if (isset($Get['t'])) {
             $data['t'] = [

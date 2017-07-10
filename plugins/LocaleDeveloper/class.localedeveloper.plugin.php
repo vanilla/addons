@@ -43,27 +43,27 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
 
         // Load the core definitions.
         if (file_exists($this->LocalePath.'/captured_site_core.php')) {
-            $Definition = array();
+            $Definition = [];
             include $this->LocalePath.'/captured_site_core.php';
             $Core = $Definition;
         } else {
-            $Core = array();
+            $Core = [];
         }
 
         // Load the admin definitions.
         if (file_exists($this->LocalePath.'/captured_dash_core.php')) {
-            $Definition = array();
+            $Definition = [];
             include $this->LocalePath.'/captured_dash_core.php';
             $Admin = $Definition;
         } else {
-            $Admin = array();
+            $Admin = [];
         }
 
         // Load the ignore file.
-        $Definition = array();
+        $Definition = [];
         include dirname(__FILE__).'/ignore.php';
         $Ignore = $Definition;
-        $Definition = array();
+        $Definition = [];
 
         $CapturedDefinitions = $Locale->CapturedDefinitions();
 
@@ -135,7 +135,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
      *
      * @var SettingsController $Sender
      */
-    public function SettingsController_LocaleDeveloper_Create($Sender, $Args = array()) {
+    public function SettingsController_LocaleDeveloper_Create($Sender, $Args = []) {
         $Sender->Permission('Garden.Settings.Manage');
 
         $Sender->AddSideMenu();
@@ -238,7 +238,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
                 unset($Info[$Key]);
         }
 
-        $InfoArray = array(GetValue('Key', $Info, 'LocaleDeveloper') => array(
+        $InfoArray = [GetValue('Key', $Info, 'LocaleDeveloper') => [
             'Locale' => GetValue('Locale', $Info, Gdn::Locale()->Current()),
             'Name' => GetValue('Name', $Info, 'Locale Developer'),
             'Description' => 'Automatically gernerated by the Locale Developer plugin.',
@@ -247,7 +247,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
             'AuthorEmail' => 'Your Email',
             'AuthorUrl' => 'http://your.domain.com',
             'License' => 'Your choice of license'
-        ));
+        ]];
 
         return $InfoArray;
     }
@@ -288,7 +288,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
         // Grab the existing locale packs.
         $LocaleModel = new LocaleModel();
         $LocalePacks = $LocaleModel->AvailableLocalePacks();
-        $LocalArray = array();
+        $LocalArray = [];
         foreach ($LocalePacks as $Key => $Info) {
             $LocaleArray[$Key] = GetValue('Name', $Info, $Key);
         }
@@ -296,14 +296,14 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
 
         if ($this->Form->IsPostBack()) {
             if ($this->Form->GetFormValue('Save')) {
-                $Values = ArrayTranslate($this->Form->FormValues(), array('Key', 'Name', 'Locale', 'CaptureDefinitions'));
-                $SaveValues = array();
+                $Values = ArrayTranslate($this->Form->FormValues(), ['Key', 'Name', 'Locale', 'CaptureDefinitions']);
+                $SaveValues = [];
                 foreach ($Values as $Key => $Value) {
                     $SaveValues['Plugins.LocaleDeveloper.'.$Key] = $Value;
                 }
 
                 // Save the settings.
-                SaveToConfig($SaveValues, '', array('RemoveEmpty' => TRUE));
+                SaveToConfig($SaveValues, '', ['RemoveEmpty' => TRUE]);
 
                 $Sender->StatusMessage = T('Your changes have been saved.');
             } elseif ($this->Form->GetFormValue('GenerateChanges')) {
@@ -389,7 +389,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
         $Zip->open($TmpPath, ZIPARCHIVE::CREATE);
 
         // Add all of the files in the locale to the zip.
-        $Files = SafeGlob(rtrim($this->LocalePath, '/').'/*.*', array('php', 'txt'));
+        $Files = SafeGlob(rtrim($this->LocalePath, '/').'/*.*', ['php', 'txt']);
         foreach ($Files as $File) {
             $LocalPath = $Key.'/'.basename($File);
             $Zip->addFile($File, $LocalPath);

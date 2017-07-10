@@ -6,7 +6,7 @@
  */
 
 class DeveloperLocale extends Gdn_Locale {
-    public $_CapturedDefinitions = array();
+    public $_CapturedDefinitions = [];
 
     /**
      * Gets all of the definitions in the current locale.
@@ -33,7 +33,7 @@ class DeveloperLocale extends Gdn_Locale {
                     return self::PrefixFromPath($Row['file']);
             }
             if (strcasecmp($Row['function'], 'Translate') === 0) {
-                if (!in_array(basename($Row['file']), array('functions.general.php', 'class.gdn.php'))) {
+                if (!in_array(basename($Row['file']), ['functions.general.php', 'class.gdn.php'])) {
                     return self::PrefixFromPath($Row['file']);
                 }
             }
@@ -48,7 +48,7 @@ class DeveloperLocale extends Gdn_Locale {
         if (preg_match('`/plugins/([^/]+)`i', $Path, $Matches)) {
             $Plugin = strtolower($Matches[1]);
 
-            if (in_array($Plugin, array('buttonbar', 'fileupload', 'facebook', 'twitter', 'quotes', 'signatures', 'splitmerge', 'tagging', 'nbbc'))) {
+            if (in_array($Plugin, ['buttonbar', 'fileupload', 'facebook', 'twitter', 'quotes', 'signatures', 'splitmerge', 'tagging', 'nbbc'])) {
                 $Result .= 'core';
             } else
                 $Result .= $Plugin.'_plugin';
@@ -57,7 +57,7 @@ class DeveloperLocale extends Gdn_Locale {
         } elseif (preg_match('`/applications/([^/]+)`i', $Path, $Matches)) {
             $App = strtolower($Matches[1]);
 
-            if (in_array($App, array('conversations', 'vanilla', 'dashboard'))) {
+            if (in_array($App, ['conversations', 'vanilla', 'dashboard'])) {
                 // This is a core app.
                 $Result .= 'core';
             } else {

@@ -48,9 +48,9 @@ class SMFCompatibilityPlugin extends Gdn_Plugin {
       $OldFormat = C('Garden.InputFormatter');
 
       if ($OldFormat != 'BBCode') {
-         SaveToConfig(array(
+         SaveToConfig([
             'Garden.InputFormatter' => 'BBCode',
-            'Garden.InputFormatterBak' => $OldFormat));
+            'Garden.InputFormatterBak' => $OldFormat]);
       }
 
       // Setup the default routes.

@@ -26,7 +26,7 @@ foreach($this->Colors as $Color => $HSV) {
 		echo "\n<div class='Box'> \n";
 		$LastHue = $Hue;
 	}
-	$RGB = array(hexdec(substr($Color, 0, 2)), hexdec(substr($Color, 2, 2)), hexdec(substr($Color, 4, 2)));
+	$RGB = [hexdec(substr($Color, 0, 2)), hexdec(substr($Color, 2, 2)), hexdec(substr($Color, 4, 2))];
 	$R += $RGB[0];
 	$G += $RGB[1];
 	$B += $RGB[2];

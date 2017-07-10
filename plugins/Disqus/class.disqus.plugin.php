@@ -57,11 +57,11 @@ class DisqusPlugin extends Gdn_Plugin {
             return '';
         }
 
-        $Qs = array(
+        $Qs = [
             'client_id' => $Provider['AuthenticationKey'],
             'scope' => 'read',
             'response_type' => 'code',
-        );
+        ];
 
         $SigninHref = 'https://disqus.com/api/oauth/2.0/authorize/?'.http_build_query($Qs);
 
@@ -106,10 +106,10 @@ class DisqusPlugin extends Gdn_Plugin {
             $Url = $this->authorizeUri();
 
             // Add the Disqus method to the controller.
-            $Method = array(
+            $Method = [
                 'Name' => 'Disqus',
                 'SignInHtml' => socialSigninButton('Disqus', $Url, 'button')
-            );
+            ];
             $Sender->Data['Methods'][] = $Method;
         }
     }
@@ -156,7 +156,7 @@ class DisqusPlugin extends Gdn_Plugin {
         }
 
         if (!Gdn::session()->isValid()) {
-            echo "\n".wrap($this->_getButton(), 'li', array('class' => 'Connect DisqusConnect'));
+            echo "\n".wrap($this->_getButton(), 'li', ['class' => 'Connect DisqusConnect']);
         }
     }
 
@@ -175,7 +175,7 @@ class DisqusPlugin extends Gdn_Plugin {
             $Sender->Form->setFormValue(Gdn_AuthenticationProviderModel::COLUMN_NAME, 'Disqus');
             $Sender->Form->setModel($Model);
 
-            if ($Sender->Form->save(array('PK' => Gdn_AuthenticationProviderModel::COLUMN_ALIAS))) {
+            if ($Sender->Form->save(['PK' => Gdn_AuthenticationProviderModel::COLUMN_ALIAS])) {
                 $Sender->informMessage(t("Your settings have been saved."));
             }
         } else {
@@ -222,13 +222,13 @@ class DisqusPlugin extends Gdn_Plugin {
         // Get the access token.
         if ($Code && !$AccessToken) {
             // Exchange the token for an access token.
-            $Qs = array(
+            $Qs = [
                 'grant_type' => 'authorization_code',
                 'client_id' => $AppID,
                 'client_secret' => $Secret,
                 'code' => $Code,
                 'redirect_uri' => url('/entry/connect/disqus', true),
-            );
+            ];
 
             $Url = 'https://disqus.com/api/oauth/2.0/access_token/'; //.http_build_query($Qs);
 
@@ -259,11 +259,11 @@ class DisqusPlugin extends Gdn_Plugin {
 
         if ($AccessToken) {
             // Grab the user's profile.
-            $Qs = array(
+            $Qs = [
                 'access_token' => $AccessToken,
                 'api_key' => $AppID,
                 'api_secret' => $Secret
-            );
+            ];
 
             $Url = 'https://disqus.com/api/3.0/users/details.json?'.http_build_query($Qs);
             $C = curl_init();

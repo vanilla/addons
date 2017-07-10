@@ -62,7 +62,7 @@
 		//-----------------------------------------------------------------------------
 		// Standard library of smiley definitions.
 	
-		var $default_smileys = Array(
+		var $default_smileys = [
 			':)' => 'smile.gif',       ':-)' => 'smile.gif',
 			'=)' => 'smile.gif',       '=-)' => 'smile.gif',
 			':(' => 'frown.gif',       ':-(' => 'frown.gif',
@@ -116,215 +116,215 @@
 			':zzz:' => 'sleepy.gif',
 			'<3' => 'heart.gif',
 			':star:' => 'star.gif',
-		);
+		];
 
 		//-----------------------------------------------------------------------------
 		// Standard rules for what to do when a BBCode tag is encountered.
 
-		var $default_tag_rules = Array(
+		var $default_tag_rules = [
 		
-			'b' => Array(
+			'b' => [
 				'simple_start' => "<b>",
 				'simple_end' => "</b>",
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
 				'plain_start' => "<b>",
 				'plain_end' => "</b>",
-			),
-			'i' => Array(
+			],
+			'i' => [
 				'simple_start' => "<i>",
 				'simple_end' => "</i>",
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
 				'plain_start' => "<i>",
 				'plain_end' => "</i>",
-			),
-			'u' => Array(
+			],
+			'u' => [
 				'simple_start' => "<u>",
 				'simple_end' => "</u>",
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
 				'plain_start' => "<u>",
 				'plain_end' => "</u>",
-			),
-			's' => Array(
+			],
+			's' => [
 				'simple_start' => "<strike>",
 				'simple_end' => "</strike>",
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
 				'plain_start' => "<i>",
 				'plain_end' => "</i>",
-			),
+			],
 
-			'font' => Array(
+			'font' => [
 				'mode' => BBCODE_MODE_LIBRARY,
-				'allow' => Array('_default' => '/^[a-zA-Z0-9._ ,-]+$/'),
+				'allow' => ['_default' => '/^[a-zA-Z0-9._ ,-]+$/'],
 				'method' => 'DoFont',
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
-			),
-			'color' => Array(
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
+			],
+			'color' => [
 				'mode' => BBCODE_MODE_ENHANCED,
-				'allow' => Array('_default' => '/^#?[a-zA-Z0-9._ -]+$/'),
+				'allow' => ['_default' => '/^#?[a-zA-Z0-9._ -]+$/'],
 				'template' => '<span style="color:{$_default/tw}">{$_content/v}</span>',
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
-			),
-			'size' => Array(
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
+			],
+			'size' => [
 				'mode' => BBCODE_MODE_LIBRARY,
-				'allow' => Array('_default' => '/^[0-9.]+$/D'),
+				'allow' => ['_default' => '/^[0-9.]+$/D'],
 				'method' => 'DoSize',
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
-			),
-			'sup' => Array(
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
+			],
+			'sup' => [
 				'simple_start' => "<sup>",
 				'simple_end' => "</sup>",
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
-			),
-			'sub' => Array(
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
+			],
+			'sub' => [
 				'simple_start' => "<sub>",
 				'simple_end' => "</sub>",
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
-			),
-			'spoiler' => Array(
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
+			],
+			'spoiler' => [
 				'simple_start' => "<span class=\"bbcode_spoiler\">",
 				'simple_end' => "</span>",
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
-			),
-			'acronym' => Array(
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
+			],
+			'acronym' => [
 				'mode' => BBCODE_MODE_ENHANCED,
 				'template' => '<span class="bbcode_acronym" title="{$_default/e}">{$_content/v}</span>',
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
-			),
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
+			],
 
-			'url' => Array(
+			'url' => [
 				'mode' => BBCODE_MODE_LIBRARY,
 				'method' => 'DoURL',
 				'class' => 'link',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline'),
+				'allow_in' => ['listitem', 'block', 'columns', 'inline'],
 				'content' => BBCODE_REQUIRED,
 				'plain_start' => "<a href=\"{\$link}\">",
 				'plain_end' => "</a>",
-				'plain_content' => Array('_content', '_default'),
-				'plain_link' => Array('_default', '_content'),
-			),
-			'email' => Array(
+				'plain_content' => ['_content', '_default'],
+				'plain_link' => ['_default', '_content'],
+			],
+			'email' => [
 				'mode' => BBCODE_MODE_LIBRARY,
 				'method' => 'DoEmail',
 				'class' => 'link',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline'),
+				'allow_in' => ['listitem', 'block', 'columns', 'inline'],
 				'content' => BBCODE_REQUIRED,
 				'plain_start' => "<a href=\"mailto:{\$link}\">",
 				'plain_end' => "</a>",
-				'plain_content' => Array('_content', '_default'),
-				'plain_link' => Array('_default', '_content'),
-			),
-			'wiki' => Array(
+				'plain_content' => ['_content', '_default'],
+				'plain_link' => ['_default', '_content'],
+			],
+			'wiki' => [
 				'mode' => BBCODE_MODE_LIBRARY,
 				'method' => "DoWiki",
 				'class' => 'link',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline'),
+				'allow_in' => ['listitem', 'block', 'columns', 'inline'],
 				'end_tag' => BBCODE_PROHIBIT,
 				'content' => BBCODE_PROHIBIT,
 				'plain_start' => "<b>[",
 				'plain_end' => "]</b>",
-				'plain_content' => Array('title', '_default'),
-				'plain_link' => Array('_default', '_content'),
-			),
+				'plain_content' => ['title', '_default'],
+				'plain_link' => ['_default', '_content'],
+			],
 
-			'img' => Array(
+			'img' => [
 				'mode' => BBCODE_MODE_LIBRARY,
 				'method' => "DoImage",
 				'class' => 'image',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
 				'end_tag' => BBCODE_REQUIRED,
 				'content' => BBCODE_REQUIRED,
 				'plain_start' => "[image]",
-				'plain_content' => Array(),
-			),
-			'rule' => Array(
+				'plain_content' => [],
+			],
+			'rule' => [
 				'mode' => BBCODE_MODE_LIBRARY,
 				'method' => "DoRule",
 				'class' => 'block',
-				'allow_in' => Array('listitem', 'block', 'columns'),
+				'allow_in' => ['listitem', 'block', 'columns'],
 				'end_tag' => BBCODE_PROHIBIT,
 				'content' => BBCODE_PROHIBIT,
 				'before_tag' => "sns",
 				'after_tag' => "sns",
 				'plain_start' => "\n-----\n",
 				'plain_end' => "",
-				'plain_content' => Array(),
-			),
-			'br' => Array(
+				'plain_content' => [],
+			],
+			'br' => [
 				'mode' => BBCODE_MODE_SIMPLE,
 				'simple_start' => "<br />\n",
 				'simple_end' => "",
 				'class' => 'inline',
-				'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+				'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
 				'end_tag' => BBCODE_PROHIBIT,
 				'content' => BBCODE_PROHIBIT,
 				'before_tag' => "s",
 				'after_tag' => "s",
 				'plain_start' => "\n",
 				'plain_end' => "",
-				'plain_content' => Array(),
-			),
+				'plain_content' => [],
+			],
 
-			'left' => Array(
+			'left' => [
 				'simple_start' => "\n<div class=\"bbcode_left\" style=\"text-align:left\">\n",
 				'simple_end' => "\n</div>\n",
-				'allow_in' => Array('listitem', 'block', 'columns'),
+				'allow_in' => ['listitem', 'block', 'columns'],
 				'before_tag' => "sns",
 				'after_tag' => "sns",
 				'before_endtag' => "sns",
 				'after_endtag' => "sns",
 				'plain_start' => "\n",
 				'plain_end' => "\n",
-			),
-			'right' => Array(
+			],
+			'right' => [
 				'simple_start' => "\n<div class=\"bbcode_right\" style=\"text-align:right\">\n",
 				'simple_end' => "\n</div>\n",
-				'allow_in' => Array('listitem', 'block', 'columns'),
+				'allow_in' => ['listitem', 'block', 'columns'],
 				'before_tag' => "sns",
 				'after_tag' => "sns",
 				'before_endtag' => "sns",
 				'after_endtag' => "sns",
 				'plain_start' => "\n",
 				'plain_end' => "\n",
-			),
-			'center' => Array(
+			],
+			'center' => [
 				'simple_start' => "\n<div class=\"bbcode_center\" style=\"text-align:center\">\n",
 				'simple_end' => "\n</div>\n",
-				'allow_in' => Array('listitem', 'block', 'columns'),
+				'allow_in' => ['listitem', 'block', 'columns'],
 				'before_tag' => "sns",
 				'after_tag' => "sns",
 				'before_endtag' => "sns",
 				'after_endtag' => "sns",
 				'plain_start' => "\n",
 				'plain_end' => "\n",
-			),
-			'indent' => Array(
+			],
+			'indent' => [
 				'simple_start' => "\n<div class=\"bbcode_indent\" style=\"margin-left:4em\">\n",
 				'simple_end' => "\n</div>\n",
-				'allow_in' => Array('listitem', 'block', 'columns'),
+				'allow_in' => ['listitem', 'block', 'columns'],
 				'before_tag' => "sns",
 				'after_tag' => "sns",
 				'before_endtag' => "sns",
 				'after_endtag' => "sns",
 				'plain_start' => "\n",
 				'plain_end' => "\n",
-			),
+			],
 
-			'columns' => Array(
+			'columns' => [
 				'simple_start' => "\n<table class=\"bbcode_columns\"><tbody><tr><td class=\"bbcode_column bbcode_firstcolumn\">\n",
 				'simple_end' => "\n</td></tr></tbody></table>\n",
 				'class' => 'columns',
-				'allow_in' => Array('listitem', 'block', 'columns'),
+				'allow_in' => ['listitem', 'block', 'columns'],
 				'end_tag' => BBCODE_REQUIRED,
 				'content' => BBCODE_REQUIRED,
 				'before_tag' => "sns",
@@ -333,11 +333,11 @@
 				'after_endtag' => "sns",
 				'plain_start' => "\n",
 				'plain_end' => "\n",
-			),
-			'nextcol' => Array(
+			],
+			'nextcol' => [
 				'simple_start' => "\n</td><td class=\"bbcode_column\">\n",
 				'class' => 'nextcol',
-				'allow_in' => Array('columns'),
+				'allow_in' => ['columns'],
 				'end_tag' => BBCODE_PROHIBIT,
 				'content' => BBCODE_PROHIBIT,
 				'before_tag' => "sns",
@@ -346,13 +346,13 @@
 				'after_endtag' => "sns",
 				'plain_start' => "\n",
 				'plain_end' => "",
-			),
+			],
 
-			'code' => Array(
+			'code' => [
 				'mode' => BBCODE_MODE_ENHANCED,
 				'template' => "\n<div class=\"bbcode_code\">\n<div class=\"bbcode_code_head\">Code:</div>\n<div class=\"bbcode_code_body\" style=\"white-space:pre\">{\$_content/v}</div>\n</div>\n",
 				'class' => 'code',
-				'allow_in' => Array('listitem', 'block', 'columns'),
+				'allow_in' => ['listitem', 'block', 'columns'],
 				'content' => BBCODE_VERBATIM,
 				'before_tag' => "sns",
 				'after_tag' => "sn",
@@ -360,36 +360,36 @@
 				'after_endtag' => "sns",
 				'plain_start' => "\n<b>Code:</b>\n",
 				'plain_end' => "\n",
-			),
-			'quote' => Array(
+			],
+			'quote' => [
 				'mode' => BBCODE_MODE_LIBRARY,
 				'method' => "DoQuote",
-				'allow_in' => Array('listitem', 'block', 'columns'),
+				'allow_in' => ['listitem', 'block', 'columns'],
 				'before_tag' => "sns",
 				'after_tag' => "sns",
 				'before_endtag' => "sns",
 				'after_endtag' => "sns",
 				'plain_start' => "\n<b>Quote:</b>\n",
 				'plain_end' => "\n",
-			),
+			],
 
-			'list' => Array(
+			'list' => [
 				'mode' => BBCODE_MODE_LIBRARY,
 				'method' => 'DoList',
 				'class' => 'list',
-				'allow_in' => Array('listitem', 'block', 'columns'),
+				'allow_in' => ['listitem', 'block', 'columns'],
 				'before_tag' => "sns",
 				'after_tag' => "sns",
 				'before_endtag' => "sns",
 				'after_endtag' => "sns",
 				'plain_start' => "\n",
 				'plain_end' => "\n",
-			),
-			'*' => Array(
+			],
+			'*' => [
 				'simple_start' => "<li>",
 				'simple_end' => "</li>\n",
 				'class' => 'listitem',
-				'allow_in' => Array('list'),
+				'allow_in' => ['list'],
 				'end_tag' => BBCODE_OPTIONAL,
 				'before_tag' => "s",
 				'after_tag' => "s",
@@ -397,8 +397,8 @@
 				'after_endtag' => "sns",
 				'plain_start' => "\n * ",
 				'plain_end' => "\n",
-			),
-		);
+			],
+		];
 
 		//-----------------------------------------------------------------------------
 		//  Standard library of BBCode formatting routines.
@@ -461,7 +461,7 @@
 		function DoFont($bbcode, $action, $name, $default, $params, $content) {
 			$fonts = explode(",", $default);
 			$result = "";
-			$special_fonts = Array(
+			$special_fonts = [
 				'serif' => 'serif',
 				'sans-serif' => 'sans-serif',
 				'sans serif' => 'sans-serif',
@@ -471,7 +471,7 @@
 				'fantasy' => 'fantasy',
 				'monospace' => 'monospace',
 				'mono' => 'monospace',
-			);
+			];
 			foreach ($fonts as $font) {
 				$font = trim($font);
 				if (isset($special_fonts[$font])) {
@@ -588,27 +588,27 @@
 
 			// Allowed list styles, striaght from the CSS 2.1 spec.  The only prohibited
 			// list style is that with image-based markers, which often slows down web sites.
-			$list_styles = Array(
+			$list_styles = [
 				'1' => 'decimal',
 				'01' => 'decimal-leading-zero',
 				'i' => 'lower-roman',
 				'I' => 'upper-roman',
 				'a' => 'lower-alpha',
 				'A' => 'upper-alpha',
-			);
-			$ci_list_styles = Array(
+			];
+			$ci_list_styles = [
 				'circle' => 'circle',
 				'disc' => 'disc',
 				'square' => 'square',
 				'greek' => 'lower-greek',
 				'armenian' => 'armenian',
 				'georgian' => 'georgian',
-			);
-			$ul_types = Array(
+			];
+			$ul_types = [
 				'circle' => 'circle',
 				'disc' => 'disc',
 				'square' => 'square',
-			);
+			];
 
 			$default = trim($default);
 

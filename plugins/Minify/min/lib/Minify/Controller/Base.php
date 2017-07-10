@@ -39,12 +39,12 @@ abstract class Minify_Controller_Base {
      * @return array options for Minify
      */
     public function getDefaultMinifyOptions() {
-        return array(
+        return [
             'isPublic' => true
             ,'encodeOutput' => function_exists('gzdeflate')
             ,'encodeMethod' => null // determine later
             ,'encodeLevel' => 9
-            ,'minifierOptions' => array() // no minifier options
+            ,'minifierOptions' => [] // no minifier options
             ,'contentTypeCharset' => 'utf-8'
             ,'maxAge' => 1800 // 30 minutes
             ,'rewriteCssUris' => true
@@ -60,7 +60,7 @@ abstract class Minify_Controller_Base {
             ,'postprocessor' => null
             // file to require to load preprocessor
             ,'postprocessorRequire' => null
-        );
+        ];
     }  
 
     /**
@@ -71,9 +71,9 @@ abstract class Minify_Controller_Base {
      * @return array minifier callbacks for common types
      */
     public function getDefaultMinifers() {
-        $ret[Minify::TYPE_JS] = array('JSMin', 'minify');
-        $ret[Minify::TYPE_CSS] = array('Minify_CSS', 'minify');
-        $ret[Minify::TYPE_HTML] = array('Minify_HTML', 'minify');
+        $ret[Minify::TYPE_JS] = ['JSMin', 'minify'];
+        $ret[Minify::TYPE_CSS] = ['Minify_CSS', 'minify'];
+        $ret[Minify::TYPE_HTML] = ['Minify_HTML', 'minify'];
         return $ret;
     }
     
@@ -132,7 +132,7 @@ abstract class Minify_Controller_Base {
             return false;
         }
         list($revExt) = explode('.', strrev($base));
-        return in_array(strrev($revExt), array('js', 'css', 'html', 'txt'));
+        return in_array(strrev($revExt), ['js', 'css', 'html', 'txt']);
     }
     
     /**
@@ -141,7 +141,7 @@ abstract class Minify_Controller_Base {
      * 
      * @see Minify_Source
      */
-    public $sources = array();
+    public $sources = [];
     
     /**
      * Mix in default controller options with user-given options
@@ -156,7 +156,7 @@ abstract class Minify_Controller_Base {
             $this->getDefaultMinifyOptions(), $options
         );
         if (! isset($options['minifiers'])) {
-            $options['minifiers'] = array();
+            $options['minifiers'] = [];
         }
         $ret['minifiers'] = array_merge(
             $this->getDefaultMinifers(), $options['minifiers']
@@ -172,7 +172,7 @@ abstract class Minify_Controller_Base {
      * 
      * @return array options for Minify
      */
-    public final function analyzeSources($options = array()) 
+    public final function analyzeSources($options = []) 
     {
         if ($this->sources) {
             if (! isset($options['contentType'])) {

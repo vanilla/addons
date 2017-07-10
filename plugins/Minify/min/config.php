@@ -145,7 +145,7 @@ $min_serveOptions['minApp']['maxFiles'] = 50;
  * array('//static' => 'D:\\staticStorage')  // Windows
  * </code>
  */
-$min_symlinks = array();
+$min_symlinks = [];
 
 
 /**
@@ -184,7 +184,7 @@ ini_set('zlib.output_compression', '0');
  */
 function realpath2($path) {
    $parts = explode('/', str_replace('\\', '/', $path));
-   $result = array();
+   $result = [];
 
    foreach ($parts as $part) {
       if (!$part || $part == '.')

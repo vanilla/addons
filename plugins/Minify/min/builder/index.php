@@ -156,7 +156,7 @@ $(function () {
 
 <?php
 
-$serveOpts = array(
+$serveOpts = [
     'content' => ob_get_contents()
     ,'id' => __FILE__
     ,'lastModifiedTime' => max(
@@ -166,7 +166,7 @@ $serveOpts = array(
     )
     ,'minifyAll' => true
     ,'encodeOutput' => $encodeOutput
-);
+];
 ob_end_clean();
 
 set_include_path(dirname(__FILE__) . '/../lib' . PATH_SEPARATOR . get_include_path());

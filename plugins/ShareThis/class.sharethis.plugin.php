@@ -63,7 +63,7 @@ SHARETHIS;
 
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigArray = array('Plugin.ShareThis.PublisherNumber','Plugin.ShareThis.ViaHandle', 'Plugin.ShareThis.CopyNShare');
+      $ConfigArray = ['Plugin.ShareThis.PublisherNumber','Plugin.ShareThis.ViaHandle', 'Plugin.ShareThis.CopyNShare'];
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
          $ConfigArray['Plugin.ShareThis.PublisherNumber'] = $PublisherNumber;
          $ConfigArray['Plugin.ShareThis.ViaHandle'] = $ViaHandle;

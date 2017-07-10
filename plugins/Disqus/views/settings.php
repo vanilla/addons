@@ -17,9 +17,9 @@ $form = $this->Form;
 echo $form->open();
 echo $form->errors();
 
-echo $form->simple(array(
-    'AuthenticationKey' => array('LabelCode' => 'Consumer Key'),
-    'AssociationSecret' => array('LabelCode' => 'Consumer Secret')
-));
+echo $form->simple([
+    'AuthenticationKey' => ['LabelCode' => 'Consumer Key'],
+    'AssociationSecret' => ['LabelCode' => 'Consumer Secret']
+]);
 
 echo $form->close('Save'); ?>

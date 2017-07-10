@@ -27,12 +27,12 @@ class IPBFormatterPlugin extends Gdn_Plugin {
      * @return mixed|string
      */
     public function format($string) {
-        $string = str_replace(array('&quot;', '&#39;', '&#58;', 'Â'), array('"', "'", ':', ''), $string);
+        $string = str_replace(['&quot;', '&#39;', '&#58;', 'Â'], ['"', "'", ':', ''], $string);
         $string = str_replace('<#EMO_DIR#>', 'default', $string);
         $string = str_replace('<{POST_SNAPBACK}>', '<span class="SnapBack">»</span>', $string);
 
         // There is an issue with using uppercase code blocks, so they're forced to lowercase here
-        $string = str_replace(array('[CODE]', '[/CODE]'), array('[code]', '[/code]'), $string);
+        $string = str_replace(['[CODE]', '[/CODE]'], ['[code]', '[/code]'], $string);
 
         /**
          * IPB inserts line break markup tags at line breaks.  They need to be removed in code blocks.
@@ -41,7 +41,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
         $string = preg_replace_callback(
             '/\[code\].*?\[\/code\]/is',
             function ($codeBlocks) {
-                return str_replace(array('<br />'), array(''), $codeBlocks[0]);
+                return str_replace(['<br />'], [''], $codeBlocks[0]);
             },
             $string
         );
@@ -89,8 +89,8 @@ class IPBFormatterPlugin extends Gdn_Plugin {
         $result = Emoji::instance()->translateToHtml($result);
 
         // Make sure to clean filter the html in the end.
-        $config = array(
-            'anti_link_spam' => array('`.`', ''),
+        $config = [
+            'anti_link_spam' => ['`.`', ''],
             'comment' => 1,
             'cdata' => 3,
             'css_expression' => 1,
@@ -101,7 +101,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
             'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https',
             // clsid allowed in class
             'valid_xml' => 2
-        );
+        ];
 
         $spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
         $result = Htmlawed::filter($result, $config, $spec);
@@ -119,16 +119,16 @@ class IPBFormatterPlugin extends Gdn_Plugin {
             $this->_NBBC = $plugin->nbbc();
             $this->_NBBC->setIgnoreNewlines(true);
 
-            $this->_NBBC->addRule('attachment', array(
+            $this->_NBBC->addRule('attachment', [
                 'mode' => Nbbc\BBCode::BBCODE_MODE_CALLBACK,
-                'method' => array($this, "DoAttachment"),
+                'method' => [$this, "DoAttachment"],
                 'class' => 'image',
-                'allow_in' => array('listitem', 'block', 'columns', 'inline', 'link'),
+                'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
                 'end_tag' => Nbbc\BBCode::BBCODE_PROHIBIT,
                 'content' => Nbbc\BBCode::BBCODE_PROHIBIT,
                 'plain_start' => "[image]",
-                'plain_content' => array(),
-            ));
+                'plain_content' => [],
+            ]);
         }
 
         return $this->_NBBC;
@@ -142,7 +142,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
     public function media() {
         if ($this->_Media === null) {
             // Set _Media to a non-null value, so we only do this once.
-            $this->_Media = array();
+            $this->_Media = [];
 
             // Fire up a basic model, configured for the Media table
             $mediaModel = new Gdn_Model('Media');
@@ -155,7 +155,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
 
             // Grab comment data set from the current controller and verify it's populated
             $comments = $controller->data('Comments');
-            $commentIDs = array();
+            $commentIDs = [];
             if ($comments instanceof Gdn_DataSet && $comments->numRows()) {
                 // Build a collection of comment IDs
                 while ($currentComment = $comments->nextRow()) {

@@ -24,16 +24,16 @@ class Minify_Controller_MinApp extends Minify_Controller_Base {
     public function setupSources($options) {
         // filter controller options
         $cOptions = array_merge(
-            array(
+            [
                 'allowDirs' => '//'
                 ,'groupsOnly' => false
-                ,'groups' => array()
+                ,'groups' => []
                 ,'maxFiles' => 10                
-            )
-            ,(isset($options['minApp']) ? $options['minApp'] : array())
+            ]
+            ,(isset($options['minApp']) ? $options['minApp'] : [])
         );
         unset($options['minApp']);
-        $sources = array();
+        $sources = [];
         if (isset($_GET['g'])) {
             // try groups
             if (! isset($cOptions['groups'][$_GET['g']])) {
@@ -44,7 +44,7 @@ class Minify_Controller_MinApp extends Minify_Controller_Base {
             $files = $cOptions['groups'][$_GET['g']];
             // if $files is a single object, casting will break it
             if (is_object($files)) {
-                $files = array($files);
+                $files = [$files];
             } elseif (! is_array($files)) {
                 $files = (array)$files;
             }
@@ -58,9 +58,9 @@ class Minify_Controller_MinApp extends Minify_Controller_Base {
                 }
                 $file = realpath($file);
                 if (is_file($file)) {
-                    $sources[] = new Minify_Source(array(
+                    $sources[] = new Minify_Source([
                         'filepath' => $file
-                    ));    
+                    ]);    
                 } else {
                     $this->log("The path \"{$file}\" could not be found (or was not a file)");
                     return $options;
@@ -102,7 +102,7 @@ class Minify_Controller_MinApp extends Minify_Controller_Base {
             } else {
                 $base = '/';
             }
-            $allowDirs = array();
+            $allowDirs = [];
             foreach ((array)$cOptions['allowDirs'] as $allowDir) {
                 $allowDirs[] = realpath(str_replace('//', $_SERVER['DOCUMENT_ROOT'] . '/', $allowDir));
             }
@@ -116,9 +116,9 @@ class Minify_Controller_MinApp extends Minify_Controller_Base {
                     $this->log("Path \"{$path}\" failed Minify_Controller_Base::_fileIsSafe()");
                     return $options;
                 } else {
-                    $sources[] = new Minify_Source(array(
+                    $sources[] = new Minify_Source([
                         'filepath' => $file
-                    ));
+                    ]);
                 }
             }
         }

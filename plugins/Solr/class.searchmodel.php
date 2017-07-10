@@ -5,7 +5,7 @@
 
 class SearchModel extends Gdn_Model {
 	/// PROPERTIES ///
-   public $Types = array(1 => 'Discussion', 2 => 'Comment');
+   public $Types = [1 => 'Discussion', 2 => 'Comment'];
 
    /// METHODS ///
 
@@ -15,7 +15,7 @@ class SearchModel extends Gdn_Model {
          throw new Gdn_UserException("The search url has not been configured.");
 
       if (!$Search)
-         return array();
+         return [];
 
       // Escepe the search.
       $Search = preg_replace('`([][+&|!(){}^"~*?:\\\\-])`', "\\\\$1", $Search);
@@ -23,14 +23,14 @@ class SearchModel extends Gdn_Model {
       // Add the category watch.
       $Categories = CategoryModel::CategoryWatch();
       if ($Categories === FALSE) {
-         return array();
+         return [];
       } elseif ($Categories !== TRUE) {
          $Search = 'CategoryID:('.implode(' ', $Categories).') AND '.$Search;
       }
 
       // Build the search url.
       $BaseUrl .= strpos($BaseUrl, '?') === FALSE ? '?' : '&';
-      $Query = array('q' => $Search, 'start' => $Offset, 'rows' => $Limit);
+      $Query = ['q' => $Search, 'start' => $Offset, 'rows' => $Limit];
       $Url = $BaseUrl.http_build_query($Query);
 
       // Grab the data.
@@ -41,13 +41,13 @@ class SearchModel extends Gdn_Model {
 
       // Parse the result into the form that the search controller expects.
       $Xml = new SimpleXMLElement($CurlResult);
-      $Result = array();
+      $Result = [];
 
       if (!isset($Xml->result))
-         return array();
+         return [];
 
       foreach ($Xml->result->children() as $Doc) {
-         $Row = array();
+         $Row = [];
          foreach ($Doc->children() as $Field) {
             $Name = (string)$Field['name'];
             $Row[$Name] = (string)$Field;
@@ -67,7 +67,7 @@ class SearchModel extends Gdn_Model {
       }
 
       // Join the users into the result.
-      Gdn_DataSet::Join($Result, array('table' => 'User', 'parent' => 'UserID', 'prefix' => '', 'Name', 'Photo'));
+      Gdn_DataSet::Join($Result, ['table' => 'User', 'parent' => 'UserID', 'prefix' => '', 'Name', 'Photo']);
 
       return $Result;
 	}

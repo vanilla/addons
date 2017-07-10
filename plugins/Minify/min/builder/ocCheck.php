@@ -22,10 +22,10 @@ if (isset($_GET['hello'])) {
     
     require $min_libPath . '/HTTP/Encoder.php';
     HTTP_Encoder::$encodeToIe6  = true; // just in case
-    $he = new HTTP_Encoder(array(
+    $he = new HTTP_Encoder([
         'content' => 'World!'
         ,'method' => 'deflate'
-    ));
+    ]);
     $he->encode();
     $he->sendAll();
 

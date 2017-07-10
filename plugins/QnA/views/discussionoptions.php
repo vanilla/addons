@@ -9,14 +9,14 @@ echo $this->Form->errors();
 <div class="P">
     <?php
 //   echo $this->Form->Label();
-    echo $this->Form->radioList('Type', $this->data('_Types'), array('list' => true));
+    echo $this->Form->radioList('Type', $this->data('_Types'), ['list' => true]);
     ?>
 </div>
 
 <?php
 echo '<div class="Buttons Buttons-Confirm">',
     $this->Form->button(t('OK')), ' ',
-    $this->Form->button(t('Cancel'), array('type' => 'button', 'class' => 'Button Close')),
+    $this->Form->button(t('Cancel'), ['type' => 'button', 'class' => 'Button Close']),
     '</div>';
 echo $this->Form->close();
 ?>

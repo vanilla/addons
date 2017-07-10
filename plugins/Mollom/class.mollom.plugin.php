@@ -30,14 +30,14 @@ class MollomPlugin extends Gdn_Plugin {
       if (!$Mollom)
          return FALSE;
 
-      $Result = $Mollom->checkContent(array(
-         'checks' => array('spam'),
+      $Result = $Mollom->checkContent([
+         'checks' => ['spam'],
          'postTitle' => GetValue('Name', $Data),
          'postBody' => ConcatSep("\n\n", GetValue('Body', $Data),GetValue('Story', $Data)),
          'authorName' => $Data['Username'],
          'authorEmail' => $Data['Email'],
          'authorIp' => $Data['IPAddress']
-      ));
+      ]);
       return ($Result['spamClassification'] == 'spam') ? true : false;
    }
 
@@ -47,17 +47,17 @@ class MollomPlugin extends Gdn_Plugin {
 
    public function Structure() {
       // Get a user for operations.
-      $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'Mollom', 'Admin' => 2))->Value('UserID');
+      $UserID = Gdn::SQL()->GetWhere('User', ['Name' => 'Mollom', 'Admin' => 2])->Value('UserID');
 
       if (!$UserID) {
-         $UserID = Gdn::SQL()->Insert('User', array(
+         $UserID = Gdn::SQL()->Insert('User', [
             'Name' => 'Mollom',
             'Password' => RandomString('20'),
             'HashMethod' => 'Random',
             'Email' => 'mollom@domain.com',
             'DateInserted' => Gdn_Format::ToDateTime(),
             'Admin' => '2'
-         ));
+         ]);
       }
       SaveToConfig('Plugins.Mollom.UserID', $UserID);
    }
@@ -101,15 +101,15 @@ class MollomPlugin extends Gdn_Plugin {
       $Sender->EventArguments['IsSpam'] = $Result;
    }
 
-   public function SettingsController_Mollom_Create($Sender, $Args = array()) {
+   public function SettingsController_Mollom_Create($Sender, $Args = []) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', T('Mollom Settings'));
 
       $Cf = new ConfigurationModule($Sender);
-      $Cf->Initialize(array(
-          'Plugins.Mollom.publicKey' => array(),
-          'Plugins.Mollom.privateKey' => array()
-          ));
+      $Cf->Initialize([
+          'Plugins.Mollom.publicKey' => [],
+          'Plugins.Mollom.privateKey' => []
+          ]);
 
       $Sender->AddSideMenu('settings/plugins');
       $Cf->RenderAll();

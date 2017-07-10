@@ -104,10 +104,10 @@ class ExamplePlugin extends Gdn_Plugin {
 
 		$validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
-        $configurationModel->setField(array(
+        $configurationModel->setField([
             'Plugin.Example.RenderCondition'     => 'all',
             'Plugin.Example.TrimSize'      => 100
-        ));
+        ]);
 
         // Set the model on the form.
         $sender->Form->setModel($configurationModel);
@@ -196,9 +196,9 @@ class ExamplePlugin extends Gdn_Plugin {
                 )
             );
 
-            echo wrap($discussionBody, 'div', array(
+            echo wrap($discussionBody, 'div', [
                 'class'  => "ExampleDescription"
-            ));
+            ]);
         }
     }
 

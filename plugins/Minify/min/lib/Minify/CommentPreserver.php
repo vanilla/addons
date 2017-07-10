@@ -40,7 +40,7 @@ class Minify_CommentPreserver {
      * function (default = array())
      * @return string
      */
-    public static function process($content, $processor, $args = array())
+    public static function process($content, $processor, $args = [])
     {
         $ret = '';
         while (true) {
@@ -75,12 +75,12 @@ class Minify_CommentPreserver {
             false === ($start = strpos($in, '/*!'))
             || false === ($end = strpos($in, '*/', $start + 3))
         ) {
-            return array($in, false, false);
+            return [$in, false, false];
         }
-        $ret = array(
+        $ret = [
             substr($in, 0, $start)
             ,self::$prepend . '/*' . substr($in, $start + 3, $end - $start - 1) . self::$append
-        );
+        ];
         $endChars = (strlen($in) - $end - 2);
         $ret[] = (0 === $endChars)
             ? ''

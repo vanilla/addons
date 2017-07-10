@@ -2,7 +2,7 @@
 $Session = Gdn::Session();
 $TrackingCodes = C('Plugins.TrackingCodes.All');
 if (!is_array($TrackingCodes))
-   $TrackingCodes = array();
+   $TrackingCodes = [];
 
 ?>
 <h1><?php echo T('Tracking Codes'); ?></h1>

@@ -45,7 +45,7 @@ class MultilingualPlugin extends Gdn_Plugin {
         $localeModel = new LocaleModel();
         if (class_exists('Locale')) {
             $localePacks = $localeModel->EnabledLocalePacks(false);
-            $locales = array();
+            $locales = [];
             foreach ($localePacks as $locale) {
                 if (isset(static::$overrides[$locale]['Name'])) {
                     $locales[$locale] = static::$overrides[$locale]['Name'];
@@ -63,7 +63,7 @@ class MultilingualPlugin extends Gdn_Plugin {
 
         if (!array_key_exists($defaultLocale, $locales)) {
             $locales = array_merge(
-                array($defaultLocale => $defaultName),
+                [$defaultLocale => $defaultName],
                 $locales
             );
         }

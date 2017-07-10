@@ -7,7 +7,7 @@
     <style>.NoScript { display: block; } .YesScript { display: none; }</style>
 </noscript>
 <div class="P NoScript">
-    <?php echo $Form->radioList('Type', array('Question' => t('Ask a Question'), 'Discussion' => t('Start a New Discussion'))); ?>
+    <?php echo $Form->radioList('Type', ['Question' => t('Ask a Question'), 'Discussion' => t('Start a New Discussion')]); ?>
 </div>
 <div class="YesScript">
     <div class="Tabs">

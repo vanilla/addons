@@ -14,7 +14,7 @@ echo $this->Form->Errors();
             echo wrap(t('Separate each word with a semi-colon ";"'), 'div', ['class' => 'info']); ?>
         </div>
         <div class="input-wrap">
-            <?php echo $this->Form->TextBox('Plugins.CivilTongue.Words', array('MultiLine' => TRUE)); ?>
+            <?php echo $this->Form->TextBox('Plugins.CivilTongue.Words', ['MultiLine' => TRUE]); ?>
         </div>
     </li>
     <li class="form-group">

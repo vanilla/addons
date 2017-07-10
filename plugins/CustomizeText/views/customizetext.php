@@ -55,7 +55,7 @@ if ($this->Form->GetValue('Keywords', '') != '') {
 
         echo '<li class="form-group">';
         echo '<div class="label-wrap">';
-        echo Wrap(Gdn_Format::Text($Key), 'label', array('for' => "Form_{$ElementName}"));
+        echo Wrap(Gdn_Format::Text($Key), 'label', ['for' => "Form_{$ElementName}"]);
 
         if ($this->Form->IsPostBack()) {
             $SuppliedDefinition = $this->Form->GetValue($ElementName);
@@ -65,7 +65,7 @@ if ($this->Form->GetValue('Keywords', '') != '') {
                 if (!$DefinitionModified) $CSSClass .= " Modified";
         }
         echo '</div>';
-        echo $this->Form->textBoxWrap($ElementName, array('multiline' => TRUE, 'class' => $CSSClass));
+        echo $this->Form->textBoxWrap($ElementName, ['multiline' => TRUE, 'class' => $CSSClass]);
         echo '</li>';
     }
     echo '</ul>';

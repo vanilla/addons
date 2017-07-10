@@ -31,8 +31,8 @@ foreach($this->Data["ThemeSettings"] as $Row) {
 		</td>
 		<td>
 			<?php
-				echo $this->Form->Input('Name[]', 'hidden', array('value' => $Row['Name']));
-				echo $this->Form->Input('Setting[]', 'text', array('value' => $Row['Setting'], 'class' => 'Setting'));
+				echo $this->Form->Input('Name[]', 'hidden', ['value' => $Row['Name']]);
+				echo $this->Form->Input('Setting[]', 'text', ['value' => $Row['Setting'], 'class' => 'Setting']);
 			?>
 		</td>
 	</tr>

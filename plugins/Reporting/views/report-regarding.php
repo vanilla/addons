@@ -1,10 +1,10 @@
 <div class="RegardingEvent">
    <span class="InformSprite Skull"/>&nbsp;</span> <?php 
-      echo FormatString(T("{ReportingUser} reported this {EntityType} written by {ReportedUser}"), array(
+      echo FormatString(T("{ReportingUser} reported this {EntityType} written by {ReportedUser}"), [
          'ReportingUser'      => UserAnchor(GetValue('ReportingUser', $this->Data('ReportInfo')), 'ReportingUser'),
          'EntityType'         => GetValue('EntityType', $this->Data('ReportInfo')),
          'ReportedUser'       => UserAnchor(GetValue('ReportedUser', $this->Data('ReportInfo')), 'ReportedUser')
-      ));
+      ]);
    ?>
    <div class="RegardingTime"><?php 
       $ReportedDate = GetValue('ReportedTime', $this->Data('ReportInfo'));

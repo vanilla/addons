@@ -32,7 +32,7 @@ class VanooglePlugin extends Gdn_Plugin {
 
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->SetField(array("Plugins.Vanoogle.CSE"));
+        $ConfigurationModel->SetField(["Plugins.Vanoogle.CSE"]);
         $Sender->Form->SetModel($ConfigurationModel);
 
         if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
@@ -64,11 +64,11 @@ class VanooglePlugin extends Gdn_Plugin {
             return;
 
         // Normally one would use ->AddJsFile or ->Head->AddScript, but these insert a version arg in the url that makes the google api barf.
-        $Sender->Head->AddTag('script', array(
+        $Sender->Head->AddTag('script', [
             'src' => Asset('https://www.google.com/jsapi', FALSE, FALSE),
             'type' => 'text/javascript',
             'id' => C("Plugins.Vanoogle.CSE")
-        ));
+        ]);
         $Sender->AddCssFile('vanoogle.css', 'plugins/Vanoogle');
         $Sender->AddJsFile('vanoogle.js', 'plugins/Vanoogle');
     }
