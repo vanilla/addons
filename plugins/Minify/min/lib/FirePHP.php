@@ -163,21 +163,21 @@ class FirePHP {
    * 
    * @var array
    */
-  protected $options = array();
+  protected $options = [];
   
   /**
    * Filters used to exclude object members when encoding
    * 
    * @var array
    */
-  protected $objectFilters = array();
+  protected $objectFilters = [];
   
   /**
    * A stack of objects used to detect recursion during object encoding
    * 
    * @var object
    */
-  protected $objectStack = array();
+  protected $objectStack = [];
   
   /**
    * Flag to enable/disable logging
@@ -202,7 +202,7 @@ class FirePHP {
    * @return array
    */  
   public function __sleep() {
-    return array('options','objectFilters','enabled');
+    return ['options','objectFilters','enabled'];
   }
     
   /**
@@ -287,7 +287,7 @@ class FirePHP {
     //      E_CORE_WARNING, E_COMPILE_ERROR,
     //      E_COMPILE_WARNING, E_STRICT
     
-    set_error_handler(array($this,'errorHandler'));     
+    set_error_handler([$this,'errorHandler']);     
   }
 
   /**
@@ -318,7 +318,7 @@ class FirePHP {
    */
   public function registerExceptionHandler()
   {
-    set_exception_handler(array($this,'exceptionHandler'));     
+    set_exception_handler([$this,'exceptionHandler']);     
   }
   
   /**
@@ -532,7 +532,7 @@ class FirePHP {
       return false;
     }
   
-    $meta = array();
+    $meta = [];
     $skipFinalObjectEncode = false;
   
     if($Object instanceof Exception) {
@@ -560,20 +560,20 @@ class FirePHP {
           case E_USER_DEPRECATED: $severity = 'E_USER_DEPRECATED'; break;
         }
            
-        $Object = array('Class'=>get_class($Object),
+        $Object = ['Class'=>get_class($Object),
                         'Message'=>$severity.': '.$Object->getMessage(),
                         'File'=>$this->_escapeTraceFile($Object->getFile()),
                         'Line'=>$Object->getLine(),
                         'Type'=>'trigger',
-                        'Trace'=>$this->_escapeTrace(array_splice($trace,2)));
+                        'Trace'=>$this->_escapeTrace(array_splice($trace,2))];
         $skipFinalObjectEncode = true;
       } else {
-        $Object = array('Class'=>get_class($Object),
+        $Object = ['Class'=>get_class($Object),
                         'Message'=>$Object->getMessage(),
                         'File'=>$this->_escapeTraceFile($Object->getFile()),
                         'Line'=>$Object->getLine(),
                         'Type'=>'throw',
-                        'Trace'=>$this->_escapeTrace($trace));
+                        'Trace'=>$this->_escapeTrace($trace)];
         $skipFinalObjectEncode = true;
       }
       $Type = self::EXCEPTION;
@@ -602,14 +602,14 @@ class FirePHP {
         if($trace[$i]['function']=='fb'
            || $trace[$i]['function']=='trace'
            || $trace[$i]['function']=='send') {
-          $Object = array('Class'=>isset($trace[$i]['class'])?$trace[$i]['class']:'',
+          $Object = ['Class'=>isset($trace[$i]['class'])?$trace[$i]['class']:'',
                           'Type'=>isset($trace[$i]['type'])?$trace[$i]['type']:'',
                           'Function'=>isset($trace[$i]['function'])?$trace[$i]['function']:'',
                           'Message'=>$trace[$i]['args'][0],
                           'File'=>isset($trace[$i]['file'])?$this->_escapeTraceFile($trace[$i]['file']):'',
                           'Line'=>isset($trace[$i]['line'])?$trace[$i]['line']:'',
                           'Args'=>isset($trace[$i]['args'])?$this->encodeObject($trace[$i]['args']):'',
-                          'Trace'=>$this->_escapeTrace(array_splice($trace,$i+1)));
+                          'Trace'=>$this->_escapeTrace(array_splice($trace,$i+1))];
 
           $skipFinalObjectEncode = true;
           $meta['file'] = isset($trace[$i]['file'])?$this->_escapeTraceFile($trace[$i]['file']):'';
@@ -685,7 +685,7 @@ class FirePHP {
     if($Type==self::DUMP) {
     	$msg = '{"'.$Label.'":'.$this->jsonEncode($Object, $skipFinalObjectEncode).'}';
     } else {
-      $msg_meta = array('Type'=>$Type);
+      $msg_meta = ['Type'=>$Type];
       if($Label!==null) {
         $msg_meta['Label'] = $Label;
       }
@@ -857,7 +857,7 @@ class FirePHP {
    */
   protected function encodeObject($Object, $ObjectDepth = 1, $ArrayDepth = 1)
   {
-    $return = array();
+    $return = [];
     
     if (is_object($Object)) {
 
@@ -875,7 +875,7 @@ class FirePHP {
         $return['__className'] = $class = get_class($Object);
 
         $reflectionClass = new ReflectionClass($class);  
-        $properties = array();
+        $properties = [];
         foreach( $reflectionClass->getProperties() as $property) {
           $properties[$property->getName()] = $property;
         }
@@ -1074,7 +1074,7 @@ class FirePHP {
   /**
    * Keep a list of objects as we descend into the array so we can detect recursion.
    */
-  private $json_objectStack = array();
+  private $json_objectStack = [];
 
 
  /**
@@ -1284,7 +1284,7 @@ class FirePHP {
                   
                   $this->json_objectStack[] = $var;
 
-                  $properties = array_map(array($this, 'json_name_value'),
+                  $properties = array_map([$this, 'json_name_value'],
                                           array_keys($var),
                                           array_values($var));
 
@@ -1302,7 +1302,7 @@ class FirePHP {
               $this->json_objectStack[] = $var;
 
               // treat it like a regular array
-              $elements = array_map(array($this, 'json_encode'), $var);
+              $elements = array_map([$this, 'json_encode'], $var);
 
               array_pop($this->json_objectStack);
 
@@ -1319,7 +1319,7 @@ class FirePHP {
 
               $this->json_objectStack[] = $var;
 
-              $properties = array_map(array($this, 'json_name_value'),
+              $properties = array_map([$this, 'json_name_value'],
                                       array_keys($vars),
                                       array_values($vars));
 

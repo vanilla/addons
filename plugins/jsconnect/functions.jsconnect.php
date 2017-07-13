@@ -31,35 +31,35 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
     if ($secure) {
         // Check the client.
         if (!isset($request['v'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'Missing the v parameter.');
+            $error = ['error' => 'invalid_request', 'message' => 'Missing the v parameter.'];
         } elseif ($request['v'] !== '2') {
-            $error = array('error' => 'invalid_request', 'message' => "Unsupported version {$request['v']}.");
+            $error = ['error' => 'invalid_request', 'message' => "Unsupported version {$request['v']}."];
         } elseif (!isset($request['client_id'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'The client_id parameter is missing.');
+            $error = ['error' => 'invalid_request', 'message' => 'The client_id parameter is missing.'];
         } elseif ($request['client_id'] != $clientID) {
-            $error = array('error' => 'invalid_client', 'message' => "Unknown client {$request['client_id']}.");
+            $error = ['error' => 'invalid_client', 'message' => "Unknown client {$request['client_id']}."];
         } elseif (!isset($request['timestamp']) && !isset($request['sig'])) {
             if (is_array($user) && count($user) > 0) {
                 // This isn't really an error, but we are just going to return public information when no signature is sent.
-                $error = array('name' => (string)@$user['name'], 'photourl' => @$user['photourl'], 'signedin' => true);
+                $error = ['name' => (string)@$user['name'], 'photourl' => @$user['photourl'], 'signedin' => true];
             } else {
-                $error = array('name' => '', 'photourl' => '');
+                $error = ['name' => '', 'photourl' => ''];
             }
         } elseif (!isset($request['timestamp']) || !is_numeric($request['timestamp'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'The timestamp parameter is missing or invalid.');
+            $error = ['error' => 'invalid_request', 'message' => 'The timestamp parameter is missing or invalid.'];
         } elseif (!isset($request['sig'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'Missing sig parameter.');
+            $error = ['error' => 'invalid_request', 'message' => 'Missing sig parameter.'];
         } // Make sure the timestamp hasn't timedout
         elseif (abs($request['timestamp'] - JsTimestamp()) > JS_TIMEOUT) {
-            $error = array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.');
+            $error = ['error' => 'invalid_request', 'message' => 'The timestamp is invalid.'];
         } elseif (!isset($request['nonce'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'Missing nonce parameter.');
+            $error = ['error' => 'invalid_request', 'message' => 'Missing nonce parameter.'];
         } elseif (!isset($request['ip'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'Missing ip parameter.');
+            $error = ['error' => 'invalid_request', 'message' => 'Missing ip parameter.'];
         } else {
             $signature = jsHash($request['ip'].$request['nonce'].$request['timestamp'].$secret, $secure);
             if ($signature != $request['sig']) {
-                $error = array('error' => 'access_denied', 'message' => 'Signature invalid.');
+                $error = ['error' => 'access_denied', 'message' => 'Signature invalid.'];
             }
         }
     }
@@ -76,7 +76,7 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
             $result['v'] = '2';
         }
     } else {
-        $result = array('name' => '', 'photourl' => '');
+        $result = ['name' => '', 'photourl' => ''];
     }
 
     $json = json_encode($result);

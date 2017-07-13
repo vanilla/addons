@@ -30,7 +30,7 @@ class CssThemes extends Gdn_Plugin {
 
 	/// Properties ///
 
-	public $MissingSettings = array();
+	public $MissingSettings = [];
 
 	protected $_OrignialPath;
 	protected $_AppName;
@@ -50,17 +50,17 @@ class CssThemes extends Gdn_Plugin {
 
 		$Css = file_get_contents($OriginalPath);
 		// Process the urls.
-		$Css = preg_replace_callback(self::UrlRegEx, array($this, '_ApplyUrl'), $Css);
+		$Css = preg_replace_callback(self::UrlRegEx, [$this, '_ApplyUrl'], $Css);
 
 		// Go through the css and replace its colors with the theme colors.
-		$Css = preg_replace_callback(self::RegEx, array($this, '_ApplyThemeSetting'), $Css);
+		$Css = preg_replace_callback(self::RegEx, [$this, '_ApplyThemeSetting'], $Css);
 
 		// Insert the missing settings into the database.
 		if($InsertNames) {
 			foreach($this->MissingSettings as $Name => $Setting) {
-				$SQL->Insert('ThemeSetting', array('Name' => $Name, 'Setting' => $Setting));
+				$SQL->Insert('ThemeSetting', ['Name' => $Name, 'Setting' => $Setting]);
 			}
-			$this->MissingSettings = array();
+			$this->MissingSettings = [];
 		}
 
 		// Save the theme to the cache path.
@@ -90,14 +90,14 @@ class CssThemes extends Gdn_Plugin {
 
 		if($NoFollow !== FALSE) {
 			// Don't apply the theme to this import.
-			$OriginalAssetPath = str_replace(array(PATH_ROOT, DS), array('', '/'), $this->_OrignialPath);
-			$Url = Asset(CombinePaths(array(dirname($OriginalAssetPath), $Url), '/'));
+			$OriginalAssetPath = str_replace([PATH_ROOT, DS], ['', '/'], $this->_OrignialPath);
+			$Url = Asset(CombinePaths([dirname($OriginalAssetPath), $Url], '/'));
 		} else {
 			// Also parse the import.
 			$OrignalPath = $this->_OrignialPath;
-			$ImportPath = CombinePaths(array(dirname($OrignalPath), $Url));
+			$ImportPath = CombinePaths([dirname($OrignalPath), $Url]);
 			$Url = $this->Get($ImportPath, $this->_AppName);
-			$Url = str_replace(array(PATH_ROOT, DS), array('', '/'), $Url);
+			$Url = str_replace([PATH_ROOT, DS], ['', '/'], $Url);
 			$Url = Asset($Url);
 
 			$this->_OrignalPath = $OrignalPath;
@@ -115,14 +115,14 @@ class CssThemes extends Gdn_Plugin {
 
 		if($NoFollow !== FALSE || strcasecmp($Extension, '.css') != 0) {
 			// Don't apply the theme to this import.
-			$OriginalAssetPath = str_replace(array(PATH_ROOT, DS), array('', '/'), $this->_OrignialPath);
-			$Url = Asset(CombinePaths(array(dirname($OriginalAssetPath), $Url.$Extension), '/'));
+			$OriginalAssetPath = str_replace([PATH_ROOT, DS], ['', '/'], $this->_OrignialPath);
+			$Url = Asset(CombinePaths([dirname($OriginalAssetPath), $Url.$Extension], '/'));
 		} else {
 			// Cache the css too.
 			$OrignalPath = $this->_OrignialPath;
-			$ImportPath = CombinePaths(array(dirname($OrignalPath), $Url.$Extension));
+			$ImportPath = CombinePaths([dirname($OrignalPath), $Url.$Extension]);
 			$Url = $this->Get($ImportPath, $this->_AppName);
-			$Url = str_replace(array(PATH_ROOT, DS), array('', '/'), $Url);
+			$Url = str_replace([PATH_ROOT, DS], ['', '/'], $Url);
 			$Url = Asset($Url);
 
 			$this->_OrignalPath = $OrignalPath;
@@ -156,7 +156,7 @@ class CssThemes extends Gdn_Plugin {
 	}
 
 	public function GetNames($Css, $InsertNames = FALSE) {
-		$Result = array();
+		$Result = [];
 
 		if(preg_match_all(self::RegEx, $Css, $Matches)) {
 			foreach($Matches as $Match) {
@@ -173,7 +173,7 @@ class CssThemes extends Gdn_Plugin {
 			// Insert the necessary settings.
 			if($InsertNames) {
 				foreach($Insert as $Name => $Setting) {
-					$SQL->Insert('ThemeSetting', array('Name' => $Name, 'Setting' => $Setting));
+					$SQL->Insert('ThemeSetting', ['Name' => $Name, 'Setting' => $Setting]);
 				}
 			}
 		}
@@ -189,7 +189,7 @@ class CssThemes extends Gdn_Plugin {
 	public function PluginController_Colors_Create($Sender) {
 		$Sender->Form = Gdn::Factory('Form');
 
-		$this->Colors = array();
+		$this->Colors = [];
 
 		$this->ParseCss(PATH_APPLICATIONS);
 		//$this->ParseCss(PATH_THEMES);
@@ -218,7 +218,7 @@ class CssThemes extends Gdn_Plugin {
 				//$Css = preg_replace_callback(self::UrlRegEx, array($this, '_ApplyUrl'), $Css);
 
 				// Go through the css and replace its colors with the theme colors.
-				$Css = preg_replace_callback(self::RegEx2, array($this, 'GetColors'), $Css);
+				$Css = preg_replace_callback(self::RegEx2, [$this, 'GetColors'], $Css);
 
 			}
 		}
@@ -227,7 +227,7 @@ class CssThemes extends Gdn_Plugin {
 		$Paths = glob($Path.DS.'*', GLOB_ONLYDIR);
 		if($Paths) {
 			foreach($Paths as $Path) {
-				if(in_array(strrchr($Path, DS), array(DS.'vforg', DS.'vfcom')))
+				if(in_array(strrchr($Path, DS), [DS.'vforg', DS.'vfcom']))
 					continue;
 				$this->ParseCss($Path);
 			}
@@ -235,7 +235,7 @@ class CssThemes extends Gdn_Plugin {
 	}
 
 	public function RGB($Color) {
-		return array(hexdec(substr($Color, 0, 2)), hexdec(substr($Color, 2, 2)), hexdec(substr($Color, 4, 2)));
+		return [hexdec(substr($Color, 0, 2)), hexdec(substr($Color, 2, 2)), hexdec(substr($Color, 4, 2))];
 	}
 
 	public function GetColors($Match) {
@@ -273,7 +273,7 @@ class CssThemes extends Gdn_Plugin {
 
 		$V = $Max;
 		if($V == 0)
-			return array(1000, $S, $V);
+			return [1000, $S, $V];
 
 		$R /= $V;
 		$G /= $V;
@@ -283,7 +283,7 @@ class CssThemes extends Gdn_Plugin {
 
 		$S = $Max - $Min;
 		if($S == 0)
-			return array(1000, $S, $V);
+			return [1000, $S, $V];
 
 		$R = ($R - $Min) / ($Max - $Min);
 		$G = ($G - $Min) / ($Max - $Min);
@@ -297,7 +297,7 @@ class CssThemes extends Gdn_Plugin {
 		else
 			$H = 240 + 60 * ($R - $G);
 
-		return array($H, $S, $V);
+		return [$H, $S, $V];
 	}
 
 	/**
@@ -322,8 +322,8 @@ class CssThemes extends Gdn_Plugin {
 			foreach($Data as $Row) {
 				$SQL->Put(
 					'ThemeSetting',
-					array('Setting' => $Row['Setting']),
-					array('Name' => $Row['Name']));
+					['Setting' => $Row['Setting']],
+					['Name' => $Row['Name']]);
 			}
 
 			// Clear out the css cache.

@@ -57,5 +57,5 @@
       ?>
    </li>
 </ul>
-<?php echo $this->Form->close('Save', '', array('class' => 'Button Primary')); ?>
+<?php echo $this->Form->close('Save', '', ['class' => 'Button Primary']); ?>
 </div>

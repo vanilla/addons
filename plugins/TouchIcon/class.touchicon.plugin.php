@@ -60,7 +60,7 @@ class TouchIconPlugin extends Gdn_Plugin {
                   $TouchIconPath,
                   114,
                   114,
-                  array('OutputType' => 'png', 'ImageQuality' => '8')
+                  ['OutputType' => 'png', 'ImageQuality' => '8']
                );
 
                SaveToConfig('Garden.TouchIcon', $ImageInfo['SaveName']);

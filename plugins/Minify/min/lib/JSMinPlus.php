@@ -89,7 +89,7 @@ define('STATEMENT_FORM', 2);
 class JSMinPlus
 {
 	private $parser;
-	private $reserved = array(
+	private $reserved = [
 		'break', 'case', 'catch', 'continue', 'default', 'delete', 'do',
 		'else', 'finally', 'for', 'function', 'if', 'in', 'instanceof',
 		'new', 'return', 'switch', 'this', 'throw', 'try', 'typeof', 'var',
@@ -103,7 +103,7 @@ class JSMinPlus
 		// These are not reserved, but should be taken into account
 		// in isValidIdentifier (See jslint source code)
 		'arguments', 'eval', 'true', 'false', 'Infinity', 'NaN', 'null', 'undefined'
-	);
+	];
 
 	private function __construct()
 	{
@@ -478,7 +478,7 @@ class JSParser
 {
 	private $t;
 
-	private $opPrecedence = array(
+	private $opPrecedence = [
 		';' => 0,
 		',' => 1,
 		'=' => 2, '?' => 2, ':' => 2,
@@ -500,9 +500,9 @@ class JSParser
 		'.' => 17,
 		JS_NEW_WITH_ARGS => 0, JS_INDEX => 0, JS_CALL => 0,
 		JS_ARRAY_INIT => 0, JS_OBJECT_INIT => 0, JS_GROUP => 0
-	);
+	];
 
-	private $opArity = array(
+	private $opArity = [
 		',' => -2,
 		'=' => 2,
 		'?' => 3,
@@ -524,7 +524,7 @@ class JSParser
 		JS_NEW_WITH_ARGS => 2, JS_INDEX => 2, JS_CALL => 2,
 		JS_ARRAY_INIT => 1, JS_OBJECT_INIT => 1, JS_GROUP => 1,
 		TOKEN_CONDCOMMENT_MULTILINE => 1
-	);
+	];
 
 	public function __construct()
 	{
@@ -612,7 +612,7 @@ class JSParser
 				$this->t->mustMatch(OP_LEFT_PAREN);
 				$n->discriminant = $this->Expression($x);
 				$this->t->mustMatch(OP_RIGHT_PAREN);
-				$n->cases = array();
+				$n->cases = [];
 				$n->defaultIndex = -1;
 
 				array_push($x->stmtStack, $n);
@@ -768,7 +768,7 @@ class JSParser
 			case KEYWORD_TRY:
 				$n = new JSNode($this->t);
 				$n->tryBlock = $this->Block($x);
-				$n->catchClauses = array();
+				$n->catchClauses = [];
 
 				while ($this->t->match(KEYWORD_CATCH))
 				{
@@ -906,7 +906,7 @@ class JSParser
 			throw $this->t->newSyntaxError('Missing function identifier');
 
 		$this->t->mustMatch(OP_LEFT_PAREN);
-			$f->params = array();
+			$f->params = [];
 
 		while (($tt = $this->t->get()) != OP_RIGHT_PAREN)
 		{
@@ -965,8 +965,8 @@ class JSParser
 
 	private function Expression($x, $stop=false)
 	{
-		$operators = array();
-		$operands = array();
+		$operators = [];
+		$operands = [];
 		$n = false;
 
 		$bl = $x->bracketLevel;
@@ -1403,9 +1403,9 @@ class JSCompilerContext
 	public $parenLevel = 0;
 	public $hookLevel = 0;
 
-	public $stmtStack = array();
-	public $funDecls = array();
-	public $varDecls = array();
+	public $stmtStack = [];
+	public $funDecls = [];
+	public $varDecls = [];
 
 	public function __construct($inFunction)
 	{
@@ -1421,9 +1421,9 @@ class JSNode
 	private $start;
 	private $end;
 
-	public $treeNodes = array();
-	public $funDecls = array();
-	public $varDecls = array();
+	public $treeNodes = [];
+	public $funDecls = [];
+	public $varDecls = [];
 
 	public function __construct($t, $type=0)
 	{
@@ -1474,7 +1474,7 @@ class JSTokenizer
 	private $cursor = 0;
 	private $source;
 
-	public $tokens = array();
+	public $tokens = [];
 	public $tokenIndex = 0;
 	public $lookahead = 0;
 	public $scanNewlines = false;
@@ -1483,7 +1483,7 @@ class JSTokenizer
 	public $filename;
 	public $lineno;
 
-	private $keywords = array(
+	private $keywords = [
 		'break',
 		'case', 'catch', 'const', 'continue',
 		'debugger', 'default', 'delete', 'do',
@@ -1496,9 +1496,9 @@ class JSTokenizer
 		'this', 'throw', 'true', 'try', 'typeof',
 		'var', 'void',
 		'while', 'with'
-	);
+	];
 
-	private $opTypeNames = array(
+	private $opTypeNames = [
 		';'	=> 'SEMICOLON',
 		','	=> 'COMMA',
 		'?'	=> 'HOOK',
@@ -1537,9 +1537,9 @@ class JSTokenizer
 		'('	=> 'LEFT_PAREN',
 		')'	=> 'RIGHT_PAREN',
 		'@*/'	=> 'CONDCOMMENT_END'
-	);
+	];
 
-	private $assignOps = array('|', '^', '&', '<<', '>>', '>>>', '+', '-', '*', '/', '%');
+	private $assignOps = ['|', '^', '&', '<<', '>>', '>>>', '+', '-', '*', '/', '%'];
 	private $opRegExp;
 
 	public function __construct()
@@ -1564,7 +1564,7 @@ class JSTokenizer
 		$this->lineno = $lineno;
 
 		$this->cursor = 0;
-		$this->tokens = array();
+		$this->tokens = [];
 		$this->tokenIndex = 0;
 		$this->lookahead = 0;
 		$this->scanNewlines = false;
@@ -1695,7 +1695,7 @@ class JSTokenizer
 		if ($input == '')
 		{
 			$tt = TOKEN_END;
-			$match = array('');
+			$match = [''];
 		}
 		elseif ($conditional_comment)
 		{
@@ -1794,7 +1794,7 @@ class JSTokenizer
 				case '(':
 				case ')':
 					// these are all single
-					$match = array($input[0]);
+					$match = [$input[0]];
 					$tt = $input[0];
 				break;
 
@@ -1805,7 +1805,7 @@ class JSTokenizer
 				case "\n":
 					if ($this->scanNewlines)
 					{
-						$match = array("\n");
+						$match = ["\n"];
 						$tt = TOKEN_NEWLINE;
 					}
 					else

@@ -35,11 +35,11 @@ class SpoofPlugin implements Gdn_IPlugin {
 		// Validate the transient key && permissions
 		if (Gdn::Session()->ValidateTransientKey($TransientKey) && Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
 			$Identity = new Gdn_CookieIdentity();
-			$Identity->Init(array(
+			$Identity->Init([
 				'Salt' => Gdn::Config('Garden.Cookie.Salt'),
 				'Name' => Gdn::Config('Garden.Cookie.Name'),
 				'Domain' => Gdn::Config('Garden.Cookie.Domain')
-			));
+			]);
 			$Identity->SetIdentity($SpoofUserID, TRUE);
 		}
 		if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
@@ -89,7 +89,7 @@ class SpoofPlugin implements Gdn_IPlugin {
       $ViewingUserID = Gdn::Session()->UserID;
 
       if ($Sender->User->UserID != $ViewingUserID)
-         $SideMenu->AddLink('Options', T('Spoof User'), '/user/autospoof/'.$Sender->User->UserID.'/'.Gdn::Session()->TransientKey(), '', array('class' => 'PopConfirm'));
+         $SideMenu->AddLink('Options', T('Spoof User'), '/user/autospoof/'.$Sender->User->UserID.'/'.Gdn::Session()->TransientKey(), '', ['class' => 'PopConfirm']);
    }
 
 
@@ -123,11 +123,11 @@ class SpoofPlugin implements Gdn_IPlugin {
 
 				if ($SpoofUser) {
 					$Identity = new Gdn_CookieIdentity();
-					$Identity->Init(array(
+					$Identity->Init([
 						'Salt' => Gdn::Config('Garden.Cookie.Salt'),
 						'Name' => Gdn::Config('Garden.Cookie.Name'),
 						'Domain' => Gdn::Config('Garden.Cookie.Domain')
-					));
+					]);
 					$Identity->SetIdentity($SpoofUser->UserID, TRUE);
 	                redirectTo('profile');
 				} else {

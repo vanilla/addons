@@ -21,7 +21,7 @@ class InvisibilityCloakPlugin extends Gdn_Plugin {
      */
     public function base_render_before($sender) {
         if ($sender->Head) {
-            $sender->Head->addTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
+            $sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex,noarchive']);
         }
     }
 }

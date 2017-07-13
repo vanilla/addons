@@ -63,8 +63,8 @@ class Minify_Controller_Version1 extends Minify_Controller_Base {
             . DIRECTORY_SEPARATOR;
         $prependAbsPaths = $_SERVER['DOCUMENT_ROOT'];
         
-        $sources = array();
-        $goodFiles = array();
+        $sources = [];
+        $goodFiles = [];
         $hasBadSource = false;
         
         $allowDirs = isset($options['allowDirs'])
@@ -81,9 +81,9 @@ class Minify_Controller_Version1 extends Minify_Controller_Base {
                 && !in_array($file, $goodFiles)) 
             {
                 $goodFiles[] = $file;
-                $srcOptions = array(
+                $srcOptions = [
                     'filepath' => $file
-                );
+                ];
                 $this->sources[] = new Minify_Source($srcOptions);
             } else {
                 $hasBadSource = true;
@@ -91,7 +91,7 @@ class Minify_Controller_Version1 extends Minify_Controller_Base {
             }
         }
         if ($hasBadSource) {
-            $this->sources = array();
+            $this->sources = [];
         }
         if (! MINIFY_REWRITE_CSS_URLS) {
             $options['rewriteCssUris'] = false;
@@ -101,13 +101,13 @@ class Minify_Controller_Version1 extends Minify_Controller_Base {
     
     private static function _setupDefines()
     {
-        $defaults = array(
+        $defaults = [
             'MINIFY_BASE_DIR' => realpath($_SERVER['DOCUMENT_ROOT'])
             ,'MINIFY_ENCODING' => 'utf-8'
             ,'MINIFY_MAX_FILES' => 16
             ,'MINIFY_REWRITE_CSS_URLS' => true
             ,'MINIFY_USE_CACHE' => true
-        );
+        ];
         foreach ($defaults as $const => $val) {
             if (! defined($const)) {
                 define($const, $val);

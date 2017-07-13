@@ -14,12 +14,12 @@ class VbulletinCompatibilityPlugin extends Gdn_Plugin {
    }
    
    public function Gdn_Router_BeforeLoadRoutes_Handler($Sender) {
-      $VbRoutes = array(
-          'forumdisplay\.php\?f=(\d+)'    => array('categories/$1', 'Permanent'),
-          'showthread\.php\?t=(\d+)'      => array('discussion/$1', 'Permanent'),
-          'showthread\.php\?p=(\d+)'      => array('discussion/comment/$1', 'Permanent'),
-          'member\.php\?u=(\d+)'          => array('profile/$1/x', 'Permanent')
-      );
+      $VbRoutes = [
+          'forumdisplay\.php\?f=(\d+)'    => ['categories/$1', 'Permanent'],
+          'showthread\.php\?t=(\d+)'      => ['discussion/$1', 'Permanent'],
+          'showthread\.php\?p=(\d+)'      => ['discussion/comment/$1', 'Permanent'],
+          'member\.php\?u=(\d+)'          => ['profile/$1/x', 'Permanent']
+      ];
       
       $Sender->EventArguments['Routes'] = array_merge($Sender->EventArguments['Routes'], $VbRoutes);
    }

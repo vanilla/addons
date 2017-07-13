@@ -6,10 +6,10 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 $pointsAwardEnabled = c('QnA.Points.Enabled');
-$textBoxAttributes = array();
-$checkBoxAttributes = array(
+$textBoxAttributes = [];
+$checkBoxAttributes = [
     'id' => 'IsPointsAwardEnabled',
-);
+];
 if ($pointsAwardEnabled) {
     $checkBoxAttributes['checked'] = true;
 } else {

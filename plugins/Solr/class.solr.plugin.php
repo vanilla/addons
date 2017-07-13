@@ -5,13 +5,13 @@
  */
 
 class SolrPlugin extends Gdn_Plugin {
-   public function SettingsController_Solr_Create($Sender, $Args = array()) {
+   public function SettingsController_Solr_Create($Sender, $Args = []) {
       $Sender->Permission('Garden.Settings.Manage');
 
       $Conf = new ConfigurationModule($Sender);
-      $Conf->Initialize(array(
-          'Plugins.Solr.SearchUrl' => array('Default' => 'http://localhost:8983/solr/select/?')
-      ));
+      $Conf->Initialize([
+          'Plugins.Solr.SearchUrl' => ['Default' => 'http://localhost:8983/solr/select/?']
+      ]);
 
       $Sender->AddSideMenu();
       $Sender->SetData('Title', T('Solr Search Settings'));

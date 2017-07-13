@@ -79,9 +79,9 @@
 			// We also separate out whitespace and newlines.
 			
 			// Choose a tag marker based on the possible tag markers.
-			$regex_beginmarkers = Array( '[' => '\[', '<' => '<', '{' => '\{', '(' => '\(' );
-			$regex_endmarkers   = Array( '[' => '\]', '<' => '>', '{' => '\}', '(' => '\)' );
-			$endmarkers         = Array( '[' =>  ']', '<' => '>', '{' =>  '}', '(' =>  ')' );
+			$regex_beginmarkers = [ '[' => '\[', '<' => '<', '{' => '\{', '(' => '\(' ];
+			$regex_endmarkers   = [ '[' => '\]', '<' => '>', '{' => '\}', '(' => '\)' ];
+			$endmarkers         = [ '[' =>  ']', '<' => '>', '{' =>  '}', '(' =>  ')' ];
 			if (!isset($regex_endmarkers[$tagmarker])) $tagmarker = '[';
 			$e = $regex_endmarkers[$tagmarker];
 			$b = $regex_beginmarkers[$tagmarker];
@@ -280,7 +280,7 @@
 					case 45:
 						// A rule made of hyphens; return it as a [rule] tag.
 						if (preg_match("/^-----/", $this->text)) {
-							$this->tag = Array('_name' => 'rule', '_endtag' => false, '_default' => '');
+							$this->tag = ['_name' => 'rule', '_endtag' => false, '_default' => ''];
 							$this->state = BBCODE_LEXSTATE_TEXT;
 							return $this->token = BBCODE_TAG;
 						}
@@ -317,8 +317,8 @@
 						
 						// See if this is a [[wiki link]]; if so, convert it into a [wiki="" title=""] tag.
 						if (preg_match($this->pat_wiki, $this->text, $matches)) {
-							$this->tag = Array('_name' => 'wiki', '_endtag' => false,
-								'_default' => @$matches[1], 'title' => @$matches[2]);
+							$this->tag = ['_name' => 'wiki', '_endtag' => false,
+								'_default' => @$matches[1], 'title' => @$matches[2]];
 							$this->state = BBCODE_LEXSTATE_TEXT;
 							return $this->token = BBCODE_TAG;
 						}
@@ -355,7 +355,7 @@
 		// references, the total cost of the returned state is relatively small, and
 		// the running time of this function (and RestoreState) is very fast.
 		function SaveState() {
-			return Array(
+			return [
 				'token' => $this->token,
 				'text' => $this->text,
 				'tag' => $this->tag,
@@ -364,7 +364,7 @@
 				'ptr' => $this->ptr,
 				'unget' => $this->unget,
 				'verbatim' => $this->verbatim
-			);
+			];
 		}
 		
 		// Restore the state of this lexer from a saved previous state.
@@ -414,8 +414,8 @@
 			}
 
 			// Create the initial result object.
-			$result = Array('_tag' => $tag, '_endtag' => '', '_name' => '',
-				'_hasend' => false, '_end' => false, '_default' => false);
+			$result = ['_tag' => $tag, '_endtag' => '', '_name' => '',
+				'_hasend' => false, '_end' => false, '_default' => false];
 
 			// Strip off the [brackets] around the tag, leaving just its content.
 			$tag = substr($tag, 1, strlen($tag)-2);
@@ -447,12 +447,12 @@
 			while (($type = $this->Internal_ClassifyPiece($ptr, $pieces)) == ' ')
 				$ptr++;
 
-			$params = Array();
+			$params = [];
 
 			// If the next piece is an equal sign, then the tag's default value follows.
 			if ($type != '=') {
 				$result['_default'] = false;
-				$params[] = Array('key' => '', 'value' => '');
+				$params[] = ['key' => '', 'value' => ''];
 			}
 			else {
 				$ptr++;
@@ -511,7 +511,7 @@
 				}
 
 				$result['_default'] = $value;
-				$params[] = Array('key' => '', 'value' => $value);
+				$params[] = ['key' => '', 'value' => $value];
 			}
 
 			// The rest of the tag is composed of either floating keys or key=value pairs, so walk through
@@ -568,7 +568,7 @@
 					$result[$key] = $value;
 
 				// Record this in the parameter list always.
-				$params[] = Array('key' => $key, 'value' => $value);
+				$params[] = ['key' => $key, 'value' => $value];
 			}
 
 			// Add the parameter list as a member of the associative array.

@@ -20,12 +20,12 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Code', 'Code');
-         echo $this->Form->TextBox('Code', array('MultiLine' => TRUE));
+         echo $this->Form->TextBox('Code', ['MultiLine' => TRUE]);
       ?>
    </li>
    <li>
       <?php
-         echo $this->Form->CheckBox('Enabled', 'Enable this tracking code', array('value' => '1'));
+         echo $this->Form->CheckBox('Enabled', 'Enable this tracking code', ['value' => '1']);
       ?>
    </li>
 </ul>

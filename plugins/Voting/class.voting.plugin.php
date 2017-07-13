@@ -20,10 +20,10 @@ class VotingPlugin extends Gdn_Plugin {
    public function SettingsController_Voting_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
       $Conf = new ConfigurationModule($Sender);
-		$Conf->Initialize(array(
-			'Plugins.Voting.ModThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => -10, 'Description' => 'The vote that will flag a post for moderation.'),
-			'Plugins.Voting.ModThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => -20, 'Description' => 'The vote that will remove a post to the moderation queue.')
-		));
+		$Conf->Initialize([
+			'Plugins.Voting.ModThreshold1' => ['Type' => 'int', 'Control' => 'TextBox', 'Default' => -10, 'Description' => 'The vote that will flag a post for moderation.'],
+			'Plugins.Voting.ModThreshold2' => ['Type' => 'int', 'Control' => 'TextBox', 'Default' => -20, 'Description' => 'The vote that will remove a post to the moderation queue.']
+		]);
 
      $Sender->AddSideMenu('settings/voting');
      $Sender->SetData('Title', T('Vote Settings'));
@@ -81,7 +81,7 @@ class VotingPlugin extends Gdn_Plugin {
 			Wrap(T('Comments')) . Gdn_Format::BigNumber($Discussion->CountComments)
 			// ,'/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
 			// )
-			, 'div', array('class' => $Css));
+			, 'div', ['class' => $Css]);
 
 		// Views
 		echo Wrap(
@@ -89,7 +89,7 @@ class VotingPlugin extends Gdn_Plugin {
 			Wrap(T('Views')) . Gdn_Format::BigNumber($Discussion->CountViews)
 			// , '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
 			// )
-			, 'div', array('class' => 'StatBox ViewsBox'));
+			, 'div', ['class' => 'StatBox ViewsBox']);
 
 		// Follows
 		$Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
@@ -98,10 +98,10 @@ class VotingPlugin extends Gdn_Plugin {
 				Wrap(T('Follows')) . Gdn_Format::BigNumber($Discussion->CountBookmarks),
 				'/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
 				'',
-				array('title' => $Title)
-			), 'div', array('class' => 'StatBox FollowsBox'));
+				['title' => $Title]
+			), 'div', ['class' => 'StatBox FollowsBox']);
 		} else {
-			echo Wrap(Wrap(T('Follows')) . $Discussion->CountBookmarks, 'div', array('class' => 'StatBox FollowsBox'));
+			echo Wrap(Wrap(T('Follows')) . $Discussion->CountBookmarks, 'div', ['class' => 'StatBox FollowsBox']);
 		}
 
 		// Votes
@@ -110,10 +110,10 @@ class VotingPlugin extends Gdn_Plugin {
 				Wrap(T('Votes')) . Gdn_Format::BigNumber($CountVotes),
 				'/discussion/votediscussion/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
 				'',
-				array('title' => T('Vote'))
-			), 'div', array('class' => 'StatBox VotesBox'));
+				['title' => T('Vote')]
+			), 'div', ['class' => 'StatBox VotesBox']);
 		} else {
-			echo Wrap(Wrap(T('Votes')) . $CountVotes, 'div', array('class' => 'StatBox VotesBox'));
+			echo Wrap(Wrap(T('Votes')) . $CountVotes, 'div', ['class' => 'StatBox VotesBox']);
 		}
 	}
 
@@ -133,7 +133,7 @@ class VotingPlugin extends Gdn_Plugin {
             break;
          case 'popular':
          default:
-            $CommentModel->OrderBy(array('coalesce(c.Score, 0) desc', 'c.CommentID'));
+            $CommentModel->OrderBy(['coalesce(c.Score, 0) desc', 'c.CommentID']);
             break;
       }
    }
@@ -157,7 +157,7 @@ class VotingPlugin extends Gdn_Plugin {
          }
       }
 
-      if (!in_array($Sort, array('popular', 'date')))
+      if (!in_array($Sort, ['popular', 'date']))
          $Sort = 'popular';
       self::$_CommentSort = $Sort;
       return $Sort;
@@ -180,9 +180,9 @@ class VotingPlugin extends Gdn_Plugin {
 			echo
 				Wrap($AnswerCount.' '.Plural($AnswerCount, 'Comment', 'Comments'), 'strong');
 				echo ' sorted by '
-               .Anchor('Votes', Url(DiscussionUrl($Sender->Discussion).'?Sort=popular', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'popular' ? 'Active' : ''))
+               .Anchor('Votes', Url(DiscussionUrl($Sender->Discussion).'?Sort=popular', TRUE), '', ['rel' => 'nofollow', 'class' => self::CommentSort() == 'popular' ? 'Active' : ''])
                .' '
-               .Anchor('Date Added', Url(DiscussionUrl($Sender->Discussion).'?Sort=date', TRUE), '', array('rel' => 'nofollow', 'class' => self::CommentSort() == 'date' ? 'Active' : ''));
+               .Anchor('Date Added', Url(DiscussionUrl($Sender->Discussion).'?Sort=date', TRUE), '', ['rel' => 'nofollow', 'class' => self::CommentSort() == 'date' ? 'Active' : '']);
 			?>
 			</div>
 		</li>
@@ -229,9 +229,9 @@ class VotingPlugin extends Gdn_Plugin {
       }
 
       echo '<span class="Voter">';
-			echo Anchor(Wrap(Wrap('Vote Up', 'i'), 'i', array('class' => 'ArrowSprite SpriteUp', 'rel' => 'nofollow')), $VoteUpUrl, 'VoteUp'.$CssClass);
+			echo Anchor(Wrap(Wrap('Vote Up', 'i'), 'i', ['class' => 'ArrowSprite SpriteUp', 'rel' => 'nofollow']), $VoteUpUrl, 'VoteUp'.$CssClass);
 			echo Wrap(StringIsNullOrEmpty($Object->Score) ? '0' : Gdn_Format::BigNumber($Object->Score));
-			echo Anchor(Wrap(Wrap('Vote Down', 'i'), 'i', array('class' => 'ArrowSprite SpriteDown', 'rel' => 'nofollow')), $VoteDownUrl, 'VoteDown'.$CssClass);
+			echo Anchor(Wrap(Wrap('Vote Down', 'i'), 'i', ['class' => 'ArrowSprite SpriteDown', 'rel' => 'nofollow']), $VoteDownUrl, 'VoteDown'.$CssClass);
 		echo '</span>';
  }
 
@@ -279,7 +279,7 @@ class VotingPlugin extends Gdn_Plugin {
             $Moderate = FALSE;
 
             if ($Total <= C('Plugins.Voting.ModThreshold1', -10)) {
-               $LogOptions = array('GroupBy' => array('RecordID'));
+               $LogOptions = ['GroupBy' => ['RecordID']];
                // Get the comment row.
                $Data = $CommentModel->GetID($CommentID, DATASET_TYPE_ARRAY);
                if ($Data) {
@@ -301,7 +301,7 @@ class VotingPlugin extends Gdn_Plugin {
             }
             if ($Total <= C('Plugins.Voting.ModThreshold2', -20)) {
                // Remove the comment.
-               $CommentModel->Delete($CommentID, array('Log' => 'Moderate'));
+               $CommentModel->Delete($CommentID, ['Log' => 'Moderate']);
 
                $Sender->InformMessage(sprintf(T('The %s has been removed for moderation.'), T('comment')));
             } elseif ($Moderate) {
@@ -363,7 +363,7 @@ class VotingPlugin extends Gdn_Plugin {
             $Moderate = FALSE;
 
             if ($Total <= C('Plugins.Voting.ModThreshold1', -10)) {
-               $LogOptions = array('GroupBy' => array('RecordID'));
+               $LogOptions = ['GroupBy' => ['RecordID']];
                // Get the comment row.
                if (isset($Discussion))
                   $Data = (array)$Discussion;
@@ -388,7 +388,7 @@ class VotingPlugin extends Gdn_Plugin {
             }
             if ($Total <= C('Plugins.Voting.ModThreshold2', -20)) {
                // Remove the comment.
-               $DiscussionModel->Delete($DiscussionID, array('Log' => 'Moderate'));
+               $DiscussionModel->Delete($DiscussionID, ['Log' => 'Moderate']);
 
                $Sender->InformMessage(sprintf(T('The %s has been removed for moderation.'), T('discussion')));
             } elseif ($Moderate) {
@@ -467,7 +467,7 @@ class VotingPlugin extends Gdn_Plugin {
       $CountDiscussions = $DiscussionModel->GetCount();
       $Sender->SetData('CountDiscussions', $CountDiscussions);
       $Sender->AnnounceData = FALSE;
-		$Sender->SetData('Announcements', array(), TRUE);
+		$Sender->SetData('Announcements', [], TRUE);
       $DiscussionModel->SQL->OrderBy('d.CountViews', 'desc');
       $Sender->DiscussionData = $DiscussionModel->Get($Offset, $Limit);
       $Sender->SetData('Discussions', $Sender->DiscussionData, TRUE);

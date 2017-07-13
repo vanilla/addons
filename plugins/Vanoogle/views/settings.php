@@ -27,14 +27,14 @@
 		<ul class='CheckBoxList'>
 			<li>
 				<?php
-					echo $this->Form->Label("Enter your Custom Search Engine ID.  If you don't have one, create one here: <a target='_blank' href='http://www.google.com/cse/'>http://www.google.com/cse/", "Plugins.Vanoogle.CSE", array(
+					echo $this->Form->Label("Enter your Custom Search Engine ID.  If you don't have one, create one here: <a target='_blank' href='http://www.google.com/cse/'>http://www.google.com/cse/", "Plugins.Vanoogle.CSE", [
 						"class" => "CheckBoxLabel",
-					));
+					]);
 					echo "<br>"; 
-					echo $this->Form->Input("Plugins.Vanoogle.CSE", "input", array(
+					echo $this->Form->Input("Plugins.Vanoogle.CSE", "input", [
 						"size" => "40",
 						"style" => "font-family: Courier, 'Courier New', monospace;", 
-					)); 
+					]); 
 				?>
 			</li>
 		</ul>

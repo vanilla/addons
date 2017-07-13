@@ -19,7 +19,7 @@ class LocaleChooserModule extends Gdn_Module {
     public function buildLocaleLink($Name, $UrlCode) {
         $Url = 'profile/setlocale/'.$UrlCode.'/'.Gdn::Session()->TransientKey();
 
-        return Wrap(Anchor($Name, $Url), 'span', array('class' => 'LocaleOption '.$Name.'Locale'));
+        return Wrap(Anchor($Name, $Url), 'span', ['class' => 'LocaleOption '.$Name.'Locale']);
     }
 
     /**
@@ -47,6 +47,6 @@ class LocaleChooserModule extends Gdn_Module {
         if (!$this->Links)
             $this->Links = $this->BuildLocales();
 
-        echo Wrap($this->Links, 'div', array('class' => 'LocaleOptions'));
+        echo Wrap($this->Links, 'div', ['class' => 'LocaleOptions']);
     }
 }

@@ -26,16 +26,16 @@ class MinifyPlugin extends Gdn_Plugin {
       $Tags = $Head->Tags();
 
       // Grab all of the CSS
-      $CssToCache = array();
-      $JsToCache = array(); // Add the global js files
-      $GlobalJS = array(
+      $CssToCache = [];
+      $JsToCache = []; // Add the global js files
+      $GlobalJS = [
          'jquery.js',
          'jquery.livequery.js',
          'jquery.form.js',
          'jquery.popup.js',
          'jquery.gardenhandleajaxform.js',
          'global.js'
-      );
+      ];
       
       // Process all tags, finding JS & CSS files
       foreach ($Tags as $Index => $Tag) {
@@ -117,7 +117,7 @@ class MinifyPlugin extends Gdn_Plugin {
     */
    protected function _PrepareToken($Files, $Suffix = '') {
       // Build token.
-      $Query = array('f' => implode(',', array_unique($Files)));
+      $Query = ['f' => implode(',', array_unique($Files))];
       if ($this->BasePath != '')
          $Query['b'] = $this->BasePath;
       $Query = serialize($Query);

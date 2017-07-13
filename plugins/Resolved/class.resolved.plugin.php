@@ -45,11 +45,11 @@ class ResolvedPlugin extends Gdn_Plugin {
      * @return void
      */
     public function resolve(&$discussion, $resolve) {
-        $resolution = array(
+        $resolution = [
             'Resolved' => $resolve,
             'DateResolved' => $resolve ? Gdn_Format::toDateTime() : null,
             'ResolvedUserID' => $resolve ? Gdn::session()->UserID : null
-        );
+        ];
 
         $discussionID = val('DiscussionID', $discussion);
         self::discussionModel()->setField($discussionID, $resolution);
@@ -64,7 +64,7 @@ class ResolvedPlugin extends Gdn_Plugin {
     public function base_afterBodyField_handler($sender, $args) {
         if (checkPermission('Plugins.Resolved.Manage')) {
             echo '<span class="ResolvedCheckbox">' .
-            $sender->Form->checkBox('Resolved', T('Resolved'), array('value' => '1')) . '</span>';
+            $sender->Form->checkBox('Resolved', T('Resolved'), ['value' => '1']) . '</span>';
         }
     }
 
@@ -84,11 +84,11 @@ class ResolvedPlugin extends Gdn_Plugin {
             if (isset($sender->Options)) {
                 $sender->Options .= wrap(anchor($label, $url, 'ResolveDiscussion Hijack'), 'li');
             } else {
-                $args['DiscussionOptions']['ResolveDiscussion'] = array(
+                $args['DiscussionOptions']['ResolveDiscussion'] = [
                     'Label' => $label,
                     'Url' => $url,
                     'Class' => 'ResolveDiscussion Hijack'
-                );
+                ];
             }
         }
     }
@@ -169,9 +169,9 @@ class ResolvedPlugin extends Gdn_Plugin {
     public function commentModel_afterSaveComment_handler($sender, $args) {
         $resolved = valr('FormPostValues.Resolved', $args);
         $discussionID = val('DiscussionID', $args['FormPostValues']);
-        $discussion = array(
+        $discussion = [
             'DiscussionID' => $discussionID
-        );
+        ];
         if (!checkPermission('Plugins.Resolved.Manage')) {
             // Unset Resolved flag
             $this->resolve($discussion, 0);
@@ -224,7 +224,7 @@ class ResolvedPlugin extends Gdn_Plugin {
             ->from('Discussion d')
             ->where('d.Resolved', 0)
             ->beginWhereGroup()
-            ->whereNotIn('d.Type', array('page', 'Report', 'poll', 'SimplePage'))
+            ->whereNotIn('d.Type', ['page', 'Report', 'poll', 'SimplePage'])
             ->orWhere('d.Type is null')
             ->endWhereGroup()
             ->get()
@@ -252,11 +252,11 @@ class ResolvedPlugin extends Gdn_Plugin {
         }
 
         $discussionModel = new DiscussionModel();
-        $wheres = array('d.Resolved' => '0');
+        $wheres = ['d.Resolved' => '0'];
 
         // Hack in our wheregroup.
         Gdn::sql()->beginWhereGroup()
-            ->whereNotIn('d.Type', array('page', 'Report', 'poll', 'SimplePage'))
+            ->whereNotIn('d.Type', ['page', 'Report', 'poll', 'SimplePage'])
             ->orWhere('d.Type is null')
             ->endWhereGroup();
 
@@ -299,7 +299,7 @@ class ResolvedPlugin extends Gdn_Plugin {
 
         // Render default view
         $sender->setData('Title', T('Unresolved'));
-        $sender->setData('Breadcrumbs', array(array('Name' => T('Unresolved'), 'Url' => '/discussions/unresolved')));
+        $sender->setData('Breadcrumbs', [['Name' => T('Unresolved'), 'Url' => '/discussions/unresolved']]);
         $sender->render('index');
     }
 

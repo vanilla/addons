@@ -51,7 +51,7 @@ class ReportingPlugin extends Gdn_Plugin {
       $Command = GetValue('2', $Sender->RequestArgs);
       $TransientKey = Gdn::request()->get('TransientKey');
       if (Gdn::Session()->ValidateTransientKey($TransientKey)) {
-         if (in_array($Feature, array('awesome', 'report'))) {
+         if (in_array($Feature, ['awesome', 'report'])) {
             SaveToConfig(
                'Plugins.Reporting.'.ucfirst($Feature).'Enabled',
                $Command == 'disable' ? FALSE : TRUE
@@ -62,10 +62,10 @@ class ReportingPlugin extends Gdn_Plugin {
       }
 
       $CategoryModel = new CategoryModel();
-      $Sender->SetData('Plugins.Reporting.Data', array(
+      $Sender->SetData('Plugins.Reporting.Data', [
          'ReportEnabled'   => $this->ReportEnabled,
          'AwesomeEnabled'  => $this->AwesomeEnabled
-      ));
+      ]);
 
       $Sender->Render($this->GetView('settings.php'));
    }
@@ -118,7 +118,7 @@ class ReportingPlugin extends Gdn_Plugin {
       $RegardingAction = C('Plugins.Reporting.ReportAction', FALSE);
       $RegardingActionSupplement = C('Plugins.Reporting.ReportActionSupplement', FALSE);
 
-      $ReportingData = array(
+      $ReportingData = [
          'Type'            => 'report',
          'Context'         => $Context,
          'Element'         => $ReportElement,
@@ -131,7 +131,7 @@ class ReportingPlugin extends Gdn_Plugin {
          'UserName'        => $UserName,
          'Action'          => $RegardingAction,
          'Supplement'      => $RegardingActionSupplement
-      );
+      ];
 
       if ($Sender->Form->AuthenticatedPostBack()) {
          $RegardingTitle = sprintf(T("Reported: '{RegardingTitle}' by %s"), $ElementAuthorName);
@@ -203,7 +203,7 @@ class ReportingPlugin extends Gdn_Plugin {
       $ElementAuthor = Gdn::UserModel()->GetID($ElementAuthorID);
       $ElementAuthorName = GetValue('Name', $ElementAuthor);
 
-      $ReportingData = array(
+      $ReportingData = [
          'Context'         => $Context,
          'ElementID'       => $ElementID,
          'ElementTitle'    => $ElementTitle,
@@ -212,7 +212,7 @@ class ReportingPlugin extends Gdn_Plugin {
          'URL'             => $URL,
          'UserID'          => $UserID,
          'UserName'        => $UserName
-      );
+      ];
 
       $RegardingAction = C('Plugins.Reporting.AwesomeAction', FALSE);
       $RegardingActionSupplement = C('Plugins.Reporting.AwesomeActionSupplement', FALSE);
@@ -249,7 +249,7 @@ class ReportingPlugin extends Gdn_Plugin {
    public function DiscussionController_AfterReactions_Handler($Sender) {
       $Context = $Sender->EventArguments['Type'];
       $Text = FALSE;
-      $Style = array();
+      $Style = [];
 
       $Context = strtolower($Sender->EventArguments['Type']);
 
@@ -312,20 +312,20 @@ class ReportingPlugin extends Gdn_Plugin {
     */
 
    public function Gdn_Regarding_RegardingDisplay_Handler($Sender) {
-      $Event = $Sender->MatchEvent(array('report', 'awesome'), '*');
+      $Event = $Sender->MatchEvent(['report', 'awesome'], '*');
       if ($Event === FALSE)
          return;
 
       $Entity = GetValue('Entity', $Event);
       $RegardingData = GetValue('RegardingData', $Event);
       $RegardingType = GetValue('Type', $RegardingData);
-      $ReportInfo = array(
+      $ReportInfo = [
          'ReportingUser'         => Gdn::UserModel()->GetID(GetValue('InsertUserID', $RegardingData)),
          'EntityType'            => T(ucfirst(GetValue('ForeignType', $RegardingData))),
          'ReportedUser'          => Gdn::UserModel()->GetID(GetValue('InsertUserID', $Entity)),
          'ReportedTime'          => GetValue('DateInserted', $RegardingData),
          'EntityURL'             => GetValue('ForeignURL', $RegardingData, NULL)
-      );
+      ];
 
       if (!is_null($ReportedReason = GetValue('Comment', $RegardingData, NULL)))
          $ReportInfo['ReportedReason'] = $ReportedReason;

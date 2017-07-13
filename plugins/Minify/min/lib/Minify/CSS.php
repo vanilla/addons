@@ -48,7 +48,7 @@ class Minify_CSS {
      * 
      * @return string
      */
-    public static function minify($css, $options = array()) 
+    public static function minify($css, $options = []) 
     {
         require_once 'Minify/CSS/Compressor.php';
         if (isset($options['preserveComments']) 
@@ -58,8 +58,8 @@ class Minify_CSS {
             require_once 'Minify/CommentPreserver.php';
             $css = Minify_CommentPreserver::process(
                 $css
-                ,array('Minify_CSS_Compressor', 'process')
-                ,array($options)
+                ,['Minify_CSS_Compressor', 'process']
+                ,[$options]
             );
         }
         if (! isset($options['currentDir']) && ! isset($options['prependRelativePath'])) {
@@ -71,7 +71,7 @@ class Minify_CSS {
                 $css
                 ,$options['currentDir']
                 ,isset($options['docRoot']) ? $options['docRoot'] : $_SERVER['DOCUMENT_ROOT']
-                ,isset($options['symlinks']) ? $options['symlinks'] : array()
+                ,isset($options['symlinks']) ? $options['symlinks'] : []
             );  
         } else {
             return Minify_CSS_UriRewriter::prepend(

@@ -88,12 +88,12 @@ class LastEditedPlugin extends Gdn_Plugin {
         $UpdatedUserID = $Data->UpdateUserID;
 
         $UserData = Gdn::userModel()->getID($UpdatedUserID);
-        $Edited = array(
+        $Edited = [
             'EditUser' => val('Name', $UserData, t('Unknown User')),
             'EditDate' => Gdn_Format::date($Data->DateUpdated, 'html'),
             'EditLogUrl' => url("/log/record/{$RecordType}/{$RecordID}"),
             'EditWord' => 'at'
-        );
+        ];
 
         $DateUpdateTime = Gdn_Format::toTimestamp($Data->DateUpdated);
         if (date('ymd', $DateUpdateTime) != date('ymd')) {

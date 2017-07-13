@@ -2,14 +2,14 @@
 
 class FacebookIDPlugin extends Gdn_Plugin {
    /** @var array */
-   public $FacebookIDs = array();
+   public $FacebookIDs = [];
 
    public function UserInfoModule_OnBasicInfo_Handler($Sender, $Args) {
       if (Gdn::Session()->CheckPermission('Plugins.FacebookID.View')) {
          // Grab the facebook ID.
          $FacebookID = Gdn::SQL()->GetWhere(
             'UserAuthentication',
-            array('ProviderKey' => 'facebook', 'UserID' => $Sender->User->UserID)
+            ['ProviderKey' => 'facebook', 'UserID' => $Sender->User->UserID]
          )->Value('ForeignUserKey', T('n/a'));
 
          echo '<dt class="Value">'.T('Facebook ID').'</dt><dd>'.$FacebookID.'</dd>';
@@ -27,7 +27,7 @@ class FacebookIDPlugin extends Gdn_Plugin {
          return;
 
       if (!$this->FacebookIDs)
-         $this->FacebookIDs = $this->GetFacebookIDs(array($Sender->Data['Discussion'], $Sender->Data['Comments']), 'InsertUserID');
+         $this->FacebookIDs = $this->GetFacebookIDs([$Sender->Data['Discussion'], $Sender->Data['Comments']], 'InsertUserID');
 
 
       $UserID = GetValue('InsertUserID',$Sender->EventArguments['Object'],'0');
@@ -49,14 +49,14 @@ class FacebookIDPlugin extends Gdn_Plugin {
     * @return <type>
     */
    public function UserController_Render_Before($Sender, $Args) {
-      if (!in_array($Sender->RequestMethod, array('index', 'browse')))
+      if (!in_array($Sender->RequestMethod, ['index', 'browse']))
          return;
       if (!Gdn::Session()->CheckPermission('Plugins.FacebookID.View'))
          return;
    }
 
    public function GetFacebookIDs($Datas, $UserIDColumn) {
-      $UserIDs = array();
+      $UserIDs = [];
       foreach ($Datas as $Data) {
          if ($UserID = GetValue($UserIDColumn, $Data))
             $UserIDs[] = $UserID;
@@ -70,7 +70,7 @@ class FacebookIDPlugin extends Gdn_Plugin {
          ->WhereIn('UserID', array_unique($UserIDs))
          ->GetWhere(
          'UserAuthentication',
-         array('ProviderKey' => 'facebook'))->ResultArray();
+         ['ProviderKey' => 'facebook'])->ResultArray();
 
       $Result = array_column($FbIDs, 'ForeignUserKey', 'UserID');
       return $Result;

@@ -78,7 +78,7 @@ function Minify_groupsMtime($groups)
  */
 function _Minify_getBuild($group)
 {
-    static $builds = array();
+    static $builds = [];
     static $gc = false;
     if (false === $gc) {
         $gc = (require dirname(__FILE__) . '/groupsConfig.php');

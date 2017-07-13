@@ -43,7 +43,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
     *
     * @return string CSV list of columns in both copies of the table minus the primary key.
     */
-   public function GetColumns($Table, $OldDatabase, $OldPrefix, $Options = array()) {
+   public function GetColumns($Table, $OldDatabase, $OldPrefix, $Options = []) {
       Gdn::Structure()->Database->DatabasePrefix = '';
       $OldColumns = Gdn::Structure()->Get($OldDatabase.'.'.$OldPrefix.$Table)->Columns();
 
@@ -135,7 +135,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
       // CATEGORIES //
       if ($this->OldTableExists('Category')) {
-         $CategoryColumnOptions = array('Legacy' => $DoLegacy);
+         $CategoryColumnOptions = ['Legacy' => $DoLegacy];
          $CategoryColumns = $this->GetColumns('Category', $OldDatabase, $OldPrefix, $CategoryColumnOptions);
 
          /*if ($this->MergeCategories) {
@@ -164,12 +164,12 @@ class ForumMergePlugin implements Gdn_IPlugin {
          }
 
          // Remap hierarchy in the ugliest way possible
-         $CategoryMap = array();
+         $CategoryMap = [];
          $Categories = Gdn::SQL()->Select('CategoryID')
             ->Select('ParentCategoryID')
             ->Select('OldID')
             ->From('Category')
-            ->Where(array('OldID >' => 0))
+            ->Where(['OldID >' => 0])
             ->Get()->Result(DATASET_TYPE_ARRAY);
          foreach ($Categories as $Category) {
             $CategoryMap[$Category['OldID']] = $Category['CategoryID'];
@@ -178,8 +178,8 @@ class ForumMergePlugin implements Gdn_IPlugin {
             if ($Category['ParentCategoryID'] > 0 && !empty($CategoryMap[$Category['ParentCategoryID']])) {
                $ParentID = $CategoryMap[$Category['ParentCategoryID']];
                Gdn::SQL()->Update('Category')
-                  ->Set(array('ParentCategoryID' => $ParentID))
-                  ->Where(array('CategoryID' => $Category['CategoryID']))
+                  ->Set(['ParentCategoryID' => $ParentID])
+                  ->Where(['CategoryID' => $Category['CategoryID']])
                   ->Put();
             }
          }
@@ -195,7 +195,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
       // DISCUSSIONS //
       if ($this->OldTableExists('Discussion')) {
-         $DiscussionColumnOptions = array('Legacy' => $DoLegacy);
+         $DiscussionColumnOptions = ['Legacy' => $DoLegacy];
          $DiscussionColumns = $this->GetColumns('Discussion', $OldDatabase, $OldPrefix, $DiscussionColumnOptions);
 
          // Copy over all discussions
@@ -234,7 +234,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
       // COMMENTS //
       if ($this->OldTableExists('Comment')) {
-         $CommentColumnOptions = array('Legacy' => $DoLegacy);
+         $CommentColumnOptions = ['Legacy' => $DoLegacy];
          $CommentColumns = $this->GetColumns('Comment', $OldDatabase, $OldPrefix, $CommentColumnOptions);
 
          // Copy over all comments
@@ -308,7 +308,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
          // a. Build userid lookup
 
          $Users = Gdn::SQL()->Query('select UserID, OldID from '.$NewPrefix.'User');
-         $UserIDLookup = array();
+         $UserIDLookup = [];
          foreach($Users->Result() as $User) {
             $OldID = GetValue('OldID', $User);
             $UserIDLookup[$OldID] = GetValue('UserID', $User);
@@ -321,7 +321,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
             $Contributors = dbdecode(GetValue('Contributors', $Conversation));
             if (!is_array($Contributors))
                continue;
-            $UpdatedContributors = array();
+            $UpdatedContributors = [];
             foreach($Contributors as $UserID) {
                if (isset($UserIDLookup[$UserID]))
                   $UpdatedContributors[] = $UserIDLookup[$UserID];
@@ -474,7 +474,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
       // Preparing to capture SQL (not execute) for operations that may need to be performed manually by the user
       Gdn::Structure()->CaptureOnly = TRUE;
-      Gdn::Structure()->Database->CapturedSql = array();
+      Gdn::Structure()->Database->CapturedSql = [];
 
       // Comment table threshold check
       $CurrentComments =  GDN::SQL()->Query("show table status where Name = '{$Px}Comment'")->FirstRow()->Rows;

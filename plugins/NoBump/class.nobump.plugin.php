@@ -6,7 +6,7 @@ class NoBumpPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_AfterBodyField_Handler($Sender) {
       if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
-         echo $Sender->Form->CheckBox('NoBump', T('No Bump'), array('value' => '1'));
+         echo $Sender->Form->CheckBox('NoBump', T('No Bump'), ['value' => '1']);
    }
 
    /**

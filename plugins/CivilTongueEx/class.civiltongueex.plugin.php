@@ -42,12 +42,12 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param $Sender
      * @param array $Args
      */
-    public function pluginController_tongue_create($Sender, $Args = array()) {
+    public function pluginController_tongue_create($Sender, $Args = []) {
         $Sender->permission('Garden.Settings.Manage');
         $Sender->Form = new Gdn_Form();
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array('Plugins.CivilTongue.Words', 'Plugins.CivilTongue.Replacement'));
+        $ConfigurationModel->setField(['Plugins.CivilTongue.Words', 'Plugins.CivilTongue.Replacement']);
         $Sender->Form->setModel($ConfigurationModel);
 
         if ($Sender->Form->authenticatedPostBack() === FALSE) {
@@ -306,7 +306,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
         static $Patterns = NULL;
 
         if ($Patterns === NULL) {
-            $Patterns = array();
+            $Patterns = [];
             $Words = c('Plugins.CivilTongue.Words', null);
             if ($Words !== null) {
                 $ExplodedWords = explode(';', $Words);

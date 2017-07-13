@@ -71,15 +71,15 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
          return;
 
       // See if there is a user with the same email/password.
-      $Users = $UserModel->GetWhere(array('Email' => GetValueR('InsertFields.Email', $Args)))->ResultArray();
+      $Users = $UserModel->GetWhere(['Email' => GetValueR('InsertFields.Email', $Args)])->ResultArray();
       $Hasher = new Gdn_PasswordHash();
 
       foreach ($Users as $User) {
          if ($Hasher->CheckPassword($Password, $User['Password'], $User['HashMethod'])) {
             $UserModel->SQL->Put(
                'User',
-               array('Password' => $User['Password'], 'HashMethod' => $User['HashMethod']),
-               array('UserID' => GetValue('InsertUserID', $Args)));
+               ['Password' => $User['Password'], 'HashMethod' => $User['HashMethod']],
+               ['UserID' => GetValue('InsertUserID', $Args)]);
             return;
          }
       }
@@ -107,7 +107,7 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
       $UserID = GetValueR('FormPostValues.UserID', $Args);
       if ($UserID) {
          $CurrentUser = $UserModel->GetID($UserID, DATASET_TYPE_ARRAY);
-         $this->_OldPasswordHash = array($CurrentUser['Password'], $CurrentUser['HashMethod']);
+         $this->_OldPasswordHash = [$CurrentUser['Password'], $CurrentUser['HashMethod']];
       }
    }
 
@@ -134,7 +134,7 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
       $Email = $Args['Email'];
       $Users =& $Args['Users'];
 
-      $Names = array();
+      $Names = [];
 
       foreach ($Users as $Index => $User) {
          if ($User->Email == $Email) {

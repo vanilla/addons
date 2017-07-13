@@ -32,9 +32,9 @@ function MediaThumbnail($Media, $Data = FALSE) {
          }
       }
       if ($Data)
-         $Result = array('src' => $Src, 'width' => GetValue('ThumbWidth', $Media), 'height' => GetValue('ThumbHeight', $Media));
+         $Result = ['src' => $Src, 'width' => GetValue('ThumbWidth', $Media), 'height' => GetValue('ThumbHeight', $Media)];
       else
-         $Result = Img($Src, array('class' => 'ImageThumbnail', 'width' => GetValue('ThumbWidth', $Media), 'height' => GetValue('ThumbHeight', $Media)));
+         $Result = Img($Src, ['class' => 'ImageThumbnail', 'width' => GetValue('ThumbWidth', $Media), 'height' => GetValue('ThumbHeight', $Media)]);
 
       return $Result;
 
@@ -43,7 +43,7 @@ function MediaThumbnail($Media, $Data = FALSE) {
 function DefaultMediaThumbnail($Media) {
   $Result = '<span class="Thumb-Default">'.
    '<span class="Thumb-Extension">'.pathinfo($Media['Name'], PATHINFO_EXTENSION).'</span>'.
-   Img('/plugins/FileUpload/images/file.png', array('class' => 'ImageThumbnail', 'height' => GetValue('ThumbHeight', $Media))).
+   Img('/plugins/FileUpload/images/file.png', ['class' => 'ImageThumbnail', 'height' => GetValue('ThumbHeight', $Media)]).
    '</span>';
 
    return $Result;

@@ -34,7 +34,7 @@ class Minify_Lines {
      * 
      * @return string 
      */
-    public static function minify($content, $options = array()) 
+    public static function minify($content, $options = []) 
     {
         $id = (isset($options['id']) && $options['id'])
             ? $options['id']
@@ -46,7 +46,7 @@ class Minify_Lines {
         $padTo = strlen($numLines);
         $inComment = false;
         $i = 0;
-        $newLines = array();
+        $newLines = [];
         while (null !== ($line = array_shift($lines))) {
             if (('' !== $id) && (0 == $i % 50)) {
                 array_push($newLines, '', "/* {$id} */", '');
@@ -65,7 +65,7 @@ class Minify_Lines {
                  $content
                 ,$options['currentDir']
                 ,isset($options['docRoot']) ? $options['docRoot'] : $_SERVER['DOCUMENT_ROOT']
-                ,isset($options['symlinks']) ? $options['symlinks'] : array()
+                ,isset($options['symlinks']) ? $options['symlinks'] : []
             );
             $content = "/* Minify_CSS_UriRewriter::\$debugText\n\n" 
                      . Minify_CSS_UriRewriter::$debugText . "*/\n"

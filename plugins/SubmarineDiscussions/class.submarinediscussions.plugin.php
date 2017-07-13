@@ -7,7 +7,7 @@ class SubmarineDiscussionsPlugin extends Gdn_Plugin {
    public function PostController_DiscussionFormOptions_Handler($Sender) {
       $Session = Gdn::Session();
       if ($Session->CheckPermission('Vanilla.Discussions.Sink'))
-         $Sender->EventArguments['Options'] .= '<li>'.$Sender->Form->CheckBox('Sink', T('Sink'), array('value' => '1')).'</li>';
+         $Sender->EventArguments['Options'] .= '<li>'.$Sender->Form->CheckBox('Sink', T('Sink'), ['value' => '1']).'</li>';
    }
    
    /**

@@ -96,9 +96,9 @@ class HTTP_Encoder {
             $this->_headers['Content-Type'] = $spec['type'];
         }
         if (isset($spec['method'])
-            && in_array($spec['method'], array('gzip', 'deflate', 'compress', '')))
+            && in_array($spec['method'], ['gzip', 'deflate', 'compress', '']))
         {
-            $this->_encodeMethod = array($spec['method'], $spec['method']);
+            $this->_encodeMethod = [$spec['method'], $spec['method']];
         } else {
             $this->_encodeMethod = self::getAcceptedEncoding();
         }
@@ -197,21 +197,21 @@ class HTTP_Encoder {
         if (! isset($_SERVER['HTTP_ACCEPT_ENCODING'])
             || self::_isBuggyIe())
         {
-            return array('', '');
+            return ['', ''];
         }
         $ae = $_SERVER['HTTP_ACCEPT_ENCODING'];
         // gzip checks (quick)
         if (0 === strpos($ae, 'gzip,')             // most browsers
             || 0 === strpos($ae, 'deflate, gzip,') // opera
         ) {
-            return array('gzip', 'gzip');
+            return ['gzip', 'gzip'];
         }
         // gzip checks (slow)
         if (preg_match(
                 '@(?:^|,)\\s*((?:x-)?gzip)\\s*(?:$|,|;\\s*q=(?:0\\.|1))@'
                 ,$ae
                 ,$m)) {
-            return array('gzip', $m[1]);
+            return ['gzip', $m[1]];
         }
         if ($allowDeflate) {
             // deflate checks    
@@ -222,16 +222,16 @@ class HTTP_Encoder {
                 // slow parsing
                 || preg_match(
                     '@(?:^|,)\\s*deflate\\s*(?:$|,|;\\s*q=(?:0\\.|1))@', $ae)) {
-                return array('deflate', 'deflate');
+                return ['deflate', 'deflate'];
             }
         }
         if ($allowCompress && preg_match(
                 '@(?:^|,)\\s*((?:x-)?compress)\\s*(?:$|,|;\\s*q=(?:0\\.|1))@'
                 ,$ae
                 ,$m)) {
-            return array('compress', $m[1]);
+            return ['compress', $m[1]];
         }
-        return array('', '');
+        return ['', ''];
     }
 
     /**
@@ -296,15 +296,15 @@ class HTTP_Encoder {
         if (null === $compressionLevel) {
             $compressionLevel = self::$compressionLevel;
         }
-        $he = new HTTP_Encoder(array('content' => $content));
+        $he = new HTTP_Encoder(['content' => $content]);
         $ret = $he->encode($compressionLevel);
         $he->sendAll();
         return $ret;
     }
     
     protected $_content = '';
-    protected $_headers = array();
-    protected $_encodeMethod = array('', '');
+    protected $_headers = [];
+    protected $_encodeMethod = ['', ''];
 
     /**
      * Is the browser an IE version earlier than 6 SP2?  

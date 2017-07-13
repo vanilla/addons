@@ -47,10 +47,10 @@ class SteamConnectPlugin extends Gdn_Plugin {
             $Url = $this->_AuthorizeHref();
 
             // Add the steam method to the controller.
-            $Method = array(
+            $Method = [
                 'Name' => 'Steam',
-                'SignInHtml' => SocialSigninButton('Steam', $Url, 'button', array('class' => 'js-extern'))
-            );
+                'SignInHtml' => SocialSigninButton('Steam', $Url, 'button', ['class' => 'js-extern'])
+            ];
 
             $Sender->Data['Methods'][] = $Method;
         }
@@ -75,13 +75,13 @@ class SteamConnectPlugin extends Gdn_Plugin {
     private function _GetButton() {
         if ($this->isConfig()) {
             $Url = $this->_AuthorizeHref();
-            return SocialSigninButton('Steam', $Url, 'icon', array('class' => 'js-extern'));
+            return SocialSigninButton('Steam', $Url, 'icon', ['class' => 'js-extern']);
         }
     }
 
     public function Base_BeforeSignInLink_Handler($Sender) {
         if (!Gdn::Session()->IsValid() && $this->isConfig()) {
-            echo "\n".Wrap($this->_GetButton(), 'li', array('class' => 'Connect SteamConnect'));
+            echo "\n".Wrap($this->_GetButton(), 'li', ['class' => 'Connect SteamConnect']);
         }
     }
 
@@ -92,10 +92,10 @@ class SteamConnectPlugin extends Gdn_Plugin {
         $SteamID = $this->getSteamID($OpenID);
 
         // Make a call to steam.
-        $qs = array(
+        $qs = [
             'key' => C('Plugins.SteamConnect.APIKey'),
             'steamids' => $SteamID
-        );
+        ];
 
         $url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?'.http_build_query($qs);
 
@@ -135,9 +135,9 @@ class SteamConnectPlugin extends Gdn_Plugin {
             .' <a href="http://steamcommunity.com/dev/apikey">'.T('Get one here.').'</a></div>';
 
         $Conf = new ConfigurationModule($Sender);
-        $Conf->Initialize(array(
-            'Plugins.SteamConnect.APIKey' => array('Control' => 'TextBox', 'LabelCode' => 'Steam Web API Key', 'Description' => $APIKeyDescription)
-        ));
+        $Conf->Initialize([
+            'Plugins.SteamConnect.APIKey' => ['Control' => 'TextBox', 'LabelCode' => 'Steam Web API Key', 'Description' => $APIKeyDescription]
+        ]);
 
         $Sender->AddSideMenu();
         $Sender->SetData('Title', sprintf(T('%s Settings'), T('Steam Connect')));

@@ -50,17 +50,17 @@ class IgnorePlugin extends Gdn_Plugin {
    public function SimpleApiPlugin_Mapper_Handler($Sender) {
       switch ($Sender->Mapper->Version) {
          case '1.0':
-            $Sender->Mapper->AddMap(array(
+            $Sender->Mapper->AddMap([
                'ignore/list'           => 'profile/ignore',
                'ignore/add'            => 'profile/ignore/add',
                'ignore/remove'         => 'profile/ignore/remove',
                'ignore/restrict'       => 'profile/ignore/restrict'
-            ), NULL, array(
-               'ignore/list'           => array('IgnoreList', 'IgnoreLimit', 'IgnoreRestricted'),
-               'ignore/add'            => array('Success'),
-               'ignore/remove'         => array('Success'),
-               'ignore/restrict'       => array('Success')
-            ));
+            ], NULL, [
+               'ignore/list'           => ['IgnoreList', 'IgnoreLimit', 'IgnoreRestricted'],
+               'ignore/add'            => ['Success'],
+               'ignore/remove'         => ['Success'],
+               'ignore/restrict'       => ['Success']
+            ]);
             break;
       }
    }
@@ -73,9 +73,9 @@ class IgnorePlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
 
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', Sprite('SpIgnoreList').' '.T('Ignore List'), '/profile/ignore', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpIgnoreList').' '.T('Ignore List'), '/profile/ignore', FALSE, ['class' => 'Popup']);
       } else {
-         $SideMenu->AddLink('Options', Sprite('SpIgnoreList').' '.T('Ignore List'), "/profile/ignore/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpIgnoreList').' '.T('Ignore List'), "/profile/ignore/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name), 'Garden.Users.Edit', ['class' => 'Popup']);
       }
    }
 
@@ -95,7 +95,7 @@ class IgnorePlugin extends Gdn_Plugin {
 
       $Args = $Sender->RequestArgs;
       if (sizeof($Args) < 2)
-         $Args = array_merge($Args, array(0,0));
+         $Args = array_merge($Args, [0,0]);
       elseif (sizeof($Args) > 2)
          $Args = array_slice($Args, 0, 2);
 
@@ -154,7 +154,7 @@ class IgnorePlugin extends Gdn_Plugin {
       }
 
       $IgnoredUsersRaw = $this->GetUserMeta($UserID, 'Blocked.User.%');
-      $IgnoredUsersIDs = array();
+      $IgnoredUsersIDs = [];
       foreach ($IgnoredUsersRaw as $IgnoredUsersKey => $IgnoredUsersIgnoreDate) {
          $IgnoredUsersKeyArray = explode('.', $IgnoredUsersKey);
          $IgnoredUsersID = array_pop($IgnoredUsersKeyArray);
@@ -263,7 +263,7 @@ class IgnorePlugin extends Gdn_Plugin {
          throw new Exception("No such user '{$UserID}'", 404);
 
       $Restricted = strtolower(Gdn::Request()->Get('Restricted', 'no'));
-      $Restricted = in_array($Restricted, array('yes', 'true', 'on', TRUE)) ? TRUE : NULL;
+      $Restricted = in_array($Restricted, ['yes', 'true', 'on', TRUE]) ? TRUE : NULL;
       $this->SetUserMeta($UserID, 'Forbidden', $Restricted);
 
       $Sender->SetData('Success', sprintf(T($Restricted ?
@@ -295,9 +295,9 @@ class IgnorePlugin extends Gdn_Plugin {
          // Add to dropdown
          $UserIgnored = $this->Ignored($Sender->User->UserID);
          $Label = ($UserIgnored) ? Sprite('SpUnignore').' '.T('Unignore') : Sprite('SpIgnore').' '.T('Ignore');
-         $Args['ProfileOptions'][] = array('Text' => $Label,
+         $Args['ProfileOptions'][] = ['Text' => $Label,
             'Url' => "/user/ignore/toggle/{$Sender->User->UserID}/".Gdn_Format::Url($Sender->User->Name),
-            'CssClass' => 'Popup');
+            'CssClass' => 'Popup'];
       }
    }
 
@@ -369,7 +369,7 @@ class IgnorePlugin extends Gdn_Plugin {
 
       $Args = $Sender->RequestArgs;
       if (sizeof($Args) < 3)
-         $Args = array_merge($Args, array(0,0));
+         $Args = array_merge($Args, [0,0]);
       elseif (sizeof($Args) > 2)
          $Args = array_slice($Args, 1, 3);
 
@@ -483,7 +483,7 @@ class IgnorePlugin extends Gdn_Plugin {
 
       $Args = $Sender->RequestArgs;
       if (sizeof($Args) < 3)
-         $Args = array_merge($Args, array(0,0));
+         $Args = array_merge($Args, [0,0]);
       elseif (sizeof($Args) > 2)
          $Args = array_slice($Args, 1, 3);
 
@@ -561,10 +561,10 @@ class IgnorePlugin extends Gdn_Plugin {
       if (class_exists('ConversationModel')) {
          // Remove from conversations
          $Conversations = $this->IgnoreConversations($IgnoreUserID, $ForUserID);
-         Gdn::SQL()->Delete('UserConversation', array(
+         Gdn::SQL()->Delete('UserConversation', [
              'UserID' => $ForUserID,
              'ConversationID' => $Conversations
-         ));
+         ]);
          $conversationModel = new ConversationModel();
          $conversationModel->countUnread($ForUserID, true);
       }
@@ -669,7 +669,7 @@ class IgnorePlugin extends Gdn_Plugin {
 
       // Avoid a call to the database if the Conversation application is turned off.
       if (!class_exists('ConversationModel')) {
-         return array();
+         return [];
       }
 
       // Get ignore user's conversation IDs

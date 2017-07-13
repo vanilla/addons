@@ -33,7 +33,7 @@ echo $Form->Errors();
    <li>
       <?php
       echo $this->Form->Label('_Locale', 'Locale'),
-         $this->Form->TextBox('Locale', array('Class' => 'SmallInput'));
+         $this->Form->TextBox('Locale', ['Class' => 'SmallInput']);
       ?>
    </li>
    <li>
@@ -58,7 +58,7 @@ echo $Form->Errors();
          echo T('Capture locale pack changes.', 'Capture the changes between one of your locale packs and the Locale Developer. It will be put in the <code>changes.php</code> file.');
          echo $Form->Label('Choose a locale pack', 'LocalePackForChanges');
          echo $Form->DropDown('LocalePackForChanges', $this->Data('LocalePacks'));
-         echo $Form->Button('Generate', array('Name' => 'Form/GenerateChanges'));
+         echo $Form->Button('Generate', ['Name' => 'Form/GenerateChanges']);
       ?>
    </li>
    <li>

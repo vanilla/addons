@@ -46,7 +46,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
       if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey)) {
 			$TrackingCodes = C('Plugins.TrackingCodes.All');
 			if (!is_array($TrackingCodes))
-				$TrackingCodes = array();
+				$TrackingCodes = [];
 
 			if ($Key !== FALSE)
 				foreach ($TrackingCodes as $Index => $Code) {
@@ -72,7 +72,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
       if ($TransientKey !== FALSE && $Session->ValidateTransientKey($TransientKey)) {
 			$TrackingCodes = C('Plugins.TrackingCodes.All');
 			if (!is_array($TrackingCodes))
-				$TrackingCodes = array();
+				$TrackingCodes = [];
 
 			if ($Key !== FALSE)
 				foreach ($TrackingCodes as $Index => $Code) {
@@ -102,7 +102,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 		$Sender->Code = FALSE;
 		$TrackingCodes = C('Plugins.TrackingCodes.All');
 		if (!is_array($TrackingCodes))
-			$TrackingCodes = array();
+			$TrackingCodes = [];
 
 		if ($EditKey !== FALSE)
 			foreach ($TrackingCodes as $Index => $Code) {
@@ -152,7 +152,7 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 
 		$TrackingCodes = C('Plugins.TrackingCodes.All');
 		if (!is_array($TrackingCodes))
-			$TrackingCodes = array();
+			$TrackingCodes = [];
 		foreach ($TrackingCodes as $Index => $Code) {
 			if (GetValue('Enabled', $Code) == '1')
 				echo GetValue('Code', $Code);

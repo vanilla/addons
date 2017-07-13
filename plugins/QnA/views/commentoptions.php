@@ -10,14 +10,14 @@ echo $this->Form->errors();
     <?php
     echo '<i>'.t('Did this answer the question?').'</i>';
     echo $this->Form->getFormValue('QnA');
-    echo $this->Form->radioList('QnA', $this->data('_QnAs'), array('list' => true));
+    echo $this->Form->radioList('QnA', $this->data('_QnAs'), ['list' => true]);
     ?>
 </div>
 
 <?php
 echo '<div class="Buttons Buttons-Confirm">',
     $this->Form->button(t('OK')), ' ',
-    $this->Form->button(t('Cancel'), array('type' => 'button', 'class' => 'Button Close')),
+    $this->Form->button(t('Cancel'), ['type' => 'button', 'class' => 'Button Close']),
     '</div>';
 echo $this->Form->close();
 ?>

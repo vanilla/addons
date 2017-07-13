@@ -128,7 +128,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $target = '/';
         }
 
-        $qs = array('client_id' => $provider['AuthenticationKey'], 'Target' => $target);
+        $qs = ['client_id' => $provider['AuthenticationKey'], 'Target' => $target];
         return $qs;
     }
 
@@ -279,7 +279,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         $finalTarget = urlencode(url('/entry/jsconnect', true).'?'.http_build_query($qs));
 
         $registerUrl = str_ireplace(
-            array('{target}', '{redirect}'),
+            ['{target}', '{redirect}'],
             $finalTarget,
             $registerUrl);
 
@@ -459,7 +459,7 @@ class JsConnectPlugin extends Gdn_Plugin {
     public function base_getAppSettingsMenuItems_handler($Sender) {
         $Menu = $Sender->EventArguments['SideMenu'];
         $Menu->addItem('Users', t('Users'));
-        $Menu->addLink('Users', 'jsConnect', 'settings/jsconnect', 'Garden.Settings.Manage', array('class' => 'nav-jsconnect'));
+        $Menu->addLink('Users', 'jsConnect', 'settings/jsconnect', 'Garden.Settings.Manage', ['class' => 'nav-jsconnect']);
     }
 
     /**
@@ -564,7 +564,7 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $Sender
      * @param array $Args
      */
-    public function profileController_jsConnect_create($Sender, $Args = array()) {
+    public function profileController_jsConnect_create($Sender, $Args = []) {
         include_once dirname(__FILE__).'/functions.jsconnect.php';
 
         $client_id = $Sender->Request->get('client_id', 0);
@@ -575,7 +575,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         $Secret = val('AssociationSecret', $Provider);
 
         if (Gdn::session()->isValid()) {
-            $User = ArrayTranslate((array)Gdn::session()->User, array('UserID' => 'UniqueID', 'Name', 'Email', 'PhotoUrl', 'DateOfBirth', 'Gender'));
+            $User = ArrayTranslate((array)Gdn::session()->User, ['UserID' => 'UniqueID', 'Name', 'Email', 'PhotoUrl', 'DateOfBirth', 'Gender']);
 
             // Grab the user's roles.
             $Roles = Gdn::userModel()->getRoles(Gdn::session()->UserID);
@@ -626,7 +626,7 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @param SettingsController $Sender
      * @param array $Args
      */
-    public function settingsController_jsConnect_create($Sender, $Args = array()) {
+    public function settingsController_jsConnect_create($Sender, $Args = []) {
         $Sender->addJsFile('jsconnect-settings.js', 'plugins/jsconnect');
         $Sender->permission('Garden.Settings.Manage');
         $Sender->addSideMenu();
@@ -687,7 +687,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $provider = self::getProvider($client_id);
                 touchValue('Trusted', $provider, 1);
             } else {
-                $provider = array();
+                $provider = [];
             }
             $form->setData($provider);
         }

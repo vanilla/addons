@@ -21,31 +21,31 @@ class MollomVanilla extends Mollom {
 
    public function getClientInformation() {
       $PluginInfo = Gdn::PluginManager()->AvailablePlugins();
-      return array(
+      return [
          'platformName' => 'Vanilla',
          'platformVersion' => APPLICATION_VERSION,
          'clientName' => 'Mollom Vanilla',
          'clientVersion' => $PluginInfo['Mollom']['Version']
-      );
+      ];
    }
 
-   protected function request($method, $server, $path, $query = NULL, array $headers = array()) {
+   protected function request($method, $server, $path, $query = NULL, array $headers = []) {
       $Request = new ProxyRequest();
       $Request->Request(
-         array('Method' => $method,
+         ['Method' => $method,
             'URL' => trim($server,'/').trim($path,'/'),
             //'Debug' => TRUE
-         ),
+         ],
          $query,
          NULL,
          $headers
       );
 
-      $MollomResponse = (object) array(
+      $MollomResponse = (object) [
          'code' => $Request->ResponseStatus,
          'headers' => $Request->ResponseHeaders,
          'body' => $Request->ResponseBody,
-      );
+      ];
       return $MollomResponse;
    }
 }

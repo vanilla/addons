@@ -12,11 +12,11 @@
 <ul>
     <li><?php
         echo $this->Form->label('Display condition', 'Plugin.Example.RenderCondition');
-        echo $this->Form->dropDown('Plugin.Example.RenderCondition', array(
+        echo $this->Form->dropDown('Plugin.Example.RenderCondition', [
             'all' => 'Discussions & Announcements',
             'announcements' => 'Just Announcements',
             'discussions' => 'Just Discussions'
-        ));
+        ]);
     ?></li>
     <li><?php
         echo $this->Form->label('Excerpt length', 'Plugin.Example.TrimSize');

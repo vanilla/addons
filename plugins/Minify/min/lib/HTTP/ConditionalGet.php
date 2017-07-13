@@ -233,7 +233,7 @@ class HTTP_ConditionalGet {
      *
      * @return null     
      */
-    public static function check($lastModifiedTime = null, $isPublic = false, $options = array())
+    public static function check($lastModifiedTime = null, $isPublic = false, $options = [])
     {
         if (null !== $lastModifiedTime) {
             $options['lastModifiedTime'] = (int)$lastModifiedTime;
@@ -263,7 +263,7 @@ class HTTP_ConditionalGet {
         return gmdate('D, d M Y H:i:s \G\M\T', $time);
     }
     
-    protected $_headers = array();
+    protected $_headers = [];
     protected $_lmTime = null;
     protected $_etag = null;
     protected $_stripEtag = false;

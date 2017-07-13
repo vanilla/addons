@@ -60,7 +60,7 @@ class CustomizeTextPlugin extends Gdn_Plugin {
             $Method = 'save';
       }
       
-      $Matches = array();
+      $Matches = [];
       $Keywords = NULL;
       switch ($Method) {
          case 'none':
@@ -102,7 +102,7 @@ class CustomizeTextPlugin extends Gdn_Plugin {
                else
                   $CurrentDefinition = $BaseDefinition;
 
-               $Matches[$Key] = array('def' => $CurrentDefinition, 'mod' => $Modified);
+               $Matches[$Key] = ['def' => $CurrentDefinition, 'mod' => $Modified];
                if ($CurrentDefinition[0] == "\r\n")
                   $CurrentDefinition = "\r\n{$CurrentDefinition}";
                else if ($CurrentDefinition[0] == "\r")
@@ -123,11 +123,11 @@ class CustomizeTextPlugin extends Gdn_Plugin {
                         $SaveDefinition = str_replace("\r\n", "\n", $SaveDefinition);
                      }
                      
-                     Gdn::Locale()->SetTranslation($Key, $SaveDefinition, array(
+                     Gdn::Locale()->SetTranslation($Key, $SaveDefinition, [
                         'Save'         => TRUE,
                         'RemoveEmpty'  => TRUE
-                     ));
-                     $Matches[$Key] = array('def' => $SuppliedDefinition, 'mod' => !is_null($SaveDefinition));
+                     ]);
+                     $Matches[$Key] = ['def' => $SuppliedDefinition, 'mod' => !is_null($SaveDefinition)];
                      $Changed = TRUE;
                   }
                }

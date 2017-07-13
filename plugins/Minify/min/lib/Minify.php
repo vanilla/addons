@@ -157,7 +157,7 @@ class Minify {
      * with keys "success" (bool), "statusCode" (int), "content" (string), and
      * "headers" (array).
      */
-    public static function serve($controller, $options = array())
+    public static function serve($controller, $options = [])
     {
         if (is_string($controller)) {
             // make $controller into object
@@ -184,12 +184,12 @@ class Minify {
                 return;
             } else {
                 list(,$statusCode) = explode(' ', self::$_options['badRequestHeader']);
-                return array(
+                return [
                     'success' => false
                     ,'statusCode' => (int)$statusCode
                     ,'content' => ''
-                    ,'headers' => array()
-                );
+                    ,'headers' => []
+                ];
             }
         }
         
@@ -219,11 +219,11 @@ class Minify {
         
         // check client cache
         require_once 'HTTP/ConditionalGet.php';
-        $cgOptions = array(
+        $cgOptions = [
             'lastModifiedTime' => self::$_options['lastModifiedTime']
             ,'isPublic' => self::$_options['isPublic']
             ,'encoding' => self::$_options['encodeMethod']
-        );
+        ];
         if (self::$_options['maxAge'] > 0) {
             $cgOptions['maxAge'] = self::$_options['maxAge'];
         }
@@ -234,12 +234,12 @@ class Minify {
                 $cg->sendHeaders();
                 return;
             } else {
-                return array(
+                return [
                     'success' => true
                     ,'statusCode' => 304
                     ,'content' => ''
                     ,'headers' => $cg->getHeaders()
-                );
+                ];
             }
         } else {
             // client will need output
@@ -317,14 +317,14 @@ class Minify {
                 echo $content;
             }
         } else {
-            return array(
+            return [
                 'success' => true
                 ,'statusCode' => 200
                 ,'content' => $cacheIsReady
                     ? self::$_cache->fetch($fullCacheId)
                     : $content
                 ,'headers' => $headers
-            );
+            ];
         }
     }
     
@@ -340,16 +340,16 @@ class Minify {
      * 
      * @return string
      */
-    public static function combine($sources, $options = array())
+    public static function combine($sources, $options = [])
     {
         $cache = self::$_cache;
         self::$_cache = null;
-        $options = array_merge(array(
+        $options = array_merge([
             'files' => (array)$sources
             ,'quiet' => true
             ,'encodeMethod' => ''
             ,'lastModifiedTime' => 0
-        ), $options);
+        ], $options);
         $out = self::serve('Files', $options);
         self::$_cache = $cache;
         return $out['content'];
@@ -406,11 +406,11 @@ class Minify {
     protected static function _setupDebug($sources)
     {
         foreach ($sources as $source) {
-            $source->minifier = array('Minify_Lines', 'minify');
+            $source->minifier = ['Minify_Lines', 'minify'];
             $id = $source->getId();
-            $source->minifyOptions = array(
+            $source->minifyOptions = [
                 'id' => (is_file($id) ? basename($id) : $id)
-            );
+            ];
         }
     }
     
@@ -433,7 +433,7 @@ class Minify {
         // these
         $defaultOptions = isset(self::$_options['minifierOptions'][$type])
             ? self::$_options['minifierOptions'][$type]
-            : array();
+            : [];
         // if minifier not set, default is no minification. source objects
         // may still override this
         $defaultMinifier = isset(self::$_options['minifiers'][$type])
@@ -498,13 +498,13 @@ class Minify {
        if (defined('MINIFY_TOKEN'))
           return MINIFY_TOKEN;
 
-        return md5(serialize(array(
+        return md5(serialize([
             Minify_Source::getDigest(self::$_controller->sources)
             ,self::$_options['minifiers'] 
             ,self::$_options['minifierOptions']
             ,self::$_options['postprocessor']
             ,self::$_options['bubbleCssImports']
-        )));
+        ]));
     }
     
     /**

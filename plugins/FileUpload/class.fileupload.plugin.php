@@ -106,10 +106,10 @@ class FileUploadPlugin extends Gdn_Plugin {
         $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
         $Sender->deliveryType(DELIVERY_TYPE_VIEW);
 
-        $Delete = array(
+        $Delete = [
             'MediaID'    => $MediaID,
             'Status'     => 'failed'
-        );
+        ];
 
         $Media = $this->mediaModel()->getID($MediaID);
         $ForeignTable = val('ForeignTable', $Media);
@@ -245,7 +245,7 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     protected function cacheAttachedMedia($Sender) {
         $Comments = $Sender->data('Comments');
-        $CommentIDList = array();
+        $CommentIDList = [];
 
         if ($Comments instanceof Gdn_DataSet && $Comments->numRows()) {
             $Comments->dataSeek(-1);
@@ -317,7 +317,7 @@ class FileUploadPlugin extends Gdn_Plugin {
      * @param SettingsController $Sender
      */
     public function settingsController_addEditCategory_handler($Sender) {
-        $Sender->Data['_PermissionFields']['AllowFileUploads'] = array('Control' => 'CheckBox');
+        $Sender->Data['_PermissionFields']['AllowFileUploads'] = ['Control' => 'CheckBox'];
     }
 
     /**
@@ -379,9 +379,9 @@ class FileUploadPlugin extends Gdn_Plugin {
             $Filename = $Media->Name;
         }
 
-        $DownloadPath = combinePaths(array(self::pathUploads(),val('Path', $Media)));
+        $DownloadPath = combinePaths([self::pathUploads(),val('Path', $Media)]);
 
-        if (in_array(strtolower(pathinfo($Filename, PATHINFO_EXTENSION)), array('bmp', 'gif', 'jpg', 'jpeg', 'png'))) {
+        if (in_array(strtolower(pathinfo($Filename, PATHINFO_EXTENSION)), ['bmp', 'gif', 'jpg', 'jpeg', 'png'])) {
             $ServeMode = 'inline';
         } else {
             $ServeMode = 'attachment';
@@ -461,7 +461,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         $Log = val('Log', $Args);
         $Type = strtolower(val('RecordType', $Log));
         $Operation = val('Operation', $Log);
-        if (!in_array($Type, array('discussion', 'comment')) || $Operation != 'Pending') {
+        if (!in_array($Type, ['discussion', 'comment']) || $Operation != 'Pending') {
             return;
         }
 
@@ -486,7 +486,7 @@ class FileUploadPlugin extends Gdn_Plugin {
 
         // Only trigger if restoring discussion or comment
         $Type = strtolower(val('RecordType', $Log));
-        if (!in_array($Type, array('discussion', 'comment'))) {
+        if (!in_array($Type, ['discussion', 'comment'])) {
             return;
         }
 
@@ -531,7 +531,7 @@ class FileUploadPlugin extends Gdn_Plugin {
      * @param UtilityController $Sender
      * @param array $Args
      */
-    public function utilityController_thumbnail_create($Sender, $Args = array()) {
+    public function utilityController_thumbnail_create($Sender, $Args = []) {
         $MediaID = array_shift($Args);
         if (!is_numeric($MediaID)) {
             array_unshift($Args, $MediaID);
@@ -554,11 +554,11 @@ class FileUploadPlugin extends Gdn_Plugin {
         $SHeight = $ImageSize[1];
         $SWidth = $ImageSize[0];
 
-        if (!in_array($ImageSize[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
+        if (!in_array($ImageSize[2], [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
             if (is_numeric($MediaID)) {
                 // Fix the thumbnail information so this isn't requested again and again.
                 $Model = new MediaModel();
-                $Media = array('MediaID' => $MediaID, 'ImageWidth' => 0, 'ImageHeight' => 0, 'ThumbPath' => null);
+                $Media = ['MediaID' => $MediaID, 'ImageWidth' => 0, 'ImageHeight' => 0, 'ThumbPath' => null];
                 $Model->save($Media);
             }
 
@@ -566,7 +566,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             redirectTo($Url, 301);
         }
 
-        $Options = array();
+        $Options = [];
 
         $ThumbHeight = self::thumbnailHeight();
         $ThumbWidth = self::thumbnailWidth();
@@ -600,7 +600,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         if (is_numeric($MediaID)) {
             // Save the thumbnail information.
             $Model = new MediaModel();
-            $Media = array('MediaID' => $MediaID, 'ThumbWidth' => $ThumbParsed['Width'], 'ThumbHeight' => $ThumbParsed['Height'], 'ThumbPath' => $ThumbParsed['SaveName']);
+            $Media = ['MediaID' => $MediaID, 'ThumbWidth' => $ThumbParsed['Width'], 'ThumbHeight' => $ThumbParsed['Height'], 'ThumbPath' => $ThumbParsed['SaveName']];
             $Model->save($Media);
         }
 
@@ -643,7 +643,7 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     protected function placeMedia(&$Media, $UserID) {
         $NewFolder = FileUploadPlugin::findLocalMediaFolder($Media->MediaID, $UserID, true, false);
-        $CurrentPath = array();
+        $CurrentPath = [];
         foreach ($NewFolder as $FolderPart) {
             array_push($CurrentPath, $FolderPart);
             $TestFolder = CombinePaths($CurrentPath);
@@ -654,8 +654,8 @@ class FileUploadPlugin extends Gdn_Plugin {
         }
 
         $FileParts = pathinfo($Media->Name);
-        $SourceFilePath = combinePaths(array(self::pathUploads(), $Media->Path));
-        $NewFilePath = combinePaths(array($TestFolder,$Media->MediaID.'.'.$FileParts['extension']));
+        $SourceFilePath = combinePaths([self::pathUploads(), $Media->Path]);
+        $NewFilePath = combinePaths([$TestFolder,$Media->MediaID.'.'.$FileParts['extension']]);
         $Success = rename($SourceFilePath, $NewFilePath);
         if (!$Success) {
             throw new Exception("Failed renaming '{$SourceFilePath}' -> '{$NewFilePath}'");
@@ -679,7 +679,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     public static function findLocalMediaFolder($MediaID, $UserID, $Absolute = false, $ReturnString = false) {
         $DispersionFactor = c('Plugin.FileUpload.DispersionFactor', 20);
         $FolderID = $MediaID % $DispersionFactor;
-        $ReturnArray = array('FileUpload',$FolderID);
+        $ReturnArray = ['FileUpload',$FolderID];
 
         if ($Absolute) {
             array_unshift($ReturnArray, self::pathUploads());
@@ -778,7 +778,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             // Analyze file extension
             $FileNameParts = pathinfo($FileName);
             $Extension = strtolower($FileNameParts['extension']);
-            $AllowedExtensions = C('Garden.Upload.AllowedFileExtensions', array("*"));
+            $AllowedExtensions = C('Garden.Upload.AllowedFileExtensions', ["*"]);
             if (!in_array($Extension, $AllowedExtensions) && !in_array('*',$AllowedExtensions)) {
                 throw new FileUploadPluginUploadErrorException("Uploaded file type is not allowed.", 11, $FileName, $FileKey);
             }
@@ -842,7 +842,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             }
 
             // Save Media data
-            $Media = array(
+            $Media = [
                 'Name' => $FileName,
                 'Type' => $FileType,
                 'Size' => $FileSize,
@@ -851,11 +851,11 @@ class FileUploadPlugin extends Gdn_Plugin {
                 'InsertUserID' => Gdn::session()->UserID,
                 'DateInserted' => date('Y-m-d H:i:s'),
                 'Path' => $SaveFilename
-            );
+            ];
             $MediaID = $this->mediaModel()->save($Media);
             $Media['MediaID'] = $MediaID;
 
-            $MediaResponse = array(
+            $MediaResponse = [
                 'Status' => 'success',
                 'MediaID' => $MediaID,
                 'Filename' => $FileName,
@@ -865,14 +865,14 @@ class FileUploadPlugin extends Gdn_Plugin {
                 'Thumbnail' => base64_encode(MediaThumbnail($Media)),
                 'FinalImageLocation' => Url(self::url($Media)),
                 'Parsed' => $Parsed
-            );
+            ];
         } catch (FileUploadPluginUploadErrorException $e) {
-            $MediaResponse = array(
+            $MediaResponse = [
                 'Status' => 'failed',
                 'ErrorCode' => $e->getCode(),
                 'Filename' => $e->getFilename(),
                 'StrError' => $e->getMessage()
-            );
+            ];
 
             if (!is_null($e->getApcKey())) {
                 $MediaResponse['ProgressKey'] = $e->getApcKey();
@@ -882,11 +882,11 @@ class FileUploadPlugin extends Gdn_Plugin {
                 $MediaResponse['StrError'] = '('.$e->getFilename().') '.$MediaResponse['StrError'];
             }
         } catch (Exception $Ex) {
-            $MediaResponse = array(
+            $MediaResponse = [
                 'Status' => 'failed',
                 'ErrorCode' => $Ex->getCode(),
                 'StrError' => $Ex->getMessage()
-            );
+            ];
         }
 
         $Sender->setJSON('MediaResponse', $MediaResponse);
@@ -917,11 +917,11 @@ class FileUploadPlugin extends Gdn_Plugin {
         $ApcAvailable = self::apcAvailable();
 
 
-        $Progress = array(
+        $Progress = [
             'key' => $ApcKey,
             'uploader' => $UploaderID,
             'apc' => ($ApcAvailable) ? 'yes' : 'no'
-        );
+        ];
 
         if ($ApcAvailable) {
             $Success = false;
