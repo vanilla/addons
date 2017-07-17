@@ -1,23 +1,19 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) { exit(); }
 /**
- * @copyright 2009-2014 Vanilla Forums, Inc.
+ * @copyright 2009-2017 Vanilla Forums, Inc.
  * @license GNU GPLv2
  */
 
+/**
+ * Class LinkTypesPlugin
+ */
 class LinkTypesPlugin extends Gdn_Plugin {
    /**
     * Add JS file.
     *
-    * @param $Sender AssetModel
+    * @param $sender AssetModel
     */
-   public function Base_Render_Before($Sender) {
-      $Sender->AddJsFile('linktypes.js', 'plugins/LinkTypes');
-   }
-   
-   /**
-    * Plugin setup.
-    */
-   public function Setup() {
-
+   public function base_render_before($sender) {
+      $sender->addJsFile('linktypes.js', 'plugins/LinkTypes');
    }
 }
