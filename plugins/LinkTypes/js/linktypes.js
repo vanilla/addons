@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(function() {
 
     // Get type of URL.
     var urlType = function(url) {
@@ -46,7 +46,7 @@ $(document).ready(function() {
             //    $(this).attr('target', '_top');
             //    break;
             case 'external':
-                $(this).attr('target', '_blank');
+                $(this).attr('rel', 'noopener noreferrer').attr('target', '_blank');
                 break;
             // case 'internal':
             //    $(this).attr('target', '');
