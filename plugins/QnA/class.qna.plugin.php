@@ -812,16 +812,16 @@ class QnAPlugin extends Gdn_Plugin {
      * @param $sender
      */
     public function base_afterDiscussionFilters_handler($sender) {
-        $count = Gdn::cache()->get('QnA-UnansweredCount');
-        if ($count === Gdn_Cache::CACHEOP_FAILURE) {
-            $count =
+        $Count = Gdn::cache()->get('QnA-UnansweredCount');
+        if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
+            $Count =
                 '<span class="Aside">'
                     .'<span class="Popin Count" rel="/discussions/unansweredcount"></span>'
                 .'</span>';
         } else {
-            $count =
+            $Count =
                 '<span class="Aside">'
-                    .'<span class="Count">'.$count.'</span>'
+                    .'<span class="Count">'.$Count.'</span>'
                 .'</span>';
         }
 
@@ -830,7 +830,7 @@ class QnAPlugin extends Gdn_Plugin {
 
         echo "<li class='QnA-UnansweredQuestions $extraClass'>"
                 .anchor(
-                    $sprite.t('Unanswered').' '.$count,
+                    $sprite.' '.t('Unanswered').' '.$Count,
                     '/discussions/unanswered',
                     'UnansweredQuestions'
                 )
