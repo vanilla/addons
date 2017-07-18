@@ -157,7 +157,7 @@ if ($this->Reactions && class_exists('ReactionModel')) {
         }
 
         // AcceptAnswer
-        $record = $Rm->getWhere(['UrlCode' => 'AcceptAnswer']);
+        $record = $Rm->getWhere(['UrlCode' => 'AcceptAnswer'])->resultArray();
         if (!$record) {
             $result = $Rm->defineReactionType([
                 'UrlCode' => 'AcceptAnswer',
