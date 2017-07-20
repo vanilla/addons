@@ -707,7 +707,7 @@ EOT;
         $Conf->initialize([
             'Signatures.Images.MaxNumber' => [
                 'Control' => 'Dropdown',
-                'LabelCode' => '@'.sprintf(t('Max number of %s'),t('images')),
+                'LabelCode' => '@'.sprintf(t('Max number of %s'), t('images')),
                 'Items' => [
                     'Unlimited' => t('Unlimited'),
                     'None' => t('None'),
