@@ -705,13 +705,63 @@ EOT;
 
         $Conf = new ConfigurationModule($Sender);
         $Conf->initialize([
-            'Signatures.Images.MaxNumber' => ['Control' => 'Dropdown', 'LabelCode' => '@'.sprintf(t('Max number of %s'), t('images')), 'Items' => ['Unlimited' => t('Unlimited'), 'None' => t('None'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5]], 'Default' => $maxNumberImages,
-            'Signatures.Images.MaxHeight' => ['Control' => 'TextBox', 'Description' => 'Only enter number, no "px" needed.', 'LabelCode' => '@'.sprintf(t('Max height of %s'), t('images'))." ".t('in pixels'), 'Options' => ['class' => 'InputBox SmallInput', 'type' => 'number', 'min' => '0'], 'Default' => $maxImageHeight],
-            'Signatures.Text.MaxLength' => ['Control' => 'TextBox', 'Type' => 'int','Description' => 'Leave blank for no limit.', 'LabelCode' => '@'.sprintf(t('Max %s length'), t('signature')), 'Options' => ['class' => 'InputBox SmallInput', 'type' => 'number', 'min' => '1'], 'Default' => $maxTextLength],
-            'Signatures.Hide.Guest' => ['Control' => 'CheckBox', 'LabelCode' => 'Hide signatures for guests', 'Default' => $hideGuest],
-            'Signatures.Hide.Embed' => ['Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on embedded comments', 'Default' => $hideEmbed],
-            'Signatures.Hide.Mobile' => ['Control' => 'CheckBox', 'LabelCode' => 'Hide signatures on mobile', 'Default' => $hideMobile],
-            'Signatures.Allow.Embeds' => ['Control' => 'CheckBox', 'LabelCode' => 'Allow embedded content', 'Default' => $allowEmbeds],
+            'Signatures.Images.MaxNumber' => [
+                'Control' => 'Dropdown',
+                'LabelCode' => '@'.sprintf(t('Max number of %s'),t('images')),
+                'Items' => [
+                    'Unlimited' => t('Unlimited'),
+                    'None' => t('None'),
+                    1 => 1,
+                    2 => 2,
+                    3 => 3,
+                    4 => 4,
+                    5 => 5
+                ],
+                'Default' => $maxNumberImages
+            ],
+            'Signatures.Images.MaxHeight' => [
+                'Control' => 'TextBox',
+                'Description' => 'Only enter number, no "px" needed.',
+                'LabelCode' => '@'.sprintf(t('Max height of %s'), t('images'))." ".t('in pixels'),
+                'Options' => [
+                    'class' => 'InputBox SmallInput',
+                    'type' => 'number',
+                    'min' => '0'
+                ],
+                'Default' => $maxImageHeight
+            ],
+            'Signatures.Text.MaxLength' => [
+                'Control' => 'TextBox',
+                'Type' => 'int',
+                'Description' => 'Leave blank for no limit.',
+                'LabelCode' => '@'.sprintf(t('Max %s length'), t('signature')),
+                'Options' => [
+                    'class' => 'InputBox SmallInput',
+                    'type' => 'number',
+                    'min' => '1'
+                ],
+                'Default' => $maxTextLength
+            ],
+            'Signatures.Hide.Guest' => [
+                'Control' => 'CheckBox',
+                'LabelCode' => 'Hide signatures for guests',
+                'Default' => $hideGuest
+            ],
+            'Signatures.Hide.Embed' => [
+                'Control' => 'CheckBox',
+                'LabelCode' => 'Hide signatures on embedded comments',
+                'Default' => $hideEmbed
+            ],
+            'Signatures.Hide.Mobile' => [
+                'Control' => 'CheckBox',
+                'LabelCode' => 'Hide signatures on mobile',
+                'Default' => $hideMobile
+            ],
+            'Signatures.Allow.Embeds' => [
+                'Control' => 'CheckBox',
+                'LabelCode' => 'Allow embedded content',
+                'Default' => $allowEmbeds
+            ],
         ]);
 
         $this->setConfigSettingsToDefault('Plugins.Signatures', $this->overriddenConfigSettings);
