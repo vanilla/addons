@@ -15,9 +15,9 @@ class NBBCPlugin extends Gdn_Plugin {
    public $Class = 'BBCode';
 
    /// CONSTRUCTOR ///
-   public function __construct($Class = 'BBCode') {
+   public function __construct($class = 'BBCode') {
       parent::__construct();
-      $this->Class = $Class;
+      $this->Class = $class;
    }
 
    /// PROPERTIES ///
@@ -78,11 +78,11 @@ EOT;
    }
 
    function DoVideo($bbcode, $action, $name, $default, $params, $content) {
-      list($Width, $Height) = Gdn_Format::GetEmbedSize();
-      list($Type, $Code) = explode(';', $default);
-      switch ($Type) {
+      list($width, $height) = Gdn_Format::GetEmbedSize();
+      list($type, $code) = explode(';', $default);
+      switch ($type) {
          case 'youtube':
-            return '<div class="Video P"><iframe width="'.$Width.'" height="'.$Height.'" src="https://www.youtube.com/embed/' . $Code . '" frameborder="0" allowfullscreen></iframe></div>';
+            return '<div class="Video P"><iframe width="'.$width.'" height="'.$height.'" src="https://www.youtube.com/embed/' . $code . '" frameborder="0" allowfullscreen></iframe></div>';
          default:
             return $content;
       }
@@ -220,29 +220,29 @@ EOT;
          return htmlspecialchars($params['_tag']) . $content . htmlspecialchars($params['_endtag']);
    }
 
-   public function Format($Result) {
-      $Result = str_replace(['[CODE]', '[/CODE]'], ['[code]', '[/code]'], $Result);
-      $Result = $this->NBBC()->Parse($Result);
-      return $Result;
+   public function Format($result) {
+      $result = str_replace(['[CODE]', '[/CODE]'], ['[code]', '[/code]'], $result);
+      $result = $this->NBBC()->Parse($result);
+      return $result;
    }
 
    protected $_Media = NULL;
    public function Media() {
       if ($this->_Media === NULL) {
          try {
-            $I = Gdn::PluginManager()->GetPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
-            $M = $I->MediaCache();
-         } catch (Exception $Ex) {
-            $M = [];
+            $i = Gdn::PluginManager()->GetPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
+            $m = $i->MediaCache();
+         } catch (Exception $ex) {
+            $m = [];
          }
 
-         $Media = [];
-         foreach ($M as $Key => $Data) {
-            foreach ($Data as $Row) {
-               $Media[$Row->MediaID] = $Row;
+         $media = [];
+         foreach ($m as $key => $data) {
+            foreach ($data as $row) {
+               $media[$row->MediaID] = $row;
             }
          }
-         $this->_Media = $Media;
+         $this->_Media = $media;
       }
       return $this->_Media;
    }

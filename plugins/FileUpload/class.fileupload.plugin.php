@@ -40,8 +40,8 @@ class FileUploadPlugin extends Gdn_Plugin {
         $this->CanDownload = checkPermission('Plugins.Attachments.Download.Allow');
 
         if ($this->CanUpload) {
-            $PermissionCategory = CategoryModel::permissionCategory(Gdn::controller()->data('Category'));
-            if (!val('AllowFileUploads', $PermissionCategory, true)) {
+            $permissionCategory = CategoryModel::permissionCategory(Gdn::controller()->data('Category'));
+            if (!val('AllowFileUploads', $permissionCategory, true)) {
                 $this->CanUpload = false;
             }
         }
@@ -74,73 +74,73 @@ class FileUploadPlugin extends Gdn_Plugin {
      * @return MediaModel MediaModel
      */
     public function mediaModel() {
-        static $MediaModel = null;
+        static $mediaModel = null;
 
-        if ($MediaModel === null) {
-            $MediaModel = new MediaModel();
+        if ($mediaModel === null) {
+            $mediaModel = new MediaModel();
         }
-        return $MediaModel;
+        return $mediaModel;
     }
 
     /**
      *
      *
-     * @param PluginController $Sender
+     * @param PluginController $sender
      * @throws Exception
      */
-    public function pluginController_fileUpload_create($Sender) {
-        $Sender->title('FileUpload');
+    public function pluginController_fileUpload_create($sender) {
+        $sender->title('FileUpload');
         Gdn_Theme::section('Dashboard');
-        $Sender->Form = new Gdn_Form();
-        $this->dispatch($Sender, $Sender->RequestArgs);
+        $sender->Form = new Gdn_Form();
+        $this->dispatch($sender, $sender->RequestArgs);
     }
 
     /**
      *
      *
-     * @param $Sender
+     * @param $sender
      * @throws Exception
      */
-    public function controller_delete($Sender) {
-        list($Action, $MediaID) = $Sender->RequestArgs;
-        $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
-        $Sender->deliveryType(DELIVERY_TYPE_VIEW);
+    public function controller_delete($sender) {
+        list($action, $mediaID) = $sender->RequestArgs;
+        $sender->deliveryMethod(DELIVERY_METHOD_JSON);
+        $sender->deliveryType(DELIVERY_TYPE_VIEW);
 
-        $Delete = [
-            'MediaID'    => $MediaID,
+        $delete = [
+            'MediaID'    => $mediaID,
             'Status'     => 'failed'
         ];
 
-        $Media = $this->mediaModel()->getID($MediaID);
-        $ForeignTable = val('ForeignTable', $Media);
-        $Permission = false;
+        $media = $this->mediaModel()->getID($mediaID);
+        $foreignTable = val('ForeignTable', $media);
+        $permission = false;
 
         // Get the category so we can figure out whether or not the user has permission to delete.
-        if ($ForeignTable == 'discussion') {
-            $PermissionCategoryID = Gdn::sql()
+        if ($foreignTable == 'discussion') {
+            $permissionCategoryID = Gdn::sql()
                 ->select('c.PermissionCategoryID')
                 ->from('Discussion d')
                 ->join('Category c', 'd.CategoryID = c.CategoryID')
-                ->where('d.DiscussionID', val('ForeignID', $Media))
+                ->where('d.DiscussionID', val('ForeignID', $media))
                 ->get()->value('PermissionCategoryID');
-            $Permission = 'Vanilla.Discussions.Edit';
-        } elseif ($ForeignTable == 'comment') {
-            $PermissionCategoryID = Gdn::sql()
+            $permission = 'Vanilla.Discussions.Edit';
+        } elseif ($foreignTable == 'comment') {
+            $permissionCategoryID = Gdn::sql()
                 ->select('c.PermissionCategoryID')
                 ->from('Comment cm')
                 ->join('Discussion d', 'd.DiscussionID = cm.DiscussionID')
                 ->join('Category c', 'd.CategoryID = c.CategoryID')
-                ->where('cm.CommentID', val('ForeignID', $Media))
+                ->where('cm.CommentID', val('ForeignID', $media))
                 ->get()->value('PermissionCategoryID');
-            $Permission = 'Vanilla.Comments.Edit';
+            $permission = 'Vanilla.Comments.Edit';
         }
 
-        if ($Media) {
-            $Delete['Media'] = $Media;
-            $UserID = val('UserID', Gdn::session());
-            if (val('InsertUserID', $Media, null) == $UserID || Gdn::session()->checkPermission($Permission, true, 'Category', $PermissionCategoryID)) {
-                $this->mediaModel()->delete($Media, true);
-                $Delete['Status'] = 'success';
+        if ($media) {
+            $delete['Media'] = $media;
+            $userID = val('UserID', Gdn::session());
+            if (val('InsertUserID', $media, null) == $userID || Gdn::session()->checkPermission($permission, true, 'Category', $permissionCategoryID)) {
+                $this->mediaModel()->delete($media, true);
+                $delete['Status'] = 'success';
             } else {
                 throw PermissionException();
             }
@@ -148,58 +148,58 @@ class FileUploadPlugin extends Gdn_Plugin {
             throw NotFoundException('Media');
         }
 
-        $Sender->setJSON('Delete', $Delete);
-        $Sender->render($Sender->fetchViewLocation('blank', '', 'plugins/FileUpload'));
+        $sender->setJSON('Delete', $delete);
+        $sender->render($sender->fetchViewLocation('blank', '', 'plugins/FileUpload'));
     }
 
     /**
      * Calls FileUploadPlugin::PrepareController
      *
-     * @param DiscussionController $Sender The hooked controller
+     * @param DiscussionController $sender The hooked controller
      */
-    public function discussionController_render_before($Sender) {
-        $this->prepareController($Sender);
+    public function discussionController_render_before($sender) {
+        $this->prepareController($sender);
     }
 
     /**
      * Calls FileUploadPlugin::PrepareController
      *
-     * @param PostController $Sender The hooked controller
+     * @param PostController $sender The hooked controller
      */
-    public function postController_render_before($Sender) {
-        $this->prepareController($Sender);
+    public function postController_render_before($sender) {
+        $this->prepareController($sender);
     }
 
     /**
      * Adds CSS and JS includes to the header of the discussion or post.
      *
-     * @param mixed $Controller The hooked controller
+     * @param mixed $controller The hooked controller
      */
-    protected function prepareController($Controller) {
-        $Controller->addJsFile('fileupload.js', 'plugins/FileUpload');
-        $Controller->addDefinition('apcavailable', self::apcAvailable());
-        $Controller->addDefinition('uploaderuniq', uniqid());
+    protected function prepareController($controller) {
+        $controller->addJsFile('fileupload.js', 'plugins/FileUpload');
+        $controller->addDefinition('apcavailable', self::apcAvailable());
+        $controller->addDefinition('uploaderuniq', uniqid());
 
-        $PostMaxSize = Gdn_Upload::unformatFileSize(ini_get('post_max_size'));
-        $FileMaxSize = Gdn_Upload::unformatFileSize(ini_get('upload_max_filesize'));
-        $ConfigMaxSize = Gdn_Upload::unformatFileSize(c('Garden.Upload.MaxFileSize', '1MB'));
+        $postMaxSize = Gdn_Upload::unformatFileSize(ini_get('post_max_size'));
+        $fileMaxSize = Gdn_Upload::unformatFileSize(ini_get('upload_max_filesize'));
+        $configMaxSize = Gdn_Upload::unformatFileSize(c('Garden.Upload.MaxFileSize', '1MB'));
 
-        $MaxSize = min($PostMaxSize, $FileMaxSize, $ConfigMaxSize);
-        $Controller->addDefinition('maxuploadsize', $MaxSize);
+        $maxSize = min($postMaxSize, $fileMaxSize, $configMaxSize);
+        $controller->addDefinition('maxuploadsize', $maxSize);
     }
 
     /**
      * Calls FileUploadPlugin::DrawAttachFile
      *
-     * @param PostController $Sender
+     * @param PostController $sender
      */
-    public function postController_afterDiscussionFormOptions_handler($Sender) {
-        if (!is_null($Discussion = val('Discussion', $Sender, null))) {
-            $Sender->EventArguments['Type'] = 'Discussion';
-            $Sender->EventArguments['Discussion'] = $Discussion;
-            $this->attachUploadsToComment($Sender, 'discussion');
+    public function postController_afterDiscussionFormOptions_handler($sender) {
+        if (!is_null($discussion = val('Discussion', $sender, null))) {
+            $sender->EventArguments['Type'] = 'Discussion';
+            $sender->EventArguments['Discussion'] = $discussion;
+            $this->attachUploadsToComment($sender, 'discussion');
         }
-        $this->drawAttachFile($Sender);
+        $this->drawAttachFile($sender);
     }
 
     /**
@@ -214,10 +214,10 @@ class FileUploadPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      */
-    public function discussionController_beforeFormButtons_handler($Sender) {
-        $this->drawAttachFile($Sender);
+    public function discussionController_beforeFormButtons_handler($sender) {
+        $this->drawAttachFile($sender);
     }
 
     /**
@@ -227,97 +227,97 @@ class FileUploadPlugin extends Gdn_Plugin {
      * Post Discussion and Post Comment forms.
      *
      * @access public
-     * @param mixed $Sender
+     * @param mixed $sender
      */
-    public function drawAttachFile($Sender) {
+    public function drawAttachFile($sender) {
         if (!$this->CanUpload) {
             return;
         }
-        echo $Sender->fetchView('attach_file', '', 'plugins/FileUpload');
+        echo $sender->fetchView('attach_file', '', 'plugins/FileUpload');
     }
 
     /**
      * CacheAttachedMedia function.
      *
      * @access protected
-     * @param mixed $Sender
+     * @param mixed $sender
      * @return void
      */
-    protected function cacheAttachedMedia($Sender) {
-        $Comments = $Sender->data('Comments');
-        $CommentIDList = [];
+    protected function cacheAttachedMedia($sender) {
+        $comments = $sender->data('Comments');
+        $commentIDList = [];
 
-        if ($Comments instanceof Gdn_DataSet && $Comments->numRows()) {
-            $Comments->dataSeek(-1);
-            while ($Comment = $Comments->nextRow()) {
-                $CommentIDList[] = $Comment->CommentID;
+        if ($comments instanceof Gdn_DataSet && $comments->numRows()) {
+            $comments->dataSeek(-1);
+            while ($comment = $comments->nextRow()) {
+                $commentIDList[] = $comment->CommentID;
             }
-        } elseif (isset($Sender->Discussion) && $Sender->Discussion) {
-            $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
+        } elseif (isset($sender->Discussion) && $sender->Discussion) {
+            $commentIDList[] = $sender->DiscussionID = $sender->Discussion->DiscussionID;
         }
 
-        if (isset($Sender->Comment) && isset($Sender->Comment->CommentID)) {
-            $CommentIDList[] = $Sender->Comment->CommentID;
+        if (isset($sender->Comment) && isset($sender->Comment->CommentID)) {
+            $commentIDList[] = $sender->Comment->CommentID;
         }
 
-        if (count($CommentIDList)) {
-            $DiscussionID = $Sender->data('Discussion.DiscussionID');
-            $MediaData = $this->preloadDiscussionMedia($DiscussionID, $CommentIDList);
+        if (count($commentIDList)) {
+            $discussionID = $sender->data('Discussion.DiscussionID');
+            $mediaData = $this->preloadDiscussionMedia($discussionID, $commentIDList);
         } else {
-            $MediaData = false;
+            $mediaData = false;
         }
 
-        $MediaArray = [];
-        if ($MediaData !== false) {
-            $MediaData->dataSeek(-1);
-            while ($Media = $MediaData->nextRow()) {
-                $MediaArray[$Media->ForeignTable.'/'.$Media->ForeignID][] = $Media;
+        $mediaArray = [];
+        if ($mediaData !== false) {
+            $mediaData->dataSeek(-1);
+            while ($media = $mediaData->nextRow()) {
+                $mediaArray[$media->ForeignTable.'/'.$media->ForeignID][] = $media;
             }
         }
 
-        $this->_MediaCache = $MediaArray;
+        $this->_MediaCache = $mediaArray;
     }
 
     /**
      *
      *
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      * @return void
      */
-    public function discussionController_afterCommentBody_handler($Sender, $Args) {
-        if (isset($Args['Type'])) {
-            $this->attachUploadsToComment($Sender, strtolower($Args['Type']));
+    public function discussionController_afterCommentBody_handler($sender, $args) {
+        if (isset($args['Type'])) {
+            $this->attachUploadsToComment($sender, strtolower($args['Type']));
         } else {
-            $this->attachUploadsToComment($Sender);
+            $this->attachUploadsToComment($sender);
         }
     }
 
     /**
      *
      *
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      */
-    public function discussionController_afterDiscussionBody_handler($Sender) {
-        $this->attachUploadsToComment($Sender, 'discussion');
+    public function discussionController_afterDiscussionBody_handler($sender) {
+        $this->attachUploadsToComment($sender, 'discussion');
     }
 
     /**
      *
      *
-     * @param PostController $Sender
+     * @param PostController $sender
      * @return void
      */
-    public function postController_afterCommentBody_handler($Sender) {
-        $this->attachUploadsToComment($Sender);
+    public function postController_afterCommentBody_handler($sender) {
+        $this->attachUploadsToComment($sender);
     }
 
     /**
      *
      *
-     * @param SettingsController $Sender
+     * @param SettingsController $sender
      */
-    public function settingsController_addEditCategory_handler($Sender) {
-        $Sender->Data['_PermissionFields']['AllowFileUploads'] = ['Control' => 'CheckBox'];
+    public function settingsController_addEditCategory_handler($sender) {
+        $sender->Data['_PermissionFields']['AllowFileUploads'] = ['Control' => 'CheckBox'];
     }
 
     /**
@@ -360,43 +360,43 @@ class FileUploadPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      */
-    public function discussionController_download_create($Sender) {
+    public function discussionController_download_create($sender) {
         if (!$this->CanDownload) {
             throw PermissionException("File could not be streamed: Access is denied");
         }
 
-        list($MediaID) = $Sender->RequestArgs;
-        $Media = $this->mediaModel()->getID($MediaID);
+        list($mediaID) = $sender->RequestArgs;
+        $media = $this->mediaModel()->getID($mediaID);
 
-        if (!$Media) {
+        if (!$media) {
             return;
         }
 
-        $Filename = Gdn::request()->filename();
-        if (!$Filename || $Filename == 'default') {
-            $Filename = $Media->Name;
+        $filename = Gdn::request()->filename();
+        if (!$filename || $filename == 'default') {
+            $filename = $media->Name;
         }
 
-        $DownloadPath = combinePaths([self::pathUploads(),val('Path', $Media)]);
+        $downloadPath = combinePaths([self::pathUploads(),val('Path', $media)]);
 
-        if (in_array(strtolower(pathinfo($Filename, PATHINFO_EXTENSION)), ['bmp', 'gif', 'jpg', 'jpeg', 'png'])) {
-            $ServeMode = 'inline';
+        if (in_array(strtolower(pathinfo($filename, PATHINFO_EXTENSION)), ['bmp', 'gif', 'jpg', 'jpeg', 'png'])) {
+            $serveMode = 'inline';
         } else {
-            $ServeMode = 'attachment';
+            $serveMode = 'attachment';
         }
 
-        $Served = false;
-        $this->EventArguments['DownloadPath'] = $DownloadPath;
-        $this->EventArguments['ServeMode'] = $ServeMode;
-        $this->EventArguments['Media'] = $Media;
-        $this->EventArguments['Served'] = &$Served;
+        $served = false;
+        $this->EventArguments['DownloadPath'] = $downloadPath;
+        $this->EventArguments['ServeMode'] = $serveMode;
+        $this->EventArguments['Media'] = $media;
+        $this->EventArguments['Served'] = &$served;
         $this->fireEvent('BeforeDownload');
 
-        if (!$Served) {
-            return Gdn_FileSystem::serveFile($DownloadPath, $Filename, $Media->Type, $ServeMode);
-            throw new Exception('File could not be streamed: missing file ('.$DownloadPath.').');
+        if (!$served) {
+            return Gdn_FileSystem::serveFile($downloadPath, $filename, $media->Type, $serveMode);
+            throw new Exception('File could not be streamed: missing file ('.$downloadPath.').');
         }
 
         exit();
@@ -405,72 +405,72 @@ class FileUploadPlugin extends Gdn_Plugin {
     /**
      * Attach files to a comment during save.
      *
-     * @param PostController $Sender
-     * @param array $Args
+     * @param PostController $sender
+     * @param array $args
      */
-    public function postController_afterCommentSave_handler($Sender, $Args) {
-        if (!$Args['Comment']) {
+    public function postController_afterCommentSave_handler($sender, $args) {
+        if (!$args['Comment']) {
             return;
         }
 
-        $CommentID = $Args['Comment']->CommentID;
-        if (!$CommentID) {
+        $commentID = $args['Comment']->CommentID;
+        if (!$commentID) {
             return;
         }
 
-        $AttachedFilesData = Gdn::request()->getValue('AttachedUploads');
-        $AllFilesData = Gdn::request()->getValue('AllUploads');
+        $attachedFilesData = Gdn::request()->getValue('AttachedUploads');
+        $allFilesData = Gdn::request()->getValue('AllUploads');
 
-        $this->attachAllFiles($AttachedFilesData, $AllFilesData, $CommentID, 'comment');
+        $this->attachAllFiles($attachedFilesData, $allFilesData, $commentID, 'comment');
     }
 
     /**
      * Attach files to a discussion during save.
      *
-     * @param PostController $Sender
-     * @param array $Args
+     * @param PostController $sender
+     * @param array $args
      */
-    public function postController_afterDiscussionSave_handler($Sender, $Args) {
-        if (!$Args['Discussion']) {
+    public function postController_afterDiscussionSave_handler($sender, $args) {
+        if (!$args['Discussion']) {
             return;
         }
 
-        $DiscussionID = $Args['Discussion']->DiscussionID;
-        if (!$DiscussionID) {
+        $discussionID = $args['Discussion']->DiscussionID;
+        if (!$discussionID) {
             return;
         }
 
-        $AttachedFilesData = Gdn::request()->getValue('AttachedUploads');
-        $AllFilesData = Gdn::request()->getValue('AllUploads');
-        $this->EventArguments['AllFilesData'] = $AllFilesData;
-        $this->EventArguments['CategoryID'] = $Args['Discussion']->CategoryID;
+        $attachedFilesData = Gdn::request()->getValue('AttachedUploads');
+        $allFilesData = Gdn::request()->getValue('AllUploads');
+        $this->EventArguments['AllFilesData'] = $allFilesData;
+        $this->EventArguments['CategoryID'] = $args['Discussion']->CategoryID;
         $this->fireEvent("InsertDiscussionMedia");
 
-        $this->attachAllFiles($AttachedFilesData, $AllFilesData, $DiscussionID, 'discussion');
+        $this->attachAllFiles($attachedFilesData, $allFilesData, $discussionID, 'discussion');
     }
 
     /**
      * Attach files to a log entry; used when new content is sent to moderation queue.
      *
      * @access public
-     * @param object $Sender
-     * @param array $Args
+     * @param object $sender
+     * @param array $args
      */
-    public function logModel_afterInsert_handler($Sender, $Args) {
+    public function logModel_afterInsert_handler($sender, $args) {
         // Only trigger if logging unapproved discussion or comment
-        $Log = val('Log', $Args);
-        $Type = strtolower(val('RecordType', $Log));
-        $Operation = val('Operation', $Log);
-        if (!in_array($Type, ['discussion', 'comment']) || $Operation != 'Pending') {
+        $log = val('Log', $args);
+        $type = strtolower(val('RecordType', $log));
+        $operation = val('Operation', $log);
+        if (!in_array($type, ['discussion', 'comment']) || $operation != 'Pending') {
             return;
         }
 
         // Attach file to the log entry
-        $LogID = val('LogID', $Args);
-        $AttachedFilesData = Gdn::request()->getValue('AttachedUploads');
-        $AllFilesData = Gdn::request()->getValue('AllUploads');
+        $logID = val('LogID', $args);
+        $attachedFilesData = Gdn::request()->getValue('AttachedUploads');
+        $allFilesData = Gdn::request()->getValue('AllUploads');
 
-        $this->attachAllFiles($AttachedFilesData, $AllFilesData, $LogID, 'log');
+        $this->attachAllFiles($attachedFilesData, $allFilesData, $logID, 'log');
     }
 
     /**
@@ -478,153 +478,153 @@ class FileUploadPlugin extends Gdn_Plugin {
      *
      * This happens when a discussion or comment is approved.
      *
-     * @param LogModel $Sender
-     * @param array $Args
+     * @param LogModel $sender
+     * @param array $args
      */
-    public function logModel_afterRestore_handler($Sender, $Args) {
-        $Log = val('Log', $Args);
+    public function logModel_afterRestore_handler($sender, $args) {
+        $log = val('Log', $args);
 
         // Only trigger if restoring discussion or comment
-        $Type = strtolower(val('RecordType', $Log));
-        if (!in_array($Type, ['discussion', 'comment'])) {
+        $type = strtolower(val('RecordType', $log));
+        if (!in_array($type, ['discussion', 'comment'])) {
             return;
         }
 
         // Reassign media records from log entry to newly inserted content
-        $this->mediaModel()->reassign(val('LogID', $Log), 'log', val('InsertID', $Args), $Type);
+        $this->mediaModel()->reassign(val('LogID', $log), 'log', val('InsertID', $args), $type);
     }
 
     /**
      * AttachAllFiles function.
      *
      * @access protected
-     * @param mixed $AttachedFilesData
-     * @param mixed $AllFilesData
-     * @param mixed $ForeignID
-     * @param mixed $ForeignTable
+     * @param mixed $attachedFilesData
+     * @param mixed $allFilesData
+     * @param mixed $foreignID
+     * @param mixed $foreignTable
      * @return void
      */
-    protected function attachAllFiles($AttachedFilesData, $AllFilesData, $ForeignID, $ForeignTable) {
+    protected function attachAllFiles($attachedFilesData, $allFilesData, $foreignID, $foreignTable) {
         // No files attached
-        if (!$AttachedFilesData) {
+        if (!$attachedFilesData) {
             return;
         }
 
-        $SuccessFiles = [];
-        foreach ($AttachedFilesData as $FileID) {
-            $Attached = $this->attachFile($FileID, $ForeignID, $ForeignTable);
-            if ($Attached) {
-                $SuccessFiles[] = $FileID;
+        $successFiles = [];
+        foreach ($attachedFilesData as $fileID) {
+            $attached = $this->attachFile($fileID, $foreignID, $foreignTable);
+            if ($attached) {
+                $successFiles[] = $fileID;
             }
         }
 
         // clean up failed and unattached files
-        $DeleteIDs = array_diff($AllFilesData, $SuccessFiles);
-        foreach ($DeleteIDs as $DeleteID) {
-            $this->trashFile($DeleteID);
+        $deleteIDs = array_diff($allFilesData, $successFiles);
+        foreach ($deleteIDs as $deleteID) {
+            $this->trashFile($deleteID);
         }
     }
 
     /**
      * Create and display a thumbnail of an uploaded file.
      *
-     * @param UtilityController $Sender
-     * @param array $Args
+     * @param UtilityController $sender
+     * @param array $args
      */
-    public function utilityController_thumbnail_create($Sender, $Args = []) {
-        $MediaID = array_shift($Args);
-        if (!is_numeric($MediaID)) {
-            array_unshift($Args, $MediaID);
+    public function utilityController_thumbnail_create($sender, $args = []) {
+        $mediaID = array_shift($args);
+        if (!is_numeric($mediaID)) {
+            array_unshift($args, $mediaID);
         }
-        $SubPath = implode('/', $Args);
+        $subPath = implode('/', $args);
         // Fix mauling of protocol:// URLs.
-        $SubPath = preg_replace('/:\/{1}/', '://', $SubPath);
-        $Name = $SubPath;
-        $Parsed = Gdn_Upload::parse($Name);
+        $subPath = preg_replace('/:\/{1}/', '://', $subPath);
+        $name = $subPath;
+        $parsed = Gdn_Upload::parse($name);
 
         // Get actual path to the file.
         $upload = new Gdn_UploadImage();
-        $Path = $upload->copyLocal($SubPath);
-        if (!file_exists($Path)) {
+        $path = $upload->copyLocal($subPath);
+        if (!file_exists($path)) {
             throw NotFoundException('File');
         }
 
         // Figure out the dimensions of the upload.
-        $ImageSize = getimagesize($Path);
-        $SHeight = $ImageSize[1];
-        $SWidth = $ImageSize[0];
+        $imageSize = getimagesize($path);
+        $sHeight = $imageSize[1];
+        $sWidth = $imageSize[0];
 
-        if (!in_array($ImageSize[2], [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
-            if (is_numeric($MediaID)) {
+        if (!in_array($imageSize[2], [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+            if (is_numeric($mediaID)) {
                 // Fix the thumbnail information so this isn't requested again and again.
-                $Model = new MediaModel();
-                $Media = ['MediaID' => $MediaID, 'ImageWidth' => 0, 'ImageHeight' => 0, 'ThumbPath' => null];
-                $Model->save($Media);
+                $model = new MediaModel();
+                $media = ['MediaID' => $mediaID, 'ImageWidth' => 0, 'ImageHeight' => 0, 'ThumbPath' => null];
+                $model->save($media);
             }
 
-            $Url = Asset('/plugins/FileUpload/images/file.png');
-            redirectTo($Url, 301);
+            $url = Asset('/plugins/FileUpload/images/file.png');
+            redirectTo($url, 301);
         }
 
-        $Options = [];
+        $options = [];
 
-        $ThumbHeight = self::thumbnailHeight();
-        $ThumbWidth = self::thumbnailWidth();
+        $thumbHeight = self::thumbnailHeight();
+        $thumbWidth = self::thumbnailWidth();
 
-        if (!$ThumbHeight || $SHeight < $ThumbHeight) {
-            $Height = $SHeight;
-            $Width = $SWidth;
+        if (!$thumbHeight || $sHeight < $thumbHeight) {
+            $height = $sHeight;
+            $width = $sWidth;
         } else {
-            $Height = $ThumbHeight;
-            $Width = round($Height * $SWidth / $SHeight);
+            $height = $thumbHeight;
+            $width = round($height * $sWidth / $sHeight);
         }
 
-        if ($ThumbWidth && $Width > $ThumbWidth) {
-            $Width = $ThumbWidth;
+        if ($thumbWidth && $width > $thumbWidth) {
+            $width = $thumbWidth;
 
-            if (!$ThumbHeight) {
-                $Height = round($Width * $SHeight / $SWidth);
+            if (!$thumbHeight) {
+                $height = round($width * $sHeight / $sWidth);
             } else {
-                $Options['Crop'] = true;
+                $options['Crop'] = true;
             }
         }
 
-        $TargetPath = "thumbnails/{$Parsed['Name']}";
-        $ThumbParsed = Gdn_UploadImage::saveImageAs($Path, $TargetPath, $Height, $Width, $Options);
+        $targetPath = "thumbnails/{$parsed['Name']}";
+        $thumbParsed = Gdn_UploadImage::saveImageAs($path, $targetPath, $height, $width, $options);
 
         // Cleanup if we're using a scratch copy
-        if ($ThumbParsed['Type'] != '' || $Path != self::pathUploads().'/'.$SubPath) {
-            @unlink($Path);
+        if ($thumbParsed['Type'] != '' || $path != self::pathUploads().'/'.$subPath) {
+            @unlink($path);
         }
 
-        if (is_numeric($MediaID)) {
+        if (is_numeric($mediaID)) {
             // Save the thumbnail information.
-            $Model = new MediaModel();
-            $Media = ['MediaID' => $MediaID, 'ThumbWidth' => $ThumbParsed['Width'], 'ThumbHeight' => $ThumbParsed['Height'], 'ThumbPath' => $ThumbParsed['SaveName']];
-            $Model->save($Media);
+            $model = new MediaModel();
+            $media = ['MediaID' => $mediaID, 'ThumbWidth' => $thumbParsed['Width'], 'ThumbHeight' => $thumbParsed['Height'], 'ThumbPath' => $thumbParsed['SaveName']];
+            $model->save($media);
         }
 
-        $Url = $ThumbParsed['Url'];
-        redirectTo($Url, 301, false);
+        $url = $thumbParsed['Url'];
+        redirectTo($url, 301, false);
     }
 
     /**
      * Attach a file to a foreign table and ID.
      *
      * @access protected
-     * @param int $FileID
-     * @param int $ForeignID
-     * @param string $ForeignType Lowercase.
+     * @param int $fileID
+     * @param int $foreignID
+     * @param string $foreignType Lowercase.
      * @return bool Whether attach was successful.
      */
-    protected function attachFile($FileID, $ForeignID, $ForeignType) {
-        $Media = $this->mediaModel()->getID($FileID);
-        if ($Media) {
-            $Media->ForeignID = $ForeignID;
-            $Media->ForeignTable = $ForeignType;
+    protected function attachFile($fileID, $foreignID, $foreignType) {
+        $media = $this->mediaModel()->getID($fileID);
+        if ($media) {
+            $media->ForeignID = $foreignID;
+            $media->ForeignTable = $foreignType;
             try {
 //                $PlacementStatus = $this->PlaceMedia($Media, Gdn::Session()->UserID);
-                $this->mediaModel()->save($Media);
+                $this->mediaModel()->save($media);
             } catch (Exception $e) {
                 die($e->getMessage());
                 return false;
@@ -637,32 +637,32 @@ class FileUploadPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param mixed &$Media
-     * @param mixed $UserID
+     * @param mixed &$media
+     * @param mixed $userID
      * @return bool
      */
-    protected function placeMedia(&$Media, $UserID) {
-        $NewFolder = FileUploadPlugin::findLocalMediaFolder($Media->MediaID, $UserID, true, false);
-        $CurrentPath = [];
-        foreach ($NewFolder as $FolderPart) {
-            array_push($CurrentPath, $FolderPart);
-            $TestFolder = CombinePaths($CurrentPath);
+    protected function placeMedia(&$media, $userID) {
+        $newFolder = FileUploadPlugin::findLocalMediaFolder($media->MediaID, $userID, true, false);
+        $currentPath = [];
+        foreach ($newFolder as $folderPart) {
+            array_push($currentPath, $folderPart);
+            $testFolder = CombinePaths($currentPath);
 
-            if (!is_dir($TestFolder) && !@mkdir($TestFolder, 0777, true)) {
-                throw new Exception("Failed creating folder '{$TestFolder}' during PlaceMedia verification loop");
+            if (!is_dir($testFolder) && !@mkdir($testFolder, 0777, true)) {
+                throw new Exception("Failed creating folder '{$testFolder}' during PlaceMedia verification loop");
             }
         }
 
-        $FileParts = pathinfo($Media->Name);
-        $SourceFilePath = combinePaths([self::pathUploads(), $Media->Path]);
-        $NewFilePath = combinePaths([$TestFolder,$Media->MediaID.'.'.$FileParts['extension']]);
-        $Success = rename($SourceFilePath, $NewFilePath);
-        if (!$Success) {
-            throw new Exception("Failed renaming '{$SourceFilePath}' -> '{$NewFilePath}'");
+        $fileParts = pathinfo($media->Name);
+        $sourceFilePath = combinePaths([self::pathUploads(), $media->Path]);
+        $newFilePath = combinePaths([$testFolder,$media->MediaID.'.'.$fileParts['extension']]);
+        $success = rename($sourceFilePath, $newFilePath);
+        if (!$success) {
+            throw new Exception("Failed renaming '{$sourceFilePath}' -> '{$newFilePath}'");
         }
 
-        $NewFilePath = FileUploadPlugin::findLocalMedia($Media, false, true);
-        $Media->Path = $NewFilePath;
+        $newFilePath = FileUploadPlugin::findLocalMedia($media, false, true);
+        $media->Path = $newFilePath;
 
         return true;
     }
@@ -670,40 +670,40 @@ class FileUploadPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param mixed $MediaID
-     * @param mixed $UserID
-     * @param mixed $Absolute. (default: false)
-     * @param mixed $ReturnString. (default: false)
+     * @param mixed $mediaID
+     * @param mixed $userID
+     * @param mixed $absolute. (default: false)
+     * @param mixed $returnString. (default: false)
      * @return array
      */
-    public static function findLocalMediaFolder($MediaID, $UserID, $Absolute = false, $ReturnString = false) {
-        $DispersionFactor = c('Plugin.FileUpload.DispersionFactor', 20);
-        $FolderID = $MediaID % $DispersionFactor;
-        $ReturnArray = ['FileUpload',$FolderID];
+    public static function findLocalMediaFolder($mediaID, $userID, $absolute = false, $returnString = false) {
+        $dispersionFactor = c('Plugin.FileUpload.DispersionFactor', 20);
+        $folderID = $mediaID % $dispersionFactor;
+        $returnArray = ['FileUpload',$folderID];
 
-        if ($Absolute) {
-            array_unshift($ReturnArray, self::pathUploads());
+        if ($absolute) {
+            array_unshift($returnArray, self::pathUploads());
         }
 
-        return ($ReturnString) ? implode(DS,$ReturnArray) : $ReturnArray;
+        return ($returnString) ? implode(DS,$returnArray) : $returnArray;
     }
 
     /**
      *
      *
-     * @param mixed $Media
-     * @param mixed $Absolute. (default: false)
-     * @param mixed $ReturnString. (default: false)
+     * @param mixed $media
+     * @param mixed $absolute. (default: false)
+     * @param mixed $returnString. (default: false)
      * @return array
      */
-    public static function findLocalMedia($Media, $Absolute = false, $ReturnString = false) {
-        $ArrayPath = FileUploadPlugin::findLocalMediaFolder($Media->MediaID, $Media->InsertUserID, $Absolute, false);
+    public static function findLocalMedia($media, $absolute = false, $returnString = false) {
+        $arrayPath = FileUploadPlugin::findLocalMediaFolder($media->MediaID, $media->InsertUserID, $absolute, false);
 
-        $FileParts = pathinfo($Media->Name);
-        $RealFileName = $Media->MediaID.'.'.$FileParts['extension'];
-        array_push($ArrayPath, $RealFileName);
+        $fileParts = pathinfo($media->Name);
+        $realFileName = $media->MediaID.'.'.$fileParts['extension'];
+        array_push($arrayPath, $realFileName);
 
-        return ($ReturnString) ? implode(DS, $ArrayPath) : $ArrayPath;
+        return ($returnString) ? implode(DS, $arrayPath) : $arrayPath;
     }
 
     /**
@@ -903,42 +903,42 @@ class FileUploadPlugin extends Gdn_Plugin {
      * upload that is currently in progress.
      *
      * @access public
-     * @param object $Sender
+     * @param object $sender
      */
-    public function postController_checkUpload_create($Sender) {
-        list($ApcKey) = $Sender->RequestArgs;
+    public function postController_checkUpload_create($sender) {
+        list($apcKey) = $sender->RequestArgs;
 
-        $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
-        $Sender->deliveryType(DELIVERY_TYPE_VIEW);
+        $sender->deliveryMethod(DELIVERY_METHOD_JSON);
+        $sender->deliveryType(DELIVERY_TYPE_VIEW);
 
-        $KeyData = explode('_',$ApcKey);
-        array_shift($KeyData);
-        $UploaderID = implode('_',$KeyData);
-        $ApcAvailable = self::apcAvailable();
+        $keyData = explode('_',$apcKey);
+        array_shift($keyData);
+        $uploaderID = implode('_',$keyData);
+        $apcAvailable = self::apcAvailable();
 
 
-        $Progress = [
-            'key' => $ApcKey,
-            'uploader' => $UploaderID,
-            'apc' => ($ApcAvailable) ? 'yes' : 'no'
+        $progress = [
+            'key' => $apcKey,
+            'uploader' => $uploaderID,
+            'apc' => ($apcAvailable) ? 'yes' : 'no'
         ];
 
-        if ($ApcAvailable) {
-            $Success = false;
-            $UploadStatus = apc_fetch('upload_'.$ApcKey, $Success);
+        if ($apcAvailable) {
+            $success = false;
+            $uploadStatus = apc_fetch('upload_'.$apcKey, $success);
 
-            if (!$Success) {
-                $UploadStatus = ['current' => 0, 'total' => -1];
+            if (!$success) {
+                $uploadStatus = ['current' => 0, 'total' => -1];
             }
 
-            $Progress['progress'] = ($UploadStatus['current'] / $UploadStatus['total']) * 100;
-            $Progress['total'] = $UploadStatus['total'];
-            $Progress['format_total'] = Gdn_Format::bytes($Progress['total'],1);
-            $Progress['cache'] = $UploadStatus;
+            $progress['progress'] = ($uploadStatus['current'] / $uploadStatus['total']) * 100;
+            $progress['total'] = $uploadStatus['total'];
+            $progress['format_total'] = Gdn_Format::bytes($progress['total'],1);
+            $progress['cache'] = $uploadStatus;
         }
 
-        $Sender->setJSON('Progress', $Progress);
-        $Sender->render($this->getView('blank.php'));
+        $sender->setJSON('Progress', $progress);
+        $sender->render($this->getView('blank.php'));
     }
 
     /**
@@ -962,47 +962,47 @@ class FileUploadPlugin extends Gdn_Plugin {
      * @return bool
      */
     public static function apcAvailable() {
-        $ApcAvailable = true;
+        $apcAvailable = true;
 
-        if ($ApcAvailable && !ini_get('apc.enabled')) {
-            $ApcAvailable = false;
+        if ($apcAvailable && !ini_get('apc.enabled')) {
+            $apcAvailable = false;
         }
 
-        if ($ApcAvailable && !ini_get('apc.rfc1867')) {
-            $ApcAvailable = false;
+        if ($apcAvailable && !ini_get('apc.rfc1867')) {
+            $apcAvailable = false;
         }
 
-        return $ApcAvailable;
+        return $apcAvailable;
     }
 
     /**
      * Delete an uploaded file & its media record.
      *
-     * @param int $MediaID Unique ID on Media table.
+     * @param int $mediaID Unique ID on Media table.
      */
-    protected function trashFile($MediaID) {
-        $Media = $this->mediaModel()->getID($MediaID);
+    protected function trashFile($mediaID) {
+        $media = $this->mediaModel()->getID($mediaID);
 
-        if ($Media) {
-            $this->mediaModel()->delete($Media);
-            $Deleted = false;
+        if ($media) {
+            $this->mediaModel()->delete($media);
+            $deleted = false;
 
             // Allow interception
-            $this->EventArguments['Parsed'] = Gdn_Upload::parse($Media->Path);
-            $this->EventArguments['Handled'] =& $Deleted; // Allow skipping steps below
+            $this->EventArguments['Parsed'] = Gdn_Upload::parse($media->Path);
+            $this->EventArguments['Handled'] =& $deleted; // Allow skipping steps below
             $this->fireEvent('TrashFile');
 
-            if (!$Deleted) {
-                $DirectPath = self::pathUploads().DS.$Media->Path;
-                if (file_exists($DirectPath)) {
-                    $Deleted = @unlink($DirectPath);
+            if (!$deleted) {
+                $directPath = self::pathUploads().DS.$media->Path;
+                if (file_exists($directPath)) {
+                    $deleted = @unlink($directPath);
                 }
             }
 
-            if (!$Deleted) {
-                $CalcPath = FileUploadPlugin::findLocalMedia($Media, true, true);
-                if (file_exists($CalcPath)) {
-                    @unlink($CalcPath);
+            if (!$deleted) {
+                $calcPath = FileUploadPlugin::findLocalMedia($media, true, true);
+                if (file_exists($calcPath)) {
+                    @unlink($calcPath);
                 }
             }
 
@@ -1012,21 +1012,21 @@ class FileUploadPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param DiscussionModel $Sender
+     * @param DiscussionModel $sender
      */
-    public function discussionModel_deleteDiscussion_handler($Sender) {
-        $DiscussionID = $Sender->EventArguments['DiscussionID'];
-        $this->mediaModel()->deleteParent('Discussion', $DiscussionID);
+    public function discussionModel_deleteDiscussion_handler($sender) {
+        $discussionID = $sender->EventArguments['DiscussionID'];
+        $this->mediaModel()->deleteParent('Discussion', $discussionID);
     }
 
     /**
      *
      *
-     * @param CommentModel $Sender
+     * @param CommentModel $sender
      */
-    public function commentModel_deleteComment_handler($Sender) {
-        $CommentID = $Sender->EventArguments['CommentID'];
-        $this->mediaModel()->deleteParent('Comment', $CommentID);
+    public function commentModel_deleteComment_handler($sender) {
+        $commentID = $sender->EventArguments['CommentID'];
+        $this->mediaModel()->deleteParent('Comment', $commentID);
     }
 
     /**
@@ -1252,15 +1252,15 @@ class FileUploadPluginUploadErrorException extends Exception {
     /**
      * FileUploadPluginUploadErrorException constructor.
      *
-     * @param string $Message
-     * @param int $Code
-     * @param Exception $Filename
-     * @param null $ApcKey
+     * @param string $message
+     * @param int $code
+     * @param Exception $filename
+     * @param null $apcKey
      */
-    public function __construct($Message, $Code, $Filename, $ApcKey = null) {
-        parent::__construct($Message, $Code);
-        $this->Filename = $Filename;
-        $this->ApcKey = $ApcKey;
+    public function __construct($message, $code, $filename, $apcKey = null) {
+        parent::__construct($message, $code);
+        $this->Filename = $filename;
+        $this->ApcKey = $apcKey;
     }
 
     /**

@@ -23,51 +23,51 @@ class SMFCompatibilityPlugin extends Gdn_Plugin {
 
 	/// METHODS ///
 
-   public function Base_BeforeDispatch_Handler($Sender) {
-      $Request = Gdn::Request();
-      $Folder = ltrim($Request->RequestFolder(), '/');
-      $Uri = ltrim($_SERVER['REQUEST_URI'], '/');
+   public function Base_BeforeDispatch_Handler($sender) {
+      $request = Gdn::Request();
+      $folder = ltrim($request->RequestFolder(), '/');
+      $uri = ltrim($_SERVER['REQUEST_URI'], '/');
 
       // Fix the url in the request for routing.
-      if (preg_match("`^{$Folder}index.php/`", $Uri)) {
-         $Request->PathAndQuery(substr($Uri, strlen($Folder)));
+      if (preg_match("`^{$folder}index.php/`", $uri)) {
+         $request->PathAndQuery(substr($uri, strlen($folder)));
       }
    }
 
-	public function Format($String) {
+	public function Format($string) {
       try {
-         $Result = parse_bbc($String);
-      } catch (Exception $Ex) {
-         $Result = '<!-- Error: '.htmlspecialchars($Ex->getMessage()).'-->'
-            .Gdn_Format::Display($String);
+         $result = parse_bbc($string);
+      } catch (Exception $ex) {
+         $result = '<!-- Error: '.htmlspecialchars($ex->getMessage()).'-->'
+            .Gdn_Format::Display($string);
       }
-      return $Result;
+      return $result;
 	}
 
 	public function Setup() {
-      $OldFormat = C('Garden.InputFormatter');
+      $oldFormat = C('Garden.InputFormatter');
 
-      if ($OldFormat != 'BBCode') {
+      if ($oldFormat != 'BBCode') {
          SaveToConfig([
             'Garden.InputFormatter' => 'BBCode',
-            'Garden.InputFormatterBak' => $OldFormat]);
+            'Garden.InputFormatterBak' => $oldFormat]);
       }
 
       // Setup the default routes.
-      $Router = Gdn::Router();
-      $Router->SetRoute('\?board=(\d+).*$', 'categories/$1', 'Permanent');
-      $Router->SetRoute('index\.php/topic,(\d+).(\d+)\.html.*$', 'discussion/$1/x/$2lim', 'Permanent');
-      $Router->SetRoute('index\.php/board,(\d+)\.(\d+)\.html.*$', 'categories/$1/$2lim', 'Permanent');
-      $Router->SetRoute('\?action=profile%3Bu%3D(\d+).*$', 'profile/$1/x', 'Permanent');
-      $Router->SetRoute('index\.php/topic,(\d+)\.msg(\d+)\.html.*$', 'discussion/comment/$2/#Comment_$2', 'Permanent');
-      $Router->SetRoute('\?topic=(\d+).*$', 'discussion/$1/x/p1', 'Permanent');
+      $router = Gdn::Router();
+      $router->SetRoute('\?board=(\d+).*$', 'categories/$1', 'Permanent');
+      $router->SetRoute('index\.php/topic,(\d+).(\d+)\.html.*$', 'discussion/$1/x/$2lim', 'Permanent');
+      $router->SetRoute('index\.php/board,(\d+)\.(\d+)\.html.*$', 'categories/$1/$2lim', 'Permanent');
+      $router->SetRoute('\?action=profile%3Bu%3D(\d+).*$', 'profile/$1/x', 'Permanent');
+      $router->SetRoute('index\.php/topic,(\d+)\.msg(\d+)\.html.*$', 'discussion/comment/$2/#Comment_$2', 'Permanent');
+      $router->SetRoute('\?topic=(\d+).*$', 'discussion/$1/x/p1', 'Permanent');
 	}
 
    public function OnDisable() {
-      $OldFormat = C('Garden.InputFormatterBak');
+      $oldFormat = C('Garden.InputFormatterBak');
 
-      if ($OldFormat !== FALSE) {
-         SaveToConfig('Garden.InputFormatter', $OldFormat);
+      if ($oldFormat !== FALSE) {
+         SaveToConfig('Garden.InputFormatter', $oldFormat);
       }
    }
 }

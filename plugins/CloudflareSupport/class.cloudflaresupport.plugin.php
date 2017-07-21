@@ -45,27 +45,27 @@ class CloudflareSupportPlugin extends Gdn_Plugin {
       parent::__construct();
 
       // If cloudflare isn't telling us a client IP, bust outta here!
-      $CloudflareClientIP = val('HTTP_CF_CONNECTING_IP', $_SERVER, NULL);
-      if (is_null($CloudflareClientIP)) {
+      $cloudflareClientIP = val('HTTP_CF_CONNECTING_IP', $_SERVER, NULL);
+      if (is_null($cloudflareClientIP)) {
          return;
       }
 
-      $RequestAddress = Gdn::Request()->RequestAddress();
-      $CloudflareRequest = FALSE;
-      foreach ($this->CloudflareSourceIPs as $CloudflareIPRange) {
+      $requestAddress = Gdn::Request()->RequestAddress();
+      $cloudflareRequest = FALSE;
+      foreach ($this->CloudflareSourceIPs as $cloudflareIPRange) {
 
          // Not a cloudflare origin server
-         if (!ip_in_range($RequestAddress, $CloudflareIPRange)) {
+         if (!ip_in_range($requestAddress, $cloudflareIPRange)) {
             continue;
          }
 
-         Gdn::Request()->RequestAddress($CloudflareClientIP);
-         $CloudflareRequest = TRUE;
+         Gdn::Request()->RequestAddress($cloudflareClientIP);
+         $cloudflareRequest = TRUE;
          break;
       }
 
       // Let people know that the CF plugin is turned on.
-      if ($CloudflareRequest && !headers_sent()) {
+      if ($cloudflareRequest && !headers_sent()) {
          header("X-CF-Powered-By: CF-Vanilla v" . $this->GetPluginKey('Version'));
       }
    }

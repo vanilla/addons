@@ -2,8 +2,8 @@
 
 class LikedPlugin extends Gdn_Plugin {
 
-	public function DiscussionController_Render_Before($Sender) {
-      $FB_SDK = <<<EOD
+	public function DiscussionController_Render_Before($sender) {
+      $fB_SDK = <<<EOD
 <div id="fb-root"></div>
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
@@ -13,10 +13,10 @@ class LikedPlugin extends Gdn_Plugin {
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 EOD;
-      $Sender->AddAsset('Panel', $FB_SDK);
+      $sender->AddAsset('Panel', $fB_SDK);
 	}
 
-	public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
+	public function DiscussionController_AfterDiscussionBody_Handler($sender) {
       echo '<div class="fb-like" data-href="';
       echo Gdn_Url::Request(true, true, true);
       echo '" data-send="false" data-width="450" data-show-faces="false" data-font="lucida grande"></div>';

@@ -77,64 +77,64 @@ class MultilingualPlugin extends Gdn_Plugin {
      *
      * Moved event from AppStart to AfterAnalyzeRequest to allow Embed to set P3P header first.
      */
-    public function gdn_dispatcher_afterAnalyzeRequest_handler($Sender) {
+    public function gdn_dispatcher_afterAnalyzeRequest_handler($sender) {
         // Set user preference
-        if ($TempLocale = $this->getAlternateLocale()) {
-            Gdn::Locale()->Set($TempLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
+        if ($tempLocale = $this->getAlternateLocale()) {
+            Gdn::Locale()->Set($tempLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
         }
     }
 
     /**
      * Show alternate locale options in Foot.
      */
-    public function base_render_before($Sender) {
+    public function base_render_before($sender) {
         // Not in Dashboard
         // Block guests until guest sessions are restored
-        if ($Sender->MasterView == 'admin' || !CheckPermission('Garden.SignIn.Allow'))
+        if ($sender->MasterView == 'admin' || !CheckPermission('Garden.SignIn.Allow'))
             return;
 
-        $Sender->AddModule('LocaleChooserModule');
+        $sender->AddModule('LocaleChooserModule');
 
         // Add a simple style
-        $Sender->AddAsset('Head', '<style>.LocaleOption { padding-left: 10px; } .LocaleOptions { padding: 10px; } .Dashboard .LocaleOptions { display: none; }</style>');
+        $sender->AddAsset('Head', '<style>.LocaleOption { padding-left: 10px; } .LocaleOptions { padding: 10px; } .Dashboard .LocaleOptions { display: none; }</style>');
     }
 
     /**
      * Get user preference or queried locale.
      */
     protected function getAlternateLocale() {
-        $Locale = false;
+        $locale = false;
 
         // User preference
         if (Gdn::Session()->IsValid()) {
-            $Locale = $this->GetUserMeta(Gdn::Session()->UserID, 'Locale', false);
-            $Locale = val('Plugin.Multilingual.Locale', $Locale, false);
+            $locale = $this->GetUserMeta(Gdn::Session()->UserID, 'Locale', false);
+            $locale = val('Plugin.Multilingual.Locale', $locale, false);
         }
         // Query string
-        if (!$Locale) {
-            $Locale = $this->validateLocale(Gdn::Request()->Get('locale'));
-            if ($Locale) {
-                Gdn::Session()->Stash('Locale', $Locale);
+        if (!$locale) {
+            $locale = $this->validateLocale(Gdn::Request()->Get('locale'));
+            if ($locale) {
+                Gdn::Session()->Stash('Locale', $locale);
             }
         }
         // Session
-        if (!$Locale) {
-            $Locale = Gdn::Session()->Stash('Locale', '', false);
+        if (!$locale) {
+            $locale = Gdn::Session()->Stash('Locale', '', false);
         }
 
-        return $Locale;
+        return $locale;
     }
 
     /**
      * Allow user to set their preferred locale via link-click.
      */
-    public function profileController_setLocale_create($Sender, $locale, $TK) {
+    public function profileController_setLocale_create($sender, $locale, $tK) {
         if (!Gdn::Session()->UserID) {
             throw PermissionException('Garden.SignIn.Allow');
         }
 
         // Check intent.
-        if (!Gdn::Session()->ValidateTransientKey($TK)) {
+        if (!Gdn::Session()->ValidateTransientKey($tK)) {
             redirectTo($_SERVER['HTTP_REFERER']);
         }
 
@@ -158,11 +158,11 @@ class MultilingualPlugin extends Gdn_Plugin {
     /**
      * Confirm selected locale is valid and available.
      *
-     * @param string $Locale Locale code.
+     * @param string $locale Locale code.
      * @return string Returns the canonical version of the locale on success or an empty string otherwise.
      */
-    protected function validateLocale($Locale) {
-        $canonicalLocale = Gdn_Locale::Canonicalize($Locale);
+    protected function validateLocale($locale) {
+        $canonicalLocale = Gdn_Locale::Canonicalize($locale);
         $locales = static::enabledLocales();
 
         $result = isset($locales[$canonicalLocale]) ? $canonicalLocale : '';

@@ -13,8 +13,8 @@
 
 class EmotifyPlugin implements Gdn_IPlugin {
    
-   public function AssetModel_StyleCss_Handler($Sender) {
-      $Sender->AddCssFile('emotify.css', 'plugins/Emotify');
+   public function AssetModel_StyleCss_Handler($sender) {
+      $sender->AddCssFile('emotify.css', 'plugins/Emotify');
    }
 	
     /**
@@ -27,17 +27,17 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	/**
 	 * Replace emoticons in comments.
 	 */
-	public function Base_AfterCommentFormat_Handler($Sender) {
+	public function Base_AfterCommentFormat_Handler($sender) {
 		if (!C('Plugins.Emotify.FormatEmoticons', TRUE))
 			return;
 
-		$Object = $Sender->EventArguments['Object'];
-		$Object->FormatBody = $this->DoEmoticons($Object->FormatBody);
-		$Sender->EventArguments['Object'] = $Object;
+		$object = $sender->EventArguments['Object'];
+		$object->FormatBody = $this->DoEmoticons($object->FormatBody);
+		$sender->EventArguments['Object'] = $object;
 	}
 	
-	public function DiscussionController_Render_Before($Sender) {
-		$this->_EmotifySetup($Sender);
+	public function DiscussionController_Render_Before($sender) {
+		$this->_EmotifySetup($sender);
 	}
 
 	/**
@@ -195,62 +195,62 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	/**
 	 * Replace emoticons in comment preview.
 	 */
-	public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
+	public function PostController_AfterCommentPreviewFormat_Handler($sender) {
 		if (!C('Plugins.Emotify.FormatEmoticons', TRUE))
 			return;
 		
-		$Sender->Comment->Body = $this->DoEmoticons($Sender->Comment->Body);
+		$sender->Comment->Body = $this->DoEmoticons($sender->Comment->Body);
 	}
 	
-	public function PostController_Render_Before($Sender) {
-		$this->_EmotifySetup($Sender);
+	public function PostController_Render_Before($sender) {
+		$this->_EmotifySetup($sender);
 	}
    
-   public function NBBCPlugin_AfterNBBCSetup_Handler($Sender, $Args) {
+   public function NBBCPlugin_AfterNBBCSetup_Handler($sender, $args) {
 //      $BBCode = new BBCode();
-      $BBCode = $Args['BBCode'];
-      $BBCode->smiley_url = SmartAsset('/plugins/Emotify/design/images');
+      $bBCode = $args['BBCode'];
+      $bBCode->smiley_url = SmartAsset('/plugins/Emotify/design/images');
       
-      $Smileys = [];
-      foreach (self::GetEmoticons() as $Text => $Filename) {
-         $Smileys[$Text]= $Filename.'.gif';
+      $smileys = [];
+      foreach (self::GetEmoticons() as $text => $filename) {
+         $smileys[$text]= $filename.'.gif';
       }
       
-      $BBCode->smileys = $Smileys;
+      $bBCode->smileys = $smileys;
    }
 	
 	/**
 	 * Thanks to punbb 1.3.5 (GPL License) for this function - ported from their do_smilies function.
 	 */
-	public static function DoEmoticons($Text) {
-		$Text = ' '.$Text.' ';
-		$Emoticons = EmotifyPlugin::GetEmoticons();
-		foreach ($Emoticons as $Key => $Replacement) {
-			if (strpos($Text, $Key) !== FALSE)
-				$Text = preg_replace(
-					"#(?<=[>\s])".preg_quote($Key, '#')."(?=\W)#m",
-					'<span class="Emoticon Emoticon' . $Replacement . '"><span>' . $Key . '</span></span>',
-					$Text
+	public static function DoEmoticons($text) {
+		$text = ' '.$text.' ';
+		$emoticons = EmotifyPlugin::GetEmoticons();
+		foreach ($emoticons as $key => $replacement) {
+			if (strpos($text, $key) !== FALSE)
+				$text = preg_replace(
+					"#(?<=[>\s])".preg_quote($key, '#')."(?=\W)#m",
+					'<span class="Emoticon Emoticon' . $replacement . '"><span>' . $key . '</span></span>',
+					$text
 				);
 		}
 
-		return substr($Text, 1, -1);
+		return substr($text, 1, -1);
 	}
 
 	/**
 	 * Prepare a page to be emotified.
 	 */
-	private function _EmotifySetup($Sender) {
-		$Sender->AddJsFile('emotify.js', 'plugins/Emotify');  
+	private function _EmotifySetup($sender) {
+		$sender->AddJsFile('emotify.js', 'plugins/Emotify');  
 		// Deliver the emoticons to the page.
-      $Emoticons = [];
+      $emoticons = [];
       foreach ($this->GetEmoticons() as $i => $gif) {
-         if (!isset($Emoticons[$gif]))
-            $Emoticons[$gif] = $i;
+         if (!isset($emoticons[$gif]))
+            $emoticons[$gif] = $i;
       }
-      $Emoticons = array_flip($Emoticons);
+      $emoticons = array_flip($emoticons);
 
-		$Sender->AddDefinition('Emoticons', base64_encode(json_encode($Emoticons)));
+		$sender->AddDefinition('Emoticons', base64_encode(json_encode($emoticons)));
 	}
 	
 	public function Setup() {

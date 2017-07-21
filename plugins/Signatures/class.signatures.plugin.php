@@ -37,12 +37,12 @@ class SignaturesPlugin extends Gdn_Plugin {
     /**
      * Add mapper methods
      *
-     * @param SimpleApiPlugin $Sender
+     * @param SimpleApiPlugin $sender
      */
-    public function simpleApiPlugin_mapper_handler($Sender) {
-        switch ($Sender->Mapper->Version) {
+    public function simpleApiPlugin_mapper_handler($sender) {
+        switch ($sender->Mapper->Version) {
             case '1.0':
-                $Sender->Mapper->addMap([
+                $sender->Mapper->addMap([
                     'signature/get' => 'profile/signature/modify',
                     'signature/set' => 'profile/signature/modify',
                 ], null, [
@@ -56,20 +56,20 @@ class SignaturesPlugin extends Gdn_Plugin {
     /**
      * Add "Signature Settings" to profile edit mode side menu.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function profileController_afterAddSideMenu_handler($Sender) {
+    public function profileController_afterAddSideMenu_handler($sender) {
         if (!CheckPermission('Garden.SignIn.Allow')) {
             return;
         }
 
-        $SideMenu = $Sender->EventArguments['SideMenu'];
-        $ViewingUserID = Gdn::session()->UserID;
+        $sideMenu = $sender->EventArguments['SideMenu'];
+        $viewingUserID = Gdn::session()->UserID;
 
-        if ($Sender->User->UserID == $ViewingUserID) {
-            $SideMenu->addLink('Options', sprite('SpSignatures').' '.t('Signature Settings'), '/profile/signature', false, ['class' => 'Popup']);
+        if ($sender->User->UserID == $viewingUserID) {
+            $sideMenu->addLink('Options', sprite('SpSignatures').' '.t('Signature Settings'), '/profile/signature', false, ['class' => 'Popup']);
         } else {
-            $SideMenu->addLink('Options', sprite('SpSignatures').' '.t('Signature Settings'), userUrl($Sender->User, '', 'signature'), ['Garden.Users.Edit', 'Moderation.Signatures.Edit'], ['class' => 'Popup']);
+            $sideMenu->addLink('Options', sprite('SpSignatures').' '.t('Signature Settings'), userUrl($sender->User, '', 'signature'), ['Garden.Users.Edit', 'Moderation.Signatures.Edit'], ['class' => 'Popup']);
         }
     }
 
@@ -77,152 +77,152 @@ class SignaturesPlugin extends Gdn_Plugin {
      * Add "Signature Settings" to Profile Edit button group.
      * Only do this if they cannot edit profiles because otherwise they can't navigate there.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function profileController_beforeProfileOptions_handler($Sender, $Args) {
-        $CanEditProfiles = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
-        if (checkPermission('Moderation.Signatures.Edit') && !$CanEditProfiles) {
-            $Args['ProfileOptions'][] = ['Text' => sprite('SpSignatures').' '.t('Signature Settings'), 'Url' => userUrl($Sender->User, '', 'signature')];
+    public function profileController_beforeProfileOptions_handler($sender, $args) {
+        $canEditProfiles = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
+        if (checkPermission('Moderation.Signatures.Edit') && !$canEditProfiles) {
+            $args['ProfileOptions'][] = ['Text' => sprite('SpSignatures').' '.t('Signature Settings'), 'Url' => userUrl($sender->User, '', 'signature')];
         }
     }
 
     /**
      * Profile settings
      *
-     * @param ProfileController $Sender
+     * @param ProfileController $sender
      */
-    public function profileController_signature_create($Sender) {
-        $Sender->permission('Garden.SignIn.Allow');
-        $Sender->title(t('Signature Settings'));
+    public function profileController_signature_create($sender) {
+        $sender->permission('Garden.SignIn.Allow');
+        $sender->title(t('Signature Settings'));
 
-        $this->dispatch($Sender);
+        $this->dispatch($sender);
     }
 
 
-    public function controller_index($Sender) {
-        $Sender->permission([
+    public function controller_index($sender) {
+        $sender->permission([
             'Garden.Profiles.Edit'
         ]);
 
-        $Args = $Sender->RequestArgs;
-        if (sizeof($Args) < 2) {
-            $Args = array_merge($Args, [0, 0]);
-        } elseif (sizeof($Args) > 2) {
-            $Args = array_slice($Args, 0, 2);
+        $args = $sender->RequestArgs;
+        if (sizeof($args) < 2) {
+            $args = array_merge($args, [0, 0]);
+        } elseif (sizeof($args) > 2) {
+            $args = array_slice($args, 0, 2);
         }
 
-        list($UserReference, $Username) = $Args;
+        list($userReference, $username) = $args;
 
         $canEditSignatures = checkPermission('Plugins.Signatures.Edit');
 
 
-        $Sender->getUserInfo($UserReference, $Username);
-        $UserPrefs = dbdecode($Sender->User->Preferences);
-        if (!is_array($UserPrefs)) {
-            $UserPrefs = [];
+        $sender->getUserInfo($userReference, $username);
+        $userPrefs = dbdecode($sender->User->Preferences);
+        if (!is_array($userPrefs)) {
+            $userPrefs = [];
         }
 
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigArray = [
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configArray = [
             'Plugin.Signatures.Sig' => null,
             'Plugin.Signatures.HideAll' => null,
             'Plugin.Signatures.HideImages' => null,
             'Plugin.Signatures.HideMobile' => null,
             'Plugin.Signatures.Format' => null
         ];
-        $SigUserID = $ViewingUserID = Gdn::session()->UserID;
+        $sigUserID = $viewingUserID = Gdn::session()->UserID;
 
-        if ($Sender->User->UserID != $ViewingUserID) {
-            $Sender->permission(['Garden.Users.Edit', 'Moderation.Signatures.Edit'], false);
-            $SigUserID = $Sender->User->UserID;
+        if ($sender->User->UserID != $viewingUserID) {
+            $sender->permission(['Garden.Users.Edit', 'Moderation.Signatures.Edit'], false);
+            $sigUserID = $sender->User->UserID;
             $canEditSignatures = true;
         }
 
-        $Sender->setData('CanEdit', $canEditSignatures);
-        $Sender->setData('Plugin-Signatures-ForceEditing', ($SigUserID == Gdn::session()->UserID) ? false : $Sender->User->Name);
-        $UserMeta = $this->getUserMeta($SigUserID, '%');
+        $sender->setData('CanEdit', $canEditSignatures);
+        $sender->setData('Plugin-Signatures-ForceEditing', ($sigUserID == Gdn::session()->UserID) ? false : $sender->User->Name);
+        $userMeta = $this->getUserMeta($sigUserID, '%');
 
-        if ($Sender->Form->authenticatedPostBack() === false && is_array($UserMeta)) {
-            $ConfigArray = array_merge($ConfigArray, $UserMeta);
+        if ($sender->Form->authenticatedPostBack() === false && is_array($userMeta)) {
+            $configArray = array_merge($configArray, $userMeta);
         }
 
-        $ConfigurationModel->setField($ConfigArray);
+        $configurationModel->setField($configArray);
 
         // Set the model on the form.
-        $Sender->Form->setModel($ConfigurationModel);
+        $sender->Form->setModel($configurationModel);
 
-        $Data = $ConfigurationModel->Data;
-        $Sender->setData('Signature', $Data);
+        $data = $configurationModel->Data;
+        $sender->setData('Signature', $data);
 
-        $this->setSignatureRules($Sender);
+        $this->setSignatureRules($sender);
 
         // Form submission handling.
-        if ($Sender->Form->authenticatedPostBack()) {
-            $Values = $Sender->Form->formValues();
+        if ($sender->Form->authenticatedPostBack()) {
+            $values = $sender->Form->formValues();
 
             if ($canEditSignatures) {
-                $Values['Plugin.Signatures.Sig'] = val('Body', $Values, null);
-                $Values['Plugin.Signatures.Format'] = val('Format', $Values, null);
+                $values['Plugin.Signatures.Sig'] = val('Body', $values, null);
+                $values['Plugin.Signatures.Format'] = val('Format', $values, null);
             }
 
-            $FrmValues = array_intersect_key($Values, $ConfigArray);
+            $frmValues = array_intersect_key($values, $configArray);
 
-            if (sizeof($FrmValues)) {
+            if (sizeof($frmValues)) {
 
-                if (!GetValue($this->makeMetaKey('Sig'), $FrmValues)) {
+                if (!GetValue($this->makeMetaKey('Sig'), $frmValues)) {
                     // Delete the signature.
-                    $FrmValues[$this->makeMetaKey('Sig')] = null;
-                    $FrmValues[$this->makeMetaKey('Format')] = null;
+                    $frmValues[$this->makeMetaKey('Sig')] = null;
+                    $frmValues[$this->makeMetaKey('Format')] = null;
                 }
 
-                $this->crossCheckSignature($Values, $Sender);
+                $this->crossCheckSignature($values, $sender);
 
-                if ($Sender->Form->errorCount() == 0) {
-                    foreach ($FrmValues as $UserMetaKey => $UserMetaValue) {
-                        $Key = $this->trimMetaKey($UserMetaKey);
+                if ($sender->Form->errorCount() == 0) {
+                    foreach ($frmValues as $userMetaKey => $userMetaValue) {
+                        $key = $this->trimMetaKey($userMetaKey);
 
-                        switch ($Key) {
+                        switch ($key) {
                             case 'Format':
-                                if (strcasecmp($UserMetaValue, 'Raw') == 0) {
-                                    $UserMetaValue = null;
+                                if (strcasecmp($userMetaValue, 'Raw') == 0) {
+                                    $userMetaValue = null;
                                 } // don't allow raw signatures.
                                 break;
                         }
 
-                        $this->setUserMeta($SigUserID, $Key, $UserMetaValue);
+                        $this->setUserMeta($sigUserID, $key, $userMetaValue);
                     }
-                    $Sender->informMessage(T("Your changes have been saved."));
+                    $sender->informMessage(T("Your changes have been saved."));
                 }
             }
         } else {
             // Load form data.
-            $Data['Body'] = val('Plugin.Signatures.Sig', $Data);
-            $Data['Format'] = val('Plugin.Signatures.Format', $Data) ?: Gdn_Format::defaultFormat();
+            $data['Body'] = val('Plugin.Signatures.Sig', $data);
+            $data['Format'] = val('Plugin.Signatures.Format', $data) ?: Gdn_Format::defaultFormat();
 
             // Apply the config settings to the form.
-            $Sender->Form->setData($Data);
+            $sender->Form->setData($data);
         }
 
-        $Sender->render('signature', '', 'plugins/Signatures');
+        $sender->render('signature', '', 'plugins/Signatures');
     }
 
     /**
      * Checks signature against constraints set in config settings,
      * and executes the external ValidateSignature function, if it exists.
      *
-     * @param $Values Signature settings form values
-     * @param $Sender Controller
+     * @param $values Signature settings form values
+     * @param $sender Controller
      */
-    public function crossCheckSignature($Values, &$Sender) {
-        $this->checkSignatureLength($Values, $Sender);
-        $this->checkNumberOfImages($Values, $Sender);
+    public function crossCheckSignature($values, &$sender) {
+        $this->checkSignatureLength($values, $sender);
+        $this->checkNumberOfImages($values, $sender);
 
         // Validate the signature.
         if (function_exists('ValidateSignature')) {
-            $Sig = trim(val('Plugin.Signatures.Sig', $Values));
-            if (validateRequired($Sig) && !ValidateSignature($Sig, val('Plugin.Signatures.Format', $Values))) {
-                $Sender->Form->addError('Signature invalid.');
+            $sig = trim(val('Plugin.Signatures.Sig', $values));
+            if (validateRequired($sig) && !ValidateSignature($sig, val('Plugin.Signatures.Format', $values))) {
+                $sender->Form->addError('Signature invalid.');
             }
         }
     }
@@ -262,36 +262,36 @@ class SignaturesPlugin extends Gdn_Plugin {
     /**
      * Checks number of images in signature against Plugins.Signatures.MaxNumberImages
      *
-     * @param $Values Signature settings form values
-     * @param $Sender Controller
+     * @param $values Signature settings form values
+     * @param $sender Controller
      */
-    public function checkNumberOfImages($Values, &$Sender) {
+    public function checkNumberOfImages($values, &$sender) {
         $maxImages = self::getMaximumNumberOfImages();
         if ($maxImages !== 'Unlimited') {
-            $Sig = Gdn_Format::to(val('Plugin.Signatures.Sig', $Values), val('Plugin.Signatures.Format', $Values, c('Garden.InputFormatter')));
-            $numMatches = preg_match_all('/<img/i', $Sig);
+            $sig = Gdn_Format::to(val('Plugin.Signatures.Sig', $values), val('Plugin.Signatures.Format', $values, c('Garden.InputFormatter')));
+            $numMatches = preg_match_all('/<img/i', $sig);
 
             if($maxImages === 'None' && $numMatches > 0) {
-                $Sender->Form->addError('Images not allowed');
+                $sender->Form->addError('Images not allowed');
             } elseif (is_int($maxImages) && $numMatches > $maxImages) {
-                $Sender->Form->addError('@'.formatString('You are only allowed {maxImages,plural,%s image,%s images}.',
+                $sender->Form->addError('@'.formatString('You are only allowed {maxImages,plural,%s image,%s images}.',
                         ['maxImages' => $maxImages]));
 
             }
         }
     }
 
-    public function setSignatureRules($Sender) {
+    public function setSignatureRules($sender) {
         $rules = [];
         $rulesParams = [];
         $imagesAllowed = true;
         $maxTextLength = self::getMaximumTextLength();
         $maxImageHeight = self::getMaximumImageHeight();
-        $MaxNumberImages = self::getMaximumNumberOfImages();
+        $maxNumberImages = self::getMaximumNumberOfImages();
 
-        if ($MaxNumberImages !== 'Unlimited') {
-            if (is_numeric($MaxNumberImages) && $MaxNumberImages > 0) { //'None' or any other non positive ints
-                $rulesParams['maxImages'] = $MaxNumberImages;
+        if ($maxNumberImages !== 'Unlimited') {
+            if (is_numeric($maxNumberImages) && $maxNumberImages > 0) { //'None' or any other non positive ints
+                $rulesParams['maxImages'] = $maxNumberImages;
                 $rules[] = formatString(t('Use up to {maxImages,plural,%s image, %s images}.'), $rulesParams);
             } else {
                 $rules[] = t('Images not allowed');
@@ -309,19 +309,19 @@ class SignaturesPlugin extends Gdn_Plugin {
             $rules[] = formatString(t('Signatures can be up to {maxLength} characters long.'), $rulesParams);
         }
 
-        $Sender->setData('SignatureRules', implode(' ', $rules));
+        $sender->setData('SignatureRules', implode(' ', $rules));
     }
 
 
     /**
      * Strips all line breaks from text
      *
-     * @param string $Text
-     * @param string $Delimiter
+     * @param string $text
+     * @param string $delimiter
      */
-    public function stripLineBreaks(&$Text, $Delimiter = ' ') {
-        $Text = str_replace(["\r\n", "\r"], "\n", $Text);
-        $lines = explode("\n", $Text);
+    public function stripLineBreaks(&$text, $delimiter = ' ') {
+        $text = str_replace(["\r\n", "\r"], "\n", $text);
+        $lines = explode("\n", $text);
         $new_lines = [];
         foreach ($lines as $i => $line) {
             $line = trim($line);
@@ -329,7 +329,7 @@ class SignaturesPlugin extends Gdn_Plugin {
                 $new_lines[] = $line;
             }
         }
-        $Text = implode($new_lines, $Delimiter);
+        $text = implode($new_lines, $delimiter);
     }
 
     public function stripFormatting() {
@@ -340,25 +340,25 @@ class SignaturesPlugin extends Gdn_Plugin {
      * API METHODS
      */
 
-    public function controller_Modify($Sender) {
+    public function controller_Modify($sender) {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
-        $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
-        $Sender->deliveryType(DELIVERY_TYPE_DATA);
+        $sender->deliveryMethod(DELIVERY_METHOD_JSON);
+        $sender->deliveryType(DELIVERY_TYPE_DATA);
 
-        $UserID = Gdn::request()->get('UserID');
-        if ($UserID != Gdn::session()->UserID) {
-            $Sender->permission(['Garden.Users.Edit', 'Moderation.Signatures.Edit'], false);
+        $userID = Gdn::request()->get('UserID');
+        if ($userID != Gdn::session()->UserID) {
+            $sender->permission(['Garden.Users.Edit', 'Moderation.Signatures.Edit'], false);
         } else {
-            $Sender->permission(['Garden.Profiles.Edit', 'Plugins.Signatures.Edit']);
+            $sender->permission(['Garden.Profiles.Edit', 'Plugins.Signatures.Edit']);
         }
-        $User = Gdn::userModel()->getID($UserID);
-        if (!$User) {
-            throw new Exception("No such user '{$UserID}'", 404);
+        $user = Gdn::userModel()->getID($userID);
+        if (!$user) {
+            throw new Exception("No such user '{$userID}'", 404);
         }
 
-        $Translation = [
+        $translation = [
             'Plugin.Signatures.Sig' => 'Body',
             'Plugin.Signatures.Format' => 'Format',
             'Plugin.Signatures.HideAll' => 'HideAll',
@@ -366,133 +366,133 @@ class SignaturesPlugin extends Gdn_Plugin {
             'Plugin.Signatures.HideMobile' => 'HideMobile'
         ];
 
-        $UserMeta = $this->getUserMeta($UserID, '%');
-        $SigData = [];
-        foreach ($Translation as $TranslationField => $TranslationShortcut) {
-            $SigData[$TranslationShortcut] = val($TranslationField, $UserMeta, null);
+        $userMeta = $this->getUserMeta($userID, '%');
+        $sigData = [];
+        foreach ($translation as $translationField => $translationShortcut) {
+            $sigData[$translationShortcut] = val($translationField, $userMeta, null);
         }
 
-        $Sender->setData('Signature', $SigData);
+        $sender->setData('Signature', $sigData);
 
-        if ($Sender->Form->isPostBack()) {
-            $Sender->setData('Success', false);
+        if ($sender->Form->isPostBack()) {
+            $sender->setData('Success', false);
 
             // Validate the signature.
             if (function_exists('ValidateSignature')) {
-                $Sig = $Sender->Form->getFormValue('Body');
-                $Format = $Sender->Form->getFormValue('Format');
-                if (validateRequired($Sig) && !ValidateSignature($Sig, $Format)) {
-                    $Sender->Form->addError('Signature invalid.');
+                $sig = $sender->Form->getFormValue('Body');
+                $format = $sender->Form->getFormValue('Format');
+                if (validateRequired($sig) && !ValidateSignature($sig, $format)) {
+                    $sender->Form->addError('Signature invalid.');
                 }
             }
 
-            if ($Sender->Form->errorCount() == 0) {
-                foreach ($Translation as $TranslationField => $TranslationShortcut) {
-                    $UserMetaValue = $Sender->Form->getValue($TranslationShortcut, null);
-                    if (is_null($UserMetaValue)) {
+            if ($sender->Form->errorCount() == 0) {
+                foreach ($translation as $translationField => $translationShortcut) {
+                    $userMetaValue = $sender->Form->getValue($translationShortcut, null);
+                    if (is_null($userMetaValue)) {
                         continue;
                     }
 
-                    if ($TranslationShortcut == 'Body' && empty($UserMetaValue)) {
-                        $UserMetaValue = null;
+                    if ($translationShortcut == 'Body' && empty($userMetaValue)) {
+                        $userMetaValue = null;
                     }
 
-                    $Key = $this->trimMetaKey($TranslationField);
+                    $key = $this->trimMetaKey($translationField);
 
-                    switch ($Key) {
+                    switch ($key) {
                         case 'Format':
-                            if (strcasecmp($UserMetaValue, 'Raw') == 0) {
-                                $UserMetaValue = null;
+                            if (strcasecmp($userMetaValue, 'Raw') == 0) {
+                                $userMetaValue = null;
                             } // don't allow raw signatures.
                             break;
                     }
 
-                    if ($Sender->Form->errorCount() == 0) {
-                        $this->setUserMeta($UserID, $Key, $UserMetaValue);
+                    if ($sender->Form->errorCount() == 0) {
+                        $this->setUserMeta($userID, $key, $userMetaValue);
                     }
                 }
-                $Sender->setData('Success', true);
+                $sender->setData('Success', true);
             }
         }
 
-        $Sender->render();
+        $sender->render();
     }
 
-    protected function userPreferences($SigKey = null, $Default = null) {
-        static $UserSigData = null;
-        if (is_null($UserSigData)) {
-            $UserSigData = $this->getUserMeta(Gdn::session()->UserID, '%');
+    protected function userPreferences($sigKey = null, $default = null) {
+        static $userSigData = null;
+        if (is_null($userSigData)) {
+            $userSigData = $this->getUserMeta(Gdn::session()->UserID, '%');
 
         }
 
-        if (!is_null($SigKey)) {
-            return val($SigKey, $UserSigData, $Default);
+        if (!is_null($sigKey)) {
+            return val($sigKey, $userSigData, $default);
         }
 
-        return $UserSigData;
+        return $userSigData;
     }
 
-    protected function signatures($Sender, $RequestUserID = null, $Default = null) {
-        static $Signatures = null;
+    protected function signatures($sender, $requestUserID = null, $default = null) {
+        static $signatures = null;
 
-        if (is_null($Signatures)) {
-            $Signatures = [];
+        if (is_null($signatures)) {
+            $signatures = [];
 
             // Short circuit if not needed.
             if ($this->hide()) {
-                return $Signatures;
+                return $signatures;
             }
 
-            $Discussion = $Sender->data('Discussion');
-            $Comments = $Sender->data('Comments');
-            $UserIDList = [];
+            $discussion = $sender->data('Discussion');
+            $comments = $sender->data('Comments');
+            $userIDList = [];
 
-            if ($Discussion) {
-                $UserIDList[GetValue('InsertUserID', $Discussion)] = 1;
+            if ($discussion) {
+                $userIDList[GetValue('InsertUserID', $discussion)] = 1;
             }
 
-            if ($Comments && $Comments->numRows()) {
-                $Comments->dataSeek(-1);
-                while ($Comment = $Comments->nextRow()) {
-                    $UserIDList[GetValue('InsertUserID', $Comment)] = 1;
+            if ($comments && $comments->numRows()) {
+                $comments->dataSeek(-1);
+                while ($comment = $comments->nextRow()) {
+                    $userIDList[GetValue('InsertUserID', $comment)] = 1;
                 }
             }
 
-            if (sizeof($UserIDList)) {
-                $DataSignatures = $this->getUserMeta(array_keys($UserIDList), 'Sig');
-                $Formats = (array)$this->getUserMeta(array_keys($UserIDList), 'Format');
+            if (sizeof($userIDList)) {
+                $dataSignatures = $this->getUserMeta(array_keys($userIDList), 'Sig');
+                $formats = (array)$this->getUserMeta(array_keys($userIDList), 'Format');
 
-                if (is_array($DataSignatures)) {
-                    foreach ($DataSignatures as $UserID => $UserSig) {
-                        $Sig = val($this->makeMetaKey('Sig'), $UserSig);
-                        if (isset($Formats[$UserID])) {
-                            $Format = val($this->makeMetaKey('Format'), $Formats[$UserID], c('Garden.InputFormatter'));
+                if (is_array($dataSignatures)) {
+                    foreach ($dataSignatures as $userID => $userSig) {
+                        $sig = val($this->makeMetaKey('Sig'), $userSig);
+                        if (isset($formats[$userID])) {
+                            $format = val($this->makeMetaKey('Format'), $formats[$userID], c('Garden.InputFormatter'));
                         } else {
-                            $Format = c('Garden.InputFormatter');
+                            $format = c('Garden.InputFormatter');
                         }
 
-                        $Signatures[$UserID] = [$Sig, $Format];
+                        $signatures[$userID] = [$sig, $format];
                     }
                 }
             }
 
         }
 
-        if (!is_null($RequestUserID)) {
-            return val($RequestUserID, $Signatures, $Default);
+        if (!is_null($requestUserID)) {
+            return val($requestUserID, $signatures, $default);
         }
 
-        return $Signatures;
+        return $signatures;
     }
 
 
     /** Deprecated in 2.1. */
-    public function base_afterCommentBody_handler($Sender) {
+    public function base_afterCommentBody_handler($sender) {
         if ($this->Disabled) {
             return;
         }
 
-        $this->drawSignature($Sender);
+        $this->drawSignature($sender);
     }
 
     /**
@@ -518,61 +518,61 @@ EOT;
     }
 
     /** New call for 2.1. */
-    public function discussionController_afterDiscussionBody_handler($Sender) {
+    public function discussionController_afterDiscussionBody_handler($sender) {
         if ($this->Disabled) {
             return;
         }
-        $this->drawSignature($Sender);
+        $this->drawSignature($sender);
     }
 
-    protected function drawSignature($Sender) {
+    protected function drawSignature($sender) {
         if ($this->hide()) {
             return;
         }
 
-        if (isset($Sender->EventArguments['Discussion'])) {
-            $Data = $Sender->EventArguments['Discussion'];
+        if (isset($sender->EventArguments['Discussion'])) {
+            $data = $sender->EventArguments['Discussion'];
         }
 
-        if (isset($Sender->EventArguments['Comment'])) {
-            $Data = $Sender->EventArguments['Comment'];
+        if (isset($sender->EventArguments['Comment'])) {
+            $data = $sender->EventArguments['Comment'];
         }
 
-        $SourceUserID = val('InsertUserID', $Data);
-        $User = Gdn::userModel()->getID($SourceUserID, DATASET_TYPE_ARRAY);
-        if (val('HideSignature', $User, false)) {
+        $sourceUserID = val('InsertUserID', $data);
+        $user = Gdn::userModel()->getID($sourceUserID, DATASET_TYPE_ARRAY);
+        if (val('HideSignature', $user, false)) {
             return;
         }
 
 
-        $Signature = $this->signatures($Sender, $SourceUserID);
+        $signature = $this->signatures($sender, $sourceUserID);
 
-        if (is_array($Signature)) {
-            list($Signature, $SigFormat) = $Signature;
+        if (is_array($signature)) {
+            list($signature, $sigFormat) = $signature;
         } else {
-            $SigFormat = c('Garden.InputFormatter');
+            $sigFormat = c('Garden.InputFormatter');
         }
 
-        if (!$SigFormat) {
-            $SigFormat = c('Garden.InputFormatter');
+        if (!$sigFormat) {
+            $sigFormat = c('Garden.InputFormatter');
         }
 
         $this->EventArguments = [
-            'UserID' => $SourceUserID,
-            'Signature' => &$Signature
+            'UserID' => $sourceUserID,
+            'Signature' => &$signature
         ];
         $this->fireEvent('BeforeDrawSignature');
 
-        $SigClasses = '';
-        if (!is_null($Signature)) {
-            $HideImages = $this->userPreferences('Plugin.Signatures.HideImages', false);
+        $sigClasses = '';
+        if (!is_null($signature)) {
+            $hideImages = $this->userPreferences('Plugin.Signatures.HideImages', false);
 
-            if ($HideImages) {
-                $SigClasses .= 'HideImages ';
+            if ($hideImages) {
+                $sigClasses .= 'HideImages ';
             }
 
             // Don't show empty sigs
-            if ($Signature == '') {
+            if ($signature == '') {
                 return;
             }
 
@@ -589,7 +589,7 @@ EOT;
                 ]);
             }
 
-            $UserSignature = Gdn_Format::to($Signature, $SigFormat)."<!-- $SigFormat -->";
+            $userSignature = Gdn_Format::to($signature, $sigFormat)."<!-- $sigFormat -->";
 
             // Restore original config.
             if (!$allowEmbeds) {
@@ -601,14 +601,14 @@ EOT;
             }
 
             $this->EventArguments = [
-                'UserID' => $SourceUserID,
-                'String' => &$UserSignature
+                'UserID' => $sourceUserID,
+                'String' => &$userSignature
             ];
 
             $this->fireEvent('FilterContent');
 
-            if ($UserSignature) {
-                echo "<div class=\"Signature UserSignature {$SigClasses}\">{$UserSignature}</div>";
+            if ($userSignature) {
+                echo "<div class=\"Signature UserSignature {$sigClasses}\">{$userSignature}</div>";
             }
         }
     }
@@ -688,12 +688,12 @@ EOT;
         }
     }
 
-    public function assetModel_styleCss_handler($Sender) {
-        $Sender->addCssFile('signature.css', 'plugins/Signatures');
+    public function assetModel_styleCss_handler($sender) {
+        $sender->addCssFile('signature.css', 'plugins/Signatures');
     }
 
-    public function settingsController_signatures_create($Sender) {
-        $Sender->permission('Garden.Settings.Manage');
+    public function settingsController_signatures_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
 
         $maxNumberImages = self::getMaximumNumberOfImages();
         $maxImageHeight = self::getMaximumImageHeight();
@@ -703,8 +703,8 @@ EOT;
         $hideMobile = self::getHideMobile();
         $allowEmbeds = self::getAllowEmbeds();
 
-        $Conf = new ConfigurationModule($Sender);
-        $Conf->initialize([
+        $conf = new ConfigurationModule($sender);
+        $conf->initialize([
             'Signatures.Images.MaxNumber' => ['Control' => 'Dropdown', 'LabelCode' => '@'.sprintf(t('Max number of %s'), t('images')), 'Items' => ['Unlimited' => t('Unlimited'), 'None' => t('None'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5]], 'Default' => $maxNumberImages,
             'Signatures.Images.MaxHeight' => ['Control' => 'TextBox', 'Description' => 'Only enter number, no "px" needed.', 'LabelCode' => '@'.sprintf(t('Max height of %s'), t('images'))." ".t('in pixels'), 'Options' => ['class' => 'InputBox SmallInput', 'type' => 'number', 'min' => '0'], 'Default' => $maxImageHeight],
             'Signatures.Text.MaxLength' => ['Control' => 'TextBox', 'Type' => 'int','Description' => 'Leave blank for no limit.', 'LabelCode' => '@'.sprintf(t('Max %s length'), t('signature')), 'Options' => ['class' => 'InputBox SmallInput', 'type' => 'number', 'min' => '1'], 'Default' => $maxTextLength],
@@ -716,10 +716,10 @@ EOT;
 
         $this->setConfigSettingsToDefault('Plugins.Signatures', $this->overriddenConfigSettings);
 
-        $Sender->addSideMenu();
-        $Sender->setData('Title', sprintf(t('%s Settings'), t('Signature')));
-        $Sender->ConfigurationModule = $Conf;
-        $Conf->renderAll();
+        $sender->addSideMenu();
+        $sender->setData('Title', sprintf(t('%s Settings'), t('Signature')));
+        $sender->ConfigurationModule = $conf;
+        $conf->renderAll();
     }
 
     /**

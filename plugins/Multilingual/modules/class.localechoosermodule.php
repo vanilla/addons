@@ -16,10 +16,10 @@ class LocaleChooserModule extends Gdn_Module {
     /**
      * Build footer link to change locale.
      */
-    public function buildLocaleLink($Name, $UrlCode) {
-        $Url = 'profile/setlocale/'.$UrlCode.'/'.Gdn::Session()->TransientKey();
+    public function buildLocaleLink($name, $urlCode) {
+        $url = 'profile/setlocale/'.$urlCode.'/'.Gdn::Session()->TransientKey();
 
-        return Wrap(Anchor($Name, $Url), 'span', ['class' => 'LocaleOption '.$Name.'Locale']);
+        return Wrap(Anchor($name, $url), 'span', ['class' => 'LocaleOption '.$name.'Locale']);
     }
 
     /**
@@ -30,12 +30,12 @@ class LocaleChooserModule extends Gdn_Module {
     public function buildLocales() {
         $locales = MultilingualPlugin::enabledLocales();
 
-        $Links = '';
+        $links = '';
         foreach ($locales as $code => $name) {
-            $Links .= $this->BuildLocaleLink($name, $code);
+            $links .= $this->BuildLocaleLink($name, $code);
         }
 
-        return $Links;
+        return $links;
     }
 
     /**

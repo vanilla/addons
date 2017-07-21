@@ -4,24 +4,24 @@ class MessageLinkPlugin extends Gdn_Plugin {
    /**
     * Add 'Send Message' option to Discussion.
     */
-   public function Base_AfterFlag_Handler($Sender, $Args) {
+   public function Base_AfterFlag_Handler($sender, $args) {
       if (CheckPermission('Conversations.Conversations.Add'))
-         $this->AddSendMessageButton($Sender, $Args);
+         $this->AddSendMessageButton($sender, $args);
    }
 
    /**
     * Output Send Message link.
     */
-   protected function AddSendMessageButton($Sender, $Args) {
+   protected function AddSendMessageButton($sender, $args) {
       if (!Gdn::Session()->UserID) return;
-      if (isset($Args['Comment'])) {
-         $Object = $Args['Comment'];
-         $ObjectID = 'Comment_'.$Args['Comment']->CommentID;
-      } else if (isset($Args['Discussion'])) {
-         $Object = $Args['Discussion'];
-         $ObjectID = 'Discussion_'.$Args['Discussion']->DiscussionID;
+      if (isset($args['Comment'])) {
+         $object = $args['Comment'];
+         $objectID = 'Comment_'.$args['Comment']->CommentID;
+      } else if (isset($args['Discussion'])) {
+         $object = $args['Discussion'];
+         $objectID = 'Discussion_'.$args['Discussion']->DiscussionID;
       } else return;
 
-      echo Anchor(Sprite('ReactMessage', 'ReactSprite').T('Send Message'), Url("/messages/add/{$Object->InsertName}",TRUE), 'ReactButton Visible SendMessage').' ';
+      echo Anchor(Sprite('ReactMessage', 'ReactSprite').T('Send Message'), Url("/messages/add/{$object->InsertName}",TRUE), 'ReactButton Visible SendMessage').' ';
    }
 }

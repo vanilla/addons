@@ -10,15 +10,15 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class StopAutoDraftPlugin extends Gdn_Plugin {
 
-   public function DiscussionController_Render_Before($Sender) {
-		$this->_NoDrafting($Sender);
+   public function DiscussionController_Render_Before($sender) {
+		$this->_NoDrafting($sender);
 	}
-   public function PostController_Render_Before($Sender) {
-		$this->_NoDrafting($Sender);
+   public function PostController_Render_Before($sender) {
+		$this->_NoDrafting($sender);
 	}
-	private function _NoDrafting($Sender) {
-	   $Sender->RemoveJsFile('autosave.js');
-		$Sender->Head->AddString('
+	private function _NoDrafting($sender) {
+	   $sender->RemoveJsFile('autosave.js');
+		$sender->Head->AddString('
 <script type="text/javascript">
 jQuery(document).ready(function($) {
    $.fn.autosave = function(opts) {

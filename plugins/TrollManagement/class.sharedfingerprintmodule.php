@@ -6,15 +6,15 @@ class SharedFingerprintModule extends Gdn_Module {
 
 	protected $_Data = FALSE;
 	
-	public function GetData($FingerprintUserID, $Fingerprint) {
+	public function GetData($fingerprintUserID, $fingerprint) {
 		if (!Gdn::Session()->CheckPermission('Garden.Users.Edit'))
 			return;
 		
 		$this->_Data = Gdn::SQL()
 			->Select()
 			->From('User')
-			->Where('Fingerprint', $Fingerprint)
-			->Where('UserID <>', $FingerprintUserID)
+			->Where('Fingerprint', $fingerprint)
+			->Where('UserID <>', $fingerprintUserID)
 			->Get();
 	}
 
@@ -35,15 +35,15 @@ class SharedFingerprintModule extends Gdn_Module {
          <h4><?php echo T("Shared Accounts"); ?> <span class="Count"><?php echo $this->_Data->NumRows(); ?></span></h4>
 			<ul class="PanelInfo">
          <?php
-			foreach ($this->_Data->Result() as $SharedAccount) {
-				echo '<li><strong>'.UserAnchor($SharedAccount).'</strong><br /></li>';
+			foreach ($this->_Data->Result() as $sharedAccount) {
+				echo '<li><strong>'.UserAnchor($sharedAccount).'</strong><br /></li>';
 			}
          ?>
 			</ul>
 		</div>
 		<?php
-		$String = ob_get_contents();
+		$string = ob_get_contents();
 		@ob_end_clean();
-		return $String;
+		return $string;
 	}
 }
