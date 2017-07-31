@@ -4,18 +4,18 @@ class ReactionsStubPlugin extends Gdn_Plugin {
 
    public function __construct() {}
 
-   public function RootController_React_Create($Sender, $RecordType, $Reaction, $ID) {
-      $Sender->Render('blank', 'utility', 'dashboard');
+   public function RootController_React_Create($sender, $recordType, $reaction, $iD) {
+      $sender->Render('blank', 'utility', 'dashboard');
    }
 
-   private function AddJs($Sender) {
-      $Sender->AddJsFile('jquery-ui.js');
-      $Sender->AddJsFile('reactions.js', 'plugins/ReactionsStub');
+   private function AddJs($sender) {
+      $sender->AddJsFile('jquery-ui.js');
+      $sender->AddJsFile('reactions.js', 'plugins/ReactionsStub');
    }
 
-   public function DiscussionController_Render_Before($Sender) {
-      $Sender->AddCssFile('reactions.css', 'plugins/ReactionsStub');
-      $this->AddJs($Sender);
+   public function DiscussionController_Render_Before($sender) {
+      $sender->AddCssFile('reactions.css', 'plugins/ReactionsStub');
+      $this->AddJs($sender);
    }
 
    public function Setup() {}
@@ -24,8 +24,8 @@ class ReactionsStubPlugin extends Gdn_Plugin {
 
 if (!function_exists('WriteReactions')) {
 
-   function WriteReactions($Row) {
-      $Reactions = <<<REACTIONS
+   function WriteReactions($row) {
+      $reactions = <<<REACTIONS
 <div class="Reactions"><span class="Flag ToggleFlyout"><a class="Hijack ReactButton ReactButton-Flag" href="" title="Flag" rel="nofollow"><span class="ReactSprite ReactFlag"></span> <span class="ReactLabel">Flag</span></a>
    <ul class="Flyout MenuItems Flags" style="display: none;"><li><a class="Hijack ReactButton ReactButton-Spam" href="/react/comment/spam?id=25011203" title="Spam" rel="nofollow"><span class="ReactSprite ReactSpam"></span> <span class="ReactLabel">Spam</span></a>
    </li><li><a class="Hijack ReactButton ReactButton-Abuse" href="/react/comment/abuse?id=25011203" title="Abuse" rel="nofollow"><span class="ReactSprite ReactAbuse"></span> <span class="ReactLabel">Abuse</span></a>
@@ -36,7 +36,7 @@ if (!function_exists('WriteReactions')) {
    </span></span></div>
 REACTIONS;
 
-      echo $Reactions;
+      echo $reactions;
    }
 
 }

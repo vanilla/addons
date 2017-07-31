@@ -29,32 +29,32 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
     /**
      * Set up appmenu link
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
-        $Menu = &$Sender->EventArguments['SideMenu'];
-        $Menu->addItem('Forum', t('Forum'));
-        $Menu->addLink('Forum', t('Feed Discussions'), 'plugin/feeddiscussions', 'Garden.Settings.Manage');
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        $menu = &$sender->EventArguments['SideMenu'];
+        $menu->addItem('Forum', t('Forum'));
+        $menu->addLink('Forum', t('Feed Discussions'), 'plugin/feeddiscussions', 'Garden.Settings.Manage');
     }
 
     /**
      * Include Javascript in discussion pages.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function discussionController_beforeDiscussionRender_handler($Sender) {
+    public function discussionController_beforeDiscussionRender_handler($sender) {
         if ($this->isEnabled()) {
             if ($this->checkFeeds(false)) {
-                $Sender->addJsFile('feeddiscussions.js', 'plugins/FeedDiscussions');
+                $sender->addJsFile('feeddiscussions.js', 'plugins/FeedDiscussions');
             }
 
-            $Sender->addCssFile('feeddiscussions.css', 'plugins/FeedDiscussions');
+            $sender->addCssFile('feeddiscussions.css', 'plugins/FeedDiscussions');
         }
     }
 
     /**
      * Act as a mini dispatcher for API requests to the plugin app
      */
-    public function pluginController_feedDiscussions_create($Sender) {
-        $this->dispatch($Sender, $Sender->RequestArgs);
+    public function pluginController_feedDiscussions_create($sender) {
+        $this->dispatch($sender, $sender->RequestArgs);
     }
 
     /**
@@ -63,45 +63,45 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      * This method handles the internally re-dispatched call generated when a user clicks
      * the 'Enable' or 'Disable' button within the dashboard settings page for Feed Discussions.
      */
-    public function controller_Toggle($Sender) {
-        $Sender->permission('Garden.Settings.Manage');
+    public function controller_Toggle($sender) {
+        $sender->permission('Garden.Settings.Manage');
 
         // Handle Enabled/Disabled toggling
-        $this->autoToggle($Sender);
+        $this->autoToggle($sender);
     }
 
     /**
      * Endpoint to trigger feed check & update.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function controller_CheckFeeds($Sender) {
-        $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
-        $Sender->deliveryType(DELIVERY_TYPE_DATA);
+    public function controller_CheckFeeds($sender) {
+        $sender->deliveryMethod(DELIVERY_METHOD_JSON);
+        $sender->deliveryType(DELIVERY_TYPE_DATA);
         $this->checkFeeds();
-        $Sender->render();
+        $sender->render();
     }
 
     /**
      * Time to update from RSS?
      *
-     * @param bool $AutoImport
+     * @param bool $autoImport
      * @return bool|int
      */
-    public function checkFeeds($AutoImport = true) {
-        Gdn::controller()->setData("AutoImport", $AutoImport);
-        $NeedToPoll = 0;
-        foreach ($this->getFeeds() as $FeedURL => $FeedData) {
-            Gdn::controller()->setData("{$FeedURL}", $FeedData);
+    public function checkFeeds($autoImport = true) {
+        Gdn::controller()->setData("AutoImport", $autoImport);
+        $needToPoll = 0;
+        foreach ($this->getFeeds() as $feedURL => $feedData) {
+            Gdn::controller()->setData("{$feedURL}", $feedData);
             // Check feed here
-            $LastImport = val('LastImport', $FeedData) == 'never' ? null : strtotime(val('LastImport', $FeedData));
-            if (is_null($LastImport)) {
-                $LastImport = strtotime(val('Added', $FeedData, 0));
+            $lastImport = val('LastImport', $feedData) == 'never' ? null : strtotime(val('LastImport', $feedData));
+            if (is_null($lastImport)) {
+                $lastImport = strtotime(val('Added', $feedData, 0));
             }
 
-            $Historical = (bool)val('Historical', $FeedData, false);
-            $Delay = val('Refresh', $FeedData);
-            $DelayStr = '+'.str_replace([
+            $historical = (bool)val('Historical', $feedData, false);
+            $delay = val('Refresh', $feedData);
+            $delayStr = '+'.str_replace([
                     'm',
                     'h',
                     'd',
@@ -111,360 +111,360 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                     'hours',
                     'days',
                     'weeks'
-                ], $Delay);
-            $DelayMinTime = strtotime($DelayStr, $LastImport);
+                ], $delay);
+            $delayMinTime = strtotime($delayStr, $lastImport);
             if (
-                ($LastImport && time() > $DelayMinTime) ||                  // We've imported before, and this article was published since then
+                ($lastImport && time() > $delayMinTime) ||                  // We've imported before, and this article was published since then
 
-                (!$LastImport && (time() > $DelayMinTime || $Historical))   // We've not imported before, and this is either a new article,
+                (!$lastImport && (time() > $delayMinTime || $historical))   // We've not imported before, and this is either a new article,
                 // or its old and we're allowed to import old articles
             ) {
-                if ($AutoImport) {
-                    $NeedToPoll = $NeedToPoll | 1;
-                    $this->pollFeed($FeedURL, $LastImport);
+                if ($autoImport) {
+                    $needToPoll = $needToPoll | 1;
+                    $this->pollFeed($feedURL, $lastImport);
                 } else {
                     return true;
                 }
             }
         }
-        $NeedToPoll = (bool)$NeedToPoll;
-        if ($NeedToPoll && $AutoImport) {
+        $needToPoll = (bool)$needToPoll;
+        if ($needToPoll && $autoImport) {
             Gdn::controller()->statusCode(201);
         }
 
-        return $NeedToPoll;
+        return $needToPoll;
     }
 
     /**
      * Dashboard settings page.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function controller_Index($Sender) {
-        $Sender->permission('Garden.Settings.Manage');
-        $Sender->title($this->getPluginKey('name'));
-        $Sender->addSideMenu('plugin/feeddiscussions');
-        $Sender->setData('Description', $this->getPluginKey('description'));
-        $Sender->addCssFile('feeddiscussions.css', 'plugins/FeedDiscussions');
+    public function controller_Index($sender) {
+        $sender->permission('Garden.Settings.Manage');
+        $sender->title($this->getPluginKey('name'));
+        $sender->addSideMenu('plugin/feeddiscussions');
+        $sender->setData('Description', $this->getPluginKey('description'));
+        $sender->addCssFile('feeddiscussions.css', 'plugins/FeedDiscussions');
 
-        $Categories = CategoryModel::categories();
-        $Sender->setData('Categories', $Categories);
-        $Sender->setData('Feeds', $this->getFeeds());
+        $categories = CategoryModel::categories();
+        $sender->setData('Categories', $categories);
+        $sender->setData('Feeds', $this->getFeeds());
 
-        $Sender->render('feeddiscussions', '', 'plugins/FeedDiscussions');
+        $sender->render('feeddiscussions', '', 'plugins/FeedDiscussions');
     }
 
     /**
      * Add a feed.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function controller_AddFeed($Sender) {
+    public function controller_AddFeed($sender) {
 
-        $Categories = CategoryModel::categories();
-        $Sender->setData('Categories', $Categories);
+        $categories = CategoryModel::categories();
+        $sender->setData('Categories', $categories);
 
         // Do addfeed stuff here;
-        if ($Sender->Form->authenticatedPostback()) {
+        if ($sender->Form->authenticatedPostback()) {
 
             // Grab posted values and merge with defaults
-            $FormPostValues = $Sender->Form->formValues();
-            $Defaults = [
+            $formPostValues = $sender->Form->formValues();
+            $defaults = [
                 'Historical' => 1,
                 'Refresh' => '1d',
                 'Category' => -1
             ];
-            $FormPostValues = array_merge($Defaults, $FormPostValues);
+            $formPostValues = array_merge($defaults, $formPostValues);
 
             try {
-                $FeedURL = val('FeedURL', $FormPostValues, null);
-                if (empty($FeedURL)) {
+                $feedURL = val('FeedURL', $formPostValues, null);
+                if (empty($feedURL)) {
                     throw new Exception("You must supply a valid Feed URL");
                 }
 
-                if ($this->haveFeed($FeedURL, false)) {
+                if ($this->haveFeed($feedURL, false)) {
                     throw new Exception("The Feed URL you supplied is already part of an Active Feed");
                 }
 
-                $FeedCategoryID = val('Category', $FormPostValues);
-                if (!array_key_exists($FeedCategoryID, $Categories)) {
+                $feedCategoryID = val('Category', $formPostValues);
+                if (!array_key_exists($feedCategoryID, $categories)) {
                     throw new Exception("You need to select a Category");
                 }
 
                 // Check feed is valid RSS:
-                $Pr = new ProxyRequest();
-                $FeedRSS = $Pr->request([
-                    'URL' => $FeedURL
+                $pr = new ProxyRequest();
+                $feedRSS = $pr->request([
+                    'URL' => $feedURL
                 ]);
 
-                if (!$FeedRSS) {
+                if (!$feedRSS) {
                     throw new Exception("The Feed URL you supplied is not available");
                 }
 
-                $RSSData = simplexml_load_string($FeedRSS);
-                if (!$RSSData) {
+                $rSSData = simplexml_load_string($feedRSS);
+                if (!$rSSData) {
                     throw new Exception("The Feed URL you supplied is not valid XML");
                 }
 
-                $Channel = val('channel', $RSSData, false);
-                if (!$Channel) {
+                $channel = val('channel', $rSSData, false);
+                if (!$channel) {
                     throw new Exception("The Feed URL you supplied is not an RSS stream");
                 }
 
-                $this->addFeed($FeedURL, [
-                    'Historical' => $FormPostValues['Historical'],
-                    'Refresh' => $FormPostValues['Refresh'],
-                    'Category' => $FeedCategoryID,
+                $this->addFeed($feedURL, [
+                    'Historical' => $formPostValues['Historical'],
+                    'Refresh' => $formPostValues['Refresh'],
+                    'Category' => $feedCategoryID,
                     'Added' => date('Y-m-d H:i:s'),
                     'LastImport' => "never"
                 ]);
-                $Sender->informMessage(sprintf(t("Feed has been added"), $FeedURL));
-                $Sender->Form->clearInputs();
+                $sender->informMessage(sprintf(t("Feed has been added"), $feedURL));
+                $sender->Form->clearInputs();
 
             } catch (Exception $e) {
-                $Sender->Form->addError(T($e->getMessage()));
+                $sender->Form->addError(T($e->getMessage()));
             }
         }
 
         // redirectTo('/plugin/feeddiscussions/');
-        $this->controller_Index($Sender);
+        $this->controller_Index($sender);
     }
 
     /**
      * Delete a feed.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function controller_DeleteFeed($Sender) {
-        $FeedKey = val(1, $Sender->RequestArgs, null);
-        if (!is_null($FeedKey) && $this->haveFeed($FeedKey)) {
-            $Feed = $this->getFeed($FeedKey, true);
-            $FeedURL = $Feed['URL'];
+    public function controller_DeleteFeed($sender) {
+        $feedKey = val(1, $sender->RequestArgs, null);
+        if (!is_null($feedKey) && $this->haveFeed($feedKey)) {
+            $feed = $this->getFeed($feedKey, true);
+            $feedURL = $feed['URL'];
 
-            $this->removeFeed($FeedKey);
-            $Sender->informMessage(sprintf(t("Feed has been removed"), $FeedURL));
+            $this->removeFeed($feedKey);
+            $sender->informMessage(sprintf(t("Feed has been removed"), $feedURL));
         }
 
         // redirectTo('/plugin/feeddiscussions/');
-        $this->controller_Index($Sender);
+        $this->controller_Index($sender);
     }
 
-    protected function getFeeds($Raw = false, $Regen = false) {
-        if (is_null($this->FeedList) || $Regen) {
-            $FeedArray = $this->getUserMeta(0, "Feed.%");
+    protected function getFeeds($raw = false, $regen = false) {
+        if (is_null($this->FeedList) || $regen) {
+            $feedArray = $this->getUserMeta(0, "Feed.%");
 
             //die('feeds');
             $this->FeedList = [];
             $this->RawFeedList = [];
 
-            foreach ($FeedArray as $FeedMetaKey => $FeedItem) {
-                $DecodedFeedItem = json_decode($FeedItem, true);
-                $FeedURL = val('URL', $DecodedFeedItem, null);
-                $FeedKey = self::encodeFeedKey($FeedURL);
+            foreach ($feedArray as $feedMetaKey => $feedItem) {
+                $decodedFeedItem = json_decode($feedItem, true);
+                $feedURL = val('URL', $decodedFeedItem, null);
+                $feedKey = self::encodeFeedKey($feedURL);
 
-                if (is_null($FeedURL)) {
+                if (is_null($feedURL)) {
                     //$this->removeFeed($FeedKey);
                     continue;
                 }
 
-                $this->RawFeedList[$FeedKey] = $this->FeedList[$FeedURL] = $DecodedFeedItem;
+                $this->RawFeedList[$feedKey] = $this->FeedList[$feedURL] = $decodedFeedItem;
             }
         }
 
-        return ($Raw) ? $this->RawFeedList : $this->FeedList;
+        return ($raw) ? $this->RawFeedList : $this->FeedList;
     }
 
-    protected function pollFeed($FeedURL, $LastImportDate) {
-        $Pr = new ProxyRequest();
-        $FeedRSS = $Pr->request([
-            'URL' => $FeedURL
+    protected function pollFeed($feedURL, $lastImportDate) {
+        $pr = new ProxyRequest();
+        $feedRSS = $pr->request([
+            'URL' => $feedURL
         ]);
 
-        if (!$FeedRSS) {
+        if (!$feedRSS) {
             return false;
         }
 
-        $RSSData = simplexml_load_string($FeedRSS);
-        if (!$RSSData) {
+        $rSSData = simplexml_load_string($feedRSS);
+        if (!$rSSData) {
             return false;
         }
 
-        $Channel = val('channel', $RSSData, false);
-        if (!$Channel) {
+        $channel = val('channel', $rSSData, false);
+        if (!$channel) {
             return false;
         }
 
-        if (!array_key_exists('item', $Channel)) {
+        if (!array_key_exists('item', $channel)) {
             return false;
         }
 
-        $Feed = $this->getFeed($FeedURL, false);
+        $feed = $this->getFeed($feedURL, false);
 
-        $DiscussionModel = new DiscussionModel();
-        $DiscussionModel->SpamCheck = false;
+        $discussionModel = new DiscussionModel();
+        $discussionModel->SpamCheck = false;
 
-        $LastPublishDate = val('LastPublishDate', $Feed, date('c'));
-        $LastPublishTime = strtotime($LastPublishDate);
+        $lastPublishDate = val('LastPublishDate', $feed, date('c'));
+        $lastPublishTime = strtotime($lastPublishDate);
 
-        $FeedLastPublishTime = 0;
-        foreach (val('item', $Channel) as $Item) {
-            $FeedItemGUID = trim((string)val('guid', $Item));
-            if (empty($FeedItemGUID)) {
+        $feedLastPublishTime = 0;
+        foreach (val('item', $channel) as $item) {
+            $feedItemGUID = trim((string)val('guid', $item));
+            if (empty($feedItemGUID)) {
                 trace('guid is not set in each item of the RSS.  Will attempt to use link as unique identifier.');
-                $FeedItemGUID = val('link', $Item);
+                $feedItemGUID = val('link', $item);
             }
-            $FeedItemID = substr(md5($FeedItemGUID), 0, 30);
+            $feedItemID = substr(md5($feedItemGUID), 0, 30);
 
-            $ItemPubDate = (string)val('pubDate', $Item, null);
-            if (is_null($ItemPubDate)) {
-                $ItemPubTime = time();
+            $itemPubDate = (string)val('pubDate', $item, null);
+            if (is_null($itemPubDate)) {
+                $itemPubTime = time();
             } else {
-                $ItemPubTime = strtotime($ItemPubDate);
+                $itemPubTime = strtotime($itemPubDate);
             }
 
-            if ($ItemPubTime > $FeedLastPublishTime) {
-                $FeedLastPublishTime = $ItemPubTime;
+            if ($itemPubTime > $feedLastPublishTime) {
+                $feedLastPublishTime = $itemPubTime;
             }
 
-            if ($ItemPubTime < $LastPublishTime && !$Feed['Historical']) {
+            if ($itemPubTime < $lastPublishTime && !$feed['Historical']) {
                 continue;
             }
 
-            $ExistingDiscussion = $DiscussionModel->getWhere([
-                'ForeignID' => $FeedItemID
+            $existingDiscussion = $discussionModel->getWhere([
+                'ForeignID' => $feedItemID
             ]);
 
-            if ($ExistingDiscussion && $ExistingDiscussion->numRows()) {
+            if ($existingDiscussion && $existingDiscussion->numRows()) {
                 continue;
             }
 
             $this->EventArguments['Publish'] = true;
 
-            $this->EventArguments['FeedURL'] = $FeedURL;
-            $this->EventArguments['Feed'] = &$Feed;
-            $this->EventArguments['Item'] = &$Item;
+            $this->EventArguments['FeedURL'] = $feedURL;
+            $this->EventArguments['Feed'] = &$feed;
+            $this->EventArguments['Item'] = &$item;
             $this->fireEvent('FeedItem');
 
             if (!$this->EventArguments['Publish']) {
                 continue;
             }
 
-            $StoryTitle = array_shift($Trash = explode("\n", (string)val('title', $Item)));
-            $StoryBody = (string)val('description', $Item);
-            $StoryPublished = date("Y-m-d H:i:s", $ItemPubTime);
+            $storyTitle = array_shift($trash = explode("\n", (string)val('title', $item)));
+            $storyBody = (string)val('description', $item);
+            $storyPublished = date("Y-m-d H:i:s", $itemPubTime);
 
-            $ParsedStoryBody = $StoryBody;
-            $ParsedStoryBody = '<div class="AutoFeedDiscussion">'.$ParsedStoryBody.'</div> <br /><div class="AutoFeedSource">Source: '.$FeedItemGUID.'</div>';
+            $parsedStoryBody = $storyBody;
+            $parsedStoryBody = '<div class="AutoFeedDiscussion">'.$parsedStoryBody.'</div> <br /><div class="AutoFeedSource">Source: '.$feedItemGUID.'</div>';
 
-            $DiscussionData = [
-                'Name' => $StoryTitle,
+            $discussionData = [
+                'Name' => $storyTitle,
                 'Format' => 'Html',
-                'CategoryID' => $Feed['Category'],
-                'ForeignID' => substr($FeedItemID, 0, 30),
-                'Body' => $ParsedStoryBody
+                'CategoryID' => $feed['Category'],
+                'ForeignID' => substr($feedItemID, 0, 30),
+                'Body' => $parsedStoryBody
             ];
 
             // Post as Minion (if one exists) or the system user
             if (Gdn::addonManager()->isEnabled('Minion', \Vanilla\Addon::TYPE_ADDON)) {
-                $Minion = Gdn::pluginManager()->getPluginInstance('MinionPlugin');
-                $InsertUserID = $Minion->getMinionUserID();
+                $minion = Gdn::pluginManager()->getPluginInstance('MinionPlugin');
+                $insertUserID = $minion->getMinionUserID();
             } else {
-                $InsertUserID = Gdn::userModel()->getSystemUserID();
+                $insertUserID = Gdn::userModel()->getSystemUserID();
             }
 
-            $DiscussionData[$DiscussionModel->DateInserted] = $StoryPublished;
-            $DiscussionData[$DiscussionModel->InsertUserID] = $InsertUserID;
+            $discussionData[$discussionModel->DateInserted] = $storyPublished;
+            $discussionData[$discussionModel->InsertUserID] = $insertUserID;
 
-            $DiscussionData[$DiscussionModel->DateUpdated] = $StoryPublished;
-            $DiscussionData[$DiscussionModel->UpdateUserID] = $InsertUserID;
+            $discussionData[$discussionModel->DateUpdated] = $storyPublished;
+            $discussionData[$discussionModel->UpdateUserID] = $insertUserID;
 
-            $this->EventArguments['FeedDiscussion'] = &$DiscussionData;
+            $this->EventArguments['FeedDiscussion'] = &$discussionData;
             $this->fireEvent('Publish');
 
             if (!$this->EventArguments['Publish']) {
                 continue;
             }
 
-            $InsertID = $DiscussionModel->save($DiscussionData);
+            $insertID = $discussionModel->save($discussionData);
 
-            $this->EventArguments['DiscussionID'] = $InsertID;
-            $this->EventArguments['Validation'] = $DiscussionModel->Validation;
+            $this->EventArguments['DiscussionID'] = $insertID;
+            $this->EventArguments['Validation'] = $discussionModel->Validation;
             $this->fireEvent('Published');
 
             // Reset discussion validation
-            $DiscussionModel->Validation->results(true);
+            $discussionModel->Validation->results(true);
         }
 
-        $FeedKey = self::encodeFeedKey($FeedURL);
-        $this->updateFeed($FeedKey, [
+        $feedKey = self::encodeFeedKey($feedURL);
+        $this->updateFeed($feedKey, [
             'LastImport' => date('Y-m-d H:i:s'),
-            'LastPublishDate' => date('c', $FeedLastPublishTime)
+            'LastPublishDate' => date('c', $feedLastPublishTime)
         ]);
     }
 
-    public function replaceBadURLs($Matches) {
-        $MatchedURL = $Matches[0];
-        $FixedURL = array_pop($Trash = explode("/*", $MatchedURL));
-        return 'href="'.$FixedURL.'"';
+    public function replaceBadURLs($matches) {
+        $matchedURL = $matches[0];
+        $fixedURL = array_pop($trash = explode("/*", $matchedURL));
+        return 'href="'.$fixedURL.'"';
     }
 
-    protected function addFeed($FeedURL, $Feed) {
-        $FeedKey = self::encodeFeedKey($FeedURL);
+    protected function addFeed($feedURL, $feed) {
+        $feedKey = self::encodeFeedKey($feedURL);
 
-        $Feed['URL'] = $FeedURL;
-        $EncodedFeed = json_encode($Feed);
-        $this->setUserMeta(0, "Feed.{$FeedKey}", $EncodedFeed);
+        $feed['URL'] = $feedURL;
+        $encodedFeed = json_encode($feed);
+        $this->setUserMeta(0, "Feed.{$feedKey}", $encodedFeed);
 
         // regenerate the internal feed list
         $this->getFeeds(true, true);
     }
 
-    protected function updateFeed($FeedKey, $FeedOptionKey, $FeedOptionValue = null) {
-        $Feed = $this->getFeed($FeedKey);
+    protected function updateFeed($feedKey, $feedOptionKey, $feedOptionValue = null) {
+        $feed = $this->getFeed($feedKey);
 
-        if (!is_array($FeedOptionKey)) {
-            $FeedOptionKey = [$FeedOptionKey => $FeedOptionValue];
+        if (!is_array($feedOptionKey)) {
+            $feedOptionKey = [$feedOptionKey => $feedOptionValue];
         }
 
-        $Feed = array_merge($Feed, $FeedOptionKey);
+        $feed = array_merge($feed, $feedOptionKey);
 
-        $EncodedFeed = json_encode($Feed);
-        $this->setUserMeta(0, "Feed.{$FeedKey}", $EncodedFeed);
-
-        // regenerate the internal feed list
-        $this->getFeeds(true, true);
-    }
-
-    protected function removeFeed($FeedKey, $PreEncoded = true) {
-        $FeedKey = (!$PreEncoded) ? self::encodeFeedKey($FeedKey) : $FeedKey;
-        $this->setUserMeta(0, "Feed.{$FeedKey}", null);
+        $encodedFeed = json_encode($feed);
+        $this->setUserMeta(0, "Feed.{$feedKey}", $encodedFeed);
 
         // regenerate the internal feed list
         $this->getFeeds(true, true);
     }
 
-    protected function getFeed($FeedKey, $PreEncoded = true) {
-        $FeedKey = (!$PreEncoded) ? self::encodeFeedKey($FeedKey) : $FeedKey;
-        $Feeds = $this->getFeeds(true);
+    protected function removeFeed($feedKey, $preEncoded = true) {
+        $feedKey = (!$preEncoded) ? self::encodeFeedKey($feedKey) : $feedKey;
+        $this->setUserMeta(0, "Feed.{$feedKey}", null);
 
-        if (array_key_exists($FeedKey, $Feeds)) {
-            return $Feeds[$FeedKey];
+        // regenerate the internal feed list
+        $this->getFeeds(true, true);
+    }
+
+    protected function getFeed($feedKey, $preEncoded = true) {
+        $feedKey = (!$preEncoded) ? self::encodeFeedKey($feedKey) : $feedKey;
+        $feeds = $this->getFeeds(true);
+
+        if (array_key_exists($feedKey, $feeds)) {
+            return $feeds[$feedKey];
         }
 
         return null;
     }
 
-    protected function haveFeed($FeedKey, $PreEncoded = true) {
-        $FeedKey = (!$PreEncoded) ? self::encodeFeedKey($FeedKey) : $FeedKey;
-        $Feed = $this->getFeed($FeedKey);
-        if (!empty($Feed)) {
+    protected function haveFeed($feedKey, $preEncoded = true) {
+        $feedKey = (!$preEncoded) ? self::encodeFeedKey($feedKey) : $feedKey;
+        $feed = $this->getFeed($feedKey);
+        if (!empty($feed)) {
             return true;
         }
         return false;
     }
 
-    public static function encodeFeedKey($Key) {
-        return md5($Key);
+    public static function encodeFeedKey($key) {
+        return md5($key);
     }
 
     public function setup() {

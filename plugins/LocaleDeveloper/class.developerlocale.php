@@ -14,8 +14,8 @@ class DeveloperLocale extends Gdn_Locale {
      * return array
      */
     public function AllDefinitions() {
-        $Result = array_merge($this->_Definition, $this->_CapturedDefinitions);
-        return $Result;
+        $result = array_merge($this->_Definition, $this->_CapturedDefinitions);
+        return $result;
     }
 
     public function CapturedDefinitions() {
@@ -23,18 +23,18 @@ class DeveloperLocale extends Gdn_Locale {
     }
 
     public static function GuessPrefix() {
-        $Trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
-        foreach ($Trace as $i => $Row) {
-            if (strcasecmp($Row['function'], 't') === 0) {
-                if ($Trace[$i + 1]['function'] == 'Plural')
-                    return self::PrefixFromPath($Trace[$i + 1]['file']);
+        foreach ($trace as $i => $row) {
+            if (strcasecmp($row['function'], 't') === 0) {
+                if ($trace[$i + 1]['function'] == 'Plural')
+                    return self::PrefixFromPath($trace[$i + 1]['file']);
                 else
-                    return self::PrefixFromPath($Row['file']);
+                    return self::PrefixFromPath($row['file']);
             }
-            if (strcasecmp($Row['function'], 'Translate') === 0) {
-                if (!in_array(basename($Row['file']), ['functions.general.php', 'class.gdn.php'])) {
-                    return self::PrefixFromPath($Row['file']);
+            if (strcasecmp($row['function'], 'Translate') === 0) {
+                if (!in_array(basename($row['file']), ['functions.general.php', 'class.gdn.php'])) {
+                    return self::PrefixFromPath($row['file']);
                 }
             }
         }
@@ -42,58 +42,58 @@ class DeveloperLocale extends Gdn_Locale {
         return FALSE;
     }
 
-    public static function PrefixFromPath($Path) {
-        $Result = '';
+    public static function PrefixFromPath($path) {
+        $result = '';
 
-        if (preg_match('`/plugins/([^/]+)`i', $Path, $Matches)) {
-            $Plugin = strtolower($Matches[1]);
+        if (preg_match('`/plugins/([^/]+)`i', $path, $matches)) {
+            $plugin = strtolower($matches[1]);
 
-            if (in_array($Plugin, ['buttonbar', 'fileupload', 'facebook', 'twitter', 'quotes', 'signatures', 'splitmerge', 'tagging', 'nbbc'])) {
-                $Result .= 'core';
+            if (in_array($plugin, ['buttonbar', 'fileupload', 'facebook', 'twitter', 'quotes', 'signatures', 'splitmerge', 'tagging', 'nbbc'])) {
+                $result .= 'core';
             } else
-                $Result .= $Plugin.'_plugin';
-        } elseif (preg_match('`/library/`i', $Path, $Matches)) {
-            $Result .= 'core';
-        } elseif (preg_match('`/applications/([^/]+)`i', $Path, $Matches)) {
-            $App = strtolower($Matches[1]);
+                $result .= $plugin.'_plugin';
+        } elseif (preg_match('`/library/`i', $path, $matches)) {
+            $result .= 'core';
+        } elseif (preg_match('`/applications/([^/]+)`i', $path, $matches)) {
+            $app = strtolower($matches[1]);
 
-            if (in_array($App, ['conversations', 'vanilla', 'dashboard'])) {
+            if (in_array($app, ['conversations', 'vanilla', 'dashboard'])) {
                 // This is a core app.
-                $Result .= 'core';
+                $result .= 'core';
             } else {
-                $Result .= $App.'_application';
+                $result .= $app.'_application';
             }
-        } elseif (preg_match('`/themes/([^/]+)`i', $Path, $Matches)) {
-            $Result = FALSE;
+        } elseif (preg_match('`/themes/([^/]+)`i', $path, $matches)) {
+            $result = FALSE;
         }
-        return $Result;
+        return $result;
     }
 
-    public function Translate($Code, $Default = FALSE) {
-        $Result = parent::Translate($Code, $Default);
+    public function Translate($code, $default = FALSE) {
+        $result = parent::Translate($code, $default);
 
-        if (!$Code || substr($Code, 0, 1) == '@')
-            return $Result;
+        if (!$code || substr($code, 0, 1) == '@')
+            return $result;
 
-        $Prefix = self::GuessPrefix();
+        $prefix = self::GuessPrefix();
 
-        if (!$Prefix) {
-            return $Result;
+        if (!$prefix) {
+            return $result;
         }
 
-        if ($Prefix == 'unknown') {
-            decho($Code);
+        if ($prefix == 'unknown') {
+            decho($code);
             decho(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
             die();
         }
 
         if (Gdn_Theme::InSection('Dashboard'))
-            $Prefix = 'dash_'.$Prefix;
+            $prefix = 'dash_'.$prefix;
         else
-            $Prefix = 'site_'.$Prefix;
+            $prefix = 'site_'.$prefix;
 
-        $this->_CapturedDefinitions[$Prefix][$Code] = $Result;
+        $this->_CapturedDefinitions[$prefix][$code] = $result;
 
-        return $Result;
+        return $result;
     }
 }

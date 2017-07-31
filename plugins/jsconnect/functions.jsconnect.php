@@ -102,9 +102,9 @@ function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false
     $normalizedData = array_change_key_case($data);
     ksort($normalizedData);
 
-    foreach ($normalizedData as $Key => $value) {
+    foreach ($normalizedData as $key => $value) {
         if ($value === null) {
-            $normalizedData[$Key] = '';
+            $normalizedData[$key] = '';
         }
     }
 

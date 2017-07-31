@@ -39,155 +39,155 @@ class CssThemes extends Gdn_Plugin {
 
 	/// Methods ///
 
-	public function ApplyTheme($OriginalPath, $CachePath, $InsertNames = TRUE) {
+	public function ApplyTheme($originalPath, $cachePath, $insertNames = TRUE) {
 		// Get the theme settings.
-		$SQL = Gdn::SQL();
+		$sQL = Gdn::SQL();
 		if(is_null($this->ThemeSettings)) {
-			$Data = $SQL->Get('ThemeSetting')->ResultArray();
-			$Data = ConsolidateArrayValuesByKey($Data, 'Name', 'Setting', '');
-			$this->ThemeSettings = $Data;
+			$data = $sQL->Get('ThemeSetting')->ResultArray();
+			$data = ConsolidateArrayValuesByKey($data, 'Name', 'Setting', '');
+			$this->ThemeSettings = $data;
 		}
 
-		$Css = file_get_contents($OriginalPath);
+		$css = file_get_contents($originalPath);
 		// Process the urls.
-		$Css = preg_replace_callback(self::UrlRegEx, [$this, '_ApplyUrl'], $Css);
+		$css = preg_replace_callback(self::UrlRegEx, [$this, '_ApplyUrl'], $css);
 
 		// Go through the css and replace its colors with the theme colors.
-		$Css = preg_replace_callback(self::RegEx, [$this, '_ApplyThemeSetting'], $Css);
+		$css = preg_replace_callback(self::RegEx, [$this, '_ApplyThemeSetting'], $css);
 
 		// Insert the missing settings into the database.
-		if($InsertNames) {
-			foreach($this->MissingSettings as $Name => $Setting) {
-				$SQL->Insert('ThemeSetting', ['Name' => $Name, 'Setting' => $Setting]);
+		if($insertNames) {
+			foreach($this->MissingSettings as $name => $setting) {
+				$sQL->Insert('ThemeSetting', ['Name' => $name, 'Setting' => $setting]);
 			}
 			$this->MissingSettings = [];
 		}
 
 		// Save the theme to the cache path.
-		file_put_contents($CachePath, $Css);
-		return $CachePath;
+		file_put_contents($cachePath, $css);
+		return $cachePath;
 	}
 
-	protected function _ApplyThemeSetting($Match) {
-		$Setting = $Match[1];
-		$Name = $Match[3];
+	protected function _ApplyThemeSetting($match) {
+		$setting = $match[1];
+		$name = $match[3];
 
-		if(array_key_exists($Name, $this->ThemeSettings)) {
-			$Setting = $this->ThemeSettings[$Name];
+		if(array_key_exists($name, $this->ThemeSettings)) {
+			$setting = $this->ThemeSettings[$name];
 		} else {
-			$this->ThemeSettings[$Name] = $Setting;
-			$this->MissingSettings[$Name] = $Setting;
+			$this->ThemeSettings[$name] = $setting;
+			$this->MissingSettings[$name] = $setting;
 		}
 
-		$Result = $Setting.$Match[2].$Name.$Match[4];
+		$result = $setting.$match[2].$name.$match[4];
 
-		return $Result;
+		return $result;
 	}
 
-	protected function _ApplyImport($Match) {
-		$NoFollow = ArrayValue(4, $Match);
-		$Url = $Match[2];
+	protected function _ApplyImport($match) {
+		$noFollow = ArrayValue(4, $match);
+		$url = $match[2];
 
-		if($NoFollow !== FALSE) {
+		if($noFollow !== FALSE) {
 			// Don't apply the theme to this import.
-			$OriginalAssetPath = str_replace([PATH_ROOT, DS], ['', '/'], $this->_OrignialPath);
-			$Url = Asset(CombinePaths([dirname($OriginalAssetPath), $Url], '/'));
+			$originalAssetPath = str_replace([PATH_ROOT, DS], ['', '/'], $this->_OrignialPath);
+			$url = Asset(CombinePaths([dirname($originalAssetPath), $url], '/'));
 		} else {
 			// Also parse the import.
-			$OrignalPath = $this->_OrignialPath;
-			$ImportPath = CombinePaths([dirname($OrignalPath), $Url]);
-			$Url = $this->Get($ImportPath, $this->_AppName);
-			$Url = str_replace([PATH_ROOT, DS], ['', '/'], $Url);
-			$Url = Asset($Url);
+			$orignalPath = $this->_OrignialPath;
+			$importPath = CombinePaths([dirname($orignalPath), $url]);
+			$url = $this->Get($importPath, $this->_AppName);
+			$url = str_replace([PATH_ROOT, DS], ['', '/'], $url);
+			$url = Asset($url);
 
-			$this->_OrignalPath = $OrignalPath;
+			$this->_OrignalPath = $orignalPath;
 		}
 
 
-		$Result = $Match[1].$Url.$Match[3];
-		return $Result;
+		$result = $match[1].$url.$match[3];
+		return $result;
 	}
 
-	protected function _ApplyUrl($Match) {
-		$NoFollow = ArrayValue(5, $Match);
-		$Url = $Match[2];
-		$Extension = $Match[3];
+	protected function _ApplyUrl($match) {
+		$noFollow = ArrayValue(5, $match);
+		$url = $match[2];
+		$extension = $match[3];
 
-		if($NoFollow !== FALSE || strcasecmp($Extension, '.css') != 0) {
+		if($noFollow !== FALSE || strcasecmp($extension, '.css') != 0) {
 			// Don't apply the theme to this import.
-			$OriginalAssetPath = str_replace([PATH_ROOT, DS], ['', '/'], $this->_OrignialPath);
-			$Url = Asset(CombinePaths([dirname($OriginalAssetPath), $Url.$Extension], '/'));
+			$originalAssetPath = str_replace([PATH_ROOT, DS], ['', '/'], $this->_OrignialPath);
+			$url = Asset(CombinePaths([dirname($originalAssetPath), $url.$extension], '/'));
 		} else {
 			// Cache the css too.
-			$OrignalPath = $this->_OrignialPath;
-			$ImportPath = CombinePaths([dirname($OrignalPath), $Url.$Extension]);
-			$Url = $this->Get($ImportPath, $this->_AppName);
-			$Url = str_replace([PATH_ROOT, DS], ['', '/'], $Url);
-			$Url = Asset($Url);
+			$orignalPath = $this->_OrignialPath;
+			$importPath = CombinePaths([dirname($orignalPath), $url.$extension]);
+			$url = $this->Get($importPath, $this->_AppName);
+			$url = str_replace([PATH_ROOT, DS], ['', '/'], $url);
+			$url = Asset($url);
 
-			$this->_OrignalPath = $OrignalPath;
+			$this->_OrignalPath = $orignalPath;
 		}
 
-		$Result = $Match[1].$Url.$Match[4];
-		return $Result;
+		$result = $match[1].$url.$match[4];
+		return $result;
 	}
 
-	public function Get($OriginalPath, $AppName) {
-		if(!file_exists($OriginalPath))
+	public function Get($originalPath, $appName) {
+		if(!file_exists($originalPath))
 			return FALSE;
 
-		$this->_OrignialPath = $OriginalPath;
-		$this->_AppName = $AppName;
+		$this->_OrignialPath = $originalPath;
+		$this->_AppName = $appName;
 
-		$Result = $OriginalPath;
+		$result = $originalPath;
 
-		$Filename = basename($OriginalPath);
-		$CachePath = PATH_CACHE.DS.'css'.DS.$AppName.'_'.$Filename;
+		$filename = basename($originalPath);
+		$cachePath = PATH_CACHE.DS.'css'.DS.$appName.'_'.$filename;
 
-		if(!file_exists($CachePath) || filemtime($OriginalPath) > filemtime($CachePath)) {
-			$Css = file_get_contents($OriginalPath);
+		if(!file_exists($cachePath) || filemtime($originalPath) > filemtime($cachePath)) {
+			$css = file_get_contents($originalPath);
 
-			$Result = $this->ApplyTheme($OriginalPath, $CachePath);
+			$result = $this->ApplyTheme($originalPath, $cachePath);
 		} else {
-			$Result = $CachePath;
+			$result = $cachePath;
 		}
 
-		return $Result;
+		return $result;
 	}
 
-	public function GetNames($Css, $InsertNames = FALSE) {
-		$Result = [];
+	public function GetNames($css, $insertNames = FALSE) {
+		$result = [];
 
-		if(preg_match_all(self::RegEx, $Css, $Matches)) {
-			foreach($Matches as $Match) {
-				$Result[$Match[1]] = $Match[0];
+		if(preg_match_all(self::RegEx, $css, $matches)) {
+			foreach($matches as $match) {
+				$result[$match[1]] = $match[0];
 			}
 		}
 		// Insert all of the names into the database.
-		if(count($Result) > 0) {
-			$SQL = Gdn::SQL();
+		if(count($result) > 0) {
+			$sQL = Gdn::SQL();
 			// Get the existing names.
-			$Insert = $Result;
+			$insert = $result;
 
 
 			// Insert the necessary settings.
-			if($InsertNames) {
-				foreach($Insert as $Name => $Setting) {
-					$SQL->Insert('ThemeSetting', ['Name' => $Name, 'Setting' => $Setting]);
+			if($insertNames) {
+				foreach($insert as $name => $setting) {
+					$sQL->Insert('ThemeSetting', ['Name' => $name, 'Setting' => $setting]);
 				}
 			}
 		}
 
-		return $Result;
+		return $result;
 	}
 
-	public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-      $Menu = $Sender->EventArguments['SideMenu'];
-		$Menu->AddLink('Add-ons', 'Colors', 'plugin/cssthemes', 'Garden.Themes.Manage');
+	public function Base_GetAppSettingsMenuItems_Handler($sender) {
+      $menu = $sender->EventArguments['SideMenu'];
+		$menu->AddLink('Add-ons', 'Colors', 'plugin/cssthemes', 'Garden.Themes.Manage');
 	}
 
-	public function PluginController_Colors_Create($Sender) {
-		$Sender->Form = Gdn::Factory('Form');
+	public function PluginController_Colors_Create($sender) {
+		$sender->Form = Gdn::Factory('Form');
 
 		$this->Colors = [];
 
@@ -195,172 +195,172 @@ class CssThemes extends Gdn_Plugin {
 		//$this->ParseCss(PATH_THEMES);
 
 		asort($this->Colors);
-		$Sender->Colors = $this->Colors;
+		$sender->Colors = $this->Colors;
 
 		// Add the javascript & css.
 		//$Sender->Head->AddScript('/plugins/cssthemes/colorpicker.js');
 		//$Sender->Head->AddScript('/plugins/cssthemes/cssthemes.js');
-		$Sender->Head->AddCss('/plugins/cssthemes/colorpicker.css');
-		$Sender->Head->AddCss('/plugins/cssthemes/cssthemes.css');
+		$sender->Head->AddCss('/plugins/cssthemes/colorpicker.css');
+		$sender->Head->AddCss('/plugins/cssthemes/cssthemes.css');
 
-		$Sender->View = $this->GetView('colors.php');
-		$Sender->Render();
+		$sender->View = $this->GetView('colors.php');
+		$sender->Render();
 	}
 
-	public function ParseCss($Path) {
+	public function ParseCss($path) {
 		// Look for all of the css files in the path.
-		$CssPaths = glob($Path.DS.'*.css');
-		if($CssPaths) {
-			foreach($CssPaths as $CssPath) {
+		$cssPaths = glob($path.DS.'*.css');
+		if($cssPaths) {
+			foreach($cssPaths as $cssPath) {
 				//echo $CssPath, "<br />\n";
-				$Css = file_get_contents($CssPath);
+				$css = file_get_contents($cssPath);
 				// Process the urls.
 				//$Css = preg_replace_callback(self::UrlRegEx, array($this, '_ApplyUrl'), $Css);
 
 				// Go through the css and replace its colors with the theme colors.
-				$Css = preg_replace_callback(self::RegEx2, [$this, 'GetColors'], $Css);
+				$css = preg_replace_callback(self::RegEx2, [$this, 'GetColors'], $css);
 
 			}
 		}
 
 		// Look for all of the subdirectories.
-		$Paths = glob($Path.DS.'*', GLOB_ONLYDIR);
-		if($Paths) {
-			foreach($Paths as $Path) {
-				if(in_array(strrchr($Path, DS), [DS.'vforg', DS.'vfcom']))
+		$paths = glob($path.DS.'*', GLOB_ONLYDIR);
+		if($paths) {
+			foreach($paths as $path) {
+				if(in_array(strrchr($path, DS), [DS.'vforg', DS.'vfcom']))
 					continue;
-				$this->ParseCss($Path);
+				$this->ParseCss($path);
 			}
 		}
 	}
 
-	public function RGB($Color) {
-		return [hexdec(substr($Color, 0, 2)), hexdec(substr($Color, 2, 2)), hexdec(substr($Color, 4, 2))];
+	public function RGB($color) {
+		return [hexdec(substr($color, 0, 2)), hexdec(substr($color, 2, 2)), hexdec(substr($color, 4, 2))];
 	}
 
-	public function GetColors($Match) {
-		$Color = strtolower($Match[1]);
-		if(strlen($Color) == 3)
-			$Color = str_repeat(substr($Color, 0, 1), 2).str_repeat(substr($Color, 1, 1), 2).str_repeat(substr($Color, 2, 1), 2);
+	public function GetColors($match) {
+		$color = strtolower($match[1]);
+		if(strlen($color) == 3)
+			$color = str_repeat(substr($color, 0, 1), 2).str_repeat(substr($color, 1, 1), 2).str_repeat(substr($color, 2, 1), 2);
 
-		list($H, $S, $V) = $this->RGB2HSB(hexdec(substr($Color, 0, 2)), hexdec(substr($Color, 2, 2)), hexdec(substr($Color, 4, 2)));
+		list($h, $s, $v) = $this->RGB2HSB(hexdec(substr($color, 0, 2)), hexdec(substr($color, 2, 2)), hexdec(substr($color, 4, 2)));
 
-		if($S < .2) {
-			$S = 0;
-			$H = 1000;
+		if($s < .2) {
+			$s = 0;
+			$h = 1000;
 		}
-		$H2 = $H / 72.0;
+		$h2 = $h / 72.0;
 
-		$HSV = sprintf('%04d,%04d,%04d', round($H2), $V * 1000, $S * 1000);
+		$hSV = sprintf('%04d,%04d,%04d', round($h2), $v * 1000, $s * 1000);
 
-		$this->Colors[$Color] = $HSV;
+		$this->Colors[$color] = $hSV;
 
-		return implode($Match);
+		return implode($match);
 	}
 
-	function RGB2HSB($R, $G = NULL, $B = NULL) {
-		if(is_null($G)) {
-			list($R, $G, $B) = (array)$R;
+	function RGB2HSB($r, $g = NULL, $b = NULL) {
+		if(is_null($g)) {
+			list($r, $g, $b) = (array)$r;
 		}
 
-		$R /= 255;
-		$G /= 255;
-		$B /= 255;
+		$r /= 255;
+		$g /= 255;
+		$b /= 255;
 
-		$H = $S = $V = 0;
-		$Min = min($R, $G, $B);
-		$Max = max($R, $G, $B);
+		$h = $s = $v = 0;
+		$min = min($r, $g, $b);
+		$max = max($r, $g, $b);
 
-		$V = $Max;
-		if($V == 0)
-			return [1000, $S, $V];
+		$v = $max;
+		if($v == 0)
+			return [1000, $s, $v];
 
-		$R /= $V;
-		$G /= $V;
-		$B /= $V;
-		$Min = min($R, $G, $B);
-		$Max = max($R, $G, $B);
+		$r /= $v;
+		$g /= $v;
+		$b /= $v;
+		$min = min($r, $g, $b);
+		$max = max($r, $g, $b);
 
-		$S = $Max - $Min;
-		if($S == 0)
-			return [1000, $S, $V];
+		$s = $max - $min;
+		if($s == 0)
+			return [1000, $s, $v];
 
-		$R = ($R - $Min) / ($Max - $Min);
-		$G = ($G - $Min) / ($Max - $Min);
-		$B = ($B - $Min) / ($Max - $Min);
+		$r = ($r - $min) / ($max - $min);
+		$g = ($g - $min) / ($max - $min);
+		$b = ($b - $min) / ($max - $min);
 
-		if($Max == $R) {
-			$H = 60 * ($G - $B);
-			if($H < 0) $H += 360;
-		} elseif($Max == $G)
-			$H = 120 + 60 * ($B - $R);
+		if($max == $r) {
+			$h = 60 * ($g - $b);
+			if($h < 0) $h += 360;
+		} elseif($max == $g)
+			$h = 120 + 60 * ($b - $r);
 		else
-			$H = 240 + 60 * ($R - $G);
+			$h = 240 + 60 * ($r - $g);
 
-		return [$H, $S, $V];
+		return [$h, $s, $v];
 	}
 
 	/**
-	 * @package $Sender Gdn_Controller
+	 * @package $sender Gdn_Controller
 	 */
-	public function PluginController_CssThemes_Create($Sender) {
-		$Sender->Form = Gdn::Factory('Form');
-		$Model = new Gdn_Model('ThemeSetting');
-		$Sender->Form->SetModel($Model);
+	public function PluginController_CssThemes_Create($sender) {
+		$sender->Form = Gdn::Factory('Form');
+		$model = new Gdn_Model('ThemeSetting');
+		$sender->Form->SetModel($model);
 
-		if($Sender->Form->AuthenticatedPostBack() === FALSE) {
+		if($sender->Form->AuthenticatedPostBack() === FALSE) {
 			// Grab the colors.
-			$Data = $Model->Get();
+			$data = $model->Get();
 			//$Data = ConsolidateArrayValuesByKey($Data->ResultArray(), 'Name', 'Setting');
-			$Sender->SetData('ThemeSettings', $Data->ResultArray());
+			$sender->SetData('ThemeSettings', $data->ResultArray());
 			//$Sender->Form->SetData($Data);
 		} else {
-			$Data = $Sender->Form->FormDataSet();
+			$data = $sender->Form->FormDataSet();
 
 			// Update the database.
-			$SQL = Gdn::SQL();
-			foreach($Data as $Row) {
-				$SQL->Put(
+			$sQL = Gdn::SQL();
+			foreach($data as $row) {
+				$sQL->Put(
 					'ThemeSetting',
-					['Setting' => $Row['Setting']],
-					['Name' => $Row['Name']]);
+					['Setting' => $row['Setting']],
+					['Name' => $row['Name']]);
 			}
 
 			// Clear out the css cache.
-			$Files = SafeGlob(PATH_CACHE.DS.'css'.DS.'*.css');
-			foreach($Files as $File) {
-				unlink($File);
+			$files = SafeGlob(PATH_CACHE.DS.'css'.DS.'*.css');
+			foreach($files as $file) {
+				unlink($file);
 			}
 
-			$Sender->SetData('ThemeSettings', $Data);
-			$Sender->StatusMessage = T('Your changes have been saved.');
+			$sender->SetData('ThemeSettings', $data);
+			$sender->StatusMessage = T('Your changes have been saved.');
 		}
 
 		// Add the javascript & css.
-		$Sender->Head->AddScript('/plugins/cssthemes/colorpicker.js');
-		$Sender->Head->AddScript('/plugins/cssthemes/cssthemes.js');
-		$Sender->Head->AddCss('/plugins/cssthemes/colorpicker.css');
-		$Sender->Head->AddCss('/plugins/cssthemes/cssthemes.css');
+		$sender->Head->AddScript('/plugins/cssthemes/colorpicker.js');
+		$sender->Head->AddScript('/plugins/cssthemes/cssthemes.js');
+		$sender->Head->AddCss('/plugins/cssthemes/colorpicker.css');
+		$sender->Head->AddCss('/plugins/cssthemes/cssthemes.css');
 
 		// Add the side module.
-      $Sender->AddSideMenu('/plugin/cssthemes');
+      $sender->AddSideMenu('/plugin/cssthemes');
 
-		$Sender->View = $this->GetView('cssthemes.php');
-		$Sender->Render();
+		$sender->View = $this->GetView('cssthemes.php');
+		$sender->Render();
 	}
 
 	public function Setup() {
 		if (!file_exists(PATH_CACHE.DS.'css')) mkdir(PATH_CACHE.DS.'css');
 
 		// Setup the theme table.
-		$St = Gdn::Structure();
-		$St->Table('bThemeSetting')
+		$st = Gdn::Structure();
+		$st->Table('bThemeSetting')
 			->Column('Name', 'varchar(50)', FALSE, 'primary')
 			->Column('Setting', 'varchar(50)')
 			->Set(FALSE, FALSE);
 
 		// Insert default values.
-		$St->Database->Query('insert '.$St->Database->DatabasePrefix.'bThemeSetting (Name, Setting) values '.
+		$st->Database->Query('insert '.$st->Database->DatabasePrefix.'bThemeSetting (Name, Setting) values '.
 		"('Banner Background Color', '#44c7f4'),
 		('Banner Font Color', '#fff'),
 		('Banner Font Shadow Color', '#30ACD6'),

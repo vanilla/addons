@@ -23,19 +23,19 @@ class RightToLeftPlugin extends Gdn_Plugin {
     * The rtl stylesheets should always be added separately so that they aren't combined with other stylesheets when
     * a non-rtl language is still being displayed.
     *
-    * @param Gdn_Controller $Sender
+    * @param Gdn_Controller $sender
     */
-    public function Base_Render_Before($Sender) {
+    public function Base_Render_Before($sender) {
         $currentLocale = substr(Gdn::Locale()->Current(), 0, 2);
 
         if (in_array($currentLocale, $this->rtlLocales)) {
             if (InSection('Dashboard')) {
-               $Sender->AddCssFile('admin_rtl.css', 'plugins/RightToLeft');
+               $sender->AddCssFile('admin_rtl.css', 'plugins/RightToLeft');
             } else {
-               $Sender->AddCssFile('style_rtl.css', 'plugins/RightToLeft');
+               $sender->AddCssFile('style_rtl.css', 'plugins/RightToLeft');
             }
 
-            $Sender->CssClass .= ' rtl';
+            $sender->CssClass .= ' rtl';
        }
     }
 }

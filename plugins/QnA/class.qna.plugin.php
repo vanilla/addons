@@ -154,10 +154,10 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function base_beforeCommentDisplay_handler($sender, $args) {
-        $QnA = valr('Comment.QnA', $args);
+        $qnA = valr('Comment.QnA', $args);
 
-        if ($QnA && isset($args['CssClass'])) {
-            $args['CssClass'] = concatSep(' ', $args['CssClass'], "QnA-Item-$QnA");
+        if ($qnA && isset($args['CssClass'])) {
+            $args['CssClass'] = concatSep(' ', $args['CssClass'], "QnA-Item-$qnA");
         }
     }
 
@@ -184,16 +184,16 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function base_commentInfo_handler($sender, $args) {
-        $Type = val('Type', $args);
-        if ($Type != 'Comment') {
+        $type = val('Type', $args);
+        if ($type != 'Comment') {
             return;
         }
 
-        $QnA = valr('Comment.QnA', $args);
+        $qnA = valr('Comment.QnA', $args);
 
-        if ($QnA && ($QnA == 'Accepted' || Gdn::session()->checkPermission('Garden.Moderation.Manage'))) {
-            $Title = t("QnA $QnA Answer", "$QnA Answer");
-            echo ' <span class="Tag QnA-Box QnA-'.$QnA.'" title="'.htmlspecialchars($Title).'"><span>'.$Title.'</span></span> ';
+        if ($qnA && ($qnA == 'Accepted' || Gdn::session()->checkPermission('Garden.Moderation.Manage'))) {
+            $title = t("QnA $qnA Answer", "$qnA Answer");
+            echo ' <span class="Tag QnA-Box QnA-'.$qnA.'" title="'.htmlspecialchars($title).'"><span>'.$title.'</span></span> ';
         }
     }
 
@@ -204,21 +204,21 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function discussionController_commentOptions_handler($sender, $args) {
-        $Comment = $args['Comment'];
-        if (!$Comment) {
+        $comment = $args['Comment'];
+        if (!$comment) {
             return;
         }
-        $Discussion = Gdn::controller()->data('Discussion');
+        $discussion = Gdn::controller()->data('Discussion');
 
-        if (val('Type', $Discussion) != 'Question') {
-            return;
-        }
-
-        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID)) {
+        if (val('Type', $discussion) != 'Question') {
             return;
         }
 
-        $args['CommentOptions']['QnA'] = ['Label' => t('Q&A').'...', 'Url' => '/discussion/qnaoptions?commentid='.$Comment->CommentID, 'Class' => 'Popup'];
+        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
+            return;
+        }
+
+        $args['CommentOptions']['QnA'] = ['Label' => t('Q&A').'...', 'Url' => '/discussion/qnaoptions?commentid='.$comment->CommentID, 'Class' => 'Popup'];
     }
 
     /**
@@ -228,15 +228,15 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function base_discussionOptions_handler($sender, $args) {
-        $Discussion = $args['Discussion'];
-        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID)) {
+        $discussion = $args['Discussion'];
+        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
             return;
         }
 
         if (isset($args['DiscussionOptions'])) {
-            $args['DiscussionOptions']['QnA'] = ['Label' => t('Q&A').'...', 'Url' => '/discussion/qnaoptions?discussionid='.$Discussion->DiscussionID, 'Class' => 'Popup'];
+            $args['DiscussionOptions']['QnA'] = ['Label' => t('Q&A').'...', 'Url' => '/discussion/qnaoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup'];
         } elseif (isset($sender->Options)) {
-            $sender->Options .= '<li>'.anchor(t('Q&A').'...', '/discussion/qnaoptions?discussionid='.$Discussion->DiscussionID, 'Popup QnAOptions') . '</li>';
+            $sender->Options .= '<li>'.anchor(t('Q&A').'...', '/discussion/qnaoptions?discussionid='.$discussion->DiscussionID, 'Popup QnAOptions') . '</li>';
         }
     }
 
@@ -247,37 +247,37 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function commentModel_beforeNotification_handler($sender, $args) {
-        $ActivityModel = $args['ActivityModel'];
-        $Comment = (array)$args['Comment'];
-        $CommentID = $Comment['CommentID'];
-        $Discussion = (array)$args['Discussion'];
+        $activityModel = $args['ActivityModel'];
+        $comment = (array)$args['Comment'];
+        $commentID = $comment['CommentID'];
+        $discussion = (array)$args['Discussion'];
 
-        if ($Comment['InsertUserID'] == $Discussion['InsertUserID']) {
+        if ($comment['InsertUserID'] == $discussion['InsertUserID']) {
             return;
         }
-        if (strtolower($Discussion['Type']) != 'question') {
+        if (strtolower($discussion['Type']) != 'question') {
             return;
         }
         if (!c('Plugins.QnA.Notifications', true)) {
             return;
         }
 
-        $HeadlineFormat = t('HeadlineFormat.Answer', '{ActivityUserID,user} answered your question: <a href="{Url,html}">{Data.Name,text}</a>');
+        $headlineFormat = t('HeadlineFormat.Answer', '{ActivityUserID,user} answered your question: <a href="{Url,html}">{Data.Name,text}</a>');
 
-        $Activity = [
+        $activity = [
             'ActivityType' => 'Comment',
-            'ActivityUserID' => $Comment['InsertUserID'],
-            'NotifyUserID' => $Discussion['InsertUserID'],
-            'HeadlineFormat' => $HeadlineFormat,
+            'ActivityUserID' => $comment['InsertUserID'],
+            'NotifyUserID' => $discussion['InsertUserID'],
+            'HeadlineFormat' => $headlineFormat,
             'RecordType' => 'Comment',
-            'RecordID' => $CommentID,
-            'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
+            'RecordID' => $commentID,
+            'Route' => "/discussion/comment/$commentID#Comment_$commentID",
             'Data' => [
-                'Name' => val('Name', $Discussion)
+                'Name' => val('Name', $discussion)
             ]
         ];
 
-        $ActivityModel->queue($Activity, 'DiscussionComment');
+        $activityModel->queue($activity, 'DiscussionComment');
     }
 
     /**
@@ -287,10 +287,10 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function commentModel_beforeUpdateCommentCount_handler($sender, $args) {
-        $Discussion =& $args['Discussion'];
+        $discussion =& $args['Discussion'];
 
         // Mark the question as answered.
-        if (strtolower($Discussion['Type']) == 'question' && !$Discussion['Sink'] && !in_array($Discussion['QnA'], ['Answered', 'Accepted'])) {
+        if (strtolower($discussion['Type']) == 'question' && !$discussion['Sink'] && !in_array($discussion['QnA'], ['Answered', 'Accepted'])) {
             if($args['Counts']['CountComments'] > 0) {
                 $sender->SQL->set('QnA', 'Answered');
             } else {
@@ -315,26 +315,26 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         // Find the accepted answer(s) to the question.
-        $CommentModel = new CommentModel();
-        $Answers = $CommentModel->getWhere(['DiscussionID' => $sender->data('Discussion.DiscussionID'), 'Qna' => 'Accepted'])->result();
+        $commentModel = new CommentModel();
+        $answers = $commentModel->getWhere(['DiscussionID' => $sender->data('Discussion.DiscussionID'), 'Qna' => 'Accepted'])->result();
 
         if (class_exists('ReplyModel')) {
-            $ReplyModel = new ReplyModel();
-            $Discussion = null;
-            $ReplyModel->joinReplies($Discussion, $Answers);
+            $replyModel = new ReplyModel();
+            $discussion = null;
+            $replyModel->joinReplies($discussion, $answers);
         }
 
-        $sender->setData('Answers', $Answers);
+        $sender->setData('Answers', $answers);
 
         // Remove the accepted answers from the comments.
         // Allow this to be skipped via config.
         if (c('QnA.AcceptedAnswers.Filter', true)) {
             if (isset($sender->Data['Comments'])) {
-                $Comments = $sender->Data['Comments']->result();
-                $Comments = array_filter($Comments, function($Row) {
-                    return strcasecmp(val('QnA', $Row), 'accepted');
+                $comments = $sender->Data['Comments']->result();
+                $comments = array_filter($comments, function($row) {
+                    return strcasecmp(val('QnA', $row), 'accepted');
                 });
-                $sender->Data['Comments'] = new Gdn_DataSet(array_values($Comments));
+                $sender->Data['Comments'] = new Gdn_DataSet(array_values($comments));
             }
         }
     }
@@ -342,52 +342,52 @@ class QnAPlugin extends Gdn_Plugin {
     /**
      * Write the accept/reject buttons.
      *
-     * @staticvar null $DiscussionModel
+     * @staticvar null $discussionModel
      * @staticvar boolean $InformMessage
      *
      * @param DiscussionController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
     public function discussionController_afterCommentBody_handler($sender, $args) {
-        $Discussion = $sender->data('Discussion');
-        $Comment = val('Comment', $args);
+        $discussion = $sender->data('Discussion');
+        $comment = val('Comment', $args);
 
-        if (!$Comment) {
+        if (!$comment) {
             return;
         }
 
-        $CommentID = val('CommentID', $Comment);
-        if (!is_numeric($CommentID)) {
+        $commentID = val('CommentID', $comment);
+        if (!is_numeric($commentID)) {
             return;
         }
 
-        if (!$Discussion) {
-            static $DiscussionModel = null;
-            if ($DiscussionModel === null) {
-                $DiscussionModel = new DiscussionModel();
+        if (!$discussion) {
+            static $discussionModel = null;
+            if ($discussionModel === null) {
+                $discussionModel = new DiscussionModel();
             }
-            $Discussion = $DiscussionModel->getID(val('DiscussionID', $Comment));
+            $discussion = $discussionModel->getID(val('DiscussionID', $comment));
         }
 
-        if (!$Discussion || strtolower(val('Type', $Discussion)) != 'question') {
+        if (!$discussion || strtolower(val('Type', $discussion)) != 'question') {
             return;
         }
 
         // Check permissions.
-        $CanAccept = Gdn::session()->checkPermission('Garden.Moderation.Manage');
-        $CanAccept |= Gdn::session()->UserID == val('InsertUserID', $Discussion);
+        $canAccept = Gdn::session()->checkPermission('Garden.Moderation.Manage');
+        $canAccept |= Gdn::session()->UserID == val('InsertUserID', $discussion);
 
-        if (!$CanAccept) {
+        if (!$canAccept) {
             return;
         }
 
-        $QnA = val('QnA', $Comment);
-        if ($QnA) {
+        $qnA = val('QnA', $comment);
+        if ($qnA) {
             return;
         }
 
 
-        $Query = http_build_query(['commentid' => $CommentID, 'tkey' => Gdn::session()->transientKey()]);
+        $query = http_build_query(['commentid' => $commentID, 'tkey' => Gdn::session()->transientKey()]);
 
         echo '<div class="ActionBlock QnA-Feedback">';
 
@@ -395,9 +395,9 @@ class QnAPlugin extends Gdn_Plugin {
 
         echo '<span class="QnA-YesNo">';
 
-        echo anchor(t('Yes'), '/discussion/qna/accept?'.$Query, ['class' => 'React QnA-Yes', 'title' => t('Accept this answer.')]);
+        echo anchor(t('Yes'), '/discussion/qna/accept?'.$query, ['class' => 'React QnA-Yes', 'title' => t('Accept this answer.')]);
         echo ' '.bullet().' ';
-        echo anchor(t('No'), '/discussion/qna/reject?'.$Query, ['class' => 'React QnA-No', 'title' => t('Reject this answer.')]);
+        echo anchor(t('No'), '/discussion/qna/reject?'.$query, ['class' => 'React QnA-No', 'title' => t('Reject this answer.')]);
 
         echo '</span>';
 
@@ -572,31 +572,31 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function recalculateDiscussionQnA($discussion) {
         // Find comments in this discussion with a QnA value.
-        $Set = [];
+        $set = [];
 
-        $Row = Gdn::SQL()->getWhere('Comment',
+        $row = Gdn::SQL()->getWhere('Comment',
             ['DiscussionID' => val('DiscussionID', $discussion), 'QnA is not null' => ''], 'QnA, DateAccepted', 'asc', 1)->firstRow(DATASET_TYPE_ARRAY);
 
-        if (!$Row) {
+        if (!$row) {
             if (val('CountComments', $discussion) > 0) {
-                $Set['QnA'] = 'Unanswered';
+                $set['QnA'] = 'Unanswered';
             } else {
-                $Set['QnA'] = 'Answered';
+                $set['QnA'] = 'Answered';
             }
 
-            $Set['DateAccepted'] = null;
-            $Set['DateOfAnswer'] = null;
-        } elseif ($Row['QnA'] == 'Accepted') {
-            $Set['QnA'] = 'Accepted';
-            $Set['DateAccepted'] = $Row['DateAccepted'];
-            $Set['DateOfAnswer'] = $Row['DateInserted'];
-        } elseif ($Row['QnA'] == 'Rejected') {
-            $Set['QnA'] = 'Rejected';
-            $Set['DateAccepted'] = null;
-            $Set['DateOfAnswer'] = null;
+            $set['DateAccepted'] = null;
+            $set['DateOfAnswer'] = null;
+        } elseif ($row['QnA'] == 'Accepted') {
+            $set['QnA'] = 'Accepted';
+            $set['DateAccepted'] = $row['DateAccepted'];
+            $set['DateOfAnswer'] = $row['DateInserted'];
+        } elseif ($row['QnA'] == 'Rejected') {
+            $set['QnA'] = 'Rejected';
+            $set['DateAccepted'] = null;
+            $set['DateOfAnswer'] = null;
         }
 
-        Gdn::controller()->DiscussionModel->setField(val('DiscussionID', $discussion), $Set);
+        Gdn::controller()->DiscussionModel->setField(val('DiscussionID', $discussion), $set);
     }
 
     /**
@@ -605,8 +605,8 @@ class QnAPlugin extends Gdn_Plugin {
      * @param string|int $userID User identifier
      */
     public function recalculateUserQnA($userID) {
-        $CountAcceptedAnswers = Gdn::SQL()->getCount('Comment', ['InsertUserID' => $userID, 'QnA' => 'Accepted']);
-        Gdn::userModel()->setField($userID, 'CountAcceptedAnswers', $CountAcceptedAnswers);
+        $countAcceptedAnswers = Gdn::SQL()->getCount('Comment', ['InsertUserID' => $userID, 'QnA' => 'Accepted']);
+        Gdn::userModel()->setField($userID, 'CountAcceptedAnswers', $countAcceptedAnswers);
     }
 
     /**
@@ -728,24 +728,24 @@ class QnAPlugin extends Gdn_Plugin {
     protected function _discussionOptions($sender, $discussionID) {
         $sender->Form = new Gdn_Form();
 
-        $Discussion = $sender->DiscussionModel->getID($discussionID);
+        $discussion = $sender->DiscussionModel->getID($discussionID);
 
-        if (!$Discussion) {
+        if (!$discussion) {
             throw notFoundException('Discussion');
         }
 
-        $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $Discussion));
+        $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
 
         // Both '' and 'Discussion' denote a discussion type of discussion.
-        if (!val('Type', $Discussion)) {
-            setValue('Type', $Discussion, 'Discussion');
+        if (!val('Type', $discussion)) {
+            setValue('Type', $discussion, 'Discussion');
         }
 
         if ($sender->Form->isPostBack()) {
             $sender->DiscussionModel->setField($discussionID, 'Type', $sender->Form->getFormValue('Type'));
 
             // Update the QnA field.  Default to "Unanswered" for questions. Null the field for other types.
-            $qna = val('QnA', $Discussion);
+            $qna = val('QnA', $discussion);
             switch ($sender->Form->getFormValue('Type')) {
                 case 'Question':
                     $sender->DiscussionModel->setField(
@@ -761,10 +761,10 @@ class QnAPlugin extends Gdn_Plugin {
 
             Gdn::controller()->jsonTarget('', '', 'Refresh');
         } else {
-            $sender->Form->setData($Discussion);
+            $sender->Form->setData($discussion);
         }
 
-        $sender->setData('Discussion', $Discussion);
+        $sender->setData('Discussion', $discussion);
         $sender->setData('_Types', ['Question' => '@'.t('Question Type', 'Question'), 'Discussion' => '@'.t('Discussion Type', 'Discussion')]);
         $sender->setData('Title', t('Q&A Options'));
         $sender->render('DiscussionOptions', '', 'plugins/QnA');
@@ -778,17 +778,17 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function discussionModel_beforeGet_handler($sender, $args) {
         if (Gdn::controller()) {
-            $Unanswered = Gdn::controller()->ClassName == 'DiscussionsController' && Gdn::controller()->RequestMethod == 'unanswered';
+            $unanswered = Gdn::controller()->ClassName == 'DiscussionsController' && Gdn::controller()->RequestMethod == 'unanswered';
 
-            if ($Unanswered) {
+            if ($unanswered) {
                 $args['Wheres']['Type'] = 'Question';
                 $sender->SQL->beginWhereGroup()
                     ->where('d.QnA', null)
                     ->orWhereIn('d.QnA', ['Unanswered', 'Rejected'])
                     ->endWhereGroup();
                 Gdn::controller()->title(t('Unanswered Questions'));
-            } elseif ($QnA = Gdn::request()->get('qna')) {
-                $args['Wheres']['QnA'] = $QnA;
+            } elseif ($qnA = Gdn::request()->get('qna')) {
+                $args['Wheres']['QnA'] = $qnA;
             }
         }
     }
@@ -800,9 +800,9 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function discussionModel_beforeSaveDiscussion_handler($sender, $args) {
-        $Post =& $args['FormPostValues'];
-        if ($args['Insert'] && val('Type', $Post) == 'Question') {
-            $Post['QnA'] = 'Unanswered';
+        $post =& $args['FormPostValues'];
+        if ($args['Insert'] && val('Type', $post) == 'Question') {
+            $post['QnA'] = 'Unanswered';
         }
     }
 
@@ -812,16 +812,16 @@ class QnAPlugin extends Gdn_Plugin {
      * @param $sender
      */
     public function base_afterDiscussionFilters_handler($sender) {
-        $Count = Gdn::cache()->get('QnA-UnansweredCount');
-        if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
-            $Count =
+        $count = Gdn::cache()->get('QnA-UnansweredCount');
+        if ($count === Gdn_Cache::CACHEOP_FAILURE) {
+            $count =
                 '<span class="Aside">'
                     .'<span class="Popin Count" rel="/discussions/unansweredcount"></span>'
                 .'</span>';
         } else {
-            $Count =
+            $count =
                 '<span class="Aside">'
-                    .'<span class="Count">'.$Count.'</span>'
+                    .'<span class="Count">'.$count.'</span>'
                 .'</span>';
         }
 
@@ -830,7 +830,7 @@ class QnAPlugin extends Gdn_Plugin {
 
         echo "<li class='QnA-UnansweredQuestions $extraClass'>"
                 .anchor(
-                    $sprite.' '.t('Unanswered').' '.$Count,
+                    $sprite.' '.t('Unanswered').' '.$count,
                     '/discussions/unanswered',
                     'UnansweredQuestions'
                 )
@@ -842,19 +842,19 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function discussionsController_afterDiscussionTabs_handler() {
         if (stringEndsWith(Gdn::request()->path(), '/unanswered', true)) {
-            $CssClass = ' class="Active"';
+            $cssClass = ' class="Active"';
         } else {
-            $CssClass = '';
+            $cssClass = '';
         }
 
-        $Count = Gdn::cache()->get('QnA-UnansweredCount');
-        if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
-            $Count = ' <span class="Popin Count" rel="/discussions/unansweredcount">';
+        $count = Gdn::cache()->get('QnA-UnansweredCount');
+        if ($count === Gdn_Cache::CACHEOP_FAILURE) {
+            $count = ' <span class="Popin Count" rel="/discussions/unansweredcount">';
         } else {
-            $Count = ' <span class="Count">'.$Count.'</span>';
+            $count = ' <span class="Count">'.$count.'</span>';
         }
 
-        echo '<li'.$CssClass.'><a class="TabLink QnA-UnansweredQuestions" href="'.url('/discussions/unanswered').'">'.t('Unanswered Questions', 'Unanswered').$Count.'</span></a></li>';
+        echo '<li'.$cssClass.'><a class="TabLink QnA-UnansweredQuestions" href="'.url('/discussions/unanswered').'">'.t('Unanswered Questions', 'Unanswered').$count.'</span></a></li>';
     }
 
     /**
@@ -887,8 +887,8 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function discussionsController_beforeBuildPager_handler($sender, $args) {
         if (Gdn::controller()->RequestMethod == 'unanswered') {
-            $Count = $this->getUnansweredCount();
-            $sender->setData('CountDiscussions', $Count);
+            $count = $this->getUnansweredCount();
+            $sender->setData('CountDiscussions', $count);
         }
     }
 
@@ -931,22 +931,22 @@ class QnAPlugin extends Gdn_Plugin {
 
         // Add 'Ask a Question' button if using BigButtons.
         if (c('Plugins.QnA.UseBigButtons')) {
-            $QuestionModule = new NewQuestionModule($sender, 'plugins/QnA');
-            $sender->addModule($QuestionModule);
+            $questionModule = new NewQuestionModule($sender, 'plugins/QnA');
+            $sender->addModule($questionModule);
         }
 
         // Remove announcements that aren't questions...
         if (is_a($sender->data('Announcements'), 'Gdn_DataSet')) {
             $sender->data('Announcements')->result();
-            $Announcements = [];
-            foreach ($sender->data('Announcements') as $i => $Row) {
-                if (val('Type', $Row) == 'Question') {
-                    $Announcements[] = $Row;
+            $announcements = [];
+            foreach ($sender->data('Announcements') as $i => $row) {
+                if (val('Type', $row) == 'Question') {
+                    $announcements[] = $row;
                 }
             }
-            trace($Announcements);
-            $sender->setData('Announcements', $Announcements);
-            $sender->AnnounceData = $Announcements;
+            trace($announcements);
+            $sender->setData('Announcements', $announcements);
+            $sender->AnnounceData = $announcements;
         }
     }
 
@@ -957,10 +957,10 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function discussionsController_unansweredCount_create($sender, $args) {
-        $Count = $this->getUnansweredCount();
+        $count = $this->getUnansweredCount();
 
-        $sender->setData('UnansweredCount', $Count);
-        $sender->setData('_Value', $Count);
+        $sender->setData('UnansweredCount', $count);
+        $sender->setData('_Value', $count);
         $sender->render('Value', 'Utility', 'Dashboard');
     }
 
@@ -971,37 +971,37 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function base_beforeDiscussionMeta_handler($sender, $args) {
-        $Discussion = $args['Discussion'];
+        $discussion = $args['Discussion'];
 
-        if (strtolower(val('Type', $Discussion)) != 'question') {
+        if (strtolower(val('Type', $discussion)) != 'question') {
             return;
         }
 
-        $QnA = val('QnA', $Discussion);
-        $Title = '';
-        switch ($QnA) {
+        $qnA = val('QnA', $discussion);
+        $title = '';
+        switch ($qnA) {
             case '':
             case 'Unanswered':
             case 'Rejected':
-                $Text = 'Question';
-                $QnA = 'Question';
+                $text = 'Question';
+                $qnA = 'Question';
                 break;
             case 'Answered':
-                $Text = 'Answered';
-                if (val('InsertUserID', $Discussion) == Gdn::session()->UserID) {
-                    $QnA = 'Answered';
-                    $Title = ' title="'.t("Someone's answered your question. You need to accept/reject the answer.").'"';
+                $text = 'Answered';
+                if (val('InsertUserID', $discussion) == Gdn::session()->UserID) {
+                    $qnA = 'Answered';
+                    $title = ' title="'.t("Someone's answered your question. You need to accept/reject the answer.").'"';
                 }
                 break;
             case 'Accepted':
-                $Text = 'Answered';
-                $Title = ' title="'.t("This question's answer has been accepted.").'"';
+                $text = 'Answered';
+                $title = ' title="'.t("This question's answer has been accepted.").'"';
                 break;
             default:
-                $QnA = false;
+                $qnA = false;
         }
-        if ($QnA) {
-            echo ' <span class="Tag QnA-Tag-'.$QnA.'"'.$Title.'>'.t("Q&A $QnA", $Text).'</span> ';
+        if ($qnA) {
+            echo ' <span class="Tag QnA-Tag-'.$qnA.'"'.$title.'>'.t("Q&A $qnA", $text).'</span> ';
         }
     }
 
@@ -1012,14 +1012,14 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function notificationsController_beforeInformNotifications_handler($sender, $args) {
-        $Path = trim($sender->Request->getValue('Path'), '/');
-        if (preg_match('`^(vanilla/)?discussion[^s]`i', $Path)) {
+        $path = trim($sender->Request->getValue('Path'), '/');
+        if (preg_match('`^(vanilla/)?discussion[^s]`i', $path)) {
             return;
         }
 
         // Check to see if the user has answered questions.
-        $Count = Gdn::SQL()->getCount('Discussion', ['Type' => 'Question', 'InsertUserID' => Gdn::session()->UserID, 'QnA' => 'Answered']);
-        if ($Count > 0) {
+        $count = Gdn::SQL()->getCount('Discussion', ['Type' => 'Question', 'InsertUserID' => Gdn::session()->UserID, 'QnA' => 'Answered']);
+        if ($count > 0) {
             $sender->informMessage(formatString(t("You've asked questions that have now been answered", "<a href=\"{/discussions/mine?qna=Answered,url}\">You've asked questions that now have answers</a>. Make sure you accept/reject the answers.")), 'Dismissable');
         }
     }
@@ -1031,8 +1031,8 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function categoriesController_render_before($sender) {
         if (c('Plugins.QnA.UseBigButtons')) {
-            $QuestionModule = new NewQuestionModule($sender, 'plugins/QnA');
-            $sender->addModule($QuestionModule);
+            $questionModule = new NewQuestionModule($sender, 'plugins/QnA');
+            $sender->addModule($questionModule);
         }
     }
 
@@ -1043,8 +1043,8 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function discussionController_render_before($sender) {
         if (c('Plugins.QnA.UseBigButtons')) {
-            $QuestionModule = new NewQuestionModule($sender, 'plugins/QnA');
-            $sender->addModule($QuestionModule);
+            $questionModule = new NewQuestionModule($sender, 'plugins/QnA');
+            $sender->addModule($questionModule);
         }
 
         if ($sender->data('Discussion.Type') == 'Question') {
@@ -1058,9 +1058,9 @@ class QnAPlugin extends Gdn_Plugin {
      * @param PostController $sender Sending controller instance.
      */
     public function postController_afterForms_handler($sender) {
-        $Forms = $sender->data('Forms');
-        $Forms[] = ['Name' => 'Question', 'Label' => sprite('SpQuestion').t('Ask a Question'), 'Url' => 'post/question'];
-        $sender->setData('Forms', $Forms);
+        $forms = $sender->data('Forms');
+        $forms[] = ['Name' => 'Question', 'Label' => sprite('SpQuestion').t('Ask a Question'), 'Url' => 'post/question'];
+        $sender->setData('Forms', $forms);
     }
 
     /**
@@ -1068,11 +1068,11 @@ class QnAPlugin extends Gdn_Plugin {
      *
      * @param PostController $sender Sending controller instance.
      */
-    public function postController_question_create($sender, $CategoryUrlCode = '') {
+    public function postController_question_create($sender, $categoryUrlCode = '') {
         // Create & call PostController->Discussion()
         $sender->View = PATH_PLUGINS.'/QnA/views/post.php';
         $sender->setData('Type', 'Question');
-        $sender->discussion($CategoryUrlCode);
+        $sender->discussion($categoryUrlCode);
     }
 
     /**

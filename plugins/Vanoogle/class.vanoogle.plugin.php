@@ -25,60 +25,60 @@ class VanooglePlugin extends Gdn_Plugin {
 
     /**
      * Build the setting page.
-     * @param $Sender
+     * @param $sender
      */
-    public function SettingsController_Vanoogle_Create($Sender) {
-        $Sender->Permission('Garden.Settings.Manage');
+    public function SettingsController_Vanoogle_Create($sender) {
+        $sender->Permission('Garden.Settings.Manage');
 
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->SetField(["Plugins.Vanoogle.CSE"]);
-        $Sender->Form->SetModel($ConfigurationModel);
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->SetField(["Plugins.Vanoogle.CSE"]);
+        $sender->Form->SetModel($configurationModel);
 
-        if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
-            $Sender->Form->SetData($ConfigurationModel->Data);
+        if ($sender->Form->AuthenticatedPostBack() === FALSE) {
+            $sender->Form->SetData($configurationModel->Data);
         } else {
-            $Data = $Sender->Form->FormValues();
-            $ConfigurationModel->Validation->ApplyRule("Plugins.Vanoogle.CSE", "Required");
-            if ($Sender->Form->Save() !== FALSE)
-                $Sender->StatusMessage = T("Your settings have been saved.");
+            $data = $sender->Form->FormValues();
+            $configurationModel->Validation->ApplyRule("Plugins.Vanoogle.CSE", "Required");
+            if ($sender->Form->Save() !== FALSE)
+                $sender->StatusMessage = T("Your settings have been saved.");
         }
 
-        $Sender->AddSideMenu();
-        $Sender->SetData("Title", T("Vanoogle Settings"));
+        $sender->AddSideMenu();
+        $sender->SetData("Title", T("Vanoogle Settings"));
 
-        $CategoryModel = new CategoryModel();
-        $Sender->SetData("CategoryData", $CategoryModel->GetAll(), TRUE);
-        array_shift($Sender->CategoryData->Result());
+        $categoryModel = new CategoryModel();
+        $sender->SetData("CategoryData", $categoryModel->GetAll(), TRUE);
+        array_shift($sender->CategoryData->Result());
 
-        $Sender->Render($this->GetView("settings.php"));
+        $sender->Render($this->GetView("settings.php"));
     }
 
     /**
      * Add our script and css to every page.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function Base_Render_Before($Sender) {
+    public function Base_Render_Before($sender) {
         if (!C("Plugins.Vanoogle.CSE"))
             return;
 
         // Normally one would use ->AddJsFile or ->Head->AddScript, but these insert a version arg in the url that makes the google api barf.
-        $Sender->Head->AddTag('script', [
+        $sender->Head->AddTag('script', [
             'src' => Asset('https://www.google.com/jsapi', FALSE, FALSE),
             'type' => 'text/javascript',
             'id' => C("Plugins.Vanoogle.CSE")
         ]);
-        $Sender->AddCssFile('vanoogle.css', 'plugins/Vanoogle');
-        $Sender->AddJsFile('vanoogle.js', 'plugins/Vanoogle');
+        $sender->AddCssFile('vanoogle.css', 'plugins/Vanoogle');
+        $sender->AddJsFile('vanoogle.js', 'plugins/Vanoogle');
     }
 
     /**
      * Place our search element on page to be moved by js later.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function Base_Render_After($Sender) {
+    public function Base_Render_After($sender) {
         if (!C("Plugins.Vanoogle.ApiKey"))
             return;
         ?>

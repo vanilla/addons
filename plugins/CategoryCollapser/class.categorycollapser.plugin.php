@@ -4,9 +4,9 @@ class CategoryCollapserPlugin extends Gdn_Plugin {
    /**
 	 * Just include our JS on all category pages.
 	 */
-   public function CategoriesController_Render_Before($Sender) {
-      $Sender->AddJsFile("category_collapse.js", "plugins/CategoryCollapser");
-      $Style = Wrap('
+   public function CategoriesController_Render_Before($sender) {
+      $sender->AddJsFile("category_collapse.js", "plugins/CategoryCollapser");
+      $style = Wrap('
       .Expando {
          float: right;
          background: url(plugins/CategoryCollapser/design/tagsprites.png) no-repeat 0 -52px;
@@ -17,6 +17,6 @@ class CategoryCollapserPlugin extends Gdn_Plugin {
          cursor: pointer; }
       .Expando-Collapsed .Expando {
          background-position: 0 -69px; }', 'style');
-      $Sender->AddAsset('Head', $Style);
+      $sender->AddAsset('Head', $style);
    }
 }

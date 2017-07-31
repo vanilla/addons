@@ -10,28 +10,28 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class PostCountPlugin extends Gdn_Plugin {
    
-   public function UserInfoModule_OnBasicInfo_Handler($Sender) {
-      $User = Gdn::UserModel()->GetID($Sender->User->UserID);
-      if ($User) {
-         $PostCount = GetValue('CountComments', $User, 0) + GetValue('CountDiscussions', $User, 0);
+   public function UserInfoModule_OnBasicInfo_Handler($sender) {
+      $user = Gdn::UserModel()->GetID($sender->User->UserID);
+      if ($user) {
+         $postCount = GetValue('CountComments', $user, 0) + GetValue('CountDiscussions', $user, 0);
          echo "<dt class=\"Posts\">".T('Posts')."</dt>\n";
-         echo "<dd class=\"Posts\">".number_format($PostCount)."</dd>";
+         echo "<dd class=\"Posts\">".number_format($postCount)."</dd>";
       }
    }
    
-   public function DiscussionController_AuthorInfo_Handler($Sender) {
-      $this->_AttachPostCount($Sender);
+   public function DiscussionController_AuthorInfo_Handler($sender) {
+      $this->_AttachPostCount($sender);
    }
    
-   public function PostController_AuthorInfo_Handler($Sender) {
-      $this->_AttachPostCount($Sender);
+   public function PostController_AuthorInfo_Handler($sender) {
+      $this->_AttachPostCount($sender);
    }
    
-   protected function _AttachPostCount($Sender) {
-      $User = Gdn::UserModel()->GetID($Sender->EventArguments['Author']->UserID);
-      if ($User) {
-         $Posts = GetValue('CountComments', $User, 0) + GetValue('CountDiscussions', $User, 0);
-         echo '<span class="MItem PostCount">'.Plural(number_format($Posts), '@'.T('Posts.Singular: %s', 'Posts: <b>%s</b>'), '@'.T('Posts.Plural: %s', 'Posts: <b>%s</b>')).'</span>';
+   protected function _AttachPostCount($sender) {
+      $user = Gdn::UserModel()->GetID($sender->EventArguments['Author']->UserID);
+      if ($user) {
+         $posts = GetValue('CountComments', $user, 0) + GetValue('CountDiscussions', $user, 0);
+         echo '<span class="MItem PostCount">'.Plural(number_format($posts), '@'.T('Posts.Singular: %s', 'Posts: <b>%s</b>'), '@'.T('Posts.Plural: %s', 'Posts: <b>%s</b>')).'</span>';
       }
    }
 

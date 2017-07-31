@@ -20,18 +20,18 @@ class MollomVanilla extends Mollom {
    }
 
    public function getClientInformation() {
-      $PluginInfo = Gdn::PluginManager()->AvailablePlugins();
+      $pluginInfo = Gdn::PluginManager()->AvailablePlugins();
       return [
          'platformName' => 'Vanilla',
          'platformVersion' => APPLICATION_VERSION,
          'clientName' => 'Mollom Vanilla',
-         'clientVersion' => $PluginInfo['Mollom']['Version']
+         'clientVersion' => $pluginInfo['Mollom']['Version']
       ];
    }
 
    protected function request($method, $server, $path, $query = NULL, array $headers = []) {
-      $Request = new ProxyRequest();
-      $Request->Request(
+      $request = new ProxyRequest();
+      $request->Request(
          ['Method' => $method,
             'URL' => trim($server,'/').trim($path,'/'),
             //'Debug' => TRUE
@@ -41,11 +41,11 @@ class MollomVanilla extends Mollom {
          $headers
       );
 
-      $MollomResponse = (object) [
-         'code' => $Request->ResponseStatus,
-         'headers' => $Request->ResponseHeaders,
-         'body' => $Request->ResponseBody,
+      $mollomResponse = (object) [
+         'code' => $request->ResponseStatus,
+         'headers' => $request->ResponseHeaders,
+         'body' => $request->ResponseBody,
       ];
-      return $MollomResponse;
+      return $mollomResponse;
    }
 }
