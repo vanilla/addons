@@ -703,7 +703,7 @@ EOT;
         $hideMobile = self::getHideMobile();
         $allowEmbeds = self::getAllowEmbeds();
 
-        $conf = new ConfigurationModule($Sender);
+        $conf = new ConfigurationModule($sender);
         $conf->initialize([
             'Signatures.Images.MaxNumber' => [
                 'Control' => 'Dropdown',
