@@ -814,13 +814,26 @@ class QnAPlugin extends Gdn_Plugin {
     public function base_afterDiscussionFilters_handler($sender) {
         $count = Gdn::cache()->get('QnA-UnansweredCount');
         if ($count === Gdn_Cache::CACHEOP_FAILURE) {
-            $count = ' <span class="Aside"><span class="Popin Count" rel="/discussions/unansweredcount"></span>';
+            $count =
+                '<span class="Aside">'
+                    .'<span class="Popin Count" rel="/discussions/unansweredcount"></span>'
+                .'</span>';
         } else {
-            $count = ' <span class="Aside"><span class="Count">'.$count.'</span></span>';
+            $count =
+                '<span class="Aside">'
+                    .'<span class="Count">'.$count.'</span>'
+                .'</span>';
         }
 
-        echo '<li class="QnA-UnansweredQuestions '.($sender->RequestMethod == 'unanswered' ? ' Active' : '').'">'
-            .anchor(sprite('SpUnansweredQuestions').' '.t('Unanswered').$count, '/discussions/unanswered', 'UnansweredQuestions')
+        $extraClass = ($sender->RequestMethod == 'unanswered') ? 'Active' : '';
+        $sprite = sprite('SpUnansweredQuestions');
+
+        echo "<li class='QnA-UnansweredQuestions $extraClass'>"
+                .anchor(
+                    $sprite.' '.t('Unanswered').' '.$count,
+                    '/discussions/unanswered',
+                    'UnansweredQuestions'
+                )
             .'</li>';
     }
 
