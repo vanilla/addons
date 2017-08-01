@@ -4,16 +4,16 @@ class MessageLinkPlugin extends Gdn_Plugin {
    /**
     * Add 'Send Message' option to Discussion.
     */
-   public function Base_AfterFlag_Handler($sender, $args) {
-      if (CheckPermission('Conversations.Conversations.Add'))
-         $this->AddSendMessageButton($sender, $args);
+   public function base_afterFlag_handler($sender, $args) {
+      if (checkPermission('Conversations.Conversations.Add'))
+         $this->addSendMessageButton($sender, $args);
    }
 
    /**
     * Output Send Message link.
     */
-   protected function AddSendMessageButton($sender, $args) {
-      if (!Gdn::Session()->UserID) return;
+   protected function addSendMessageButton($sender, $args) {
+      if (!Gdn::session()->UserID) return;
       if (isset($args['Comment'])) {
          $object = $args['Comment'];
          $objectID = 'Comment_'.$args['Comment']->CommentID;
@@ -22,6 +22,6 @@ class MessageLinkPlugin extends Gdn_Plugin {
          $objectID = 'Discussion_'.$args['Discussion']->DiscussionID;
       } else return;
 
-      echo Anchor(Sprite('ReactMessage', 'ReactSprite').T('Send Message'), Url("/messages/add/{$object->InsertName}",TRUE), 'ReactButton Visible SendMessage').' ';
+      echo anchor(sprite('ReactMessage', 'ReactSprite').t('Send Message'), url("/messages/add/{$object->InsertName}",TRUE), 'ReactButton Visible SendMessage').' ';
    }
 }

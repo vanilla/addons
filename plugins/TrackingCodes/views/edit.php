@@ -1,32 +1,32 @@
 <?php if (!defined('APPLICATION')) exit();?>
 <h1><?php
    if (($this->Code))
-      echo T('Edit Tracking Code');
+      echo t('Edit Tracking Code');
    else
-      echo T('Add Tracking Code');
+      echo t('Add Tracking Code');
 ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Hidden('Key');
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->hidden('Key');
+echo $this->Form->errors();
 ?>
 <ul>
    <li>
       <?php
-         echo $this->Form->Label('Name', 'Name');
-         echo $this->Form->TextBox('Name');
+         echo $this->Form->label('Name', 'Name');
+         echo $this->Form->textBox('Name');
       ?>
    </li>
    <li>
       <?php
-         echo $this->Form->Label('Code', 'Code');
-         echo $this->Form->TextBox('Code', ['MultiLine' => TRUE]);
+         echo $this->Form->label('Code', 'Code');
+         echo $this->Form->textBox('Code', ['MultiLine' => TRUE]);
       ?>
    </li>
    <li>
       <?php
-         echo $this->Form->CheckBox('Enabled', 'Enable this tracking code', ['value' => '1']);
+         echo $this->Form->checkBox('Enabled', 'Enable this tracking code', ['value' => '1']);
       ?>
    </li>
 </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->close('Save');

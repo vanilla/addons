@@ -8,7 +8,7 @@
   Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 
-Gdn::FactoryInstall('BBCodeFormatter', 'NBBCPlugin', __FILE__, Gdn::FactorySingleton);
+Gdn::factoryInstall('BBCodeFormatter', 'NBBCPlugin', __FILE__, Gdn::FactorySingleton);
 
 class NBBCPlugin extends Gdn_Plugin {
 
@@ -23,36 +23,36 @@ class NBBCPlugin extends Gdn_Plugin {
    /// PROPERTIES ///
    /// METHODS ///
 
-   public function DoAttachment($bbcode, $action, $name, $default, $params, $content) {
-      $Medias = $this->Media();
+   public function doAttachment($bbcode, $action, $name, $default, $params, $content) {
+      $Medias = $this->media();
       $MediaID = $content;
       if (isset($Medias[$MediaID])) {
          $Media = $Medias[$MediaID];
 //         decho($Media, 'Media');
 
-         $Src = htmlspecialchars(Gdn_Upload::Url(GetValue('Path', $Media)));
-         $Name = htmlspecialchars(GetValue('Name', $Media));
+         $Src = htmlspecialchars(Gdn_Upload::url(getValue('Path', $Media)));
+         $Name = htmlspecialchars(getValue('Name', $Media));
 
-         if (GetValue('ImageWidth', $Media)) {
+         if (getValue('ImageWidth', $Media)) {
             return <<<EOT
 <div class="Attachment Image"><img src="$Src" alt="$Name" /></div>
 EOT;
          } else {
-            return Anchor($Name, $Src, 'Attachment File');
+            return anchor($Name, $Src, 'Attachment File');
          }
       }
 
-      return Anchor(T('Attachment not found.'), '#', 'Attachment NotFound');
+      return anchor(t('Attachment not found.'), '#', 'Attachment NotFound');
    }
 
-   function DoImage($bbcode, $action, $name, $default, $params, $content) {
+   function doImage($bbcode, $action, $name, $default, $params, $content) {
       if ($action == BBCODE_CHECK)
          return true;
-      $content = trim($bbcode->UnHTMLEncode(strip_tags($content)));
+      $content = trim($bbcode->unHTMLEncode(strip_tags($content)));
       if (!$content && $default)
          $content = $default;
 
-      if ($bbcode->IsValidUrl($content, false))
+      if ($bbcode->isValidUrl($content, false))
          return "<img src=\"" . htmlspecialchars($content) . "\" alt=\""
             . htmlspecialchars(basename($content)) . "\" class=\"bbcode_img\" />";
 
@@ -69,7 +69,7 @@ EOT;
 //                  . htmlspecialchars($info[1]) . "\" class=\"bbcode_img\" />";
 //               }
 //            }
-//         } else if ($bbcode->IsValidURL($content, false)) {
+//         } else if ($bbcode->isValidURL($content, false)) {
 //            return "<img src=\"" . htmlspecialchars($content) . "\" alt=\""
 //            . htmlspecialchars(basename($content)) . "\" class=\"bbcode_img\" />";
 //         }
@@ -77,8 +77,8 @@ EOT;
       return htmlspecialchars($params['_tag']) . htmlspecialchars($content) . htmlspecialchars($params['_endtag']);
    }
 
-   function DoVideo($bbcode, $action, $name, $default, $params, $content) {
-      list($width, $height) = Gdn_Format::GetEmbedSize();
+   function doVideo($bbcode, $action, $name, $default, $params, $content) {
+      list($width, $height) = Gdn_Format::getEmbedSize();
       list($type, $code) = explode(';', $default);
       switch ($type) {
          case 'youtube':
@@ -88,15 +88,15 @@ EOT;
       }
    }
 
-   function DoYoutube($bbcode, $action, $name, $default, $params, $content) {
+   function doYoutube($bbcode, $action, $name, $default, $params, $content) {
        if ($action == BBCODE_CHECK) return true;
 
-       $videoId = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
+       $videoId = is_string($default) ? $default : $bbcode->unHTMLEncode(strip_tags($content));
 
        return '<div class="Video P"><iframe width="560" height="315" src="https://www.youtube.com/embed/' . $videoId . '" frameborder="0" allowfullscreen></iframe></div>';
    }
 
-   function DoQuote($bbcode, $action, $name, $default, $params, $content) {
+   function doQuote($bbcode, $action, $name, $default, $params, $content) {
       if ($action == BBCODE_CHECK)
          return true;
 
@@ -117,17 +117,17 @@ EOT;
          $username = trim($params['name']);
          $username = html_entity_decode($username, ENT_QUOTES, 'UTF-8');
 
-         $User = Gdn::UserModel()->GetByUsername($username);
+         $User = Gdn::userModel()->getByUsername($username);
          if ($User)
-            $UserAnchor = UserAnchor($User);
+            $UserAnchor = userAnchor($User);
          else
-            $UserAnchor = Anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/' . rawurlencode($username));
+            $UserAnchor = anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/' . rawurlencode($username));
 
-         $title = ConcatSep(' ', $title, $UserAnchor, T('Quote wrote', 'wrote'));
+         $title = concatSep(' ', $title, $UserAnchor, t('Quote wrote', 'wrote'));
       }
 
       if (isset($params['date']))
-         $title = ConcatSep(' ', $title, T('Quote on', 'on'), htmlspecialchars(trim($params['date'])));
+         $title = concatSep(' ', $title, t('Quote on', 'on'), htmlspecialchars(trim($params['date'])));
 
       if ($title)
          $title = $title . ':';
@@ -137,11 +137,11 @@ EOT;
 
          if (is_numeric($url))
             $url = "/discussion/comment/$url#Comment_{$url}";
-         elseif (!$bbcode->IsValidURL($url))
+         elseif (!$bbcode->isValidURL($url))
             $url = '';
 
          if ($url)
-            $title = ConcatSep(' ', $title, Anchor('<span class="ArrowLink">»</span>', $url, ['class' => 'QuoteLink']));
+            $title = concatSep(' ', $title, anchor('<span class="ArrowLink">»</span>', $url, ['class' => 'QuoteLink']));
       }
 
       if ($title)
@@ -199,12 +199,12 @@ EOT;
        return "<span style=\"font-size:$size\">$content</span>";
    }
 
-   function DoURL($bbcode, $action, $name, $default, $params, $content) {
+   function doURL($bbcode, $action, $name, $default, $params, $content) {
       if ($action == BBCODE_CHECK) return true;
 
-      $url = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
+      $url = is_string($default) ? $default : $bbcode->unHTMLEncode(strip_tags($content));
 
-      if ($bbcode->IsValidURL($url)) {
+      if ($bbcode->isValidURL($url)) {
          if ($bbcode->debug)
             print "ISVALIDURL<br />";
          if ($bbcode->url_targetable !== false && isset($params['target']))
@@ -220,18 +220,18 @@ EOT;
          return htmlspecialchars($params['_tag']) . $content . htmlspecialchars($params['_endtag']);
    }
 
-   public function Format($result) {
+   public function format($result) {
       $result = str_replace(['[CODE]', '[/CODE]'], ['[code]', '[/code]'], $result);
-      $result = $this->NBBC()->Parse($result);
+      $result = $this->nBBC()->parse($result);
       return $result;
    }
 
    protected $_Media = NULL;
-   public function Media() {
+   public function media() {
       if ($this->_Media === NULL) {
          try {
-            $i = Gdn::PluginManager()->GetPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
-            $m = $i->MediaCache();
+            $i = Gdn::pluginManager()->getPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
+            $m = $i->mediaCache();
          } catch (Exception $ex) {
             $m = [];
          }
@@ -252,14 +252,14 @@ EOT;
     *
     * @return BBCode
     */
-   public function NBBC() {
+   public function nBBC() {
       if ($this->_NBBC === NULL) {
          require_once(dirname(__FILE__) . '/nbbc/nbbc.php');
-         $BBCode = new $this->Class();
+         $BBCode = new $this->class();
          $BBCode->enable_smileys = false;
-         $BBCode->SetAllowAmpersand(TRUE);
+         $BBCode->setAllowAmpersand(TRUE);
 
-         $BBCode->AddRule('attach', [
+         $BBCode->addRule('attach', [
             'mode' => BBCODE_MODE_CALLBACK,
             'method' => [$this, "DoAttachment"],
             'class' => 'image',
@@ -270,7 +270,7 @@ EOT;
             'plain_content' => [],
             ]);
 
-         $BBCode->AddRule('code', [
+         $BBCode->addRule('code', [
              'mode' => BBCODE_MODE_ENHANCED,
              'template' => "\n<pre>{\$_content/v}\n</pre>\n",
              'class' => 'code',
@@ -285,7 +285,7 @@ EOT;
          ]);
 
 
-         $BBCode->AddRule('quote', ['mode' => BBCODE_MODE_CALLBACK,
+         $BBCode->addRule('quote', ['mode' => BBCODE_MODE_CALLBACK,
              'method' => [$this, "DoQuote"],
              'allow_in' => ['listitem', 'block', 'columns'],
              'before_tag' => "sns",
@@ -296,7 +296,7 @@ EOT;
              'plain_end' => "\n",
          ]);
 //
-         $BBCode->AddRule('spoiler', [
+         $BBCode->addRule('spoiler', [
              'mode' => BBCODE_MODE_CALLBACK,
              'method' => [$this, "doSpoiler"],
              'allow_in' => ['listitem', 'block', 'columns'],
@@ -308,7 +308,7 @@ EOT;
              'plain_end' => "\n"
              ]);
 
-         $BBCode->AddRule('img', [
+         $BBCode->addRule('img', [
             'mode' => BBCODE_MODE_CALLBACK,
             'method' => [$this, "DoImage"],
             'class' => 'image',
@@ -319,9 +319,9 @@ EOT;
             'plain_content' => [],
             ]);
 
-         $BBCode->AddRule('snapback', [
+         $BBCode->addRule('snapback', [
              'mode' => BBCODE_MODE_ENHANCED,
-             'template' => ' <a href="'.Url('/discussion/comment/{$_content/v}#Comment_{$_content/v}', TRUE).'" class="SnapBack">»</a> ',
+             'template' => ' <a href="'.url('/discussion/comment/{$_content/v}#Comment_{$_content/v}', TRUE).'" class="SnapBack">»</a> ',
              'class' => 'code',
              'allow_in' => ['listitem', 'block', 'columns'],
              'content' => BBCODE_VERBATIM,
@@ -333,7 +333,7 @@ EOT;
              'plain_end' => "\n",
          ]);
 
-         $BBCode->AddRule('video', ['mode' => BBCODE_MODE_CALLBACK,
+         $BBCode->addRule('video', ['mode' => BBCODE_MODE_CALLBACK,
              'method' => [$this, "DoVideo"],
              'allow_in' => ['listitem', 'block', 'columns'],
              'before_tag' => "sns",
@@ -344,7 +344,7 @@ EOT;
              'plain_end' => "\n",
          ]);
 
-          $BBCode->AddRule('youtube', [
+          $BBCode->addRule('youtube', [
               'mode' => BBCODE_MODE_CALLBACK,
               'method' => [$this, 'DoYouTube'],
               'class' => 'link',
@@ -356,7 +356,7 @@ EOT;
               'plain_link' => ['_default', '_content']
           ]);
 
-          $BBCode->AddRule('hr', [
+          $BBCode->addRule('hr', [
               'simple_start' => "",
               'simple_end' => "",
               'allow_in' => ['listitem', 'block', 'columns'],
@@ -368,7 +368,7 @@ EOT;
               'plain_end' => "\n"
           ]);
 
-          $BBCode->AddRule('attachment', [
+          $BBCode->addRule('attachment', [
               'mode' => BBCODE_MODE_CALLBACK,
               'method' => [$this, "RemoveAttachment"],
               'class' => 'image',
@@ -380,7 +380,7 @@ EOT;
           ]);
 
 
-          $BBCode->AddRule('url', [
+          $BBCode->addRule('url', [
              'mode' => BBCODE_MODE_CALLBACK,
              'method' => [$this, 'DoURL'],
              'class' => 'link',
@@ -405,23 +405,23 @@ EOT;
           ]);
 
           // Prevent unsupported tags from displaying
-          $BBCode->AddRule('table', []);
-          $BBCode->AddRule('tr', []);
-          $BBCode->AddRule('td', []);
+          $BBCode->addRule('table', []);
+          $BBCode->addRule('tr', []);
+          $BBCode->addRule('td', []);
 
          $this->EventArguments['BBCode'] = $BBCode;
-         $this->FireEvent('AfterNBBCSetup');
+         $this->fireEvent('AfterNBBCSetup');
          $this->_NBBC = $BBCode;
       }
       return $this->_NBBC;
    }
 
-   public function RemoveAttachment() {
+   public function removeAttachment() {
        // We dont need this since we show attachments.
        return '<!-- PhpBB Attachments -->';
    }
 
-   public function Setup() {
+   public function setup() {
 
    }
 

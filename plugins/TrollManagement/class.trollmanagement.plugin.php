@@ -83,7 +83,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
         // Validate the transient key && permissions
         // Make sure we are posting back.
         if (!$sender->Request->isAuthenticatedPostBack()) {
-            throw PermissionException('Javascript');
+            throw permissionException('Javascript');
         }
 
         $trolls = self::getTrolls();

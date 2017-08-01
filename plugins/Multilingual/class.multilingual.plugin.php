@@ -40,11 +40,11 @@ class MultilingualPlugin extends Gdn_Plugin {
      * @return array Returns an array in the form `[locale => localeName]`.
      */
     public static function enabledLocales() {
-        $defaultLocale = Gdn_Locale::Canonicalize(C('Garden.Locale'));
+        $defaultLocale = Gdn_Locale::canonicalize(c('Garden.Locale'));
 
         $localeModel = new LocaleModel();
         if (class_exists('Locale')) {
-            $localePacks = $localeModel->EnabledLocalePacks(false);
+            $localePacks = $localeModel->enabledLocalePacks(false);
             $locales = [];
             foreach ($localePacks as $locale) {
                 if (isset(static::$overrides[$locale]['Name'])) {
@@ -55,7 +55,7 @@ class MultilingualPlugin extends Gdn_Plugin {
             }
             $defaultName = Locale::getDisplayName($defaultLocale, $defaultLocale);
         } else {
-            $locales = $localeModel->EnabledLocalePacks(true);
+            $locales = $localeModel->enabledLocalePacks(true);
             $locales = array_column($locales, 'Name', 'Locale');
             $defaultName = $defaultLocale === 'en' ? 'English' : $defaultLocale;
         }
@@ -80,7 +80,7 @@ class MultilingualPlugin extends Gdn_Plugin {
     public function gdn_dispatcher_afterAnalyzeRequest_handler($sender) {
         // Set user preference
         if ($tempLocale = $this->getAlternateLocale()) {
-            Gdn::Locale()->Set($tempLocale, Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
+            Gdn::locale()->set($tempLocale, Gdn::applicationManager()->enabledApplicationFolders(), Gdn::pluginManager()->enabledPluginFolders());
         }
     }
 
@@ -90,13 +90,13 @@ class MultilingualPlugin extends Gdn_Plugin {
     public function base_render_before($sender) {
         // Not in Dashboard
         // Block guests until guest sessions are restored
-        if ($sender->MasterView == 'admin' || !CheckPermission('Garden.SignIn.Allow'))
+        if ($sender->MasterView == 'admin' || !checkPermission('Garden.SignIn.Allow'))
             return;
 
-        $sender->AddModule('LocaleChooserModule');
+        $sender->addModule('LocaleChooserModule');
 
         // Add a simple style
-        $sender->AddAsset('Head', '<style>.LocaleOption { padding-left: 10px; } .LocaleOptions { padding: 10px; } .Dashboard .LocaleOptions { display: none; }</style>');
+        $sender->addAsset('Head', '<style>.LocaleOption { padding-left: 10px; } .LocaleOptions { padding: 10px; } .Dashboard .LocaleOptions { display: none; }</style>');
     }
 
     /**
@@ -106,20 +106,20 @@ class MultilingualPlugin extends Gdn_Plugin {
         $locale = false;
 
         // User preference
-        if (Gdn::Session()->IsValid()) {
-            $locale = $this->GetUserMeta(Gdn::Session()->UserID, 'Locale', false);
+        if (Gdn::session()->isValid()) {
+            $locale = $this->getUserMeta(Gdn::session()->UserID, 'Locale', false);
             $locale = val('Plugin.Multilingual.Locale', $locale, false);
         }
         // Query string
         if (!$locale) {
-            $locale = $this->validateLocale(Gdn::Request()->Get('locale'));
+            $locale = $this->validateLocale(Gdn::request()->get('locale'));
             if ($locale) {
-                Gdn::Session()->Stash('Locale', $locale);
+                Gdn::session()->stash('Locale', $locale);
             }
         }
         // Session
         if (!$locale) {
-            $locale = Gdn::Session()->Stash('Locale', '', false);
+            $locale = Gdn::session()->stash('Locale', '', false);
         }
 
         return $locale;
@@ -129,12 +129,12 @@ class MultilingualPlugin extends Gdn_Plugin {
      * Allow user to set their preferred locale via link-click.
      */
     public function profileController_setLocale_create($sender, $locale, $tK) {
-        if (!Gdn::Session()->UserID) {
-            throw PermissionException('Garden.SignIn.Allow');
+        if (!Gdn::session()->UserID) {
+            throw permissionException('Garden.SignIn.Allow');
         }
 
         // Check intent.
-        if (!Gdn::Session()->ValidateTransientKey($tK)) {
+        if (!Gdn::session()->validateTransientKey($tK)) {
             redirectTo($_SERVER['HTTP_REFERER']);
         }
 
@@ -142,7 +142,7 @@ class MultilingualPlugin extends Gdn_Plugin {
         if (isset($locale)) {
             $locale = $this->validateLocale($locale);
             if ($locale) {
-                $this->SetUserMeta(Gdn::Session()->UserID, 'Locale', $locale);
+                $this->setUserMeta(Gdn::session()->UserID, 'Locale', $locale);
             }
         }
 
@@ -162,7 +162,7 @@ class MultilingualPlugin extends Gdn_Plugin {
      * @return string Returns the canonical version of the locale on success or an empty string otherwise.
      */
     protected function validateLocale($locale) {
-        $canonicalLocale = Gdn_Locale::Canonicalize($locale);
+        $canonicalLocale = Gdn_Locale::canonicalize($locale);
         $locales = static::enabledLocales();
 
         $result = isset($locales[$canonicalLocale]) ? $canonicalLocale : '';

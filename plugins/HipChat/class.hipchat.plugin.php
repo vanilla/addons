@@ -45,7 +45,7 @@ class HipChatPlugin extends Gdn_Plugin {
         ]);
 
         $sender->addSideMenu();
-        $sender->setData('Title', sprintf(T('%s Settings'), 'HipChat'));
+        $sender->setData('Title', sprintf(t('%s Settings'), 'HipChat'));
         $sender->ConfigurationModule = $conf;
         $conf->renderAll();
     }

@@ -50,7 +50,7 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
         } elseif (!isset($request['sig'])) {
             $error = ['error' => 'invalid_request', 'message' => 'Missing sig parameter.'];
         } // Make sure the timestamp hasn't timedout
-        elseif (abs($request['timestamp'] - JsTimestamp()) > JS_TIMEOUT) {
+        elseif (abs($request['timestamp'] - jsTimestamp()) > JS_TIMEOUT) {
             $error = ['error' => 'invalid_request', 'message' => 'The timestamp is invalid.'];
         } elseif (!isset($request['nonce'])) {
             $error = ['error' => 'invalid_request', 'message' => 'Missing nonce parameter.'];

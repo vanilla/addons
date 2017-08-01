@@ -9,8 +9,8 @@ class SearchModel extends Gdn_Model {
 
    /// METHODS ///
 
-   public function Search($search, $offset = 0, $limit = 20) {
-      $baseUrl = C('Plugins.Solr.SearchUrl', 'http://localhost:8983/solr/select/?');
+   public function search($search, $offset = 0, $limit = 20) {
+      $baseUrl = c('Plugins.Solr.SearchUrl', 'http://localhost:8983/solr/select/?');
       if (!$baseUrl)
          throw new Gdn_UserException("The search url has not been configured.");
 
@@ -21,7 +21,7 @@ class SearchModel extends Gdn_Model {
       $search = preg_replace('`([][+&|!(){}^"~*?:\\\\-])`', "\\\\$1", $search);
 
       // Add the category watch.
-      $categories = CategoryModel::CategoryWatch();
+      $categories = CategoryModel::categoryWatch();
       if ($categories === FALSE) {
          return [];
       } elseif ($categories !== TRUE) {
@@ -55,7 +55,7 @@ class SearchModel extends Gdn_Model {
          // Add the url.
          switch ($row['DocType']) {
             case 'Discussion':
-               $row['Url'] = '/discussion/'.$row['PrimaryID'].'/'.Gdn_Format::Url($row['Title']);
+               $row['Url'] = '/discussion/'.$row['PrimaryID'].'/'.Gdn_Format::url($row['Title']);
                break;
             case 'Comment':
                $row['Url'] = "/discussion/comment/{$row['PrimaryID']}/#Comment_{$row['PrimaryID']}";
@@ -67,7 +67,7 @@ class SearchModel extends Gdn_Model {
       }
 
       // Join the users into the result.
-      Gdn_DataSet::Join($result, ['table' => 'User', 'parent' => 'UserID', 'prefix' => '', 'Name', 'Photo']);
+      Gdn_DataSet::join($result, ['table' => 'User', 'parent' => 'UserID', 'prefix' => '', 'Name', 'Photo']);
 
       return $result;
 	}

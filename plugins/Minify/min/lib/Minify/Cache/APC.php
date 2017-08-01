@@ -8,7 +8,7 @@
  * APC-based cache class for Minify
  * 
  * <code>
- * Minify::setCache(new Minify_Cache_APC());
+ * Minify::setCache(new minify_Cache_APC());
  * </code>
  * 
  * @package Minify

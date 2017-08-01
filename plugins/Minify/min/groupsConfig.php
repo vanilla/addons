@@ -39,7 +39,7 @@ return [
     /*'js2' => array(
         dirname(__FILE__) . '/../min_unit_tests/_test_files/js/before.js',
         // do NOT process this file
-        new Minify_Source(array(
+        new minify_Source(array(
             'filepath' => dirname(__FILE__) . '/../min_unit_tests/_test_files/js/before.js',
             'minifier' => create_function('$a', 'return $a;')
         ))
@@ -48,7 +48,7 @@ return [
     /*'js3' => array(
         dirname(__FILE__) . '/../min_unit_tests/_test_files/js/before.js',
         // do NOT process this file
-        new Minify_Source(array(
+        new minify_Source(array(
             'filepath' => dirname(__FILE__) . '/../min_unit_tests/_test_files/js/before.js',
             'minifier' => array('Minify_Packer', 'minify')
         ))

@@ -21,16 +21,16 @@ class SteamConnectPlugin extends Gdn_Plugin {
     }
 
     public function isConfig() {
-        return C('Plugins.SteamConnect.APIKey', FALSE);
+        return c('Plugins.SteamConnect.APIKey', FALSE);
     }
 
     protected function _AuthorizeHref($popup = FALSE) {
-        $url = Url('/entry/openid', TRUE);
+        $url = url('/entry/openid', TRUE);
         $urlParts = explode('?', $url);
-        parse_str(GetValue(1, $urlParts, ''), $query);
+        parse_str(getValue(1, $urlParts, ''), $query);
         $query['url'] = 'http://steamcommunity.com/openid';
-        $path = '/'.Gdn::Request()->Path();
-        $query['Target'] = GetValue('Target', $_GET, $path ? $path : '/');
+        $path = '/'.Gdn::request()->path();
+        $query['Target'] = getValue('Target', $_GET, $path ? $path : '/');
         if ($popup)
             $query['display'] = 'popup';
 
@@ -41,7 +41,7 @@ class SteamConnectPlugin extends Gdn_Plugin {
 
     /// Plugin Event Handlers ///
 
-    public function EntryController_SignIn_Handler($sender, $args) {
+    public function entryController_signIn_handler($sender, $args) {
 
         if (isset($sender->Data['Methods']) && $this->isConfig()) {
             $url = $this->_AuthorizeHref();
@@ -49,43 +49,43 @@ class SteamConnectPlugin extends Gdn_Plugin {
             // Add the steam method to the controller.
             $method = [
                 'Name' => 'Steam',
-                'SignInHtml' => SocialSigninButton('Steam', $url, 'button', ['class' => 'js-extern'])
+                'SignInHtml' => socialSigninButton('Steam', $url, 'button', ['class' => 'js-extern'])
             ];
 
             $sender->Data['Methods'][] = $method;
         }
     }
 
-    public function Base_SignInIcons_Handler($sender, $args) {
+    public function base_signInIcons_handler($sender, $args) {
         if ($this->isConfig()) {
             echo "\n".$this->_GetButton();
         }
     }
 
-    public function Base_BeforeSignInButton_Handler($sender, $args) {
+    public function base_beforeSignInButton_handler($sender, $args) {
         if ($this->isConfig()) {
             echo "\n".$this->_GetButton();
         }
     }
 
-    public function AssetModel_StyleCss_Handler($sender) {
-        $sender->AddCssFile('steam-connect.css', 'plugins/SteamConnect');
+    public function assetModel_styleCss_handler($sender) {
+        $sender->addCssFile('steam-connect.css', 'plugins/SteamConnect');
     }
 
     private function _GetButton() {
         if ($this->isConfig()) {
             $url = $this->_AuthorizeHref();
-            return SocialSigninButton('Steam', $url, 'icon', ['class' => 'js-extern']);
+            return socialSigninButton('Steam', $url, 'icon', ['class' => 'js-extern']);
         }
     }
 
-    public function Base_BeforeSignInLink_Handler($sender) {
-        if (!Gdn::Session()->IsValid() && $this->isConfig()) {
-            echo "\n".Wrap($this->_GetButton(), 'li', ['class' => 'Connect SteamConnect']);
+    public function base_beforeSignInLink_handler($sender) {
+        if (!Gdn::session()->isValid() && $this->isConfig()) {
+            echo "\n".wrap($this->_GetButton(), 'li', ['class' => 'Connect SteamConnect']);
         }
     }
 
-    public function OpenIDPlugin_AfterConnectData_Handler($sender, $args) {
+    public function openIDPlugin_afterConnectData_handler($sender, $args) {
 
         $form = $args['Form'];
         $openID = $args['OpenID'];
@@ -93,7 +93,7 @@ class SteamConnectPlugin extends Gdn_Plugin {
 
         // Make a call to steam.
         $qs = [
-            'key' => C('Plugins.SteamConnect.APIKey'),
+            'key' => c('Plugins.SteamConnect.APIKey'),
             'steamids' => $steamID
         ];
 
@@ -104,20 +104,20 @@ class SteamConnectPlugin extends Gdn_Plugin {
 
         $player = $json_decoded->response->players[0];
 
-        $form->SetFormValue('Provider', 'Steam');
-        $form->SetFormValue('ProviderName', 'Steam');
-        $form->SetFormValue('UniqueID', $steamID);
-        $form->SetFormValue('Photo', $player->avatarfull);
+        $form->setFormValue('Provider', 'Steam');
+        $form->setFormValue('ProviderName', 'Steam');
+        $form->setFormValue('UniqueID', $steamID);
+        $form->setFormValue('Photo', $player->avatarfull);
 
         /**
          * Check to see if we already have an authentication record for this user.  If we don't, setup their username.
          */
-        if (!Gdn::UserModel()->GetAuthentication($steamID, 'Steam')) {
-            $form->SetFormValue('Name', $player->personaname);
+        if (!Gdn::userModel()->getAuthentication($steamID, 'Steam')) {
+            $form->setFormValue('Name', $player->personaname);
         }
 
         if (isset($player->realname)) {
-            $form->SetFormValue('FullName', $player->realname);
+            $form->setFormValue('FullName', $player->realname);
         }
     }
 
@@ -127,21 +127,21 @@ class SteamConnectPlugin extends Gdn_Plugin {
         return $matches[1];
     }
 
-    public function SettingsController_SteamConnect_Create($sender) {
-        $sender->Permission('Garden.Settings.Manage');
+    public function settingsController_steamConnect_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
 
-        $aPIKeyDescription =  '<div class="info">'.sprintf(T('A %s is necessary for this plugin to work.'), T('Steam Web API Key')).' '
-            .sprintf(T('Don\'t have a %s?'), T('Steam Web API Key'))
-            .' <a href="http://steamcommunity.com/dev/apikey">'.T('Get one here.').'</a></div>';
+        $aPIKeyDescription =  '<div class="info">'.sprintf(t('A %s is necessary for this plugin to work.'), t('Steam Web API Key')).' '
+            .sprintf(t('Don\'t have a %s?'), t('Steam Web API Key'))
+            .' <a href="http://steamcommunity.com/dev/apikey">'.t('Get one here.').'</a></div>';
 
         $conf = new ConfigurationModule($sender);
-        $conf->Initialize([
+        $conf->initialize([
             'Plugins.SteamConnect.APIKey' => ['Control' => 'TextBox', 'LabelCode' => 'Steam Web API Key', 'Description' => $aPIKeyDescription]
         ]);
 
-        $sender->AddSideMenu();
-        $sender->SetData('Title', sprintf(T('%s Settings'), T('Steam Connect')));
+        $sender->addSideMenu();
+        $sender->setData('Title', sprintf(t('%s Settings'), t('Steam Connect')));
         $sender->ConfigurationModule = $conf;
-        $conf->RenderAll();
+        $conf->renderAll();
     }
 }

@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
-$Locale = Gdn::Locale();
-$Definitions = $Locale->GetDeveloperDefinitions();
+$Locale = Gdn::locale();
+$Definitions = $Locale->getDeveloperDefinitions();
 $CountDefinitions = count($Definitions);
 ?>
-<h1><?php echo T('Customize Text'); ?></h1>
+<h1><?php echo t('Customize Text'); ?></h1>
 <div class="padded">
    <?php
 		echo 'Search complete. There are <strong>'. $CountDefinitions . '</strong> text definitions available for editing.';
-		echo Wrap(Anchor('Go edit them now!', 'settings/customizetext'), 'p');
+		echo wrap(anchor('Go edit them now!', 'settings/customizetext'), 'p');
    ?>
 </div>

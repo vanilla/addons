@@ -2,7 +2,7 @@
 
 class LikedPlugin extends Gdn_Plugin {
 
-	public function DiscussionController_Render_Before($sender) {
+	public function discussionController_render_before($sender) {
       $fB_SDK = <<<EOD
 <div id="fb-root"></div>
 <script>(function(d, s, id) {
@@ -13,16 +13,16 @@ class LikedPlugin extends Gdn_Plugin {
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 EOD;
-      $sender->AddAsset('Panel', $fB_SDK);
+      $sender->addAsset('Panel', $fB_SDK);
 	}
 
-	public function DiscussionController_AfterDiscussionBody_Handler($sender) {
+	public function discussionController_afterDiscussionBody_handler($sender) {
       echo '<div class="fb-like" data-href="';
-      echo Gdn_Url::Request(true, true, true);
+      echo Gdn_Url::request(true, true, true);
       echo '" data-send="false" data-width="450" data-show-faces="false" data-font="lucida grande"></div>';
 	}
 
-   public function Setup() {
+   public function setup() {
       // No setup required.
    }
 }

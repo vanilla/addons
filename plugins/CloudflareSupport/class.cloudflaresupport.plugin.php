@@ -50,7 +50,7 @@ class CloudflareSupportPlugin extends Gdn_Plugin {
          return;
       }
 
-      $requestAddress = Gdn::Request()->RequestAddress();
+      $requestAddress = Gdn::request()->requestAddress();
       $cloudflareRequest = FALSE;
       foreach ($this->CloudflareSourceIPs as $cloudflareIPRange) {
 
@@ -59,14 +59,14 @@ class CloudflareSupportPlugin extends Gdn_Plugin {
             continue;
          }
 
-         Gdn::Request()->RequestAddress($cloudflareClientIP);
+         Gdn::request()->requestAddress($cloudflareClientIP);
          $cloudflareRequest = TRUE;
          break;
       }
 
       // Let people know that the CF plugin is turned on.
       if ($cloudflareRequest && !headers_sent()) {
-         header("X-CF-Powered-By: CF-Vanilla v" . $this->GetPluginKey('Version'));
+         header("X-CF-Powered-By: CF-Vanilla v" . $this->getPluginKey('Version'));
       }
    }
 

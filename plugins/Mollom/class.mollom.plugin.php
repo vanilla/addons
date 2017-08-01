@@ -12,7 +12,7 @@ class MollomPlugin extends Gdn_Plugin {
    /**
     * @return Akismet
     */
-   public static function Mollom() {
+   public static function mollom() {
       static $mollom;
       if (!$mollom)
          $mollom = new MollomVanilla();
@@ -20,20 +20,20 @@ class MollomPlugin extends Gdn_Plugin {
       return $mollom;
    }
 
-   public function CheckMollom($recordType, $data) {
-      $userID = $this->UserID();
+   public function checkMollom($recordType, $data) {
+      $userID = $this->userID();
       if (!$userID)
          return FALSE;
 
-      $mollom = self::Mollom();
+      $mollom = self::mollom();
 
       if (!$mollom)
          return FALSE;
 
       $result = $mollom->checkContent([
          'checks' => ['spam'],
-         'postTitle' => GetValue('Name', $data),
-         'postBody' => ConcatSep("\n\n", GetValue('Body', $data),GetValue('Story', $data)),
+         'postTitle' => getValue('Name', $data),
+         'postBody' => concatSep("\n\n", getValue('Body', $data),getValue('Story', $data)),
          'authorName' => $data['Username'],
          'authorEmail' => $data['Email'],
          'authorIp' => $data['IPAddress']
@@ -41,34 +41,34 @@ class MollomPlugin extends Gdn_Plugin {
       return ($result['spamClassification'] == 'spam') ? true : false;
    }
 
-   public function Setup() {
-      $this->Structure();
+   public function setup() {
+      $this->structure();
    }
 
-   public function Structure() {
+   public function structure() {
       // Get a user for operations.
-      $userID = Gdn::SQL()->GetWhere('User', ['Name' => 'Mollom', 'Admin' => 2])->Value('UserID');
+      $userID = Gdn::sql()->getWhere('User', ['Name' => 'Mollom', 'Admin' => 2])->value('UserID');
 
       if (!$userID) {
-         $userID = Gdn::SQL()->Insert('User', [
+         $userID = Gdn::sql()->insert('User', [
             'Name' => 'Mollom',
-            'Password' => RandomString('20'),
+            'Password' => randomString('20'),
             'HashMethod' => 'Random',
             'Email' => 'mollom@domain.com',
-            'DateInserted' => Gdn_Format::ToDateTime(),
+            'DateInserted' => Gdn_Format::toDateTime(),
             'Admin' => '2'
          ]);
       }
-      SaveToConfig('Plugins.Mollom.UserID', $userID);
+      saveToConfig('Plugins.Mollom.UserID', $userID);
    }
 
-   public function UserID() {
-      return C('Plugins.Mollom.UserID', NULL);
+   public function userID() {
+      return c('Plugins.Mollom.UserID', NULL);
    }
 
    /// EVENT HANDLERS ///
 
-   public function Base_CheckSpam_Handler($sender, $args) {
+   public function base_checkSpam_handler($sender, $args) {
       if ($args['IsSpam'])
          return; // don't double check
 
@@ -79,21 +79,21 @@ class MollomPlugin extends Gdn_Plugin {
       switch ($recordType) {
          case 'Registration':
             $data['Name'] = '';
-            $data['Body'] = GetValue('DiscoveryText', $data);
+            $data['Body'] = getValue('DiscoveryText', $data);
             if ($data['Body']) {
                // Only check for spam if there is discovery text.
-               $result = $this->CheckMollom($recordType, $data);
+               $result = $this->checkMollom($recordType, $data);
                if ($result)
-                  $data['Log_InsertUserID'] = $this->UserID();
+                  $data['Log_InsertUserID'] = $this->userID();
             }
             break;
          case 'Comment':
          case 'Discussion':
          case 'Activity':
          case 'ActivityComment':
-            $result = $this->CheckMollom($recordType, $data);
+            $result = $this->checkMollom($recordType, $data);
             if ($result)
-               $data['Log_InsertUserID'] = $this->UserID();
+               $data['Log_InsertUserID'] = $this->userID();
             break;
          default:
             $result = FALSE;
@@ -101,17 +101,17 @@ class MollomPlugin extends Gdn_Plugin {
       $sender->EventArguments['IsSpam'] = $result;
    }
 
-   public function SettingsController_Mollom_Create($sender, $args = []) {
-      $sender->Permission('Garden.Settings.Manage');
-      $sender->SetData('Title', T('Mollom Settings'));
+   public function settingsController_mollom_create($sender, $args = []) {
+      $sender->permission('Garden.Settings.Manage');
+      $sender->setData('Title', t('Mollom Settings'));
 
       $cf = new ConfigurationModule($sender);
-      $cf->Initialize([
+      $cf->initialize([
           'Plugins.Mollom.publicKey' => [],
           'Plugins.Mollom.privateKey' => []
           ]);
 
-      $sender->AddSideMenu('settings/plugins');
-      $cf->RenderAll();
+      $sender->addSideMenu('settings/plugins');
+      $cf->renderAll();
    }
 }

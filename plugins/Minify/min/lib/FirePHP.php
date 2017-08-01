@@ -1125,7 +1125,7 @@ class FirePHP {
   * encodes an arbitrary variable into JSON format
   *
   * @param    mixed   $var    any number, boolean, string, array, or object to be encoded.
-  *                           see argument 1 to Services_JSON() above for array-parsing behavior.
+  *                           see argument 1 to services_JSON() above for array-parsing behavior.
   *                           if var is a strng, note that encode() always expects it
   *                           to be in ASCII or UTF-8 format!
   *

@@ -35,7 +35,7 @@ class AuthorSelectorPlugin extends Gdn_Plugin {
         $discussionID = $sender->Request->get('discussionid');
         $discussion = $sender->DiscussionModel->getID($discussionID);
         if (!$discussion) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
 
         // Check edit permission

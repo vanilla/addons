@@ -217,7 +217,7 @@ class DisqusPlugin extends Gdn_Plugin {
 
         $form = $sender->Form;
 
-        $accessToken = $form->getFormValue('AccessToken'); //Gdn::Session()->Stash('Disqus.AccessToken', NULL, NULL);
+        $accessToken = $form->getFormValue('AccessToken'); //Gdn::session()->stash('Disqus.AccessToken', NULL, NULL);
 
         // Get the access token.
         if ($code && !$accessToken) {

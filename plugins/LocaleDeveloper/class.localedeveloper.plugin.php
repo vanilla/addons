@@ -28,17 +28,17 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $Sender
      * @param array $Args
      */
-    public function Base_Render_After($Sender, $Args) {
-        $Locale = Gdn::Locale();
+    public function base_render_after($Sender, $Args) {
+        $Locale = Gdn::locale();
         if (!is_a($Locale, 'DeveloperLocale'))
             return;
 
-        $Path = $this->LocalePath.'/tmp_'.RandomString(10);
+        $Path = $this->LocalePath.'/tmp_'.randomString(10);
         if (!file_exists(dirname($Path)))
             mkdir(dirname($Path), 0777, TRUE);
         elseif (file_exists($Path)) {
             // Load the existing definitions.
-            $Locale->Load($Path);
+            $Locale->load($Path);
         }
 
         // Load the core definitions.
@@ -65,7 +65,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
         $Ignore = $Definition;
         $Definition = [];
 
-        $CapturedDefinitions = $Locale->CapturedDefinitions();
+        $CapturedDefinitions = $Locale->capturedDefinitions();
 
 //      decho ($CapturedDefinitions);
 //      die();
@@ -94,8 +94,8 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
                 Logger::error("Could not open {path}.", ['path' => $Path]);
                 continue;
             }
-            fwrite($fp, $this->GetFileHeader());
-            LocaleModel::WriteDefinitions($fp, $Definition);
+            fwrite($fp, $this->getFileHeader());
+            LocaleModel::writeDefinitions($fp, $Definition);
             fclose($fp);
 
             // Copy the file over the existing one.
@@ -103,14 +103,14 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
         }
     }
 
-    public function Gdn_Dispatcher_BeforeDispatch_Handler($sender) {
-        if (C('Plugins.LocaleDeveloper.CaptureDefinitions')) {
+    public function gdn_Dispatcher_BeforeDispatch_Handler($sender) {
+        if (c('Plugins.LocaleDeveloper.CaptureDefinitions')) {
             // Install the developer locale.
-            $_Locale = new DeveloperLocale(Gdn::Locale()->Current(), C('EnabledApplications'), C('EnabledPlugins'));
+            $_Locale = new DeveloperLocale(Gdn::locale()->current(), c('EnabledApplications'), c('EnabledPlugins'));
 
-            $tmp = Gdn::FactoryOverwrite(TRUE);
-            Gdn::FactoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $_Locale);
-            Gdn::FactoryOverwrite($tmp);
+            $tmp = Gdn::factoryOverwrite(TRUE);
+            Gdn::factoryInstall(Gdn::AliasLocale, 'Gdn_Locale', NULL, Gdn::FactorySingleton, $_Locale);
+            Gdn::factoryOverwrite($tmp);
             unset($tmp);
         }
     }
@@ -120,28 +120,28 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function SettingsController_Render_Before($sender, $args) {
+    public function settingsController_render_before($sender, $args) {
         if (strcasecmp($sender->RequestMethod, 'locales') != 0)
             return;
 
         // Add a little pointer to the settings.
         $text = '<div class="Info">'.
-            sprintf(T('Locale Developer Settings %s.'), Anchor(T('here'), '/settings/localedeveloper')).
+            sprintf(t('Locale Developer Settings %s.'), anchor(t('here'), '/settings/localedeveloper')).
             '</div>';
-        $sender->AddAsset('Content', $text, 'LocaleDeveloperLink');
+        $sender->addAsset('Content', $text, 'LocaleDeveloperLink');
     }
 
     /**
      *
      * @var SettingsController $sender
      */
-    public function SettingsController_LocaleDeveloper_Create($sender, $args = []) {
-        $sender->Permission('Garden.Settings.Manage');
+    public function settingsController_localeDeveloper_create($sender, $args = []) {
+        $sender->permission('Garden.Settings.Manage');
 
-        $sender->AddSideMenu();
-        $sender->SetData('Title', T('Locale Developer'));
+        $sender->addSideMenu();
+        $sender->setData('Title', t('Locale Developer'));
 
-        switch (strtolower(GetValue(0, $args, ''))) {
+        switch (strtolower(getValue(0, $args, ''))) {
             case '':
                 $this->_Settings($sender, $args);
                 break;
@@ -157,25 +157,25 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
     public function _Download($sender, $args) {
         try {
             // Create the zip file.
-            $path = $this->CreateZip();
+            $path = $this->createZip();
 
             // Serve the zip file.
-            Gdn_FileSystem::ServeFile($path, basename($path), 'application/zip');
+            Gdn_FileSystem::serveFile($path, basename($path), 'application/zip');
         } catch (Exception $ex) {
-            $this->Form->AddError($ex);
+            $this->Form->addError($ex);
             $this->_Settings($sender, $args);
         }
     }
 
-    public function EnsureDefinitionFile() {
+    public function ensureDefinitionFile() {
         $path = $this->LocalePath.'/definitions.php';
         if (file_exists($path))
             unlink($path);
-        $contents = $this->GetFileHeader().self::FormatInfoArray('$LocaleInfo', $this->GetInfoArray());
-        Gdn_FileSystem::SaveFile($path, $contents);
+        $contents = $this->getFileHeader().self::formatInfoArray('$LocaleInfo', $this->getInfoArray());
+        Gdn_FileSystem::saveFile($path, $contents);
     }
 
-    public static function FormatInfoArray($variableName, $array) {
+    public static function formatInfoArray($variableName, $array) {
         $variableName = '$'.trim($variableName, '$');
 
         $result = '';
@@ -188,7 +188,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
         return $result;
     }
 
-    public static function FormatValue($value, $singleLine = TRUE) {
+    public static function formatValue($value, $singleLine = TRUE) {
         if (is_bool($value)) {
             return $value ? 'TRUE' : 'FALSE';
         } elseif (is_numeric($value)) {
@@ -209,7 +209,7 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
                 if ($singleLine == 'TRUEFALSE')
                     $singleLine = FALSE;
 
-                $result .= "'".addcslashes($key, "'")."' => ".self::FormatValue($arrayValue, $singleLine);
+                $result .= "'".addcslashes($key, "'")."' => ".self::formatValue($arrayValue, $singleLine);
             }
 
             $result = 'array('.$result.')';
@@ -222,8 +222,8 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
         }
     }
 
-    public function GetFileHeader() {
-        $now = Gdn_Format::ToDateTime();
+    public function getFileHeader() {
+        $now = Gdn_Format::toDateTime();
 
         $result = "<?php if (!defined('APPLICATION')) exit();
 /** This file was generated by the Locale Developer plugin on $now **/\n\n";
@@ -231,16 +231,16 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
         return $result;
     }
 
-    public function GetInfoArray() {
-        $info = C('Plugins.LocaleDeveloper');
+    public function getInfoArray() {
+        $info = c('Plugins.LocaleDeveloper');
         foreach ($info as $key => $value) {
             if (!$value)
                 unset($info[$key]);
         }
 
-        $infoArray = [GetValue('Key', $info, 'LocaleDeveloper') => [
-            'Locale' => GetValue('Locale', $info, Gdn::Locale()->Current()),
-            'Name' => GetValue('Name', $info, 'Locale Developer'),
+        $infoArray = [getValue('Key', $info, 'LocaleDeveloper') => [
+            'Locale' => getValue('Locale', $info, Gdn::locale()->current()),
+            'Name' => getValue('Name', $info, 'Locale Developer'),
             'Description' => 'Automatically gernerated by the Locale Developer plugin.',
             'Version' => '0.1a',
             'Author' => "Your Name",
@@ -255,23 +255,23 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
     public function _GoogleTranslate($sender, $args) {
         $sender->Form = $this->Form;
 
-        if ($this->Form->IsPostBack()) {
+        if ($this->Form->isPostBack()) {
             exit('Foo');
 
         } else {
             // Load all of the definitions.
-            //$Definitions = $this->LoadDefinitions();
-            //$Sender->SetData('Definitions', $Definitions);
+            //$Definitions = $this->loadDefinitions();
+            //$Sender->setData('Definitions', $Definitions);
         }
 
-        $sender->Render('googletranslate', '', 'plugins/LocaleDeveloper');
+        $sender->render('googletranslate', '', 'plugins/LocaleDeveloper');
     }
 
-//   public function LoadDefinitions($Path = NULL) {
+//   public function loadDefinitions($Path = NULL) {
 //      if ($Path === NULL)
 //         $Path = $this->LocalePath;
 //
-//      $Paths = SafeGlob($Path.'/*.php');
+//      $Paths = safeGlob($Path.'/*.php');
 //      $Definition = array();
 //      foreach ($Paths as $Path) {
 //         // Skip the locale developer's changes file.
@@ -287,109 +287,109 @@ class LocaleDeveloperPlugin extends Gdn_Plugin {
 
         // Grab the existing locale packs.
         $localeModel = new LocaleModel();
-        $localePacks = $localeModel->AvailableLocalePacks();
+        $localePacks = $localeModel->availableLocalePacks();
         $localArray = [];
         foreach ($localePacks as $key => $info) {
-            $localeArray[$key] = GetValue('Name', $info, $key);
+            $localeArray[$key] = getValue('Name', $info, $key);
         }
-        $sender->SetData('LocalePacks', $localeArray);
+        $sender->setData('LocalePacks', $localeArray);
 
-        if ($this->Form->IsPostBack()) {
-            if ($this->Form->GetFormValue('Save')) {
-                $values = ArrayTranslate($this->Form->FormValues(), ['Key', 'Name', 'Locale', 'CaptureDefinitions']);
+        if ($this->Form->isPostBack()) {
+            if ($this->Form->getFormValue('Save')) {
+                $values = arrayTranslate($this->Form->formValues(), ['Key', 'Name', 'Locale', 'CaptureDefinitions']);
                 $saveValues = [];
                 foreach ($values as $key => $value) {
                     $saveValues['Plugins.LocaleDeveloper.'.$key] = $value;
                 }
 
                 // Save the settings.
-                SaveToConfig($saveValues, '', ['RemoveEmpty' => TRUE]);
+                saveToConfig($saveValues, '', ['RemoveEmpty' => TRUE]);
 
-                $sender->StatusMessage = T('Your changes have been saved.');
-            } elseif ($this->Form->GetFormValue('GenerateChanges')) {
-                $key = $this->Form->GetFormValue('LocalePackForChanges');
+                $sender->StatusMessage = t('Your changes have been saved.');
+            } elseif ($this->Form->getFormValue('GenerateChanges')) {
+                $key = $this->Form->getFormValue('LocalePackForChanges');
                 if (!$key)
-                    $this->Form->AddError('ValidateRequired', 'Locale Pack');
+                    $this->Form->addError('ValidateRequired', 'Locale Pack');
                 $path = PATH_ROOT.'/locales/'.$key;
                 if (!file_exists($path))
-                    $this->Form->AddError('Could not find the selected locale pack.');
+                    $this->Form->addError('Could not find the selected locale pack.');
 
-                if ($this->Form->ErrorCount() == 0) {
+                if ($this->Form->errorCount() == 0) {
                     try {
-                        $localeModel->GenerateChanges($path, $this->LocalePath);
-                        $sender->StatusMessage = T('Your changes have been saved.');
+                        $localeModel->generateChanges($path, $this->LocalePath);
+                        $sender->StatusMessage = t('Your changes have been saved.');
                     } catch (Exception $ex) {
-                        $this->Form->AddError($ex);
+                        $this->Form->addError($ex);
                     }
                 }
-            } elseif ($this->Form->GetFormValue('Copy')) {
-                $key = $this->Form->GetFormValue('LocalePackForCopy');
+            } elseif ($this->Form->getFormValue('Copy')) {
+                $key = $this->Form->getFormValue('LocalePackForCopy');
                 if (!$key)
-                    $this->Form->AddError('ValidateRequired', 'Locale Pack');
+                    $this->Form->addError('ValidateRequired', 'Locale Pack');
                 $path = PATH_ROOT.'/locales/'.$key;
                 if (!file_exists($path))
-                    $this->Form->AddError('Could not find the selected locale pack.');
+                    $this->Form->addError('Could not find the selected locale pack.');
 
-                if ($this->Form->ErrorCount() == 0) {
+                if ($this->Form->errorCount() == 0) {
                     try {
-                        $localeModel->CopyDefinitions($path, $this->LocalePath.'/copied.php');
-                        $sender->StatusMessage = T('Your changes have been saved.');
+                        $localeModel->copyDefinitions($path, $this->LocalePath.'/copied.php');
+                        $sender->StatusMessage = t('Your changes have been saved.');
                     } catch (Exception $ex) {
-                        $this->Form->AddError($ex);
+                        $this->Form->addError($ex);
                     }
                 }
-            } elseif ($this->Form->GetFormValue('Remove')) {
-                $files = SafeGlob($this->LocalePath.'/*');
+            } elseif ($this->Form->getFormValue('Remove')) {
+                $files = safeGlob($this->LocalePath.'/*');
                 foreach ($files as $file) {
                     $result = unlink($file);
                     if (!$result) {
-                        $this->Form->AddError('@'.sprintf(T('Could not remove %s.'), $file));
+                        $this->Form->addError('@'.sprintf(t('Could not remove %s.'), $file));
                     }
                 }
-                if ($this->Form->ErrorCount() == 0)
-                    $sender->StatusMessage = T('Your changes have been saved.');
+                if ($this->Form->errorCount() == 0)
+                    $sender->StatusMessage = t('Your changes have been saved.');
             }
         } else {
-            $values = C('Plugins.LocaleDeveloper');
+            $values = c('Plugins.LocaleDeveloper');
             foreach ($values as $key => $value) {
-                $this->Form->SetFormValue($key, $value);
+                $this->Form->setFormValue($key, $value);
             }
         }
 
-        $sender->SetData('LocalePath', $this->LocalePath);
+        $sender->setData('LocalePath', $this->LocalePath);
 
-        $sender->Render('', '', 'plugins/LocaleDeveloper');
+        $sender->render('', '', 'plugins/LocaleDeveloper');
     }
 
-    public function WriteInfoArray($fp) {
-        $info = C('Plugins.LocaleDeveloper');
+    public function writeInfoArray($fp) {
+        $info = c('Plugins.LocaleDeveloper');
 
         // Write the info array.
-        $infoArray = $this->GetInfoArray();
+        $infoArray = $this->getInfoArray();
 
-        $infoString = self::FormatInfoArray('$LocaleInfo', $infoArray);
+        $infoString = self::formatInfoArray('$LocaleInfo', $infoArray);
         fwrite($fp, $infoString);
     }
 
-    public function CreateZip() {
+    public function createZip() {
         if (!class_exists('ZipArchive')) {
             throw new Exception('Your server does not support zipping files.', 400);
         }
 
-        $info = $this->GetInfoArray();
-        $this->EnsureDefinitionFile();
+        $info = $this->getInfoArray();
+        $this->ensureDefinitionFile();
 
         // Get the basename of the locale.
         $key = key($info);
 
         $zipPath = PATH_UPLOADS."/$key.zip";
-        $tmpPath = PATH_UPLOADS."/tmp_".RandomString(10);
+        $tmpPath = PATH_UPLOADS."/tmp_".randomString(10);
 
         $zip = new ZipArchive();
         $zip->open($tmpPath, ZIPARCHIVE::CREATE);
 
         // Add all of the files in the locale to the zip.
-        $files = SafeGlob(rtrim($this->LocalePath, '/').'/*.*', ['php', 'txt']);
+        $files = safeGlob(rtrim($this->LocalePath, '/').'/*.*', ['php', 'txt']);
         foreach ($files as $file) {
             $localPath = $key.'/'.basename($file);
             $zip->addFile($file, $localPath);

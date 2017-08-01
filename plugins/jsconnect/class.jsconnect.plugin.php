@@ -87,7 +87,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $connectLabel = '<span class="Username"></span><div class="ConnectLabel TextColor">'.sprintf(t('Sign In with %s'), $provider['Name']).'</div>';
         }
 
-        if (!C('Plugins.JsConnect.NoGuestCheck')) {
+        if (!c('Plugins.JsConnect.NoGuestCheck')) {
             $result = '<div style="display: none" class="JsConnect-Container ConnectButton Small UserInfo" rel="'.$url.'">';
 
             if (!val('IsDefault', $provider)) {
@@ -523,7 +523,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $provider = self::getProvider($client_id);
 
             if (empty($provider)) {
-                throw NotFoundException('Provider');
+                throw notFoundException('Provider');
             }
 
             $get = arrayTranslate($sender->Request->get(), ['client_id', 'display']);
@@ -536,7 +536,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $sender->Form->addHidden('Target', $target);
 
             $sender->MasterView = 'empty';
-            $sender->Render('JsConnect', '', 'plugins/jsconnect');
+            $sender->render('JsConnect', '', 'plugins/jsconnect');
         }
     }
 
@@ -575,7 +575,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         $Secret = val('AssociationSecret', $Provider);
 
         if (Gdn::session()->isValid()) {
-            $User = ArrayTranslate((array)Gdn::session()->User, ['UserID' => 'UniqueID', 'Name', 'Email', 'PhotoUrl', 'DateOfBirth', 'Gender']);
+            $User = arrayTranslate((array)Gdn::session()->User, ['UserID' => 'UniqueID', 'Name', 'Email', 'PhotoUrl', 'DateOfBirth', 'Gender']);
 
             // Grab the user's roles.
             $Roles = Gdn::userModel()->getRoles(Gdn::session()->UserID);

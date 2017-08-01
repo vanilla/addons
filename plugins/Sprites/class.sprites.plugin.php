@@ -10,13 +10,13 @@
 
 class SpritesPlugin extends Gdn_Plugin {
 
-   public function Base_Render_Before($sender) {
+   public function base_render_before($sender) {
       if ($sender->MasterView == '' || $sender->MasterView == 'default')
-         $sender->AddCssFile('sprites.css', 'plugins/Sprites');
+         $sender->addCssFile('sprites.css', 'plugins/Sprites');
    }
 
-   public function Setup() {}
+   public function setup() {}
 
-   public function Structure() {}
+   public function structure() {}
 
 }

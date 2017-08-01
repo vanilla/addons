@@ -10,7 +10,7 @@ function googleTranslateElementInit() {
 </script><script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <?php
 
-$Definitions = (array)$this->Data('Definitions', []);
+$Definitions = (array)$this->data('Definitions', []);
 
 foreach ($Definitions as $Code => $Translation) {
    echo '<div class="Definition" Code="'.urlencode($Code).'">',

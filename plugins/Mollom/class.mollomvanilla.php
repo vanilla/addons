@@ -8,19 +8,19 @@
 class MollomVanilla extends Mollom {
 
    public function loadConfiguration($name) {
-      return C('Plugins.Mollom.'.$name, NULL);
+      return c('Plugins.Mollom.'.$name, NULL);
    }
 
    public function saveConfiguration($name, $value) {
-      SaveToConfig('Plugins.Mollom.'.$name, $value);
+      saveToConfig('Plugins.Mollom.'.$name, $value);
    }
 
    public function deleteConfiguration($name) {
-      RemoveFromConfig('Plugins.Mollom.'.$name);
+      removeFromConfig('Plugins.Mollom.'.$name);
    }
 
    public function getClientInformation() {
-      $pluginInfo = Gdn::PluginManager()->AvailablePlugins();
+      $pluginInfo = Gdn::pluginManager()->availablePlugins();
       return [
          'platformName' => 'Vanilla',
          'platformVersion' => APPLICATION_VERSION,
@@ -31,7 +31,7 @@ class MollomVanilla extends Mollom {
 
    protected function request($method, $server, $path, $query = NULL, array $headers = []) {
       $request = new ProxyRequest();
-      $request->Request(
+      $request->request(
          ['Method' => $method,
             'URL' => trim($server,'/').trim($path,'/'),
             //'Debug' => TRUE

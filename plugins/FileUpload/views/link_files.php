@@ -1,27 +1,27 @@
 <div class="Attachments">
    <div class="AttachFileContainer">
       <?php
-         $CanDownload = $this->Data('CanDownload');
-         foreach ($this->Data('CommentMediaList') as $Media) {
-            $IsOwner = (Gdn::Session()->IsValid() && (Gdn::Session()->UserID == GetValue('InsertUserID',$Media,NULL)));
+         $CanDownload = $this->data('CanDownload');
+         foreach ($this->data('CommentMediaList') as $Media) {
+            $IsOwner = (Gdn::session()->isValid() && (Gdn::session()->UserID == getValue('InsertUserID',$Media,NULL)));
             $this->EventArguments['CanDownload'] =& $CanDownload;
             $this->EventArguments['Media'] =& $Media;
-            $this->FireEvent('BeforeFile');
+            $this->fireEvent('BeforeFile');
 
       ?>
             <div class="Attachment">
                <div class="FilePreview">
                   <?php
-                  $Path = GetValue('Path', $Media);
+                  $Path = getValue('Path', $Media);
                   $Img = '';
 
                   if ($CanDownload) {
-                     $DownloadUrl = Url(FileUploadPlugin::Url($Media));
+                     $DownloadUrl = url(FileUploadPlugin::url($Media));
                      $Img = '<a href="'.$DownloadUrl.'">';
                   }
 
-                  $ThumbnailUrl = FileUploadPlugin::ThumbnailUrl($Media);
-                  $Img .= MediaThumbnail($Media);
+                  $ThumbnailUrl = FileUploadPlugin::thumbnailUrl($Media);
+                  $Img .= mediaThumbnail($Media);
                   if ($CanDownload)
                      $Img .= '</a>';
 
@@ -47,20 +47,20 @@
                         echo ' <span class="FileSize">'.$Media->ImageWidth.'&#160;x&#160;'.$Media->ImageHeight.'</span> - ';
                      }
 
-                     echo ' <span class="FileSize">', Gdn_Format::Bytes($Media->Size, 0), '</span>';
+                     echo ' <span class="FileSize">', Gdn_Format::bytes($Media->Size, 0), '</span>';
                      echo '</div>';
 
                      $Actions = '';
-                     if (StringBeginsWith($this->ControllerName, 'post', TRUE))
-                        $Actions = ConcatSep(' | ', $Actions, '<a class="InsertImage" href="'.Url(FileUploadPlugin::Url($Path)).'">'.T('Insert Image').'</a>');
+                     if (stringBeginsWith($this->ControllerName, 'post', TRUE))
+                        $Actions = concatSep(' | ', $Actions, '<a class="InsertImage" href="'.url(FileUploadPlugin::url($Path)).'">'.t('Insert Image').'</a>');
 
-                     if (GetValue('ForeignTable', $Media) == 'discussion')
+                     if (getValue('ForeignTable', $Media) == 'discussion')
                         $PermissionName = "Vanilla.Discussions.Edit";
                      else
                         $PermissionName = "Vanilla.Comments.Edit";
 
-                     if ($IsOwner || Gdn::Session()->CheckPermission($PermissionName, TRUE, 'Category', $this->Data('Discussion.PermissionCategoryID')))
-                        $Actions = ConcatSep(' | ', $Actions, '<a class="DeleteFile" href="'.Url("/plugin/fileupload/delete/{$Media->MediaID}").'"><span>'.T('Delete').'</span></a>');
+                     if ($IsOwner || Gdn::session()->checkPermission($PermissionName, TRUE, 'Category', $this->data('Discussion.PermissionCategoryID')))
+                        $Actions = concatSep(' | ', $Actions, '<a class="DeleteFile" href="'.url("/plugin/fileupload/delete/{$Media->MediaID}").'"><span>'.t('Delete').'</span></a>');
 
                      if ($Actions)
                         echo '<div>', $Actions, '</div>';

@@ -7,20 +7,20 @@ class TrackingCodesPlugin extends Gdn_Plugin {
    /**
     * Adds dashboard menu option.
     */
-   public function Base_GetAppSettingsMenuItems_Handler($sender) {
+   public function base_getAppSettingsMenuItems_handler($sender) {
       $menu = &$sender->EventArguments['SideMenu'];
-      $menu->AddLink('Add-ons', T('Tracking Codes'), 'settings/trackingcodes', 'Garden.Settings.Manage');
+      $menu->addLink('Add-ons', t('Tracking Codes'), 'settings/trackingcodes', 'Garden.Settings.Manage');
 	}
 
 	/**
 	 * Tracking codes management page.
 	 */
-	public function SettingsController_TrackingCodes_Create($sender) {
-		$sender->Permission('Garden.Settings.Manage');
-      $sender->AddSideMenu('settings/trackingcodes');
+	public function settingsController_trackingCodes_create($sender) {
+		$sender->permission('Garden.Settings.Manage');
+      $sender->addSideMenu('settings/trackingcodes');
 
-      $sender->Title('Tracking Codes');
-		$action = strtolower(GetValue(0, $sender->RequestArgs, ''));
+      $sender->title('Tracking Codes');
+		$action = strtolower(getValue(0, $sender->RequestArgs, ''));
 		if ($action == 'add')
 			$this->_Add($sender);
 		else if ($action == 'edit')
@@ -32,27 +32,27 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 		else if ($action == 'sort')
 			$this->_Sort($sender);
 		else
-			$sender->Render('index', '', 'plugins/TrackingCodes');
+			$sender->render('index', '', 'plugins/TrackingCodes');
 	}
 
    /**
     * Delete a code.
     */
    private function _Delete($sender) {
-      $sender->Permission('Garden.Settings.Manage');
-		$key = GetValue(1, $sender->RequestArgs);
-		$transientKey = GetValue(2, $sender->RequestArgs);
-      $session = Gdn::Session();
-      if ($transientKey !== FALSE && $session->ValidateTransientKey($transientKey)) {
-			$trackingCodes = C('Plugins.TrackingCodes.All');
+      $sender->permission('Garden.Settings.Manage');
+		$key = getValue(1, $sender->RequestArgs);
+		$transientKey = getValue(2, $sender->RequestArgs);
+      $session = Gdn::session();
+      if ($transientKey !== FALSE && $session->validateTransientKey($transientKey)) {
+			$trackingCodes = c('Plugins.TrackingCodes.All');
 			if (!is_array($trackingCodes))
 				$trackingCodes = [];
 
 			if ($key !== FALSE)
 				foreach ($trackingCodes as $index => $code) {
-					if ($key == GetValue('Key', $code, FALSE)) {
+					if ($key == getValue('Key', $code, FALSE)) {
 						unset($trackingCodes[$index]);
-						SaveToConfig('Plugins.TrackingCodes.All', $trackingCodes);
+						saveToConfig('Plugins.TrackingCodes.All', $trackingCodes);
 						break;
 					}
 				}
@@ -65,21 +65,21 @@ class TrackingCodesPlugin extends Gdn_Plugin {
     * Toggle a tracking code's state.
     */
    private function _Toggle($sender) {
-      $sender->Permission('Garden.Settings.Manage');
-		$key = GetValue(1, $sender->RequestArgs);
-		$transientKey = GetValue(2, $sender->RequestArgs);
-      $session = Gdn::Session();
-      if ($transientKey !== FALSE && $session->ValidateTransientKey($transientKey)) {
-			$trackingCodes = C('Plugins.TrackingCodes.All');
+      $sender->permission('Garden.Settings.Manage');
+		$key = getValue(1, $sender->RequestArgs);
+		$transientKey = getValue(2, $sender->RequestArgs);
+      $session = Gdn::session();
+      if ($transientKey !== FALSE && $session->validateTransientKey($transientKey)) {
+			$trackingCodes = c('Plugins.TrackingCodes.All');
 			if (!is_array($trackingCodes))
 				$trackingCodes = [];
 
 			if ($key !== FALSE)
 				foreach ($trackingCodes as $index => $code) {
-					if ($key == GetValue('Key', $code, FALSE)) {
-						$code['Enabled'] = GetValue('Enabled', $code) == '1' ? '0' : '1';
+					if ($key == getValue('Key', $code, FALSE)) {
+						$code['Enabled'] = getValue('Enabled', $code) == '1' ? '0' : '1';
 						$trackingCodes[$index] = $code;
-						SaveToConfig('Plugins.TrackingCodes.All', $trackingCodes);
+						saveToConfig('Plugins.TrackingCodes.All', $trackingCodes);
 						break;
 					}
 				}
@@ -94,39 +94,39 @@ class TrackingCodesPlugin extends Gdn_Plugin {
     * @param SettingsController $sender
     */
    private function _Edit($sender) {
-		$sender->Permission('Garden.Settings.Manage');
-      $sender->AddSideMenu('settings/trackingcodes');
-      $sender->AddJsFile('jquery.autogrow.js');
+		$sender->permission('Garden.Settings.Manage');
+      $sender->addSideMenu('settings/trackingcodes');
+      $sender->addJsFile('jquery.autogrow.js');
 		$editIndex = FALSE;
-		$editKey = GetValue(1, $sender->RequestArgs);
+		$editKey = getValue(1, $sender->RequestArgs);
 		$sender->Code = FALSE;
-		$trackingCodes = C('Plugins.TrackingCodes.All');
+		$trackingCodes = c('Plugins.TrackingCodes.All');
 		if (!is_array($trackingCodes))
 			$trackingCodes = [];
 
 		if ($editKey !== FALSE)
 			foreach ($trackingCodes as $index => $code) {
-				if ($editKey == GetValue('Key', $code, FALSE)) {
+				if ($editKey == getValue('Key', $code, FALSE)) {
 					$editIndex = $index;
 					$sender->Code = $code;
 					break;
 				}
 			}
 
-      if (!$sender->Form->AuthenticatedPostBack()) {
+      if (!$sender->Form->authenticatedPostBack()) {
 			// Set defaults
 			if ($sender->Code)
-				$sender->Form->SetData($sender->Code);
+				$sender->Form->setData($sender->Code);
       } else {
 			// Let the form take care of itself, but save to the db.
-			$formValues = $sender->Form->FormValues();
-			$valuesToSave['Key'] = GetValue('Key', $formValues, '');
+			$formValues = $sender->Form->formValues();
+			$valuesToSave['Key'] = getValue('Key', $formValues, '');
 			if ($valuesToSave['Key'] == '')
-				$valuesToSave['Key'] = time().Gdn::Session()->UserID; // create a new unique id for the item
+				$valuesToSave['Key'] = time().Gdn::session()->UserID; // create a new unique id for the item
 
-			$valuesToSave['Name'] = GetValue('Name', $formValues, '');
-			$valuesToSave['Code'] = GetValue('Code', $formValues, '');
-			$valuesToSave['Enabled'] = GetValue('Enabled', $formValues, '');
+			$valuesToSave['Name'] = getValue('Name', $formValues, '');
+			$valuesToSave['Code'] = getValue('Code', $formValues, '');
+			$valuesToSave['Enabled'] = getValue('Enabled', $formValues, '');
 			if ($editIndex !== FALSE) {
 				$sender->Code = $valuesToSave; // Show the correct page title (add or edit).
 				$trackingCodes[$editIndex] = $valuesToSave;
@@ -134,28 +134,28 @@ class TrackingCodesPlugin extends Gdn_Plugin {
 				$trackingCodes[] = $valuesToSave;
 			}
 
-			SaveToConfig('Plugins.TrackingCodes.All', $trackingCodes);
-         $sender->InformMessage(T('Your changes have been saved.'));
+			saveToConfig('Plugins.TrackingCodes.All', $trackingCodes);
+         $sender->informMessage(t('Your changes have been saved.'));
 			$sender->setRedirectTo('settings/trackingcodes');
       }
 
-      $sender->Render('edit', '', 'plugins/TrackingCodes');
+      $sender->render('edit', '', 'plugins/TrackingCodes');
    }
 
 
 	/**
 	 * Dump all of the tracking codes to the page if *not* in admin master view.
 	 */
-	public function Base_AfterBody_Handler($sender) {
+	public function base_afterBody_handler($sender) {
 		if ($sender->MasterView == 'admin')
 			return;
 
-		$trackingCodes = C('Plugins.TrackingCodes.All');
+		$trackingCodes = c('Plugins.TrackingCodes.All');
 		if (!is_array($trackingCodes))
 			$trackingCodes = [];
 		foreach ($trackingCodes as $index => $code) {
-			if (GetValue('Enabled', $code) == '1')
-				echo GetValue('Code', $code);
+			if (getValue('Enabled', $code) == '1')
+				echo getValue('Code', $code);
 		}
 	}
 }

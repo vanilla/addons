@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 
 <h1>Colors</h1>

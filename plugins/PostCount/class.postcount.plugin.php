@@ -10,36 +10,36 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class PostCountPlugin extends Gdn_Plugin {
    
-   public function UserInfoModule_OnBasicInfo_Handler($sender) {
-      $user = Gdn::UserModel()->GetID($sender->User->UserID);
+   public function userInfoModule_onBasicInfo_handler($sender) {
+      $user = Gdn::userModel()->getID($sender->User->UserID);
       if ($user) {
-         $postCount = GetValue('CountComments', $user, 0) + GetValue('CountDiscussions', $user, 0);
-         echo "<dt class=\"Posts\">".T('Posts')."</dt>\n";
+         $postCount = getValue('CountComments', $user, 0) + getValue('CountDiscussions', $user, 0);
+         echo "<dt class=\"Posts\">".t('Posts')."</dt>\n";
          echo "<dd class=\"Posts\">".number_format($postCount)."</dd>";
       }
    }
    
-   public function DiscussionController_AuthorInfo_Handler($sender) {
+   public function discussionController_authorInfo_handler($sender) {
       $this->_AttachPostCount($sender);
    }
    
-   public function PostController_AuthorInfo_Handler($sender) {
+   public function postController_authorInfo_handler($sender) {
       $this->_AttachPostCount($sender);
    }
    
    protected function _AttachPostCount($sender) {
-      $user = Gdn::UserModel()->GetID($sender->EventArguments['Author']->UserID);
+      $user = Gdn::userModel()->getID($sender->EventArguments['Author']->UserID);
       if ($user) {
-         $posts = GetValue('CountComments', $user, 0) + GetValue('CountDiscussions', $user, 0);
-         echo '<span class="MItem PostCount">'.Plural(number_format($posts), '@'.T('Posts.Singular: %s', 'Posts: <b>%s</b>'), '@'.T('Posts.Plural: %s', 'Posts: <b>%s</b>')).'</span>';
+         $posts = getValue('CountComments', $user, 0) + getValue('CountDiscussions', $user, 0);
+         echo '<span class="MItem PostCount">'.plural(number_format($posts), '@'.t('Posts.Singular: %s', 'Posts: <b>%s</b>'), '@'.t('Posts.Plural: %s', 'Posts: <b>%s</b>')).'</span>';
       }
    }
 
-   public function Setup() {
+   public function setup() {
       // Nothing to do here!
    }
    
-   public function Structure() {
+   public function structure() {
       // Nothing to do here!
    }
          

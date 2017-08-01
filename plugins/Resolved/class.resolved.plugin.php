@@ -64,7 +64,7 @@ class ResolvedPlugin extends Gdn_Plugin {
     public function base_afterBodyField_handler($sender, $args) {
         if (checkPermission('Plugins.Resolved.Manage')) {
             echo '<span class="ResolvedCheckbox">' .
-            $sender->Form->checkBox('Resolved', T('Resolved'), ['value' => '1']) . '</span>';
+            $sender->Form->checkBox('Resolved', t('Resolved'), ['value' => '1']) . '</span>';
         }
     }
 
@@ -78,7 +78,7 @@ class ResolvedPlugin extends Gdn_Plugin {
         $resolved = val('Resolved', $discussion);
         $newResolved = (int) !$resolved;
         if (checkPermission('Plugins.Resolved.Manage')) {
-            $label = T($resolved ? 'Unresolve' : 'Resolve');
+            $label = t($resolved ? 'Unresolve' : 'Resolve');
             $url = "/discussion/resolve?discussionid={$discussion->DiscussionID}&resolve={$newResolved}";
             // Deal with inconsistencies in how options are passed
             if (isset($sender->Options)) {
@@ -101,7 +101,7 @@ class ResolvedPlugin extends Gdn_Plugin {
     public function base_beforeDiscussionMeta_handler($sender, $args) {
         $resolved = val('Resolved', val('Discussion', $args));
         if (checkPermission('Plugins.Resolved.Manage') && !$resolved) {
-            echo ' <span class="Tag Tag-Unresolved">' . T('Unresolved') . '</span> ';
+            echo ' <span class="Tag Tag-Unresolved">' . t('Unresolved') . '</span> ';
         }
     }
 
@@ -132,13 +132,13 @@ class ResolvedPlugin extends Gdn_Plugin {
 
         // Make sure we are posting back.
         if (!$sender->Request->isPostBack()) {
-            throw PermissionException('Javascript');
+            throw permissionException('Javascript');
         }
 
         $discussion = $sender->DiscussionModel->getID($discussionID);
 
         if (!$discussion) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
 
         // Resolve the discussion.
@@ -148,7 +148,7 @@ class ResolvedPlugin extends Gdn_Plugin {
 
         if (!$resolve) {
             require_once $sender->fetchViewLocation('helper_functions', 'Discussions');
-            $sender->jsonTarget(".Section-DiscussionList #Discussion_{$discussionID} .Meta-Discussion", '<span class="Tag Tag-Unresolved" title="Unresolved">' . T('Unresolved') . '</span>', 'Prepend');
+            $sender->jsonTarget(".Section-DiscussionList #Discussion_{$discussionID} .Meta-Discussion", '<span class="Tag Tag-Unresolved" title="Unresolved">' . t('Unresolved') . '</span>', 'Prepend');
             $sender->jsonTarget(".Section-DiscussionList #Discussion_{$discussionID}", 'Unresolved', 'AddClass');
         } else {
             $sender->jsonTarget(".Section-DiscussionList #Discussion_{$discussionID} .Tag-Unresolved", null, 'Remove');
@@ -208,7 +208,7 @@ class ResolvedPlugin extends Gdn_Plugin {
      */
     public function base_afterDiscussionFilters_handler($sender) {
         if (checkPermission('Plugins.Resolved.Manage')) {
-            $unresolved .= T('Unresolved').filterCountString(self::countUnresolved());
+            $unresolved .= t('Unresolved').filterCountString(self::countUnresolved());
             echo '<li class="Unresolved">'.anchor(sprite('SpUnresolved').' '.$unresolved, '/discussions/unresolved') . '</li>';
         }
     }
@@ -244,7 +244,7 @@ class ResolvedPlugin extends Gdn_Plugin {
         $page = val(0, $args, 0);
 
         // Determine offset from $Page
-        list($page, $limit) = offsetLimit($page, C('Vanilla.Discussions.PerPage', 30));
+        list($page, $limit) = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
 
         // Validate $Page
         if (!is_numeric($page) || $page < 0) {
@@ -260,9 +260,9 @@ class ResolvedPlugin extends Gdn_Plugin {
             ->orWhere('d.Type is null')
             ->endWhereGroup();
 
-        $sender->DiscussionData = $discussionModel->Get($page, $limit, $wheres);
+        $sender->DiscussionData = $discussionModel->get($page, $limit, $wheres);
         $sender->setData('Discussions', $sender->DiscussionData);
-        $countDiscussions = $discussionModel->GetCount($wheres);
+        $countDiscussions = $discussionModel->getCount($wheres);
         $sender->setData('CountDiscussions', $countDiscussions);
         $sender->Category = false;
 
@@ -298,8 +298,8 @@ class ResolvedPlugin extends Gdn_Plugin {
         $sender->addModule('CategoriesModule');
 
         // Render default view
-        $sender->setData('Title', T('Unresolved'));
-        $sender->setData('Breadcrumbs', [['Name' => T('Unresolved'), 'Url' => '/discussions/unresolved']]);
+        $sender->setData('Title', t('Unresolved'));
+        $sender->setData('Breadcrumbs', [['Name' => t('Unresolved'), 'Url' => '/discussions/unresolved']]);
         $sender->render('index');
     }
 

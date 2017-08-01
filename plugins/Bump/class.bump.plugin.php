@@ -36,7 +36,7 @@ class BumpPlugin extends Gdn_Plugin {
      * @return void.
      */
     public function discussionController_bump_create($sender, $args) {
-        $sender->Permission('Garden.Moderation.Manage');
+        $sender->permission('Garden.Moderation.Manage');
 
         // Get discussion
         $discussionID = $sender->Request->get('discussionid');

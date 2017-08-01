@@ -13,7 +13,7 @@
  *
  * <code>
  * // Send a CSS file, compressed if possible
- * $he = new HTTP_Encoder(array(
+ * $he = new hTTP_Encoder(array(
  *     'content' => file_get_contents($cssFile)
  *     ,'type' => 'text/css'
  * ));

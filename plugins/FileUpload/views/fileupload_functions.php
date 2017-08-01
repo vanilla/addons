@@ -1,49 +1,49 @@
 <?php
 
-function MediaThumbnail($media, $data = FALSE) {
+function mediaThumbnail($media, $data = FALSE) {
       $media = (array)$media;
 
-      if (GetValue('ThumbPath', $media)) {
-         $src = Gdn_Upload::Url(ltrim(GetValue('ThumbPath', $media), '/'));
+      if (getValue('ThumbPath', $media)) {
+         $src = Gdn_Upload::url(ltrim(getValue('ThumbPath', $media), '/'));
       } else {
-         $width = GetValue('ImageWidth', $media);
-         $height = GetValue('ImageHeight', $media);
+         $width = getValue('ImageWidth', $media);
+         $height = getValue('ImageHeight', $media);
 
          if (!$width || !$height) {
-            $height = FileUploadPlugin::ThumbnailHeight();
+            $height = FileUploadPlugin::thumbnailHeight();
             if (!$height)
                $height = 100;
-               SetValue('ThumbHeight', $media, $height);
+               setValue('ThumbHeight', $media, $height);
 
-            return DefaultMediaThumbnail($media);
+            return defaultMediaThumbnail($media);
          }
 
          $requiresThumbnail = FALSE;
-         if (FileUploadPlugin::ThumbnailHeight() && $height > FileUploadPlugin::ThumbnailHeight())
+         if (FileUploadPlugin::thumbnailHeight() && $height > FileUploadPlugin::thumbnailHeight())
             $requiresThumbnail = TRUE;
-         elseif (FileUploadPlugin::ThumbnailWidth() && $width > FileUploadPlugin::ThumbnailWidth())
+         elseif (FileUploadPlugin::thumbnailWidth() && $width > FileUploadPlugin::thumbnailWidth())
             $requiresThumbnail = TRUE;
 
-         $path = ltrim(GetValue('Path', $media), '/');
+         $path = ltrim(getValue('Path', $media), '/');
          if ($requiresThumbnail) {
-            $src = Url('/utility/thumbnail/'.GetValue('MediaID', $media, 'x').'/'.$path, TRUE);
+            $src = url('/utility/thumbnail/'.getValue('MediaID', $media, 'x').'/'.$path, TRUE);
          } else {
-            $src = Gdn_Upload::Url($path);
+            $src = Gdn_Upload::url($path);
          }
       }
       if ($data)
-         $result = ['src' => $src, 'width' => GetValue('ThumbWidth', $media), 'height' => GetValue('ThumbHeight', $media)];
+         $result = ['src' => $src, 'width' => getValue('ThumbWidth', $media), 'height' => getValue('ThumbHeight', $media)];
       else
-         $result = Img($src, ['class' => 'ImageThumbnail', 'width' => GetValue('ThumbWidth', $media), 'height' => GetValue('ThumbHeight', $media)]);
+         $result = img($src, ['class' => 'ImageThumbnail', 'width' => getValue('ThumbWidth', $media), 'height' => getValue('ThumbHeight', $media)]);
 
       return $result;
 
 }
 
-function DefaultMediaThumbnail($media) {
+function defaultMediaThumbnail($media) {
   $result = '<span class="Thumb-Default">'.
    '<span class="Thumb-Extension">'.pathinfo($media['Name'], PATHINFO_EXTENSION).'</span>'.
-   Img('/plugins/FileUpload/images/file.png', ['class' => 'ImageThumbnail', 'height' => GetValue('ThumbHeight', $media)]).
+   img('/plugins/FileUpload/images/file.png', ['class' => 'ImageThumbnail', 'height' => getValue('ThumbHeight', $media)]).
    '</span>';
 
    return $result;
