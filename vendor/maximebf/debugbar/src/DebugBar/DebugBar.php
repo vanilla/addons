@@ -21,7 +21,7 @@ use DebugBar\Storage\StorageInterface;
  * to collectors by name.
  *
  * <code>
- *     $debugbar = new DebugBar();
+ *     $debugbar = new debugBar();
  *     $debugbar->addCollector(new DataCollector\MessagesCollector());
  *     $debugbar['messages']->addMessage("foobar");
  * </code>

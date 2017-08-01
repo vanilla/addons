@@ -23,8 +23,8 @@ use DebugBar\DataCollector\Renderable;
  * TraceableTwigEnvironment object
  *
  * <code>
- * $env = new TraceableTwigEnvironment(new Twig_Environment($loader));
- * $debugbar->addCollector(new TwigCollector($env));
+ * $env = new traceableTwigEnvironment(new twig_Environment($loader));
+ * $debugbar->addCollector(new twigCollector($env));
  * </code>
  */
 class TwigCollector extends DataCollector implements Renderable, AssetProvider

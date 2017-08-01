@@ -21,9 +21,9 @@ use Monolog\Logger;
  *
  * Example:
  * <code>
- * $debugbar->addCollector(new CacheCacheCollector(CacheManager::get('default')));
+ * $debugbar->addCollector(new cacheCacheCollector(CacheManager::get('default')));
  * // or
- * $debugbar->addCollector(new CacheCacheCollector());
+ * $debugbar->addCollector(new cacheCacheCollector());
  * $debugbar['cache']->addCache(CacheManager::get('default'));
  * </code>
  */

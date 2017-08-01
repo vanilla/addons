@@ -30,7 +30,7 @@ use Psr\Log\LoggerInterface;
  *
  * Example:
  * <code>
- * $debugbar->addCollector(new PropelCollector($debugbar['messages']));
+ * $debugbar->addCollector(new propelCollector($debugbar['messages']));
  * PropelCollector::enablePropelProfiling();
  * </code>
  */

@@ -18,7 +18,7 @@ class DatabaseDebugBar extends \Gdn_Database {
      * @param \DebugBar\DebugBar $debugBar
      */
     public function addCollector($debugBar) {
-        $connection = $this->Connection();
+        $connection = $this->connection();
         if (!($connection instanceof TraceablePDO)) {
             $connection = new TraceablePDO($connection);
             $this->_Connection = $connection;
@@ -28,7 +28,7 @@ class DatabaseDebugBar extends \Gdn_Database {
             $debugBar->addCollector($collector);
         }
 
-        $slave = $this->Slave();
+        $slave = $this->slave();
         if (isset($collector) && !($slave instanceof TraceablePDO)) {
             $slave = new TraceablePDO($slave);
             $this->_Slave = $slave;

@@ -22,7 +22,7 @@ use Monolog\Logger;
  * https://github.com/Seldaek/monolog
  *
  * <code>
- * $debugbar->addCollector(new MonologCollector($logger));
+ * $debugbar->addCollector(new monologCollector($logger));
  * </code>
  */
 class MonologCollector extends AbstractProcessingHandler implements DataCollectorInterface, Renderable, MessagesAggregateInterface

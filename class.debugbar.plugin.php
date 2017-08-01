@@ -165,7 +165,7 @@ class DebugBarPlugin extends Gdn_Plugin {
             }
         } else {
             $head = $this->jsRenderer()->renderHead();
-            $sender->AddAsset('Head', $head, 'debugbar-head');
+            $sender->addAsset('Head', $head, 'debugbar-head');
             $sender->addCssFile('debugbar.css', 'plugins/debugbar');
         }
         $called = true;

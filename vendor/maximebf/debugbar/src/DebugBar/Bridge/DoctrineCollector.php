@@ -27,7 +27,7 @@ use Doctrine\ORM\EntityManager;
  * <code>
  * $debugStack = new Doctrine\DBAL\Logging\DebugStack();
  * $entityManager->getConnection()->getConfiguration()->setSQLLogger($debugStack);
- * $debugbar->addCollector(new DoctrineCollector($debugStack));
+ * $debugbar->addCollector(new doctrineCollector($debugStack));
  * </code>
  */
 class DoctrineCollector extends DataCollector implements Renderable, AssetProvider

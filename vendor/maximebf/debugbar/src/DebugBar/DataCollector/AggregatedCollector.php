@@ -17,9 +17,9 @@ use DebugBar\DebugBarException;
  * Aggregates data from multiple collectors
  *
  * <code>
- * $aggcollector = new AggregateCollector('foobar');
- * $aggcollector->addCollector(new MessagesCollector('msg1'));
- * $aggcollector->addCollector(new MessagesCollector('msg2'));
+ * $aggcollector = new aggregateCollector('foobar');
+ * $aggcollector->addCollector(new messagesCollector('msg1'));
+ * $aggcollector->addCollector(new messagesCollector('msg2'));
  * $aggcollector['msg1']->addMessage('hello world');
  * </code>
  */
