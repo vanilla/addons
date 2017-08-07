@@ -8,9 +8,9 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-$tmp = Gdn::FactoryOverwrite(TRUE);
-Gdn::FactoryInstall('CssCacher', 'Gdn_CssThemes', __FILE__);
-Gdn::FactoryOverwrite($tmp);
+$tmp = Gdn::factoryOverwrite(TRUE);
+Gdn::factoryInstall('CssCacher', 'Gdn_CssThemes', __FILE__);
+Gdn::factoryOverwrite($tmp);
 unset($tmp);
 
 
@@ -39,12 +39,12 @@ class CssThemes extends Gdn_Plugin {
 
 	/// Methods ///
 
-	public function ApplyTheme($originalPath, $cachePath, $insertNames = TRUE) {
+	public function applyTheme($originalPath, $cachePath, $insertNames = TRUE) {
 		// Get the theme settings.
-		$sQL = Gdn::SQL();
+		$sQL = Gdn::sql();
 		if(is_null($this->ThemeSettings)) {
-			$data = $sQL->Get('ThemeSetting')->ResultArray();
-			$data = ConsolidateArrayValuesByKey($data, 'Name', 'Setting', '');
+			$data = $sQL->get('ThemeSetting')->resultArray();
+			$data = consolidateArrayValuesByKey($data, 'Name', 'Setting', '');
 			$this->ThemeSettings = $data;
 		}
 
@@ -58,7 +58,7 @@ class CssThemes extends Gdn_Plugin {
 		// Insert the missing settings into the database.
 		if($insertNames) {
 			foreach($this->MissingSettings as $name => $setting) {
-				$sQL->Insert('ThemeSetting', ['Name' => $name, 'Setting' => $setting]);
+				$sQL->insert('ThemeSetting', ['Name' => $name, 'Setting' => $setting]);
 			}
 			$this->MissingSettings = [];
 		}
@@ -85,20 +85,20 @@ class CssThemes extends Gdn_Plugin {
 	}
 
 	protected function _ApplyImport($match) {
-		$noFollow = ArrayValue(4, $match);
+		$noFollow = arrayValue(4, $match);
 		$url = $match[2];
 
 		if($noFollow !== FALSE) {
 			// Don't apply the theme to this import.
 			$originalAssetPath = str_replace([PATH_ROOT, DS], ['', '/'], $this->_OrignialPath);
-			$url = Asset(CombinePaths([dirname($originalAssetPath), $url], '/'));
+			$url = asset(combinePaths([dirname($originalAssetPath), $url], '/'));
 		} else {
 			// Also parse the import.
 			$orignalPath = $this->_OrignialPath;
-			$importPath = CombinePaths([dirname($orignalPath), $url]);
-			$url = $this->Get($importPath, $this->_AppName);
+			$importPath = combinePaths([dirname($orignalPath), $url]);
+			$url = $this->get($importPath, $this->_AppName);
 			$url = str_replace([PATH_ROOT, DS], ['', '/'], $url);
-			$url = Asset($url);
+			$url = asset($url);
 
 			$this->_OrignalPath = $orignalPath;
 		}
@@ -109,21 +109,21 @@ class CssThemes extends Gdn_Plugin {
 	}
 
 	protected function _ApplyUrl($match) {
-		$noFollow = ArrayValue(5, $match);
+		$noFollow = arrayValue(5, $match);
 		$url = $match[2];
 		$extension = $match[3];
 
 		if($noFollow !== FALSE || strcasecmp($extension, '.css') != 0) {
 			// Don't apply the theme to this import.
 			$originalAssetPath = str_replace([PATH_ROOT, DS], ['', '/'], $this->_OrignialPath);
-			$url = Asset(CombinePaths([dirname($originalAssetPath), $url.$extension], '/'));
+			$url = asset(combinePaths([dirname($originalAssetPath), $url.$extension], '/'));
 		} else {
 			// Cache the css too.
 			$orignalPath = $this->_OrignialPath;
-			$importPath = CombinePaths([dirname($orignalPath), $url.$extension]);
-			$url = $this->Get($importPath, $this->_AppName);
+			$importPath = combinePaths([dirname($orignalPath), $url.$extension]);
+			$url = $this->get($importPath, $this->_AppName);
 			$url = str_replace([PATH_ROOT, DS], ['', '/'], $url);
-			$url = Asset($url);
+			$url = asset($url);
 
 			$this->_OrignalPath = $orignalPath;
 		}
@@ -132,7 +132,7 @@ class CssThemes extends Gdn_Plugin {
 		return $result;
 	}
 
-	public function Get($originalPath, $appName) {
+	public function get($originalPath, $appName) {
 		if(!file_exists($originalPath))
 			return FALSE;
 
@@ -147,7 +147,7 @@ class CssThemes extends Gdn_Plugin {
 		if(!file_exists($cachePath) || filemtime($originalPath) > filemtime($cachePath)) {
 			$css = file_get_contents($originalPath);
 
-			$result = $this->ApplyTheme($originalPath, $cachePath);
+			$result = $this->applyTheme($originalPath, $cachePath);
 		} else {
 			$result = $cachePath;
 		}
@@ -155,7 +155,7 @@ class CssThemes extends Gdn_Plugin {
 		return $result;
 	}
 
-	public function GetNames($css, $insertNames = FALSE) {
+	public function getNames($css, $insertNames = FALSE) {
 		$result = [];
 
 		if(preg_match_all(self::RegEx, $css, $matches)) {
@@ -165,7 +165,7 @@ class CssThemes extends Gdn_Plugin {
 		}
 		// Insert all of the names into the database.
 		if(count($result) > 0) {
-			$sQL = Gdn::SQL();
+			$sQL = Gdn::sql();
 			// Get the existing names.
 			$insert = $result;
 
@@ -173,7 +173,7 @@ class CssThemes extends Gdn_Plugin {
 			// Insert the necessary settings.
 			if($insertNames) {
 				foreach($insert as $name => $setting) {
-					$sQL->Insert('ThemeSetting', ['Name' => $name, 'Setting' => $setting]);
+					$sQL->insert('ThemeSetting', ['Name' => $name, 'Setting' => $setting]);
 				}
 			}
 		}
@@ -181,33 +181,33 @@ class CssThemes extends Gdn_Plugin {
 		return $result;
 	}
 
-	public function Base_GetAppSettingsMenuItems_Handler($sender) {
+	public function base_getAppSettingsMenuItems_handler($sender) {
       $menu = $sender->EventArguments['SideMenu'];
-		$menu->AddLink('Add-ons', 'Colors', 'plugin/cssthemes', 'Garden.Themes.Manage');
+		$menu->addLink('Add-ons', 'Colors', 'plugin/cssthemes', 'Garden.Themes.Manage');
 	}
 
-	public function PluginController_Colors_Create($sender) {
-		$sender->Form = Gdn::Factory('Form');
+	public function pluginController_colors_create($sender) {
+		$sender->Form = Gdn::factory('Form');
 
 		$this->Colors = [];
 
-		$this->ParseCss(PATH_APPLICATIONS);
-		//$this->ParseCss(PATH_THEMES);
+		$this->parseCss(PATH_APPLICATIONS);
+		//$this->parseCss(PATH_THEMES);
 
 		asort($this->Colors);
 		$sender->Colors = $this->Colors;
 
 		// Add the javascript & css.
-		//$Sender->Head->AddScript('/plugins/cssthemes/colorpicker.js');
-		//$Sender->Head->AddScript('/plugins/cssthemes/cssthemes.js');
-		$sender->Head->AddCss('/plugins/cssthemes/colorpicker.css');
-		$sender->Head->AddCss('/plugins/cssthemes/cssthemes.css');
+		//$Sender->Head->addScript('/plugins/cssthemes/colorpicker.js');
+		//$Sender->Head->addScript('/plugins/cssthemes/cssthemes.js');
+		$sender->Head->addCss('/plugins/cssthemes/colorpicker.css');
+		$sender->Head->addCss('/plugins/cssthemes/cssthemes.css');
 
-		$sender->View = $this->GetView('colors.php');
-		$sender->Render();
+		$sender->View = $this->getView('colors.php');
+		$sender->render();
 	}
 
-	public function ParseCss($path) {
+	public function parseCss($path) {
 		// Look for all of the css files in the path.
 		$cssPaths = glob($path.DS.'*.css');
 		if($cssPaths) {
@@ -229,21 +229,21 @@ class CssThemes extends Gdn_Plugin {
 			foreach($paths as $path) {
 				if(in_array(strrchr($path, DS), [DS.'vforg', DS.'vfcom']))
 					continue;
-				$this->ParseCss($path);
+				$this->parseCss($path);
 			}
 		}
 	}
 
-	public function RGB($color) {
+	public function rGB($color) {
 		return [hexdec(substr($color, 0, 2)), hexdec(substr($color, 2, 2)), hexdec(substr($color, 4, 2))];
 	}
 
-	public function GetColors($match) {
+	public function getColors($match) {
 		$color = strtolower($match[1]);
 		if(strlen($color) == 3)
 			$color = str_repeat(substr($color, 0, 1), 2).str_repeat(substr($color, 1, 1), 2).str_repeat(substr($color, 2, 1), 2);
 
-		list($h, $s, $v) = $this->RGB2HSB(hexdec(substr($color, 0, 2)), hexdec(substr($color, 2, 2)), hexdec(substr($color, 4, 2)));
+		list($h, $s, $v) = $this->rGB2HSB(hexdec(substr($color, 0, 2)), hexdec(substr($color, 2, 2)), hexdec(substr($color, 4, 2)));
 
 		if($s < .2) {
 			$s = 0;
@@ -258,7 +258,7 @@ class CssThemes extends Gdn_Plugin {
 		return implode($match);
 	}
 
-	function RGB2HSB($r, $g = NULL, $b = NULL) {
+	function rGB2HSB($r, $g = NULL, $b = NULL) {
 		if(is_null($g)) {
 			list($r, $g, $b) = (array)$r;
 		}
@@ -303,64 +303,64 @@ class CssThemes extends Gdn_Plugin {
 	/**
 	 * @package $sender Gdn_Controller
 	 */
-	public function PluginController_CssThemes_Create($sender) {
-		$sender->Form = Gdn::Factory('Form');
+	public function pluginController_cssThemes_create($sender) {
+		$sender->Form = Gdn::factory('Form');
 		$model = new Gdn_Model('ThemeSetting');
-		$sender->Form->SetModel($model);
+		$sender->Form->setModel($model);
 
-		if($sender->Form->AuthenticatedPostBack() === FALSE) {
+		if($sender->Form->authenticatedPostBack() === FALSE) {
 			// Grab the colors.
-			$data = $model->Get();
-			//$Data = ConsolidateArrayValuesByKey($Data->ResultArray(), 'Name', 'Setting');
-			$sender->SetData('ThemeSettings', $data->ResultArray());
-			//$Sender->Form->SetData($Data);
+			$data = $model->get();
+			//$Data = consolidateArrayValuesByKey($Data->resultArray(), 'Name', 'Setting');
+			$sender->setData('ThemeSettings', $data->resultArray());
+			//$Sender->Form->setData($Data);
 		} else {
-			$data = $sender->Form->FormDataSet();
+			$data = $sender->Form->formDataSet();
 
 			// Update the database.
-			$sQL = Gdn::SQL();
+			$sQL = Gdn::sql();
 			foreach($data as $row) {
-				$sQL->Put(
+				$sQL->put(
 					'ThemeSetting',
 					['Setting' => $row['Setting']],
 					['Name' => $row['Name']]);
 			}
 
 			// Clear out the css cache.
-			$files = SafeGlob(PATH_CACHE.DS.'css'.DS.'*.css');
+			$files = safeGlob(PATH_CACHE.DS.'css'.DS.'*.css');
 			foreach($files as $file) {
 				unlink($file);
 			}
 
-			$sender->SetData('ThemeSettings', $data);
-			$sender->StatusMessage = T('Your changes have been saved.');
+			$sender->setData('ThemeSettings', $data);
+			$sender->StatusMessage = t('Your changes have been saved.');
 		}
 
 		// Add the javascript & css.
-		$sender->Head->AddScript('/plugins/cssthemes/colorpicker.js');
-		$sender->Head->AddScript('/plugins/cssthemes/cssthemes.js');
-		$sender->Head->AddCss('/plugins/cssthemes/colorpicker.css');
-		$sender->Head->AddCss('/plugins/cssthemes/cssthemes.css');
+		$sender->Head->addScript('/plugins/cssthemes/colorpicker.js');
+		$sender->Head->addScript('/plugins/cssthemes/cssthemes.js');
+		$sender->Head->addCss('/plugins/cssthemes/colorpicker.css');
+		$sender->Head->addCss('/plugins/cssthemes/cssthemes.css');
 
 		// Add the side module.
-      $sender->AddSideMenu('/plugin/cssthemes');
+      $sender->addSideMenu('/plugin/cssthemes');
 
-		$sender->View = $this->GetView('cssthemes.php');
-		$sender->Render();
+		$sender->View = $this->getView('cssthemes.php');
+		$sender->render();
 	}
 
-	public function Setup() {
+	public function setup() {
 		if (!file_exists(PATH_CACHE.DS.'css')) mkdir(PATH_CACHE.DS.'css');
 
 		// Setup the theme table.
-		$st = Gdn::Structure();
-		$st->Table('bThemeSetting')
-			->Column('Name', 'varchar(50)', FALSE, 'primary')
-			->Column('Setting', 'varchar(50)')
-			->Set(FALSE, FALSE);
+		$st = Gdn::structure();
+		$st->table('bThemeSetting')
+			->column('Name', 'varchar(50)', FALSE, 'primary')
+			->column('Setting', 'varchar(50)')
+			->set(FALSE, FALSE);
 
 		// Insert default values.
-		$st->Database->Query('insert '.$st->Database->DatabasePrefix.'bThemeSetting (Name, Setting) values '.
+		$st->Database->query('insert '.$st->Database->DatabasePrefix.'bThemeSetting (Name, Setting) values '.
 		"('Banner Background Color', '#44c7f4'),
 		('Banner Font Color', '#fff'),
 		('Banner Font Shadow Color', '#30ACD6'),
@@ -392,7 +392,7 @@ class CssThemes extends Gdn_Plugin {
 		('Panel Selected Font Color', '#ff0084')");
 	}
 
-	public function CleanUp() {
-	   Gdn::Structure()->Table('bThemeSetting')->Drop();
+	public function cleanUp() {
+	   Gdn::structure()->table('bThemeSetting')->drop();
 	}
 }

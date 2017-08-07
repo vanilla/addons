@@ -18,12 +18,12 @@ class MinifyPlugin extends Gdn_Plugin {
     *
     * @param HeadModule $head
     */
-   public function HeadModule_BeforeToString_Handler($head) {
+   public function headModule_beforeToString_handler($head) {
       // Set BasePath for the plugin
-      $this->BasePath = Gdn::Request()->WebRoot();
+      $this->BasePath = Gdn::request()->webRoot();
       
       // Get current tags
-      $tags = $head->Tags();
+      $tags = $head->tags();
 
       // Grab all of the CSS
       $cssToCache = [];
@@ -39,15 +39,15 @@ class MinifyPlugin extends Gdn_Plugin {
       
       // Process all tags, finding JS & CSS files
       foreach ($tags as $index => $tag) {
-         $isJs = GetValue(HeadModule::TAG_KEY, $tag) == 'script';
-         $isCss = (GetValue(HeadModule::TAG_KEY, $tag) == 'link' && GetValue('rel', $tag) == 'stylesheet');
+         $isJs = getValue(HeadModule::TAG_KEY, $tag) == 'script';
+         $isCss = (getValue(HeadModule::TAG_KEY, $tag) == 'link' && getValue('rel', $tag) == 'stylesheet');
          if (!$isJs && !$isCss)
             continue;
 
          if ($isCss)
-            $href = GetValue('href', $tag, '!');
+            $href = getValue('href', $tag, '!');
          else
-            $href = GetValue('src', $tag, '!');
+            $href = getValue('src', $tag, '!');
          
          // Skip the rest if path doesn't start with a slash
          if ($href[0] != '/')
@@ -87,25 +87,25 @@ class MinifyPlugin extends Gdn_Plugin {
       $url = 'plugins/Minify/min/?' . ($this->BasePath != '' ? "b={$this->BasePath}&" : '');
       
       // Update HeadModule's $Tags
-      $head->Tags($tags);
+      $head->tags($tags);
       
       // Add minified CSS to HeadModule.
       $token = $this->_PrepareToken($cssToCache, ".css");
       if (file_exists(PATH_CACHE."/Minify/minify_$token")) {
-         $head->AddCss("/cache/Minify/minify_$token", 'screen', FALSE);
+         $head->addCss("/cache/Minify/minify_$token", 'screen', FALSE);
       } else {
-         $head->AddCss($url.'token='.urlencode($token), 'screen', FALSE);
+         $head->addCss($url.'token='.urlencode($token), 'screen', FALSE);
       }
       
       // Add global minified JS separately (and first)
-      $head->AddScript($url . 'g=globaljs', 'text/javascript', -100);
+      $head->addScript($url . 'g=globaljs', 'text/javascript', -100);
       
       // Add other minified JS to HeadModule.
       $token = $this->_PrepareToken($jsToCache, '.js');
       if (file_exists(PATH_CACHE."/Minify/minify_$token")) {
-         $head->AddScript("/cache/Minify/minify_$token", 'text/javascript', NULL, FALSE);
+         $head->addScript("/cache/Minify/minify_$token", 'text/javascript', NULL, FALSE);
       } else {
-         $head->AddScript($url . 'token=' . $token, 'text/javascript', NULL, FALSE);
+         $head->addScript($url . 'token=' . $token, 'text/javascript', NULL, FALSE);
       }
    }
    
@@ -137,7 +137,7 @@ class MinifyPlugin extends Gdn_Plugin {
    /**
     * Create 'Minify' cache folder.
     */
-   public function Setup() {
+   public function setup() {
       $folder = PATH_CACHE.'/Minify';
       if (!file_exists($folder))
          @mkdir($folder);
@@ -146,16 +146,16 @@ class MinifyPlugin extends Gdn_Plugin {
    /**
     * Empty cache when disabling this plugin.
     */ 
-   public function OnDisable() { $this->_EmptyCache(); }
+   public function onDisable() { $this->_EmptyCache(); }
    
    /** 
     * Empty cache when enabling or disabling any other plugin, application, or theme.
     */
-   public function SettingsController_AfterEnablePlugin_Handler() { $this->_EmptyCache(); }
-   public function SettingsController_AfterDisablePlugin_Handler() { $this->_EmptyCache(); }
-   public function SettingsController_AfterEnableApplication_Handler() { $this->_EmptyCache(); }
-   public function SettingsController_AfterDisableApplication_Handler() { $this->_EmptyCache(); }
-   public function SettingsController_AfterEnableTheme_Handler() { $this->_EmptyCache(); }
+   public function settingsController_afterEnablePlugin_handler() { $this->_EmptyCache(); }
+   public function settingsController_afterDisablePlugin_handler() { $this->_EmptyCache(); }
+   public function settingsController_afterEnableApplication_handler() { $this->_EmptyCache(); }
+   public function settingsController_afterDisableApplication_handler() { $this->_EmptyCache(); }
+   public function settingsController_afterEnableTheme_handler() { $this->_EmptyCache(); }
    
    /**
     * Empty Minify's cache.

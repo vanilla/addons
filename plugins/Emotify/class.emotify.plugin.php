@@ -13,37 +13,37 @@
 
 class EmotifyPlugin implements Gdn_IPlugin {
    
-   public function AssetModel_StyleCss_Handler($sender) {
-      $sender->AddCssFile('emotify.css', 'plugins/Emotify');
+   public function assetModel_styleCss_handler($sender) {
+      $sender->addCssFile('emotify.css', 'plugins/Emotify');
    }
 	
     /**
     * Disable Emoji sets.
     */
-    public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler() {
-        SaveToConfig('Garden.EmojiSet', 'none', false);
+    public function gdn_Dispatcher_AfterAnalyzeRequest_Handler() {
+        saveToConfig('Garden.EmojiSet', 'none', false);
     }
 	
 	/**
 	 * Replace emoticons in comments.
 	 */
-	public function Base_AfterCommentFormat_Handler($sender) {
-		if (!C('Plugins.Emotify.FormatEmoticons', TRUE))
+	public function base_afterCommentFormat_handler($sender) {
+		if (!c('Plugins.Emotify.FormatEmoticons', TRUE))
 			return;
 
 		$object = $sender->EventArguments['Object'];
-		$object->FormatBody = $this->DoEmoticons($object->FormatBody);
+		$object->FormatBody = $this->doEmoticons($object->FormatBody);
 		$sender->EventArguments['Object'] = $object;
 	}
 	
-	public function DiscussionController_Render_Before($sender) {
+	public function discussionController_render_before($sender) {
 		$this->_EmotifySetup($sender);
 	}
 
 	/**
 	 * Return an array of emoticons.
 	 */
-	public static function GetEmoticons() {
+	public static function getEmoticons() {
 		return [
 			':)]' => '100',
 			';))' => '71',
@@ -195,24 +195,24 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	/**
 	 * Replace emoticons in comment preview.
 	 */
-	public function PostController_AfterCommentPreviewFormat_Handler($sender) {
-		if (!C('Plugins.Emotify.FormatEmoticons', TRUE))
+	public function postController_afterCommentPreviewFormat_handler($sender) {
+		if (!c('Plugins.Emotify.FormatEmoticons', TRUE))
 			return;
 		
-		$sender->Comment->Body = $this->DoEmoticons($sender->Comment->Body);
+		$sender->Comment->Body = $this->doEmoticons($sender->Comment->Body);
 	}
 	
-	public function PostController_Render_Before($sender) {
+	public function postController_render_before($sender) {
 		$this->_EmotifySetup($sender);
 	}
    
-   public function NBBCPlugin_AfterNBBCSetup_Handler($sender, $args) {
-//      $BBCode = new BBCode();
+   public function nBBCPlugin_afterNBBCSetup_handler($sender, $args) {
+//      $BBCode = new bBCode();
       $bBCode = $args['BBCode'];
-      $bBCode->smiley_url = SmartAsset('/plugins/Emotify/design/images');
+      $bBCode->smiley_url = smartAsset('/plugins/Emotify/design/images');
       
       $smileys = [];
-      foreach (self::GetEmoticons() as $text => $filename) {
+      foreach (self::getEmoticons() as $text => $filename) {
          $smileys[$text]= $filename.'.gif';
       }
       
@@ -222,9 +222,9 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	/**
 	 * Thanks to punbb 1.3.5 (GPL License) for this function - ported from their do_smilies function.
 	 */
-	public static function DoEmoticons($text) {
+	public static function doEmoticons($text) {
 		$text = ' '.$text.' ';
-		$emoticons = EmotifyPlugin::GetEmoticons();
+		$emoticons = EmotifyPlugin::getEmoticons();
 		foreach ($emoticons as $key => $replacement) {
 			if (strpos($text, $key) !== FALSE)
 				$text = preg_replace(
@@ -241,21 +241,21 @@ class EmotifyPlugin implements Gdn_IPlugin {
 	 * Prepare a page to be emotified.
 	 */
 	private function _EmotifySetup($sender) {
-		$sender->AddJsFile('emotify.js', 'plugins/Emotify');  
+		$sender->addJsFile('emotify.js', 'plugins/Emotify');  
 		// Deliver the emoticons to the page.
       $emoticons = [];
-      foreach ($this->GetEmoticons() as $i => $gif) {
+      foreach ($this->getEmoticons() as $i => $gif) {
          if (!isset($emoticons[$gif]))
             $emoticons[$gif] = $i;
       }
       $emoticons = array_flip($emoticons);
 
-		$sender->AddDefinition('Emoticons', base64_encode(json_encode($emoticons)));
+		$sender->addDefinition('Emoticons', base64_encode(json_encode($emoticons)));
 	}
 	
-	public function Setup() {
+	public function setup() {
 		//SaveToConfig('Plugins.Emotify.FormatEmoticons', TRUE);
-		SaveToConfig('Garden.Format.Hashtags', FALSE); // Autohashing to search is incompatible with emotify
+		saveToConfig('Garden.Format.Hashtags', FALSE); // Autohashing to search is incompatible with emotify
 	}
 	
 }

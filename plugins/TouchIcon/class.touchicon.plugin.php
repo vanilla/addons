@@ -10,8 +10,8 @@ class TouchIconPlugin extends Gdn_Plugin {
    /**
 	 * Create route.
 	 */
-   public function Setup() {
-      Gdn::Router()->SetRoute(
+   public function setup() {
+      Gdn::router()->setRoute(
          'apple-touch-icon.png',
          'utility/showtouchicon',
          'Internal'
@@ -21,18 +21,18 @@ class TouchIconPlugin extends Gdn_Plugin {
    /**
     * Remove route.
     */
-   public function OnDisable() {
-      Gdn::Router()->DeleteRoute('apple-touch-icon.png');
+   public function onDisable() {
+      Gdn::router()->deleteRoute('apple-touch-icon.png');
    }
 
    /**
     * Updates.
     */
-   public function Structure() {
+   public function structure() {
       // Backwards compatibility with v1.
-      if (C('Plugins.TouchIcon.Uploaded')) {
-         SaveToConfig('Garden.TouchIcon', 'TouchIcon/apple-touch-icon.png');
-         RemoveFromConfig('Plugins.TouchIcon.Uploaded');
+      if (c('Plugins.TouchIcon.Uploaded')) {
+         saveToConfig('Garden.TouchIcon', 'TouchIcon/apple-touch-icon.png');
+         removeFromConfig('Plugins.TouchIcon.Uploaded');
       }
    }
 
@@ -42,20 +42,20 @@ class TouchIconPlugin extends Gdn_Plugin {
     * @since 1.0
     * @access public
     */
-   public function SettingsController_TouchIcon_Create($sender) {
-      $sender->Permission('Garden.Settings.Manage');
-      $sender->AddSideMenu('settings/touchicon');
-      $sender->Title(T('Touch Icon'));
+   public function settingsController_touchIcon_create($sender) {
+      $sender->permission('Garden.Settings.Manage');
+      $sender->addSideMenu('settings/touchicon');
+      $sender->title(t('Touch Icon'));
 
-      if ($sender->Form->AuthenticatedPostBack()) {
+      if ($sender->Form->authenticatedPostBack()) {
          $upload = new Gdn_UploadImage();
          try {
             // Validate the upload
-            $tmpImage = $upload->ValidateUpload('TouchIcon', FALSE);
+            $tmpImage = $upload->validateUpload('TouchIcon', FALSE);
             if ($tmpImage) {
                // Save the uploaded image.
                $touchIconPath ='banner/touchicon_'.substr(md5(microtime()), 16).'.png';
-               $imageInfo = $upload->SaveImageAs(
+               $imageInfo = $upload->saveImageAs(
                   $tmpImage,
                   $touchIconPath,
                   114,
@@ -63,17 +63,17 @@ class TouchIconPlugin extends Gdn_Plugin {
                   ['OutputType' => 'png', 'ImageQuality' => '8']
                );
 
-               SaveToConfig('Garden.TouchIcon', $imageInfo['SaveName']);
+               saveToConfig('Garden.TouchIcon', $imageInfo['SaveName']);
             }
          } catch (Exception $ex) {
-            $sender->Form->AddError($ex->getMessage());
+            $sender->Form->addError($ex->getMessage());
          }
 
-         $sender->InformMessage(T("Your icon has been saved."));
+         $sender->informMessage(t("Your icon has been saved."));
       }
 
-      $sender->SetData('Path', $this->getIconUrl());
-      $sender->Render($this->GetView('touchicon.php'));
+      $sender->setData('Path', $this->getIconUrl());
+      $sender->render($this->getView('touchicon.php'));
    }
 
    /**
@@ -82,7 +82,7 @@ class TouchIconPlugin extends Gdn_Plugin {
     * @return string Path to icon
     */
    public function getIconUrl() {
-      $icon = C('Garden.TouchIcon') ? Gdn_Upload::Url(C('Garden.TouchIcon')) : Asset(self::DEFAULT_PATH);
+      $icon = c('Garden.TouchIcon') ? Gdn_Upload::url(c('Garden.TouchIcon')) : asset(self::DEFAULT_PATH);
       return $icon;
    }
 
@@ -92,7 +92,7 @@ class TouchIconPlugin extends Gdn_Plugin {
     * @since 1.0
     * @access public
     */
-   public function UtilityController_ShowTouchIcon_Create($sender) {
+   public function utilityController_showTouchIcon_create($sender) {
       $redirect = $this->getIconUrl();
       redirectTo($redirect, 302, false);
       exit();

@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
     <div class="alert alert-info padded">
         <?php echo t('This plugin adds ShareThis buttons to the bottom of each post.'); ?>
@@ -11,7 +11,7 @@ echo $this->Form->Errors();
     <ul>
         <li class="form-group">
             <div class="label-wrap">
-                <?php echo $this->Form->Label("ShareThis Publisher Number", 'Plugin.ShareThis.PublisherNumber'); ?>
+                <?php echo $this->Form->label("ShareThis Publisher Number", 'Plugin.ShareThis.PublisherNumber'); ?>
                 <div class="info">
                     <?php echo t('<a href="http://sharethis.com/register" target="_blank">Register with ShareThis for a publishers account</a>, which gives you support, publishing tools, and analytics. If you do not have, or want a publisher account please leave this field blank.'); ?>
                 </div>
@@ -26,10 +26,10 @@ echo $this->Form->Errors();
         </li>
         <li class="form-group">
             <div class="input-wrap no-label">
-                <?php echo $this->Form->CheckBox('Plugin.ShareThis.CopyNShare', "Enable 'CopyNShare' functionality"); ?>
+                <?php echo $this->Form->checkBox('Plugin.ShareThis.CopyNShare', "Enable 'CopyNShare' functionality"); ?>
             </div>
         </li>
     </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->close('Save');
 
 

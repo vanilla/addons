@@ -46,28 +46,28 @@ function smf_setglobals() {
 
    $txt = [];
    $txt['lang_character_set'] = 'utf8';
-   $txt['smf238'] = T('Code');
-   $txt['smf239'] = T('Quote from');
-   $txt['smf240'] = T('Quote');
-   $txt[176] = T('on');
+   $txt['smf238'] = t('Code');
+   $txt['smf239'] = t('Quote from');
+   $txt['smf240'] = t('Quote');
+   $txt[176] = t('on');
    $txt['lang_locale'] = 'en';
-   $txt[287] = T('Smiley');
-   $txt[288] = T('Angry');
-   $txt[289] = T('Cheesy');
-   $txt[290] = T('Laugh');
-   $txt[291] = T('Sad');
-   $txt[292] = T('Wink');
-   $txt[293] = T('Grin');
-   $txt[294] = T('Shocked');
-   $txt[295] = T('Cool');
-   $txt[296] = T('Huh');
-   $txt[450] = T('Roll Eyes');
-   $txt[451] = T('Tongue');
-   $txt[526] = T('Embarrassed');
-   $txt[527] = T('Lips sealed');
-   $txt[528] = T('Undecided');
-   $txt[529] = T('Kiss');
-   $txt[530] = T('Cry');
+   $txt[287] = t('Smiley');
+   $txt[288] = t('Angry');
+   $txt[289] = t('Cheesy');
+   $txt[290] = t('Laugh');
+   $txt[291] = t('Sad');
+   $txt[292] = t('Wink');
+   $txt[293] = t('Grin');
+   $txt[294] = t('Shocked');
+   $txt[295] = t('Cool');
+   $txt[296] = t('Huh');
+   $txt[450] = t('Roll Eyes');
+   $txt[451] = t('Tongue');
+   $txt[526] = t('Embarrassed');
+   $txt[527] = t('Lips sealed');
+   $txt[528] = t('Undecided');
+   $txt[529] = t('Kiss');
+   $txt[530] = t('Cry');
 }
 smf_setglobals();
 
@@ -1656,7 +1656,7 @@ function permute($array)
 // Format a time to make it look purdy.
 function timeformat($logTime, $show_today = true)
 {
-   return Gdn_Format::Date($logTime);
+   return Gdn_Format::date($logTime);
 
 	global $user_info, $txt, $db_prefix, $modSettings, $func;
 

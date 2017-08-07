@@ -1093,26 +1093,26 @@ h1 { text-align: center; }
 		],
 	];
 
-	function MicroNow() {
+	function microNow() {
 		list($usec, $sec) = explode(" ", microtime());
 		return ((float)$usec + (float)$sec);
 	}
 
-	function FormatTime($time) {
+	function formatTime($time) {
 		return sprintf("%0.2f ms", $time * 1000);
 	}
 
 	$bbcode = new BBCode;
 
-	$bbcode->AddRule('wstest', [
+	$bbcode->addRule('wstest', [
 		'mode' => BBCODE_MODE_ENHANCED,
 		'allow' => ['_default' => '/^[a-zA-Z0-9._ -]+$/'],
 		'template' => '<span style="wstest:{$_default}">{$_content}</span>',
 		'class' => 'inline',
 		'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
 	]);	
-	$bbcode->SetLocalImgDir("smileys");
-	$bbcode->SetLocalImgURL("smileys");
+	$bbcode->setLocalImgDir("smileys");
+	$bbcode->setLocalImgURL("smileys");
 
 	print "<table class='test_table' align='center'>\n"
 		. "<thead><tr><th>Description</th><th>Result</th><th>Avg. Time</th></thead>\n"
@@ -1131,30 +1131,30 @@ h1 { text-align: center; }
 			$output = "<tr class='test'><td class='descr'>" . htmlspecialchars($test['descr']) . "</td>";
 
 			if (@$test['debug'] == true)
-				$bbcode->SetDebug(true);
-			else $bbcode->SetDebug(false);
-			$bbcode->SetTagMarker('[');
-			$bbcode->SetAllowAmpersand(false);
-			if (@$test['newline_ignore'] == true) $bbcode->SetIgnoreNewlines(true);
-			else $bbcode->SetIgnoreNewlines(false);
-			if (@$test['detect_urls'] == true) $bbcode->SetDetectURLs(true);
-			else $bbcode->SetDetectURLs(false);
-			if (@$test['urltarget'] == true) $bbcode->SetURLTargetable(true);
-			else $bbcode->SetURLTargetable(false);
+				$bbcode->setDebug(true);
+			else $bbcode->setDebug(false);
+			$bbcode->setTagMarker('[');
+			$bbcode->setAllowAmpersand(false);
+			if (@$test['newline_ignore'] == true) $bbcode->setIgnoreNewlines(true);
+			else $bbcode->setIgnoreNewlines(false);
+			if (@$test['detect_urls'] == true) $bbcode->setDetectURLs(true);
+			else $bbcode->setDetectURLs(false);
+			if (@$test['urltarget'] == true) $bbcode->setURLTargetable(true);
+			else $bbcode->setURLTargetable(false);
 			if (is_string(@$test['urlforcetarget']))
-				$bbcode->SetURLTarget($test['urlforcetarget']);
-			else $bbcode->SetURLTarget(false);
+				$bbcode->setURLTarget($test['urlforcetarget']);
+			else $bbcode->setURLTarget(false);
 			if (isset($test['plainmode']))
-				$bbcode->SetPlainMode($test['plainmode']);
-			else $bbcode->SetPlainMode(false);
+				$bbcode->setPlainMode($test['plainmode']);
+			else $bbcode->setPlainMode(false);
 			if (@$test['tag_marker'] == '<') {
-				$bbcode->SetTagMarker('<');
-				$bbcode->SetAllowAmpersand(true);
+				$bbcode->setTagMarker('<');
+				$bbcode->setAllowAmpersand(true);
 			}
 			else if (isset($test['tag_marker']))
-				$bbcode->SetTagMarker($test['tag_marker']);
+				$bbcode->setTagMarker($test['tag_marker']);
 
-			$result = $bbcode->Parse($test['bbcode']);
+			$result = $bbcode->parse($test['bbcode']);
 
 			$numtested++;
 
@@ -1171,14 +1171,14 @@ h1 { text-align: center; }
 
 				// If we didn't fail, run the same test twenty times so we can see how long
 				// it takes, on average.
-				$bbcode->SetDebug(false);
-				$start = MicroNow();
+				$bbcode->setDebug(false);
+				$start = microNow();
 				for ($i = 0; $i < 20; $i++)
-					$result = $bbcode->Parse($test['bbcode']);
-				$time = (MicroNow() - $start) / 20;
+					$result = $bbcode->parse($test['bbcode']);
+				$time = (microNow() - $start) / 20;
 
 				$output .= "<td class='good'>Pass</td>"
-					. "<td class='good' style='text-align:right;'>" . FormatTime($time) . "</td></tr>\n";
+					. "<td class='good' style='text-align:right;'>" . formatTime($time) . "</td></tr>\n";
 				$numpassed++;
 			}
 			else {

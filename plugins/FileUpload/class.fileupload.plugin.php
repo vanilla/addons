@@ -142,10 +142,10 @@ class FileUploadPlugin extends Gdn_Plugin {
                 $this->mediaModel()->delete($media, true);
                 $delete['Status'] = 'success';
             } else {
-                throw PermissionException();
+                throw permissionException();
             }
         } else {
-            throw NotFoundException('Media');
+            throw notFoundException('Media');
         }
 
         $sender->setJSON('Delete', $delete);
@@ -330,7 +330,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     protected function attachUploadsToComment($Controller, $Type = 'comment') {
         $RawType = ucfirst($Type);
 
-        if (StringEndsWith($Controller->RequestMethod, 'Comment', true) && $Type != 'comment') {
+        if (stringEndsWith($Controller->RequestMethod, 'Comment', true) && $Type != 'comment') {
             $Type = 'comment';
             $RawType = 'Comment';
             if (!isset($Controller->Comment)) {
@@ -364,7 +364,7 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     public function discussionController_download_create($sender) {
         if (!$this->CanDownload) {
-            throw PermissionException("File could not be streamed: Access is denied");
+            throw permissionException("File could not be streamed: Access is denied");
         }
 
         list($mediaID) = $sender->RequestArgs;
@@ -546,7 +546,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         $upload = new Gdn_UploadImage();
         $path = $upload->copyLocal($subPath);
         if (!file_exists($path)) {
-            throw NotFoundException('File');
+            throw notFoundException('File');
         }
 
         // Figure out the dimensions of the upload.
@@ -562,7 +562,7 @@ class FileUploadPlugin extends Gdn_Plugin {
                 $model->save($media);
             }
 
-            $url = Asset('/plugins/FileUpload/images/file.png');
+            $url = asset('/plugins/FileUpload/images/file.png');
             redirectTo($url, 301);
         }
 
@@ -623,7 +623,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             $media->ForeignID = $foreignID;
             $media->ForeignTable = $foreignType;
             try {
-//                $PlacementStatus = $this->PlaceMedia($Media, Gdn::Session()->UserID);
+//                $PlacementStatus = $this->placeMedia($Media, Gdn::session()->UserID);
                 $this->mediaModel()->save($media);
             } catch (Exception $e) {
                 die($e->getMessage());
@@ -646,7 +646,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         $currentPath = [];
         foreach ($newFolder as $folderPart) {
             array_push($currentPath, $folderPart);
-            $testFolder = CombinePaths($currentPath);
+            $testFolder = combinePaths($currentPath);
 
             if (!is_dir($testFolder) && !@mkdir($testFolder, 0777, true)) {
                 throw new Exception("Failed creating folder '{$testFolder}' during PlaceMedia verification loop");
@@ -778,7 +778,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             // Analyze file extension
             $FileNameParts = pathinfo($FileName);
             $Extension = strtolower($FileNameParts['extension']);
-            $AllowedExtensions = C('Garden.Upload.AllowedFileExtensions', ["*"]);
+            $AllowedExtensions = c('Garden.Upload.AllowedFileExtensions', ["*"]);
             if (!in_array($Extension, $AllowedExtensions) && !in_array('*',$AllowedExtensions)) {
                 throw new FileUploadPluginUploadErrorException("Uploaded file type is not allowed.", 11, $FileName, $FileKey);
             }
@@ -862,8 +862,8 @@ class FileUploadPlugin extends Gdn_Plugin {
                 'Filesize' => $FileSize,
                 'FormatFilesize' => Gdn_Format::bytes($FileSize,1),
                 'ProgressKey' => $Sender->ApcKey ? $Sender->ApcKey : '',
-                'Thumbnail' => base64_encode(MediaThumbnail($Media)),
-                'FinalImageLocation' => Url(self::url($Media)),
+                'Thumbnail' => base64_encode(mediaThumbnail($Media)),
+                'FinalImageLocation' => url(self::url($Media)),
                 'Parsed' => $Parsed
             ];
         } catch (FileUploadPluginUploadErrorException $e) {

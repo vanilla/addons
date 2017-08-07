@@ -19,16 +19,16 @@ class CustomizeTextPlugin extends Gdn_Plugin {
    
    public function __construct() {
       parent::__construct();
-      if (!C('Garden.Locales.DeveloperMode', FALSE))
-         SaveToConfig('Garden.Locales.DeveloperMode', TRUE);
+      if (!c('Garden.Locales.DeveloperMode', FALSE))
+         saveToConfig('Garden.Locales.DeveloperMode', TRUE);
    }
 
    /**
 	 * Add the customize text menu option.
 	 */
-   public function Base_GetAppSettingsMenuItems_Handler($sender) {
+   public function base_getAppSettingsMenuItems_handler($sender) {
 		$menu = &$sender->EventArguments['SideMenu'];
-      $menu->AddLink('Appearance', 'Customize Text', 'settings/customizetext', 'Garden.Settings.Manage');
+      $menu->addLink('Appearance', 'Customize Text', 'settings/customizetext', 'Garden.Settings.Manage');
 	}
 
 	/**
@@ -36,15 +36,15 @@ class CustomizeTextPlugin extends Gdn_Plugin {
     * 
     * @param Gdn_Controller $sender
 	 */
-   public function SettingsController_CustomizeText_Create($sender) {
-      $sender->Permission('Garden.Settings.Manage');
+   public function settingsController_customizeText_create($sender) {
+      $sender->permission('Garden.Settings.Manage');
       
-      $sender->AddSideMenu('settings/customizetext');
-		$sender->AddJsFile('jquery.autogrow.js');
+      $sender->addSideMenu('settings/customizetext');
+		$sender->addJsFile('jquery.autogrow.js');
       
-      $sender->Title('Customize Text');
+      $sender->title('Customize Text');
 
-		$directive = GetValue(0, $sender->RequestArgs, '');
+		$directive = getValue(0, $sender->RequestArgs, '');
 		$view = 'customizetext';
 		if ($directive == 'rebuild')
 			$view = 'rebuild';
@@ -53,10 +53,10 @@ class CustomizeTextPlugin extends Gdn_Plugin {
       
       $method = 'none';
       
-      if ($sender->Form->IsPostback()) {
+      if ($sender->Form->isPostback()) {
          $method = 'search';
       
-         if ($sender->Form->GetValue('Save_All'))
+         if ($sender->Form->getValue('Save_All'))
             $method = 'save';
       }
       
@@ -69,16 +69,16 @@ class CustomizeTextPlugin extends Gdn_Plugin {
          case 'search':
          case 'save':
             
-            $keywords = strtolower($sender->Form->GetValue('Keywords'));
+            $keywords = strtolower($sender->Form->getValue('Keywords'));
             
             if ($method == 'search') {
-               $sender->Form->ClearInputs();
-               $sender->Form->SetFormValue('Keywords', $keywords);
+               $sender->Form->clearInputs();
+               $sender->Form->setFormValue('Keywords', $keywords);
             }
             
-            $definitions = Gdn::Locale()->GetDeveloperDefinitions();
+            $definitions = Gdn::locale()->getDeveloperDefinitions();
             $countDefinitions = sizeof($definitions);
-            $sender->SetData('CountDefinitions', $countDefinitions);
+            $sender->setData('CountDefinitions', $countDefinitions);
             
             $changed = FALSE;
             foreach ($definitions as $key => $baseDefinition) {
@@ -96,7 +96,7 @@ class CustomizeTextPlugin extends Gdn_Plugin {
                $modified = FALSE;
 
                // Found a definition, look it up in the real locale first, to see if it has been overridden
-               $currentDefinition = Gdn::Locale()->Translate($key, FALSE);
+               $currentDefinition = Gdn::locale()->translate($key, FALSE);
                if ($currentDefinition !== FALSE && $currentDefinition != $baseDefinition)
                   $modified = TRUE;
                else
@@ -111,7 +111,7 @@ class CustomizeTextPlugin extends Gdn_Plugin {
                   $currentDefinition = "\n{$currentDefinition}";
                
                if ($method == 'save') {
-                  $suppliedDefinition = $sender->Form->GetValue($elementName);
+                  $suppliedDefinition = $sender->Form->getValue($elementName);
 
                   // Has this field been changed?
                   if ($suppliedDefinition != FALSE && $suppliedDefinition != $currentDefinition) {
@@ -123,7 +123,7 @@ class CustomizeTextPlugin extends Gdn_Plugin {
                         $saveDefinition = str_replace("\r\n", "\n", $saveDefinition);
                      }
                      
-                     Gdn::Locale()->SetTranslation($key, $saveDefinition, [
+                     Gdn::locale()->setTranslation($key, $saveDefinition, [
                         'Save'         => TRUE,
                         'RemoveEmpty'  => TRUE
                      ]);
@@ -132,20 +132,20 @@ class CustomizeTextPlugin extends Gdn_Plugin {
                   }
                }
                
-               $sender->Form->SetFormValue($elementName, $currentDefinition);
+               $sender->Form->setFormValue($elementName, $currentDefinition);
             }
 
             if ($changed) {
-               $sender->InformMessage("Locale changes have been saved!");
+               $sender->informMessage("Locale changes have been saved!");
             }
             
             break;
       }
       
-      $sender->SetData('Matches', $matches);
+      $sender->setData('Matches', $matches);
       $countMatches = sizeof($matches);
-      $sender->SetData('CountMatches', $countMatches);
+      $sender->setData('CountMatches', $countMatches);
       
-      $sender->Render($view, '', 'plugins/CustomizeText');
+      $sender->render($view, '', 'plugins/CustomizeText');
    }
 }

@@ -69,7 +69,7 @@ class QnAPlugin extends Gdn_Plugin {
      *
      * @param $sender Sending controller instance
      */
-    public function settingsController_QnA_create($sender) {
+    public function settingsController_qnA_create($sender) {
         // Prevent non-admins from accessing this page
         $sender->permission('Garden.Settings.Manage');
 
@@ -168,7 +168,7 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function base_discussionTypes_handler($sender, $args) {
-        if (!C('Plugins.QnA.UseBigButtons')) {
+        if (!c('Plugins.QnA.UseBigButtons')) {
             $args['Types']['Question'] = [
                 'Singular' => 'Question',
                 'Plural' => 'Questions',
@@ -424,13 +424,13 @@ class QnAPlugin extends Gdn_Plugin {
      *
      * @throws notFoundException
      */
-    public function discussionController_QnA_create($sender, $args) {
-        $Comment = Gdn::SQL()->getWhere('Comment', ['CommentID' => $sender->Request->get('commentid')])->firstRow(DATASET_TYPE_ARRAY);
+    public function discussionController_qnA_create($sender, $args) {
+        $Comment = Gdn::sql()->getWhere('Comment', ['CommentID' => $sender->Request->get('commentid')])->firstRow(DATASET_TYPE_ARRAY);
         if (!$Comment) {
             throw notFoundException('Comment');
         }
 
-        $Discussion = Gdn::SQL()->getWhere('Discussion', ['DiscussionID' => $Comment['DiscussionID']])->firstRow(DATASET_TYPE_ARRAY);
+        $Discussion = Gdn::sql()->getWhere('Discussion', ['DiscussionID' => $Comment['DiscussionID']])->firstRow(DATASET_TYPE_ARRAY);
 
         // Check for permission.
         if (!(Gdn::session()->UserID == val('InsertUserID', $Discussion) || Gdn::session()->checkPermission('Garden.Moderation.Manage'))) {
@@ -464,11 +464,11 @@ class QnAPlugin extends Gdn_Plugin {
             }
 
             // Update the comment.
-            Gdn::SQL()->put('Comment', $CommentSet, ['CommentID' => $Comment['CommentID']]);
+            Gdn::sql()->put('Comment', $CommentSet, ['CommentID' => $Comment['CommentID']]);
 
             // Update the discussion.
             if ($Discussion['QnA'] != $QnA && (!$Discussion['QnA'] || in_array($Discussion['QnA'], ['Unanswered', 'Answered', 'Rejected']))) {
-                Gdn::SQL()->put(
+                Gdn::sql()->put(
                     'Discussion',
                     $DiscussionSet,
                     ['DiscussionID' => $Comment['DiscussionID']]);
@@ -558,7 +558,7 @@ class QnAPlugin extends Gdn_Plugin {
      * @param string|int $discussionID Identifier of the discussion
      * @param string|int $commentID Identifier of the comment.
      */
-    public function discussionController_QnAOptions_create($sender, $discussionID = '', $commentID = '') {
+    public function discussionController_qnAOptions_create($sender, $discussionID = '', $commentID = '') {
         if ($discussionID) {
             $this->_discussionOptions($sender, $discussionID);
         } elseif ($commentID) {
@@ -574,7 +574,7 @@ class QnAPlugin extends Gdn_Plugin {
         // Find comments in this discussion with a QnA value.
         $set = [];
 
-        $row = Gdn::SQL()->getWhere('Comment',
+        $row = Gdn::sql()->getWhere('Comment',
             ['DiscussionID' => val('DiscussionID', $discussion), 'QnA is not null' => ''], 'QnA, DateAccepted', 'asc', 1)->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$row) {
@@ -605,7 +605,7 @@ class QnAPlugin extends Gdn_Plugin {
      * @param string|int $userID User identifier
      */
     public function recalculateUserQnA($userID) {
-        $countAcceptedAnswers = Gdn::SQL()->getCount('Comment', ['InsertUserID' => $userID, 'QnA' => 'Accepted']);
+        $countAcceptedAnswers = Gdn::sql()->getCount('Comment', ['InsertUserID' => $userID, 'QnA' => 'Accepted']);
         Gdn::userModel()->setField($userID, 'CountAcceptedAnswers', $countAcceptedAnswers);
     }
 
@@ -1018,7 +1018,7 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         // Check to see if the user has answered questions.
-        $count = Gdn::SQL()->getCount('Discussion', ['Type' => 'Question', 'InsertUserID' => Gdn::session()->UserID, 'QnA' => 'Answered']);
+        $count = Gdn::sql()->getCount('Discussion', ['Type' => 'Question', 'InsertUserID' => Gdn::session()->UserID, 'QnA' => 'Answered']);
         if ($count > 0) {
             $sender->informMessage(formatString(t("You've asked questions that have now been answered", "<a href=\"{/discussions/mine?qna=Answered,url}\">You've asked questions that now have answers</a>. Make sure you accept/reject the answers.")), 'Dismissable');
         }
@@ -1069,14 +1069,14 @@ class QnAPlugin extends Gdn_Plugin {
      * @param PostController $sender Sending controller instance.
      */
     public function postController_question_create($sender, $categoryUrlCode = '') {
-        // Create & call PostController->Discussion()
+        // Create & call PostController->discussion()
         $sender->View = PATH_PLUGINS.'/QnA/views/post.php';
         $sender->setData('Type', 'Question');
         $sender->discussion($categoryUrlCode);
     }
 
     /**
-     * Override the PostController->Discussion() method before render to use our view instead.
+     * Override the PostController->discussion() method before render to use our view instead.
      *
      * @param PostController $sender Sending controller instance.
      */

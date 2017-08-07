@@ -240,7 +240,7 @@ EOT;
      * @param $sender
      * @param $args
      */
-    public function BBCode_afterBBCodeSetup_handler($sender, $args) {
+    public function bBCode_afterBBCodeSetup_handler($sender, $args) {
         $nbbc = $args['BBCode'];
         $nbbc->setEscapeContent(false);
     }

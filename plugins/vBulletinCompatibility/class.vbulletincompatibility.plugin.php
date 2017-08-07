@@ -13,7 +13,7 @@ class VbulletinCompatibilityPlugin extends Gdn_Plugin {
    public function __construct() {
    }
    
-   public function Gdn_Router_BeforeLoadRoutes_Handler($sender) {
+   public function gdn_Router_BeforeLoadRoutes_Handler($sender) {
       $vbRoutes = [
           'forumdisplay\.php\?f=(\d+)'    => ['categories/$1', 'Permanent'],
           'showthread\.php\?t=(\d+)'      => ['discussion/$1', 'Permanent'],

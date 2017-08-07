@@ -9,9 +9,9 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
    protected $_OldPasswordHash;
 
    /// Methods.
-   public function Setup() {
+   public function setup() {
       // Allow multiple emails.
-      SaveToConfig('Garden.Registration.EmailUnique', FALSE);
+      saveToConfig('Garden.Registration.EmailUnique', FALSE);
    }
 
    /**
@@ -21,13 +21,13 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
     * @param bool $checkPasswords
     */
    protected function _SyncPasswords($userModel, $userID, $checkPasswords = TRUE) {
-      $user = $userModel->GetID($userID, DATASET_TYPE_ARRAY);
+      $user = $userModel->getID($userID, DATASET_TYPE_ARRAY);
 
       if ($checkPasswords) {
          if (is_array($this->_OldPasswordHash)) {
             $userModel->SQL
-               ->Where('Password', $this->_OldPasswordHash[0])
-               ->Where('HashMethod', $this->_OldPasswordHash[1]);
+               ->where('Password', $this->_OldPasswordHash[0])
+               ->where('HashMethod', $this->_OldPasswordHash[1]);
 
             $this->_OldPasswordHash = NULL;
          } else {
@@ -36,28 +36,28 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
       }
 
       $userModel->SQL
-         ->Update('User')
-         ->Set('Password', $user['Password'])
-         ->Set('HashMethod', $user['HashMethod'])
-         ->Where('Email', $user['Email'])
-         ->Put();
+         ->update('User')
+         ->set('Password', $user['Password'])
+         ->set('HashMethod', $user['HashMethod'])
+         ->where('Email', $user['Email'])
+         ->put();
    }
 
    /**
     * @param Gdn_Controller $sender
     * @param array $args
     */
-   public function EntryController_Render_Before($sender, $args) {
+   public function entryController_render_before($sender, $args) {
       if ($sender->RequestMethod != 'passwordreset')
          return;
 
       if (isset($sender->Data['User'])) {
          // Get all of the users with the same email.
-         $email = $sender->Data('User.Email');
-         $users = Gdn::SQL()->Select('Name')->From('User')->Where('Email', $email)->Get()->ResultArray();
+         $email = $sender->data('User.Email');
+         $users = Gdn::sql()->select('Name')->from('User')->where('Email', $email)->get()->resultArray();
          $names = array_column($users, 'Name');
 
-         SetValue('Name', $sender->Data['User'], implode(', ', $names));
+         setValue('Name', $sender->Data['User'], implode(', ', $names));
       }
    }
 
@@ -65,21 +65,21 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
     * @param UserModel $userModel
     * @param array $args
     */
-   public function UserModel_AfterInsertUser_Handler($userModel, $args) {
-      $password = GetValue('User/Password', $_POST);
+   public function userModel_afterInsertUser_handler($userModel, $args) {
+      $password = getValue('User/Password', $_POST);
       if (!$password)
          return;
 
       // See if there is a user with the same email/password.
-      $users = $userModel->GetWhere(['Email' => GetValueR('InsertFields.Email', $args)])->ResultArray();
+      $users = $userModel->getWhere(['Email' => getValueR('InsertFields.Email', $args)])->resultArray();
       $hasher = new Gdn_PasswordHash();
 
       foreach ($users as $user) {
-         if ($hasher->CheckPassword($password, $user['Password'], $user['HashMethod'])) {
-            $userModel->SQL->Put(
+         if ($hasher->checkPassword($password, $user['Password'], $user['HashMethod'])) {
+            $userModel->SQL->put(
                'User',
                ['Password' => $user['Password'], 'HashMethod' => $user['HashMethod']],
-               ['UserID' => GetValue('InsertUserID', $args)]);
+               ['UserID' => getValue('InsertUserID', $args)]);
             return;
          }
       }
@@ -89,8 +89,8 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
     * @param UserModel $userModel
     * @param array $args
     */
-   public function UserModel_AfterPasswordReset_Handler($userModel, $args) {
-      $userID = GetValue('UserID', $args);
+   public function userModel_afterPasswordReset_handler($userModel, $args) {
+      $userID = getValue('UserID', $args);
 
       $this->_SyncPasswords($userModel, $userID, FALSE);
    }
@@ -99,14 +99,14 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
     * @param UserModel $userModel
     * @param array $args
     */
-   public function UserModel_BeforeSave_Handler($userModel, $args) {
+   public function userModel_beforeSave_handler($userModel, $args) {
       if (isset($args['Fields']) && !isset($args['Fields']['Password']))
          return;
 
       // Grab the current passwordhash for comparison.
-      $userID = GetValueR('FormPostValues.UserID', $args);
+      $userID = getValueR('FormPostValues.UserID', $args);
       if ($userID) {
-         $currentUser = $userModel->GetID($userID, DATASET_TYPE_ARRAY);
+         $currentUser = $userModel->getID($userID, DATASET_TYPE_ARRAY);
          $this->_OldPasswordHash = [$currentUser['Password'], $currentUser['HashMethod']];
       }
    }
@@ -115,11 +115,11 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
     * @param UserModel $userModel
     * @param array $args
     */
-   public function UserModel_AfterSave_Handler($userModel, $args) {
+   public function userModel_afterSave_handler($userModel, $args) {
       if (isset($args['Fields']) && !isset($args['Fields']['Password']))
          return;
 
-      $userID = GetValue('UserID', $args);
+      $userID = getValue('UserID', $args);
 
       $this->_SyncPasswords($userModel, $userID);
    }
@@ -130,7 +130,7 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
     * @param UserModel $userModel
     * @param array $args
     */
-   public function UserModel_BeforePasswordRequest_Handler($userModel, $args) {
+   public function userModel_beforePasswordRequest_handler($userModel, $args) {
       $email = $args['Email'];
       $users =& $args['Users'];
 
@@ -155,6 +155,6 @@ class MultipleEmailsPlugin extends Gdn_Plugin {
 
       $this->EventArguments['Users'] = $users;
       $this->EventArguments['Email'] = $email;
-      $this->FireEvent('PasswordRequestBefore');
+      $this->fireEvent('PasswordRequestBefore');
    }
 }

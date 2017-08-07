@@ -23,11 +23,11 @@ Gdn::structure()
     ->column('CountAcceptedAnswers', 'int', '0')
     ->set();
 
-Gdn::SQL()->replace(
+Gdn::sql()->replace(
     'ActivityType',
     ['AllowComments' => '0', 'RouteCode' => 'question', 'Notify' => '1', 'Public' => '0', 'ProfileHeadline' => '', 'FullHeadline' => ''],
     ['Name' => 'QuestionAnswer'], true);
-Gdn::SQL()->replace(
+Gdn::sql()->replace(
     'ActivityType',
     ['AllowComments' => '0', 'RouteCode' => 'answer', 'Notify' => '1', 'Public' => '0', 'ProfileHeadline' => '', 'FullHeadline' => ''],
     ['Name' => 'AnswerAccepted'], true);
@@ -36,12 +36,12 @@ if ($QnAExists && !$DateAcceptedExists) {
     // Default the date accepted to the accepted answer's date.
     $Px = Gdn::database()->DatabasePrefix;
     $Sql = "update {$Px}Discussion d set DateAccepted = (select min(c.DateInserted) from {$Px}Comment c where c.DiscussionID = d.DiscussionID and c.QnA = 'Accepted')";
-    Gdn::SQL()->query($Sql, 'update');
-    Gdn::SQL()->update('Discussion')
+    Gdn::sql()->query($Sql, 'update');
+    Gdn::sql()->update('Discussion')
         ->set('DateOfAnswer', 'DateAccepted', false, false)
         ->put();
 
-    Gdn::SQL()->update('Comment c')
+    Gdn::sql()->update('Comment c')
         ->join('Discussion d', 'c.CommentID = d.DiscussionID')
         ->set('c.DateAccepted', 'c.DateInserted', false, false)
         ->set('c.AcceptedUserID', 'd.InsertUserID', false, false)

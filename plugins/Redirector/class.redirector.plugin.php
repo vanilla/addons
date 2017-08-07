@@ -113,13 +113,13 @@ class RedirectorPlugin extends Gdn_Plugin {
      *
      */
     public function gdn_Dispatcher_NotFound_Handler() {
-        $path = Gdn::Request()->Path();
-        $get = Gdn::Request()->Get();
+        $path = Gdn::request()->path();
+        $get = Gdn::request()->get();
         /**
          * There may be two incoming p URL parameters.  If that is the case, we need to compensate for it.  This is done
          * by manually parsing the server's QUERY_STRING variable, if available.
          */
-        $queryString = Gdn::Request()->getValueFrom('server', 'QUERY_STRING', false);
+        $queryString = Gdn::request()->getValueFrom('server', 'QUERY_STRING', false);
         trace(['QUERY_STRING' => $queryString], 'Server Variables');
         if ($queryString && preg_match('/(^|&)p\=\/?(showpost\.php|showthread\.php|viewtopic\.php)/i', $queryString)) {
             // Check for multiple values of p in our URL parameters
@@ -177,7 +177,7 @@ class RedirectorPlugin extends Gdn_Plugin {
         $url = $this->filenameRedirect($filename, $get);
 
         if ($url) {
-            if (Debug()) {
+            if (debug()) {
                 trace($url, 'Redirect found');
             } else {
                 redirectTo($url, 301);
@@ -246,14 +246,14 @@ class RedirectorPlugin extends Gdn_Plugin {
             trace("Looking up comment {$Vars['CommentID']}.");
             $CommentModel = new CommentModel();
             // If a legacy slug is provided (assigned during a merge), attempt to lookup the comment using it
-            if (isset($Get['legacy']) && Gdn::Structure()->Table('Comment')->ColumnExists('ForeignID')) {
-                $Comment = $CommentModel->GetWhere(['ForeignID' => $Vars['CommentID']])->FirstRow();
+            if (isset($Get['legacy']) && Gdn::structure()->table('Comment')->columnExists('ForeignID')) {
+                $Comment = $CommentModel->getWhere(['ForeignID' => $Vars['CommentID']])->firstRow();
 
             } else {
-                $Comment = $CommentModel->GetID($Vars['CommentID']);
+                $Comment = $CommentModel->getID($Vars['CommentID']);
             }
             if ($Comment) {
-                $Result = CommentUrl($Comment, '//');
+                $Result = commentUrl($Comment, '//');
             } else {
                 // vBulletin, defaulting to discussions (foreign ID) when showthread.php?p=xxxx returns no comment
                 $Vars['DiscussionID'] = $Vars['CommentID'];
@@ -270,43 +270,43 @@ class RedirectorPlugin extends Gdn_Plugin {
 
             if (is_numeric($DiscussionID)) {
                 // If a legacy slug is provided (assigned during a merge), attempt to lookup the discussion using it
-                if (isset($Get['legacy']) && Gdn::Structure()->Table('Discussion')->ColumnExists('ForeignID')) {
-                    $Discussion = $DiscussionModel->GetWhere(['ForeignID' => $DiscussionID])->FirstRow();
+                if (isset($Get['legacy']) && Gdn::structure()->table('Discussion')->columnExists('ForeignID')) {
+                    $Discussion = $DiscussionModel->getWhere(['ForeignID' => $DiscussionID])->firstRow();
                 } else {
-                    $Discussion = $DiscussionModel->GetID($Vars['DiscussionID']);
+                    $Discussion = $DiscussionModel->getID($Vars['DiscussionID']);
                 }
             } else {
                 // This is a slug style discussion ID. Let's see if there is a UrlCode column in the discussion table.
-                $DiscussionModel->DefineSchema();
-                if ($DiscussionModel->Schema->FieldExists('Discussion', 'UrlCode')) {
-                    $Discussion = $DiscussionModel->GetWhere(['UrlCode' => $DiscussionID])->FirstRow();
+                $DiscussionModel->defineSchema();
+                if ($DiscussionModel->Schema->fieldExists('Discussion', 'UrlCode')) {
+                    $Discussion = $DiscussionModel->getWhere(['UrlCode' => $DiscussionID])->firstRow();
                 }
             }
 
             if ($Discussion) {
-                $Result = DiscussionUrl($Discussion, self::pageNumber($Vars, 'Vanilla.Comments.PerPage'), '//');
+                $Result = discussionUrl($Discussion, self::pageNumber($Vars, 'Vanilla.Comments.PerPage'), '//');
             }
         } elseif (isset($Vars['UserID'])) {
             trace("Looking up user {$Vars['UserID']}.");
 
-            $User = Gdn::UserModel()->GetID($Vars['UserID']);
+            $User = Gdn::userModel()->getID($Vars['UserID']);
             if ($User) {
-                $Result = Url(UserUrl($User), '//');
+                $Result = url(userUrl($User), '//');
             }
         } elseif (isset($Vars['TagID'])) {
-            $Tag = TagModel::instance()->GetID($Vars['TagID']);
+            $Tag = TagModel::instance()->getID($Vars['TagID']);
             if ($Tag) {
-                 $Result = TagUrl($Tag, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
+                 $Result = tagUrl($Tag, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
             }
         } elseif (isset($Vars['CategoryID'])) {
             trace("Looking up category {$Vars['CategoryID']}.");
 
             // If a legacy slug is provided (assigned during a merge), attempt to lookup the category ID based on it
-            if (isset($Get['legacy']) && Gdn::Structure()->Table('Category')->ColumnExists('ForeignID')) {
+            if (isset($Get['legacy']) && Gdn::structure()->table('Category')->columnExists('ForeignID')) {
                 $CategoryModel = new CategoryModel();
-                $Category = $CategoryModel->GetWhere(['ForeignID' => $Get['legacy'] . '-' . $Vars['CategoryID']])->FirstRow();
+                $Category = $CategoryModel->getWhere(['ForeignID' => $Get['legacy'] . '-' . $Vars['CategoryID']])->firstRow();
             } else {
-                $Category = CategoryModel::Categories($Vars['CategoryID']);
+                $Category = CategoryModel::categories($Vars['CategoryID']);
             }
             if ($Category) {
                 $Result = categoryUrl($Category, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
@@ -452,7 +452,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      * @param $value
      * @return array|null
      */
-    public static function IPBPageNumber($value) {
+    public static function iPBPageNumber($value) {
         if (preg_match('`page__st__(\d+)`i', $value, $matches))
             return ['Offset', $matches[1]];
         return self::getNumber($value);
@@ -470,9 +470,9 @@ class RedirectorPlugin extends Gdn_Plugin {
             return $vars['Page'];
         if (isset($vars['Offset'])) {
             if (is_numeric($pageSize))
-                return pageNumber($vars['Offset'], $pageSize, false, Gdn::Session()->IsValid());
+                return pageNumber($vars['Offset'], $pageSize, false, Gdn::session()->isValid());
             else
-                return pageNumber($vars['Offset'], C($pageSize, 30), false, Gdn::Session()->IsValid());
+                return pageNumber($vars['Offset'], c($pageSize, 30), false, Gdn::session()->isValid());
         }
         return 1;
     }

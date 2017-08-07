@@ -59,7 +59,7 @@ class SignaturesPlugin extends Gdn_Plugin {
      * @param $sender
      */
     public function profileController_afterAddSideMenu_handler($sender) {
-        if (!CheckPermission('Garden.SignIn.Allow')) {
+        if (!checkPermission('Garden.SignIn.Allow')) {
             return;
         }
 
@@ -170,7 +170,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
             if (sizeof($frmValues)) {
 
-                if (!GetValue($this->makeMetaKey('Sig'), $frmValues)) {
+                if (!getValue($this->makeMetaKey('Sig'), $frmValues)) {
                     // Delete the signature.
                     $frmValues[$this->makeMetaKey('Sig')] = null;
                     $frmValues[$this->makeMetaKey('Format')] = null;
@@ -192,7 +192,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
                         $this->setUserMeta($sigUserID, $key, $userMetaValue);
                     }
-                    $sender->informMessage(T("Your changes have been saved."));
+                    $sender->informMessage(t("Your changes have been saved."));
                 }
             }
         } else {
@@ -221,7 +221,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         // Validate the signature.
         if (function_exists('ValidateSignature')) {
             $sig = trim(val('Plugin.Signatures.Sig', $values));
-            if (validateRequired($sig) && !ValidateSignature($sig, val('Plugin.Signatures.Format', $values))) {
+            if (validateRequired($sig) && !validateSignature($sig, val('Plugin.Signatures.Format', $values))) {
                 $sender->Form->addError('Signature invalid.');
             }
         }
@@ -381,7 +381,7 @@ class SignaturesPlugin extends Gdn_Plugin {
             if (function_exists('ValidateSignature')) {
                 $sig = $sender->Form->getFormValue('Body');
                 $format = $sender->Form->getFormValue('Format');
-                if (validateRequired($sig) && !ValidateSignature($sig, $format)) {
+                if (validateRequired($sig) && !validateSignature($sig, $format)) {
                     $sender->Form->addError('Signature invalid.');
                 }
             }
@@ -448,13 +448,13 @@ class SignaturesPlugin extends Gdn_Plugin {
             $userIDList = [];
 
             if ($discussion) {
-                $userIDList[GetValue('InsertUserID', $discussion)] = 1;
+                $userIDList[getValue('InsertUserID', $discussion)] = 1;
             }
 
             if ($comments && $comments->numRows()) {
                 $comments->dataSeek(-1);
                 while ($comment = $comments->nextRow()) {
-                    $userIDList[GetValue('InsertUserID', $comment)] = 1;
+                    $userIDList[getValue('InsertUserID', $comment)] = 1;
                 }
             }
 

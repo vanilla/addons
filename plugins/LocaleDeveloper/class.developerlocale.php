@@ -13,28 +13,28 @@ class DeveloperLocale extends Gdn_Locale {
      *
      * return array
      */
-    public function AllDefinitions() {
+    public function allDefinitions() {
         $result = array_merge($this->_Definition, $this->_CapturedDefinitions);
         return $result;
     }
 
-    public function CapturedDefinitions() {
+    public function capturedDefinitions() {
         return $this->_CapturedDefinitions;
     }
 
-    public static function GuessPrefix() {
+    public static function guessPrefix() {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
         foreach ($trace as $i => $row) {
             if (strcasecmp($row['function'], 't') === 0) {
                 if ($trace[$i + 1]['function'] == 'Plural')
-                    return self::PrefixFromPath($trace[$i + 1]['file']);
+                    return self::prefixFromPath($trace[$i + 1]['file']);
                 else
-                    return self::PrefixFromPath($row['file']);
+                    return self::prefixFromPath($row['file']);
             }
             if (strcasecmp($row['function'], 'Translate') === 0) {
                 if (!in_array(basename($row['file']), ['functions.general.php', 'class.gdn.php'])) {
-                    return self::PrefixFromPath($row['file']);
+                    return self::prefixFromPath($row['file']);
                 }
             }
         }
@@ -42,7 +42,7 @@ class DeveloperLocale extends Gdn_Locale {
         return FALSE;
     }
 
-    public static function PrefixFromPath($path) {
+    public static function prefixFromPath($path) {
         $result = '';
 
         if (preg_match('`/plugins/([^/]+)`i', $path, $matches)) {
@@ -69,13 +69,13 @@ class DeveloperLocale extends Gdn_Locale {
         return $result;
     }
 
-    public function Translate($code, $default = FALSE) {
-        $result = parent::Translate($code, $default);
+    public function translate($code, $default = FALSE) {
+        $result = parent::translate($code, $default);
 
         if (!$code || substr($code, 0, 1) == '@')
             return $result;
 
-        $prefix = self::GuessPrefix();
+        $prefix = self::guessPrefix();
 
         if (!$prefix) {
             return $result;
@@ -87,7 +87,7 @@ class DeveloperLocale extends Gdn_Locale {
             die();
         }
 
-        if (Gdn_Theme::InSection('Dashboard'))
+        if (Gdn_Theme::inSection('Dashboard'))
             $prefix = 'dash_'.$prefix;
         else
             $prefix = 'site_'.$prefix;

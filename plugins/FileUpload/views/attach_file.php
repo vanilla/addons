@@ -1,6 +1,6 @@
 <div class="AttachFileWrapper AttachmentWindow">
    <div class="AttachFileLink">
-      <a href="javascript:void(0);"><?php echo T('Attach a file'); ?></a>
+      <a href="javascript:void(0);"><?php echo t('Attach a file'); ?></a>
       <div class="CurrentUploader"></div>
    </div>
    <div class="AttachFileContainer">
@@ -10,17 +10,17 @@
             <div class="FileHover">
                <div class="FileMeta">
                   <div>
-                     <span class="FileName"><?php echo T('Filename'); ?></span>
-                     <span class="FileSize"><?php echo T('File Size'); ?></span>
+                     <span class="FileName"><?php echo t('Filename'); ?></span>
+                     <span class="FileSize"><?php echo t('File Size'); ?></span>
                   </div>
                   <span class="FileOptions"></span>
-                  <a class="InsertImage Hidden"><?php echo T('Insert Image'); ?></a>
-                  <a class="DeleteFile"><?php echo T('Delete'); ?></a>
+                  <a class="InsertImage Hidden"><?php echo t('Insert Image'); ?></a>
+                  <a class="DeleteFile"><?php echo t('Delete'); ?></a>
                </div>
             </div>
          </div>
          <div class="UploadProgress">
-            <div class="Foreground"><strong><?php echo T('Uploading...'); ?></strong></div>
+            <div class="Foreground"><strong><?php echo t('Uploading...'); ?></strong></div>
             <div class="Background">&nbsp;</div>
             <div>&nbsp;</div>
          </div>

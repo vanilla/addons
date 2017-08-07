@@ -52,8 +52,8 @@
 	//  manually afterward:
 	//
 	//    $bbcode = new BBCode;
-	//    $bbcode->AddRule(...);
-	//    $bbcode->AddSmiley(...);
+	//    $bbcode->addRule(...);
+	//    $bbcode->addSmiley(...);
 	//
 	//-----------------------------------------------------------------------------
 
@@ -405,13 +405,13 @@
 
 		// Format a [url] tag by producing an <a>...</a> element.
 		// The URL only allows http, https, mailto, and ftp protocols for safety.
-		function DoURL($bbcode, $action, $name, $default, $params, $content) {
+		function doURL($bbcode, $action, $name, $default, $params, $content) {
 			// We can't check this with BBCODE_CHECK because we may have no URL before the content
 			// has been processed.
 			if ($action == BBCODE_CHECK) return true;
 
-			$url = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
-			if ($bbcode->IsValidURL($url)) {
+			$url = is_string($default) ? $default : $bbcode->unHTMLEncode(strip_tags($content));
+			if ($bbcode->isValidURL($url)) {
 				if ($bbcode->debug)
 					print "ISVALIDURL<br />";
 				if ($bbcode->url_targetable !== false && isset($params['target']))
@@ -428,19 +428,19 @@
 		// Format an [email] tag by producing an <a>...</a> element.
 		// The e-mail address must be a valid address including at least a '@' and a valid domain
 		// name or IPv4 or IPv6 address after the '@'.
-		function DoEmail($bbcode, $action, $name, $default, $params, $content) {
+		function doEmail($bbcode, $action, $name, $default, $params, $content) {
 			// We can't check this with BBCODE_CHECK because we may have no URL before the content
 			// has been processed.
 			if ($action == BBCODE_CHECK) return true;
 
-			$email = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
-			if ($bbcode->IsValidEmail($email))
+			$email = is_string($default) ? $default : $bbcode->unHTMLEncode(strip_tags($content));
+			if ($bbcode->isValidEmail($email))
 				return '<a href="mailto:' . htmlspecialchars($email) . '" class="bbcode_email">' . $content . '</a>';
 			else return htmlspecialchars($params['_tag']) . $content . htmlspecialchars($params['_endtag']);
 		}
 		
 		// Format a [size] tag by producing a <span> with a style with a different font-size.
-		function DoSize($bbcode, $action, $name, $default, $params, $content) {
+		function doSize($bbcode, $action, $name, $default, $params, $content) {
 			switch ($default) {
 			case '0': $size = '.5em'; break;
 			case '1': $size = '.67em'; break;
@@ -458,7 +458,7 @@
 		// Format a [font] tag by producing a <span> with a style with a different font-family.
 		// This is complicated by the fact that we have to recognize the five special font
 		// names and quote all the others.
-		function DoFont($bbcode, $action, $name, $default, $params, $content) {
+		function doFont($bbcode, $action, $name, $default, $params, $content) {
 			$fonts = explode(",", $default);
 			$result = "";
 			$special_fonts = [
@@ -487,8 +487,8 @@
 		}
 
 		// Format a [wiki] tag by producing an <a>...</a> element.
-		function DoWiki($bbcode, $action, $name, $default, $params, $content) {
-			$name = $bbcode->Wikify($default);
+		function doWiki($bbcode, $action, $name, $default, $params, $content) {
+			$name = $bbcode->wikify($default);
 			if ($action == BBCODE_CHECK)
 				return strlen($name) > 0;
 			$title = trim(@$params['title']);
@@ -498,11 +498,11 @@
 		}
 
 		// Format an [img] tag.  The URL only allows http, https, and ftp protocols for safety.
-		function DoImage($bbcode, $action, $name, $default, $params, $content) {
+		function doImage($bbcode, $action, $name, $default, $params, $content) {
 			// We can't validate this until we have its content.
 			if ($action == BBCODE_CHECK) return true;
 
-			$content = trim($bbcode->UnHTMLEncode(strip_tags($content)));
+			$content = trim($bbcode->unHTMLEncode(strip_tags($content)));
 			if (preg_match("/\\.(?:gif|jpeg|jpg|jpe|png)$/", $content)) {
 				if (preg_match("/^[a-zA-Z0-9_][^:]+$/", $content)) {
 					// No protocol, so the image is in our local image directory, or somewhere under it.
@@ -517,7 +517,7 @@
 						}
 					}
 				}
-				else if ($bbcode->IsValidURL($content, false)) {
+				else if ($bbcode->isValidURL($content, false)) {
 					// Remote URL, or at least we don't know where it is.
 					return "<img src=\"" . htmlspecialchars($content) . "\" alt=\""
 						. htmlspecialchars(basename($content)) . "\" class=\"bbcode_img\" />";
@@ -529,7 +529,7 @@
 
 		// Format a [rule] tag.  This substitutes the content provided by the BBCode
 		// object, whatever that may be.
-		function DoRule($bbcode, $action, $name, $default, $params, $content) {
+		function doRule($bbcode, $action, $name, $default, $params, $content) {
 			if ($action == BBCODE_CHECK) return true;
 			else return $bbcode->rule_html;
 		}
@@ -547,7 +547,7 @@
 		//  [quote name="Tom" date="July 4, 1776 3:48 PM" url="http://www.constitution.gov"]...[/quote]
 		//
 		// The URL only allows http, https, mailto, gopher, ftp, and feed protocols for safety.
-		function DoQuote($bbcode, $action, $name, $default, $params, $content) {
+		function doQuote($bbcode, $action, $name, $default, $params, $content) {
 			if ($action == BBCODE_CHECK) return true;
 
 			if (isset($params['name'])) {
@@ -557,7 +557,7 @@
 				$title .= ":";
 				if (isset($params['url'])) {
 					$url = trim($params['url']);
-					if ($bbcode->IsValidURL($url))
+					if ($bbcode->isValidURL($url))
 						$title = "<a href=\"" . htmlspecialchars($params['url']) . "\">" . $title . "</a>";
 				}
 			}
@@ -584,7 +584,7 @@
 		//   [list=i]         Ordered list, lowercase Roman numerals, starting at i
 		//   [list=greek]     Ordered list, lowercase Greek letters, starting at alpha
 		//   [list=01]        Ordered list, two-digit numeric with 0-padding, starting at 01
-		function DoList($bbcode, $action, $name, $default, $params, $content) {
+		function doList($bbcode, $action, $name, $default, $params, $content) {
 
 			// Allowed list styles, striaght from the CSS 2.1 spec.  The only prohibited
 			// list style is that with image-based markers, which often slows down web sites.

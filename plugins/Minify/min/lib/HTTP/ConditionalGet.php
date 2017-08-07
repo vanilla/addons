@@ -11,7 +11,7 @@
  * E.g. Content from DB with update time:
  * <code>
  * list($updateTime, $content) = getDbUpdateAndContent();
- * $cg = new HTTP_ConditionalGet(array(
+ * $cg = new hTTP_ConditionalGet(array(
  *     'lastModifiedTime' => $updateTime
  *     ,'isPublic' => true
  * ));
@@ -31,7 +31,7 @@
  * E.g. Content from DB with no update time:
  * <code>
  * $content = getContentFromDB();
- * $cg = new HTTP_ConditionalGet(array(
+ * $cg = new hTTP_ConditionalGet(array(
  *     'contentHash' => md5($content)
  * ));
  * $cg->sendHeaders();
@@ -44,7 +44,7 @@
  * E.g. Static content with some static includes:
  * <code>
  * // before content
- * $cg = new HTTP_ConditionalGet(array(
+ * $cg = new hTTP_ConditionalGet(array(
  *     'lastUpdateTime' => max(
  *         filemtime(__FILE__)
  *         ,filemtime('/path/to/header.inc')

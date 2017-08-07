@@ -1,71 +1,71 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo '<h1>', $this->Data('Title'), '</h1>';
+echo '<h1>', $this->data('Title'), '</h1>';
 
-$Form = $this->Form; //new Gdn_Form();
-echo $Form->Open();
-echo $Form->Errors();
+$Form = $this->Form; //new gdn_Form();
+echo $Form->open();
+echo $Form->errors();
 ?>
 <div class="Info">
-   <?php echo sprintf(T('This plugin helps locale package development.', 'This plugin helps locale package development. The plugin keeps a working locale pack at <code>%s</code>.'),
-      $this->Data('LocalePath'));
+   <?php echo sprintf(t('This plugin helps locale package development.', 'This plugin helps locale package development. The plugin keeps a working locale pack at <code>%s</code>.'),
+      $this->data('LocalePath'));
       echo ' ';
-      echo sprintf(T('For more help on localization check out the page <a href="%s">here</a>.'), 'http://vanillaforums.org/page/localization');
+      echo sprintf(t('For more help on localization check out the page <a href="%s">here</a>.'), 'http://vanillaforums.org/page/localization');
    ?>
 </div>
-<h3><?php echo T('Settings'); ?></h3>
+<h3><?php echo t('Settings'); ?></h3>
 <ul>
    <li>
-      <?php echo sprintf(T('Locale info file settings.', '<p>When you generate the zip file you can set the information for the locale below.</p> <p>You can download a zip of the locale pack by clicking <a href="%s">here</a>.</p>'), Url("/settings/localedeveloper/download")); ?>
+      <?php echo sprintf(t('Locale info file settings.', '<p>When you generate the zip file you can set the information for the locale below.</p> <p>You can download a zip of the locale pack by clicking <a href="%s">here</a>.</p>'), url("/settings/localedeveloper/download")); ?>
    </li>
    <li>
       <?php
-      echo $this->Form->Label('Locale Key (Folder)', 'Key'),
-         $this->Form->TextBox('Key');
+      echo $this->Form->label('Locale Key (Folder)', 'Key'),
+         $this->Form->textBox('Key');
       ?>
    </li>
    <li>
       <?php
-      echo $this->Form->Label('Locale Name', 'Name'),
-         $this->Form->TextBox('Name');
+      echo $this->Form->label('Locale Name', 'Name'),
+         $this->Form->textBox('Name');
       ?>
    </li>
    <li>
       <?php
-      echo $this->Form->Label('_Locale', 'Locale'),
-         $this->Form->TextBox('Locale', ['Class' => 'SmallInput']);
+      echo $this->Form->label('_Locale', 'Locale'),
+         $this->Form->textBox('Locale', ['Class' => 'SmallInput']);
       ?>
    </li>
    <li>
       <?php
-      echo $this->Form->CheckBox('CaptureDefinitions', 'Capture definitions throughout the site. You must visit the pages in the site in order for the definitions to be captured. The captured definitions will be put in the <code>captured.php</code> and <code>captured_admin.php</code>.');
+      echo $this->Form->checkBox('CaptureDefinitions', 'Capture definitions throughout the site. You must visit the pages in the site in order for the definitions to be captured. The captured definitions will be put in the <code>captured.php</code> and <code>captured_admin.php</code>.');
       ?>
    </li>
 </ul>
-<?php echo $Form->Button('Save'); ?>
-<h3><?php echo T('Tools'); ?></h3>
+<?php echo $Form->button('Save'); ?>
+<h3><?php echo t('Tools'); ?></h3>
 <ul>
    <li>
       <?php
-         echo T('Copy locale pack.', 'Copy the definitions from a locale pack to the Locale Developer. The definitions will be put in the <code>copied.php</code> file.');
-         echo $Form->Label('Choose a locale pack', 'LocalePackForCopy');
-         echo $Form->DropDown('LocalePackForCopy', $this->Data('LocalePacks'));
-         echo $Form->Button('Copy');
+         echo t('Copy locale pack.', 'Copy the definitions from a locale pack to the Locale Developer. The definitions will be put in the <code>copied.php</code> file.');
+         echo $Form->label('Choose a locale pack', 'LocalePackForCopy');
+         echo $Form->dropDown('LocalePackForCopy', $this->data('LocalePacks'));
+         echo $Form->button('Copy');
       ?>
    </li>
    <li>
       <?php
-         echo T('Capture locale pack changes.', 'Capture the changes between one of your locale packs and the Locale Developer. It will be put in the <code>changes.php</code> file.');
-         echo $Form->Label('Choose a locale pack', 'LocalePackForChanges');
-         echo $Form->DropDown('LocalePackForChanges', $this->Data('LocalePacks'));
-         echo $Form->Button('Generate', ['Name' => 'Form/GenerateChanges']);
+         echo t('Capture locale pack changes.', 'Capture the changes between one of your locale packs and the Locale Developer. It will be put in the <code>changes.php</code> file.');
+         echo $Form->label('Choose a locale pack', 'LocalePackForChanges');
+         echo $Form->dropDown('LocalePackForChanges', $this->data('LocalePacks'));
+         echo $Form->button('Generate', ['Name' => 'Form/GenerateChanges']);
       ?>
    </li>
    <li>
       <?php
-         echo '<div>', T('Remove locale developer files.', 'Remove the locale deveoper files and reset your changes.'), '</div>';
-         echo $Form->Button('Remove');
+         echo '<div>', t('Remove locale developer files.', 'Remove the locale deveoper files and reset your changes.'), '</div>';
+         echo $Form->button('Remove');
       ?>
    </li>
 </ul>
-<?php echo $Form->Close(); ?>
+<?php echo $Form->close(); ?>

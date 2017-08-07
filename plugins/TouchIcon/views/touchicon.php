@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 ?>
-<h1><?php echo T('Touch Icon'); ?></h1>
+<h1><?php echo t('Touch Icon'); ?></h1>
 <?php
 echo $this->Form->open(['enctype' => 'multipart/form-data']);
 echo $this->Form->errors();

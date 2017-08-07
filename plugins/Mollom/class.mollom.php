@@ -676,7 +676,7 @@ abstract class Mollom {
     * Used to parse an XML response from Mollom servers into a PHP array. For
     * example:
     * @code
-    * $elements = new SimpleXmlIterator($response_body);
+    * $elements = new simpleXmlIterator($response_body);
     * $parsed_response = $this->parseXML($elements);
     * @endcode
     *

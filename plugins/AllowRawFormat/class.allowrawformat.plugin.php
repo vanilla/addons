@@ -5,9 +5,9 @@
  */
 
 class AllowRawFormatPlugin extends Gdn_Plugin {
-   public function Base_BeforeDispatch_Handler($sender, $args) {
-      if (Gdn::Session()->CheckPermission('Plugins.AllowRawFormat.Allow')) {
-         SaveToConfig('Garden.InputFormatter', 'Raw', ['Save' => FALSE]);
+   public function base_beforeDispatch_handler($sender, $args) {
+      if (Gdn::session()->checkPermission('Plugins.AllowRawFormat.Allow')) {
+         saveToConfig('Garden.InputFormatter', 'Raw', ['Save' => FALSE]);
       }
    }
 }

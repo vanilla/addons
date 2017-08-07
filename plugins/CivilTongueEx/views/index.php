@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
-echo Wrap($this->Data('Title'), 'h1');
+echo wrap($this->data('Title'), 'h1');
 
-$desc =  T('Civil Tongue lets you make a list of words that are not allowed on the forum and replace them. This plugins also helps to make your forum suitable for younger audiences.');
+$desc =  t('Civil Tongue lets you make a list of words that are not allowed on the forum and replace them. This plugins also helps to make your forum suitable for younger audiences.');
 echo wrap($desc, 'div', ['class' => 'alert alert-info padded']);
 
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 <ul>
     <li class="form-group">
@@ -14,7 +14,7 @@ echo $this->Form->Errors();
             echo wrap(t('Separate each word with a semi-colon ";"'), 'div', ['class' => 'info']); ?>
         </div>
         <div class="input-wrap">
-            <?php echo $this->Form->TextBox('Plugins.CivilTongue.Words', ['MultiLine' => TRUE]); ?>
+            <?php echo $this->Form->textBox('Plugins.CivilTongue.Words', ['MultiLine' => TRUE]); ?>
         </div>
     </li>
     <li class="form-group">
@@ -23,8 +23,8 @@ echo $this->Form->Errors();
             echo wrap(t('Enter the word you wish to replace the banned word with.'), 'div', ['class' => 'info']); ?>
         </div>
         <div class="input-wrap">
-            <?php echo $this->Form->TextBox('Plugins.CivilTongue.Replacement'); ?>
+            <?php echo $this->Form->textBox('Plugins.CivilTongue.Replacement'); ?>
         </div>
     </li>
 </ul>
-<?php echo $this->Form->Close('Save'); ?>
+<?php echo $this->Form->close('Save'); ?>

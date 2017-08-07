@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 echo heading(t('Spoof'));
 ?>
 <ul>
@@ -19,8 +19,8 @@ echo heading(t('Spoof'));
    <li class="form-group">
       <?php echo $this->Form->labelWrap('Your Password', 'Password'); ?>
       <div class="input-wrap">
-         <?php echo $this->Form->Input('Password', 'password'); ?>
+         <?php echo $this->Form->input('Password', 'password'); ?>
       </div>
    </li>
 </ul>
-<?php echo $this->Form->Close('Go'); ?>
+<?php echo $this->Form->close('Go'); ?>

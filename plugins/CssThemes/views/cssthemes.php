@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 
 <table id="CssThemes">
@@ -23,7 +23,7 @@ foreach($this->Data["ThemeSettings"] as $Row) {
 	}
 ?>
 	<tr class="ColorRow">
-		<td><?php echo T($Name); ?></td>
+		<td><?php echo t($Name); ?></td>
 		<td>
 			<div class="ColorPicker" style="background-color: <?php echo $Row['Setting']; ?>">
 				&nbsp;
@@ -31,8 +31,8 @@ foreach($this->Data["ThemeSettings"] as $Row) {
 		</td>
 		<td>
 			<?php
-				echo $this->Form->Input('Name[]', 'hidden', ['value' => $Row['Name']]);
-				echo $this->Form->Input('Setting[]', 'text', ['value' => $Row['Setting'], 'class' => 'Setting']);
+				echo $this->Form->input('Name[]', 'hidden', ['value' => $Row['Name']]);
+				echo $this->Form->input('Setting[]', 'text', ['value' => $Row['Setting'], 'class' => 'Setting']);
 			?>
 		</td>
 	</tr>
@@ -41,5 +41,5 @@ foreach($this->Data["ThemeSettings"] as $Row) {
 ?>
 </table>
 <?php
-echo $this->Form->Close("Save");
+echo $this->Form->close("Save");
 ?>

@@ -8,7 +8,7 @@ echo $this->Form->errors();
 
 <div class="P">
     <?php
-//   echo $this->Form->Label();
+//   echo $this->Form->label();
     echo $this->Form->radioList('Type', $this->data('_Types'), ['list' => true]);
     ?>
 </div>

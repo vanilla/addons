@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<h1><?php echo T($this->Data['Title']); ?></h1>
+<h1><?php echo t($this->Data['Title']); ?></h1>
 <div class="Info">
     <?php echo t($this->Data['PluginDescription']); ?>
 </div>

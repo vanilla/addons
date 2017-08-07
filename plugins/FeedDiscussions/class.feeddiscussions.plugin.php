@@ -222,7 +222,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                 $sender->Form->clearInputs();
 
             } catch (Exception $e) {
-                $sender->Form->addError(T($e->getMessage()));
+                $sender->Form->addError(t($e->getMessage()));
             }
         }
 

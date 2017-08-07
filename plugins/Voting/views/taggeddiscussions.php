@@ -1,15 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
-include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
+include($this->fetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 ?>
 <div class="TaggedHeading"><?php printf("Questions tagged with '%s'", $this->Tag); ?></div>
-<?php if ($this->DiscussionData->NumRows() > 0) { ?>
+<?php if ($this->DiscussionData->numRows() > 0) { ?>
 <ul class="DataList Discussions">
-   <?php include($this->FetchViewLocation('discussions')); ?>
+   <?php include($this->fetchViewLocation('discussions')); ?>
 </ul>
 <?php
-   echo $this->Pager->ToString('more');
+   echo $this->Pager->toString('more');
 } else {
    ?>
-   <div class="Empty"><?php printf(T('No items tagged with %s.'), $this->Tag); ?></div>
+   <div class="Empty"><?php printf(t('No items tagged with %s.'), $this->Tag); ?></div>
    <?php
 }

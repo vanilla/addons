@@ -25,14 +25,14 @@ class RightToLeftPlugin extends Gdn_Plugin {
     *
     * @param Gdn_Controller $sender
     */
-    public function Base_Render_Before($sender) {
-        $currentLocale = substr(Gdn::Locale()->Current(), 0, 2);
+    public function base_render_before($sender) {
+        $currentLocale = substr(Gdn::locale()->current(), 0, 2);
 
         if (in_array($currentLocale, $this->rtlLocales)) {
-            if (InSection('Dashboard')) {
-               $sender->AddCssFile('admin_rtl.css', 'plugins/RightToLeft');
+            if (inSection('Dashboard')) {
+               $sender->addCssFile('admin_rtl.css', 'plugins/RightToLeft');
             } else {
-               $sender->AddCssFile('style_rtl.css', 'plugins/RightToLeft');
+               $sender->addCssFile('style_rtl.css', 'plugins/RightToLeft');
             }
 
             $sender->CssClass .= ' rtl';

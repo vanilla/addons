@@ -4,27 +4,27 @@ class ReactionsStubPlugin extends Gdn_Plugin {
 
    public function __construct() {}
 
-   public function RootController_React_Create($sender, $recordType, $reaction, $iD) {
-      $sender->Render('blank', 'utility', 'dashboard');
+   public function rootController_react_create($sender, $recordType, $reaction, $iD) {
+      $sender->render('blank', 'utility', 'dashboard');
    }
 
-   private function AddJs($sender) {
-      $sender->AddJsFile('jquery-ui.js');
-      $sender->AddJsFile('reactions.js', 'plugins/ReactionsStub');
+   private function addJs($sender) {
+      $sender->addJsFile('jquery-ui.js');
+      $sender->addJsFile('reactions.js', 'plugins/ReactionsStub');
    }
 
-   public function DiscussionController_Render_Before($sender) {
-      $sender->AddCssFile('reactions.css', 'plugins/ReactionsStub');
-      $this->AddJs($sender);
+   public function discussionController_render_before($sender) {
+      $sender->addCssFile('reactions.css', 'plugins/ReactionsStub');
+      $this->addJs($sender);
    }
 
-   public function Setup() {}
+   public function setup() {}
 
 }
 
 if (!function_exists('WriteReactions')) {
 
-   function WriteReactions($row) {
+   function writeReactions($row) {
       $reactions = <<<REACTIONS
 <div class="Reactions"><span class="Flag ToggleFlyout"><a class="Hijack ReactButton ReactButton-Flag" href="" title="Flag" rel="nofollow"><span class="ReactSprite ReactFlag"></span> <span class="ReactLabel">Flag</span></a>
    <ul class="Flyout MenuItems Flags" style="display: none;"><li><a class="Hijack ReactButton ReactButton-Spam" href="/react/comment/spam?id=25011203" title="Spam" rel="nofollow"><span class="ReactSprite ReactSpam"></span> <span class="ReactLabel">Spam</span></a>

@@ -27,31 +27,31 @@ class VanooglePlugin extends Gdn_Plugin {
      * Build the setting page.
      * @param $sender
      */
-    public function SettingsController_Vanoogle_Create($sender) {
-        $sender->Permission('Garden.Settings.Manage');
+    public function settingsController_vanoogle_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
 
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
-        $configurationModel->SetField(["Plugins.Vanoogle.CSE"]);
-        $sender->Form->SetModel($configurationModel);
+        $configurationModel->setField(["Plugins.Vanoogle.CSE"]);
+        $sender->Form->setModel($configurationModel);
 
-        if ($sender->Form->AuthenticatedPostBack() === FALSE) {
-            $sender->Form->SetData($configurationModel->Data);
+        if ($sender->Form->authenticatedPostBack() === FALSE) {
+            $sender->Form->setData($configurationModel->Data);
         } else {
-            $data = $sender->Form->FormValues();
-            $configurationModel->Validation->ApplyRule("Plugins.Vanoogle.CSE", "Required");
-            if ($sender->Form->Save() !== FALSE)
-                $sender->StatusMessage = T("Your settings have been saved.");
+            $data = $sender->Form->formValues();
+            $configurationModel->Validation->applyRule("Plugins.Vanoogle.CSE", "Required");
+            if ($sender->Form->save() !== FALSE)
+                $sender->StatusMessage = t("Your settings have been saved.");
         }
 
-        $sender->AddSideMenu();
-        $sender->SetData("Title", T("Vanoogle Settings"));
+        $sender->addSideMenu();
+        $sender->setData("Title", t("Vanoogle Settings"));
 
         $categoryModel = new CategoryModel();
-        $sender->SetData("CategoryData", $categoryModel->GetAll(), TRUE);
-        array_shift($sender->CategoryData->Result());
+        $sender->setData("CategoryData", $categoryModel->getAll(), TRUE);
+        array_shift($sender->CategoryData->result());
 
-        $sender->Render($this->GetView("settings.php"));
+        $sender->render($this->getView("settings.php"));
     }
 
     /**
@@ -59,18 +59,18 @@ class VanooglePlugin extends Gdn_Plugin {
      *
      * @param $sender
      */
-    public function Base_Render_Before($sender) {
-        if (!C("Plugins.Vanoogle.CSE"))
+    public function base_render_before($sender) {
+        if (!c("Plugins.Vanoogle.CSE"))
             return;
 
         // Normally one would use ->AddJsFile or ->Head->AddScript, but these insert a version arg in the url that makes the google api barf.
-        $sender->Head->AddTag('script', [
-            'src' => Asset('https://www.google.com/jsapi', FALSE, FALSE),
+        $sender->Head->addTag('script', [
+            'src' => asset('https://www.google.com/jsapi', FALSE, FALSE),
             'type' => 'text/javascript',
-            'id' => C("Plugins.Vanoogle.CSE")
+            'id' => c("Plugins.Vanoogle.CSE")
         ]);
-        $sender->AddCssFile('vanoogle.css', 'plugins/Vanoogle');
-        $sender->AddJsFile('vanoogle.js', 'plugins/Vanoogle');
+        $sender->addCssFile('vanoogle.css', 'plugins/Vanoogle');
+        $sender->addJsFile('vanoogle.js', 'plugins/Vanoogle');
     }
 
     /**
@@ -78,12 +78,12 @@ class VanooglePlugin extends Gdn_Plugin {
      *
      * @param $sender
      */
-    public function Base_Render_After($sender) {
-        if (!C("Plugins.Vanoogle.ApiKey"))
+    public function base_render_after($sender) {
+        if (!c("Plugins.Vanoogle.ApiKey"))
             return;
         ?>
             <div id="hidden" style="display:none;">
-                <div id="VanoogleSearch"><?php echo T('Loading Search...');?></div>
+                <div id="VanoogleSearch"><?php echo t('Loading Search...');?></div>
                 <div id="vanoogle_webResult">
                     <li class="Item gs-webResult gs-result"
                       data-vars="{longUrl:function(){var i = unescapedUrl.indexOf(visibleUrl); return i &lt; 1 ? visibleUrl : unescapedUrl.substring(i);},trimmedTitle:function(){return html(title.replace(/[-][^-]+$/, ''));}}">
@@ -116,5 +116,5 @@ class VanooglePlugin extends Gdn_Plugin {
         <?php
     }
 
-    public function Setup() {}
+    public function setup() {}
 }

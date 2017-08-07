@@ -71,7 +71,7 @@
 		var $pat_comment2;	// Pattern for matching comments.
 		var $pat_wiki;		// Pattern for matching wiki-links.
 
-		function BBCodeLexer($string, $tagmarker = '[') {
+		function bBCodeLexer($string, $tagmarker = '[') {
 			// First thing we do is to split the input string into tuples of
 			// text and tags.  This will make it easy to tokenize.  We define a tag as
 			// anything starting with a [, ending with a ], and containing no [ or ] in
@@ -152,7 +152,7 @@
 		// This is optimized for speed, not accuracy, so it'll get some stuff like
 		// horizontal rules and weird whitespace characters wrong, but it's only supposed
 		// to provide a rough quick guess, not a hard fact.
-		function GuessTextLength() {
+		function guessTextLength() {
 			$length = 0;
 			$ptr = 0;
 			$state = BBCODE_LEXSTATE_TEXT;
@@ -195,7 +195,7 @@
 		//
 		// If this is a BBCODE_TAG token, $this->tag will be an array computed from
 		// the tag's contents, like this:
-		//    Array(
+		//    array(
 		//       '_name' => tag_name,
 		//       '_end' => true if this is an end tag (i.e., the name starts with a /)
 		//       '_default' => default value (for example, in [url=foo], this is "foo").
@@ -203,7 +203,7 @@
 		//       ...all other key => value parameters given in the tag...
 		//       ...
 		//    )
-		function NextToken() {
+		function nextToken() {
 		
 			// Handle ungets; if the last token has been "ungotten", just return it again.
 			if ($this->unget) {
@@ -324,7 +324,7 @@
 						}
 						
 						// Not a comment, so parse it like a tag.
-						$this->tag = $this->Internal_DecodeTag($this->text);
+						$this->tag = $this->internal_DecodeTag($this->text);
 						$this->state = BBCODE_LEXSTATE_TEXT;
 						return $this->token = ($this->tag['_end'] ? BBCODE_ENDTAG : BBCODE_TAG);
 					}
@@ -332,19 +332,19 @@
 			}
 		}
 		
-		// Ungets the last token read so that a subsequent call to NextToken() will
-		// return it.  Note that UngetToken() does not switch states when you switch
+		// Ungets the last token read so that a subsequent call to nextToken() will
+		// return it.  Note that ungetToken() does not switch states when you switch
 		// between verbatim mode and standard mode:  For example, if you read a tag,
 		// unget the tag, switch to verbatim mode, and then get the next token, you'll
 		// get back a BBCODE_TAG --- exactly what you ungot, not a BBCODE_TEXT token.
-		function UngetToken() {
+		function ungetToken() {
 			if ($this->token !== BBCODE_EOI)
 				$this->unget = true;
 		}
 
 		// Peek at the next token, but don't remove it.
-		function PeekToken() {
-			$result = $this->NextToken();
+		function peekToken() {
+			$result = $this->nextToken();
 			if ($this->token !== BBCODE_EOI)
 				$this->unget = true;
 			return $result;
@@ -354,7 +354,7 @@
 		// value from this should be considered opaque.  Because PHP uses copy-on-write
 		// references, the total cost of the returned state is relatively small, and
 		// the running time of this function (and RestoreState) is very fast.
-		function SaveState() {
+		function saveState() {
 			return [
 				'token' => $this->token,
 				'text' => $this->text,
@@ -368,7 +368,7 @@
 		}
 		
 		// Restore the state of this lexer from a saved previous state.
-		function RestoreState($state) {
+		function restoreState($state) {
 			if (!is_array($state)) return;
 			$this->token = @$state['token'];
 			$this->text = @$state['text'];
@@ -381,7 +381,7 @@
 		}
 
 		// Given a string, if it's surrounded by "quotes" or 'quotes', remove them.
-		function Internal_StripQuotes($string) {
+		function internal_StripQuotes($string) {
 			if (preg_match("/^\\\"(.*)\\\"$/", $string, $matches))
 				return $matches[1];
 			else if (preg_match("/^\\'(.*)\\'$/", $string, $matches))
@@ -396,7 +396,7 @@
 		//    ' '   Token is whitespace.
 		//    '"'   Token is quoted text.
 		//    'A'   Token is unquoted text.
-		function Internal_ClassifyPiece($ptr, $pieces) {
+		function internal_ClassifyPiece($ptr, $pieces) {
 			if ($ptr >= count($pieces)) return -1;	// EOI.
 			$piece = $pieces[$ptr];
 			if ($piece == '=') return '=';
@@ -407,7 +407,7 @@
 
 		// Given a string containing a complete [tag] (including its brackets), break
 		// it down into its components and return them as an array.
-		function Internal_DecodeTag($tag) {
+		function internal_DecodeTag($tag) {
 
 			if ($this->debug) {
 				print "<b>Lexer::InternalDecodeTag:</b> input: " . htmlspecialchars($tag) . "<br />\n";
@@ -444,7 +444,7 @@
 			}
 
 			// Skip whitespace after the tag name.
-			while (($type = $this->Internal_ClassifyPiece($ptr, $pieces)) == ' ')
+			while (($type = $this->internal_ClassifyPiece($ptr, $pieces)) == ' ')
 				$ptr++;
 
 			$params = [];
@@ -458,13 +458,13 @@
 				$ptr++;
 
 				// Skip whitespace after the initial equal-sign.
-				while (($type = $this->Internal_ClassifyPiece($ptr, $pieces)) == ' ')
+				while (($type = $this->internal_ClassifyPiece($ptr, $pieces)) == ' ')
 					$ptr++;
 
 				// Examine the next (real) piece, and see if it's quoted; if not, we need to
 				// use heuristics to guess where the default value begins and ends.
 				if ($type == "\"")
-					$value = $this->Internal_StripQuotes($pieces[$ptr++]);
+					$value = $this->internal_StripQuotes($pieces[$ptr++]);
 				else {
 					// Collect pieces going forward until we reach an = sign or the end of the
 					// tag; then rewind before whatever comes before the = sign, and everything
@@ -476,7 +476,7 @@
 					// to behave in a way that makes (tolerable) sense.
 					$after_space = false;
 					$start = $ptr;
-					while (($type = $this->Internal_ClassifyPiece($ptr, $pieces)) != -1) {
+					while (($type = $this->internal_ClassifyPiece($ptr, $pieces)) != -1) {
 						if ($type == ' ') $after_space = true;
 						if ($type == '=' && $after_space) break;
 						$ptr++;
@@ -491,19 +491,19 @@
 						// Rewind before = sign.
 						$ptr--;
 						// Rewind before any whitespace before = sign.
-						while ($ptr > $start && $this->Internal_ClassifyPiece($ptr, $pieces) == ' ')
+						while ($ptr > $start && $this->internal_ClassifyPiece($ptr, $pieces) == ' ')
 							$ptr--;
 						// Rewind before any text elements before that.
-						while ($ptr > $start && $this->Internal_ClassifyPiece($ptr, $pieces) != ' ')
+						while ($ptr > $start && $this->internal_ClassifyPiece($ptr, $pieces) != ' ')
 							$ptr--;
 					}
 
 					// The default value is everything from $start to $ptr, inclusive.
 					$value = "";
 					for (; $start <= $ptr; $start++) {
-						if ($this->Internal_ClassifyPiece($start, $pieces) == ' ')
+						if ($this->internal_ClassifyPiece($start, $pieces) == ' ')
 							$value .= " ";
-						else $value .= $this->Internal_StripQuotes($pieces[$start]);
+						else $value .= $this->internal_StripQuotes($pieces[$start]);
 					}
 					$value = trim($value);
 					
@@ -517,17 +517,17 @@
 			// The rest of the tag is composed of either floating keys or key=value pairs, so walk through
 			// the tag and collect them all.  Again, we have the nasty special case where an equal sign
 			// in a parameter but before whitespace counts as part of that parameter.
-			while (($type = $this->Internal_ClassifyPiece($ptr, $pieces)) != -1) {
+			while (($type = $this->internal_ClassifyPiece($ptr, $pieces)) != -1) {
 
 				// Skip whitespace before the next key name.
 				while ($type == ' ') {
 					$ptr++;
-					$type = $this->Internal_ClassifyPiece($ptr, $pieces);
+					$type = $this->internal_ClassifyPiece($ptr, $pieces);
 				}
 
 				// Decode the key name.
 				if ($type == 'A' || $type == '"')
-					$key = strtolower($this->Internal_StripQuotes(@$pieces[$ptr++]));
+					$key = strtolower($this->internal_StripQuotes(@$pieces[$ptr++]));
 				else if ($type == '=') {
 					$ptr++;
 					continue;
@@ -535,27 +535,27 @@
 				else if ($type == -1) break;
 
 				// Skip whitespace after the key name.
-				while (($type = $this->Internal_ClassifyPiece($ptr, $pieces)) == ' ')
+				while (($type = $this->internal_ClassifyPiece($ptr, $pieces)) == ' ')
 					$ptr++;
 
 				// If an equal-sign follows, we need to collect a value.  Otherwise, we
 				// take the key itself as the value.
 				if ($type != '=')
-					$value = $this->Internal_StripQuotes($key);
+					$value = $this->internal_StripQuotes($key);
 				else {
 					$ptr++;
 					// Skip whitespace after the equal sign.
-					while (($type = $this->Internal_ClassifyPiece($ptr, $pieces)) == ' ')
+					while (($type = $this->internal_ClassifyPiece($ptr, $pieces)) == ' ')
 						$ptr++;
 					if ($type == '"') {
 						// If we get a quoted value, take that as the only value.
-						$value = $this->Internal_StripQuotes($pieces[$ptr++]);
+						$value = $this->internal_StripQuotes($pieces[$ptr++]);
 					}
 					else if ($type != -1) {
 						// If we get a non-quoted value, consume non-quoted values
 						// until we reach whitespace.
 						$value = $pieces[$ptr++];
-						while (($type = $this->Internal_ClassifyPiece($ptr, $pieces)) != -1
+						while (($type = $this->internal_ClassifyPiece($ptr, $pieces)) != -1
 							&& $type != ' ')
 							$value .= $pieces[$ptr++];
 					}
