@@ -101,7 +101,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
     /**
      *
-     * 
+     *
      * @param $sender
      */
     public function controller_index($sender) {
@@ -717,32 +717,40 @@ EOT;
      * Run on utility/update.
      */
     public function structure() {
-        saveToConfig('Signatures.Images.MaxNumber', c('Plugins.Signatures.Default.MaxNumberImages'));
-        saveToConfig('Signatures.Images.MaxHeight', c('Plugins.Signatures.MaxImageHeight'));
-        saveToConfig('Signatures.Text.MaxLength', c('Plugins.Signatures.Default.MaxLength'));
-        saveToConfig('Signatures.Hide.Guest', c('Plugins.Signatures.HideGuest'));
-        saveToConfig('Signatures.Hide.Embed', c('Plugins.Signatures.HideEmbed', true));
-        saveToConfig('Signatures.Hide.Mobile', c('Plugins.Signatures.HideMobile', true));
-        saveToConfig('Signatures.Allow.Embeds', c('Plugins.Signatures.AllowEmbeds', true));
 
+        // Update old config settings for backwards compatibility.
+        if (c('Plugins.Signatures.Default.MaxNumberImages') || c('Plugins.Signatures.MaxNumberImages')) {
+            saveToConfig('Signatures.Images.MaxNumber', c('Plugins.Signatures.Default.MaxNumberImages', c('Plugins.Signatures.MaxNumberImages')));
+        }
+        if (c('Plugins.Signatures.MaxImageHeight')) {
+            saveToConfig('Signatures.Images.MaxHeight', c('Plugins.Signatures.MaxImageHeight'));
+        }
+        if (c('Plugins.Signatures.Default.MaxLength') || c('Plugins.Signatures.MaxLength')) {
+            saveToConfig('Signatures.Text.MaxLength', c('Plugins.Signatures.Default.MaxLength', c('Plugins.Signatures.MaxLength')));
+        }
+        if (c('Plugins.Signatures.HideGuest')) {
+            saveToConfig('Signatures.Hide.Guest', c('Plugins.Signatures.HideGuest'));
+        }
+        if (c('Plugins.Signatures.HideEmbed')) {
+            saveToConfig('Signatures.Hide.Embed', c('Plugins.Signatures.HideEmbed', true));
+        }
+        if (c('Plugins.Signatures.HideMobile')) {
+            saveToConfig('Signatures.Hide.Mobile', c('Plugins.Signatures.HideMobile', true));
+        }
+        if (c('Plugins.Signatures.AllowEmbeds')) {
+            saveToConfig('Signatures.Allow.Embeds', c('Plugins.Signatures.AllowEmbeds', true));
+        }
         removeFromConfig([
             'Plugins.Signatures.Default.MaxNumberImages',
+            'Plugins.Signatures.MaxNumberImages',
             'Plugins.Signatures.MaxImageHeight',
             'Plugins.Signatures.Default.MaxLength',
+            'Plugins.Signatures.MaxLength',
             'Plugins.Signatures.HideGuest',
             'Plugins.Signatures.HideEmbed',
             'Plugins.Signatures.HideMobile',
             'Plugins.Signatures.AllowEmbeds',
         ]);
-
-        // Make sure the theme revision exists in the database.
-        $revisionID = c('Plugins.CustomTheme.LiveRevisionID');
-        if ($revisionID) {
-            $row = Gdn::sql()->getWhere('CustomThemeRevision', ['RevisionID' => $revisionID])->firstRow();
-            if (!$row) {
-                removeFromConfig('Plugins.CustomTheme.LiveRevisionID');
-            }
-        }
     }
 
     /**
