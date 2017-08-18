@@ -358,15 +358,14 @@ class CivilTonguePlugin extends Gdn_Plugin {
     /**
      * Cleanup Activity messages.
      *
-     * @param $Sender
-     * @param $Args
+     * @param ActivityModel $sender
+     * @param array $args
      */
-    public function activityModel_beforeSave_handler($sender, &$args) {
+    public function activityModel_beforeSave_handler($sender, $args) {
         $activity = val('Activity', $args);
         setValue('Story', $activity, $this->replace(val('Story', $activity)));
         $sender->EventArguments['Activity'] = $activity;
     }
-
 
     /**
      * Cleanup private messages displayed on the messages page.
