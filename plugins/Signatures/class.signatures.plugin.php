@@ -23,14 +23,15 @@
  */
 
 class SignaturesPlugin extends Gdn_Plugin {
-    public $Disabled = false;
 
     const Unlimited = 'Unlimited';
+
     const None = 'None';
 
-    /**
-     * @var array List of config settings can be overridden by sessions in other plugins
-     */
+    /** @var bool */
+    public $Disabled = false;
+
+    /** @var array List of config settings can be overridden by sessions in other plugins */
     private $overriddenConfigSettings = ['MaxNumberImages', 'MaxLength'];
 
 
@@ -98,7 +99,11 @@ class SignaturesPlugin extends Gdn_Plugin {
         $this->dispatch($sender);
     }
 
-
+    /**
+     *
+     *
+     * @param $sender
+     */
     public function controller_index($sender) {
         $sender->permission([
             'Garden.Profiles.Edit'
@@ -267,11 +272,11 @@ class SignaturesPlugin extends Gdn_Plugin {
      */
     public function checkNumberOfImages($values, &$sender) {
         $maxImages = self::getMaximumNumberOfImages();
-        if ($maxImages !== 'Unlimited') {
+        if ($maxImages !== self::Unlimited) {
             $sig = Gdn_Format::to(val('Plugin.Signatures.Sig', $values), val('Plugin.Signatures.Format', $values, c('Garden.InputFormatter')));
             $numMatches = preg_match_all('/<img/i', $sig);
 
-            if($maxImages === 'None' && $numMatches > 0) {
+            if($maxImages === self::None && $numMatches > 0) {
                 $sender->Form->addError('Images not allowed');
             } elseif (is_int($maxImages) && $numMatches > $maxImages) {
                 $sender->Form->addError('@'.formatString('You are only allowed {maxImages,plural,%s image,%s images}.',
@@ -281,6 +286,11 @@ class SignaturesPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     *
+     * @param $sender
+     */
     public function setSignatureRules($sender) {
         $rules = [];
         $rulesParams = [];
@@ -289,7 +299,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         $maxImageHeight = self::getMaximumImageHeight();
         $maxNumberImages = self::getMaximumNumberOfImages();
 
-        if ($maxNumberImages !== 'Unlimited') {
+        if ($maxNumberImages !== self::Unlimited) {
             if (is_numeric($maxNumberImages) && $maxNumberImages > 0) { //'None' or any other non positive ints
                 $rulesParams['maxImages'] = $maxNumberImages;
                 $rules[] = formatString(t('Use up to {maxImages,plural,%s image, %s images}.'), $rulesParams);
@@ -332,14 +342,18 @@ class SignaturesPlugin extends Gdn_Plugin {
         $text = implode($new_lines, $delimiter);
     }
 
+    /**
+     *
+     */
     public function stripFormatting() {
 
     }
 
-    /*
-     * API METHODS
+    /**
+     * @param $sender
+     *
+     * @throws Exception
      */
-
     public function controller_Modify($sender) {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
@@ -418,6 +432,14 @@ class SignaturesPlugin extends Gdn_Plugin {
         $sender->render();
     }
 
+    /**
+     *
+     *
+     * @param null $sigKey
+     * @param null $default
+     *
+     * @return array|bool|mixed|null
+     */
     protected function userPreferences($sigKey = null, $default = null) {
         static $userSigData = null;
         if (is_null($userSigData)) {
@@ -432,6 +454,15 @@ class SignaturesPlugin extends Gdn_Plugin {
         return $userSigData;
     }
 
+    /**
+     *
+     *
+     * @param $sender
+     * @param null $requestUserID
+     * @param null $default
+     *
+     * @return array|bool|mixed|null
+     */
     protected function signatures($sender, $requestUserID = null, $default = null) {
         static $signatures = null;
 
@@ -485,8 +516,12 @@ class SignaturesPlugin extends Gdn_Plugin {
         return $signatures;
     }
 
-
-    /** Deprecated in 2.1. */
+    /**
+     *
+     *
+     * @param $sender
+     * @deprecated since 2.1
+     */
     public function base_afterCommentBody_handler($sender) {
         if ($this->Disabled) {
             return;
@@ -517,7 +552,12 @@ EOT;
         }
     }
 
-    /** New call for 2.1. */
+    /**
+     *
+     *
+     * @param $sender
+     * @since 2.1
+     */
     public function discussionController_afterDiscussionBody_handler($sender) {
         if ($this->Disabled) {
             return;
@@ -525,6 +565,11 @@ EOT;
         $this->drawSignature($sender);
     }
 
+    /**
+     *
+     *
+     * @param $sender
+     */
     protected function drawSignature($sender) {
         if ($this->hide()) {
             return;
@@ -613,6 +658,11 @@ EOT;
         }
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     protected function hide() {
         if ($this->Disabled) {
             return true;
@@ -637,6 +687,15 @@ EOT;
         return false;
     }
 
+    /**
+     *
+     *
+     * @param $str
+     * @param $tags
+     * @param bool $stripContent
+     *
+     * @return mixed
+     */
     protected function _stripOnly($str, $tags, $stripContent = false) {
         $content = '';
         if (!is_array($tags)) {
@@ -654,44 +713,60 @@ EOT;
         return $str;
     }
 
-    public function setup() {
-        // Nothing to do here!
-    }
-
+    /**
+     * Run on utility/update.
+     */
     public function structure() {
-        saveToConfig('Signatures.Images.MaxNumber', c('Plugins.Signatures.Default.MaxNumberImages'));
-        saveToConfig('Signatures.Images.MaxHeight', c('Plugins.Signatures.MaxImageHeight'));
-        saveToConfig('Signatures.Text.MaxLength', c('Plugins.Signatures.Default.MaxLength'));
-        saveToConfig('Signatures.Hide.Guest', c('Plugins.Signatures.HideGuest'));
-        saveToConfig('Signatures.Hide.Embed', c('Plugins.Signatures.HideEmbed', true));
-        saveToConfig('Signatures.Hide.Mobile', c('Plugins.Signatures.HideMobile', true));
-        saveToConfig('Signatures.Allow.Embeds', c('Plugins.Signatures.AllowEmbeds', true));
 
-
+        // Update old config settings for backwards compatibility.
+        if (c('Plugins.Signatures.Default.MaxNumberImages') || c('Plugins.Signatures.MaxNumberImages')) {
+            saveToConfig('Signatures.Images.MaxNumber', c('Plugins.Signatures.Default.MaxNumberImages', c('Plugins.Signatures.MaxNumberImages')));
+        }
+        if (c('Plugins.Signatures.MaxImageHeight')) {
+            saveToConfig('Signatures.Images.MaxHeight', c('Plugins.Signatures.MaxImageHeight'));
+        }
+        if (c('Plugins.Signatures.Default.MaxLength') || c('Plugins.Signatures.MaxLength')) {
+            saveToConfig('Signatures.Text.MaxLength', c('Plugins.Signatures.Default.MaxLength', c('Plugins.Signatures.MaxLength')));
+        }
+        if (c('Plugins.Signatures.HideGuest')) {
+            saveToConfig('Signatures.Hide.Guest', c('Plugins.Signatures.HideGuest'));
+        }
+        if (c('Plugins.Signatures.HideEmbed')) {
+            saveToConfig('Signatures.Hide.Embed', c('Plugins.Signatures.HideEmbed', true));
+        }
+        if (c('Plugins.Signatures.HideMobile')) {
+            saveToConfig('Signatures.Hide.Mobile', c('Plugins.Signatures.HideMobile', true));
+        }
+        if (c('Plugins.Signatures.AllowEmbeds')) {
+            saveToConfig('Signatures.Allow.Embeds', c('Plugins.Signatures.AllowEmbeds', true));
+        }
         removeFromConfig([
             'Plugins.Signatures.Default.MaxNumberImages',
+            'Plugins.Signatures.MaxNumberImages',
             'Plugins.Signatures.MaxImageHeight',
             'Plugins.Signatures.Default.MaxLength',
+            'Plugins.Signatures.MaxLength',
             'Plugins.Signatures.HideGuest',
             'Plugins.Signatures.HideEmbed',
             'Plugins.Signatures.HideMobile',
             'Plugins.Signatures.AllowEmbeds',
         ]);
-
-        // Make sure the theme revision exists in the database.
-        $revisionID = c('Plugins.CustomTheme.LiveRevisionID');
-        if ($revisionID) {
-            $row = Gdn::sql()->getWhere('CustomThemeRevision', ['RevisionID' => $revisionID])->firstRow();
-            if (!$row) {
-                removeFromConfig('Plugins.CustomTheme.LiveRevisionID');
-            }
-        }
     }
 
+    /**
+     *
+     *
+     * @param $sender
+     */
     public function assetModel_styleCss_handler($sender) {
         $sender->addCssFile('signature.css', 'plugins/Signatures');
     }
 
+    /**
+     *
+     *
+     * @param $sender
+     */
     public function settingsController_signatures_create($sender) {
         $sender->permission('Garden.Settings.Manage');
 
@@ -773,6 +848,8 @@ EOT;
     }
 
     /**
+     * Sets config settings to the default settings.
+     *
      * Why do we need this? (i.e., Mantra for the function)
      * We retrieve the signature restraints from the config settings.
      * These are sometimes overridden by plugins (i.e., Ranks)
@@ -782,12 +859,8 @@ EOT;
      * populate the form, but we've got to transfer them over to the
      * config settings in use.
      *
-     * Sets config settings to the default settings.
-     *
-     *
      * @param string $basename
      * @param array $settings
-     *
      */
     public function setConfigSettingsToDefault($basename, $settings) {
         foreach ($settings as $setting) {
@@ -812,18 +885,18 @@ EOT;
     }
 
     /**
-     * Get number of images
-     * Returns mixed False, positive int, 'Unlimited', or 'None'
+     * Get allowed number of images.
+     *
+     * @return mixed 'Unlimited', 'None', or positive integer.
      */
     private function getMaximumNumberOfImages() {
-        $max = self::Unlimited;
         $val = c('Signatures.Images.MaxNumber', 0);
 
-        if(is_bool($val) && $val == false) {
+        if (is_bool($val) && $val == false) {
             $val = 'None';
         }
 
-        if($val != self::Unlimited && $val != self::None) {
+        if ($val != self::Unlimited && $val != self::None) {
             $max = self::getPositiveIntOrFallback($val, 0);
         } else {
             $max = $val;
@@ -831,7 +904,6 @@ EOT;
 
         return $max;
     }
-
 
     /**
      * Make sure we get a valid value for Image Height. fall back is 0 if
@@ -853,18 +925,30 @@ EOT;
         return self::getPositiveIntOrFallback(c('Signatures.Text.MaxLength', 0));
     }
 
+    /**
+     * @return bool
+     */
     private function getHideGuest() {
         return c('Signatures.Hide.Guest', false);
     }
 
+    /**
+     * @return bool
+     */
     private function getHideEmbed() {
         return c('Signatures.Hide.Embed', true);
     }
 
+    /**
+     * @return bool
+     */
     private function getHideMobile() {
         return c('Signatures.Hide.Mobile', true);
     }
 
+    /**
+     * @return bool
+     */
     private function getAllowEmbeds() {
         return c('Signatures.Allow.Embeds', true);
     }
