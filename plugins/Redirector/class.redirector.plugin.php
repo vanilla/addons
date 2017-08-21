@@ -107,6 +107,9 @@ class RedirectorPlugin extends Gdn_Plugin {
             'p' => 'CommentID',
             'start' => 'Offset',
         ],
+        'topics' => [ // get satisfaction discussion
+            '_arg0' => 'DiscussionID', // this should be a url slug
+        ],
     ];
 
     /**
