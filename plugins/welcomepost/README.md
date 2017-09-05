@@ -15,8 +15,8 @@ If a forum requires email confirmation of registrants this step is skipped and i
 
 Predefined text can be altered in locale files.
  
-* **Instruction**: `WelcomePostInstruction` defaults to Say "'Hello' to the rest of the community. If you're feeling too shy, press 'Skip'"
-* **Default Post Title**: `Welcome post discussion name` defaults to "Hi, my name is %s!" where %s is the username.
+* **Instruction**: `WelcomePostInstruction` defaults to say "'Hello' to the rest of the community. If you're feeling too shy, press 'Skip'"
+* **Default Post Title**: "Welcome post discussion name" defaults to `Hi, my name is %s!` where `%s` is the username.
 * **Default Post Body**: `WelcomePostBody` defaults to blank because not every forum will want to add a body for the users. They can optionally add `WelcomePostBody` to their locale file.
 
      
