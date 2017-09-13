@@ -170,5 +170,6 @@ class WelcomePostPlugin extends Gdn_Plugin {
         $sender->Form->addHidden('CategoryID', $categoryID);
 
         $sender->Form->setValue('Name', sprintf(t('Welcome post discussion name', 'Hi, my name is %s!'), $username));
+        $sender->Form->setValue('Body', t('WelcomePostBody', ''));
     }
 }
