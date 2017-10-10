@@ -44,7 +44,7 @@ class Pocket {
     public $RepeatType = Pocket::REPEAT_INDEX;
 
     /** $var array The repeat frequency. */
-    public $RepeatFrequency = array(1);
+    public $RepeatFrequency = [1];
 
     /** $var array The repeat frequency. */
     public $MobileOnly = false;
@@ -55,6 +55,9 @@ class Pocket {
     /** $var string Pocket type */
     public $Type;
 
+    /** $var string Whether the pocket is in test mode. */
+    public $TestMode = false;
+
     /** $var bool Whether to disable the pocket for embedded comments. * */
     public $EmbeddedNever = false;
 
@@ -62,30 +65,41 @@ class Pocket {
     public $ShowInDashboard = false;
 
     /** @var array */
-    public static $NameTranslations = array('conversations' => 'inbox', 'messages' => 'inbox', 'categories' => 'discussions', 'discussion' => 'comments');
+    public static $NameTranslations = ['conversations' => 'inbox', 'messages' => 'inbox', 'categories' => 'discussions', 'discussion' => 'comments'];
 
     /**
      * Pocket constructor.
      *
-     * @param string $Location
+     * @param string $location
      */
-    public function __construct($Location = '') {
-        $this->Location = $Location;
+    public function __construct($location = '') {
+        $this->Location = $location;
+    }
+
+    /**
+     * The Disabled field used to have 3 states: enabled, disabled, or testing. Testing has since branched out
+     * into its own field: TestMode. We need to check both places to see if a pocket is in test mode.
+     *
+     * @param $pocket
+     * @return bool
+     */
+    public static function inTestMode($pocket) {
+        return (val('Disabled', $pocket) === Pocket::TESTING) || (val('TestMode', $pocket) === 1);
     }
 
     /**
      * Whether or not this pocket should be processed based on its state.
      *
-     * @param array $Data Data specific to the request.
+     * @param array $data Data specific to the request.
      * @return bool
      */
-    public function canRender($Data) {
+    public function canRender($data) {
         if (!$this->ShowInDashboard && inSection('Dashboard')) {
             return false;
         }
 
-        $IsMobile = isMobile();
-        if (($this->MobileOnly && !$IsMobile) || ($this->MobileNever && $IsMobile)) {
+        $isMobile = isMobile();
+        if (($this->MobileOnly && !$isMobile) || ($this->MobileNever && $isMobile)) {
             return false;
         }
 
@@ -97,48 +111,46 @@ class Pocket {
             return false;
         }
 
-        // Check to see if the pocket is enabled.
-        switch ($this->Disabled) {
-            case Pocket::DISABLED:
-                return false;
-            case Pocket::TESTING:
-                if (!checkPermission('Plugins.Pockets.Manage'))
-                    return false;
-                break;
+        if ($this->Disabled === Pocket::DISABLED) {
+            return false;
+        }
+
+        if (self::inTestMode($this) && !checkPermission('Plugins.Pockets.Manage')) {
+            return false;
         }
 
         // Check to see if the page matches.
-        if ($this->Page && strcasecmp($this->Page, val('PageName', $Data)) != 0) {
+        if ($this->Page && strcasecmp($this->Page, val('PageName', $data)) != 0) {
             return false;
         }
 
         // Check to see if this is repeating.
-        $Count = val('Count', $Data);
-        if ($Count) {
+        $count = val('Count', $data);
+        if ($count) {
             switch ($this->RepeatType) {
                 case Pocket::REPEAT_AFTER:
-                    if (strcasecmp($Count, Pocket::REPEAT_AFTER) != 0)
+                    if (strcasecmp($count, Pocket::REPEAT_AFTER) != 0)
                         return false;
                     break;
                 case Pocket::REPEAT_BEFORE:
-                    if (strcasecmp($Count, Pocket::REPEAT_BEFORE) != 0)
+                    if (strcasecmp($count, Pocket::REPEAT_BEFORE) != 0)
                         return false;
                     break;
                 case Pocket::REPEAT_ONCE:
-                    if ($Count != 1)
+                    if ($count != 1)
                         return false;
                     break;
                 case Pocket::REPEAT_EVERY:
-                    $Frequency = (array)$this->RepeatFrequency;
-                    $Every = val(0, $Frequency, 1);
-                    if ($Every < 1)
-                        $Every = 1;
-                    $Begin = val(1, $Frequency, 1);
-                    if (($Count % $Every) > 0 || ($Count < $Begin))
+                    $frequency = (array)$this->RepeatFrequency;
+                    $every = val(0, $frequency, 1);
+                    if ($every < 1)
+                        $every = 1;
+                    $begin = val(1, $frequency, 1);
+                    if (($count % $every) > 0 || ($count < $begin))
                         return false;
                     break;
                 case Pocket::REPEAT_INDEX:
-                    if (!in_array($Count, (array)$this->RepeatFrequency))
+                    if (!in_array($count, (array)$this->RepeatFrequency))
                         return false;
                     break;
             }
@@ -151,24 +163,25 @@ class Pocket {
     /**
      * Load the pocket's data from an array.
      *
-     * @param array $Data
+     * @param array $data
      */
-    public function load($Data) {
-        $this->Body = $Data['Body'];
-        $this->Disabled = $Data['Disabled'];
-        $this->Format = $Data['Format'];
-        $this->Location = $Data['Location'];
-        $this->Name = $Data['Name'];
-        $this->Page = $Data['Page'];
-        $this->MobileOnly = $Data['MobileOnly'];
-        $this->MobileNever = $Data['MobileNever'];
-        $this->Type = val('Type', $Data, Pocket::TYPE_DEFAULT);
-        $this->EmbeddedNever = val('EmbeddedNever', $Data);
-        $this->ShowInDashboard = val('ShowInDashboard', $Data);
+    public function load($data) {
+        $this->Body = $data['Body'];
+        $this->Disabled = $data['Disabled'];
+        $this->Format = $data['Format'];
+        $this->Location = $data['Location'];
+        $this->Name = $data['Name'];
+        $this->Page = $data['Page'];
+        $this->MobileOnly = $data['MobileOnly'];
+        $this->MobileNever = $data['MobileNever'];
+        $this->Type = val('Type', $data, Pocket::TYPE_DEFAULT);
+        $this->EmbeddedNever = val('EmbeddedNever', $data);
+        $this->ShowInDashboard = val('ShowInDashboard', $data);
+        $this->TestMode = val('TestMode', $data);
 
         // parse the frequency.
-        $Repeat = $Data['Repeat'];
-        list($this->RepeatType, $this->RepeatFrequency) = Pocket::parseRepeat($Repeat);
+        $repeat = $data['Repeat'];
+        list($this->RepeatType, $this->RepeatFrequency) = Pocket::parseRepeat($repeat);
     }
 
     /**
@@ -183,91 +196,91 @@ class Pocket {
     /**
      *
      *
-     * @param null $NameOrObject
+     * @param null $nameOrObject
      * @return mixed|null|string
      */
-    public static function pageName($NameOrObject = null) {
-        if (is_object($NameOrObject))
-            $Name = val('PageName', $NameOrObject, val('ControllerName', $NameOrObject, get_class($NameOrObject)));
+    public static function pageName($nameOrObject = null) {
+        if (is_object($nameOrObject))
+            $name = val('PageName', $nameOrObject, val('ControllerName', $nameOrObject, get_class($nameOrObject)));
         else
-            $Name = $NameOrObject;
+            $name = $nameOrObject;
 
-        $Name = strtolower($Name);
-        if (stringEndsWith($Name, 'controller', false))
-            $Name = substr($Name, 0, -strlen('controller'));
+        $name = strtolower($name);
+        if (stringEndsWith($name, 'controller', false))
+            $name = substr($name, 0, -strlen('controller'));
 
-        if (array_key_exists($Name, self::$NameTranslations))
-            $Name = self::$NameTranslations[$Name];
-        return $Name;
+        if (array_key_exists($name, self::$NameTranslations))
+            $name = self::$NameTranslations[$name];
+        return $name;
     }
 
     /**
      *
      *
-     * @param $Repeat
+     * @param $repeat
      * @return array
      */
-    public static function parseRepeat($Repeat) {
-        if (StringBeginsWith($Repeat, Pocket::REPEAT_EVERY)) {
-            $RepeatType = Pocket::REPEAT_EVERY;
-            $Frequency = substr($Repeat, strlen(Pocket::REPEAT_EVERY));
-        } elseif (StringBeginsWith($Repeat, Pocket::REPEAT_INDEX)) {
-            $RepeatType = Pocket::REPEAT_INDEX;
-            $Frequency = substr($Repeat, strlen(Pocket::REPEAT_INDEX));
-        } elseif (StringBeginsWith($Repeat, Pocket::REPEAT_ONCE)) {
-            $RepeatType = Pocket::REPEAT_ONCE;
-        } elseif (StringBeginsWith($Repeat, Pocket::REPEAT_BEFORE)) {
-            $RepeatType = Pocket::REPEAT_BEFORE;
-        } elseif (StringBeginsWith($Repeat, Pocket::REPEAT_AFTER)) {
-            $RepeatType = Pocket::REPEAT_AFTER;
+    public static function parseRepeat($repeat) {
+        if (stringBeginsWith($repeat, Pocket::REPEAT_EVERY)) {
+            $repeatType = Pocket::REPEAT_EVERY;
+            $frequency = substr($repeat, strlen(Pocket::REPEAT_EVERY));
+        } elseif (stringBeginsWith($repeat, Pocket::REPEAT_INDEX)) {
+            $repeatType = Pocket::REPEAT_INDEX;
+            $frequency = substr($repeat, strlen(Pocket::REPEAT_INDEX));
+        } elseif (stringBeginsWith($repeat, Pocket::REPEAT_ONCE)) {
+            $repeatType = Pocket::REPEAT_ONCE;
+        } elseif (stringBeginsWith($repeat, Pocket::REPEAT_BEFORE)) {
+            $repeatType = Pocket::REPEAT_BEFORE;
+        } elseif (stringBeginsWith($repeat, Pocket::REPEAT_AFTER)) {
+            $repeatType = Pocket::REPEAT_AFTER;
         }
 
-        if (isset($Frequency)) {
-            $Frequency = explode(',', $Frequency);
-            $Frequency = array_map('trim', $Frequency);
+        if (isset($frequency)) {
+            $frequency = explode(',', $frequency);
+            $frequency = array_map('trim', $frequency);
         } else {
-            $Frequency = array();
+            $frequency = [];
         }
 
-        return array($RepeatType, $Frequency);
+        return [$repeatType, $frequency];
     }
 
     /**
      * Render the pocket to the page.
      *
-     *  @param array $Data additional data for the pocket.
+     *  @param array $data additional data for the pocket.
      */
-    public function render($Data = NULL) {
-        echo $this->toString($Data);
+    public function render($data = NULL) {
+        echo $this->toString($data);
     }
 
     /** Set the repeat of the pocket.
      *
-     *  @param string $Type The repeat type, contained in the various Pocket::REPEAT_* constants.
-     *    - every: Repeats every x times. If $Frequency is an array then it will be interpretted as array($Frequency, $Begin).
+     *  @param string $type The repeat type, contained in the various Pocket::REPEAT_* constants.
+     *    - every: Repeats every x times. If $frequency is an array then it will be interpretted as array($frequency, $Begin).
      *    - indexes: Renders only at the given indexes, starting at 1.
-     *  @param int|array $Frequency The frequency of the repeating, see the $Type parameter for how this works.
+     *  @param int|array $frequency The frequency of the repeating, see the $type parameter for how this works.
      */
-    public function repeat($Type, $Frequency) {
-        $this->RepeatType = $Type;
-        $this->RepeatFrequency = $Frequency;
+    public function repeat($type, $frequency) {
+        $this->RepeatType = $type;
+        $this->RepeatFrequency = $frequency;
     }
 
     /**
      *
      *
-     * @param null $Data
+     * @param null $data
      * @return mixed|string
      * @throws Exception
      */
-    public function toString($Data = NULL) {
-        static $Plugin;
-        if (!isset($Plugin)) {
-            $Plugin = Gdn::pluginManager()->getPluginInstance('PocketsPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
+    public function toString($data = NULL) {
+        static $plugin;
+        if (!isset($plugin)) {
+            $plugin = Gdn::pluginManager()->getPluginInstance('PocketsPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
         }
 
-        $Plugin->EventArguments['Pocket'] = $this;
-        $Plugin->fireEvent('ToString');
+        $plugin->EventArguments['Pocket'] = $this;
+        $plugin->fireEvent('ToString');
 
         if (strcasecmp($this->Format, 'raw') == 0) {
             return $this->Body;
@@ -279,20 +292,20 @@ class Pocket {
     /**
      *
      *
-     * @param $Name
-     * @param $Value
+     * @param $name
+     * @param $value
      */
-    public static function touch($Name, $Value) {
-        $Model = new Gdn_Model('Pocket');
-        $Pockets = $Model->getWhere(array('Name' => $Name))->resultArray();
+    public static function touch($name, $value) {
+        $model = new Gdn_Model('Pocket');
+        $pockets = $model->getWhere(['Name' => $name])->resultArray();
 
-        if (empty($Pockets)) {
-            $Pocket = array(
-                'Name' => $Name,
+        if (empty($pockets)) {
+            $pocket = [
+                'Name' => $name,
                 'Location' => 'Content',
                 'Sort' => 0,
                 'Repeat' => Pocket::REPEAT_BEFORE,
-                'Body' => $Value,
+                'Body' => $value,
                 'Format' => 'Raw',
                 'Disabled' => Pocket::DISABLED,
                 'MobileOnly' => 0,
@@ -300,8 +313,8 @@ class Pocket {
                 'EmbeddedNever' => 0,
                 'ShowInDashboard' => 0,
                 'Type' => 'default'
-                );
-            $Model->save($Pocket);
+                ];
+            $model->save($pocket);
         }
     }
 

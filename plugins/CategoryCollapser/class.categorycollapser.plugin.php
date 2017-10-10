@@ -1,24 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 
-// Define the plugin:
-$PluginInfo['CategoryCollapser'] = array(
-   'Name' => 'Category Collapser',
-   'Description' => 'Allows categories to be collapsed and expanded. Requires using category table view and displaying root categories as headings.',
-   'Version' => '1.0.1',
-   'Author' => "Vanilla Forums",
-   'AuthorUrl' => 'http://vanillaforums.com',
-   'Icon' => 'collapse_categories.png',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'MobileFriendly' => TRUE
-);
-
 class CategoryCollapserPlugin extends Gdn_Plugin {
    /**
 	 * Just include our JS on all category pages.
 	 */
-   public function CategoriesController_Render_Before($Sender) {
-      $Sender->AddJsFile("category_collapse.js", "plugins/CategoryCollapser");
-      $Style = Wrap('
+   public function categoriesController_render_before($sender) {
+      $sender->addJsFile("category_collapse.js", "plugins/CategoryCollapser");
+      $style = wrap('
       .Expando {
          float: right;
          background: url(plugins/CategoryCollapser/design/tagsprites.png) no-repeat 0 -52px;
@@ -29,6 +17,6 @@ class CategoryCollapserPlugin extends Gdn_Plugin {
          cursor: pointer; }
       .Expando-Collapsed .Expando {
          background-position: 0 -69px; }', 'style');
-      $Sender->AddAsset('Head', $Style);
+      $sender->addAsset('Head', $style);
    }
 }

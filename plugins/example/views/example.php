@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<h1><?php echo T($this->Data['Title']); ?></h1>
+<h1><?php echo t($this->Data['Title']); ?></h1>
 <div class="Info">
     <?php echo t($this->Data['PluginDescription']); ?>
 </div>
@@ -12,11 +12,11 @@
 <ul>
     <li><?php
         echo $this->Form->label('Display condition', 'Plugin.Example.RenderCondition');
-        echo $this->Form->dropDown('Plugin.Example.RenderCondition', array(
+        echo $this->Form->dropDown('Plugin.Example.RenderCondition', [
             'all' => 'Discussions & Announcements',
             'announcements' => 'Just Announcements',
             'discussions' => 'Just Discussions'
-        ));
+        ]);
     ?></li>
     <li><?php
         echo $this->Form->label('Excerpt length', 'Plugin.Example.TrimSize');

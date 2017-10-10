@@ -1,0 +1,19 @@
+{
+    "name": "Post Numbering",
+    "description": "Add numerical indices, beside posts, that link to the post itself.",
+    "version": "1.0",
+    "license": "GNU GPL2",
+    "key": "postnumbering",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com",
+            "homepage": "https://github.com/DaazKu"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    },
+	"icon": "post_numbering.png"
+}

@@ -6,16 +6,6 @@
  * @license GNU GPLv2
  */
 
-$PluginInfo['necro'] = array(
-    'Name' => 'Necro',
-    'Description' => 'Mark discussions raised from the dead.',
-    'Version' => '1.1',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'License' => 'GNU GPL2',
-    'Author' => "Lincoln Russell",
-    'AuthorEmail' => 'lincolnwebs@gmail.com'
-);
-
 /**
  * Class NecroPlugin.
  */

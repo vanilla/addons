@@ -8,44 +8,44 @@
 class MollomVanilla extends Mollom {
 
    public function loadConfiguration($name) {
-      return C('Plugins.Mollom.'.$name, NULL);
+      return c('Plugins.Mollom.'.$name, NULL);
    }
 
    public function saveConfiguration($name, $value) {
-      SaveToConfig('Plugins.Mollom.'.$name, $value);
+      saveToConfig('Plugins.Mollom.'.$name, $value);
    }
 
    public function deleteConfiguration($name) {
-      RemoveFromConfig('Plugins.Mollom.'.$name);
+      removeFromConfig('Plugins.Mollom.'.$name);
    }
 
    public function getClientInformation() {
-      $PluginInfo = Gdn::PluginManager()->AvailablePlugins();
-      return array(
+      $pluginInfo = Gdn::pluginManager()->availablePlugins();
+      return [
          'platformName' => 'Vanilla',
          'platformVersion' => APPLICATION_VERSION,
          'clientName' => 'Mollom Vanilla',
-         'clientVersion' => $PluginInfo['Mollom']['Version']
-      );
+         'clientVersion' => $pluginInfo['Mollom']['Version']
+      ];
    }
 
-   protected function request($method, $server, $path, $query = NULL, array $headers = array()) {
-      $Request = new ProxyRequest();
-      $Request->Request(
-         array('Method' => $method,
+   protected function request($method, $server, $path, $query = NULL, array $headers = []) {
+      $request = new ProxyRequest();
+      $request->request(
+         ['Method' => $method,
             'URL' => trim($server,'/').trim($path,'/'),
             //'Debug' => TRUE
-         ),
+         ],
          $query,
          NULL,
          $headers
       );
 
-      $MollomResponse = (object) array(
-         'code' => $Request->ResponseStatus,
-         'headers' => $Request->ResponseHeaders,
-         'body' => $Request->ResponseBody,
-      );
-      return $MollomResponse;
+      $mollomResponse = (object) [
+         'code' => $request->ResponseStatus,
+         'headers' => $request->ResponseHeaders,
+         'body' => $request->ResponseBody,
+      ];
+      return $mollomResponse;
    }
 }

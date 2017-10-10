@@ -47,13 +47,13 @@ class Minify_CSS_UriRewriter {
      * 
      * @return string
      */
-    public static function rewrite($css, $currentDir, $docRoot = null, $symlinks = array()) 
+    public static function rewrite($css, $currentDir, $docRoot = null, $symlinks = []) 
     {
         self::$_docRoot = self::_realpath(
             $docRoot ? $docRoot : $_SERVER['DOCUMENT_ROOT']
         );
         self::$_currentDir = self::_realpath($currentDir);
-        self::$_symlinks = array();
+        self::$_symlinks = [];
         
         // normalize symlinks
         foreach ($symlinks as $link => $target) {
@@ -75,9 +75,9 @@ class Minify_CSS_UriRewriter {
         
         // rewrite
         $css = preg_replace_callback('/@import\\s+([\'"])(.*?)[\'"]/'
-            ,array(self::$className, '_processUriCB'), $css);
+            ,[self::$className, '_processUriCB'], $css);
         $css = preg_replace_callback('/url\\(\\s*([^\\)\\s]+)\\s*\\)/'
-            ,array(self::$className, '_processUriCB'), $css);
+            ,[self::$className, '_processUriCB'], $css);
 
         return $css;
     }
@@ -99,9 +99,9 @@ class Minify_CSS_UriRewriter {
         
         // append
         $css = preg_replace_callback('/@import\\s+([\'"])(.*?)[\'"]/'
-            ,array(self::$className, '_processUriCB'), $css);
+            ,[self::$className, '_processUriCB'], $css);
         $css = preg_replace_callback('/url\\(\\s*([^\\)\\s]+)\\s*\\)/'
-            ,array(self::$className, '_processUriCB'), $css);
+            ,[self::$className, '_processUriCB'], $css);
 
         self::$_prependPath = null;
         return $css;
@@ -122,7 +122,7 @@ class Minify_CSS_UriRewriter {
      * @var array directory replacements to map symlink targets back to their
      * source (within the document root) E.g. '/var/www/symlink' => '/var/realpath'
      */
-    private static $_symlinks = array();
+    private static $_symlinks = [];
     
     /**
      * @var string path to prepend
@@ -210,7 +210,7 @@ class Minify_CSS_UriRewriter {
      * 
      * @return string
      */
-    public static function rewriteRelative($uri, $realCurrentDir, $realDocRoot, $symlinks = array())
+    public static function rewriteRelative($uri, $realCurrentDir, $realDocRoot, $symlinks = [])
     {
         // prepend path with current dir separator (OS-independent)
         $path = strtr($realCurrentDir, '/', DIRECTORY_SEPARATOR)  

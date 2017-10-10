@@ -1,0 +1,18 @@
+{
+    "description": "Allows IRC-style /me actions in the middle of comments as long as they appear at start of a new line.",
+    "version": "1.1",
+    "mobileFriendly": true,
+    "key": "meaction",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    },
+	"icon": "me_action.png"
+}

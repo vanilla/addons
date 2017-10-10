@@ -1,16 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['NoIndex'] = array(
-   'Name' => 'No Index',
-   'Description' => "Allows moderators & curators to mark a discussion as noindex/noarchive.",
-   'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'MobileFriendly' => TRUE,
-   'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincolnwebs@gmail.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
-);
-
 /**
  * Class NoIndexPlugin.
  *
@@ -22,21 +11,21 @@ class NoIndexPlugin extends Gdn_Plugin {
    /**
     * Allow mods to add/remove NoIndex via discussion options.
     */
-   public function Base_DiscussionOptions_Handler($Sender, $Args) {
-      if (CheckPermission(array('Garden.Moderation.Manage', 'Garden.Curation.Manage'), FALSE)) {
-         $Discussion = $Args['Discussion'];
-         $Label = (GetValue('NoIndex', $Discussion)) ? T('Remove NoIndex') : T('Add NoIndex');
-         $Url = "/discussion/noindex?discussionid={$Discussion->DiscussionID}";
+   public function base_discussionOptions_handler($sender, $args) {
+      if (checkPermission(['Garden.Moderation.Manage', 'Garden.Curation.Manage'], FALSE)) {
+         $discussion = $args['Discussion'];
+         $label = (getValue('NoIndex', $discussion)) ? t('Remove NoIndex') : t('Add NoIndex');
+         $url = "/discussion/noindex?discussionid={$discussion->DiscussionID}";
          // Deal with inconsistencies in how options are passed
-         if (isset($Sender->Options)) {
-            $Sender->Options .= Wrap(Anchor($Label, $Url, 'NoIndex'), 'li');
+         if (isset($sender->Options)) {
+            $sender->Options .= wrap(anchor($label, $url, 'NoIndex'), 'li');
          }
          else {
-            $Args['DiscussionOptions']['Bump'] = array(
-               'Label' => $Label,
-               'Url' => $Url,
+            $args['DiscussionOptions']['Bump'] = [
+               'Label' => $label,
+               'Url' => $url,
                'Class' => 'NoIndex'
-            );
+            ];
          }
       }
    }
@@ -44,69 +33,69 @@ class NoIndexPlugin extends Gdn_Plugin {
    /**
     * Handle discussion option menu NoIndex action (simple toggle).
     */
-   public function DiscussionController_NoIndex_Create($Sender, $Args) {
-      $Sender->Permission(array('Garden.Moderation.Manage', 'Garden.Curation.Manage'), FALSE);
+   public function discussionController_noIndex_create($sender, $args) {
+      $sender->permission(['Garden.Moderation.Manage', 'Garden.Curation.Manage'], FALSE);
 
       // Get discussion
-      $DiscussionID = $Sender->Request->Get('discussionid');
-      $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
-      if (!$Discussion) {
-         throw NotFoundException('Discussion');
+      $discussionID = $sender->Request->get('discussionid');
+      $discussion = $sender->DiscussionModel->getID($discussionID);
+      if (!$discussion) {
+         throw notFoundException('Discussion');
       }
 
       // Toggle NoIndex
-      $NoIndex = GetValue('NoIndex', $Discussion) ? 0 : 1;
+      $noIndex = getValue('NoIndex', $discussion) ? 0 : 1;
 
       // Update DateLastComment & redirect
-      $Sender->DiscussionModel->SetProperty($DiscussionID, 'NoIndex', $NoIndex);
-      Redirect(DiscussionUrl($Discussion));
+      $sender->DiscussionModel->setProperty($discussionID, 'NoIndex', $noIndex);
+      redirectTo(discussionUrl($discussion));
    }
 
     /**
      * Add a mod message to NoIndex discussions.
      */
-    public function DiscussionController_BeforeDiscussionDisplay_Handler($Sender, $Args) {
-        if (!CheckPermission(array('Garden.Moderation.Manage', 'Garden.Curation.Manage'), FALSE))
+    public function discussionController_beforeDiscussionDisplay_handler($sender, $args) {
+        if (!checkPermission(['Garden.Moderation.Manage', 'Garden.Curation.Manage'], FALSE))
             return;
 
-        if (GetValue('NoIndex', $Sender->Data('Discussion'))) {
-            echo Wrap(T('Discussion marked as noindex'), 'div', array('class' => 'Warning'));
+        if (getValue('NoIndex', $sender->data('Discussion'))) {
+            echo wrap(t('Discussion marked as noindex'), 'div', ['class' => 'Warning']);
         }
     }
 
     /**
      * Add the noindex/noarchive meta tag.
      */
-    public function DiscussionController_Render_Before($Sender, $Args) {
-        if ($Sender->Head && GetValue('NoIndex', $Sender->Data('Discussion'))) {
-            $Sender->Head->AddTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
+    public function discussionController_render_before($sender, $args) {
+        if ($sender->Head && getValue('NoIndex', $sender->data('Discussion'))) {
+            $sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex,noarchive']);
         }
     }
 
     /**
      * Show NoIndex meta tag on discussions list.
      */
-    public function Base_BeforeDiscussionMeta_Handler($Sender, $Args) {
-        $NoIndex = GetValue('NoIndex', GetValue('Discussion', $Args));
-        if (CheckPermission(array('Garden.Moderation.Manage', 'Garden.Curation.Manage'), FALSE) && $NoIndex) {
-            echo ' <span class="Tag Tag-NoIndex">'.T('NoIndex').'</span> ';
+    public function base_beforeDiscussionMeta_handler($sender, $args) {
+        $noIndex = getValue('NoIndex', getValue('Discussion', $args));
+        if (checkPermission(['Garden.Moderation.Manage', 'Garden.Curation.Manage'], FALSE) && $noIndex) {
+            echo ' <span class="Tag Tag-NoIndex">'.t('NoIndex').'</span> ';
         }
     }
 
    /**
     * Invoke structure changes.
     */
-   public function Setup() {
-        $this->Structure();
+   public function setup() {
+        $this->structure();
    }
 
     /**
      * Add NoIndex property to discussions.
      */
-    public function Structure() {
-       Gdn::Structure()
-          ->Table('Discussion')
-          ->Column('NoIndex', 'int', '0')
-          ->Set();
+    public function structure() {
+       Gdn::structure()
+          ->table('Discussion')
+          ->column('NoIndex', 'int', '0')
+          ->set();
    }
 }

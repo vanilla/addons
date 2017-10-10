@@ -1,16 +1,4 @@
 <?php
-$PluginInfo['RoleTitle'] = [
-   'Name' => 'Role Titles',
-   'Description' => "Lists users' roles under their name and adds role-specific CSS classes to their comments for theming.",
-   'Version' => '1.0',
-   'RequiredApplications' => ['Vanilla' => '2.0.18'],
-   'MobileFriendly' => true,
-   'RegisterPermissions' => false,
-   'Icon' => 'role_titles.png',
-   'Author' => 'Matt Lincoln Russell',
-   'AuthorEmail' => 'lincolnwebs@gmail.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
-];
 
 class RoleTitlePlugin extends Gdn_Plugin {
 

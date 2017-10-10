@@ -15,150 +15,137 @@
  * Blacklist known "problem translations" that are in buttons or wreck page layout.
  */
 
-$PluginInfo['CustomizeText'] = array(
-   'Name' => 'Customize Text',
-   'Description' => "Allows administrators to edit the text throughout their forum.",
-   'Version' => '1.2',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com',
-   'Icon' => 'custom_text.png',
-   'SettingsUrl' => 'settings/customizetext',
-   'UsePopupSettings' => false
-);
-
 class CustomizeTextPlugin extends Gdn_Plugin {
    
    public function __construct() {
       parent::__construct();
-      if (!C('Garden.Locales.DeveloperMode', FALSE))
-         SaveToConfig('Garden.Locales.DeveloperMode', TRUE);
+      if (!c('Garden.Locales.DeveloperMode', FALSE))
+         saveToConfig('Garden.Locales.DeveloperMode', TRUE);
    }
 
    /**
 	 * Add the customize text menu option.
 	 */
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-		$Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Appearance', 'Customize Text', 'settings/customizetext', 'Garden.Settings.Manage');
+   public function base_getAppSettingsMenuItems_handler($sender) {
+		$menu = &$sender->EventArguments['SideMenu'];
+      $menu->addLink('Appearance', 'Customize Text', 'settings/customizetext', 'Garden.Settings.Manage');
 	}
 
 	/**
 	 * Add the customize text page to the dashboard.
     * 
-    * @param Gdn_Controller $Sender
+    * @param Gdn_Controller $sender
 	 */
-   public function SettingsController_CustomizeText_Create($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
+   public function settingsController_customizeText_create($sender) {
+      $sender->permission('Garden.Settings.Manage');
       
-      $Sender->AddSideMenu('settings/customizetext');
-		$Sender->AddJsFile('jquery.autogrow.js');
+      $sender->addSideMenu('settings/customizetext');
+		$sender->addJsFile('jquery.autogrow.js');
       
-      $Sender->Title('Customize Text');
+      $sender->title('Customize Text');
 
-		$Directive = GetValue(0, $Sender->RequestArgs, '');
-		$View = 'customizetext';
-		if ($Directive == 'rebuild')
-			$View = 'rebuild';
-		elseif ($Directive == 'rebuildcomplete')
-			$View = 'rebuildcomplete';
+		$directive = getValue(0, $sender->RequestArgs, '');
+		$view = 'customizetext';
+		if ($directive == 'rebuild')
+			$view = 'rebuild';
+		elseif ($directive == 'rebuildcomplete')
+			$view = 'rebuildcomplete';
       
-      $Method = 'none';
+      $method = 'none';
       
-      if ($Sender->Form->IsPostback()) {
-         $Method = 'search';
+      if ($sender->Form->isPostback()) {
+         $method = 'search';
       
-         if ($Sender->Form->GetValue('Save_All'))
-            $Method = 'save';
+         if ($sender->Form->getValue('Save_All'))
+            $method = 'save';
       }
       
-      $Matches = array();
-      $Keywords = NULL;
-      switch ($Method) {
+      $matches = [];
+      $keywords = NULL;
+      switch ($method) {
          case 'none':
             break;
          
          case 'search':
          case 'save':
             
-            $Keywords = strtolower($Sender->Form->GetValue('Keywords'));
+            $keywords = strtolower($sender->Form->getValue('Keywords'));
             
-            if ($Method == 'search') {
-               $Sender->Form->ClearInputs();
-               $Sender->Form->SetFormValue('Keywords', $Keywords);
+            if ($method == 'search') {
+               $sender->Form->clearInputs();
+               $sender->Form->setFormValue('Keywords', $keywords);
             }
             
-            $Definitions = Gdn::Locale()->GetDeveloperDefinitions();
-            $CountDefinitions = sizeof($Definitions);
-            $Sender->SetData('CountDefinitions', $CountDefinitions);
+            $definitions = Gdn::locale()->getDeveloperDefinitions();
+            $countDefinitions = sizeof($definitions);
+            $sender->setData('CountDefinitions', $countDefinitions);
             
-            $Changed = FALSE;
-            foreach ($Definitions as $Key => $BaseDefinition) {
-               $KeyHash = md5($Key);
-               $ElementName = "def_{$KeyHash}";
+            $changed = FALSE;
+            foreach ($definitions as $key => $baseDefinition) {
+               $keyHash = md5($key);
+               $elementName = "def_{$keyHash}";
 
                // Look for matches
-               $k = strtolower($Key);
-               $d = strtolower($BaseDefinition);
+               $k = strtolower($key);
+               $d = strtolower($baseDefinition);
                
                // If this key doesn't match, skip it
-               if ($Keywords != '*' && !(strlen($Keywords) > 0 && (strpos($k, $Keywords) !== FALSE || strpos($d, $Keywords) !== FALSE)))
+               if ($keywords != '*' && !(strlen($keywords) > 0 && (strpos($k, $keywords) !== FALSE || strpos($d, $keywords) !== FALSE)))
                   continue;
                
-               $Modified = FALSE;
+               $modified = FALSE;
 
                // Found a definition, look it up in the real locale first, to see if it has been overridden
-               $CurrentDefinition = Gdn::Locale()->Translate($Key, FALSE);
-               if ($CurrentDefinition !== FALSE && $CurrentDefinition != $BaseDefinition)
-                  $Modified = TRUE;
+               $currentDefinition = Gdn::locale()->translate($key, FALSE);
+               if ($currentDefinition !== FALSE && $currentDefinition != $baseDefinition)
+                  $modified = TRUE;
                else
-                  $CurrentDefinition = $BaseDefinition;
+                  $currentDefinition = $baseDefinition;
 
-               $Matches[$Key] = array('def' => $CurrentDefinition, 'mod' => $Modified);
-               if ($CurrentDefinition[0] == "\r\n")
-                  $CurrentDefinition = "\r\n{$CurrentDefinition}";
-               else if ($CurrentDefinition[0] == "\r")
-                  $CurrentDefinition = "\r{$CurrentDefinition}";
-               else if ($CurrentDefinition[0] == "\n")
-                  $CurrentDefinition = "\n{$CurrentDefinition}";
+               $matches[$key] = ['def' => $currentDefinition, 'mod' => $modified];
+               if ($currentDefinition[0] == "\r\n")
+                  $currentDefinition = "\r\n{$currentDefinition}";
+               else if ($currentDefinition[0] == "\r")
+                  $currentDefinition = "\r{$currentDefinition}";
+               else if ($currentDefinition[0] == "\n")
+                  $currentDefinition = "\n{$currentDefinition}";
                
-               if ($Method == 'save') {
-                  $SuppliedDefinition = $Sender->Form->GetValue($ElementName);
+               if ($method == 'save') {
+                  $suppliedDefinition = $sender->Form->getValue($elementName);
 
                   // Has this field been changed?
-                  if ($SuppliedDefinition != FALSE && $SuppliedDefinition != $CurrentDefinition) {
+                  if ($suppliedDefinition != FALSE && $suppliedDefinition != $currentDefinition) {
 
                      // Changed from what it was, but is it a change from the *base* value?
-                     $SaveDefinition = ($SuppliedDefinition != $BaseDefinition) ? $SuppliedDefinition : NULL;
-                     if (!is_null($SaveDefinition)) {
-                        $CurrentDefinition = $SaveDefinition;
-                        $SaveDefinition = str_replace("\r\n", "\n", $SaveDefinition);
+                     $saveDefinition = ($suppliedDefinition != $baseDefinition) ? $suppliedDefinition : NULL;
+                     if (!is_null($saveDefinition)) {
+                        $currentDefinition = $saveDefinition;
+                        $saveDefinition = str_replace("\r\n", "\n", $saveDefinition);
                      }
                      
-                     Gdn::Locale()->SetTranslation($Key, $SaveDefinition, array(
+                     Gdn::locale()->setTranslation($key, $saveDefinition, [
                         'Save'         => TRUE,
                         'RemoveEmpty'  => TRUE
-                     ));
-                     $Matches[$Key] = array('def' => $SuppliedDefinition, 'mod' => !is_null($SaveDefinition));
-                     $Changed = TRUE;
+                     ]);
+                     $matches[$key] = ['def' => $suppliedDefinition, 'mod' => !is_null($saveDefinition)];
+                     $changed = TRUE;
                   }
                }
                
-               $Sender->Form->SetFormValue($ElementName, $CurrentDefinition);
+               $sender->Form->setFormValue($elementName, $currentDefinition);
             }
 
-            if ($Changed) {
-               $Sender->InformMessage("Locale changes have been saved!");
+            if ($changed) {
+               $sender->informMessage("Locale changes have been saved!");
             }
             
             break;
       }
       
-      $Sender->SetData('Matches', $Matches);
-      $CountMatches = sizeof($Matches);
-      $Sender->SetData('CountMatches', $CountMatches);
+      $sender->setData('Matches', $matches);
+      $countMatches = sizeof($matches);
+      $sender->setData('CountMatches', $countMatches);
       
-      $Sender->Render($View, '', 'plugins/CustomizeText');
+      $sender->render($view, '', 'plugins/CustomizeText');
    }
 }

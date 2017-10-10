@@ -8,28 +8,15 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
-$PluginInfo['Sprites'] = array(
-   'Name' => 'Sprites',
-   'Description' => 'Adds sprites (icons) to all menus and nav buttons throughout Vanilla.',
-   'Version' => '1.0',
-   'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'RequiredTheme' => FALSE, 
-   'RequiredPlugins' => FALSE,
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 class SpritesPlugin extends Gdn_Plugin {
 
-   public function Base_Render_Before($Sender) {
-      if ($Sender->MasterView == '' || $Sender->MasterView == 'default')
-         $Sender->AddCssFile('sprites.css', 'plugins/Sprites');
+   public function base_render_before($sender) {
+      if ($sender->MasterView == '' || $sender->MasterView == 'default')
+         $sender->addCssFile('sprites.css', 'plugins/Sprites');
    }
 
-   public function Setup() {}
+   public function setup() {}
 
-   public function Structure() {}
+   public function structure() {}
 
 }

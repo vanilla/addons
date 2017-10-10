@@ -4,19 +4,6 @@
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
-$PluginInfo['AuthorSelector'] = [
-    'Name' => 'Author Selector',
-    'Description' => "Allows administrators to change the author of a discussion.",
-    'Version' => '1.2',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'MobileFriendly' => true,
-    'License' => 'GNU GPLv2',
-    'Icon' => 'author_selector.png',
-    'Author' => "Lincoln Russell",
-    'AuthorEmail' => 'lincolnwebs@gmail.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
-];
-
 /**
  * Class AuthorSelectorPlugin
  */
@@ -25,18 +12,18 @@ class AuthorSelectorPlugin extends Gdn_Plugin {
     /**
      * Allow admin to Change Author via discussion options.
      */
-    public function base_discussionOptions_handler($Sender, $Args) {
-        $Discussion = $Args['Discussion'];
-        if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID)) {
-            $Label = t('Change Author');
-            $Url = "/discussion/author?discussionid={$Discussion->DiscussionID}";
+    public function base_discussionOptions_handler($sender, $args) {
+        $discussion = $args['Discussion'];
+        if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
+            $label = t('Change Author');
+            $url = "/discussion/author?discussionid={$discussion->DiscussionID}";
 
             // Deal with inconsistencies in how options are passed
-            if (isset($Sender->Options)) {
-                $Sender->Options .= wrap(anchor($Label, $Url, 'ChangeAuthor'), 'li');
+            if (isset($sender->Options)) {
+                $sender->Options .= wrap(anchor($label, $url, 'ChangeAuthor'), 'li');
             }
             else {
-                $Args['DiscussionOptions']['ChangeAuthor'] = ['Label' => $Label, 'Url' => $Url, 'Class' => 'ChangeAuthor'];
+                $args['DiscussionOptions']['ChangeAuthor'] = ['Label' => $label, 'Url' => $url, 'Class' => 'ChangeAuthor'];
             }
         }
     }
@@ -44,78 +31,78 @@ class AuthorSelectorPlugin extends Gdn_Plugin {
     /**
      * Handle discussion option menu Change Author action.
      */
-    public function discussionController_author_create($Sender) {
-        $DiscussionID = $Sender->Request->get('discussionid');
-        $Discussion = $Sender->DiscussionModel->getID($DiscussionID);
-        if (!$Discussion) {
-            throw NotFoundException('Discussion');
+    public function discussionController_author_create($sender) {
+        $discussionID = $sender->Request->get('discussionid');
+        $discussion = $sender->DiscussionModel->getID($discussionID);
+        if (!$discussion) {
+            throw notFoundException('Discussion');
         }
 
         // Check edit permission
-        $Sender->permission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID);
+        $sender->permission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID);
 
-        if ($Sender->Form->authenticatedPostBack()) {
+        if ($sender->Form->authenticatedPostBack()) {
             // Change the author
-            $Name = $Sender->Form->getFormValue('Author', '');
-            $UserModel = new UserModel();
-            if (trim($Name) != '') {
-                $User = $UserModel->getByUsername(trim($Name));
-                if (is_object($User)) {
-                    if ($Discussion->InsertUserID == $User->UserID)
-                        $Sender->Form->addError('That user is already the discussion author.');
+            $name = $sender->Form->getFormValue('Author', '');
+            $userModel = new UserModel();
+            if (trim($name) != '') {
+                $user = $userModel->getByUsername(trim($name));
+                if (is_object($user)) {
+                    if ($discussion->InsertUserID == $user->UserID)
+                        $sender->Form->addError('That user is already the discussion author.');
                     else {
                         // Change discussion InsertUserID
-                        $Sender->DiscussionModel->setField($DiscussionID, 'InsertUserID', $User->UserID);
+                        $sender->DiscussionModel->setField($discussionID, 'InsertUserID', $user->UserID);
 
                         // Update users' discussion counts
-                        $Sender->DiscussionModel->updateUserDiscussionCount($Discussion->InsertUserID);
-                        $Sender->DiscussionModel->updateUserDiscussionCount($User->UserID, true); // Increment
+                        $sender->DiscussionModel->updateUserDiscussionCount($discussion->InsertUserID);
+                        $sender->DiscussionModel->updateUserDiscussionCount($user->UserID, true); // Increment
 
                         // Go to the updated discussion
-                        redirect(discussionUrl($Discussion));
+                        redirectTo(discussionUrl($discussion));
                     }
                 }
                 else {
-                    $Sender->Form->addError('No user with that name was found.');
+                    $sender->Form->addError('No user with that name was found.');
                 }
             }
         }
         else {
             // Form to change the author
-            $Sender->setData('Title', $Discussion->Name);
+            $sender->setData('Title', $discussion->Name);
         }
 
-        $Sender->render('changeauthor', '', 'plugins/AuthorSelector');
+        $sender->render('changeauthor', '', 'plugins/AuthorSelector');
     }
 
     /**
      * Add Javascript files required for autocomplete / username token.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    protected function addJsFiles($Sender) {
-        $Sender->addJsFile('jquery.tokeninput.js');
-        $Sender->addJsFile('authorselector.js', 'plugins/AuthorSelector');
+    protected function addJsFiles($sender) {
+        $sender->addJsFile('jquery.tokeninput.js');
+        $sender->addJsFile('authorselector.js', 'plugins/AuthorSelector');
     }
 
     /**
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      */
-    public function discussionsController_render_before($Sender) {
-        $this->addJsFiles($Sender);
+    public function discussionsController_render_before($sender) {
+        $this->addJsFiles($sender);
     }
 
     /**
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      */
-    public function discussionController_render_before($Sender) {
-        $this->addJsFiles($Sender);
+    public function discussionController_render_before($sender) {
+        $this->addJsFiles($sender);
     }
 
     /**
-     * @param CategoriesController $Sender
+     * @param CategoriesController $sender
      */
-    public function categoriesController_render_before($Sender) {
-        $this->addJsFiles($Sender);
+    public function categoriesController_render_before($sender) {
+        $this->addJsFiles($sender);
     }
 }

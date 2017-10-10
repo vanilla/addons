@@ -1,0 +1,17 @@
+{
+    "name": "Link Types",
+    "description": "Open external URLs in a new tab. Links that are on the same main domain are not considered external URLs",
+    "version": "1.0",
+    "key": "linktypes",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    },
+    "icon": "link_types.png"
+}

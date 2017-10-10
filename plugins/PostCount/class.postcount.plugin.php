@@ -8,55 +8,38 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['PostCount'] = array(
-   'Name' => 'Post Count',
-   'Description' => "Shows each user's comment total by their name in each comment.",
-   'Version' => '1.0.3',
-   'MobileFriendly' => TRUE,
-   'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE, 
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => TRUE,
-   'RegisterPermissions' => FALSE,
-   'Icon' => 'post_count.png',
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 class PostCountPlugin extends Gdn_Plugin {
    
-   public function UserInfoModule_OnBasicInfo_Handler($Sender) {
-      $User = Gdn::UserModel()->GetID($Sender->User->UserID);
-      if ($User) {
-         $PostCount = GetValue('CountComments', $User, 0) + GetValue('CountDiscussions', $User, 0);
-         echo "<dt class=\"Posts\">".T('Posts')."</dt>\n";
-         echo "<dd class=\"Posts\">".number_format($PostCount)."</dd>";
+   public function userInfoModule_onBasicInfo_handler($sender) {
+      $user = Gdn::userModel()->getID($sender->User->UserID);
+      if ($user) {
+         $postCount = getValue('CountComments', $user, 0) + getValue('CountDiscussions', $user, 0);
+         echo "<dt class=\"Posts\">".t('Posts')."</dt>\n";
+         echo "<dd class=\"Posts\">".number_format($postCount)."</dd>";
       }
    }
    
-   public function DiscussionController_AuthorInfo_Handler($Sender) {
-      $this->_AttachPostCount($Sender);
+   public function discussionController_authorInfo_handler($sender) {
+      $this->_AttachPostCount($sender);
    }
    
-   public function PostController_AuthorInfo_Handler($Sender) {
-      $this->_AttachPostCount($Sender);
+   public function postController_authorInfo_handler($sender) {
+      $this->_AttachPostCount($sender);
    }
    
-   protected function _AttachPostCount($Sender) {
-      $User = Gdn::UserModel()->GetID($Sender->EventArguments['Author']->UserID);
-      if ($User) {
-         $Posts = GetValue('CountComments', $User, 0) + GetValue('CountDiscussions', $User, 0);
-         echo '<span class="MItem PostCount">'.Plural(number_format($Posts), '@'.T('Posts.Singular: %s', 'Posts: <b>%s</b>'), '@'.T('Posts.Plural: %s', 'Posts: <b>%s</b>')).'</span>';
+   protected function _AttachPostCount($sender) {
+      $user = Gdn::userModel()->getID($sender->EventArguments['Author']->UserID);
+      if ($user) {
+         $posts = getValue('CountComments', $user, 0) + getValue('CountDiscussions', $user, 0);
+         echo '<span class="MItem PostCount">'.plural(number_format($posts), '@'.t('Posts.Singular: %s', 'Posts: <b>%s</b>'), '@'.t('Posts.Plural: %s', 'Posts: <b>%s</b>')).'</span>';
       }
    }
 
-   public function Setup() {
+   public function setup() {
       // Nothing to do here!
    }
    
-   public function Structure() {
+   public function structure() {
       // Nothing to do here!
    }
          

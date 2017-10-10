@@ -2,20 +2,9 @@
 /**
  * PostNumbering Plugin
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
-
-$PluginInfo['postnumbering'] = [
-    'Name' => 'Post Numbering',
-    'Description' => 'Add numerical indices, beside posts, that link to the post itself.',
-    'Version' => '1.0',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'License' => 'GNU GPL2',
-    'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com',
-    'AuthorUrl' => 'https://github.com/DaazKu',
-];
 
 /**
  * Class PostNumberingPlugin

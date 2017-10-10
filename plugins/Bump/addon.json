@@ -1,0 +1,19 @@
+{
+    "name": "Bump",
+    "description": "Allows moderators to bump a discussion without commenting.",
+    "version": "1.0.1",
+    "mobileFriendly": true,
+    "key": "bump",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincolnwebs@gmail.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    },
+    "icon": "bump.png"
+}

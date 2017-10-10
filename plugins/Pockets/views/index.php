@@ -13,9 +13,9 @@ echo heading($this->data('Title'), sprintf(t('Add %s'), t('Pocket')), 'settings/
         <span id="pocket-locations-toggle">
             <?php
             if (!c('Plugins.Pockets.ShowLocations')) {
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/showlocations'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/showlocations'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
             } else {
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/hidelocations'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/hidelocations'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
             }
             ?>
         </span>
@@ -27,46 +27,32 @@ echo heading($this->data('Title'), sprintf(t('Add %s'), t('Pocket')), 'settings/
             <tr>
                 <th class="column-md"><?php echo t('Name'); ?></th>
                 <th class="column-xl"><?php echo t('Pocket'); ?></th>
-                <th class="column-sm"></th>
+                <th class="column-md"></th>
             </tr>
         </thead>
         <tbody>
             <?php
             foreach ($this->data('PocketData') as $PocketRow) {
-                 $MobileOnly = $PocketRow['MobileOnly'];
-                 $MobileNever = $PocketRow['MobileNever'];
-                 $NoAds = $PocketRow['Type'] == Pocket::TYPE_AD;
-
                 echo '<tr'.($PocketRow['Disabled'] != Pocket::DISABLED ? '' : ' class="Disabled"').'>';
 
                 echo '<td>',
                     '<strong>', htmlspecialchars($PocketRow['Name']), '</strong>';
-                    if ($notes = $PocketRow['Notes']) {
-                        echo '<div class="info pocket-notes">'.sprintf(t('%s: %s'), t('Notes'), $notes).'</div>';
-                    }
-                    if ($page = htmlspecialchars($PocketRow['Page'])) {
-                        echo '<div class="info pocket-page">'.sprintf(t('%s: %s'), t('Page'), $page).'</div>';
-                    }
-                    if ($location = htmlspecialchars($PocketRow['Location'])) {
-                        echo '<div class="info pocket-location">'.sprintf(t('%s: %s'), t('Location'), $location).'</div>';
-                    }
-                    if ($MobileOnly) {
-                        echo '<div class="info">(', t('Shown only on mobile'), ')</div>';
-                    }
-                    if ($MobileNever) {
-                        echo '<div class="info">(', t('Hidden for mobile'), ')</div>';
-                    }
-                    if ($MobileNever && $MobileOnly) {
-                        echo '<div class="info">(', t('Hidden for everything!'), ')</div>';
-                    }
-                    if ($NoAds) {
-                        echo '<div class="info">(', t('Users with the no ads permission will not see this pocket.'), ')</div>';
-                    }
-                    '</td>';
+
+                $meta = $PocketRow['Meta'];
+                echo '<div class="table-meta">';
+                foreach ($meta as $metaItem) {
+                    $label = wrap(sprintf(t('%s: %s'), val('label', $metaItem), ''), 'span', ['class' => 'table-meta-item-label']);
+                    $value = wrap(val('value', $metaItem), 'span', ['class' => 'table-meta-item-data']);
+                    echo '<div class="table-meta-item">'.$label.$value.'</div>';
+                }
+
+                echo '</div>';
+                echo '</td>';
                 echo '<td><pre style="white-space: pre-wrap;">', nl2br(htmlspecialchars(substr($PocketRow['Body'], 0, 200))), '</pre></td>';
                 echo '<td class="options"><div class="btn-group">';
                 echo anchor(dashboardSymbol('edit'), "/settings/pockets/edit/{$PocketRow['PocketID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit'), 'data-content' => ['cssClass' => 'pockets']]);
                 echo anchor(dashboardSymbol('delete'), "/settings/pockets/delete/{$PocketRow['PocketID']}", 'Popup btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
+                echo renderPocketToggle($PocketRow);
                 echo '</div></td>';
                 echo "</tr>\n";
             }

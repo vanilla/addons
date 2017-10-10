@@ -8,37 +8,20 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['vBulletinCompatibility'] = array(
-   'Name' => 'vBulletin Compatibility Mode',
-   'Description' => "This plugin hooks into Garden and applies tweaks to help ease the transition from vBulleting to Vanilla.",
-   'Version' => '1.0',
-   'MobileFriendly' => TRUE,
-   'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE, 
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => FALSE,
-   'RegisterPermissions' => FALSE,
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com',
-   'Hidden' => TRUE
-);
-
 class VbulletinCompatibilityPlugin extends Gdn_Plugin {
    
    public function __construct() {
    }
    
-   public function Gdn_Router_BeforeLoadRoutes_Handler($Sender) {
-      $VbRoutes = array(
-          'forumdisplay\.php\?f=(\d+)'    => array('categories/$1', 'Permanent'),
-          'showthread\.php\?t=(\d+)'      => array('discussion/$1', 'Permanent'),
-          'showthread\.php\?p=(\d+)'      => array('discussion/comment/$1', 'Permanent'),
-          'member\.php\?u=(\d+)'          => array('profile/$1/x', 'Permanent')
-      );
+   public function gdn_Router_BeforeLoadRoutes_Handler($sender) {
+      $vbRoutes = [
+          'forumdisplay\.php\?f=(\d+)'    => ['categories/$1', 'Permanent'],
+          'showthread\.php\?t=(\d+)'      => ['discussion/$1', 'Permanent'],
+          'showthread\.php\?p=(\d+)'      => ['discussion/comment/$1', 'Permanent'],
+          'member\.php\?u=(\d+)'          => ['profile/$1/x', 'Permanent']
+      ];
       
-      $Sender->EventArguments['Routes'] = array_merge($Sender->EventArguments['Routes'], $VbRoutes);
+      $sender->EventArguments['Routes'] = array_merge($sender->EventArguments['Routes'], $vbRoutes);
    }
    
 }

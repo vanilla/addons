@@ -37,23 +37,23 @@ class Minify_Controller_Page extends Minify_Controller_Base {
      */
     public function setupSources($options) {
         if (isset($options['file'])) {
-            $sourceSpec = array(
+            $sourceSpec = [
                 'filepath' => $options['file']
-            );
+            ];
         } else {
             // strip controller options
-            $sourceSpec = array(
+            $sourceSpec = [
                 'content' => $options['content']
                 ,'id' => $options['id']
-            );
+            ];
             unset($options['content'], $options['id']);
         }
         if (isset($options['minifyAll'])) {
             // this will be the 2nd argument passed to Minify_HTML::minify()
-            $sourceSpec['minifyOptions'] = array(
-                'cssMinifier' => array('Minify_CSS', 'minify')
-                ,'jsMinifier' => array('JSMin', 'minify')
-            );
+            $sourceSpec['minifyOptions'] = [
+                'cssMinifier' => ['Minify_CSS', 'minify']
+                ,'jsMinifier' => ['JSMin', 'minify']
+            ];
             $this->_loadCssJsMinifiers = true;
             unset($options['minifyAll']);
         }

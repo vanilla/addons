@@ -11,7 +11,7 @@ helpAsset(t('Need More Help?'), $links);
 echo heading(sprintf(t('%s Settings'), 'jsConnect'), t('Add Connection'), '/settings/jsconnect/addedit', 'btn btn-primary js-modal');
 
 $inTestMode = [];
-foreach ($this->Data('Providers') as $Provider) {
+foreach ($this->data('Providers') as $Provider) {
     if ($Provider['TestMode']) {
         $inTestMode[] = $Provider;
     }
@@ -65,7 +65,7 @@ foreach ($this->Data('Providers') as $Provider) {
         </tr>
         </thead>
         <tbody>
-        <?php foreach ($this->Data('Providers') as $Provider): ?>
+        <?php foreach ($this->data('Providers') as $Provider): ?>
             <tr>
                 <td><?php echo htmlspecialchars($Provider['AuthenticationKey']); ?></td>
                 <td><?php echo htmlspecialchars($Provider['Name']); ?></td>

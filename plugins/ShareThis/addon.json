@@ -1,0 +1,20 @@
+{
+    "name": "ShareThis",
+    "description": "Adds ShareThis (http://sharethis.com) buttons below discussions.",
+    "version": "1.2",
+    "requiredTheme": false,
+    "settingsUrl": "/plugin/sharethis",
+    "settingsPermission": "Garden.Settings.Manage",
+    "hasLocale": true,
+    "registerPermissions": false,
+    "icon": "sharethis.png",
+    "key": "sharethis",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Brendan Sera-Shriar a.k.a digibomb",
+            "email": "brendan@vanillaforums.com",
+            "homepage": "http://www.dropthedigibomb.com"
+        }
+    ]
+}

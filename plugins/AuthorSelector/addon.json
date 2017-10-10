@@ -1,0 +1,20 @@
+{
+    "name": "Author Selector",
+    "description": "Allows administrators to change the author of a discussion.",
+    "version": "1.2.1",
+    "mobileFriendly": true,
+    "license": "GNU GPLv2",
+    "icon": "author_selector.png",
+    "key": "authorselector",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincolnwebs@gmail.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    }
+}

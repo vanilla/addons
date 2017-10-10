@@ -1,0 +1,23 @@
+{
+    "name": "Community Reporting",
+    "description": "Allows users to report comments and discussions for content violations or awesomeness.",
+    "version": "1.0.4",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "registerPermissions": false,
+    "icon": "community_reporting.png",
+    "settingsUrl": "/plugin/reporting",
+    "settingsPermission": "Garden.Users.Manage",
+    "key": "reporting",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    }
+}

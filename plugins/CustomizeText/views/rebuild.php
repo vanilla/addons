@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 // ajax request common pages to fill the locale file with translations to edit.
-$Urls = array(
+$Urls = [
 	'/vanilla/discussions/index',
 	'/vanilla/discussions/bookmarked',
 	'/vanilla/discussions/mine',
@@ -28,13 +28,13 @@ $Urls = array(
 	'/dashboard/entry/signin',
 	'/dashboard/entry/register',
 	'/dashboard/entry/passwordrequest'
-);
+];
 array_map('Url', $Urls);
-$Locale = Gdn::Locale();
-$Definitions = $Locale->GetDeveloperDefinitions();
+$Locale = Gdn::locale();
+$Definitions = $Locale->getDeveloperDefinitions();
 $CountDefinitions = count($Definitions);
 ?>
-<h1><?php echo T('Customize Text'); ?></h1>
+<h1><?php echo t('Customize Text'); ?></h1>
 <div class="padded">
    <?php
 		echo 'There are currently <span class="CountDefinitions strong">'. $CountDefinitions . '</span> text definitions available for editing.';
@@ -55,9 +55,9 @@ jQuery(document).ready(function($) {
 				} else {
 					// Finished
 					gdn.informMessage('Crawling complete!', {'id':'crawlstate'});
-					// $('#Content').get('<?php echo Url('/settings/customizetext/rebuild?DeliveryType=VIEW'); ?>');
+					// $('#Content').get('<?php echo url('/settings/customizetext/rebuild?DeliveryType=VIEW'); ?>');
 					$.ajax({
-						url: '<?php echo Url('/settings/customizetext/rebuildcomplete?DeliveryType=VIEW'); ?>',
+						url: '<?php echo url('/settings/customizetext/rebuildcomplete?DeliveryType=VIEW'); ?>',
 						success: function(data) {
 							$('#Content').html(data);
 						}

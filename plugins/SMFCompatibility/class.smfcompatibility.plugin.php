@@ -10,21 +10,7 @@
 * See the "license.txt" file for details of the Simple Machines license.          *
 **********************************************************************************/
 
-$PluginInfo['SMFCompatibility'] = array(
-   'Name' => 'SMF Compatibility',
-   'Description' => 'Adds some compatibility functionality for forums imported from SMF.',
-   'Version' => '1.1',
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => FALSE,
-   'Author' => "Todd Burry",
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
-   'License' => 'Simple Machines license'
-);
-
-Gdn::FactoryInstall('BBCodeFormatter', 'SMFCompatibilityPlugin', __FILE__, Gdn::FactorySingleton);
+Gdn::factoryInstall('BBCodeFormatter', 'SMFCompatibilityPlugin', __FILE__, Gdn::FactorySingleton);
 
 class SMFCompatibilityPlugin extends Gdn_Plugin {
 	/// CONSTRUCTOR ///
@@ -37,51 +23,51 @@ class SMFCompatibilityPlugin extends Gdn_Plugin {
 
 	/// METHODS ///
 
-   public function Base_BeforeDispatch_Handler($Sender) {
-      $Request = Gdn::Request();
-      $Folder = ltrim($Request->RequestFolder(), '/');
-      $Uri = ltrim($_SERVER['REQUEST_URI'], '/');
+   public function base_beforeDispatch_handler($sender) {
+      $request = Gdn::request();
+      $folder = ltrim($request->requestFolder(), '/');
+      $uri = ltrim($_SERVER['REQUEST_URI'], '/');
 
       // Fix the url in the request for routing.
-      if (preg_match("`^{$Folder}index.php/`", $Uri)) {
-         $Request->PathAndQuery(substr($Uri, strlen($Folder)));
+      if (preg_match("`^{$folder}index.php/`", $uri)) {
+         $request->pathAndQuery(substr($uri, strlen($folder)));
       }
    }
 
-	public function Format($String) {
+	public function format($string) {
       try {
-         $Result = parse_bbc($String);
-      } catch (Exception $Ex) {
-         $Result = '<!-- Error: '.htmlspecialchars($Ex->getMessage()).'-->'
-            .Gdn_Format::Display($String);
+         $result = parse_bbc($string);
+      } catch (Exception $ex) {
+         $result = '<!-- Error: '.htmlspecialchars($ex->getMessage()).'-->'
+            .Gdn_Format::display($string);
       }
-      return $Result;
+      return $result;
 	}
 
-	public function Setup() {
-      $OldFormat = C('Garden.InputFormatter');
+	public function setup() {
+      $oldFormat = c('Garden.InputFormatter');
 
-      if ($OldFormat != 'BBCode') {
-         SaveToConfig(array(
+      if ($oldFormat != 'BBCode') {
+         saveToConfig([
             'Garden.InputFormatter' => 'BBCode',
-            'Garden.InputFormatterBak' => $OldFormat));
+            'Garden.InputFormatterBak' => $oldFormat]);
       }
 
       // Setup the default routes.
-      $Router = Gdn::Router();
-      $Router->SetRoute('\?board=(\d+).*$', 'categories/$1', 'Permanent');
-      $Router->SetRoute('index\.php/topic,(\d+).(\d+)\.html.*$', 'discussion/$1/x/$2lim', 'Permanent');
-      $Router->SetRoute('index\.php/board,(\d+)\.(\d+)\.html.*$', 'categories/$1/$2lim', 'Permanent');
-      $Router->SetRoute('\?action=profile%3Bu%3D(\d+).*$', 'profile/$1/x', 'Permanent');
-      $Router->SetRoute('index\.php/topic,(\d+)\.msg(\d+)\.html.*$', 'discussion/comment/$2/#Comment_$2', 'Permanent');
-      $Router->SetRoute('\?topic=(\d+).*$', 'discussion/$1/x/p1', 'Permanent');
+      $router = Gdn::router();
+      $router->setRoute('\?board=(\d+).*$', 'categories/$1', 'Permanent');
+      $router->setRoute('index\.php/topic,(\d+).(\d+)\.html.*$', 'discussion/$1/x/$2lim', 'Permanent');
+      $router->setRoute('index\.php/board,(\d+)\.(\d+)\.html.*$', 'categories/$1/$2lim', 'Permanent');
+      $router->setRoute('\?action=profile%3Bu%3D(\d+).*$', 'profile/$1/x', 'Permanent');
+      $router->setRoute('index\.php/topic,(\d+)\.msg(\d+)\.html.*$', 'discussion/comment/$2/#Comment_$2', 'Permanent');
+      $router->setRoute('\?topic=(\d+).*$', 'discussion/$1/x/p1', 'Permanent');
 	}
 
-   public function OnDisable() {
-      $OldFormat = C('Garden.InputFormatterBak');
+   public function onDisable() {
+      $oldFormat = c('Garden.InputFormatterBak');
 
-      if ($OldFormat !== FALSE) {
-         SaveToConfig('Garden.InputFormatter', $OldFormat);
+      if ($oldFormat !== FALSE) {
+         saveToConfig('Garden.InputFormatter', $oldFormat);
       }
    }
 }

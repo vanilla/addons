@@ -1,0 +1,19 @@
+{
+    "name": "Voting",
+    "description": "DEPRECATED. Upgrade to Reactions. Allows users to vote for comments and discussions. Administrators get unlimited votes.",
+    "version": "1.1.5",
+    "settingsUrl": "/settings/voting",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "voting",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://markosullivan.ca"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    }
+}

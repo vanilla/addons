@@ -6,44 +6,44 @@ class SharedFingerprintModule extends Gdn_Module {
 
 	protected $_Data = FALSE;
 	
-	public function GetData($FingerprintUserID, $Fingerprint) {
-		if (!Gdn::Session()->CheckPermission('Garden.Users.Edit'))
+	public function getData($fingerprintUserID, $fingerprint) {
+		if (!Gdn::session()->checkPermission('Garden.Users.Edit'))
 			return;
 		
-		$this->_Data = Gdn::SQL()
-			->Select()
-			->From('User')
-			->Where('Fingerprint', $Fingerprint)
-			->Where('UserID <>', $FingerprintUserID)
-			->Get();
+		$this->_Data = Gdn::sql()
+			->select()
+			->from('User')
+			->where('Fingerprint', $fingerprint)
+			->where('UserID <>', $fingerprintUserID)
+			->get();
 	}
 
-	public function AssetTarget() {
+	public function assetTarget() {
 		return 'Panel';
 	}
 
-	public function ToString() {
+	public function toString() {
       if (!$this->_Data)
 			return;
       
-		if ($this->_Data->NumRows() == 0)
+		if ($this->_Data->numRows() == 0)
 			return;
 		
 		ob_start();
 		?>
       <div id="SharedFingerprint" class="Box">
-         <h4><?php echo T("Shared Accounts"); ?> <span class="Count"><?php echo $this->_Data->NumRows(); ?></span></h4>
+         <h4><?php echo t("Shared Accounts"); ?> <span class="Count"><?php echo $this->_Data->numRows(); ?></span></h4>
 			<ul class="PanelInfo">
          <?php
-			foreach ($this->_Data->Result() as $SharedAccount) {
-				echo '<li><strong>'.UserAnchor($SharedAccount).'</strong><br /></li>';
+			foreach ($this->_Data->result() as $sharedAccount) {
+				echo '<li><strong>'.userAnchor($sharedAccount).'</strong><br /></li>';
 			}
          ?>
 			</ul>
 		</div>
 		<?php
-		$String = ob_get_contents();
+		$string = ob_get_contents();
 		@ob_end_clean();
-		return $String;
+		return $string;
 	}
 }

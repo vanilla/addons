@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 ?>
-<h1><?php echo T('Touch Icon'); ?></h1>
+<h1><?php echo t('Touch Icon'); ?></h1>
 <?php
-echo $this->Form->open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->open(['enctype' => 'multipart/form-data']);
 echo $this->Form->errors();
 echo wrap(t('TouchIconInfo', 'The touch icon appears when you bookmark a website on the homescreen of an Apple device.
          These are usually 57x57 or 114x114 pixels. Apple adds rounded corners and lighting effect automatically.'),

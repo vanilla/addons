@@ -28,7 +28,7 @@ if (false === (@include 'class.JavaScriptPacker.php')) {
  * @package Minify
  */
 class Minify_Packer {
-    public static function minify($code, $options = array())
+    public static function minify($code, $options = [])
     {
         // @todo: set encoding options based on $options :)
         $packer = new JavascriptPacker($code, 'Normal', true, false);

@@ -1,0 +1,19 @@
+{
+    "name": "Mollom",
+    "description": "Mollom spam protection integration for Vanilla.",
+    "version": "1.0b",
+    "settingsUrl": "/settings/mollom",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "mollom",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    },
+	"icon": "mollom.png"
+}

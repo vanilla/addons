@@ -11,7 +11,7 @@
  * E.g. Content from DB with update time:
  * <code>
  * list($updateTime, $content) = getDbUpdateAndContent();
- * $cg = new HTTP_ConditionalGet(array(
+ * $cg = new hTTP_ConditionalGet(array(
  *     'lastModifiedTime' => $updateTime
  *     ,'isPublic' => true
  * ));
@@ -31,7 +31,7 @@
  * E.g. Content from DB with no update time:
  * <code>
  * $content = getContentFromDB();
- * $cg = new HTTP_ConditionalGet(array(
+ * $cg = new hTTP_ConditionalGet(array(
  *     'contentHash' => md5($content)
  * ));
  * $cg->sendHeaders();
@@ -44,7 +44,7 @@
  * E.g. Static content with some static includes:
  * <code>
  * // before content
- * $cg = new HTTP_ConditionalGet(array(
+ * $cg = new hTTP_ConditionalGet(array(
  *     'lastUpdateTime' => max(
  *         filemtime(__FILE__)
  *         ,filemtime('/path/to/header.inc')
@@ -233,7 +233,7 @@ class HTTP_ConditionalGet {
      *
      * @return null     
      */
-    public static function check($lastModifiedTime = null, $isPublic = false, $options = array())
+    public static function check($lastModifiedTime = null, $isPublic = false, $options = [])
     {
         if (null !== $lastModifiedTime) {
             $options['lastModifiedTime'] = (int)$lastModifiedTime;
@@ -263,7 +263,7 @@ class HTTP_ConditionalGet {
         return gmdate('D, d M Y H:i:s \G\M\T', $time);
     }
     
-    protected $_headers = array();
+    protected $_headers = [];
     protected $_lmTime = null;
     protected $_etag = null;
     protected $_stripEtag = false;

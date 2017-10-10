@@ -46,7 +46,7 @@
 	}
 
 	$dir = opendir("../smileys");
-	$files = Array();
+	$files = [];
 	while (($file = readdir($dir)) !== false) {
 		if (!preg_match("/\\.(?:gif|jpg|jpe|jpeg|png)$/", $file))
 			continue;

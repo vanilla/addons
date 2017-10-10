@@ -1,5 +1,6 @@
-<?php if (!defined('APPLICATION')) exit;
-echo 'Sitemap: '.Url('/sitemapindex.xml', TRUE)."\n";
+<?php if (!defined('APPLICATION')) { exit; }
+
+echo 'Sitemap: '.url('/sitemapindex.xml', true)."\n";
 
 // TODO: Make this a settings page
 $Default = 'User-agent: *
@@ -9,4 +10,4 @@ Disallow: /profile/comments/
 Disallow: /profile/discussions/
 Disallow: /search/';
 
-echo C('Sitemap.Robots.Rules', $Default);
+echo c('Sitemap.Robots.Rules', $Default);

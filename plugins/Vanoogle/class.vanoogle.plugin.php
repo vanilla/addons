@@ -17,18 +17,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-$PluginInfo["Vanoogle"] = array(
-    "Name" => "Vanoogle",
-    "Description" => "A google search plugin for vanilla 2+",
-    "Version" => "1.2",
-    "Author" => "Dan Dumont",
-    "AuthorEmail" => "ddumont@gmail.com",
-    "SettingsUrl" => "/settings/vanoogle",
-    "SettingsPermission" => "Garden.Settings.Manage",
-    "AuthorUrl" => "http://blog.canofsleep.com",
-    "RequiredApplications" => array("Vanilla" => "2.0.17") // This needs to be bumped when Vanilla releases with my contributed changes
-);
-
 /**
  * Vanoogle seearch plugin for Vanilla
  * @author ddumont@gmail.com
@@ -37,65 +25,65 @@ class VanooglePlugin extends Gdn_Plugin {
 
     /**
      * Build the setting page.
-     * @param $Sender
+     * @param $sender
      */
-    public function SettingsController_Vanoogle_Create($Sender) {
-        $Sender->Permission('Garden.Settings.Manage');
+    public function settingsController_vanoogle_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
 
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->SetField(array("Plugins.Vanoogle.CSE"));
-        $Sender->Form->SetModel($ConfigurationModel);
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField(["Plugins.Vanoogle.CSE"]);
+        $sender->Form->setModel($configurationModel);
 
-        if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
-            $Sender->Form->SetData($ConfigurationModel->Data);
+        if ($sender->Form->authenticatedPostBack() === FALSE) {
+            $sender->Form->setData($configurationModel->Data);
         } else {
-            $Data = $Sender->Form->FormValues();
-            $ConfigurationModel->Validation->ApplyRule("Plugins.Vanoogle.CSE", "Required");
-            if ($Sender->Form->Save() !== FALSE)
-                $Sender->StatusMessage = T("Your settings have been saved.");
+            $data = $sender->Form->formValues();
+            $configurationModel->Validation->applyRule("Plugins.Vanoogle.CSE", "Required");
+            if ($sender->Form->save() !== FALSE)
+                $sender->StatusMessage = t("Your settings have been saved.");
         }
 
-        $Sender->AddSideMenu();
-        $Sender->SetData("Title", T("Vanoogle Settings"));
+        $sender->addSideMenu();
+        $sender->setData("Title", t("Vanoogle Settings"));
 
-        $CategoryModel = new CategoryModel();
-        $Sender->SetData("CategoryData", $CategoryModel->GetAll(), TRUE);
-        array_shift($Sender->CategoryData->Result());
+        $categoryModel = new CategoryModel();
+        $sender->setData("CategoryData", $categoryModel->getAll(), TRUE);
+        array_shift($sender->CategoryData->result());
 
-        $Sender->Render($this->GetView("settings.php"));
+        $sender->render($this->getView("settings.php"));
     }
 
     /**
      * Add our script and css to every page.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function Base_Render_Before($Sender) {
-        if (!C("Plugins.Vanoogle.CSE"))
+    public function base_render_before($sender) {
+        if (!c("Plugins.Vanoogle.CSE"))
             return;
 
         // Normally one would use ->AddJsFile or ->Head->AddScript, but these insert a version arg in the url that makes the google api barf.
-        $Sender->Head->AddTag('script', array(
-            'src' => Asset('https://www.google.com/jsapi', FALSE, FALSE),
+        $sender->Head->addTag('script', [
+            'src' => asset('https://www.google.com/jsapi', FALSE, FALSE),
             'type' => 'text/javascript',
-            'id' => C("Plugins.Vanoogle.CSE")
-        ));
-        $Sender->AddCssFile('vanoogle.css', 'plugins/Vanoogle');
-        $Sender->AddJsFile('vanoogle.js', 'plugins/Vanoogle');
+            'id' => c("Plugins.Vanoogle.CSE")
+        ]);
+        $sender->addCssFile('vanoogle.css', 'plugins/Vanoogle');
+        $sender->addJsFile('vanoogle.js', 'plugins/Vanoogle');
     }
 
     /**
      * Place our search element on page to be moved by js later.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function Base_Render_After($Sender) {
-        if (!C("Plugins.Vanoogle.ApiKey"))
+    public function base_render_after($sender) {
+        if (!c("Plugins.Vanoogle.ApiKey"))
             return;
         ?>
             <div id="hidden" style="display:none;">
-                <div id="VanoogleSearch"><?php echo T('Loading Search...');?></div>
+                <div id="VanoogleSearch"><?php echo t('Loading Search...');?></div>
                 <div id="vanoogle_webResult">
                     <li class="Item gs-webResult gs-result"
                       data-vars="{longUrl:function(){var i = unescapedUrl.indexOf(visibleUrl); return i &lt; 1 ? visibleUrl : unescapedUrl.substring(i);},trimmedTitle:function(){return html(title.replace(/[-][^-]+$/, ''));}}">
@@ -128,5 +116,5 @@ class VanooglePlugin extends Gdn_Plugin {
         <?php
     }
 
-    public function Setup() {}
+    public function setup() {}
 }

@@ -8,16 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['Minify'] = array(
-   'Name' => 'Minify',
-   'Description' => 'DEPRECATED. Analyzes each page request for Javascript and CSS files, merging and minifying them where applicable.',
-   'Version' => '1.0.3b',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
-);
-
 class MinifyPlugin extends Gdn_Plugin {
    
    /** @var string Subfolder that Vanilla lives in */
@@ -26,155 +16,155 @@ class MinifyPlugin extends Gdn_Plugin {
    /**
     * Remove all CSS and JS files and add minified versions.
     *
-    * @param HeadModule $Head
+    * @param HeadModule $head
     */
-   public function HeadModule_BeforeToString_Handler($Head) {
+   public function headModule_beforeToString_handler($head) {
       // Set BasePath for the plugin
-      $this->BasePath = Gdn::Request()->WebRoot();
+      $this->BasePath = Gdn::request()->webRoot();
       
       // Get current tags
-      $Tags = $Head->Tags();
+      $tags = $head->tags();
 
       // Grab all of the CSS
-      $CssToCache = array();
-      $JsToCache = array(); // Add the global js files
-      $GlobalJS = array(
+      $cssToCache = [];
+      $jsToCache = []; // Add the global js files
+      $globalJS = [
          'jquery.js',
          'jquery.livequery.js',
          'jquery.form.js',
          'jquery.popup.js',
          'jquery.gardenhandleajaxform.js',
          'global.js'
-      );
+      ];
       
       // Process all tags, finding JS & CSS files
-      foreach ($Tags as $Index => $Tag) {
-         $IsJs = GetValue(HeadModule::TAG_KEY, $Tag) == 'script';
-         $IsCss = (GetValue(HeadModule::TAG_KEY, $Tag) == 'link' && GetValue('rel', $Tag) == 'stylesheet');
-         if (!$IsJs && !$IsCss)
+      foreach ($tags as $index => $tag) {
+         $isJs = getValue(HeadModule::TAG_KEY, $tag) == 'script';
+         $isCss = (getValue(HeadModule::TAG_KEY, $tag) == 'link' && getValue('rel', $tag) == 'stylesheet');
+         if (!$isJs && !$isCss)
             continue;
 
-         if ($IsCss)
-            $Href = GetValue('href', $Tag, '!');
+         if ($isCss)
+            $href = getValue('href', $tag, '!');
          else
-            $Href = GetValue('src', $Tag, '!');
+            $href = getValue('src', $tag, '!');
          
          // Skip the rest if path doesn't start with a slash
-         if ($Href[0] != '/')
+         if ($href[0] != '/')
             continue;
 
          // Strip any querystring off the href.
-         $HrefWithVersion = $Href;
-         $Href = preg_replace('`\?.*`', '', $Href);
+         $hrefWithVersion = $href;
+         $href = preg_replace('`\?.*`', '', $href);
          
          // Strip BasePath & extra slash from Href (Minify adds an extra slash when substituting basepath)
          if($this->BasePath != '')
-            $Href = preg_replace("`^/{$this->BasePath}/`U", '', $Href);
+            $href = preg_replace("`^/{$this->BasePath}/`U", '', $href);
             
          // Skip the rest if the file doesn't exist
-         $FixPath = ($Href[0] != '/') ? '/' : ''; // Put that slash back to test for it in file structure
-         $Path = PATH_ROOT . $FixPath . $Href;
-         if (!file_exists($Path))
+         $fixPath = ($href[0] != '/') ? '/' : ''; // Put that slash back to test for it in file structure
+         $path = PATH_ROOT . $fixPath . $href;
+         if (!file_exists($path))
             continue;
 
          // Remove the css from the tag because minifier is taking care of it.
-         unset($Tags[$Index]);
+         unset($tags[$index]);
 
          // Add the reference to the appropriate cache collection.
-         if ($IsCss) {
-            $CssToCache[] = $Href;
-         } elseif ($IsJs) {
+         if ($isCss) {
+            $cssToCache[] = $href;
+         } elseif ($isJs) {
             // Don't include the file if it's in the global js.
-            $Filename = basename($Path);
-            if (in_array($Filename, $GlobalJS)) {
+            $filename = basename($path);
+            if (in_array($filename, $globalJS)) {
                continue;
             }
-            $JsToCache[] = $Href;
+            $jsToCache[] = $href;
          }
       }
       
       // Add minified css & js directly to the head module.
-      $Url = 'plugins/Minify/min/?' . ($this->BasePath != '' ? "b={$this->BasePath}&" : '');
+      $url = 'plugins/Minify/min/?' . ($this->BasePath != '' ? "b={$this->BasePath}&" : '');
       
       // Update HeadModule's $Tags
-      $Head->Tags($Tags);
+      $head->tags($tags);
       
       // Add minified CSS to HeadModule.
-      $Token = $this->_PrepareToken($CssToCache, ".css");
-      if (file_exists(PATH_CACHE."/Minify/minify_$Token")) {
-         $Head->AddCss("/cache/Minify/minify_$Token", 'screen', FALSE);
+      $token = $this->_PrepareToken($cssToCache, ".css");
+      if (file_exists(PATH_CACHE."/Minify/minify_$token")) {
+         $head->addCss("/cache/Minify/minify_$token", 'screen', FALSE);
       } else {
-         $Head->AddCss($Url.'token='.urlencode($Token), 'screen', FALSE);
+         $head->addCss($url.'token='.urlencode($token), 'screen', FALSE);
       }
       
       // Add global minified JS separately (and first)
-      $Head->AddScript($Url . 'g=globaljs', 'text/javascript', -100);
+      $head->addScript($url . 'g=globaljs', 'text/javascript', -100);
       
       // Add other minified JS to HeadModule.
-      $Token = $this->_PrepareToken($JsToCache, '.js');
-      if (file_exists(PATH_CACHE."/Minify/minify_$Token")) {
-         $Head->AddScript("/cache/Minify/minify_$Token", 'text/javascript', NULL, FALSE);
+      $token = $this->_PrepareToken($jsToCache, '.js');
+      if (file_exists(PATH_CACHE."/Minify/minify_$token")) {
+         $head->addScript("/cache/Minify/minify_$token", 'text/javascript', NULL, FALSE);
       } else {
-         $Head->AddScript($Url . 'token=' . $Token, 'text/javascript', NULL, FALSE);
+         $head->addScript($url . 'token=' . $token, 'text/javascript', NULL, FALSE);
       }
    }
    
    /**
     * Build unique, repeatable identifier for cache files.
     *
-    * @param array $Files List of filenames
-    * @return string $Token Unique identifier for file collection
+    * @param array $files List of filenames
+    * @return string $token Unique identifier for file collection
     */
-   protected function _PrepareToken($Files, $Suffix = '') {
+   protected function _PrepareToken($files, $suffix = '') {
       // Build token.
-      $Query = array('f' => implode(',', array_unique($Files)));
+      $query = ['f' => implode(',', array_unique($files))];
       if ($this->BasePath != '')
-         $Query['b'] = $this->BasePath;
-      $Query = serialize($Query);
-      $Token = md5($Query).$Suffix;
+         $query['b'] = $this->BasePath;
+      $query = serialize($query);
+      $token = md5($query).$suffix;
       
       // Save file name with token.
-      $CacheFile = PATH_CACHE."/Minify/query_$Token";
-      if (!file_exists($CacheFile)) {
-         if (!file_exists(dirname($CacheFile)))
-            mkdir(dirname($CacheFile), 0777, TRUE);
-         file_put_contents($CacheFile, $Query);
+      $cacheFile = PATH_CACHE."/Minify/query_$token";
+      if (!file_exists($cacheFile)) {
+         if (!file_exists(dirname($cacheFile)))
+            mkdir(dirname($cacheFile), 0777, TRUE);
+         file_put_contents($cacheFile, $query);
       }
       
-      return $Token;
+      return $token;
    }
    
    /**
     * Create 'Minify' cache folder.
     */
-   public function Setup() {
-      $Folder = PATH_CACHE.'/Minify';
-      if (!file_exists($Folder))
-         @mkdir($Folder);
+   public function setup() {
+      $folder = PATH_CACHE.'/Minify';
+      if (!file_exists($folder))
+         @mkdir($folder);
    }
    
    /**
     * Empty cache when disabling this plugin.
     */ 
-   public function OnDisable() { $this->_EmptyCache(); }
+   public function onDisable() { $this->_EmptyCache(); }
    
    /** 
     * Empty cache when enabling or disabling any other plugin, application, or theme.
     */
-   public function SettingsController_AfterEnablePlugin_Handler() { $this->_EmptyCache(); }
-   public function SettingsController_AfterDisablePlugin_Handler() { $this->_EmptyCache(); }
-   public function SettingsController_AfterEnableApplication_Handler() { $this->_EmptyCache(); }
-   public function SettingsController_AfterDisableApplication_Handler() { $this->_EmptyCache(); }
-   public function SettingsController_AfterEnableTheme_Handler() { $this->_EmptyCache(); }
+   public function settingsController_afterEnablePlugin_handler() { $this->_EmptyCache(); }
+   public function settingsController_afterDisablePlugin_handler() { $this->_EmptyCache(); }
+   public function settingsController_afterEnableApplication_handler() { $this->_EmptyCache(); }
+   public function settingsController_afterDisableApplication_handler() { $this->_EmptyCache(); }
+   public function settingsController_afterEnableTheme_handler() { $this->_EmptyCache(); }
    
    /**
     * Empty Minify's cache.
     */
    private function _EmptyCache() {
-      $Files = glob(PATH_CACHE.'/Minify/*', GLOB_MARK);
-      foreach ($Files as $File) {
-         if (substr($File, -1) != '/')
-            unlink($File);
+      $files = glob(PATH_CACHE.'/Minify/*', GLOB_MARK);
+      foreach ($files as $file) {
+         if (substr($file, -1) != '/')
+            unlink($file);
       }
    }
 }

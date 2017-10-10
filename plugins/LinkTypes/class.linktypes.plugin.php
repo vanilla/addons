@@ -1,34 +1,19 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) { exit(); }
 /**
- * @copyright 2009-2014 Vanilla Forums, Inc.
+ * @copyright 2009-2017 Vanilla Forums, Inc.
  * @license GNU GPLv2
  */
 
-$PluginInfo['LinkTypes'] = array(
-   'Name' => 'Link Types',
-   'Description' => 'Open external URLs in a new tab.',
-   // @todo: Make this plugin configurable to decide how different URL types should behave.
-   // Always maintain external => _blank as a default.
-   'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincoln@vanillaforums.com'
-);
-
+/**
+ * Class LinkTypesPlugin
+ */
 class LinkTypesPlugin extends Gdn_Plugin {
    /**
     * Add JS file.
     *
-    * @param $Sender AssetModel
+    * @param $sender AssetModel
     */
-   public function Base_Render_Before($Sender) {
-      $Sender->AddJsFile('linktypes.js', 'plugins/LinkTypes');
-   }
-   
-   /**
-    * Plugin setup.
-    */
-   public function Setup() {
-
+   public function base_render_before($sender) {
+      $sender->addJsFile('linktypes.js', 'plugins/LinkTypes');
    }
 }

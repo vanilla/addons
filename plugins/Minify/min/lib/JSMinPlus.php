@@ -42,7 +42,7 @@
  * Portions created by the Initial Developer are Copyright (C) 2004
  * the Initial Developer. All Rights Reserved.
  *
- * Contributor(s): Tino Zijdel <crisp@tweakers.net>
+ * contributor(s): Tino Zijdel <crisp@tweakers.net>
  * PHP port, modifications and minifier routine are (C) 2009
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -89,7 +89,7 @@ define('STATEMENT_FORM', 2);
 class JSMinPlus
 {
 	private $parser;
-	private $reserved = array(
+	private $reserved = [
 		'break', 'case', 'catch', 'continue', 'default', 'delete', 'do',
 		'else', 'finally', 'for', 'function', 'if', 'in', 'instanceof',
 		'new', 'return', 'switch', 'this', 'throw', 'try', 'typeof', 'var',
@@ -103,7 +103,7 @@ class JSMinPlus
 		// These are not reserved, but should be taken into account
 		// in isValidIdentifier (See jslint source code)
 		'arguments', 'eval', 'true', 'false', 'Infinity', 'NaN', 'null', 'undefined'
-	);
+	];
 
 	private function __construct()
 	{
@@ -478,7 +478,7 @@ class JSParser
 {
 	private $t;
 
-	private $opPrecedence = array(
+	private $opPrecedence = [
 		';' => 0,
 		',' => 1,
 		'=' => 2, '?' => 2, ':' => 2,
@@ -500,9 +500,9 @@ class JSParser
 		'.' => 17,
 		JS_NEW_WITH_ARGS => 0, JS_INDEX => 0, JS_CALL => 0,
 		JS_ARRAY_INIT => 0, JS_OBJECT_INIT => 0, JS_GROUP => 0
-	);
+	];
 
-	private $opArity = array(
+	private $opArity = [
 		',' => -2,
 		'=' => 2,
 		'?' => 3,
@@ -524,7 +524,7 @@ class JSParser
 		JS_NEW_WITH_ARGS => 2, JS_INDEX => 2, JS_CALL => 2,
 		JS_ARRAY_INIT => 1, JS_OBJECT_INIT => 1, JS_GROUP => 1,
 		TOKEN_CONDCOMMENT_MULTILINE => 1
-	);
+	];
 
 	public function __construct()
 	{
@@ -537,16 +537,16 @@ class JSParser
 		$this->t->init($s, $f, $l);
 
 		$x = new JSCompilerContext(false);
-		$n = $this->Script($x);
+		$n = $this->script($x);
 		if (!$this->t->isDone())
 			throw $this->t->newSyntaxError('Syntax error');
 
 		return $n;
 	}
 
-	private function Script($x)
+	private function script($x)
 	{
-		$n = $this->Statements($x);
+		$n = $this->statements($x);
 		$n->type = JS_SCRIPT;
 		$n->funDecls = $x->funDecls;
 		$n->varDecls = $x->varDecls;
@@ -554,29 +554,29 @@ class JSParser
 		return $n;
 	}
 
-	private function Statements($x)
+	private function statements($x)
 	{
 		$n = new JSNode($this->t, JS_BLOCK);
 		array_push($x->stmtStack, $n);
 
 		while (!$this->t->isDone() && $this->t->peek() != OP_RIGHT_CURLY)
-			$n->addNode($this->Statement($x));
+			$n->addNode($this->statement($x));
 
 		array_pop($x->stmtStack);
 
 		return $n;
 	}
 
-	private function Block($x)
+	private function block($x)
 	{
 		$this->t->mustMatch(OP_LEFT_CURLY);
-		$n = $this->Statements($x);
+		$n = $this->statements($x);
 		$this->t->mustMatch(OP_RIGHT_CURLY);
 
 		return $n;
 	}
 
-	private function Statement($x)
+	private function statement($x)
 	{
 		$tt = $this->t->get();
 		$n2 = null;
@@ -586,7 +586,7 @@ class JSParser
 		switch ($tt)
 		{
 			case KEYWORD_FUNCTION:
-				return $this->FunctionDefinition(
+				return $this->functionDefinition(
 					$x,
 					true,
 					count($x->stmtStack) > 1 ? STATEMENT_FORM : DECLARED_FORM
@@ -594,25 +594,25 @@ class JSParser
 			break;
 
 			case OP_LEFT_CURLY:
-				$n = $this->Statements($x);
+				$n = $this->statements($x);
 				$this->t->mustMatch(OP_RIGHT_CURLY);
 			return $n;
 
 			case KEYWORD_IF:
 				$n = new JSNode($this->t);
-				$n->condition = $this->ParenExpression($x);
+				$n->condition = $this->parenExpression($x);
 				array_push($x->stmtStack, $n);
-				$n->thenPart = $this->Statement($x);
-				$n->elsePart = $this->t->match(KEYWORD_ELSE) ? $this->Statement($x) : null;
+				$n->thenPart = $this->statement($x);
+				$n->elsePart = $this->t->match(KEYWORD_ELSE) ? $this->statement($x) : null;
 				array_pop($x->stmtStack);
 			return $n;
 
 			case KEYWORD_SWITCH:
 				$n = new JSNode($this->t);
 				$this->t->mustMatch(OP_LEFT_PAREN);
-				$n->discriminant = $this->Expression($x);
+				$n->discriminant = $this->expression($x);
 				$this->t->mustMatch(OP_RIGHT_PAREN);
-				$n->cases = array();
+				$n->cases = [];
 				$n->defaultIndex = -1;
 
 				array_push($x->stmtStack, $n);
@@ -632,7 +632,7 @@ class JSParser
 							if ($tt == KEYWORD_DEFAULT)
 								$n->defaultIndex = count($n->cases);
 							else
-								$n2->caseLabel = $this->Expression($x, OP_COLON);
+								$n2->caseLabel = $this->expression($x, OP_COLON);
 								break;
 						default:
 							throw $this->t->newSyntaxError('Invalid switch case');
@@ -641,7 +641,7 @@ class JSParser
 					$this->t->mustMatch(OP_COLON);
 					$n2->statements = new JSNode($this->t, JS_BLOCK);
 					while (($tt = $this->t->peek()) != KEYWORD_CASE && $tt != KEYWORD_DEFAULT && $tt != OP_RIGHT_CURLY)
-						$n2->statements->addNode($this->Statement($x));
+						$n2->statements->addNode($this->statement($x));
 
 					array_push($n->cases, $n2);
 				}
@@ -660,11 +660,11 @@ class JSParser
 					if ($tt == KEYWORD_VAR || $tt == KEYWORD_CONST)
 					{
 						$this->t->get();
-						$n2 = $this->Variables($x);
+						$n2 = $this->variables($x);
 					}
 					else
 					{
-						$n2 = $this->Expression($x);
+						$n2 = $this->expression($x);
 					}
 					$x->inForLoopInit = false;
 				}
@@ -676,7 +676,7 @@ class JSParser
 					{
 						if (count($n2->treeNodes) != 1)
 						{
-							throw $this->t->SyntaxError(
+							throw $this->t->syntaxError(
 								'Invalid for..in left-hand side',
 								$this->t->filename,
 								$n2->lineno
@@ -693,15 +693,15 @@ class JSParser
 						$n->varDecl = null;
 					}
 
-					$n->object = $this->Expression($x);
+					$n->object = $this->expression($x);
 				}
 				else
 				{
 					$n->setup = $n2 ? $n2 : null;
 					$this->t->mustMatch(OP_SEMICOLON);
-					$n->condition = $this->t->peek() == OP_SEMICOLON ? null : $this->Expression($x);
+					$n->condition = $this->t->peek() == OP_SEMICOLON ? null : $this->expression($x);
 					$this->t->mustMatch(OP_SEMICOLON);
-					$n->update = $this->t->peek() == OP_RIGHT_PAREN ? null : $this->Expression($x);
+					$n->update = $this->t->peek() == OP_RIGHT_PAREN ? null : $this->expression($x);
 				}
 
 				$this->t->mustMatch(OP_RIGHT_PAREN);
@@ -711,7 +711,7 @@ class JSParser
 			case KEYWORD_WHILE:
 			        $n = new JSNode($this->t);
 			        $n->isLoop = true;
-			        $n->condition = $this->ParenExpression($x);
+			        $n->condition = $this->parenExpression($x);
 			        $n->body = $this->nest($x, $n);
 			return $n;
 
@@ -719,7 +719,7 @@ class JSParser
 				$n = new JSNode($this->t);
 				$n->isLoop = true;
 				$n->body = $this->nest($x, $n, KEYWORD_WHILE);
-				$n->condition = $this->ParenExpression($x);
+				$n->condition = $this->parenExpression($x);
 				if (!$x->ecmaStrictMode)
 				{
 					// <script language="JavaScript"> (without version hints) may need
@@ -767,8 +767,8 @@ class JSParser
 
 			case KEYWORD_TRY:
 				$n = new JSNode($this->t);
-				$n->tryBlock = $this->Block($x);
-				$n->catchClauses = array();
+				$n->tryBlock = $this->block($x);
+				$n->catchClauses = [];
 
 				while ($this->t->match(KEYWORD_CATCH))
 				{
@@ -784,7 +784,7 @@ class JSParser
 						if (count($n->catchClauses) && !end($n->catchClauses)->guard)
 							throw $this->t->newSyntaxError('Guarded catch after unguarded');
 
-						$n2->guard = $this->Expression($x);
+						$n2->guard = $this->expression($x);
 					}
 					else
 					{
@@ -792,12 +792,12 @@ class JSParser
 					}
 
 					$this->t->mustMatch(OP_RIGHT_PAREN);
-					$n2->block = $this->Block($x);
+					$n2->block = $this->block($x);
 					array_push($n->catchClauses, $n2);
 				}
 
 				if ($this->t->match(KEYWORD_FINALLY))
-					$n->finallyBlock = $this->Block($x);
+					$n->finallyBlock = $this->block($x);
 
 				if (!count($n->catchClauses) && !$n->finallyBlock)
 					throw $this->t->newSyntaxError('Invalid try statement');
@@ -809,7 +809,7 @@ class JSParser
 
 			case KEYWORD_THROW:
 				$n = new JSNode($this->t);
-				$n->exception = $this->Expression($x);
+				$n->exception = $this->expression($x);
 			break;
 
 			case KEYWORD_RETURN:
@@ -819,20 +819,20 @@ class JSParser
 				$n = new JSNode($this->t);
 				$tt = $this->t->peekOnSameLine();
 				if ($tt != TOKEN_END && $tt != TOKEN_NEWLINE && $tt != OP_SEMICOLON && $tt != OP_RIGHT_CURLY)
-					$n->value = $this->Expression($x);
+					$n->value = $this->expression($x);
 				else
 					$n->value = null;
 			break;
 
 			case KEYWORD_WITH:
 				$n = new JSNode($this->t);
-				$n->object = $this->ParenExpression($x);
+				$n->object = $this->parenExpression($x);
 				$n->body = $this->nest($x, $n);
 			return $n;
 
 			case KEYWORD_VAR:
 			case KEYWORD_CONST:
-			        $n = $this->Variables($x);
+			        $n = $this->variables($x);
 			break;
 
 			case TOKEN_CONDCOMMENT_MULTILINE:
@@ -876,7 +876,7 @@ class JSParser
 
 				$n = new JSNode($this->t, OP_SEMICOLON);
 				$this->t->unget();
-				$n->expression = $this->Expression($x);
+				$n->expression = $this->expression($x);
 				$n->end = $n->expression->end;
 			break;
 		}
@@ -893,7 +893,7 @@ class JSParser
 		return $n;
 	}
 
-	private function FunctionDefinition($x, $requireName, $functionForm)
+	private function functionDefinition($x, $requireName, $functionForm)
 	{
 		$f = new JSNode($this->t);
 
@@ -906,7 +906,7 @@ class JSParser
 			throw $this->t->newSyntaxError('Missing function identifier');
 
 		$this->t->mustMatch(OP_LEFT_PAREN);
-			$f->params = array();
+			$f->params = [];
 
 		while (($tt = $this->t->get()) != OP_RIGHT_PAREN)
 		{
@@ -922,7 +922,7 @@ class JSParser
 		$this->t->mustMatch(OP_LEFT_CURLY);
 
 		$x2 = new JSCompilerContext(true);
-		$f->body = $this->Script($x2);
+		$f->body = $this->script($x2);
 
 		$this->t->mustMatch(OP_RIGHT_CURLY);
 		$f->end = $this->t->currentToken()->end;
@@ -934,7 +934,7 @@ class JSParser
 		return $f;
 	}
 
-	private function Variables($x)
+	private function variables($x)
 	{
 		$n = new JSNode($this->t);
 
@@ -950,7 +950,7 @@ class JSParser
 				if ($this->t->currentToken()->assignOp)
 					throw $this->t->newSyntaxError('Invalid variable initialization');
 
-				$n2->initializer = $this->Expression($x, OP_COMMA);
+				$n2->initializer = $this->expression($x, OP_COMMA);
 			}
 
 			$n2->readOnly = $n->type == KEYWORD_CONST;
@@ -963,10 +963,10 @@ class JSParser
 		return $n;
 	}
 
-	private function Expression($x, $stop=false)
+	private function expression($x, $stop=false)
 	{
-		$operators = array();
-		$operands = array();
+		$operators = [];
+		$operands = [];
 		$n = false;
 
 		$bl = $x->bracketLevel;
@@ -1114,7 +1114,7 @@ class JSParser
 					if (!$this->t->scanOperand)
 						break 2;
 
-					array_push($operands, $this->FunctionDefinition($x, false, EXPRESSED_FORM));
+					array_push($operands, $this->functionDefinition($x, false, EXPRESSED_FORM));
 					$this->t->scanOperand = false;
 				break;
 
@@ -1149,7 +1149,7 @@ class JSParser
 								continue;
 							}
 
-							$n->addNode($this->Expression($x, OP_COMMA));
+							$n->addNode($this->expression($x, OP_COMMA));
 							if (!$this->t->match(OP_COMMA))
 								break;
 						}
@@ -1196,7 +1196,7 @@ class JSParser
 								if ($x->ecmaStrictMode)
 									throw $this->t->newSyntaxError('Illegal property accessor');
 
-								$n->addNode($this->FunctionDefinition($x, true, EXPRESSED_FORM));
+								$n->addNode($this->functionDefinition($x, true, EXPRESSED_FORM));
 							}
 							else
 							{
@@ -1218,7 +1218,7 @@ class JSParser
 								}
 
 								$this->t->mustMatch(OP_COLON);
-								$n->addNode(new JSNode($this->t, JS_PROPERTY_INIT, $id, $this->Expression($x, OP_COMMA)));
+								$n->addNode(new JSNode($this->t, JS_PROPERTY_INIT, $id, $this->expression($x, OP_COMMA)));
 							}
 						}
 						while ($this->t->match(OP_COMMA));
@@ -1333,10 +1333,10 @@ class JSParser
 		return array_pop($operands);
 	}
 
-	private function ParenExpression($x)
+	private function parenExpression($x)
 	{
 		$this->t->mustMatch(OP_LEFT_PAREN);
-		$n = $this->Expression($x);
+		$n = $this->expression($x);
 		$this->t->mustMatch(OP_RIGHT_PAREN);
 
 		return $n;
@@ -1403,9 +1403,9 @@ class JSCompilerContext
 	public $parenLevel = 0;
 	public $hookLevel = 0;
 
-	public $stmtStack = array();
-	public $funDecls = array();
-	public $varDecls = array();
+	public $stmtStack = [];
+	public $funDecls = [];
+	public $varDecls = [];
 
 	public function __construct($inFunction)
 	{
@@ -1421,9 +1421,9 @@ class JSNode
 	private $start;
 	private $end;
 
-	public $treeNodes = array();
-	public $funDecls = array();
-	public $varDecls = array();
+	public $treeNodes = [];
+	public $funDecls = [];
+	public $varDecls = [];
 
 	public function __construct($t, $type=0)
 	{
@@ -1474,7 +1474,7 @@ class JSTokenizer
 	private $cursor = 0;
 	private $source;
 
-	public $tokens = array();
+	public $tokens = [];
 	public $tokenIndex = 0;
 	public $lookahead = 0;
 	public $scanNewlines = false;
@@ -1483,7 +1483,7 @@ class JSTokenizer
 	public $filename;
 	public $lineno;
 
-	private $keywords = array(
+	private $keywords = [
 		'break',
 		'case', 'catch', 'const', 'continue',
 		'debugger', 'default', 'delete', 'do',
@@ -1496,9 +1496,9 @@ class JSTokenizer
 		'this', 'throw', 'true', 'try', 'typeof',
 		'var', 'void',
 		'while', 'with'
-	);
+	];
 
-	private $opTypeNames = array(
+	private $opTypeNames = [
 		';'	=> 'SEMICOLON',
 		','	=> 'COMMA',
 		'?'	=> 'HOOK',
@@ -1537,9 +1537,9 @@ class JSTokenizer
 		'('	=> 'LEFT_PAREN',
 		')'	=> 'RIGHT_PAREN',
 		'@*/'	=> 'CONDCOMMENT_END'
-	);
+	];
 
-	private $assignOps = array('|', '^', '&', '<<', '>>', '>>>', '+', '-', '*', '/', '%');
+	private $assignOps = ['|', '^', '&', '<<', '>>', '>>>', '+', '-', '*', '/', '%'];
 	private $opRegExp;
 
 	public function __construct()
@@ -1564,7 +1564,7 @@ class JSTokenizer
 		$this->lineno = $lineno;
 
 		$this->cursor = 0;
-		$this->tokens = array();
+		$this->tokens = [];
 		$this->tokenIndex = 0;
 		$this->lookahead = 0;
 		$this->scanNewlines = false;
@@ -1695,7 +1695,7 @@ class JSTokenizer
 		if ($input == '')
 		{
 			$tt = TOKEN_END;
-			$match = array('');
+			$match = [''];
 		}
 		elseif ($conditional_comment)
 		{
@@ -1794,7 +1794,7 @@ class JSTokenizer
 				case '(':
 				case ')':
 					// these are all single
-					$match = array($input[0]);
+					$match = [$input[0]];
 					$tt = $input[0];
 				break;
 
@@ -1805,7 +1805,7 @@ class JSTokenizer
 				case "\n":
 					if ($this->scanNewlines)
 					{
-						$match = array("\n");
+						$match = ["\n"];
 						$tt = TOKEN_NEWLINE;
 					}
 					else

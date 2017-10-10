@@ -29,7 +29,7 @@ class Minify_CSS_Compressor {
      * 
      * @return string
      */
-    public static function process($css, $options = array())
+    public static function process($css, $options = [])
     {
         $obj = new Minify_CSS_Compressor($options);
         return $obj->_process($css);
@@ -81,7 +81,7 @@ class Minify_CSS_Compressor {
         
         // apply callback to all valid comments (and strip out surrounding ws
         $css = preg_replace_callback('@\\s*/\\*([\\s\\S]*?)\\*/\\s*@'
-            ,array($this, '_commentCB'), $css);
+            ,[$this, '_commentCB'], $css);
 
         // remove ws around { } and last semicolon in declaration block
         $css = preg_replace('/\\s*{\\s*/', '{', $css);
@@ -123,7 +123,7 @@ class Minify_CSS_Compressor {
                 [^~>+,\\s]+      # selector part
                 {                # open declaration block
             /x'
-            ,array($this, '_selectorsCB'), $css);
+            ,[$this, '_selectorsCB'], $css);
         
         // minimize hex colors
         $css = preg_replace('/([^=])#([a-f\\d])\\2([a-f\\d])\\3([a-f\\d])\\4([\\s;\\}])/i'
@@ -131,7 +131,7 @@ class Minify_CSS_Compressor {
         
         // remove spaces between font families
         $css = preg_replace_callback('/font-family:([^;}]+)([;}])/'
-            ,array($this, '_fontFamilyCB'), $css);
+            ,[$this, '_fontFamilyCB'], $css);
         
         $css = preg_replace('/@import\\s+url/', '@import url', $css);
         

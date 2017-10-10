@@ -1,0 +1,18 @@
+{
+    "name": "Email Password Sync",
+    "description": "Synchronizes passwords when users with the same email/password combos change their passwords.",
+    "version": "1.0b",
+    "key": "emailpasswordsync",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.17"
+    },
+	"icon": "email_password_sync.png"
+}

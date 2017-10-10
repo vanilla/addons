@@ -1,90 +1,79 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['FacebookID'] = array(
-   'Name' => 'Facebook ID Display',
-   'Description' => "Displays users' Facebook IDs in various locations in the site.",
-   'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'Author' => "Todd Burry",
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
-   'RegisterPermissions' => array('Plugins.FacebookID.View'),
-);
-
 class FacebookIDPlugin extends Gdn_Plugin {
    /** @var array */
-   public $FacebookIDs = array();
+   public $FacebookIDs = [];
 
-   public function UserInfoModule_OnBasicInfo_Handler($Sender, $Args) {
-      if (Gdn::Session()->CheckPermission('Plugins.FacebookID.View')) {
+   public function userInfoModule_onBasicInfo_handler($sender, $args) {
+      if (Gdn::session()->checkPermission('Plugins.FacebookID.View')) {
          // Grab the facebook ID.
-         $FacebookID = Gdn::SQL()->GetWhere(
+         $facebookID = Gdn::sql()->getWhere(
             'UserAuthentication',
-            array('ProviderKey' => 'facebook', 'UserID' => $Sender->User->UserID)
-         )->Value('ForeignUserKey', T('n/a'));
+            ['ProviderKey' => 'facebook', 'UserID' => $sender->User->UserID]
+         )->value('ForeignUserKey', t('n/a'));
 
-         echo '<dt class="Value">'.T('Facebook ID').'</dt><dd>'.$FacebookID.'</dd>';
+         echo '<dt class="Value">'.t('Facebook ID').'</dt><dd>'.$facebookID.'</dd>';
       }
    }
 
    /**
     * Show FacebookID on comments.
     */
-   public function Base_CommentInfo_Handler($Sender, $Args) {
-      if (!Gdn::Session()->CheckPermission('Plugins.FacebookID.View'))
+   public function base_commentInfo_handler($sender, $args) {
+      if (!Gdn::session()->checkPermission('Plugins.FacebookID.View'))
          return;
 
-      if (!isset($Sender->Data['Discussion']))
+      if (!isset($sender->Data['Discussion']))
          return;
 
       if (!$this->FacebookIDs)
-         $this->FacebookIDs = $this->GetFacebookIDs(array($Sender->Data['Discussion'], $Sender->Data['Comments']), 'InsertUserID');
+         $this->FacebookIDs = $this->getFacebookIDs([$sender->Data['Discussion'], $sender->Data['Comments']], 'InsertUserID');
 
 
-      $UserID = GetValue('InsertUserID',$Sender->EventArguments['Object'],'0');
-      $FacebookID = GetValue($UserID, $this->FacebookIDs, T('n/a'));
-      echo '<span>'.T('Facebook ID').': '.$FacebookID.'</span> ';
+      $userID = getValue('InsertUserID',$sender->EventArguments['Object'],'0');
+      $facebookID = getValue($userID, $this->FacebookIDs, t('n/a'));
+      echo '<span>'.t('Facebook ID').': '.$facebookID.'</span> ';
    }
 
    /**
     * Show FacebookID on discussions (OP).
     */
-   public function Base_DiscussionInfo_Handler($Sender, $Args) {
-      $this->Base_CommentInfo_Handler($Sender, $Args);
+   public function base_discussionInfo_handler($sender, $args) {
+      $this->base_commentInfo_handler($sender, $args);
    }
 
    /**
     *
-    * @param Gdn_Controller $Sender
-    * @param <type> $Args
+    * @param Gdn_Controller $sender
+    * @param <type> $args
     * @return <type>
     */
-   public function UserController_Render_Before($Sender, $Args) {
-      if (!in_array($Sender->RequestMethod, array('index', 'browse')))
+   public function userController_render_before($sender, $args) {
+      if (!in_array($sender->RequestMethod, ['index', 'browse']))
          return;
-      if (!Gdn::Session()->CheckPermission('Plugins.FacebookID.View'))
+      if (!Gdn::session()->checkPermission('Plugins.FacebookID.View'))
          return;
    }
 
-   public function GetFacebookIDs($Datas, $UserIDColumn) {
-      $UserIDs = array();
-      foreach ($Datas as $Data) {
-         if ($UserID = GetValue($UserIDColumn, $Data))
-            $UserIDs[] = $UserID;
+   public function getFacebookIDs($datas, $userIDColumn) {
+      $userIDs = [];
+      foreach ($datas as $data) {
+         if ($userID = getValue($userIDColumn, $data))
+            $userIDs[] = $userID;
          else {
-            $IDs = array_column($Data, $UserIDColumn);
-            $UserIDs = array_merge($UserIDs, $IDs);
+            $iDs = array_column($data, $userIDColumn);
+            $userIDs = array_merge($userIDs, $iDs);
          }
       }
 
-      $FbIDs = Gdn::SQL()
-         ->WhereIn('UserID', array_unique($UserIDs))
-         ->GetWhere(
+      $fbIDs = Gdn::sql()
+         ->whereIn('UserID', array_unique($userIDs))
+         ->getWhere(
          'UserAuthentication',
-         array('ProviderKey' => 'facebook'))->ResultArray();
+         ['ProviderKey' => 'facebook'])->resultArray();
 
-      $Result = array_column($FbIDs, 'ForeignUserKey', 'UserID');
-      return $Result;
+      $result = array_column($fbIDs, 'ForeignUserKey', 'UserID');
+      return $result;
    }
 
 }

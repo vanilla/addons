@@ -16,25 +16,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
  */?>
-<h1> <?php echo $this->Data("Title");?> </h1>
+<h1> <?php echo $this->data("Title");?> </h1>
 <?php
-	echo $this->Form->Open();
-	echo $this->Form->Errors();
+	echo $this->Form->open();
+	echo $this->Form->errors();
 ?>
 <ul>
 	<li>
-		<h3><?php echo T("Required Settings"); ?></h3>
+		<h3><?php echo t("Required Settings"); ?></h3>
 		<ul class='CheckBoxList'>
 			<li>
 				<?php
-					echo $this->Form->Label("Enter your Custom Search Engine ID.  If you don't have one, create one here: <a target='_blank' href='http://www.google.com/cse/'>http://www.google.com/cse/", "Plugins.Vanoogle.CSE", array(
+					echo $this->Form->label("Enter your Custom Search Engine ID.  If you don't have one, create one here: <a target='_blank' href='http://www.google.com/cse/'>http://www.google.com/cse/", "Plugins.Vanoogle.CSE", [
 						"class" => "CheckBoxLabel",
-					));
+					]);
 					echo "<br>"; 
-					echo $this->Form->Input("Plugins.Vanoogle.CSE", "input", array(
+					echo $this->Form->input("Plugins.Vanoogle.CSE", "input", [
 						"size" => "40",
 						"style" => "font-family: Courier, 'Courier New', monospace;", 
-					)); 
+					]); 
 				?>
 			</li>
 		</ul>
@@ -43,5 +43,5 @@
 <br>
 
 <?php 
-   echo $this->Form->Close("Save");
+   echo $this->Form->close("Save");
 

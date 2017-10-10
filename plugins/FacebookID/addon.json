@@ -1,0 +1,21 @@
+{
+    "name": "Facebook ID Display",
+    "description": "Displays users' Facebook IDs in various locations in the site.",
+    "version": "1.0",
+    "registerPermissions": [
+        "Plugins.FacebookID.View"
+    ],
+    "key": "facebookid",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.com/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    },
+	"icon": "facebook_id.png"
+}

@@ -8,49 +8,30 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['ShareThis'] = array(
-   'Name' => 'ShareThis',
-   'Description' => 'Adds ShareThis (http://sharethis.com) buttons below discussions.',
-   'Version' => '1.2',
-   'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/plugin/sharethis',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'HasLocale' => TRUE,
-   'RegisterPermissions' => FALSE,
-   'Icon' => 'sharethis.png',
-   'Author' => "Brendan Sera-Shriar a.k.a digibomb",
-   'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://www.dropthedigibomb.com'
-);
-
-
 class ShareThisPlugin extends Gdn_Plugin {
    /**
     * Show buttons after OP message body.
     */
-	public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
-      $PublisherNumber = C('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
-      $ViaHandle = C('Plugin.ShareThis.ViaHandle', '');
-      $CopyNShare = C('Plugin.ShareThis.CopyNShare', false);
+	public function discussionController_afterDiscussionBody_handler($sender) {
+      $publisherNumber = c('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
+      $viaHandle = c('Plugin.ShareThis.ViaHandle', '');
+      $copyNShare = c('Plugin.ShareThis.CopyNShare', false);
 
-      $doNotHash = $CopyNShare ? 'false' : 'true';
-      $doNotCopy = $CopyNShare ? 'false' : 'true';
-      $Domain = Gdn::Request()->Scheme() == 'https' ? 'https://ws.sharethis.com' : 'http://w.sharethis.com';
+      $doNotHash = $copyNShare ? 'false' : 'true';
+      $doNotCopy = $copyNShare ? 'false' : 'true';
+      $domain = Gdn::request()->scheme() == 'https' ? 'https://ws.sharethis.com' : 'http://w.sharethis.com';
 
       echo <<<SHARETHIS
       <script type="text/javascript">var switchTo5x=true;</script>
-      <script type="text/javascript" src="{$Domain}/button/buttons.js"></script>
+      <script type="text/javascript" src="{$domain}/button/buttons.js"></script>
       <script type="text/javascript">stLight.options({
-         publisher: "{$PublisherNumber}",
+         publisher: "{$publisherNumber}",
          doNotHash: {$doNotHash},
          doNotCopy: {$doNotCopy},
          hashAddressBar: false
       });</script>
       <div class="ShareThisButtonWrapper Right">
-         <span class="st_twitter_hcount ShareThisButton" st_via="{$ViaHandle}" displayText="Tweet"></span>
+         <span class="st_twitter_hcount ShareThisButton" st_via="{$viaHandle}" displayText="Tweet"></span>
          <span class="st_facebook_hcount ShareThisButton" displayText="Facebook"></span>
          <span class="st_linkedin_hcount ShareThisButton Hidden" displayText="LinkedIn"></span>
          <span class="st_googleplus_hcount ShareThisButton Hidden" displayText="Google +"></span>
@@ -63,46 +44,46 @@ SHARETHIS;
 
    }
 
-   public function Setup() {
+   public function setup() {
       // Nothing to do here!
    }
    
    /**
     * Settings page.
     */
-   public function PluginController_ShareThis_Create($Sender) {
-   	$Sender->Permission('Garden.Settings.Manage');
-   	$Sender->Title('ShareThis');
-      $Sender->AddSideMenu('plugin/sharethis');
-      $Sender->Form = new Gdn_Form();
+   public function pluginController_shareThis_create($sender) {
+   	$sender->permission('Garden.Settings.Manage');
+   	$sender->title('ShareThis');
+      $sender->addSideMenu('plugin/sharethis');
+      $sender->Form = new Gdn_Form();
 
-      $PublisherNumber = C('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
-      $ViaHandle = C('Plugin.ShareThis.ViaHandle', '');
-      $CopyNShare = C('Plugin.ShareThis.CopyNShare', false);
+      $publisherNumber = c('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
+      $viaHandle = c('Plugin.ShareThis.ViaHandle', '');
+      $copyNShare = c('Plugin.ShareThis.CopyNShare', false);
 
-      $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigArray = array('Plugin.ShareThis.PublisherNumber','Plugin.ShareThis.ViaHandle', 'Plugin.ShareThis.CopyNShare');
-      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
-         $ConfigArray['Plugin.ShareThis.PublisherNumber'] = $PublisherNumber;
-         $ConfigArray['Plugin.ShareThis.ViaHandle'] = $ViaHandle;
-         $ConfigArray['Plugin.ShareThis.CopyNShare'] = $CopyNShare;
+      $validation = new Gdn_Validation();
+      $configurationModel = new Gdn_ConfigurationModel($validation);
+      $configArray = ['Plugin.ShareThis.PublisherNumber','Plugin.ShareThis.ViaHandle', 'Plugin.ShareThis.CopyNShare'];
+      if ($sender->Form->authenticatedPostBack() === FALSE) {
+         $configArray['Plugin.ShareThis.PublisherNumber'] = $publisherNumber;
+         $configArray['Plugin.ShareThis.ViaHandle'] = $viaHandle;
+         $configArray['Plugin.ShareThis.CopyNShare'] = $copyNShare;
       }
 
-      $ConfigurationModel->SetField($ConfigArray);
-      $Sender->Form->SetModel($ConfigurationModel);
+      $configurationModel->setField($configArray);
+      $sender->Form->setModel($configurationModel);
       // If seeing the form for the first time...
-      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+      if ($sender->Form->authenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.
-         $Sender->Form->SetData($ConfigurationModel->Data);
+         $sender->Form->setData($configurationModel->Data);
       } else {
          // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->ApplyRule('Plugin.ShareThis.PublisherNumber', 'Required');
-         if ($Sender->Form->Save() !== FALSE)
-            $Sender->InformMessage(T("Your changes have been saved."));
+         $configurationModel->Validation->applyRule('Plugin.ShareThis.PublisherNumber', 'Required');
+         if ($sender->Form->save() !== FALSE)
+            $sender->informMessage(t("Your changes have been saved."));
       }
 
-      $Sender->Render('sharethis', '', 'plugins/ShareThis');
+      $sender->render('sharethis', '', 'plugins/ShareThis');
    }
 
     public function discussionController_render_before($sender) {

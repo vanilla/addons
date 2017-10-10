@@ -5,71 +5,71 @@
 
 class SearchModel extends Gdn_Model {
 	/// PROPERTIES ///
-   public $Types = array(1 => 'Discussion', 2 => 'Comment');
+   public $Types = [1 => 'Discussion', 2 => 'Comment'];
 
    /// METHODS ///
 
-   public function Search($Search, $Offset = 0, $Limit = 20) {
-      $BaseUrl = C('Plugins.Solr.SearchUrl', 'http://localhost:8983/solr/select/?');
-      if (!$BaseUrl)
+   public function search($search, $offset = 0, $limit = 20) {
+      $baseUrl = c('Plugins.Solr.SearchUrl', 'http://localhost:8983/solr/select/?');
+      if (!$baseUrl)
          throw new Gdn_UserException("The search url has not been configured.");
 
-      if (!$Search)
-         return array();
+      if (!$search)
+         return [];
 
       // Escepe the search.
-      $Search = preg_replace('`([][+&|!(){}^"~*?:\\\\-])`', "\\\\$1", $Search);
+      $search = preg_replace('`([][+&|!(){}^"~*?:\\\\-])`', "\\\\$1", $search);
 
       // Add the category watch.
-      $Categories = CategoryModel::CategoryWatch();
-      if ($Categories === FALSE) {
-         return array();
-      } elseif ($Categories !== TRUE) {
-         $Search = 'CategoryID:('.implode(' ', $Categories).') AND '.$Search;
+      $categories = CategoryModel::categoryWatch();
+      if ($categories === FALSE) {
+         return [];
+      } elseif ($categories !== TRUE) {
+         $search = 'CategoryID:('.implode(' ', $categories).') AND '.$search;
       }
 
       // Build the search url.
-      $BaseUrl .= strpos($BaseUrl, '?') === FALSE ? '?' : '&';
-      $Query = array('q' => $Search, 'start' => $Offset, 'rows' => $Limit);
-      $Url = $BaseUrl.http_build_query($Query);
+      $baseUrl .= strpos($baseUrl, '?') === FALSE ? '?' : '&';
+      $query = ['q' => $search, 'start' => $offset, 'rows' => $limit];
+      $url = $baseUrl.http_build_query($query);
 
       // Grab the data.
-      $Curl = curl_init($Url);
-      curl_setopt($Curl, CURLOPT_RETURNTRANSFER, 1);
-      $CurlResult = curl_exec($Curl);
-      curl_close($Curl);
+      $curl = curl_init($url);
+      curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+      $curlResult = curl_exec($curl);
+      curl_close($curl);
 
       // Parse the result into the form that the search controller expects.
-      $Xml = new SimpleXMLElement($CurlResult);
-      $Result = array();
+      $xml = new SimpleXMLElement($curlResult);
+      $result = [];
 
-      if (!isset($Xml->result))
-         return array();
+      if (!isset($xml->result))
+         return [];
 
-      foreach ($Xml->result->children() as $Doc) {
-         $Row = array();
-         foreach ($Doc->children() as $Field) {
-            $Name = (string)$Field['name'];
-            $Row[$Name] = (string)$Field;
+      foreach ($xml->result->children() as $doc) {
+         $row = [];
+         foreach ($doc->children() as $field) {
+            $name = (string)$field['name'];
+            $row[$name] = (string)$field;
          }
          // Add the url.
-         switch ($Row['DocType']) {
+         switch ($row['DocType']) {
             case 'Discussion':
-               $Row['Url'] = '/discussion/'.$Row['PrimaryID'].'/'.Gdn_Format::Url($Row['Title']);
+               $row['Url'] = '/discussion/'.$row['PrimaryID'].'/'.Gdn_Format::url($row['Title']);
                break;
             case 'Comment':
-               $Row['Url'] = "/discussion/comment/{$Row['PrimaryID']}/#Comment_{$Row['PrimaryID']}";
+               $row['Url'] = "/discussion/comment/{$row['PrimaryID']}/#Comment_{$row['PrimaryID']}";
                break;
          }
          // Fix the time.
-         $Row['DateInserted'] = strtotime($Row['DateInserted']);
-         $Result[] = $Row;
+         $row['DateInserted'] = strtotime($row['DateInserted']);
+         $result[] = $row;
       }
 
       // Join the users into the result.
-      Gdn_DataSet::Join($Result, array('table' => 'User', 'parent' => 'UserID', 'prefix' => '', 'Name', 'Photo'));
+      Gdn_DataSet::join($result, ['table' => 'User', 'parent' => 'UserID', 'prefix' => '', 'Name', 'Photo']);
 
-      return $Result;
+      return $result;
 	}
 
 }

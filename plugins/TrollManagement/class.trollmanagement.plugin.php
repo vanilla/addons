@@ -5,18 +5,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
-$PluginInfo['TrollManagement'] = array(
-    'Name' => 'Troll Management',
-    'Description' => "Allows you to mark users as trolls, making it so that only they can see their comments & discussions. They essentially become invisible to other users and eventually just leave because no-one responds to them.",
-    'Version' => '1.2.1',
-    'RequiredApplications' => array('Vanilla' => '2.0.17'),
-    'MobileFriendly' => true,
-    'Icon' => 'troll_management.png',
-    'Author' => "Mark O'Sullivan",
-    'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com'
-);
-
 /**
  * Troll Management Features
  *
@@ -95,7 +83,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
         // Validate the transient key && permissions
         // Make sure we are posting back.
         if (!$sender->Request->isAuthenticatedPostBack()) {
-            throw PermissionException('Javascript');
+            throw permissionException('Javascript');
         }
 
         $trolls = self::getTrolls();

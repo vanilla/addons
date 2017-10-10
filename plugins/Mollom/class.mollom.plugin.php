@@ -4,126 +4,114 @@
  * @license GNU GPL2
  */
 
-// Define the plugin:
-$PluginInfo['Mollom'] = array(
-   'Name' => 'Mollom',
-   'Description' => 'Mollom spam protection integration for Vanilla.',
-   'Version' => '1.0b',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'SettingsUrl' => '/settings/mollom',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Author' => 'Lincoln Russell',
-   'AuthorEmail' => 'lincoln@vanillaforums.com'
-);
-
 class MollomPlugin extends Gdn_Plugin {
    /// PROPERTIES ///
 
    /// METHODS ///
-   
+
    /**
     * @return Akismet
     */
-   public static function Mollom() {
-      static $Mollom;
-      if (!$Mollom)
-         $Mollom = new MollomVanilla();
+   public static function mollom() {
+      static $mollom;
+      if (!$mollom)
+         $mollom = new MollomVanilla();
 
-      return $Mollom;
+      return $mollom;
    }
 
-   public function CheckMollom($RecordType, $Data) {
-      $UserID = $this->UserID();
-      if (!$UserID)
+   public function checkMollom($recordType, $data) {
+      $userID = $this->userID();
+      if (!$userID)
          return FALSE;
 
-      $Mollom = self::Mollom();
-      
-      if (!$Mollom)
+      $mollom = self::mollom();
+
+      if (!$mollom)
          return FALSE;
 
-      $Result = $Mollom->checkContent(array(
-         'checks' => array('spam'),
-         'postTitle' => GetValue('Name', $Data),
-         'postBody' => ConcatSep("\n\n", GetValue('Body', $Data),GetValue('Story', $Data)),
-         'authorName' => $Data['Username'],
-         'authorEmail' => $Data['Email'],
-         'authorIp' => $Data['IPAddress']
-      ));
-      return ($Result['spamClassification'] == 'spam') ? true : false;
+      $result = $mollom->checkContent([
+         'checks' => ['spam'],
+         'postTitle' => getValue('Name', $data),
+         'postBody' => concatSep("\n\n", getValue('Body', $data),getValue('Story', $data)),
+         'authorName' => $data['Username'],
+         'authorEmail' => $data['Email'],
+         'authorIp' => $data['IPAddress']
+      ]);
+      return ($result['spamClassification'] == 'spam') ? true : false;
    }
-   
-   public function Setup() {
-      $this->Structure();
+
+   public function setup() {
+      $this->structure();
    }
-   
-   public function Structure() {
+
+   public function structure() {
       // Get a user for operations.
-      $UserID = Gdn::SQL()->GetWhere('User', array('Name' => 'Mollom', 'Admin' => 2))->Value('UserID');
+      $userID = Gdn::sql()->getWhere('User', ['Name' => 'Mollom', 'Admin' => 2])->value('UserID');
 
-      if (!$UserID) {
-         $UserID = Gdn::SQL()->Insert('User', array(
+      if (!$userID) {
+         $userID = Gdn::sql()->insert('User', [
             'Name' => 'Mollom',
-            'Password' => RandomString('20'),
+            'Password' => randomString('20'),
             'HashMethod' => 'Random',
             'Email' => 'mollom@domain.com',
-            'DateInserted' => Gdn_Format::ToDateTime(),
+            'DateInserted' => Gdn_Format::toDateTime(),
             'Admin' => '2'
-         ));
+         ]);
       }
-      SaveToConfig('Plugins.Mollom.UserID', $UserID);
+      saveToConfig('Plugins.Mollom.UserID', $userID);
    }
-   
-   public function UserID() {
-      return C('Plugins.Mollom.UserID', NULL);
+
+   public function userID() {
+      return c('Plugins.Mollom.UserID', NULL);
    }
 
    /// EVENT HANDLERS ///
 
-   public function Base_CheckSpam_Handler($Sender, $Args) {
-      if ($Args['IsSpam'])
+   public function base_checkSpam_handler($sender, $args) {
+      if ($args['IsSpam'])
          return; // don't double check
 
-      $RecordType = $Args['RecordType'];
-      $Data =& $Args['Data'];
+      $recordType = $args['RecordType'];
+      $data =& $args['Data'];
 
-      $Result = FALSE;
-      switch ($RecordType) {
+      $result = FALSE;
+      switch ($recordType) {
          case 'Registration':
-            $Data['Name'] = '';
-            $Data['Body'] = GetValue('DiscoveryText', $Data);
-            if ($Data['Body']) {
+            $data['Name'] = '';
+            $data['Body'] = getValue('DiscoveryText', $data);
+            if ($data['Body']) {
                // Only check for spam if there is discovery text.
-               $Result = $this->CheckMollom($RecordType, $Data);
-               if ($Result)
-                  $Data['Log_InsertUserID'] = $this->UserID();
+               $result = $this->checkMollom($recordType, $data);
+               if ($result)
+                  $data['Log_InsertUserID'] = $this->userID();
             }
             break;
          case 'Comment':
          case 'Discussion':
          case 'Activity':
          case 'ActivityComment':
-            $Result = $this->CheckMollom($RecordType, $Data);
-            if ($Result)
-               $Data['Log_InsertUserID'] = $this->UserID();
+            $result = $this->checkMollom($recordType, $data);
+            if ($result)
+               $data['Log_InsertUserID'] = $this->userID();
             break;
          default:
-            $Result = FALSE;
+            $result = FALSE;
       }
-      $Sender->EventArguments['IsSpam'] = $Result;
+      $sender->EventArguments['IsSpam'] = $result;
    }
 
-   public function SettingsController_Mollom_Create($Sender, $Args = array()) {
-      $Sender->Permission('Garden.Settings.Manage');
-      $Sender->SetData('Title', T('Mollom Settings'));
+   public function settingsController_mollom_create($sender, $args = []) {
+      $sender->permission('Garden.Settings.Manage');
+      $sender->setData('Title', t('Mollom Settings'));
 
-      $Cf = new ConfigurationModule($Sender);
-      $Cf->Initialize(array(
-          'Plugins.Mollom.publicKey' => array(),
-          'Plugins.Mollom.privateKey' => array()
-          ));
+      $cf = new ConfigurationModule($sender);
+      $cf->initialize([
+          'Plugins.Mollom.publicKey' => [],
+          'Plugins.Mollom.privateKey' => []
+          ]);
 
-      $Sender->AddSideMenu('settings/plugins');
-      $Cf->RenderAll();
+      $sender->addSideMenu('settings/plugins');
+      $cf->renderAll();
    }
 }

@@ -4,20 +4,6 @@
  * @license GNU GPLv2
  */
 
-$PluginInfo['LastEdited'] = [
-    'Name' => 'Last Edited',
-    'Description' => 'Appends "Post edited by [User] at [Time]" to the end of edited posts and links to change log.',
-    'Version' => '1.2',
-    'MobileFriendly' => true,
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'HasLocale' => true,
-    'RegisterPermissions' => false,
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com',
-    'Icon' => 'last-edited.png'
-];
-
 /**
  * Class LastEditedPlugin
  */
@@ -62,63 +48,63 @@ class LastEditedPlugin extends Gdn_Plugin {
      /**
       * Output 'edited' notice.
       *
-      * @param $Sender
+      * @param $sender
       */
-    protected function drawEdited($Sender) {
-        $Record = $Sender->data('Discussion');
-        if (!$Record) {
-            $Record = $Sender->data('Record');
+    protected function drawEdited($sender) {
+        $record = $sender->data('Discussion');
+        if (!$record) {
+            $record = $sender->data('Record');
         }
-        if (!$Record) {
+        if (!$record) {
             return;
         }
 
-        $PermissionCategoryID = val('PermissionCategoryID', $Record);
+        $permissionCategoryID = val('PermissionCategoryID', $record);
 
-        $Data = $Record;
-        $RecordType = 'discussion';
-        $RecordID = val('DiscussionID', $Data);
+        $data = $record;
+        $recordType = 'discussion';
+        $recordID = val('DiscussionID', $data);
 
         // But override if comment
-        if (isset($Sender->EventArguments['Comment']) || val('RecordType', $Record) == 'comment') {
-            $Data = $Sender->EventArguments['Comment'];
-            $RecordType = 'comment';
-            $RecordID = val('CommentID', $Data);
+        if (isset($sender->EventArguments['Comment']) || val('RecordType', $record) == 'comment') {
+            $data = $sender->EventArguments['Comment'];
+            $recordType = 'comment';
+            $recordID = val('CommentID', $data);
         }
 
-        $UserCanEdit = Gdn::session()->checkPermission('Vanilla.'.ucfirst($RecordType).'s.Edit', true, 'Category', $PermissionCategoryID);
+        $userCanEdit = Gdn::session()->checkPermission('Vanilla.'.ucfirst($recordType).'s.Edit', true, 'Category', $permissionCategoryID);
 
-        if (is_null($Data->DateUpdated)) {
+        if (is_null($data->DateUpdated)) {
             return;
         }
 
         // Do not show log link if no log would have been generated.
-        $elapsed = Gdn_Format::toTimestamp(val('DateUpdated', $Data)) - Gdn_Format::toTimestamp(val('DateInserted', $Data));
+        $elapsed = Gdn_Format::toTimestamp(val('DateUpdated', $data)) - Gdn_Format::toTimestamp(val('DateInserted', $data));
         $grace = c('Garden.Log.FloodControl', 20) * 60;
         if ($elapsed < $grace) {
             return;
         }
 
-        $UpdatedUserID = $Data->UpdateUserID;
+        $updatedUserID = $data->UpdateUserID;
 
-        $UserData = Gdn::userModel()->getID($UpdatedUserID);
-        $Edited = array(
-            'EditUser' => val('Name', $UserData, t('Unknown User')),
-            'EditDate' => Gdn_Format::date($Data->DateUpdated, 'html'),
-            'EditLogUrl' => url("/log/record/{$RecordType}/{$RecordID}"),
+        $userData = Gdn::userModel()->getID($updatedUserID);
+        $edited = [
+            'EditUser' => val('Name', $userData, t('Unknown User')),
+            'EditDate' => Gdn_Format::date($data->DateUpdated, 'html'),
+            'EditLogUrl' => url("/log/record/{$recordType}/{$recordID}"),
             'EditWord' => 'at'
-        );
+        ];
 
-        $DateUpdateTime = Gdn_Format::toTimestamp($Data->DateUpdated);
-        if (date('ymd', $DateUpdateTime) != date('ymd')) {
-            $Edited['EditWord'] = 'on';
+        $dateUpdateTime = Gdn_Format::toTimestamp($data->DateUpdated);
+        if (date('ymd', $dateUpdateTime) != date('ymd')) {
+            $edited['EditWord'] = 'on';
         }
 
-        $Format = t('PostEdited.Plain', 'Post edited by {EditUser} {EditWord} {EditDate}');
-        if ($UserCanEdit) {
-            $Format = t('PostEdited.Log', 'Post edited by {EditUser} {EditWord} {EditDate} (<a href="{EditLogUrl}">log</a>)');
+        $format = t('PostEdited.Plain', 'Post edited by {EditUser} {EditWord} {EditDate}');
+        if ($userCanEdit) {
+            $format = t('PostEdited.Log', 'Post edited by {EditUser} {EditWord} {EditDate} (<a href="{EditLogUrl}">log</a>)');
         }
 
-        echo '<div class="PostEdited">'.formatString($Format, $Edited).'</div>';
+        echo '<div class="PostEdited">'.formatString($format, $edited).'</div>';
     }
 }

@@ -19,11 +19,11 @@
  */
 class Minify_ImportProcessor {
     
-    public static $filesIncluded = array();
+    public static $filesIncluded = [];
     
     public static function process($file)
     {
-        self::$filesIncluded = array();
+        self::$filesIncluded = [];
         self::$_isCss = (strtolower(substr($file, -4)) === '.css');
         $obj = new Minify_ImportProcessor(dirname($file));
         return $obj->_getContent($file);
@@ -74,7 +74,7 @@ class Minify_ImportProcessor {
                 ([a-zA-Z,\\s]*)?     # 2 = media list
                 ;                    # end token
             /x'
-            ,array($this, '_importCB')
+            ,[$this, '_importCB']
             ,$content
         );
         
@@ -82,7 +82,7 @@ class Minify_ImportProcessor {
             // rewrite remaining relative URIs
             $content = preg_replace_callback(
                 '/url\\(\\s*([^\\)\\s]+)\\s*\\)/'
-                ,array($this, '_urlCB')
+                ,[$this, '_urlCB']
                 ,$content
             );
         }

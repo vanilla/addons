@@ -7,18 +7,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['Redirector'] = [
-    'Name' => 'Forum Redirector',
-    'Description' => 'Adds 301 redirects for Vanilla from common forum platforms. This redirector redirects urls from IPB, phpBB, punBB, smf, vBulletin, Lithium, and Xenforo',
-    'Version' => '1.2',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com',
-    'MobileFriendly' => true,
-];
-
 /**
  * Class RedirectorPlugin
  */
@@ -119,80 +107,83 @@ class RedirectorPlugin extends Gdn_Plugin {
             'p' => 'CommentID',
             'start' => 'Offset',
         ],
+        'topics' => [ // get satisfaction discussion
+            '_arg0' => 'DiscussionID', // this should be a url slug
+        ],
     ];
 
     /**
      *
      */
     public function gdn_Dispatcher_NotFound_Handler() {
-        $Path = Gdn::Request()->Path();
-        $Get = Gdn::Request()->Get();
+        $path = Gdn::request()->path();
+        $get = Gdn::request()->get();
         /**
          * There may be two incoming p URL parameters.  If that is the case, we need to compensate for it.  This is done
          * by manually parsing the server's QUERY_STRING variable, if available.
          */
-        $QueryString = Gdn::Request()->getValueFrom('server', 'QUERY_STRING', false);
-        trace(['QUERY_STRING' => $QueryString], 'Server Variables');
-        if ($QueryString && preg_match('/(^|&)p\=\/?(showpost\.php|showthread\.php|viewtopic\.php)/i', $QueryString)) {
+        $queryString = Gdn::request()->getValueFrom('server', 'QUERY_STRING', false);
+        trace(['QUERY_STRING' => $queryString], 'Server Variables');
+        if ($queryString && preg_match('/(^|&)p\=\/?(showpost\.php|showthread\.php|viewtopic\.php)/i', $queryString)) {
             // Check for multiple values of p in our URL parameters
-            if ($QueryString && preg_match_all('/(^|\?|&)p\=(?P<val>[^&]+)/', $QueryString, $QueryParameters) > 1) {
-                trace($QueryParameters['val'], 'p Values');
+            if ($queryString && preg_match_all('/(^|\?|&)p\=(?P<val>[^&]+)/', $queryString, $queryParameters) > 1) {
+                trace($queryParameters['val'], 'p Values');
                 // Assume the first p is Vanilla's path
-                $Path = trim($QueryParameters['val'][0], '/');
+                $path = trim($queryParameters['val'][0], '/');
                 // The second p is used for our redirects
-                $Get['p'] = $QueryParameters['val'][1];
+                $get['p'] = $queryParameters['val'][1];
             }
         }
 
-        trace(['Path' => $Path, 'Get' => $Get], 'Input');
+        trace(['Path' => $path, 'Get' => $get], 'Input');
 
         // Figure out the filename.
-        $Parts = explode('/', $Path);
-        $After = [];
-        $Filename = '';
-        while(count($Parts) > 0) {
-            $V = array_pop($Parts);
-            if (preg_match('`.*\.php`', $V)) {
-                $Filename = $V;
+        $parts = explode('/', $path);
+        $after = [];
+        $filename = '';
+        while(count($parts) > 0) {
+            $v = array_pop($parts);
+            if (preg_match('`.*\.php`', $v)) {
+                $filename = $v;
                 break;
             }
 
-            array_unshift($After, $V);
+            array_unshift($after, $v);
         }
-        if ($Filename == 'index.php') {
+        if ($filename == 'index.php') {
             // Some site have an index.php?the/path.
-            $TryPath = val(0, array_keys($Get));
-            if (!$Get[$TryPath]) {
-                $After = array_merge(explode('/', $TryPath));
-                unset($Get[$TryPath]);
-                $Filename = '';
-            } elseif (preg_match('#archive/index\.php$#', $Path) === 1) { // vBulletin archive
-                $Filename = 'archive';
+            $tryPath = val(0, array_keys($get));
+            if (!$get[$tryPath]) {
+                $after = array_merge(explode('/', $tryPath));
+                unset($get[$tryPath]);
+                $filename = '';
+            } elseif (preg_match('#archive/index\.php$#', $path) === 1) { // vBulletin archive
+                $filename = 'archive';
             }
         }
-        if (!$Filename) {
+        if (!$filename) {
             // There was no filename, so we can try the first folder as the filename.
-            while (count($After) > 0) {
-                $Filename = array_shift($After);
-                if (isset(self::$Files[$Filename]))
+            while (count($after) > 0) {
+                $filename = array_shift($after);
+                if (isset(self::$Files[$filename]))
                     break;
             }
         }
 
         // Add the after parts to the array.
         $i = 0;
-        foreach ($After as $Arg) {
-            $Get["_arg$i"] = $Arg;
+        foreach ($after as $arg) {
+            $get["_arg$i"] = $arg;
             $i++;
         }
 
-        $Url = $this->filenameRedirect($Filename, $Get);
+        $url = $this->filenameRedirect($filename, $get);
 
-        if ($Url) {
-            if (Debug()) {
-                trace($Url, 'Redirect found');
+        if ($url) {
+            if (debug()) {
+                trace($url, 'Redirect found');
             } else {
-                Redirect($Url, 301);
+                redirectTo($url, 301);
             }
         }
     }
@@ -221,7 +212,7 @@ class RedirectorPlugin extends Gdn_Plugin {
         trace($Get, 'New Get');
 
         // Translate all of the get parameters into new parameters.
-        $Vars = array();
+        $Vars = [];
         foreach ($Get as $Key => $Value) {
             if (!isset($Row[$Key]))
                 continue;
@@ -249,70 +240,76 @@ class RedirectorPlugin extends Gdn_Plugin {
             if ($Value !== null)
                 $Vars[$Opts[0]] = $Value;
         }
-
         trace($Vars, 'Translated Arguments');
         // Now let's see what kind of record we have.
         // We'll check the various primary keys in order of importance.
         $Result = false;
+
         if (isset($Vars['CommentID'])) {
             trace("Looking up comment {$Vars['CommentID']}.");
-
             $CommentModel = new CommentModel();
             // If a legacy slug is provided (assigned during a merge), attempt to lookup the comment using it
-            if (isset($Get['legacy']) && Gdn::Structure()->Table('Comment')->ColumnExists('ForeignID')) {
-                $Comment = $CommentModel->GetWhere(['ForeignID' => $Get['legacy'] . '-' . $Vars['CommentID']])->FirstRow();
+            if (isset($Get['legacy']) && Gdn::structure()->table('Comment')->columnExists('ForeignID')) {
+                $Comment = $CommentModel->getWhere(['ForeignID' => $Vars['CommentID']])->firstRow();
+
             } else {
-                $Comment = $CommentModel->GetID($Vars['CommentID']);
+                $Comment = $CommentModel->getID($Vars['CommentID']);
             }
             if ($Comment) {
-                $Result = CommentUrl($Comment, '//');
+                $Result = commentUrl($Comment, '//');
+            } else {
+                // vBulletin, defaulting to discussions (foreign ID) when showthread.php?p=xxxx returns no comment
+                $Vars['DiscussionID'] = $Vars['CommentID'];
+                unset($Vars['CommentID']);
+                $Get['legacy'] = true;
             }
-        } elseif (isset($Vars['DiscussionID'])) {
+        }
+        // Splitting the if statement to default to discussions (foreign ID) when showthread.php?p=xxxx returns no comment
+        if (isset($Vars['DiscussionID'])) {
             trace("Looking up discussion {$Vars['DiscussionID']}.");
-
             $DiscussionModel = new DiscussionModel();
             $DiscussionID = $Vars['DiscussionID'];
             $Discussion = false;
 
             if (is_numeric($DiscussionID)) {
                 // If a legacy slug is provided (assigned during a merge), attempt to lookup the discussion using it
-                if (isset($Get['legacy']) && Gdn::Structure()->Table('Discussion')->ColumnExists('ForeignID')) {
-                    $Discussion = $DiscussionModel->GetWhere(['ForeignID' => $Get['legacy'] . '-' . $DiscussionID])->FirstRow();
+                if (isset($Get['legacy']) && Gdn::structure()->table('Discussion')->columnExists('ForeignID')) {
+                    $Discussion = $DiscussionModel->getWhere(['ForeignID' => $DiscussionID])->firstRow();
                 } else {
-                    $Discussion = $DiscussionModel->GetID($Vars['DiscussionID']);
+                    $Discussion = $DiscussionModel->getID($Vars['DiscussionID']);
                 }
             } else {
                 // This is a slug style discussion ID. Let's see if there is a UrlCode column in the discussion table.
-                $DiscussionModel->DefineSchema();
-                if ($DiscussionModel->Schema->FieldExists('Discussion', 'UrlCode')) {
-                    $Discussion = $DiscussionModel->GetWhere(['UrlCode' => $DiscussionID])->FirstRow();
+                $DiscussionModel->defineSchema();
+                if ($DiscussionModel->Schema->fieldExists('Discussion', 'UrlCode')) {
+                    $Discussion = $DiscussionModel->getWhere(['UrlCode' => $DiscussionID])->firstRow();
                 }
             }
 
             if ($Discussion) {
-                $Result = DiscussionUrl($Discussion, self::pageNumber($Vars, 'Vanilla.Comments.PerPage'), '//');
+                $Result = discussionUrl($Discussion, self::pageNumber($Vars, 'Vanilla.Comments.PerPage'), '//');
             }
         } elseif (isset($Vars['UserID'])) {
             trace("Looking up user {$Vars['UserID']}.");
 
-            $User = Gdn::UserModel()->GetID($Vars['UserID']);
+            $User = Gdn::userModel()->getID($Vars['UserID']);
             if ($User) {
-                $Result = Url(UserUrl($User), '//');
+                $Result = url(userUrl($User), '//');
             }
         } elseif (isset($Vars['TagID'])) {
-            $Tag = TagModel::instance()->GetID($Vars['TagID']);
+            $Tag = TagModel::instance()->getID($Vars['TagID']);
             if ($Tag) {
-                 $Result = TagUrl($Tag, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
+                 $Result = tagUrl($Tag, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
             }
         } elseif (isset($Vars['CategoryID'])) {
             trace("Looking up category {$Vars['CategoryID']}.");
 
             // If a legacy slug is provided (assigned during a merge), attempt to lookup the category ID based on it
-            if (isset($Get['legacy']) && Gdn::Structure()->Table('Category')->ColumnExists('ForeignID')) {
+            if (isset($Get['legacy']) && Gdn::structure()->table('Category')->columnExists('ForeignID')) {
                 $CategoryModel = new CategoryModel();
-                $Category = $CategoryModel->GetWhere(['ForeignID' => $Get['legacy'] . '-' . $Vars['CategoryID']])->FirstRow();
+                $Category = $CategoryModel->getWhere(['ForeignID' => $Get['legacy'] . '-' . $Vars['CategoryID']])->firstRow();
             } else {
-                $Category = CategoryModel::Categories($Vars['CategoryID']);
+                $Category = CategoryModel::categories($Vars['CategoryID']);
             }
             if ($Category) {
                 $Result = categoryUrl($Category, self::pageNumber($Vars, 'Vanilla.Discussions.PerPage'), '//');
@@ -338,17 +335,17 @@ class RedirectorPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Get
+     * @param $get
      * @return array
      */
-    public static function forumFilter(&$Get) {
-        if (val('_arg2', $Get) == 'page') {
+    public static function forumFilter(&$get) {
+        if (val('_arg2', $get) == 'page') {
             // This is a punbb style forum.
             return [
                 '_arg0' => 'CategoryID',
                 '_arg3' => 'Page',
             ];
-        } elseif (val('_arg1', $Get) == 'page') {
+        } elseif (val('_arg1', $get) == 'page') {
             // This is a bbPress style forum.
             return [
                 '_arg0' => 'CategoryID',
@@ -419,12 +416,12 @@ class RedirectorPlugin extends Gdn_Plugin {
     /**
      * Filter vBulletin category requests, specifically to handle "friendly URLs".
      *
-     * @param $Get Request parameters
+     * @param $get Request parameters
      *
      * @return array Mapping of vB parameters
      */
-    public static function forumDisplayFilter(&$Get) {
-        self::vbFriendlyUrlID($Get, 'f');
+    public static function forumDisplayFilter(&$get) {
+        self::vbFriendlyUrlID($get, 'f');
 
         return [
             'f' => 'CategoryID',
@@ -443,42 +440,42 @@ class RedirectorPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Value
+     * @param $value
      * @return null
      */
-    public static function getNumber($Value) {
-        if (preg_match('`(\d+)`', $Value, $Matches))
-            return $Matches[1];
+    public static function getNumber($value) {
+        if (preg_match('`(\d+)`', $value, $matches))
+            return $matches[1];
         return null;
     }
 
     /**
      *
      *
-     * @param $Value
+     * @param $value
      * @return array|null
      */
-    public static function IPBPageNumber($Value) {
-        if (preg_match('`page__st__(\d+)`i', $Value, $Matches))
-            return ['Offset', $Matches[1]];
-        return self::getNumber($Value);
+    public static function iPBPageNumber($value) {
+        if (preg_match('`page__st__(\d+)`i', $value, $matches))
+            return ['Offset', $matches[1]];
+        return self::getNumber($value);
     }
 
     /**
      * Return the page number from the given variables that may have an offset or a page.
      *
-     * @param array $Vars The variables that should contain an Offset or Page key.
-     * @param int|string $PageSize The pagesize or the config key of the pagesize.
+     * @param array $vars The variables that should contain an Offset or Page key.
+     * @param int|string $pageSize The pagesize or the config key of the pagesize.
      * @return int
      */
-    public static function pageNumber($Vars, $PageSize) {
-        if (isset($Vars['Page']))
-            return $Vars['Page'];
-        if (isset($Vars['Offset'])) {
-            if (is_numeric($PageSize))
-                return pageNumber($Vars['Offset'], $PageSize, false, Gdn::Session()->IsValid());
+    public static function pageNumber($vars, $pageSize) {
+        if (isset($vars['Page']))
+            return $vars['Page'];
+        if (isset($vars['Offset'])) {
+            if (is_numeric($pageSize))
+                return pageNumber($vars['Offset'], $pageSize, false, Gdn::session()->isValid());
             else
-                return pageNumber($Vars['Offset'], C($PageSize, 30), false, Gdn::Session()->IsValid());
+                return pageNumber($vars['Offset'], c($pageSize, 30), false, Gdn::session()->isValid());
         }
         return 1;
     }
@@ -486,41 +483,40 @@ class RedirectorPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Value
+     * @param $value
      * @return null
      */
-    public static function removeID($Value) {
-        if (preg_match('`^(\d+)`', $Value, $Matches))
-            return $Matches[1];
+    public static function removeID($value) {
+        if (preg_match('`^(\d+)`', $value, $matches))
+            return $matches[1];
         return null;
     }
 
     /**
      * Filter vBulletin comment requests, specifically to handle "friendly URLs".
      *
-     * @param $Get Request parameters
+     * @param $get Request parameters
      *
      * @return array Mapping of vB parameters
      */
-    public static function showpostFilter(&$Get) {
-        self::vbFriendlyUrlID($Get, 'p');
+    public static function showpostFilter(&$get) {
+        self::vbFriendlyUrlID($get, 'p');
 
-        return array(
+        return [
             'p' => 'CommentID'
-        );
+        ];
 
     }
 
     /**
      * Filter vBulletin discussion requests, specifically to handle "friendly URLs".
      *
-     * @param $Get Request parameters
+     * @param $get Request parameters
      *
      * @return array Mapping of vB parameters
      */
-    public static function showthreadFilter(&$Get) {
-
-        $data = array(
+    public static function showthreadFilter(&$get) {
+        $data = [
             'p' => 'CommentID',
             'page' => 'Page',
             '_arg0' => [
@@ -531,35 +527,31 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'Page',
                 'Filter' => [__CLASS__, 'getNumber']
             ]
-        );
+        ];
 
-        if (isset($Get['t'])) {
+        if (isset($get['t'])) {
             $data['t'] = [
                 'DiscussionID',
                 'Filter' => [__CLASS__, 'removeID']
             ];
-            self::vbFriendlyUrlID($Get, 't');
-        } elseif (isset($Get['p'])) {
-            $data['p'] = 'DiscussionID';
-            $Get['legacy'] = true;
+            self::vbFriendlyUrlID($get, 't');
         }
-
-
         return $data;
+
     }
 
     /**
      *
      *
-     * @param $Value
+     * @param $value
      * @return array
      */
-    public static function smfAction($Value) {
+    public static function smfAction($value) {
         $result = null;
 
-        if (preg_match('`(\w+);(\w+)=(\d+)`', $Value, $M)) {
-            if (strtolower($M[1]) === 'profile') {
-                $result = ['UserID', $M[3]];
+        if (preg_match('`(\w+);(\w+)=(\d+)`', $value, $m)) {
+            if (strtolower($m[1]) === 'profile') {
+                $result = ['UserID', $m[3]];
             }
         }
 
@@ -569,17 +561,17 @@ class RedirectorPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Value
-     * @param $Key
+     * @param $value
+     * @param $key
      * @return array
      */
-    public static function smfOffset($Value, $Key) {
+    public static function smfOffset($value, $key) {
         $result = null;
 
-        if (preg_match('/(\d+)\.(\d+)/', $Value, $M)) {
-            $result = [$Key => $M[1], 'Offset' => $M[2]];
-        } elseif (preg_match('/\d+\.msg(\d+)/', $Value, $M)) {
-            $result = ['CommentID' => $M[1]];
+        if (preg_match('/(\d+)\.(\d+)/', $value, $m)) {
+            $result = [$key => $m[1], 'Offset' => $m[2]];
+        } elseif (preg_match('/\d+\.msg(\d+)/', $value, $m)) {
+            $result = ['CommentID' => $m[1]];
         }
 
         return $result;
@@ -588,17 +580,17 @@ class RedirectorPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Get
+     * @param $get
      * @return array
      */
-    public static function topicFilter(&$Get) {
-        if (val('_arg2', $Get) == 'page') {
+    public static function topicFilter(&$get) {
+        if (val('_arg2', $get) == 'page') {
             // This is a punbb style topic.
             return [
                 '_arg0' => 'DiscussionID',
                 '_arg3' => 'Page',
             ];
-        } elseif (val('_arg1', $Get) == 'page') {
+        } elseif (val('_arg1', $get) == 'page') {
             // This is a bbPress style topc.
             return [
                 '_arg0' => 'DiscussionID',
@@ -623,29 +615,29 @@ class RedirectorPlugin extends Gdn_Plugin {
     /**
      * Attempt to retrieve record ID from request parameters, if target parameter isn't already populated.
      *
-     * @param $Get Request parameters
-     * @param string $TargetParam Name of the request parameter the record value should be stored in
+     * @param $get Request parameters
+     * @param string $targetParam Name of the request parameter the record value should be stored in
      *
      * @return bool True if value saved, False if not (including if value was already set in target parameter)
      */
-    private static function vbFriendlyUrlID(&$Get, $TargetParam) {
+    private static function vbFriendlyUrlID(&$get, $targetParam) {
         /**
          * vBulletin 4 added "friendly URLs" that don't pass IDs as a name-value pair.  We need to extract the ID from
          * this format, if we don't already have it.
          * Ex: domain.com/showthread.php?0001-example-thread
          */
-        if (!empty($Get) && !isset($Get[$TargetParam])) {
+        if (!empty($get) && !isset($get[$targetParam])) {
             /**
              * The thread ID should be the very first item in the query string.  PHP interprets these identifiers as keys
              * without values.  We need to extract the first key and see if it's a match for the format.
              */
-            $FriendlyURLID = array_shift(array_keys($Get));
-            if (preg_match('/^(?P<RecordID>\d+)(-[^\/]+)?(\/page(?P<Page>\d+))?/', $FriendlyURLID, $FriendlyURLParts)) {
+            $friendlyURLID = array_shift(array_keys($get));
+            if (preg_match('/^(?P<RecordID>\d+)(-[^\/]+)?(\/page(?P<Page>\d+))?/', $friendlyURLID, $friendlyURLParts)) {
                 // Seems like we have a match.  Assign it as the value of t in our query string.
-                $Get[$TargetParam] = $FriendlyURLParts['RecordID'];
+                $get[$targetParam] = $friendlyURLParts['RecordID'];
 
-                if (!empty($FriendlyURLParts['Page'])) {
-                    $Get['page'] = $FriendlyURLParts['Page'];
+                if (!empty($friendlyURLParts['Page'])) {
+                    $get['page'] = $friendlyURLParts['Page'];
                 }
 
                 return true;

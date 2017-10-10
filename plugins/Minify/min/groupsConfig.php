@@ -22,15 +22,15 @@ if ($WebRoot != '')
 else
    $WebRoot = '//';
    
-return array(
-   'globaljs' => array(
+return [
+   'globaljs' => [
       $WebRoot.'js/library/jquery.js',
       $WebRoot.'js/library/jquery.livequery.js',
       $WebRoot.'js/library/jquery.form.js',
       $WebRoot.'js/library/jquery.popup.js',
       $WebRoot.'js/library/jquery.gardenhandleajaxform.js',
       $WebRoot.'js/global.js'
-   )
+   ]
    
     // 'js' => array('//js/file1.js', '//js/file2.js'),
     // 'css' => array('//css/file1.css', '//css/file2.css'),
@@ -39,7 +39,7 @@ return array(
     /*'js2' => array(
         dirname(__FILE__) . '/../min_unit_tests/_test_files/js/before.js',
         // do NOT process this file
-        new Minify_Source(array(
+        new minify_Source(array(
             'filepath' => dirname(__FILE__) . '/../min_unit_tests/_test_files/js/before.js',
             'minifier' => create_function('$a', 'return $a;')
         ))
@@ -48,9 +48,9 @@ return array(
     /*'js3' => array(
         dirname(__FILE__) . '/../min_unit_tests/_test_files/js/before.js',
         // do NOT process this file
-        new Minify_Source(array(
+        new minify_Source(array(
             'filepath' => dirname(__FILE__) . '/../min_unit_tests/_test_files/js/before.js',
             'minifier' => array('Minify_Packer', 'minify')
         ))
     ),//*/
-);
+];

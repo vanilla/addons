@@ -1,0 +1,20 @@
+{
+    "name": "Feed Discussions",
+    "description": "Automatically creates new discussions based on content imported from supplied RSS feeds.",
+    "version": "1.2.2",
+    "hasLocale": true,
+    "registerPermissions": false,
+    "icon": "feed_discussions.png",
+    "key": "feeddiscussions",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

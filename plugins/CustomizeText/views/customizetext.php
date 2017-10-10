@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();?>
 <h1>Customize Text</h1>
-<?php echo $this->Form->Open(); ?>
+<?php echo $this->Form->open(); ?>
     <script type="text/javascript" language="javascript">
         jQuery(document).ready(function($) {
             if ($.autogrow)
@@ -16,7 +16,7 @@
     </script>
     <div class="form-group">
         <div class="label-wrap-wide">
-            <?php echo 'There are currently '.Wrap($this->Data('CountDefinitions', '0'), 'strong').' definitions available for editing. '; ?>
+            <?php echo 'There are currently '.wrap($this->data('CountDefinitions', '0'), 'strong').' definitions available for editing. '; ?>
         </div>
         <div class="input-wrap-right">
             <?php echo anchor('Find More', '/settings/customizetext/rebuild', 'btn btn-primary'); ?>
@@ -36,13 +36,13 @@
         </div>
     </div>
 <?php
-if ($this->Form->GetValue('Keywords', '') != '') {
+if ($this->Form->getValue('Keywords', '') != '') {
     echo '<div class="padded italic">';
-    printf(t("%s matches found for '%s'."), $this->Data('CountMatches'), $this->Form->GetValue('Keywords'));
+    printf(t("%s matches found for '%s'."), $this->data('CountMatches'), $this->Form->getValue('Keywords'));
     echo '</div>';
     echo '<ul>';
 
-    foreach ($this->Data('Matches') as $Key => $Definition) {
+    foreach ($this->data('Matches') as $Key => $Definition) {
         $KeyHash = md5($Key);
 
         $DefinitionText = $Definition['def'];
@@ -55,19 +55,19 @@ if ($this->Form->GetValue('Keywords', '') != '') {
 
         echo '<li class="form-group">';
         echo '<div class="label-wrap">';
-        echo Wrap(Gdn_Format::Text($Key), 'label', array('for' => "Form_{$ElementName}"));
+        echo wrap(Gdn_Format::text($Key), 'label', ['for' => "Form_{$ElementName}"]);
 
-        if ($this->Form->IsPostBack()) {
-            $SuppliedDefinition = $this->Form->GetValue($ElementName);
+        if ($this->Form->isPostBack()) {
+            $SuppliedDefinition = $this->Form->getValue($ElementName);
 
             // Changed?
             if ($SuppliedDefinition !== FALSE && $SuppliedDefinition != $DefinitionText)
                 if (!$DefinitionModified) $CSSClass .= " Modified";
         }
         echo '</div>';
-        echo $this->Form->textBoxWrap($ElementName, array('multiline' => TRUE, 'class' => $CSSClass));
+        echo $this->Form->textBoxWrap($ElementName, ['multiline' => TRUE, 'class' => $CSSClass]);
         echo '</li>';
     }
     echo '</ul>';
 }
-echo $this->Form->Close('Save All');
+echo $this->Form->close('Save All');

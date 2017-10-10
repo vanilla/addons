@@ -1,0 +1,19 @@
+{
+    "name": "No Index",
+    "description": "Allows moderators & curators to mark a discussion as noindex/noarchive.",
+    "version": "1.0.1",
+    "mobileFriendly": true,
+    "key": "noindex",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincolnwebs@gmail.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    },
+    "icon": "no_index.png"
+}

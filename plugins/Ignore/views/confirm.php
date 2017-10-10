@@ -1,33 +1,33 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 
-switch ($this->Data('Mode')) {
+switch ($this->data('Mode')) {
    case 'set':
-      echo '<div class="P">'.sprintf(T('Are you sure you want to ignore <b>%s</b>?'), $this->Data('User.Name')).'</div>';
+      echo '<div class="P">'.sprintf(t('Are you sure you want to ignore <b>%s</b>?'), $this->data('User.Name')).'</div>';
       
-      if ($this->Data('Conversations')) {
-         $Conversations = (array)$this->Data('Conversations');
+      if ($this->data('Conversations')) {
+         $Conversations = (array)$this->data('Conversations');
          $NumConversationsAffected = count($Conversations);
          echo '<div class="Warning">';
-         echo sprintf(T('Ignoring this person will remove you from <b>%s %s</b> with them.'), $NumConversationsAffected, Plural($NumConversationsAffected, 'conversation', 'conversations'));
+         echo sprintf(t('Ignoring this person will remove you from <b>%s %s</b> with them.'), $NumConversationsAffected, plural($NumConversationsAffected, 'conversation', 'conversations'));
          echo '</div>';
       }
       
       break;
    
    case 'unset':
-      echo '<div class="P">'.sprintf(T('Are you sure you want to unignore <b>%s</b>?'), $this->Data('User.Name')).'</div>';
+      echo '<div class="P">'.sprintf(t('Are you sure you want to unignore <b>%s</b>?'), $this->data('User.Name')).'</div>';
       break;
 }
 
 echo '<div class="Buttons Buttons-Confirm">';
-echo $this->Form->Button('OK', array('class' => 'Button Primary'));
-echo $this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close'));
+echo $this->Form->button('OK', ['class' => 'Button Primary']);
+echo $this->Form->button('Cancel', ['type' => 'button', 'class' => 'Button Close']);
 echo '<div>';
-echo $this->Form->Close();
+echo $this->Form->close();
 ?>

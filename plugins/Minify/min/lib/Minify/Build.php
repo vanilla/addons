@@ -18,8 +18,8 @@ require_once 'Minify/Source.php';
  * )
  * 
  * // during HTML generation
- * $jsBuild = new Minify_Build($groupSources['js']);
- * $cssBuild = new Minify_Build($groupSources['css']);
+ * $jsBuild = new minify_Build($groupSources['js']);
+ * $cssBuild = new minify_Build($groupSources['css']);
  * 
  * $script = "<script type='text/javascript' src='"
  *     . $jsBuild->uri('/min.php/js') . "'></script>";

@@ -154,9 +154,9 @@ class Minify_Source {
     public static function getDigest($sources)
     {
         foreach ($sources as $source) {
-            $info[] = array(
+            $info[] = [
                 $source->_id, $source->minifier, $source->minifyOptions
-            );
+            ];
         }
         return md5(serialize($info));
     }

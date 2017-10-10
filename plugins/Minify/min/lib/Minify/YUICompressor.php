@@ -62,7 +62,7 @@ class Minify_YUICompressor {
      * 
      * @return string 
      */
-    public static function minifyJs($js, $options = array())
+    public static function minifyJs($js, $options = [])
     {
         return self::_minify('js', $js, $options);
     }
@@ -78,7 +78,7 @@ class Minify_YUICompressor {
      * 
      * @return string 
      */
-    public static function minifyCss($css, $options = array())
+    public static function minifyCss($css, $options = [])
     {
         return self::_minify('css', $css, $options);
     }
@@ -98,14 +98,14 @@ class Minify_YUICompressor {
     private static function _getCmd($userOptions, $type, $tmpFile)
     {
         $o = array_merge(
-            array(
+            [
                 'charset' => ''
                 ,'line-break' => 5000
                 ,'type' => $type
                 ,'nomunge' => false
                 ,'preserve-semi' => false
                 ,'disable-optimizations' => false
-            )
+            ]
             ,$userOptions
         );
         $cmd = self::$javaExecutable . ' -jar ' . escapeshellarg(self::$jarFile)
@@ -117,7 +117,7 @@ class Minify_YUICompressor {
                 ? ' --line-break ' . (int)$o['line-break']
                 : '');
         if ($type === 'js') {
-            foreach (array('nomunge', 'preserve-semi', 'disable-optimizations') as $opt) {
+            foreach (['nomunge', 'preserve-semi', 'disable-optimizations'] as $opt) {
                 $cmd .= $o[$opt] 
                     ? " --{$opt}"
                     : '';

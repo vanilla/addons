@@ -8,28 +8,17 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['StopAutoDraft'] = array(
-   'Name' => 'Stop Auto Draft',
-   'Description' => 'Comments are auto-saved as a user types. This plugin disables that feature so that drafts are only saved if the "Save Draft" button is clicked.',
-   'Version' => '1.1',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca',
-   'Icon' => 'stop_auto_draft.png'
-);
-
 class StopAutoDraftPlugin extends Gdn_Plugin {
 
-   public function DiscussionController_Render_Before($Sender) {
-		$this->_NoDrafting($Sender);
+   public function discussionController_render_before($sender) {
+		$this->_NoDrafting($sender);
 	}
-   public function PostController_Render_Before($Sender) {
-		$this->_NoDrafting($Sender);
+   public function postController_render_before($sender) {
+		$this->_NoDrafting($sender);
 	}
-	private function _NoDrafting($Sender) {
-	   $Sender->RemoveJsFile('autosave.js');
-		$Sender->Head->AddString('
+	private function _NoDrafting($sender) {
+	   $sender->removeJsFile('autosave.js');
+		$sender->Head->addString('
 <script type="text/javascript">
 jQuery(document).ready(function($) {
    $.fn.autosave = function(opts) {
@@ -40,7 +29,7 @@ jQuery(document).ready(function($) {
 ');
    }
 	
-   public function OnDisable() { }
-   public function Setup() { }
+   public function onDisable() { }
+   public function setup() { }
 	
 }

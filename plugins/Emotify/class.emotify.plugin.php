@@ -5,18 +5,6 @@
 // Corrected css reference. 
 // Fixed a bug that caused emoticons to not open the dropdown when editing.
 // Cleaned up plugin to reference itself properly, allowing for multiple emotify's on a single page to work together.
-$PluginInfo['Emotify'] = array(
-	'Name' => 'Emotify :)',
-	'Description' => 'Replaces <a href="http://en.wikipedia.org/wiki/Emoticon">emoticons</a> (smilies) with friendly pictures.',
-	'Version' 	=>	 '2.0.5.1',
-	'MobileFriendly' => TRUE,
-	'Author' 	=>	 "Mark O'Sullivan",
-	'AuthorEmail' => 'mark@vanillaforums.com',
-	'AuthorUrl' =>	 'http://vanillaforums.org',
-	'License' => 'GPL v2',
-	'RequiredApplications' => array('Vanilla' => '>=2.0.18'),
-);
-
 /**
  * Note: Added jquery events required for proper display/hiding of emoticons
  * as write & preview buttons are clicked on forms in Vanilla 2.0.14. These
@@ -25,38 +13,38 @@ $PluginInfo['Emotify'] = array(
 
 class EmotifyPlugin implements Gdn_IPlugin {
    
-   public function AssetModel_StyleCss_Handler($Sender) {
-      $Sender->AddCssFile('emotify.css', 'plugins/Emotify');
+   public function assetModel_styleCss_handler($sender) {
+      $sender->addCssFile('emotify.css', 'plugins/Emotify');
    }
 	
     /**
     * Disable Emoji sets.
     */
-    public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler() {
-        SaveToConfig('Garden.EmojiSet', 'none', false);
+    public function gdn_Dispatcher_AfterAnalyzeRequest_Handler() {
+        saveToConfig('Garden.EmojiSet', 'none', false);
     }
 	
 	/**
 	 * Replace emoticons in comments.
 	 */
-	public function Base_AfterCommentFormat_Handler($Sender) {
-		if (!C('Plugins.Emotify.FormatEmoticons', TRUE))
+	public function base_afterCommentFormat_handler($sender) {
+		if (!c('Plugins.Emotify.FormatEmoticons', TRUE))
 			return;
 
-		$Object = $Sender->EventArguments['Object'];
-		$Object->FormatBody = $this->DoEmoticons($Object->FormatBody);
-		$Sender->EventArguments['Object'] = $Object;
+		$object = $sender->EventArguments['Object'];
+		$object->FormatBody = $this->doEmoticons($object->FormatBody);
+		$sender->EventArguments['Object'] = $object;
 	}
 	
-	public function DiscussionController_Render_Before($Sender) {
-		$this->_EmotifySetup($Sender);
+	public function discussionController_render_before($sender) {
+		$this->_EmotifySetup($sender);
 	}
 
 	/**
 	 * Return an array of emoticons.
 	 */
-	public static function GetEmoticons() {
-		return array(
+	public static function getEmoticons() {
+		return [
 			':)]' => '100',
 			';))' => '71',
 			':)>-' => '67',
@@ -201,73 +189,73 @@ class EmotifyPlugin implements Gdn_IPlugin {
 			':bz' => '115',
 			':ar!' => 'pirate'
 //			'[..]' => 'transformer'
-		);
+		];
 	}
 	
 	/**
 	 * Replace emoticons in comment preview.
 	 */
-	public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
-		if (!C('Plugins.Emotify.FormatEmoticons', TRUE))
+	public function postController_afterCommentPreviewFormat_handler($sender) {
+		if (!c('Plugins.Emotify.FormatEmoticons', TRUE))
 			return;
 		
-		$Sender->Comment->Body = $this->DoEmoticons($Sender->Comment->Body);
+		$sender->Comment->Body = $this->doEmoticons($sender->Comment->Body);
 	}
 	
-	public function PostController_Render_Before($Sender) {
-		$this->_EmotifySetup($Sender);
+	public function postController_render_before($sender) {
+		$this->_EmotifySetup($sender);
 	}
    
-   public function NBBCPlugin_AfterNBBCSetup_Handler($Sender, $Args) {
-//      $BBCode = new BBCode();
-      $BBCode = $Args['BBCode'];
-      $BBCode->smiley_url = SmartAsset('/plugins/Emotify/design/images');
+   public function nBBCPlugin_afterNBBCSetup_handler($sender, $args) {
+//      $BBCode = new bBCode();
+      $bBCode = $args['BBCode'];
+      $bBCode->smiley_url = smartAsset('/plugins/Emotify/design/images');
       
-      $Smileys = array();
-      foreach (self::GetEmoticons() as $Text => $Filename) {
-         $Smileys[$Text]= $Filename.'.gif';
+      $smileys = [];
+      foreach (self::getEmoticons() as $text => $filename) {
+         $smileys[$text]= $filename.'.gif';
       }
       
-      $BBCode->smileys = $Smileys;
+      $bBCode->smileys = $smileys;
    }
 	
 	/**
 	 * Thanks to punbb 1.3.5 (GPL License) for this function - ported from their do_smilies function.
 	 */
-	public static function DoEmoticons($Text) {
-		$Text = ' '.$Text.' ';
-		$Emoticons = EmotifyPlugin::GetEmoticons();
-		foreach ($Emoticons as $Key => $Replacement) {
-			if (strpos($Text, $Key) !== FALSE)
-				$Text = preg_replace(
-					"#(?<=[>\s])".preg_quote($Key, '#')."(?=\W)#m",
-					'<span class="Emoticon Emoticon' . $Replacement . '"><span>' . $Key . '</span></span>',
-					$Text
+	public static function doEmoticons($text) {
+		$text = ' '.$text.' ';
+		$emoticons = EmotifyPlugin::getEmoticons();
+		foreach ($emoticons as $key => $replacement) {
+			if (strpos($text, $key) !== FALSE)
+				$text = preg_replace(
+					"#(?<=[>\s])".preg_quote($key, '#')."(?=\W)#m",
+					'<span class="Emoticon Emoticon' . $replacement . '"><span>' . $key . '</span></span>',
+					$text
 				);
 		}
 
-		return substr($Text, 1, -1);
+		return substr($text, 1, -1);
 	}
 
 	/**
 	 * Prepare a page to be emotified.
 	 */
-	private function _EmotifySetup($Sender) {
-		$Sender->AddJsFile('emotify.js', 'plugins/Emotify');  
+	private function _EmotifySetup($sender) {
+		$sender->addJsFile('emotify.js', 'plugins/Emotify');  
 		// Deliver the emoticons to the page.
-      $Emoticons = array();
-      foreach ($this->GetEmoticons() as $i => $gif) {
-         if (!isset($Emoticons[$gif]))
-            $Emoticons[$gif] = $i;
+      $emoticons = [];
+      foreach ($this->getEmoticons() as $i => $gif) {
+         if (!isset($emoticons[$gif]))
+            $emoticons[$gif] = $i;
       }
-      $Emoticons = array_flip($Emoticons);
+      $emoticons = array_flip($emoticons);
 
-		$Sender->AddDefinition('Emoticons', base64_encode(json_encode($Emoticons)));
+		$sender->addDefinition('Emoticons', base64_encode(json_encode($emoticons)));
 	}
 	
-	public function Setup() {
+	public function setup() {
 		//SaveToConfig('Plugins.Emotify.FormatEmoticons', TRUE);
-		SaveToConfig('Garden.Format.Hashtags', FALSE); // Autohashing to search is incompatible with emotify
+		saveToConfig('Garden.Format.Hashtags', FALSE); // Autohashing to search is incompatible with emotify
 	}
 	
 }

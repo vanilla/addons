@@ -1,24 +1,9 @@
 <?php
 
 /**
- * @copyright 2010-2014 Vanilla Forums Inc
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
-
-// Define the plugin:
-$PluginInfo['CloudflareSupport'] = array(
-   'Description' => 'This plugin modifies the Request object to work with Cloudflare.',
-   'Version' => '1.2.3',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => FALSE,
-   'SettingsUrl' => FALSE,
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
-);
 
 /**
  * Cloudflare Support Plugin
@@ -39,7 +24,7 @@ $PluginInfo['CloudflareSupport'] = array(
 class CloudflareSupportPlugin extends Gdn_Plugin {
 
    // CloudFlare IP ranges listed at https://www.cloudflare.com/ips
-   protected $CloudflareSourceIPs = array(
+   protected $CloudflareSourceIPs = [
       '103.21.244.0/22',
       '103.22.200.0/22',
       '103.31.4.0/22',
@@ -54,34 +39,34 @@ class CloudflareSupportPlugin extends Gdn_Plugin {
       '197.234.240.0/22',
       '198.41.128.0/17',
       '199.27.128.0/21'
-    );
+    ];
 
    public function __construct() {
       parent::__construct();
 
       // If cloudflare isn't telling us a client IP, bust outta here!
-      $CloudflareClientIP = val('HTTP_CF_CONNECTING_IP', $_SERVER, NULL);
-      if (is_null($CloudflareClientIP)) {
+      $cloudflareClientIP = val('HTTP_CF_CONNECTING_IP', $_SERVER, NULL);
+      if (is_null($cloudflareClientIP)) {
          return;
       }
 
-      $RequestAddress = Gdn::Request()->RequestAddress();
-      $CloudflareRequest = FALSE;
-      foreach ($this->CloudflareSourceIPs as $CloudflareIPRange) {
+      $requestAddress = Gdn::request()->requestAddress();
+      $cloudflareRequest = FALSE;
+      foreach ($this->CloudflareSourceIPs as $cloudflareIPRange) {
 
          // Not a cloudflare origin server
-         if (!ip_in_range($RequestAddress, $CloudflareIPRange)) {
+         if (!ip_in_range($requestAddress, $cloudflareIPRange)) {
             continue;
          }
 
-         Gdn::Request()->RequestAddress($CloudflareClientIP);
-         $CloudflareRequest = TRUE;
+         Gdn::request()->requestAddress($cloudflareClientIP);
+         $cloudflareRequest = TRUE;
          break;
       }
 
       // Let people know that the CF plugin is turned on.
-      if ($CloudflareRequest && !headers_sent()) {
-         header("X-CF-Powered-By: CF-Vanilla v" . $this->GetPluginKey('Version'));
+      if ($cloudflareRequest && !headers_sent()) {
+         header("X-CF-Powered-By: CF-Vanilla v" . $this->getPluginKey('Version'));
       }
    }
 

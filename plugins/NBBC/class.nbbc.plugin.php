@@ -8,64 +8,51 @@
   Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 
-$PluginInfo['NBBC'] = array(
-    'Description' => 'Adapts The New BBCode Parser to work with Vanilla.',
-    'Version' => '1.1.0',
-    'RequiredApplications' => array('Vanilla' => '2.0.2'),
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => FALSE,
-    'Icon' => 'nbbc.png',
-    'Author' => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com/profile/todd'
-);
-
-Gdn::FactoryInstall('BBCodeFormatter', 'NBBCPlugin', __FILE__, Gdn::FactorySingleton);
+Gdn::factoryInstall('BBCodeFormatter', 'NBBCPlugin', __FILE__, Gdn::FactorySingleton);
 
 class NBBCPlugin extends Gdn_Plugin {
 
    public $Class = 'BBCode';
 
    /// CONSTRUCTOR ///
-   public function __construct($Class = 'BBCode') {
+   public function __construct($class = 'BBCode') {
       parent::__construct();
-      $this->Class = $Class;
+      $this->Class = $class;
    }
 
    /// PROPERTIES ///
    /// METHODS ///
 
-   public function DoAttachment($bbcode, $action, $name, $default, $params, $content) {
-      $Medias = $this->Media();
+   public function doAttachment($bbcode, $action, $name, $default, $params, $content) {
+      $Medias = $this->media();
       $MediaID = $content;
       if (isset($Medias[$MediaID])) {
          $Media = $Medias[$MediaID];
 //         decho($Media, 'Media');
 
-         $Src = htmlspecialchars(Gdn_Upload::Url(GetValue('Path', $Media)));
-         $Name = htmlspecialchars(GetValue('Name', $Media));
+         $Src = htmlspecialchars(Gdn_Upload::url(getValue('Path', $Media)));
+         $Name = htmlspecialchars(getValue('Name', $Media));
 
-         if (GetValue('ImageWidth', $Media)) {
+         if (getValue('ImageWidth', $Media)) {
             return <<<EOT
 <div class="Attachment Image"><img src="$Src" alt="$Name" /></div>
 EOT;
          } else {
-            return Anchor($Name, $Src, 'Attachment File');
+            return anchor($Name, $Src, 'Attachment File');
          }
       }
 
-      return Anchor(T('Attachment not found.'), '#', 'Attachment NotFound');
+      return anchor(t('Attachment not found.'), '#', 'Attachment NotFound');
    }
 
-   function DoImage($bbcode, $action, $name, $default, $params, $content) {
+   function doImage($bbcode, $action, $name, $default, $params, $content) {
       if ($action == BBCODE_CHECK)
          return true;
-      $content = trim($bbcode->UnHTMLEncode(strip_tags($content)));
+      $content = trim($bbcode->unHTMLEncode(strip_tags($content)));
       if (!$content && $default)
          $content = $default;
 
-      if ($bbcode->IsValidUrl($content, false))
+      if ($bbcode->isValidUrl($content, false))
          return "<img src=\"" . htmlspecialchars($content) . "\" alt=\""
             . htmlspecialchars(basename($content)) . "\" class=\"bbcode_img\" />";
 
@@ -82,7 +69,7 @@ EOT;
 //                  . htmlspecialchars($info[1]) . "\" class=\"bbcode_img\" />";
 //               }
 //            }
-//         } else if ($bbcode->IsValidURL($content, false)) {
+//         } else if ($bbcode->isValidURL($content, false)) {
 //            return "<img src=\"" . htmlspecialchars($content) . "\" alt=\""
 //            . htmlspecialchars(basename($content)) . "\" class=\"bbcode_img\" />";
 //         }
@@ -90,26 +77,26 @@ EOT;
       return htmlspecialchars($params['_tag']) . htmlspecialchars($content) . htmlspecialchars($params['_endtag']);
    }
 
-   function DoVideo($bbcode, $action, $name, $default, $params, $content) {
-      list($Width, $Height) = Gdn_Format::GetEmbedSize();
-      list($Type, $Code) = explode(';', $default);
-      switch ($Type) {
+   function doVideo($bbcode, $action, $name, $default, $params, $content) {
+      list($width, $height) = Gdn_Format::getEmbedSize();
+      list($type, $code) = explode(';', $default);
+      switch ($type) {
          case 'youtube':
-            return '<div class="Video P"><iframe width="'.$Width.'" height="'.$Height.'" src="https://www.youtube.com/embed/' . $Code . '" frameborder="0" allowfullscreen></iframe></div>';
+            return '<div class="Video P"><iframe width="'.$width.'" height="'.$height.'" src="https://www.youtube.com/embed/' . $code . '" frameborder="0" allowfullscreen></iframe></div>';
          default:
             return $content;
       }
    }
 
-   function DoYoutube($bbcode, $action, $name, $default, $params, $content) {
+   function doYoutube($bbcode, $action, $name, $default, $params, $content) {
        if ($action == BBCODE_CHECK) return true;
 
-       $videoId = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
+       $videoId = is_string($default) ? $default : $bbcode->unHTMLEncode(strip_tags($content));
 
        return '<div class="Video P"><iframe width="560" height="315" src="https://www.youtube.com/embed/' . $videoId . '" frameborder="0" allowfullscreen></iframe></div>';
    }
 
-   function DoQuote($bbcode, $action, $name, $default, $params, $content) {
+   function doQuote($bbcode, $action, $name, $default, $params, $content) {
       if ($action == BBCODE_CHECK)
          return true;
 
@@ -130,17 +117,17 @@ EOT;
          $username = trim($params['name']);
          $username = html_entity_decode($username, ENT_QUOTES, 'UTF-8');
 
-         $User = Gdn::UserModel()->GetByUsername($username);
+         $User = Gdn::userModel()->getByUsername($username);
          if ($User)
-            $UserAnchor = UserAnchor($User);
+            $UserAnchor = userAnchor($User);
          else
-            $UserAnchor = Anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/' . rawurlencode($username));
+            $UserAnchor = anchor(htmlspecialchars($username, NULL, 'UTF-8'), '/profile/' . rawurlencode($username));
 
-         $title = ConcatSep(' ', $title, $UserAnchor, T('Quote wrote', 'wrote'));
+         $title = concatSep(' ', $title, $UserAnchor, t('Quote wrote', 'wrote'));
       }
 
       if (isset($params['date']))
-         $title = ConcatSep(' ', $title, T('Quote on', 'on'), htmlspecialchars(trim($params['date'])));
+         $title = concatSep(' ', $title, t('Quote on', 'on'), htmlspecialchars(trim($params['date'])));
 
       if ($title)
          $title = $title . ':';
@@ -150,11 +137,11 @@ EOT;
 
          if (is_numeric($url))
             $url = "/discussion/comment/$url#Comment_{$url}";
-         elseif (!$bbcode->IsValidURL($url))
+         elseif (!$bbcode->isValidURL($url))
             $url = '';
 
          if ($url)
-            $title = ConcatSep(' ', $title, Anchor('<span class="ArrowLink">»</span>', $url, array('class' => 'QuoteLink')));
+            $title = concatSep(' ', $title, anchor('<span class="ArrowLink">»</span>', $url, ['class' => 'QuoteLink']));
       }
 
       if ($title)
@@ -212,12 +199,12 @@ EOT;
        return "<span style=\"font-size:$size\">$content</span>";
    }
 
-   function DoURL($bbcode, $action, $name, $default, $params, $content) {
+   function doURL($bbcode, $action, $name, $default, $params, $content) {
       if ($action == BBCODE_CHECK) return true;
 
-      $url = is_string($default) ? $default : $bbcode->UnHTMLEncode(strip_tags($content));
+      $url = is_string($default) ? $default : $bbcode->unHTMLEncode(strip_tags($content));
 
-      if ($bbcode->IsValidURL($url)) {
+      if ($bbcode->isValidURL($url)) {
          if ($bbcode->debug)
             print "ISVALIDURL<br />";
          if ($bbcode->url_targetable !== false && isset($params['target']))
@@ -233,29 +220,29 @@ EOT;
          return htmlspecialchars($params['_tag']) . $content . htmlspecialchars($params['_endtag']);
    }
 
-   public function Format($Result) {
-      $Result = str_replace(array('[CODE]', '[/CODE]'), array('[code]', '[/code]'), $Result);
-      $Result = $this->NBBC()->Parse($Result);
-      return $Result;
+   public function format($result) {
+      $result = str_replace(['[CODE]', '[/CODE]'], ['[code]', '[/code]'], $result);
+      $result = $this->nBBC()->parse($result);
+      return $result;
    }
 
    protected $_Media = NULL;
-   public function Media() {
+   public function media() {
       if ($this->_Media === NULL) {
          try {
-            $I = Gdn::PluginManager()->GetPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
-            $M = $I->MediaCache();
-         } catch (Exception $Ex) {
-            $M = array();
+            $i = Gdn::pluginManager()->getPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
+            $m = $i->mediaCache();
+         } catch (Exception $ex) {
+            $m = [];
          }
 
-         $Media = array();
-         foreach ($M as $Key => $Data) {
-            foreach ($Data as $Row) {
-               $Media[$Row->MediaID] = $Row;
+         $media = [];
+         foreach ($m as $key => $data) {
+            foreach ($data as $row) {
+               $media[$row->MediaID] = $row;
             }
          }
-         $this->_Media = $Media;
+         $this->_Media = $media;
       }
       return $this->_Media;
    }
@@ -265,29 +252,29 @@ EOT;
     *
     * @return BBCode
     */
-   public function NBBC() {
+   public function nBBC() {
       if ($this->_NBBC === NULL) {
          require_once(dirname(__FILE__) . '/nbbc/nbbc.php');
-         $BBCode = new $this->Class();
+         $BBCode = new $this->class();
          $BBCode->enable_smileys = false;
-         $BBCode->SetAllowAmpersand(TRUE);
+         $BBCode->setAllowAmpersand(TRUE);
 
-         $BBCode->AddRule('attach', array(
+         $BBCode->addRule('attach', [
             'mode' => BBCODE_MODE_CALLBACK,
-            'method' => array($this, "DoAttachment"),
+            'method' => [$this, "DoAttachment"],
             'class' => 'image',
-            'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+            'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
             'end_tag' => BBCODE_REQUIRED,
             'content' => BBCODE_REQUIRED,
             'plain_start' => "[image]",
-            'plain_content' => Array(),
-            ));
+            'plain_content' => [],
+            ]);
 
-         $BBCode->AddRule('code', Array(
+         $BBCode->addRule('code', [
              'mode' => BBCODE_MODE_ENHANCED,
              'template' => "\n<pre>{\$_content/v}\n</pre>\n",
              'class' => 'code',
-             'allow_in' => Array('listitem', 'block', 'columns'),
+             'allow_in' => ['listitem', 'block', 'columns'],
              'content' => BBCODE_VERBATIM,
              'before_tag' => "sns",
              'after_tag' => "sn",
@@ -295,21 +282,21 @@ EOT;
              'after_endtag' => "sns",
              'plain_start' => "\n<b>Code:</b>\n",
              'plain_end' => "\n",
-         ));
+         ]);
 
 
-         $BBCode->AddRule('quote', array('mode' => BBCODE_MODE_CALLBACK,
-             'method' => array($this, "DoQuote"),
-             'allow_in' => Array('listitem', 'block', 'columns'),
+         $BBCode->addRule('quote', ['mode' => BBCODE_MODE_CALLBACK,
+             'method' => [$this, "DoQuote"],
+             'allow_in' => ['listitem', 'block', 'columns'],
              'before_tag' => "sns",
              'after_tag' => "sns",
              'before_endtag' => "sns",
              'after_endtag' => "sns",
              'plain_start' => "\n<b>Quote:</b>\n",
              'plain_end' => "\n",
-         ));
+         ]);
 //
-         $BBCode->AddRule('spoiler', array(
+         $BBCode->addRule('spoiler', [
              'mode' => BBCODE_MODE_CALLBACK,
              'method' => [$this, "doSpoiler"],
              'allow_in' => ['listitem', 'block', 'columns'],
@@ -319,24 +306,24 @@ EOT;
              'after_endtag' => "sns",
              'plain_start' => "\n",
              'plain_end' => "\n"
-             ));
+             ]);
 
-         $BBCode->AddRule('img', array(
+         $BBCode->addRule('img', [
             'mode' => BBCODE_MODE_CALLBACK,
-            'method' => array($this, "DoImage"),
+            'method' => [$this, "DoImage"],
             'class' => 'image',
-            'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+            'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
             'end_tag' => BBCODE_REQUIRED,
             'content' => BBCODE_REQUIRED,
             'plain_start' => "[image]",
-            'plain_content' => Array(),
-            ));
+            'plain_content' => [],
+            ]);
 
-         $BBCode->AddRule('snapback', Array(
+         $BBCode->addRule('snapback', [
              'mode' => BBCODE_MODE_ENHANCED,
-             'template' => ' <a href="'.Url('/discussion/comment/{$_content/v}#Comment_{$_content/v}', TRUE).'" class="SnapBack">»</a> ',
+             'template' => ' <a href="'.url('/discussion/comment/{$_content/v}#Comment_{$_content/v}', TRUE).'" class="SnapBack">»</a> ',
              'class' => 'code',
-             'allow_in' => Array('listitem', 'block', 'columns'),
+             'allow_in' => ['listitem', 'block', 'columns'],
              'content' => BBCODE_VERBATIM,
              'before_tag' => "sns",
              'after_tag' => "sn",
@@ -344,97 +331,97 @@ EOT;
              'after_endtag' => "sns",
              'plain_start' => "\n<b>Snapback:</b>\n",
              'plain_end' => "\n",
-         ));
+         ]);
 
-         $BBCode->AddRule('video', array('mode' => BBCODE_MODE_CALLBACK,
-             'method' => array($this, "DoVideo"),
-             'allow_in' => Array('listitem', 'block', 'columns'),
+         $BBCode->addRule('video', ['mode' => BBCODE_MODE_CALLBACK,
+             'method' => [$this, "DoVideo"],
+             'allow_in' => ['listitem', 'block', 'columns'],
              'before_tag' => "sns",
              'after_tag' => "sns",
              'before_endtag' => "sns",
              'after_endtag' => "sns",
              'plain_start' => "\n<b>Video:</b>\n",
              'plain_end' => "\n",
-         ));
+         ]);
 
-          $BBCode->AddRule('youtube', array(
+          $BBCode->addRule('youtube', [
               'mode' => BBCODE_MODE_CALLBACK,
-              'method' => array($this, 'DoYouTube'),
+              'method' => [$this, 'DoYouTube'],
               'class' => 'link',
-              'allow_in' => Array('listitem', 'block', 'columns', 'inline'),
+              'allow_in' => ['listitem', 'block', 'columns', 'inline'],
               'content' => BBCODE_REQUIRED,
               'plain_start' => "\n<b>Video:</b>\n",
               'plain_end' => "\n",
-              'plain_content' => Array('_content', '_default'),
-              'plain_link' => Array('_default', '_content')
-          ));
+              'plain_content' => ['_content', '_default'],
+              'plain_link' => ['_default', '_content']
+          ]);
 
-          $BBCode->AddRule('hr', Array(
+          $BBCode->addRule('hr', [
               'simple_start' => "",
               'simple_end' => "",
-              'allow_in' => Array('listitem', 'block', 'columns'),
+              'allow_in' => ['listitem', 'block', 'columns'],
               'before_tag' => "sns",
               'after_tag' => "sns",
               'before_endtag' => "sns",
               'after_endtag' => "sns",
               'plain_start' => "\n",
               'plain_end' => "\n"
-          ));
+          ]);
 
-          $BBCode->AddRule('attachment', array(
+          $BBCode->addRule('attachment', [
               'mode' => BBCODE_MODE_CALLBACK,
-              'method' => array($this, "RemoveAttachment"),
+              'method' => [$this, "RemoveAttachment"],
               'class' => 'image',
-              'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+              'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
               'end_tag' => BBCODE_REQUIRED,
               'content' => BBCODE_REQUIRED,
               'plain_start' => "[image]",
-              'plain_content' => Array(),
-          ));
+              'plain_content' => [],
+          ]);
 
 
-          $BBCode->AddRule('url', array(
+          $BBCode->addRule('url', [
              'mode' => BBCODE_MODE_CALLBACK,
-             'method' => array($this, 'DoURL'),
+             'method' => [$this, 'DoURL'],
              'class' => 'link',
-             'allow_in' => Array('listitem', 'block', 'columns', 'inline'),
+             'allow_in' => ['listitem', 'block', 'columns', 'inline'],
              'content' => BBCODE_REQUIRED,
              'plain_start' => "<a rel=\"nofollow\" href=\"{\$link}\">",
              'plain_end' => "</a>",
-             'plain_content' => Array('_content', '_default'),
-             'plain_link' => Array('_default', '_content')
-         ));
+             'plain_content' => ['_content', '_default'],
+             'plain_link' => ['_default', '_content']
+         ]);
 
           /**
            * Default size tag needs to be a little more flexible.  The original NBBC rule was copied here and the regex
            * was updated to meet our new criteria.
            */
-          $BBCode->addRule('size', array(
+          $BBCode->addRule('size', [
               'mode' => BBCODE_MODE_CALLBACK,
-              'allow' => array('_default' => '/^[0-9.]+(em|px)?$/D'),
-              'method' => array($this, 'doSize'),
+              'allow' => ['_default' => '/^[0-9.]+(em|px)?$/D'],
+              'method' => [$this, 'doSize'],
               'class' => 'inline',
-              'allow_in' => array('listitem', 'block', 'columns', 'inline', 'link'),
-          ));
+              'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
+          ]);
 
           // Prevent unsupported tags from displaying
-          $BBCode->AddRule('table', array());
-          $BBCode->AddRule('tr', array());
-          $BBCode->AddRule('td', array());
+          $BBCode->addRule('table', []);
+          $BBCode->addRule('tr', []);
+          $BBCode->addRule('td', []);
 
          $this->EventArguments['BBCode'] = $BBCode;
-         $this->FireEvent('AfterNBBCSetup');
+         $this->fireEvent('AfterNBBCSetup');
          $this->_NBBC = $BBCode;
       }
       return $this->_NBBC;
    }
 
-   public function RemoveAttachment() {
+   public function removeAttachment() {
        // We dont need this since we show attachments.
        return '<!-- PhpBB Attachments -->';
    }
 
-   public function Setup() {
+   public function setup() {
 
    }
 

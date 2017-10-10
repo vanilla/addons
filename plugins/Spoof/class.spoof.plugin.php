@@ -3,150 +3,144 @@
 /**
  * 1.2 - mosullivan - 2011-08-30 - Added "Spoof" button to various screens for admins.
  */
-// Define the plugin:
-$PluginInfo['Spoof'] = array(
-   'Name' => 'Spoof',
-   'Description' => 'Administrators may "spoof" other users, meaning they temporarily sign in as that user. Helpful for debugging permission problems.',
-   'Version' => '1.2',
-   'Icon' => 'spoof.png',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
-);
-
 class SpoofPlugin implements Gdn_IPlugin {
 
 	/**
 	 * Add the spoof admin screen to the dashboard menu.
 	 */
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+   public function base_getAppSettingsMenuItems_handler($sender) {
       // Clean out entire menu & re-add everything
-      $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Users', T('Spoof'), 'user/spoof', 'Garden.Settings.Manage');
+      $menu = &$sender->EventArguments['SideMenu'];
+      $menu->addLink('Users', t('Spoof'), 'user/spoof', 'Garden.Settings.Manage');
 	}
 
 	/**
 	 * Admin screen for spoofing a user.
 	 */
-   public function UserController_Spoof_Create($Sender) {
-		$Sender->Permission('Garden.Settings.Manage');
-      $Sender->AddSideMenu('user/spoof');
-		$this->_SpoofMethod($Sender);
+   public function userController_spoof_create($sender) {
+		$sender->permission('Garden.Settings.Manage');
+      $sender->addSideMenu('user/spoof');
+		$this->_SpoofMethod($sender);
 	}
 
 	/**
 	 * Validates the current user's permissions & transientkey and then spoofs
 	 * the userid passed as the first arg and redirects to profile.
+     *
+     * @param UserController $sender
 	 */
-	public function UserController_AutoSpoof_Create($Sender) {
-		$SpoofUserID = GetValue('0', $Sender->RequestArgs);
-		$TransientKey = GetValue('1', $Sender->RequestArgs);
+	public function userController_autoSpoof_create($sender) {
+		$spoofUserID = getValue('0', $sender->RequestArgs);
+		$transientKey = getValue('1', $sender->RequestArgs);
 		// Validate the transient key && permissions
-		if (Gdn::Session()->ValidateTransientKey($TransientKey) && Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-			$Identity = new Gdn_CookieIdentity();
-			$Identity->Init(array(
-				'Salt' => Gdn::Config('Garden.Cookie.Salt'),
-				'Name' => Gdn::Config('Garden.Cookie.Name'),
-				'Domain' => Gdn::Config('Garden.Cookie.Domain')
-			));
-			$Identity->SetIdentity($SpoofUserID, TRUE);
+		if (Gdn::session()->validateTransientKey($transientKey) && Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+			$identity = new Gdn_CookieIdentity();
+			$identity->init([
+				'Salt' => Gdn::config('Garden.Cookie.Salt'),
+				'Name' => Gdn::config('Garden.Cookie.Name'),
+				'Domain' => Gdn::config('Garden.Cookie.Domain')
+			]);
+			$identity->setIdentity($spoofUserID, TRUE);
 		}
 		if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
-			$Sender->RedirectUrl = url('profile');
-			$Sender->render('blank', 'utility', 'dashboard');
+			$sender->setRedirectTo('profile');
+			$sender->render('blank', 'utility', 'dashboard');
 		} else {
-			Redirect('profile');
+			redirectTo('profile');
 		}
 	}
 
 	/**
 	 * Adds a "Spoof" link to the user management list.
 	 */
-	public function UserController_UserListOptions_Handler($Sender) {
-		if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
+	public function userController_userListOptions_handler($sender) {
+		if (!Gdn::session()->checkPermission('Garden.Settings.Manage'))
 			return;
 
-		$User = GetValue('User', $Sender->EventArguments);
-		if ($User) {
+		$user = getValue('User', $sender->EventArguments);
+		if ($user) {
 			$attr = [
 				'aria-label' => t('Spoof'),
 				'title' => t('Spoof'),
 				'data-follow-link' => 'true'
 			];
 			$class = 'js-modal-confirm btn btn-icon';
-			echo anchor(dashboardSymbol('spoof'), '/user/autospoof/'.$User->UserID.'/'.Gdn::Session()->TransientKey(), $class, $attr);
+			echo anchor(dashboardSymbol('spoof'), '/user/autospoof/'.$user->UserID.'/'.Gdn::session()->transientKey(), $class, $attr);
 		}
 	}
 
 	/**
 	 * Adds a "Spoof" link to the site management list.
 	 */
-	public function ManageController_SiteListOptions_Handler($Sender) {
-		if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
+	public function manageController_siteListOptions_handler($sender) {
+		if (!Gdn::session()->checkPermission('Garden.Settings.Manage'))
 			return;
 
-		$Site = GetValue('Site', $Sender->EventArguments);
-		if ($Site)
-			echo Anchor(T('Spoof'), '/user/autospoof/'.$Site->InsertUserID.'/'.Gdn::Session()->TransientKey(), 'PopConfirm SmallButton');
+		$site = getValue('Site', $sender->EventArguments);
+		if ($site)
+			echo anchor(t('Spoof'), '/user/autospoof/'.$site->InsertUserID.'/'.Gdn::session()->transientKey(), 'PopConfirm SmallButton');
 	}
 
-   public function ProfileController_AfterAddSideMenu_Handler($Sender) {
-		if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
+   public function profileController_afterAddSideMenu_handler($sender) {
+		if (!Gdn::session()->checkPermission('Garden.Settings.Manage'))
 			return;
 
-      $SideMenu = $Sender->EventArguments['SideMenu'];
-      $ViewingUserID = Gdn::Session()->UserID;
+      $sideMenu = $sender->EventArguments['SideMenu'];
+      $viewingUserID = Gdn::session()->UserID;
 
-      if ($Sender->User->UserID != $ViewingUserID)
-         $SideMenu->AddLink('Options', T('Spoof User'), '/user/autospoof/'.$Sender->User->UserID.'/'.Gdn::Session()->TransientKey(), '', array('class' => 'PopConfirm'));
+      if ($sender->User->UserID != $viewingUserID)
+         $sideMenu->addLink('Options', t('Spoof User'), '/user/autospoof/'.$sender->User->UserID.'/'.Gdn::session()->transientKey(), '', ['class' => 'PopConfirm']);
    }
 
 
 	/**
 	 * Creates a spoof login page.
 	 */
-	public function EntryController_Spoof_Create($Sender) {
-		$this->_SpoofMethod($Sender);
+	public function entryController_spoof_create($sender) {
+		$this->_SpoofMethod($sender);
 	}
 
 	/**
 	 * Standard method for authenticating an admin and allowing them to spoof a user.
 	 */
-	private function _SpoofMethod($Sender) {
-      $Sender->Title('Spoof');
-      $Sender->Form = new Gdn_Form();
-      $UserReference = $Sender->Form->GetValue('UserReference', '');
-      $Email = $Sender->Form->GetValue('Email', '');
-      $Password = $Sender->Form->GetValue('Password', '');
-      if ($UserReference != '' && $Email != '' && $Password != '') {
-         $UserModel = Gdn::UserModel();
-         $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
-			// if (1 == 1) {
-         if (is_object($UserData) && $UserData->Admin) {
-				if (is_numeric($UserReference)) {
-					$SpoofUser = $UserModel->GetID($UserReference);
+	private function _SpoofMethod($sender) {
+      $sender->title('Spoof');
+      $sender->Form = new Gdn_Form();
+      $userReference = $sender->Form->getValue('UserReference', '');
+      $email = $sender->Form->getValue('Email', '');
+      $password = $sender->Form->getValue('Password', '');
+
+      if ($userReference != '' && $email != '' && $password != '') {
+         $userModel = Gdn::userModel();
+         $userData = $userModel->validateCredentials($email, 0, $password);
+
+         if (is_object($userData) && $userModel->checkPermission($userData->UserID, 'Garden.Settings.Manage')) {
+				if (is_numeric($userReference)) {
+					$spoofUser = $userModel->getID($userReference);
 				} else {
-				   $SpoofUser = $UserModel->GetByUsername($UserReference);
+				   $spoofUser = $userModel->getByUsername($userReference);
 				}
-				if ($SpoofUser) {
-					$Identity = new Gdn_CookieIdentity();
-					$Identity->Init(array(
-						'Salt' => Gdn::Config('Garden.Cookie.Salt'),
-						'Name' => Gdn::Config('Garden.Cookie.Name'),
-						'Domain' => Gdn::Config('Garden.Cookie.Domain')
-					));
-					$Identity->SetIdentity($SpoofUser->UserID, TRUE);
-	            Redirect('profile');
+
+				if ($spoofUser) {
+					$identity = new Gdn_CookieIdentity();
+					$identity->init([
+						'Salt' => Gdn::config('Garden.Cookie.Salt'),
+						'Name' => Gdn::config('Garden.Cookie.Name'),
+						'Domain' => Gdn::config('Garden.Cookie.Domain')
+					]);
+					$identity->setIdentity($spoofUser->UserID, TRUE);
+	                redirectTo('profile');
 				} else {
-					$Sender->Form->AddError('Failed to find requested user.');
+					$sender->Form->addError('Failed to find requested user.');
 				}
          } else {
-            $Sender->Form->AddError('Bad Credentials');
+            $sender->Form->addError('Bad Credentials');
          }
       }
-      $Sender->Render(PATH_PLUGINS . DS . 'Spoof' . DS . 'views' . DS . 'spoof.php');
+
+      $sender->render(PATH_PLUGINS . DS . 'Spoof' . DS . 'views' . DS . 'spoof.php');
    }
 
-   public function Setup() {}
+   public function setup() {}
 
 }

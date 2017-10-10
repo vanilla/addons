@@ -92,26 +92,26 @@
 	class BBCode_Profiler {
 		var $start_time, $total_times;
 		
-		function BBCode_Profiler()
-			{ $start_time = Array(); $total_times = Array(); }
+		function bBCode_Profiler()
+			{ $start_time = []; $total_times = []; }
 
-		function Now()
+		function now()
 			{ list($usec, $sec) = explode(" ", microtime());
 				return ((float)$usec + (float)$sec); }
 
-		function Begin($group)
-			{ $this->start_time[$group] = $this->Now(); }
-		function End($group)
-			{ $time = $this->Now() - $this->start_time[$group];
+		function begin($group)
+			{ $this->start_time[$group] = $this->now(); }
+		function end($group)
+			{ $time = $this->now() - $this->start_time[$group];
 				if (!isset($this->total_times[$group]))
 					$this->total_times[$group] = $time;
 				else $this->total_times[$group] += $time; }
-		function Reset($group)
+		function reset($group)
 			{ $this->total_times[$group] = 0; }
-		function Total($group)
+		function total($group)
 			{ return @$this->total_times[$group]; }
 
-		function DumpAllGroups() {
+		function dumpAllGroups() {
 			print "<div>Profiled times:\n<ul>\n";
 			ksort($this->total_times);
 			foreach ($this->total_times as $name => $time) {
