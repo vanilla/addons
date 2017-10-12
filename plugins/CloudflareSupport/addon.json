@@ -1,6 +1,6 @@
 {
     "description": "This plugin modifies the Request object to work with Cloudflare.",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "requiredTheme": false,
     "hasLocale": false,
     "settingsUrl": false,
