@@ -22,8 +22,7 @@
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package Addons
  */
-class CloudflareSupportPlugin extends Gdn_Plugin
-{
+class CloudflareSupportPlugin extends Gdn_Plugin {
 
     // CloudFlare IP ranges listed at https://www.cloudflare.com/ips
     protected $CloudflareSourceIPs = [
@@ -43,34 +42,33 @@ class CloudflareSupportPlugin extends Gdn_Plugin
         '198.41.128.0/17'
     ];
 
-   public function __construct()
-   {
-       parent::__construct();
+    public function __construct() {
+        parent::__construct();
 
-       // If cloudflare isn't telling us a client IP, bust outta here!
-       $cloudflareClientIP = val('HTTP_CF_CONNECTING_IP', $_SERVER, null);
-       if (is_null($cloudflareClientIP)) {
-           return;
-       }
+        // If cloudflare isn't telling us a client IP, bust outta here!
+        $cloudflareClientIP = val('HTTP_CF_CONNECTING_IP', $_SERVER, null);
+        if (is_null($cloudflareClientIP)) {
+            return;
+        }
 
-       $requestAddress = Gdn::request()->requestAddress();
-       $cloudflareRequest = false;
-       foreach ($this->CloudflareSourceIPs as $cloudflareIPRange) {
+        $requestAddress = Gdn::request()->requestAddress();
+        $cloudflareRequest = false;
+        foreach ($this->CloudflareSourceIPs as $cloudflareIPRange) {
 
-           // Not a cloudflare origin server
-           if (!ip_in_range($requestAddress, $cloudflareIPRange)) {
-               continue;
-           }
+            // Not a cloudflare origin server
+            if (!ip_in_range($requestAddress, $cloudflareIPRange)) {
+                continue;
+            }
 
-           Gdn::request()->requestAddress($cloudflareClientIP);
-           $cloudflareRequest = true;
-           break;
-       }
+            Gdn::request()->requestAddress($cloudflareClientIP);
+            $cloudflareRequest = true;
+            break;
+        }
 
-       // Let people know that the CF plugin is turned on.
-       if ($cloudflareRequest) {
-           safeHeader("X-CF-Powered-By: CF-Vanilla v" . $this->getPluginKey('Version'));
-       }
-   }
+        // Let people know that the CF plugin is turned on.
+        if ($cloudflareRequest) {
+            safeHeader("X-CF-Powered-By: CF-Vanilla v".$this->getPluginKey('Version'));
+        }
+    }
 
 }
