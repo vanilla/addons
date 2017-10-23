@@ -342,9 +342,6 @@ class QnAPlugin extends Gdn_Plugin {
     /**
      * Write the accept/reject buttons.
      *
-     * @staticvar null $discussionModel
-     * @staticvar boolean $InformMessage
-     *
      * @param DiscussionController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
@@ -362,11 +359,7 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         if (!$discussion) {
-            static $discussionModel = null;
-            if ($discussionModel === null) {
-                $discussionModel = new DiscussionModel();
-            }
-            $discussion = $discussionModel->getID(val('DiscussionID', $comment));
+            $discussion = DiscussionModel::instance()->getID(val('DiscussionID', $comment));
         }
 
         if (!$discussion || strtolower(val('Type', $discussion)) != 'question') {
@@ -425,15 +418,15 @@ class QnAPlugin extends Gdn_Plugin {
      * @throws notFoundException
      */
     public function discussionController_qnA_create($sender, $args) {
-        $Comment = Gdn::sql()->getWhere('Comment', ['CommentID' => $sender->Request->get('commentid')])->firstRow(DATASET_TYPE_ARRAY);
-        if (!$Comment) {
+        $comment = Gdn::sql()->getWhere('Comment', ['CommentID' => $sender->Request->get('commentid')])->firstRow(DATASET_TYPE_ARRAY);
+        if (!$comment) {
             throw notFoundException('Comment');
         }
 
-        $Discussion = Gdn::sql()->getWhere('Discussion', ['DiscussionID' => $Comment['DiscussionID']])->firstRow(DATASET_TYPE_ARRAY);
+        $discussion = Gdn::sql()->getWhere('Discussion', ['DiscussionID' => $comment['DiscussionID']])->firstRow(DATASET_TYPE_ARRAY);
 
         // Check for permission.
-        if (!(Gdn::session()->UserID == val('InsertUserID', $Discussion) || Gdn::session()->checkPermission('Garden.Moderation.Manage'))) {
+        if (!(Gdn::session()->UserID == val('InsertUserID', $discussion) || Gdn::session()->checkPermission('Garden.Moderation.Manage'))) {
             throw permissionException('Garden.Moderation.Manage');
         }
         if (!Gdn::session()->validateTransientKey($sender->Request->get('tkey'))) {
@@ -442,83 +435,83 @@ class QnAPlugin extends Gdn_Plugin {
 
         switch ($args[0]) {
             case 'accept':
-                $QnA = 'Accepted';
+                $qna = 'Accepted';
                 break;
             case 'reject':
-                $QnA = 'Rejected';
+                $qna = 'Rejected';
                 break;
         }
 
-        if (isset($QnA)) {
-            $DiscussionSet = ['QnA' => $QnA];
-            $CommentSet = ['QnA' => $QnA];
+        if (isset($qna)) {
+            $discussionSet = ['QnA' => $qna];
+            $CommentSet = ['QnA' => $qna];
 
-            if ($QnA == 'Accepted') {
+            if ($qna == 'Accepted') {
                 $CommentSet['DateAccepted'] = Gdn_Format::toDateTime();
                 $CommentSet['AcceptedUserID'] = Gdn::session()->UserID;
 
-                if (!$Discussion['DateAccepted']) {
-                    $DiscussionSet['DateAccepted'] = Gdn_Format::toDateTime();
-                    $DiscussionSet['DateOfAnswer'] = $Comment['DateInserted'];
+                if (!$discussion['DateAccepted']) {
+                    $discussionSet['DateAccepted'] = Gdn_Format::toDateTime();
+                    $discussionSet['DateOfAnswer'] = $comment['DateInserted'];
                 }
             }
 
             // Update the comment.
-            Gdn::sql()->put('Comment', $CommentSet, ['CommentID' => $Comment['CommentID']]);
+            Gdn::sql()->put('Comment', $CommentSet, ['CommentID' => $comment['CommentID']]);
 
             // Update the discussion.
-            if ($Discussion['QnA'] != $QnA && (!$Discussion['QnA'] || in_array($Discussion['QnA'], ['Unanswered', 'Answered', 'Rejected']))) {
+            if ($discussion['QnA'] != $qna && (!$discussion['QnA'] || in_array($discussion['QnA'], ['Unanswered', 'Answered', 'Rejected']))) {
                 Gdn::sql()->put(
                     'Discussion',
-                    $DiscussionSet,
-                    ['DiscussionID' => $Comment['DiscussionID']]);
+                    $discussionSet,
+                    ['DiscussionID' => $comment['DiscussionID']]);
             }
 
             // Determine QnA change
-            if ($Comment['QnA'] != $QnA) {
-                $Change = 0;
-                switch ($QnA) {
+            if ($comment['QnA'] != $qna) {
+                $change = 0;
+                switch ($qna) {
                     case 'Rejected':
-                        $Change = -1;
-                        if ($Comment['QnA'] != 'Accepted') {
-                            $Change = 0;
+                        $change = -1;
+                        if ($comment['QnA'] != 'Accepted') {
+                            $change = 0;
                         }
                         break;
 
                     case 'Accepted':
-                        $Change = 1;
+                        $change = 1;
                         break;
 
                     default:
-                        if ($Comment['QnA'] == 'Rejected') {
-                            $Change = 0;
+                        if ($comment['QnA'] == 'Rejected') {
+                            $change = 0;
                         }
-                        if ($Comment['QnA'] == 'Accepted') {
-                            $Change = -1;
+                        if ($comment['QnA'] == 'Accepted') {
+                            $change = -1;
                         }
                         break;
                 }
             }
 
             // Apply change effects
-            if ($Change && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
+            if ($change && $discussion['InsertUserID'] != $comment['InsertUserID']) {
                 // Update the user
-                $UserID = val('InsertUserID', $Comment);
-                $this->recalculateUserQnA($UserID);
+                $userID = val('InsertUserID', $comment);
+                $this->recalculateUserQnA($userID);
 
                 // Update reactions
                 if ($this->Reactions) {
                     include_once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
-                    $Rm = new ReactionModel();
+                    $reactionModel = new ReactionModel();
 
                     // Assume that the reaction is done by the question's owner
-                    $questionOwner = $Discussion['InsertUserID'];
+                    $questionOwner = $discussion['InsertUserID'];
                     // If there's change, reactions will take care of it
-                    $Rm->react('Comment', $Comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
+                    $reactionModel->react('Comment', $comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
                 } else {
-                    $nbsPoint = $Change * (int)c('QnA.Points.AcceptedAnswer', 1);
+                    $nbsPoint = $change * (int)c('QnA.Points.AcceptedAnswer', 1);
                     if ($nbsPoint && c('QnA.Points.Enabled', false)) {
-                        UserModel::givePoints($Comment['InsertUserID'], $nbsPoint, 'QnA');
+                        UserModel::givePoints($comment['InsertUserID'], $nbsPoint, 'QnA');
                     }
                 }
             }
@@ -526,29 +519,29 @@ class QnAPlugin extends Gdn_Plugin {
             $headlineFormat = t('HeadlineFormat.AcceptAnswer', '{ActivityUserID,You} accepted {NotifyUserID,your} answer to a question: <a href="{Url,html}">{Data.Name,text}</a>');
 
             // Record the activity.
-            if ($QnA == 'Accepted') {
-                $Activity = [
+            if ($qna == 'Accepted') {
+                $activity = [
                     'ActivityType' => 'AnswerAccepted',
-                    'NotifyUserID' => $Comment['InsertUserID'],
+                    'NotifyUserID' => $comment['InsertUserID'],
                     'HeadlineFormat' => $headlineFormat,
                     'RecordType' => 'Comment',
-                    'RecordID' => $Comment['CommentID'],
-                    'Route' => commentUrl($Comment, '/'),
+                    'RecordID' => $comment['CommentID'],
+                    'Route' => commentUrl($comment, '/'),
                     'Emailed' => ActivityModel::SENT_PENDING,
                     'Notified' => ActivityModel::SENT_PENDING,
                     'Data' => [
-                        'Name' => val('Name', $Discussion)
+                        'Name' => val('Name', $discussion)
                     ]
                 ];
 
                 $ActivityModel = new ActivityModel();
-                $ActivityModel->save($Activity);
+                $ActivityModel->save($activity);
 
-                $this->EventArguments['Activity'] =& $Activity;
+                $this->EventArguments['Activity'] =& $activity;
                 $this->fireEvent('AfterAccepted');
             }
         }
-        redirectTo("/discussion/comment/{$Comment['CommentID']}#Comment_{$Comment['CommentID']}");
+        redirectTo("/discussion/comment/{$comment['CommentID']}#Comment_{$comment['CommentID']}");
     }
 
     /**
@@ -620,15 +613,15 @@ class QnAPlugin extends Gdn_Plugin {
     public function _commentOptions($sender, $commentID) {
         $sender->Form = new Gdn_Form();
 
-        $Comment = $sender->CommentModel->getID($commentID, DATASET_TYPE_ARRAY);
+        $comment = $sender->CommentModel->getID($commentID, DATASET_TYPE_ARRAY);
 
-        if (!$Comment) {
+        if (!$comment) {
             throw notFoundException('Comment');
         }
 
-        $Discussion = $sender->DiscussionModel->getID(val('DiscussionID', $Comment), DATASET_TYPE_ARRAY);
+        $discussion = $sender->DiscussionModel->getID(val('DiscussionID', $comment), DATASET_TYPE_ARRAY);
 
-        $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $Discussion));
+        $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
 
         if ($sender->Form->authenticatedPostBack()) {
             $newQnA = $sender->Form->getFormValue('QnA');
@@ -636,82 +629,82 @@ class QnAPlugin extends Gdn_Plugin {
                 $newQnA = null;
             }
 
-            $CurrentQnA = val('QnA', $Comment);
+            $currentQnA = val('QnA', $comment);
 
-            if ($CurrentQnA != $newQnA) {
-                $Set = ['QnA' => $newQnA];
+            if ($currentQnA != $newQnA) {
+                $set = ['QnA' => $newQnA];
 
                 if ($newQnA == 'Accepted') {
-                    $Set['DateAccepted'] = Gdn_Format::toDateTime();
-                    $Set['AcceptedUserID'] = Gdn::session()->UserID;
+                    $set['DateAccepted'] = Gdn_Format::toDateTime();
+                    $set['AcceptedUserID'] = Gdn::session()->UserID;
                 } else {
-                    $Set['DateAccepted'] = null;
-                    $Set['AcceptedUserID'] = null;
+                    $set['DateAccepted'] = null;
+                    $set['AcceptedUserID'] = null;
                 }
 
-                $sender->CommentModel->setField($commentID, $Set);
+                $sender->CommentModel->setField($commentID, $set);
                 $sender->Form->setValidationResults($sender->CommentModel->validationResults());
 
                 // Determine QnA change
-                if ($CurrentQnA != $newQnA) {
-                    $Change = 0;
+                if ($currentQnA != $newQnA) {
+                    $change = 0;
                     switch ($newQnA) {
                         case 'Rejected':
-                            $Change = -1;
-                            if ($CurrentQnA != 'Accepted') {
-                                $Change = 0;
+                            $change = -1;
+                            if ($currentQnA != 'Accepted') {
+                                $change = 0;
                             }
                             break;
 
                         case 'Accepted':
-                            $Change = 1;
+                            $change = 1;
                             break;
 
                         default:
-                            if ($CurrentQnA == 'Rejected') {
-                                $Change = 0;
+                            if ($currentQnA == 'Rejected') {
+                                $change = 0;
                             }
-                            if ($CurrentQnA == 'Accepted') {
-                                $Change = -1;
+                            if ($currentQnA == 'Accepted') {
+                                $change = -1;
                             }
                             break;
                     }
                 }
 
                 // Apply change effects
-                if ($Change && $Discussion['InsertUserID'] != $Comment['InsertUserID']) {
+                if ($change && $discussion['InsertUserID'] != $comment['InsertUserID']) {
                     // Update the user
-                    $UserID = val('InsertUserID', $Comment);
-                    $this->recalculateUserQnA($UserID);
+                    $userID = val('InsertUserID', $comment);
+                    $this->recalculateUserQnA($userID);
 
                     // Update reactions
                     if ($this->Reactions) {
                         include_once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
-                        $Rm = new ReactionModel();
+                        $reactionModel = new ReactionModel();
 
                         // Assume that the reaction is done by the question's owner
-                        $questionOwner = $Discussion['InsertUserID'];
+                        $questionOwner = $discussion['InsertUserID'];
                         // If there's change, reactions will take care of it
-                        $Rm->react('Comment', $Comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
+                        $reactionModel->react('Comment', $comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
                     } else {
-                        $nbsPoint = $Change * (int)c('QnA.Points.AcceptedAnswer', 1);
+                        $nbsPoint = $change * (int)c('QnA.Points.AcceptedAnswer', 1);
                         if ($nbsPoint && c('QnA.Points.Enabled', false)) {
-                            UserModel::givePoints($Comment['InsertUserID'], $nbsPoint, 'QnA');
+                            UserModel::givePoints($comment['InsertUserID'], $nbsPoint, 'QnA');
                         }
                     }
                 }
             }
 
             // Recalculate the Q&A status of the discussion.
-            $this->recalculateDiscussionQnA($Discussion);
+            $this->recalculateDiscussionQnA($discussion);
 
             Gdn::controller()->jsonTarget('', '', 'Refresh');
         } else {
-            $sender->Form->setData($Comment);
+            $sender->Form->setData($comment);
         }
 
-        $sender->setData('Comment', $Comment);
-        $sender->setData('Discussion', $Discussion);
+        $sender->setData('Comment', $comment);
+        $sender->setData('Discussion', $discussion);
         $sender->setData('_QnAs', ['Accepted' => t('Yes'), 'Rejected' => t('No'), '' => t("Don't know")]);
         $sender->setData('Title', t('Q&A Options'));
         $sender->render('CommentOptions', '', 'plugins/QnA');
