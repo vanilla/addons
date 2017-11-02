@@ -511,7 +511,7 @@ class QnAPlugin extends Gdn_Plugin {
                 } else {
                     $nbsPoint = $change * (int)c('QnA.Points.AcceptedAnswer', 1);
                     if ($nbsPoint && c('QnA.Points.Enabled', false)) {
-                        UserModel::givePoints($comment['InsertUserID'], $nbsPoint, 'QnA');
+                        CategoryModel::givePoints($comment['InsertUserID'], $nbsPoint, 'QnA', $discussion['CategoryID']);
                     }
                 }
             }
@@ -689,7 +689,7 @@ class QnAPlugin extends Gdn_Plugin {
                     } else {
                         $nbsPoint = $change * (int)c('QnA.Points.AcceptedAnswer', 1);
                         if ($nbsPoint && c('QnA.Points.Enabled', false)) {
-                            UserModel::givePoints($comment['InsertUserID'], $nbsPoint, 'QnA');
+                            CategoryModel::givePoints($comment['InsertUserID'], $nbsPoint, 'QnA', $discussion['CategoryID']);
                         }
                     }
                 }
@@ -1119,6 +1119,6 @@ class QnAPlugin extends Gdn_Plugin {
             return;
         }
 
-        UserModel::givePoints(GDN::session()->UserID, c('QnA.Points.Answer', 1), 'QnA');
+        CategoryModel::givePoints(GDN::session()->UserID, c('QnA.Points.Answer', 1), 'QnA', $discussion['CategoryID']);
     }
 }
