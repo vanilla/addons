@@ -1,0 +1,17 @@
+{
+    "name": "Category As Link",
+    "description": "Designate a category to be displayed as a link instead of a category.",
+    "version": "1.0",
+    "key": "categoryaslink",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Patrick Kelly",
+            "email": "patrick.k@vanillaforums.com",
+            "homepage": "https://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.3.0"
+    }
+}
