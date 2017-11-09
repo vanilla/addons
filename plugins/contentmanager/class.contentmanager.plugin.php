@@ -191,7 +191,7 @@ class ContentManagerPlugin extends Gdn_Plugin {
         $this->rules = Gdn::cache()->get(self::CACHE_KEY);
 
         if ($this->rules === Gdn_Cache::CACHEOP_FAILURE) {
-            $this->rules = Gdn::sql()
+            $rules = Gdn::sql()
                 ->select('r.*, a.*')
                 ->from('ContentManagerRule r')
                 ->join(
@@ -201,6 +201,11 @@ class ContentManagerPlugin extends Gdn_Plugin {
                 )
                 ->get()
                 ->resultArray();
+
+                $this->rules = [];
+                foreach ($rules as $rule) {
+                    $this->rules[$rule['TableName']][] = $rule;
+                }
             Gdn::cache()->store(
                 self::CACHE_KEY,
                 $this->rules,
@@ -219,7 +224,9 @@ class ContentManagerPlugin extends Gdn_Plugin {
      * @return void.
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
-
+        if (!array_key_exists('Discussion', $this->rules)) {
+            return;
+        }
     }
 
     /**
@@ -231,7 +238,9 @@ class ContentManagerPlugin extends Gdn_Plugin {
      * @return void.
      */
     public function commentModel_afterSaveComment_handler($sender, $args) {
-
+        if (!array_key_exists('Comment', $this->rules)) {
+            return;
+        }
     }
 
     /**
@@ -243,6 +252,19 @@ class ContentManagerPlugin extends Gdn_Plugin {
      * @return void.
      */
     public function userModel_afterSave_handler($sender, $args) {
+        if (!array_key_exists('User', $this->rules)) {
+            return;
+        }
+    }
+
+    /**
+     * Stub for the settings.
+     *
+     * Saving rules must invalidate the cache!
+     * @param  [type] $sender [description]
+     * @return [type]         [description]
+     */
+    public function settingsController_contentManager_create($sender) {
 
     }
 }
