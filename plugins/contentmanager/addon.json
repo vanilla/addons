@@ -1,0 +1,22 @@
+{
+    "name": "Content Manager",
+    "description": "This addon will allow you to define special content detection rules. Matching a defined rule will let you automatically perform a defined action. Think of it as inbox rules for a forum.",
+    "version": "0.0.1",
+    "license": "GNU GPL2",
+    "key": "contentmanager",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com"
+        },
+        {
+            "name": "Robin Jurinka",
+            "homepage": "https://open.vanillaforums.com/profile/r_j"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    },
+	// "icon": "content_manager.png"
+}
