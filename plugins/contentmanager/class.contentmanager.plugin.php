@@ -58,4 +58,44 @@ class ContentManagerPlugin extends Gdn_Plugin {
             ->column('ContentManagerActionID', 'int(11)', false)
             ->set(false, false);
     }
+
+    public function __construct() {
+        // Fetch all rules to be able to quikly decide if an event must e tracked.
+    }
+
+    /**
+     * Handle Discussion.Body and Discussion.Name rules.
+     *
+     * @param DiscussionModel $sender Instance of the calling class.
+     * @param  mixed $args Event arguments.
+     *
+     * @return void.
+     */
+    public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
+
+    }
+
+    /**
+     * Handle Comment.Body rules.
+     *
+     * @param CommentModel $sender Instance of the calling class.
+     * @param  mixed $args Event arguments.
+     *
+     * @return void.
+     */
+    public function commentModel_afterSaveComment_handler($sender, $args) {
+
+    }
+
+    /**
+     * Handle User.Reason rules.
+     *
+     * @param UserModel $sender Instance of the calling class.
+     * @param  mixed $args Event arguments.
+     *
+     * @return void.
+     */
+    public function userModel_afterSave_handler($sender, $args) {
+
+    }
 }
