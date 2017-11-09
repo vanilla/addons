@@ -19,6 +19,7 @@ class ContentManagerPlugin extends Gdn_Plugin {
      * Create tables to hold rules and actions.
      */
     public function structure() {
+        // Create table for possible actions.
         Gdn::structure()->table('ContentManagerAction')
             ->primaryKey('ContentManagerActionID')
             ->column('Name', 'varchar(192)', true)
@@ -27,24 +28,146 @@ class ContentManagerPlugin extends Gdn_Plugin {
             ->column('ColumnName', 'varchar(192)', true)
             ->set(false, false);
 
-        /*
-        TODO: Insert actions:
+        // Discussion.Name => MoveToSpamQueue
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'MoveToSpamQueue',
+                'Body' => 'Move to spam queue.',
+                'TableName' => 'Discussion',
+                'ColumnName' => 'Name'
+            ]
+        );
 
-        Activity.Story, Discussion.Title, Discussion.Body, Comment.Body
-        'MoveToSpamQueue', 'Move to spam queue.'
-        'DeleteAndBan', 'Delete it and ban user.'
-        'ReportIt', 'Report it.' (if Reporting2 enabled) 
+        // Discussion.Body => MoveToSpamQueue
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'MoveToSpamQueue',
+                'Body' => 'Move to spam queue.',
+                'TableName' => 'Discussion',
+                'ColumnName' => 'Body'
+            ]
+        );
 
-        User.Reason
-        'DeclineUser.', 'Decline the user.'
-        'ApproveUser', 'Approve the user.'
+        // Comment.Body => MoveToSpamQueue
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'MoveToSpamQueue',
+                'Body' => 'Move to spam queue.',
+                'TableName' => 'Comment',
+                'ColumnName' => 'Body'
+            ]
+        );
 
-        Null.Null = Any
-        'SendMessage', 'Send me a message.'
-        Who is me? Better to have 2 actions? Like "Send message to mods & admins", "Send message to admins"
-        */
+        // Discussion.Name => DeleteAndBan
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'DeleteAndBan',
+                'Body' => 'Delete it and ban user.',
+                'TableName' => 'Discussion',
+                'ColumnName' => 'Name'
+            ]
+        );
 
-        // "When {recordtype.field} {condition} {pattern}, then {action}."
+        // Discussion.Body => DeleteAndBan
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'DeleteAndBan',
+                'Body' => 'Delete it and ban user.',
+                'TableName' => 'Discussion',
+                'ColumnName' => 'Body'
+            ]
+        );
+
+        // Comment.Body => DeleteAndBan
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'DeleteAndBan',
+                'Body' => 'Delete it and ban user.',
+                'TableName' => 'Comment',
+                'ColumnName' => 'Body'
+            ]
+        );
+
+        // Discussion.Name => ReportIt
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'ReportIt',
+                'Body' => 'Report it.',
+                'TableName' => 'Discussion',
+                'ColumnName' => 'Name'
+            ]
+        );
+
+        // Discussion.Body => ReportIt
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'ReportIt',
+                'Body' => 'Report it.',
+                'TableName' => 'Discussion',
+                'ColumnName' => 'Body'
+            ]
+        );
+
+        // Comment.Body => ReportIt
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'ReportIt',
+                'Body' => 'Report it.',
+                'TableName' => 'Comment',
+                'ColumnName' => 'Body'
+            ]
+        );
+
+        // User.Reason => DeclineUser
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'DeclineUser',
+                'Body' => 'Decline the user.',
+                'TableName' => 'User',
+                'ColumnName' => 'Reason'
+            ]
+        );
+
+        // User.Reason => ApproveUser
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'ApproveUser',
+                'Body' => 'Approve the user.',
+                'TableName' => 'User',
+                'ColumnName' => 'Reason'
+            ]
+        );
+
+        // Any => SendAdminMessage
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'SendAdminMessage',
+                'Body' => 'Send message to administrators.'
+            ]
+        );
+
+        // Any => SendModMessage
+        Gdn::sql()->insert(
+            'ContentManagerAction',
+            [
+                'Name' => 'SendModMessage',
+                'Body' => 'Send message to moderators.'
+            ]
+        );
+
+        // Create table for rules.
         Gdn::structure()->table('ContentManagerRule')
             ->primaryKey('ContentManagerRuleID')
             ->column('TableName', 'varchar(192)', false)
