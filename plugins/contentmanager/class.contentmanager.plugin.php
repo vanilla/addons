@@ -252,11 +252,52 @@ class ContentManagerPlugin extends Gdn_Plugin {
      * @return void.
      */
     public function userModel_afterSave_handler($sender, $args) {
+        // Ensure there is a rule for users.
         if (!array_key_exists('User', $this->rules)) {
             return;
         }
+        
+        // Ensure user needs to be approved
+        $userRoles = $sender->getRoles($args['UserID'])->resultArray();
+        $userRoleIDs = array_column($userRoles, 'RoleID');
+        $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
+        if (!array_intersect($applicantRoleIDs, userRoleIDs)) {
+            return;
+        }
+        
+        $user = $sender->getID($args['UserID']);
+        foreach ($this->rules['User'] as $rule) {
+            
+        }
     }
 
+    private ruleStartsWith($needle, $haystack, $caseSensitive = false) {
+        if (!$caseSensitive) {
+            $needle = strtolower($needle);
+            $haystack = strtolower($haystack);
+        }
+        
+        return substr($haystack, 0, strlen($needle)) === $needle;
+    }
+
+    /**
+     * Helper function to find out if one string ends with another string.
+     *  
+     * @param string $needle The string to search for.
+     * @param string $haystack The string to look in.
+     * @param boolean $caseSensitive Whether the search should be case sensitive.
+     *
+     * @return boolean Whether $haystack ends with $needle.
+     */
+    private ruleEndsWith($needle, $haystack, $caseSensitive = false) {
+        if (!$caseSensitive) {
+            $needle = strtolower($needle);
+            $haystack = strtolower($haystack);
+        }
+
+        return substr($haystack, -strlen($needle)) === $needle);
+    }
+    
     /**
      * Stub for the settings.
      *
@@ -265,6 +306,8 @@ class ContentManagerPlugin extends Gdn_Plugin {
      * @return [type]         [description]
      */
     public function settingsController_contentManager_create($sender) {
-
+        $sender = Gdn::userModel();
+        $args['UserID'] = Gdn::request()->get('UserID', 2);
+        $this->userModel_afterSave_handler($sender, $args);
     }
 }
