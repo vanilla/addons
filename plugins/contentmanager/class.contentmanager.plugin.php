@@ -8,6 +8,10 @@
  * Class ContentManagerPlugin
  */
 class ContentManagerPlugin extends Gdn_Plugin {
+    const CACHE_KEY = 'ContentManagerRules';
+    /** @var array [description] */
+    private $rules = [];
+
     /**
      * Executed when the plugin is enabled.
      */
@@ -183,7 +187,27 @@ class ContentManagerPlugin extends Gdn_Plugin {
     }
 
     public function __construct() {
-        // Fetch all rules to be able to quikly decide if an event must e tracked.
+        // Fetch all rules to be able to quickly decide if an event must be tracked.
+        $this->rules = Gdn::cache()->get(self::CACHE_KEY);
+
+        if ($this->rules === Gdn_Cache::CACHEOP_FAILURE) {
+            $this->rules = Gdn::sql()
+                ->select('r.*, a.*')
+                ->from('ContentManagerRule r')
+                ->join(
+                    'ContentManagerAction a',
+                    'r.ContentManagerActionID = a.ContentManagerActionID',
+                    'left'
+                )
+                ->get()
+                ->resultArray();
+            Gdn::cache()->store(
+                self::CACHE_KEY,
+                $this->rules,
+                [Gdn_Cache::FEATURE_EXPIRY => 3600] // 60 * 60 = 1 hour
+            );
+        }
+        parent::__construct();
     }
 
     /**
