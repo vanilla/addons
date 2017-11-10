@@ -9,7 +9,8 @@
  */
 class ContentManagerPlugin extends Gdn_Plugin {
     const CACHE_KEY = 'ContentManagerRules';
-    /** @var array [description] */
+
+    /** @var array All active rules. */
     private $rules = [];
 
     /**
@@ -131,25 +132,25 @@ class ContentManagerPlugin extends Gdn_Plugin {
             ]
         );
 
-        // User.Reason => DeclineUser
+        // User.DiscoveryText => DeclineUser
         Gdn::sql()->insert(
             'ContentManagerAction',
             [
                 'Name' => 'DeclineUser',
                 'Body' => 'Decline the user.',
                 'TableName' => 'User',
-                'ColumnName' => 'Reason'
+                'ColumnName' => 'DiscoveryText'
             ]
         );
 
-        // User.Reason => ApproveUser
+        // User.DiscoveryText => ApproveUser
         Gdn::sql()->insert(
             'ContentManagerAction',
             [
                 'Name' => 'ApproveUser',
                 'Body' => 'Approve the user.',
                 'TableName' => 'User',
-                'ColumnName' => 'Reason'
+                'ColumnName' => 'DiscoveryText'
             ]
         );
 
@@ -178,7 +179,7 @@ class ContentManagerPlugin extends Gdn_Plugin {
             ->column('ColumnName', 'varchar(192)', false)
             ->column(
                 'Condition',
-                ['contains', 'starts with', 'ends with', 'matches the pattern'],
+                ['Contains', 'StartsWith', 'EndsWith', 'Regex'],
                 false
             )
             ->column('Pattern', 'varchar(192)', false)
@@ -187,32 +188,46 @@ class ContentManagerPlugin extends Gdn_Plugin {
     }
 
     public function __construct() {
-        // Fetch all rules to be able to quickly decide if an event must be tracked.
-        $this->rules = Gdn::cache()->get(self::CACHE_KEY);
+        $this->rules = $this->getRules();
 
-        if ($this->rules === Gdn_Cache::CACHEOP_FAILURE) {
-            $rules = Gdn::sql()
-                ->select('r.*, a.*')
-                ->from('ContentManagerRule r')
-                ->join(
-                    'ContentManagerAction a',
-                    'r.ContentManagerActionID = a.ContentManagerActionID',
-                    'left'
-                )
-                ->get()
-                ->resultArray();
-
-                $this->rules = [];
-                foreach ($rules as $rule) {
-                    $this->rules[$rule['TableName']][] = $rule;
-                }
-            Gdn::cache()->store(
-                self::CACHE_KEY,
-                $this->rules,
-                [Gdn_Cache::FEATURE_EXPIRY => 3600] // 60 * 60 = 1 hour
-            );
-        }
         parent::__construct();
+    }
+
+    /**
+     * Get all rules and group them by table name.
+     *
+     * @return array The rules.
+     */
+    public function getRules() {
+        // Fetch all rules to be able to quickly decide if an event must be tracked.
+        $rules = Gdn::cache()->get(self::CACHE_KEY);
+
+        if ($rules !== Gdn_Cache::CACHEOP_FAILURE) {
+            return $rules;
+        }
+
+        $rules = Gdn::sql()
+            ->select('r.*, a.*')
+            ->from('ContentManagerRule r')
+            ->join(
+                'ContentManagerAction a',
+                'r.ContentManagerActionID = a.ContentManagerActionID',
+                'left'
+            )
+            ->get()
+            ->resultArray();
+
+        $result = [];
+        foreach ($rules as $rule) {
+            $result[$rule['TableName']][] = $rule;
+        }
+        Gdn::cache()->store(
+            self::CACHE_KEY,
+            $result,
+            [Gdn_Cache::FEATURE_EXPIRY => 3600] // 60 * 60 = 1 hour
+        );
+
+        return $result;
     }
 
     /**
@@ -244,7 +259,7 @@ class ContentManagerPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Handle User.Reason rules.
+     * Handle User.DiscoveryText rules.
      *
      * @param UserModel $sender Instance of the calling class.
      * @param  mixed $args Event arguments.
@@ -256,48 +271,84 @@ class ContentManagerPlugin extends Gdn_Plugin {
         if (!array_key_exists('User', $this->rules)) {
             return;
         }
-        
+
         // Ensure user needs to be approved
         $userRoles = $sender->getRoles($args['UserID'])->resultArray();
         $userRoleIDs = array_column($userRoles, 'RoleID');
         $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
         if (!array_intersect($applicantRoleIDs, userRoleIDs)) {
-            return;
+            decho('This user is no applicant');
+            // return;
         }
-        
+
         $user = $sender->getID($args['UserID']);
         foreach ($this->rules['User'] as $rule) {
-            
+            $conditionMethod = 'condition'.$rule['Condition'];
+            if (method_exists($this, $conditionMethod)) {
+                $haystack = $user->{$rule['ColumnName']};
+                $needle = $rule['Pattern'];
+                $conditionResult = $this->{$conditionMethod}($needle, $haystack);
+            }
         }
     }
 
-    private ruleStartsWith($needle, $haystack, $caseSensitive = false) {
+    private function actionApproveUser($user) {
+
+    }
+
+    private function actionDeclineUser($user) {
+
+    }
+
+    public function conditionStartsWith($needle, $haystack, $caseSensitive = false) {
         if (!$caseSensitive) {
             $needle = strtolower($needle);
             $haystack = strtolower($haystack);
         }
-        
-        return substr($haystack, 0, strlen($needle)) === $needle;
+
+        return mb_substr($haystack, 0, strlen($needle)) === $needle;
     }
 
     /**
      * Helper function to find out if one string ends with another string.
-     *  
+     *
      * @param string $needle The string to search for.
      * @param string $haystack The string to look in.
      * @param boolean $caseSensitive Whether the search should be case sensitive.
      *
      * @return boolean Whether $haystack ends with $needle.
      */
-    private ruleEndsWith($needle, $haystack, $caseSensitive = false) {
+    public function conditionEndsWith($needle, $haystack, $caseSensitive = false) {
         if (!$caseSensitive) {
             $needle = strtolower($needle);
             $haystack = strtolower($haystack);
         }
 
-        return substr($haystack, -strlen($needle)) === $needle);
+        return mb_substr($haystack, -strlen($needle)) === $needle;
     }
-    
+
+    public function conditionContains($needle, $haystack, $caseSensitive = false) {
+        if (!$caseSensitive) {
+            $needle = strtolower($needle);
+            $haystack = strtolower($haystack);
+        }
+
+        return mb_strpos($haystack, $needle) !== false;
+    }
+
+    /**
+     * [conditionRegex description]
+     * @param  [type] $pattern [description]
+     * @param  [type] $subject [description]
+     *
+     * @return boolean Whether $pattern applies to $subject.
+     */
+    public function conditionRegex($pattern, $subject) {
+        preg_match($pattern, $subject, $matches);
+
+        return count($matches) !== 0;
+    }
+
     /**
      * Stub for the settings.
      *
@@ -306,6 +357,27 @@ class ContentManagerPlugin extends Gdn_Plugin {
      * @return [type]         [description]
      */
     public function settingsController_contentManager_create($sender) {
+        /*
+        $haystack = "Dies ist ein langer Text. Zumindest so lang, dass er sich für einige Tests eignet...";
+        decho($haystack);
+        $pattern = "/dies.*so/";
+        decho($this->conditionRegex($pattern, $haystack), $pattern);
+        $pattern = "/dies.*so/i";
+        decho($this->conditionRegex($pattern, $haystack), $pattern);
+        $pattern = "/\,/";
+        decho($this->conditionRegex($pattern, $haystack), $pattern);
+        */
+
+       // Create table for rules.
+        Gdn::structure()->table('ContentManagerRule')
+            ->column(
+                'Condition',
+                ['Contains', 'StartsWith', 'EndsWith', 'Regex'],
+                false
+            )
+            ->set(false, false);
+
+
         $sender = Gdn::userModel();
         $args['UserID'] = Gdn::request()->get('UserID', 2);
         $this->userModel_afterSave_handler($sender, $args);
