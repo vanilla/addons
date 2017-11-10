@@ -189,7 +189,6 @@ class ContentManagerPlugin extends Gdn_Plugin {
 
     public function __construct() {
         $this->rules = $this->getRules();
-
         parent::__construct();
     }
 
@@ -267,8 +266,10 @@ class ContentManagerPlugin extends Gdn_Plugin {
      * @return void.
      */
     public function userModel_afterSave_handler($sender, $args) {
+$this->setUserMeta(0, 'Debug_'.__LINE__, 'Start');
         // Ensure there is a rule for users.
         if (!array_key_exists('User', $this->rules)) {
+$this->setUserMeta(0, 'Debug_'.__LINE__, 'no user roles');
             return;
         }
 
@@ -276,77 +277,112 @@ class ContentManagerPlugin extends Gdn_Plugin {
         $userRoles = $sender->getRoles($args['UserID'])->resultArray();
         $userRoleIDs = array_column($userRoles, 'RoleID');
         $applicantRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_APPLICANT);
-        if (!array_intersect($applicantRoleIDs, userRoleIDs)) {
-            decho('This user is no applicant');
-            // return;
+        if (!array_intersect($applicantRoleIDs, $userRoleIDs)) {
+$this->setUserMeta(0, 'Debug_'.__LINE__, 'User #'.$args['UserID'].' is no applicant');
+            return;
         }
 
         $user = $sender->getID($args['UserID']);
         foreach ($this->rules['User'] as $rule) {
-            $conditionMethod = 'condition'.$rule['Condition'];
-            if (method_exists($this, $conditionMethod)) {
-                $haystack = $user->{$rule['ColumnName']};
-                $needle = $rule['Pattern'];
-                $conditionResult = $this->{$conditionMethod}($needle, $haystack);
+$this->setUserMeta(0, 'Debug_'.__LINE__, 'looping through rules');
+$this->setUserMeta(0, 'Debug_'.__LINE__, $this->conditionCheck(
+                $rule['Pattern'],
+                val($rule['ColumnName'], $user, ''),
+                $rule['Condition']
+            ));
+            if ($this->conditionCheck(
+                $rule['Pattern'],
+                val($rule['ColumnName'], $user, ''),
+                $rule['Condition']
+            ) == true) {
+$this->setUserMeta(0, 'Debug_'.__LINE__, 'Hmm...');
+                $this->runAction(
+                    $rule['Name'],
+                    $user
+                );
             }
+
         }
-    }
-
-    private function actionApproveUser($user) {
-
-    }
-
-    private function actionDeclineUser($user) {
-
-    }
-
-    public function conditionStartsWith($needle, $haystack, $caseSensitive = false) {
-        if (!$caseSensitive) {
-            $needle = strtolower($needle);
-            $haystack = strtolower($haystack);
-        }
-
-        return mb_substr($haystack, 0, strlen($needle)) === $needle;
     }
 
     /**
-     * Helper function to find out if one string ends with another string.
+     * Checks one of the "Conditions" against needle/haystack.
      *
-     * @param string $needle The string to search for.
-     * @param string $haystack The string to look in.
-     * @param boolean $caseSensitive Whether the search should be case sensitive.
-     *
-     * @return boolean Whether $haystack ends with $needle.
+     * @param  [type]  $needle         [description]
+     * @param  [type]  $haystack       [description]
+     * @param  string  $condition      [description]
+     * @param  boolean $caseInsesitive [description]
+     * @return [type]                  [description]
      */
-    public function conditionEndsWith($needle, $haystack, $caseSensitive = false) {
-        if (!$caseSensitive) {
-            $needle = strtolower($needle);
+    public function conditionCheck(
+        $needle,
+        $haystack,
+        $condition = 'Contains',
+        $caseInsesitive = true
+    ) {
+        if ($caseInsesitive) {
+            if ($condition == 'Regex') {
+                $needle .= 'i';
+            } else {
+                $needle = strtolower($needle);
+            }
             $haystack = strtolower($haystack);
         }
 
-        return mb_substr($haystack, -strlen($needle)) === $needle;
-    }
-
-    public function conditionContains($needle, $haystack, $caseSensitive = false) {
-        if (!$caseSensitive) {
-            $needle = strtolower($needle);
-            $haystack = strtolower($haystack);
+        switch ($condition) {
+            case 'Contains':
+                $result = mb_strpos($haystack, $needle) !== false;
+$this->setUserMeta(0, 'Debug_'.__LINE__, $condition.': '.dbencode($result));
+                break;
+            case 'StartsWith':
+                $result = mb_substr($haystack, 0, strlen($needle)) === $needle;
+$this->setUserMeta(0, 'Debug_'.__LINE__, $condition.': '.dbencode($result));
+                break;
+            case 'EndsWith':
+                $result = mb_substr($haystack, -strlen($needle)) === $needle;
+$this->setUserMeta(0, 'Debug_'.__LINE__, $condition.': '.dbencode($result));
+                break;
+            case 'Regex':
+                $result = preg_match($pattern, $subject, $matches) != 1;
+$this->setUserMeta(0, 'Debug_'.__LINE__, $condition.': '.dbencode($result));
+            default:
+                // EventArguments['Needle'] = $needle;
+                // EventArguments['Haystack'] = $haystack;
+                // EventArguments['Condition'] = $condition;
+                // EventArguments['CaseInsesitive'] = $caseInsesitive;
+                // fireEvent('CustomCondition')
+                // if handled ...
+                $result = false;
         }
 
-        return mb_strpos($haystack, $needle) !== false;
+        return $result;
     }
 
-    /**
-     * [conditionRegex description]
-     * @param  [type] $pattern [description]
-     * @param  [type] $subject [description]
-     *
-     * @return boolean Whether $pattern applies to $subject.
-     */
-    public function conditionRegex($pattern, $subject) {
-        preg_match($pattern, $subject, $matches);
-
-        return count($matches) !== 0;
+    public function runAction($action, $target) {
+        switch ($action) {
+            case 'MoveToSpamQueue':
+                break;
+            case 'DeleteAndBan':
+                break;
+            case 'ReportIt':
+                break;
+            case 'DeclineUser':
+                $userController = new userController();
+                $userController->decline(val('UserID', $target));
+                break;
+            case 'ApproveUser':
+                $userController = new userController();
+                $userController->approve(val('UserID', $target));
+                break;
+            case 'SendAdminMessage':
+                break;
+            case 'SendModMessage':
+                break;
+            default:
+                // EventArguments['Action'] = $action;
+                // EventArguments['Target'] = $target;
+                // fireEvent('CustomAction')
+        }
     }
 
     /**
