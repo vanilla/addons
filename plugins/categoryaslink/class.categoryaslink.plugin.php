@@ -79,24 +79,27 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
                 // Get linked category data.
                 $linkedCategory[] = $sender->CategoryModel->categories($linkedCategoryID);
                 $sender->CategoryModel->joinRecent($linkedCategory, $linkedCategoryID);
-                $linkedCategory = $linkedCategory[0];
+
+                // Capture the original name and description for display.
+                $categoryName = val('Name', $category);
+                $categoryDescription = val('Description', $category);
+
+                // Substitute the linked category for the current category.
+                if
+                $category = $linkedCategory[0];
+
+                // Add CSS classes in case someone wants to display Aliased Categories differently.
                 $category['_CssClass'] = 'Aliased AliasedCategory';
-                $category['LastTitle'] = val('LastTitle', $linkedCategory);
-                $category['LastUrl'] = val('LastUrl', $linkedCategory);
-                $category['LastDateInserted'] = val('LastDateInserted', $linkedCategory);
-                $category['LastName'] = val('LastName', $linkedCategory);
-                $category['LastPhoto'] = val('LastPhoto', $linkedCategory);
-                $category['LastUserID'] = val('LastUserID', $linkedCategory);
-                $category['LastCategoryID'] = val('CategoryID', $linkedCategory);
-                $category['CountAllDiscussions'] = val('CountAllDiscussions', $linkedCategory);
-                $category['CountAllComments'] = val('CountAllComments', $linkedCategory);
-                $category['Name'] = val('Name', $linkedCategory);
-                $category['Description'] = val('Description', $linkedCategory);
+
+                // Put back the original name and description of the category
+                $category['Name'] = $categoryName ? $categoryName : val('Name', $linkedCategory);
+                $category['Description'] = $categoryDescription ? $categoryDescription : val('Description', $linkedCategory);
                 $category['Linked'] = true;
             }
 
             if (val('LinkedDiscussion', $category)) {
                 // Linked discussion.
+                // Add CSS classes in case someone wants to display Aliased Categories differently.
                 $category['_CssClass'] = 'Aliased AliasedDiscussion';
                 $category['LastTitle'] = null; // Set to null so that no LastDiscussion info will be displayed.
                 $category['CountAllDiscussions'] = false; // Set to false so that now Count info will be displayed.
