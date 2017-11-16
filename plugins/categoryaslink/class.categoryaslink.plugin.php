@@ -21,41 +21,39 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
 
 
     /**
-     * Add columns to the Category table to stor Linked CategoryIDs or LinkedDiscussion URLs.
+     * Add columns to the Category table to store LinkedDiscussion URLs.
      */
     public function structure() {
         Gdn::structure()->table('Category')
-            ->column('LinkedCategoryID', 'int', true)
             ->column('LinkedDiscussion', 'varchar(255)', true)
             ->set();
     }
 
 
     /**
-     * On the category add/edit page the dashboard, add a dropdown of categories, to link a category
-     * to another category. Add a textbox to link a category to some other URI (e.g. a discussion).
+     * On the category add/edit page the dashboard, add a textbox to link a category to some other URI (e.g. a discussion).
      *
      * @param SettingsController $sender
      * @param SettingsController $args
      */
     public function settingsController_addEditCategory_handler($sender, $args) {
-        $sender->Data['_ExtendedFields']['LinkedCategoryID'] = [
-            'Control' => 'categorydropdown',
-            'Description' => 'Act as a copy of another category on this forum.',
-            'Options' => ['IncludeNull' => 'None']
-        ];
         $sender->Data['_ExtendedFields']['LinkedDiscussion'] = [
             'Control' => 'TextBox',
-            'Description' => 'Act as a link to a discussion. Paste the full URL of the address. If you have linked this category to another category this will override it.',
+            'Description' => 'Act as a link to a discussion, another category or any URL. Paste the full URL of the address.',
             'Options' => ['IncludeNull' => 'None']
         ];
 
         $sender->Form->validateRule('LinkedDiscussion', 'validateWebAddress', t('Linked Discussion must be a valid Web Address'));
+        if ($sender->Form->getFormValue('LinkedDiscussion')) {
+            // Has to be displayed as Discussions for the BeforeCategoriesRender
+            // to redirect any requests to the category.
+            $sender->Form->setFormValue('DisplayAs', 'Discussions');
+        }
     }
 
 
     /**
-     * Loop through all the categories and prepare data to display LinkedCategory data or LinkedDiscussions.
+     * Loop through all the categories and prepare data to display any LinkedDiscussions.
      *
      * @param CategoriesController $sender
      * @param CategoriesController $args
@@ -70,31 +68,8 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
         $categories =& $sender->Data['CategoryTree'];
 
         foreach ($categories as &$category) {
-            if (!val('LinkedCategoryID', $category) && !val('LinkedDiscussion', $category)) {
+            if (!val('LinkedDiscussion', $category)) {
                 continue;
-            }
-
-            $linkedCategoryID = val('LinkedCategoryID', $category);
-            if (isset($linkedCategoryID)) {
-                // Get linked category data.
-                $linkedCategory[] = $sender->CategoryModel->categories($linkedCategoryID);
-                $sender->CategoryModel->joinRecent($linkedCategory, $linkedCategoryID);
-
-                // Capture the original name and description for display.
-                $categoryName = val('Name', $category);
-                $categoryDescription = val('Description', $category);
-
-                // Substitute the linked category for the current category.
-                if
-                $category = $linkedCategory[0];
-
-                // Add CSS classes in case someone wants to display Aliased Categories differently.
-                $category['_CssClass'] = 'Aliased AliasedCategory';
-
-                // Put back the original name and description of the category
-                $category['Name'] = $categoryName ? $categoryName : val('Name', $linkedCategory);
-                $category['Description'] = $categoryDescription ? $categoryDescription : val('Description', $linkedCategory);
-                $category['Linked'] = true;
             }
 
             if (val('LinkedDiscussion', $category)) {
@@ -111,16 +86,12 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
 
 
     /**
-     * Redirect any request to a category that is aliased either to another category or a discussion.
+     * Redirect any request to a category that is aliased to a discussion or other URL.
      *
      * @param CategoriesController $sender
      * @param CategoriesController $args
      */
     public function categoriesController_beforeCategoriesRender_handler($sender, $args) {
-        if ($sender->data('Category.LinkedCategoryID')) {
-            redirectTo(categoryUrl($sender->Data('Category'), 301));
-        }
-
         if ($sender->data('Category.LinkedDiscussion')) {
             redirectTo(categoryUrl($sender->Data('Category')), 301);
         }
@@ -149,11 +120,6 @@ if (!function_exists("categoryUrl")) {
         if (val('LinkedDiscussion', $category)) {
             // SafeURL because you may be linking to another web property, another forum or knowledgebase.
             return safeURL(val('LinkedDiscussion', $category));
-        }
-
-        // If there is a LinkedCategoryID use the LinkedCategory as the Category.
-        if ($linked = val('LinkedCategoryID', $category)) {
-            $category = CategoryModel::categories($linked);
         }
 
         // Build URL.
