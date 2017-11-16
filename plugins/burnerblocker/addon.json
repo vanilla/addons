@@ -1,0 +1,15 @@
+{
+    "name": "Burner Blocker",
+    "description": "Blocks all known \"burner\" email domains from registering.",
+    "version": "1.0",
+    "mobileFriendly": true,
+    "license": "Proprietary",
+    "key": "burnerblocker",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com"
+        }
+    ]
+}
