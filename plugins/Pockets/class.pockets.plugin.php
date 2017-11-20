@@ -191,6 +191,13 @@ class PocketsPlugin extends Gdn_Plugin {
                 $pocketRow['Location'] .= " ({$pocketRow['Repeat']})";
             }
 
+            if ($description = htmlspecialchars($pocketRow['Description'])) {
+                $meta['description'] = [
+                    'label' => t('Description'),
+                    'value' => $description,
+                ];
+            }
+
             if ($location = htmlspecialchars($pocketRow['Location'])) {
                 $meta['location'] = [
                     'label' => t('Location'),
@@ -343,7 +350,7 @@ class PocketsPlugin extends Gdn_Plugin {
                 $form->setFormValue('PocketID', $pocketID);
             }
 
-            // Convert the form data into a format digestable by the database.
+            // Convert the form data into a format digestible by the database.
             $repeat = $form->getFormValue('RepeatType');
             switch ($repeat) {
                 case Pocket::REPEAT_EVERY:
@@ -400,7 +407,7 @@ class PocketsPlugin extends Gdn_Plugin {
                     return Gdn::dispatcher()->dispatch('Default404');
                 }
 
-                // Convert some of the pocket data into a format digestable by the form.
+                // Convert some of the pocket data into a format digestible by the form.
                 list($repeatType, $repeatFrequency) = Pocket::parseRepeat($pocket['Repeat']);
                 $pocket['RepeatType'] = $repeatType;
                 $pocket['EveryFrequency'] = getValue(0, $repeatFrequency, 1);
@@ -695,6 +702,7 @@ class PocketsPlugin extends Gdn_Plugin {
             ->column('Condition', 'varchar(500)', null)
             ->column('Disabled', 'smallint', '0') // set to a constant in class Pocket
             ->column('Attributes', 'text', null)
+            ->column('Description', 'text', null)
             ->column('MobileOnly', 'tinyint', '0')
             ->column('MobileNever', 'tinyint', '0')
             ->column('EmbeddedNever', 'tinyint', '0')

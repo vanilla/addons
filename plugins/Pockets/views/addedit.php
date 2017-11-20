@@ -23,7 +23,15 @@ echo $Form->errors();
             echo $Form->label('Name', 'Name');
             echo '<div class="info">', t('Enter a descriptive name.', 'Enter a descriptive name for the pocket. This name will not show up anywhere except when managing your pockets here so it is only used to help you remember the pocket.'), '</div>'; ?>
         </div>
-        <?php echo $Form->textBoxWrap('Name'); ?>
+        <?php echo $Form->textBoxWrap('Name', ['Multiline' => true]); ?>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            <?php
+            echo $Form->label('Description', 'Description');
+            echo '<div class="info">', t('Enter a description for your pocket.', 'Enter a description for your Pocket. This description will not show up anywhere except when managing your pockets here so it is only used to help you remember what the Pocket does.'), '</div>'; ?>
+        </div>
+        <?php echo $Form->textBoxWrap('Description'); ?>
     </li>
     <li class="form-group">
         <div class="label-wrap">
