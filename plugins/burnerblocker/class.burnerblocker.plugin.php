@@ -80,7 +80,7 @@ class BurnerBlockerPlugin extends Gdn_Plugin {
      * @param $sender UserModel Triggering object.
      * @param $args array Event arguments.
      */
-    public function userModel_beforeRegister_handler($sender, &$args) {
+    public function userModel_beforeRegister_handler($sender, $args) {
         // Get the user's email domain.
         $email = val('Email', $args['RegisteringUser']);
         $domain = substr($email, strpos($email, '@')+1);
