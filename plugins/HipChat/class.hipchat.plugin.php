@@ -2,7 +2,7 @@
 /**
  * A HipChat integration.
  *
- * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @copyright 2008-2017 Vanilla Forums, Inc.
  * @license GNU GPLv2
  */
 
@@ -20,10 +20,8 @@ class HipChatPlugin extends Gdn_Plugin {
         $sender->permission('Garden.Settings.Manage');
         $conf = new ConfigurationModule($sender);
         $conf->initialize([
-            //'HipChat.Checkbox' => array('Control' => 'CheckBox', 'LabelCode' => 'A checkbox to tick'),
             //'HipChat.Select' => array('Control' => 'Dropdown', 'LabelCode' => '@'.sprintf(t('Max number of %s'), t('images')),
                 // 'Items' => array('Unlimited' => t('Unlimited'), 'None' => t('None'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)),
-
             'HipChat.Account' => [
                 'Control' => 'TextBox',
                 'Type' => 'string',
@@ -42,6 +40,11 @@ class HipChatPlugin extends Gdn_Plugin {
                 'LabelCode' => t('Authorization Token'),
                 'Options' => ['class' => 'InputBox LargeInput']
             ],
+            'HipChat.PostComments' => [
+                'Control' => 'CheckBox',
+                'LabelCode' => t('Post comments to HipChat'),
+                'Default' => false
+            ],
         ]);
 
         $sender->addSideMenu();
@@ -57,22 +60,50 @@ class HipChatPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
-        // Make sure we have a valid discussion.
-        if (!$args['Discussion'] || !val('DiscussionID', $args['Discussion'])) {
-            return;
-        }
-
-        // Only trigger for new discussions.
-        if (!$args['Insert']) {
+        // Make sure we have a valid discussion. Only trigger for new discussions.
+        if (!$args['Discussion'] || !val('DiscussionID', $args['Discussion']) || !$args['Insert']) {
             return;
         }
 
         // Prep HipChat message.
         $author = Gdn::userModel()->getID(val('InsertUserID', $args['Discussion']));
         $message = sprintf(
-            '%1$s: %2$s',
+            '%1$s started a discussion: %2$s',
             userAnchor($author),
             anchor(val('Name', $args['Discussion']), discussionUrl($args['Discussion']))
+        );
+
+        // Say it.
+        HipChat::say($message);
+    }
+
+    /**
+     * Optionally post every new comment to HipChat.
+     *
+     * @param PostController $sender
+     * @param array $args
+     */
+    public function commentModel_afterSaveComment_handler($sender, $args) {
+        // Only post comments if enabled.
+        if (!c('HipChat.PostComments')) {
+            return;
+        }
+
+        // Make sure we have a valid comment and that it's new.
+        if (val('CommentID', $args) && val('Insert', $args)) {
+            return;
+        }
+
+        // Why would Vanilla pass the discussion data? That would be too easy.
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($args['CommentData']['DiscussionID'], DATASET_TYPE_ARRAY);
+
+        // Prep HipChat message.
+        $author = Gdn::userModel()->getID(val('InsertUserID', $discussion));
+        $message = sprintf(
+            '%1$s commented on %2$s',
+            userAnchor($author),
+            anchor(val('Name', $discussion), discussionUrl($discussion))
         );
 
         // Say it.
@@ -100,11 +131,5 @@ class HipChatPlugin extends Gdn_Plugin {
 
         // Say it.
         HipChat::say($message);
-    }
-
-    /**
-     * Run once on enable.
-     */
-    public function setup() {
     }
 }
