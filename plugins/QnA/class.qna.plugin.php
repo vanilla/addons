@@ -734,7 +734,7 @@ class QnAPlugin extends Gdn_Plugin {
             setValue('Type', $discussion, 'Discussion');
         }
 
-        if ($sender->Form->isPostBack()) {
+        if ($sender->Form->authenticatedPostBack()) {
             $sender->DiscussionModel->setField($discussionID, 'Type', $sender->Form->getFormValue('Type'));
 
             // Update the QnA field.  Default to "Unanswered" for questions. Null the field for other types.
