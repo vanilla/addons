@@ -987,7 +987,7 @@ class QnAPlugin extends Gdn_Plugin {
                 }
                 break;
             case 'Accepted':
-                $text = 'Answered';
+                $text = 'Accepted Answer';
                 $title = ' title="'.t("This question's answer has been accepted.").'"';
                 break;
             default:
