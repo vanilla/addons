@@ -1,6 +1,6 @@
 {
     "name": "Category As Link",
-    "description": "Designate a category to be displayed as a link instead of a category.",
+    "description": "Configure a category to show up on the Category List but link to a custom URL.",
     "version": "1.0",
     "key": "categoryaslink",
     "type": "addon",
