@@ -25,7 +25,7 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
      */
     public function structure() {
         Gdn::structure()->table('Category')
-            ->column('RedirectURL', 'varchar(255)', true)
+            ->column('RedirectUrl', 'varchar(255)', true)
             ->set();
     }
 
@@ -37,14 +37,14 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
      * @param SettingsController $args
      */
     public function settingsController_addEditCategory_handler($sender, $args) {
-        $sender->Data['_ExtendedFields']['RedirectURL'] = [
+        $sender->Data['_ExtendedFields']['RedirectUrl'] = [
             'Control' => 'TextBox',
             'Description' => 'Instead of acting as a category this will link to a discussion, another category or any URL when you add a full valid URL.',
             'Options' => ['IncludeNull' => 'None']
         ];
 
-        $sender->Form->validateRule('RedirectURL', 'validateWebAddress', t('Redirect Link URL must be a valid Web Address'));
-        if ($sender->Form->getFormValue('RedirectURL')) {
+        $sender->Form->validateRule('RedirectUrl', 'validateWebAddress', t('Redirect Link URL must be a valid Web Address'));
+        if ($sender->Form->getFormValue('RedirectUrl')) {
             // Has to be displayed as Discussions for the BeforeCategoriesRender
             // to redirect any requests to the category.
             $sender->Form->setFormValue('DisplayAs', 'Discussions');
@@ -68,11 +68,11 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
         $categories =& $sender->Data['CategoryTree'];
 
         foreach ($categories as &$category) {
-            if (!val('RedirectURL', $category)) {
+            if (!val('RedirectUrl', $category)) {
                 continue;
             }
 
-            if (val('RedirectURL', $category)) {
+            if (val('RedirectUrl', $category)) {
                 // Linked discussion.
                 // Add CSS classes in case someone wants to display Aliased Categories differently.
                 $category['_CssClass'] = 'Aliased AliasedCategory';
@@ -92,7 +92,7 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
      * @param CategoriesController $args
      */
     public function categoriesController_beforeCategoriesRender_handler($sender, $args) {
-        if ($sender->data('Category.RedirectURL')) {
+        if ($sender->data('Category.RedirectUrl')) {
             redirectTo(categoryUrl($sender->Data('Category')), 301);
         }
     }
@@ -102,7 +102,7 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
 if (!function_exists("categoryUrl")) {
 
    /**
-    * Override links to categories with either the URL of the LinkedCategory or RedirectURL.
+    * Override links to categories with either the URL of the LinkedCategory or RedirectUrl.
     *
     * @param string | array $category
     * @param string | int $page The page number.
@@ -117,9 +117,9 @@ if (!function_exists("categoryUrl")) {
         $category = (array)$category;
 
         // If there is a URL that links to a discussion it overrides the category or even a link to an alias category.
-        if (val('RedirectURL', $category)) {
+        if (val('RedirectUrl', $category)) {
             // SafeURL because you may be linking to another web property, another forum or knowledgebase.
-            return safeURL(val('RedirectURL', $category));
+            return safeURL(val('RedirectUrl', $category));
         }
 
         // Build URL.
