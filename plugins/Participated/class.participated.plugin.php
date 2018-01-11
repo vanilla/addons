@@ -46,7 +46,13 @@ class ParticipatedPlugin extends Gdn_Plugin {
             $userID = Gdn::session()->UserID;
         }
 
+        $permissions = DiscussionModel::categoryPermissions();
+
         $sender->SQL->reset();
+        if ($permissions !== true) {
+            $sender->SQL->where('d.CategoryID', $permissions);
+        }
+
         $sender->SQL->select('d.*')
             ->select('ud.DateLastViewed, ud.Dismissed, ud.Bookmarked')
             ->select('ud.UserID', '', 'WatchUserID')
@@ -57,11 +63,6 @@ class ParticipatedPlugin extends Gdn_Plugin {
             ->where('ud.Participated', 1)
             ->orderBy('d.DateLastComment', 'desc')
             ->limit($limit, $offset);
-
-        $permissions = DiscussionModel::categoryPermissions();
-        if ($permissions !== true) {
-            $sender->SQL->where('d.CategoryID', $permissions);
-        }
 
         $data = $sender->SQL->get();
         $sender->addDiscussionColumns($data);
