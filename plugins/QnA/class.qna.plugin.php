@@ -300,46 +300,6 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Modify flow of discussion by pinning accepted answers.
-     *
-     * @param DiscussionController $sender Sending controller instance.
-     * @param array $args Event arguments.
-     */
-    public function discussionController_beforeDiscussionRender_handler($sender, $args) {
-        if ($sender->data('Discussion.QnA')) {
-            $sender->CssClass .= ' Question';
-        }
-
-        if (strcasecmp($sender->data('Discussion.QnA'), 'Accepted') != 0) {
-            return;
-        }
-
-        // Find the accepted answer(s) to the question.
-        $commentModel = new CommentModel();
-        $answers = $commentModel->getWhere(['DiscussionID' => $sender->data('Discussion.DiscussionID'), 'Qna' => 'Accepted'])->result();
-
-        if (class_exists('ReplyModel')) {
-            $replyModel = new ReplyModel();
-            $discussion = null;
-            $replyModel->joinReplies($discussion, $answers);
-        }
-
-        $sender->setData('Answers', $answers);
-
-        // Remove the accepted answers from the comments.
-        // Allow this to be skipped via config.
-        if (c('QnA.AcceptedAnswers.Filter', true)) {
-            if (isset($sender->Data['Comments'])) {
-                $comments = $sender->Data['Comments']->result();
-                $comments = array_filter($comments, function($row) {
-                    return strcasecmp(val('QnA', $row), 'accepted');
-                });
-                $sender->Data['Comments'] = new Gdn_DataSet(array_values($comments));
-            }
-        }
-    }
-
-    /**
      * Write the accept/reject buttons.
      *
      * @param DiscussionController $sender Sending controller instance.
@@ -1030,7 +990,7 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add 'Ask a Question' button if using BigButtons.
+     * Add 'Ask a Question' button if using BigButtons and modify flow of discussion by pinning accepted answers.
      *
      * @param DiscussionController $sender Sending controller instance.
      */
@@ -1042,6 +1002,38 @@ class QnAPlugin extends Gdn_Plugin {
 
         if ($sender->data('Discussion.Type') == 'Question') {
             $sender->setData('_CommentsHeader', t('Answers'));
+        }
+
+        if ($sender->data('Discussion.QnA')) {
+            $sender->CssClass .= ' Question';
+        }
+
+        if (strcasecmp($sender->data('Discussion.QnA'), 'Accepted') != 0) {
+            return;
+        }
+
+        // Find the accepted answer(s) to the question.
+        $commentModel = new CommentModel();
+        $answers = $commentModel->getWhere(['DiscussionID' => $sender->data('Discussion.DiscussionID'), 'Qna' => 'Accepted'])->result();
+
+        if (class_exists('ReplyModel')) {
+            $replyModel = new ReplyModel();
+            $discussion = null;
+            $replyModel->joinReplies($discussion, $answers);
+        }
+
+        $sender->setData('Answers', $answers);
+
+        // Remove the accepted answers from the comments.
+        // Allow this to be skipped via config.
+        if (c('QnA.AcceptedAnswers.Filter', true)) {
+            if (isset($sender->Data['Comments'])) {
+                $comments = $sender->Data['Comments']->result();
+                $comments = array_filter($comments, function($row) {
+                    return strcasecmp(val('QnA', $row), 'accepted');
+                });
+                $sender->Data['Comments'] = new Gdn_DataSet(array_values($comments));
+            }
         }
     }
 
