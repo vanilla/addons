@@ -33,7 +33,7 @@
                   <?php
                }
 
-               echo $this->Form->bodyBox('Body');
+               echo $this->Form->bodyBox('Body', ['ImageUpload' => true]);
             } else {
                echo t("You don't have permission to use a signature.");
             } ?>
