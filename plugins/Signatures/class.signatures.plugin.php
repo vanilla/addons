@@ -553,6 +553,15 @@ EOT;
     }
 
     /**
+     * Load signatures.
+     *
+     * @param $sender
+     */
+    public function discussionController_beforeDiscussionRender_handler($sender) {
+        $this->signatures($sender);
+    }
+
+    /**
      *
      *
      * @param $sender
