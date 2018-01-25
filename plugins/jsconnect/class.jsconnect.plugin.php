@@ -363,7 +363,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         }
         $Provider = self::getProvider($client_id);
         if (!$Provider) {
-            throw new Gdn_UserException(sprintf(t('Unknown client: %s.'), htmlspecialchars($client_id)), 400);
+            throw new Gdn_UserException(sprintf(t('Unknown client: %s.'), $client_id), 400);
         }
 
         if (!val('TestMode', $Provider)) {
