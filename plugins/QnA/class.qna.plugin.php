@@ -289,12 +289,19 @@ class QnAPlugin extends Gdn_Plugin {
     public function commentModel_beforeUpdateCommentCount_handler($sender, $args) {
         $discussion =& $args['Discussion'];
 
+        // Bail out if this isn't a comment on a question.
+        if (strtolower($discussion['Type']) !== 'question') {
+            return;
+        }
+
         // Mark the question as answered.
-        if (strtolower($discussion['Type']) == 'question' && !$discussion['Sink'] && !in_array($discussion['QnA'], ['Answered', 'Accepted'])) {
-            if($args['Counts']['CountComments'] > 0) {
-                $sender->SQL->set('QnA', 'Answered');
-            } else {
-                $sender->SQL->set('QnA', 'Unanswered');
+        if (!empty($args['Insert']) && !$discussion['Sink'] && !in_array($discussion['QnA'], ['Answered', 'Accepted'])) {
+            $sender->SQL->set('QnA', 'Answered');
+        } elseif (!isset($args['Insert'])) {
+            // This is not an edit so recalculate the QnA value entirely.
+            $set = $this->recalculateDiscussionQnA($discussion, true);
+            if (!empty($set)) {
+                $sender->SQL->set($set);
             }
         }
     }
@@ -520,10 +527,12 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Recalculate the QnA status of a discussion.
      *
-     * @param $discussion A discussion.
+     * @param array|object $discussion The discussion to recalculate.
+     * @param bool $return Whether to return the result or update the discussion.
      */
-    public function recalculateDiscussionQnA($discussion) {
+    public function recalculateDiscussionQnA($discussion, bool $return = false) {
         // Find comments in this discussion with a QnA value.
         $set = [];
 
@@ -549,6 +558,9 @@ class QnAPlugin extends Gdn_Plugin {
             $set['DateOfAnswer'] = null;
         }
 
+        if ($return) {
+            return $set;
+        }
         Gdn::controller()->DiscussionModel->setField(val('DiscussionID', $discussion), $set);
     }
 
