@@ -66,7 +66,7 @@ class NecroPlugin extends Gdn_Plugin {
      */
     protected function setNecro($discussionID) {
         Gdn::sql()->update('Discussion')
-            ->set('DateRevived', date('U'))
+            ->set('DateRevived', Gdn_Format::toDateTime())
             ->where('DiscussionID', $discussionID)
             ->put();
     }
