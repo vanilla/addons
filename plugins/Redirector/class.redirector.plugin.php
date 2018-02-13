@@ -535,6 +535,12 @@ class RedirectorPlugin extends Gdn_Plugin {
                 'Filter' => [__CLASS__, 'removeID']
             ];
             self::vbFriendlyUrlID($get, 't');
+        } elseif (!isset($get['p'])) {
+            $data['t'] = [
+                'DiscussionID',
+                'Filter' => [__CLASS__, 'removeID']
+            ];
+            self::vbFriendlyUrlID($get, 't');
         }
         return $data;
 
