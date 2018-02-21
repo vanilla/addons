@@ -4,6 +4,10 @@
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
+use Garden\Schema\Schema;
+use Garden\Web\Exception\ClientException;
+use Vanilla\ApiUtils;
+
 /**
  * Adds Question & Answer format to Vanilla.
  *
@@ -18,11 +22,34 @@ class QnAPlugin extends Gdn_Plugin {
     /** @var bool|array  */
     protected $Badges = false;
 
+    /** @var bool */
+    private $apiQuestionInsert = false;
+
+    /** @var CommentModel */
+    private $commentModel;
+
+    /** @var DiscussionModel */
+    private $discussionModel;
+
+    /** @var UserModel */
+    private $userModel;
+
+    /** @var array Lookup cache for commentsApiController_normalizeOutput */
+    public $discussionsCache = [];
+
     /**
      * QnAPlugin constructor.
+     *
+     * @param CommentModel $commentModel
+     * @param DiscussionModel $discussionModel
+     * @param UserModel $userModel
      */
-    public function __construct() {
+    public function __construct(CommentModel $commentModel, DiscussionModel $discussionModel, UserModel $userModel) {
         parent::__construct();
+
+        $this->commentModel = $commentModel;
+        $this->discussionModel = $discussionModel;
+        $this->userModel = $userModel;
 
         if (Gdn::addonManager()->isEnabled('Reactions', \Vanilla\Addon::TYPE_ADDON) && c('Plugins.QnA.Reactions', true)) {
             $this->Reactions = true;
@@ -326,7 +353,7 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         if (!$discussion) {
-            $discussion = DiscussionModel::instance()->getID(val('DiscussionID', $comment));
+            $discussion = $this->discussionModel->getID(val('DiscussionID', $comment));
         }
 
         if (!$discussion || strtolower(val('Type', $discussion)) != 'question') {
@@ -561,7 +588,7 @@ class QnAPlugin extends Gdn_Plugin {
         if ($return) {
             return $set;
         }
-        Gdn::controller()->DiscussionModel->setField(val('DiscussionID', $discussion), $set);
+        $this->discussionModel->setField(val('DiscussionID', $discussion), $set);
     }
 
     /**
@@ -585,13 +612,13 @@ class QnAPlugin extends Gdn_Plugin {
     public function _commentOptions($sender, $commentID) {
         $sender->Form = new Gdn_Form();
 
-        $comment = $sender->CommentModel->getID($commentID, DATASET_TYPE_ARRAY);
+        $comment = $this->commentModel->getID($commentID, DATASET_TYPE_ARRAY);
 
         if (!$comment) {
             throw notFoundException('Comment');
         }
 
-        $discussion = $sender->DiscussionModel->getID(val('DiscussionID', $comment), DATASET_TYPE_ARRAY);
+        $discussion = $this->discussionModel->getID(val('DiscussionID', $comment), DATASET_TYPE_ARRAY);
 
         $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
 
@@ -601,71 +628,7 @@ class QnAPlugin extends Gdn_Plugin {
                 $newQnA = null;
             }
 
-            $currentQnA = val('QnA', $comment);
-
-            if ($currentQnA != $newQnA) {
-                $set = ['QnA' => $newQnA];
-
-                if ($newQnA == 'Accepted') {
-                    $set['DateAccepted'] = Gdn_Format::toDateTime();
-                    $set['AcceptedUserID'] = Gdn::session()->UserID;
-                } else {
-                    $set['DateAccepted'] = null;
-                    $set['AcceptedUserID'] = null;
-                }
-
-                $sender->CommentModel->setField($commentID, $set);
-                $sender->Form->setValidationResults($sender->CommentModel->validationResults());
-
-                // Determine QnA change
-                if ($currentQnA != $newQnA) {
-                    $change = 0;
-                    switch ($newQnA) {
-                        case 'Rejected':
-                            $change = -1;
-                            if ($currentQnA != 'Accepted') {
-                                $change = 0;
-                            }
-                            break;
-
-                        case 'Accepted':
-                            $change = 1;
-                            break;
-
-                        default:
-                            if ($currentQnA == 'Rejected') {
-                                $change = 0;
-                            }
-                            if ($currentQnA == 'Accepted') {
-                                $change = -1;
-                            }
-                            break;
-                    }
-                }
-
-                // Apply change effects
-                if ($change && $discussion['InsertUserID'] != $comment['InsertUserID']) {
-                    // Update the user
-                    $userID = val('InsertUserID', $comment);
-                    $this->recalculateUserQnA($userID);
-
-                    // Update reactions
-                    if ($this->Reactions) {
-                        include_once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
-                        $reactionModel = new ReactionModel();
-
-                        // Assume that the reaction is done by the question's owner
-                        $questionOwner = $discussion['InsertUserID'];
-                        // If there's change, reactions will take care of it
-                        $reactionModel->react('Comment', $comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
-                    } else {
-                        $nbsPoint = $change * (int)c('QnA.Points.AcceptedAnswer', 1);
-                        if ($nbsPoint && c('QnA.Points.Enabled', false)) {
-                            CategoryModel::givePoints($comment['InsertUserID'], $nbsPoint, 'QnA', $discussion['CategoryID']);
-                        }
-                    }
-                }
-            }
+            $this->updateCommentQnA($discussion, $comment, $newQnA, $sender->Form);
 
             // Recalculate the Q&A status of the discussion.
             $this->recalculateDiscussionQnA($discussion);
@@ -683,6 +646,84 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Update a comment QnA data.
+     *
+     * @param array|object $discussion
+     * @param array|object $comment
+     * @param string|null $newQnA
+     * @param Gdn_Form|null $form
+     */
+    protected function updateCommentQnA($discussion, $comment, $newQnA, Gdn_Form $form = null) {
+        $currentQnA = val('QnA', $comment);
+
+        if ($currentQnA != $newQnA) {
+            $set = ['QnA' => $newQnA];
+
+            if ($newQnA == 'Accepted') {
+                $set['DateAccepted'] = Gdn_Format::toDateTime();
+                $set['AcceptedUserID'] = Gdn::session()->UserID;
+            } else {
+                $set['DateAccepted'] = null;
+                $set['AcceptedUserID'] = null;
+            }
+
+            $this->commentModel->setField(val('CommentID', $comment), $set);
+            if ($form) {
+                $form->setValidationResults($this->commentModel->validationResults());
+            }
+
+            // Determine QnA change
+            if ($currentQnA != $newQnA) {
+                $change = 0;
+                switch ($newQnA) {
+                    case 'Rejected':
+                        $change = -1;
+                        if ($currentQnA != 'Accepted') {
+                            $change = 0;
+                        }
+                        break;
+
+                    case 'Accepted':
+                        $change = 1;
+                        break;
+
+                    default:
+                        if ($currentQnA == 'Rejected') {
+                            $change = 0;
+                        }
+                        if ($currentQnA == 'Accepted') {
+                            $change = -1;
+                        }
+                        break;
+                }
+            }
+
+            // Apply change effects
+            if ($change && $discussion['InsertUserID'] != $comment['InsertUserID']) {
+                // Update the user
+                $userID = val('InsertUserID', $comment);
+                $this->recalculateUserQnA($userID);
+
+                // Update reactions
+                if ($this->Reactions) {
+                    include_once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
+                    $reactionModel = new ReactionModel();
+
+                    // Assume that the reaction is done by the question's owner
+                    $questionOwner = $discussion['InsertUserID'];
+                    // If there's change, reactions will take care of it
+                    $reactionModel->react('Comment', $comment['CommentID'], 'AcceptAnswer', $questionOwner, true);
+                } else {
+                    $nbsPoint = $change * (int)c('QnA.Points.AcceptedAnswer', 1);
+                    if ($nbsPoint && c('QnA.Points.Enabled', false)) {
+                        CategoryModel::givePoints($comment['InsertUserID'], $nbsPoint, 'QnA', $discussion['CategoryID']);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      *
      *
      * @param $sender controller instance.
@@ -693,7 +734,7 @@ class QnAPlugin extends Gdn_Plugin {
     protected function _discussionOptions($sender, $discussionID) {
         $sender->Form = new Gdn_Form();
 
-        $discussion = $sender->DiscussionModel->getID($discussionID);
+        $discussion = $this->discussionModel->getID($discussionID);
 
         if (!$discussion) {
             throw notFoundException('Discussion');
@@ -707,22 +748,22 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         if ($sender->Form->authenticatedPostBack()) {
-            $sender->DiscussionModel->setField($discussionID, 'Type', $sender->Form->getFormValue('Type'));
+            $this->discussionModel->setField($discussionID, 'Type', $sender->Form->getFormValue('Type'));
 
             // Update the QnA field.  Default to "Unanswered" for questions. Null the field for other types.
             $qna = val('QnA', $discussion);
             switch ($sender->Form->getFormValue('Type')) {
                 case 'Question':
-                    $sender->DiscussionModel->setField(
+                    $this->discussionModel->setField(
                         $discussionID,
                         'QnA',
                         $qna ? $qna : 'Unanswered'
                     );
                     break;
                 default:
-                    $sender->DiscussionModel->setField($discussionID, 'QnA', null);
+                    $this->discussionModel->setField($discussionID, 'QnA', null);
             }
-            $sender->Form->setValidationResults($sender->DiscussionModel->validationResults());
+            $sender->Form->setValidationResults($this->discussionModel->validationResults());
 
             Gdn::controller()->jsonTarget('', '', 'Refresh');
         } else {
@@ -747,7 +788,7 @@ class QnAPlugin extends Gdn_Plugin {
 
             if ($unanswered) {
                 $args['Wheres']['Type'] = 'Question';
-                $sender->SQL->beginWhereGroup()
+                $this->discussionModel->SQL->beginWhereGroup()
                     ->where('d.QnA', null)
                     ->orWhereIn('d.QnA', ['Unanswered', 'Rejected'])
                     ->endWhereGroup();
@@ -765,9 +806,16 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function discussionModel_beforeSaveDiscussion_handler($sender, $args) {
-        $post =& $args['FormPostValues'];
-        if ($args['Insert'] && val('Type', $post) == 'Question') {
-            $post['QnA'] = 'Unanswered';
+        if ($args['Insert']) {
+            $post =& $args['FormPostValues'];
+
+            if ($this->apiQuestionInsert) {
+                $post['Type'] = 'Question';
+            }
+
+            if (val('Type', $post) == 'Question') {
+                $post['QnA'] = 'Unanswered';
+            }
         }
     }
 
@@ -1025,8 +1073,7 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         // Find the accepted answer(s) to the question.
-        $commentModel = new CommentModel();
-        $answers = $commentModel->getWhere(['DiscussionID' => $sender->data('Discussion.DiscussionID'), 'Qna' => 'Accepted'])->result();
+        $answers = $this->commentModel->getWhere(['DiscussionID' => $sender->data('Discussion.DiscussionID'), 'Qna' => 'Accepted'])->result();
 
         if (class_exists('ReplyModel')) {
             $replyModel = new ReplyModel();
@@ -1104,8 +1151,7 @@ class QnAPlugin extends Gdn_Plugin {
             return;
         }
 
-        $discussionModel = new DiscussionModel();
-        $discussion = $discussionModel->getID($args['CommentData']['DiscussionID'], DATASET_TYPE_ARRAY);
+        $discussion = $this->discussionModel->getID($args['CommentData']['DiscussionID'], DATASET_TYPE_ARRAY);
 
         $isCommentAnAnswer = $discussion['Type'] === 'Question';
         $isQuestionResolved = $discussion['QnA'] === 'Accepted';
@@ -1114,7 +1160,7 @@ class QnAPlugin extends Gdn_Plugin {
             return;
         }
 
-        $userAnswersToQuestion = $sender->getWhere([
+        $userAnswersToQuestion = $this->commentModel->getWhere([
             'DiscussionID' => $args['CommentData']['DiscussionID'],
             'InsertUserID' => $args['CommentData']['InsertUserID'],
         ]);
@@ -1124,5 +1170,202 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         CategoryModel::givePoints(GDN::session()->UserID, c('QnA.Points.Answer', 1), 'QnA', $discussion['CategoryID']);
+    }
+
+
+    ##########################
+    ## API Controller
+    ###########################
+
+    /**
+     * The question's meta data schema.
+     *
+     * @return Schema
+     */
+    public function fullQuestionMetaDataSchema() {
+        return Schema::parse([
+            'status:s' => [
+                'enum' => ['unanswered', 'answered', 'accepted', 'rejected'],
+                'description' => 'The answering state of the question.'
+            ],
+            'dateAccepted:dt|n' => 'When an answer was accepted.',
+            'dateAnswered:dt|n' => 'When the last answer was inserted.',
+        ]);
+    }
+
+    /**
+     * Add question meta data to discussion schema.
+     *
+     * @param Schema $schema
+     */
+    public function discussionSchema_init(Schema $schema) {
+        $schema->merge(Schema::parse([
+            'attributes' => Schema::parse([
+                'question?' => $this->fullQuestionMetaDataSchema(),
+            ]),
+        ]));
+    }
+
+    /**
+     * Add question meta data to discussion record.
+     *
+     * @param array $discussion
+     * @param DiscussionsApiController $discussionsApiController
+     * @param array $options
+     * @return array
+     */
+    public function discussionsApiController_normalizeOutput(
+        array $discussion,
+        DiscussionsApiController $discussionsApiController,
+        array $options
+    ) {
+        if ($discussion['type'] !== 'question') {
+            return $discussion;
+        }
+
+        $discussion['attributes']['question'] = [
+            'status' => strtolower($discussion['qnA']),
+            'dateAccepted' => $discussion['dateAccepted'],
+            'dateAnswered' => $discussion['dateOfAnswer'],
+        ];
+
+        return $discussion;
+    }
+
+    /**
+     * Create POST /discussions/question endpoint.
+     *
+     * @param DiscussionsApiController $sender
+     * @param array $body
+     * @return array
+     */
+    public function discussionsApiController_post_question(DiscussionsApiController $sender, array $body) {
+        $this->apiQuestionInsert = true;
+        try {
+            // Type is added in discussionModel_beforeSaveDiscussion_handler
+            return $sender->post($body);
+        } finally {
+            $this->apiQuestionInsert = false;
+        }
+    }
+
+    /**
+     * Add answer meta data to comment schema.
+     *
+     * @return Schema
+     */
+    public function fullAnswerMetaDataSchema() {
+        return Schema::parse([
+            'status:s' => [
+                'enum' => ['accepted', 'rejected', 'pending'],
+                'description' => 'The state of the answer.'
+            ],
+            'dateAccepted:dt|n' => 'When an answer was accepted.',
+            'acceptUserID:i|n' => 'The user that accepted this answer.'
+        ]);
+    }
+
+    /**
+     * Add answer meta data to comment schema.
+     *
+     * @param Schema $schema
+     */
+    public function commentSchema_init(Schema $schema) {
+        $schema->merge(Schema::parse([
+            'attributes' => Schema::parse([
+                'answer?' => $this->fullAnswerMetaDataSchema(),
+            ]),
+        ]));
+    }
+
+    /**
+     * Add answer meta data to comment record.
+     *
+     * @param array $comment
+     * @param CommentsApiController $commentsApiController
+     * @param array $options
+     * @return array
+     */
+    public function commentsApiController_normalizeOutput(
+        array $comment,
+        CommentsApiController $commentsApiController,
+        array $options
+    ) {
+        $discussionID = $comment['discussionID'];
+
+        if (!isset($this->discussionsCache[$discussionID])) {
+            // This has the potential to be pretty bad, performance wise, so we at least cached the results.
+            $this->discussionsCache[$discussionID] = $commentsApiController->discussionByID($discussionID);
+        }
+        $discussion = $this->discussionsCache[$discussionID];
+
+        if ($discussion['Type'] !== 'Question') {
+            return $comment;
+        }
+
+        $comment['attributes']['answer'] = [
+            'status' => !empty($comment['qnA']) ? strtolower($comment['qnA']) : 'pending',
+            'dateAccepted' => $comment['dateAccepted'],
+            'acceptUserID' => $comment['acceptedUserID'],
+        ];
+
+        return $comment;
+    }
+
+    /**
+     * Create PATCH /comments/answer endpoint.
+     *
+     * @throws ClientException
+     * @param CommentsApiController $sender
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+    public function commentsApiController_patch_answer(CommentsApiController $sender, $id, array $body) {
+        $sender->permission('Garden.SignIn.Allow');
+
+        $sender->idParamSchema('in');
+        $in = $sender->schema(
+            Schema::parse([
+                'status'
+            ])->add($this->fullAnswerMetaDataSchema()),
+            'AnswerPatch'
+        )->setDescription('Update an answer\'s metadata.');
+        $out = $sender->commentSchema('out');
+
+        $body = $in->validate($body);
+        $data = ApiUtils::convertInputKeys($body);
+        $data['CommentID'] = $id;
+        $comment = $sender->commentByID($id);
+        $discussion = $sender->discussionByID($comment['DiscussionID']);
+
+        if ($discussion['Type'] !== 'Question') {
+            throw new ClientException('The comment is not an answer.');
+        }
+
+        if ($discussion['InsertUserID'] !== $sender->getSession()->UserID) {
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $discussion['CategoryID']);
+        }
+
+        // Body is a required field in CommentModel::save.
+        if (!array_key_exists('Body', $data)) {
+            $data['Body'] = $comment['Body'];
+        }
+
+        $status = ucFirst($body['status']);
+        if ($status === 'Pending') {
+            $status = null;
+        }
+        $this->updateCommentQnA($discussion, $comment, $status);
+        $sender->validateModel($this->commentModel);
+
+        $this->recalculateDiscussionQnA($discussion);
+
+        $row = $sender->commentByID($id);
+        $this->userModel->expandUsers($row, ['InsertUserID']);
+        $row = $sender->normalizeOutput($row);
+
+        $result = $out->validate($row);
+        return $result;
     }
 }
