@@ -662,7 +662,7 @@ EOT;
             $this->fireEvent('FilterContent');
 
             if ($userSignature) {
-                echo "<div class=\"Signature UserSignature {$sigClasses}\">{$userSignature}</div>";
+                echo "<div class=\"Signature UserSignature userContent {$sigClasses}\">{$userSignature}</div>";
             }
         }
     }
