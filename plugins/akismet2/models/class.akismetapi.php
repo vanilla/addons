@@ -13,20 +13,40 @@ class AkismetAPI extends HttpClient {
     /** @var string */
     private $blog;
 
+    /** @var bool */
+    private $includeServer = false;
+
     /**
      * AkismetAPI constructor.
      *
-     * @param string|null $key
      * @param string|null $blog
+     * @param string|null $key
      */
-    public function __construct($key = null, $blog = null) {
-        if ($key !== null) {
-            $this->setKey($key);
-        }
+    public function __construct($blog = null, $key = null) {
         if ($blog !== null) {
             $this->setBlog($blog);
+        }        if ($key !== null) {
+            $this->setKey($key);
         }
         parent::__construct();
+    }
+
+    /**
+     * Build a comment payload.
+     *
+     * @param AkismetComment $comment
+     * @param bool $includeServer
+     * @return array
+     */
+    private function buildRequestComment(AkismetComment $comment, $includeServer = false) {
+        $result = ['blog' => $this->getBlog()];
+        $result += $comment->getComment();
+
+        if ($includeServer) {
+            $result += $this->getServerVars();
+        }
+
+        return $result;
     }
 
     /**
@@ -37,8 +57,7 @@ class AkismetAPI extends HttpClient {
      */
     public function commentCheck(AkismetComment $comment) {
         $url = $this->getUrl('comment-check');
-        $body = ['blog' => $this->getBlog()];
-        $body += $comment->getComment();
+        $body = $this->buildRequestComment($comment, $this->getIncludeServer());
         $response = $this->post($url, $body);
 
         $result = false;
@@ -58,18 +77,57 @@ class AkismetAPI extends HttpClient {
     }
 
     /**
+     * Get whether or not server vars should be included in comment requests.
+     *
+     * @return bool
+     */
+    public function getIncludeServer() {
+        return $this->includeServer;
+    }
+
+    /**
+     * Get values from $_SERVER global to include in comment requests.
+     *
+     * @return array
+     */
+    private function getServerVars() {
+        $result = [];
+        $additional = ['REMOTE_ADDR', 'REQUEST_URI', 'DOCUMENT_URI'];
+
+        foreach ($_SERVER as $key => $val) {
+            if (!is_string($val)) {
+                continue;
+            }
+            if (substr($key, 0, 11) === 'HTTP_COOKIE') {
+                continue;
+            }
+            if (substr($key, 0, 5) !== 'HTTP_' || in_array($key, $additional)) {
+                continue;
+            }
+            $result[$key] = $val;
+        }
+
+        return $result;
+    }
+
+    /**
      * Get an API URL.
      *
      * @param string $path
+     * @param bool $useKeyDomain
      * @return string
      */
-    private function getUrl($path) {
-        $key = $this->getKey();
-        if (!$key) {
-            throw new Exception('key not set.');
+    private function getUrl($path, $useKeyDomain = true) {
+        $domain = 'rest.akismet.com';
+
+        if ($useKeyDomain) {
+            $key = $this->getKey();
+            if (!$key) {
+                throw new Exception('key not set.');
+            }
+            $domain = "{$key}.{$domain}";
         }
 
-        $domain = "{$key}.rest.akismet.com";
         $result = "https://{$domain}/".self::API_VERSION."/{$path}";
         return $result;
     }
@@ -95,6 +153,17 @@ class AkismetAPI extends HttpClient {
             throw new InvalidArgumentException('blog is not a valid URL.');
         }
         $this->blog = $blog;
+        return $this;
+    }
+
+    /**
+     * Set whether or not server vars should be included in comment requests.
+     *
+     * @param $includeServer
+     * @return $this
+     */
+    public function setIncludeServer($includeServer) {
+        $this->includeServer = (bool)$includeServer;
         return $this;
     }
 
@@ -130,8 +199,7 @@ class AkismetAPI extends HttpClient {
 
         $endpoint = $typeEndpoints[$actualType];
         $url = $this->getUrl($endpoint);
-        $body = ['blog' => $this->getBlog()];
-        $body += $comment->getComment();
+        $body = $this->buildRequestComment($comment);
         $response = $this->post($url, $body);
 
         $result = ($response->getStatusCode() === 200);
@@ -171,7 +239,8 @@ class AkismetAPI extends HttpClient {
         if (!$blog) {
             throw new Exception('blog must be set to verify key.');
         }
-        $response = $this->post('https://rest.akismet.com/'.self::API_VERSION.'/verify-key', [
+        $url = $this->getUrl('verify-key', false);
+        $response = $this->post($url, [
             'key' => $key,
             'blog' => $blog
         ]);

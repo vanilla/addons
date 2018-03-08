@@ -4,6 +4,9 @@
  * @license Proprietary
  */
 
+use Vanilla\Addon;
+use Vanilla\AddonManager;
+
 /**
  * Class AkismetPlugin
  */
@@ -18,25 +21,59 @@ class AkismetPlugin extends Gdn_Plugin {
     /** @var AkismetAPI */
     private $akismetAPI;
 
+    /** @var Gdn_Configuration */
+    private $configuration;
+
+    /** @var Gdn_Locale */
+    private $locale;
+
+    /** @var Gdn_Request */
+    private $request;
+
+    /** @var Gdn_Session */
+    private $session;
+
     /** @var UserModel */
     private $userModel;
 
     /**
      * AkismetPlugin constructor.
      *
+     * @param AddonManager $addonManager
      * @param AkismetAPI $akismetAPI
+     * @param Gdn_Configuration $configuration
+     * @param Gdn_Locale $locale
+     * @param Gdn_Request $request
+     * @param Gdn_Session $session
      * @param UserModel $userModel
      */
-    public function __construct(AkismetAPI $akismetAPI, UserModel $userModel) {
+    public function __construct(
+        AddonManager $addonManager,
+        AkismetAPI $akismetAPI,
+        Gdn_Configuration $configuration,
+        Gdn_Locale $locale,
+        Gdn_Request $request,
+        Gdn_Session $session,
+        UserModel $userModel) {
+
         $this->akismetAPI = $akismetAPI;
+        $this->configuration = $configuration;
+        $this->locale = $locale;
+        $this->request = $request;
+        $this->session = $session;
         $this->userModel = $userModel;
 
-        $this->akismetAPI->setBlog(Gdn::request()->url('/', true));
+        $this->akismetAPI->setBlog($this->request->url('/', true));
         if ($key = $this->getKey()) {
             $this->akismetAPI->setKey($key);
         }
+        $this->akismetAPI->setIncludeServer($this->includeServer());
 
-        parent::__construct();
+        $addon = $addonManager->lookupByClassName(__CLASS__);
+        if ($addon instanceof Addon) {
+            $addonVersion = $addon->getVersion();
+            $this->akismetAPI->setDefaultHeader('User-Agent', 'Vanilla/'.APPLICATION_VERSION.' | Akismet/'.$addonVersion);
+        }
     }
 
     /**
@@ -46,7 +83,6 @@ class AkismetPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function base_checkSpam_handler($sender, $args) {
-        echo null;
         if ($this->isConfigured() === false || $args['IsSpam']) {
             // Addon not configured or the content has already been flagged.
             return;
@@ -57,6 +93,12 @@ class AkismetPlugin extends Gdn_Plugin {
 
         $result = false;
         switch ($recordType) {
+            case 'Activity':
+            case 'ActivityComment':
+            case 'Comment':
+            case 'Discussion':
+                $result = $this->isSpam($recordType, $data, true);
+                break;
             case 'Registration':
                 $body = $data['DiscoveryText'] ?? null;
                 $data['Name'] = '';
@@ -65,12 +107,6 @@ class AkismetPlugin extends Gdn_Plugin {
                     // Only check for spam if there is discovery text.
                     $result = $this->isSpam($recordType, $data, true);
                 }
-                break;
-            case 'Comment':
-            case 'Discussion':
-            case 'Activity':
-            case 'ActivityComment':
-                $result = $this->isSpam($recordType, $data, true);
         }
 
         // Akismet says it's SPAM. Include some additional data with the log entry.
@@ -92,26 +128,36 @@ class AkismetPlugin extends Gdn_Plugin {
      */
     private function buildComment($recordType, array $data, $includeRequest = false) {
         $comment = new AkismetComment();
-        if (array_key_exists('Email', $data)) {
-            $comment->setCommentAuthorEmail($data['Email']);
+
+        $email = val('Email', $data, val('InsertEmail', $data));
+        if ($email) {
+            $comment->setCommentAuthorEmail($email);
         }
+
+        $username = val('Username', $data, val('InsertName', $data));
+        if ($username) {
+            $comment->setCommentAuthor($username);
+        }
+
         if (array_key_exists('IPAddress', $data)) {
             $comment->setUserIP($data['IPAddress']);
         }
-        if (array_key_exists('Username', $data)) {
-            $comment->setCommentAuthor($data['Username']);
+
+        $dates = ['DateInserted' => 'setCommentDateGMT', 'DateUpdated' => 'setCommentPostModifiedGMT'];
+        foreach ($dates as $date => $setMethod) {
+            $rawDate = val($date, $data);
+            if ($rawDate) {
+                $gmtDate = $this->getGMTDateTime($rawDate);
+                if ($gmtDate && is_callable([$comment, $setMethod])) {
+                    call_user_func([$comment, $setMethod], $gmtDate);
+                }
+            }
         }
 
-        $locale = Gdn::Locale()->current();
-        $localeParts = preg_split('`(_|-)`', $locale, 2);
-        if (count($localeParts) == 2) {
-            $language = $localeParts[0];
-        } else {
-            $language = $locale;
-        }
+        $language = $this->getLanguage();
         $comment->setBlogLang($language);
 
-        $charset = c('Garden.Charset', 'utf-8');
+        $charset = $this->configuration->get('Garden.Charset', 'utf-8');
         $comment->setBlogCharset($charset);
 
         switch ($recordType) {
@@ -133,12 +179,12 @@ class AkismetPlugin extends Gdn_Plugin {
         $comment->setCommentContent(implode("\n\n", $content));
 
         if ($includeRequest) {
-            $userAgent = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT');
-            $referrer = $value = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER');
-
+            $userAgent = $this->request->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT');
             if ($userAgent) {
                 $comment->setUserAgent($userAgent);
             }
+
+            $referrer = $value = $this->request->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER');
             if ($referrer) {
                 $comment->setReferrer($referrer);
             }
@@ -152,12 +198,22 @@ class AkismetPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Should server vars be included when performing comment checks?
+     *
+     * @return bool
+     */
+    private function includeServer() {
+        $result = (bool)$this->configuration->get('Akismet.IncludeServer');
+        return $result;
+    }
+
+    /**
      * Is the addon configured to be in test mode?
      *
      * @return bool
      */
     private function inTestMode() {
-        $result = (bool)c('Akismet.TestMode');
+        $result = (bool)$this->configuration->get('Akismet.TestMode');
         return $result;
     }
 
@@ -170,12 +226,23 @@ class AkismetPlugin extends Gdn_Plugin {
      * @return bool
      */
     private function isSpam($recordType, array $data, $includeRequest = false) {
-        if (!Gdn::session()->isValid()) {
+        if (!$this->session->isValid()) {
             return false;
         }
 
         $comment = $this->buildComment($recordType, $data, $includeRequest);
         $result = $this->akismetAPI->commentCheck($comment);
+        return $result;
+    }
+
+    private function getGMTDateTime($datetime) {
+        $result = false;
+
+        $time = strtotime($datetime);
+        if ($time) {
+            $result = gmdate('c', $time);
+        }
+
         return $result;
     }
 
@@ -185,7 +252,24 @@ class AkismetPlugin extends Gdn_Plugin {
      * @return string|null
      */
     private function getKey() {
-        $result = c('Akismet.Key', $this->getMasterKey());
+        $result = $this->configuration->get('Akismet.Key', $this->getMasterKey());
+        return $result;
+    }
+
+    /**
+     * Get the current language.
+     *
+     * @return string
+     */
+    private function getLanguage() {
+        $locale = $this->locale->current();
+        $localeParts = preg_split('`(_|-)`', $locale, 2);
+        if (count($localeParts) == 2) {
+            $result = $localeParts[0];
+        } else {
+            $result = $locale;
+        }
+
         return $result;
     }
 
@@ -195,7 +279,7 @@ class AkismetPlugin extends Gdn_Plugin {
      * @return string|null
      */
     private function getMasterKey() {
-        $result = c('Akismet.MasterKey', null);
+        $result = $this->configuration->get('Akismet.MasterKey', null);
         return $result;
     }
 
@@ -210,30 +294,35 @@ class AkismetPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Is this a SPAM log entry?
+     *
+     * @param array $log
+     * @return bool
+     */
+    private function logIsSpam(array $log) {
+        $result = false;
+
+        if (array_key_exists('Operation', $log) && $log['Operation'] === self::SPAM_OPERATION) {
+            $result = true;
+        }
+
+        return $result;
+    }
+
+    /**
      * Hook in after a log item is restored.
      *
      * @param LogModel $sender
      * @param array $args
      */
     public function logModel_afterRestore_handler(LogModel $sender, array $args) {
-        if (!array_key_exists('Log', $args) || !is_array($args['Log'])) {
+        if (!$this->logIsSpam($args['Log'])) {
             return;
         }
+        $data = $args['Log']['Data'];
+        $recordType = $args['Log']['RecordType'];
 
-        $recordType = $args['Log']['RecordType'] ?? null;
-        if (!$recordType) {
-            return;
-        }
-
-        if (!array_key_exists('Operation', $args['Log']) || $args['Log']['Operation'] !== self::SPAM_OPERATION) {
-            return;
-        }
-
-        $data = $args['Log']['Data'] ?? null;
-        if (!$data || !is_array($data)) {
-            return;
-        }
-
+        // Make sure this was previously flagged as SPAM by Akismet.
         if (!array_key_exists('Akismet', $data) || !$data['Akismet']) {
             return;
         }
@@ -249,32 +338,23 @@ class AkismetPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function logModel_afterInsert_handler(LogModel $sender, array $args) {
-        if (!array_key_exists('Log', $args) || !is_array($args['Log'])) {
+        if (!$this->logIsSpam($args['Log'])) {
             return;
         }
+        $data = dbdecode($args['Log']['Data']);
+        $recordType = $args['Log']['RecordType'];
 
-        if (!array_key_exists('Operation', $args['Log']) || $args['Log']['Operation'] !== self::SPAM_OPERATION) {
-            return;
-        }
-
-        $recordType = $args['Log']['RecordType'] ?? null;
-        if (!$recordType) {
-            return;
-        }
-
-        $data = $args['Log']['Data'] ?? null;
-        if (!$data) {
-            return;
-        }
-        $data = dbdecode($data);
-
+        // Make sure this entry wasn't already flagged as SPAM by Akismet.
         if (array_key_exists('Akismet', $data) && $data['Akismet']) {
             return;
         }
 
-        $comment = $this->buildComment($recordType, $data);
-        if ($comment) {
-            $this->akismetAPI->submitSpam($comment);
+        // Only submit items flagged by moderators or higher.
+        if ($this->session->checkRankedPermission('Garden.Moderation.Manage')) {
+            $comment = $this->buildComment($recordType, $data);
+            if ($comment) {
+                $this->akismetAPI->submitSpam($comment);
+            }
         }
     }
 
@@ -291,7 +371,7 @@ class AkismetPlugin extends Gdn_Plugin {
 
         // Do key validation so we don't break our entire site.
         // Always allow a blank key, because the plugin turns off in that scenario.
-        if (Gdn::request()->isAuthenticatedPostBack()) {
+        if ($this->request->isAuthenticatedPostBack()) {
             $key = $configurationModule->form()->getFormValue('Akismet.Key');
             if ($key !== '' && $this->akismetAPI->verifyKey($key) === false) {
                 $configurationModule->form()->addError('Key is invalid.');
@@ -306,6 +386,7 @@ class AkismetPlugin extends Gdn_Plugin {
         $configurationModule->initialize([
             'Akismet.Key' => ['Description' => $keyDesc]
         ]);
+        $sender->informMessage('Hello world.');
 
         $sender->addSideMenu('settings/plugins');
         $configurationModule->renderAll();
@@ -351,7 +432,7 @@ class AkismetPlugin extends Gdn_Plugin {
      * @return int|null
      */
     private function userID() {
-        $result = c('Akismet.UserID', null);
+        $result = $this->configuration->get('Akismet.UserID', null);
         return $result;
     }
 }
