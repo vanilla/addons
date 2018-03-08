@@ -386,7 +386,6 @@ class AkismetPlugin extends Gdn_Plugin {
         $configurationModule->initialize([
             'Akismet.Key' => ['Description' => $keyDesc]
         ]);
-        $sender->informMessage('Hello world.');
 
         $sender->addSideMenu('settings/plugins');
         $configurationModule->renderAll();
