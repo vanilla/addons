@@ -1,0 +1,16 @@
+.SocialIcon-Mastodon .Icon {
+    background-image: url("/plugins/Mastodon/icon.png");
+    background-size: 24px 24px;
+}
+.SocialIcon-Mastodon.HasText .Icon {
+    background-image: url("/plugins/Mastodon/icon.png");
+    background-size: 32px 32px;
+}
+.SocialIcon-Mastodon.HasText .Text {
+    background-color: #2b90d9;
+}
+.ReactMastodon {
+    background-image: url("/plugins/Mastodon/icon.png");
+    background-size: 16px 16px;
+    background-position: 0;
+}
