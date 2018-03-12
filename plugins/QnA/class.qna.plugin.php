@@ -1368,4 +1368,15 @@ class QnAPlugin extends Gdn_Plugin {
         $result = $out->validate($row);
         return $result;
     }
+
+    /**
+     * Add QnA fields to the search schema.
+     *
+     * @param Schema $schema
+     */
+    public function searchResultSchema_init(Schema $schema) {
+        $types = $schema->getField('properties.type.enum');
+        $types[] = 'question';
+        $schema->setField('properties.type.enum', $types);
+    }
 }
