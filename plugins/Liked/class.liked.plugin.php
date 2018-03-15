@@ -17,9 +17,8 @@ EOD;
 	}
 
 	public function discussionController_afterDiscussionBody_handler($sender) {
-      echo '<div class="fb-like" data-href="';
-      echo Gdn_Url::request(true, true, true);
-      echo '" data-send="false" data-width="450" data-show-faces="false" data-font="lucida grande"></div>';
+      $url = Gdn_Url::request(true, true, true);
+      echo '<div class="fb-like" data-href="'.htmlspecialchars($url).'" data-send="false" data-width="450" data-show-faces="false" data-font="lucida grande"></div>';
 	}
 
    public function setup() {
