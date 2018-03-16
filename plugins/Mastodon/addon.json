@@ -1,0 +1,22 @@
+{
+    "key": "mastodon",
+    "name": "Mastodon Social Connect",
+    "description": "Users may sign into your site using their Mastodon account.",
+    "version": "1.0.0",
+    "type": "addon",
+    "license": "GPL2",
+    "icon": "mastodon_social_connect.png",
+    "mobileFriendly": true,
+    "settingsUrl": "/dashboard/social/mastodon",
+    "settingsPermission": "Garden.Settings.Manage",
+    "authors": [
+        {
+            "name": "wakin",
+            "email": "8th.mail@gmail.com",
+            "homepage": "http://biwakodon.com/@wakin"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}
