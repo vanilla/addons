@@ -16,7 +16,7 @@ class AuthorSelectorPlugin extends Gdn_Plugin {
         $discussion = $args['Discussion'];
         if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
             $label = t('Change Author');
-            $url = "/discussion/author?discussionid={$discussion->DiscussionID}";
+            $url = url("/discussion/author?discussionid={$discussion->DiscussionID}");
 
             // Deal with inconsistencies in how options are passed
             if (isset($sender->Options)) {
