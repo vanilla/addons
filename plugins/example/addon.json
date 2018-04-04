@@ -1,11 +1,10 @@
 {
+    "name": "Example Plugin",
     "description": "Provides an example Development Pattern for Vanilla 2 plugins by demonstrating how to insert discussion body excerpts into the discussions list.",
-    "version": "1.1",
-    "requiredTheme": false,
+    "version": "1.2.0",
     "hasLocale": false,
     "license": "GNU GPL2",
     "settingsUrl": "/plugin/example",
-    "settingsPermission": "Garden.Settings.Manage",
     "key": "example",
     "type": "addon",
     "authors": [
@@ -15,7 +14,7 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1"
+        "vanilla": ">=2.5"
     },
 	"icon": "example.png"
 }

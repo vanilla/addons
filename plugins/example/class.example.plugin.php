@@ -67,7 +67,7 @@ class ExamplePlugin extends Gdn_Plugin {
          * in the dashboard. Something like this works well: <h1><?php echo t($this->Data['Title']); ?></h1>
          */
         $sender->title('Example Plugin');
-        $sender->addSideMenu('plugin/example');
+        $sender->setHighlightRoute('plugin/example');
 
         // If your sub-pages use forms, this is a good place to get it ready
         $sender->Form = new Gdn_Form();
@@ -100,13 +100,13 @@ class ExamplePlugin extends Gdn_Plugin {
     public function controller_index($sender) {
         // Prevent non-admins from accessing this page
         $sender->permission('Garden.Settings.Manage');
-        $sender->setData('PluginDescription',$this->getPluginKey('Description'));
+        $sender->setData('PluginDescription', $this->getPluginKey('Description'));
 
 		$validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField([
-            'Plugin.Example.RenderCondition'     => 'all',
-            'Plugin.Example.TrimSize'      => 100
+            'example.RenderCondition' => 'all',
+            'example.TrimSize' => 100
         ]);
 
         // Set the model on the form.
@@ -117,30 +117,32 @@ class ExamplePlugin extends Gdn_Plugin {
             // Apply the config settings to the form.
             $sender->Form->setData($configurationModel->Data);
 		} else {
-            $configurationModel->Validation->applyRule('Plugin.Example.RenderCondition', 'Required');
-            $configurationModel->Validation->applyRule('Plugin.Example.TrimSize', 'Required');
-            $configurationModel->Validation->applyRule('Plugin.Example.TrimSize', 'Integer');
+            $configurationModel->Validation->applyRule('example.RenderCondition', 'Required');
+            $configurationModel->Validation->applyRule('example.TrimSize', 'Required');
+            $configurationModel->Validation->applyRule('example.TrimSize', 'Integer');
             $saved = $sender->Form->save();
             if ($saved) {
-                $sender->StatusMessage = t("Your changes have been saved.");
+                $sender->informMessage(t("Your changes have been saved."));
             }
         }
 
-        // getView() looks for files inside plugins/PluginFolderName/views/ and returns their full path. Useful!
-        $sender->render($this->getView('example.php'));
+        // Search for the example.php view in the plugins view subfolder.
+        $sender->render('example', '', 'plugins/example');
     }
 
     /**
-     * Add a link to the dashboard menu
+     * Add a link to the dashboards site navigation module.
      *
-     * By grabbing a reference to the current SideMenu object we gain access to its methods, allowing us
-     * to add a menu link to the newly created /plugin/Example method.
-     *
-     * @param $sender Sending controller instance
+     * @param $sender Sending controller instance.
      */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        $menu = &$sender->EventArguments['SideMenu'];
-        $menu->addLink('Add-ons', 'Example', 'plugin/example', 'Garden.Settings.Manage');
+    public function dashboardNavModule_init_handler($sender) {
+        $sender->addLinkIf(
+            'Garden.Settings.Manage',
+            t('Example'),
+            '/plugin/example',
+            'add-ons.example',
+            'nav-example'
+        );
     }
 
     /**
@@ -167,15 +169,15 @@ class ExamplePlugin extends Gdn_Plugin {
 
         /*
          * The 'c' function allows plugins to access the config file. In this call, we're looking for a specific setting
-         * called 'Plugin.Example.TrimSize', but defaulting to a value of '100' if the setting cannot be found.
+         * called 'example.TrimSize', but defaulting to a value of '100' if the setting cannot be found.
          */
-        $trimSize = c('Plugin.Example.TrimSize', 100);
+        $trimSize = c('example.TrimSize', 100);
 
         /*
          * We're using this setting to allow conditional display of the excerpts. We have 3 settings: 'all', 'announcements',
          * 'discussions'. They do what you'd expect!
          */
-        $renderCondition = c('Plugin.Example.RenderCondition', 'all');
+        $renderCondition = c('example.RenderCondition', 'all');
 
         $type = (val('Announce', $sender->EventArguments['Discussion']) == '1') ? "announcement" : "discussion";
         $compareType = $type.'s';
@@ -212,8 +214,8 @@ class ExamplePlugin extends Gdn_Plugin {
     public function setup() {
 
         // Set up the plugin's default values
-        saveToConfig('Plugin.Example.TrimSize', 100);
-        saveToConfig('Plugin.Example.RenderCondition', "all");
+        saveToConfig('example.TrimSize', 100);
+        saveToConfig('example.RenderCondition', "all");
 
         // Trigger database changes
         $this->structure();
@@ -234,9 +236,9 @@ class ExamplePlugin extends Gdn_Plugin {
             ->column('Size', 'int(11)')
             ->column('InsertUserID', 'int(11)')
             ->column('DateInserted', 'datetime')
-            ->column('ForeignID', 'int(11)', TRUE)
-            ->column('ForeignTable', 'varchar(24)', TRUE)
-            ->set(FALSE, FALSE);
+            ->column('ForeignID', 'int(11)', true)
+            ->column('ForeignTable', 'varchar(24)', true)
+            ->set(false, false);
         */
     }
 
@@ -247,8 +249,8 @@ class ExamplePlugin extends Gdn_Plugin {
      * perform cleanup tasks such as deletion of unsued files and folders.
      */
     public function onDisable() {
-        removeFromConfig('Plugin.Example.TrimSize');
-        removeFromConfig('Plugin.Example.RenderCondition');
+        removeFromConfig('example.TrimSize');
+        removeFromConfig('example.RenderCondition');
 
         // Never delete from the database OnDisable.
         // Usually, you want re-enabling a plugin to be as if it was never off.
