@@ -310,7 +310,7 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param $args
      */
-    public function gitx_beforeSignInButton_handler($sender, $args) {
+    public function beforeSignInButton_handler($sender, $args) {
         $providers = self::getAllProviders();
         foreach ($providers as $provider) {
             echo "\n".self::connectButton($provider);
