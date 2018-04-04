@@ -310,7 +310,7 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param $args
      */
-    public function base_beforeSignInButton_handler($sender, $args) {
+    public gitx_beforeSignInButton_handler($sender, $args) {
         $providers = self::getAllProviders();
         foreach ($providers as $provider) {
             echo "\n".self::connectButton($provider);
@@ -338,6 +338,7 @@ class JsConnectPlugin extends Gdn_Plugin {
      *
      * @param EntryController $Sender
      * @param array $Args
+     * @throws Exception Gdn_UserException
      */
     public function base_connectData_handler($Sender, $Args) {
         if (val(0, $Args) != 'jsconnect') {
@@ -359,21 +360,25 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $JsData['sigStr'], $JsData['string']);
 
         if (!$client_id) {
+            Logger::event('jsconnect_error', Logger::ERROR, 'No Client ID Found', ['Data' => $JsData]);
             throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'client_id'), 400);
         }
         $Provider = self::getProvider($client_id);
         if (!$Provider) {
-            throw new Gdn_UserException(sprintf(t('Unknown client: %s.'), $client_id), 400);
+            Logger::event('jsconnect_error', Logger::ERROR, 'No Provider Found', ['Data' => $JsData, 'Client_id' => $client_id]);
+            throw new Gdn_UserException(sprintf(t('Unknown client: %s.'), htmlspecialchars($client_id)), 400);
         }
 
         if (!val('TestMode', $Provider)) {
             if (!$Signature) {
+                Logger::event('jsconnect_error', Logger::ERROR, 'No Signature Found', ['Data' => $JsData]);
                 throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'signature'), 400);
             }
 
             if ($version === '2') {
                 // Verify IP Address.
                 if (Gdn::request()->ipAddress() !== val('ip', $JsData, null)) {
+                    Logger::event('jsconnect_error', Logger::ERROR, 'No IP Found', ['Data' => $JsData]);
                     throw new Gdn_UserException(t('IP address invalid.'), 400);
                 }
 
@@ -381,6 +386,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $nonceModel = new UserAuthenticationNonceModel();
                 $nonce = val('nonce', $JsData, null);
                 if ($nonce === null) {
+                    Logger::event('jsconnect_error', Logger::ERROR, 'No Nonce Found in JSData', ['Data' => $JsData]);
                     throw new Gdn_UserException(t('Nonce not found.'), 400);
                 }
 
@@ -391,12 +397,14 @@ class JsConnectPlugin extends Gdn_Plugin {
                     $foundNonce = $nonceModel->getWhere(['Nonce' => $nonce])->firstRow(DATASET_TYPE_ARRAY);
                 }
                 if (!$foundNonce) {
+                    Logger::event('jsconnect_error', Logger::ERROR, 'No Nonce Found in Stash', ['Data' => $JsData]);
                     throw new Gdn_UserException(t('Nonce not found.'), 400);
                 }
 
                 // Clear nonce from the database.
                 $nonceModel->delete(['Nonce' => $nonce]);
                 if (strtotime($foundNonce['Timestamp']) < time() - self::NONCE_EXPIRATION) {
+                    Logger::event('jsconnect_error', Logger::ERROR, 'Timestamp Failed', ['Data' => $JsData, 'Timestamp' => $foundNonce['Timestamp']]);
                     throw new Gdn_UserException(t('Nonce expired.'), 400);
                 }
 
@@ -514,6 +522,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                     $message = t('Your sso timed out.', 'Your sso timed out during the request. Please try again.');
                 }
 
+                Logger::event('jsconnect_error', Logger::ERROR, 'JSConnect Timed Out', ['Message' => $message]);
                 Gdn::dispatcher()
                     ->passData('Exception', $message ? htmlspecialchars($message) : htmlspecialchars($error))
                     ->dispatch('home/error');
@@ -523,6 +532,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $provider = self::getProvider($client_id);
 
             if (empty($provider)) {
+                Logger::event('jsconnect_error', Logger::ERROR, 'No Provider Found', ['Client ID' => $client_id]);
                 throw notFoundException('Provider');
             }
 
