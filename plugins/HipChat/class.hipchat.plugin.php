@@ -90,7 +90,7 @@ class HipChatPlugin extends Gdn_Plugin {
         }
 
         // Make sure we have a valid comment and that it's new.
-        if (val('CommentID', $args) && val('Insert', $args)) {
+        if (!val('CommentID', $args) || !val('Insert', $args)) {
             return;
         }
 
