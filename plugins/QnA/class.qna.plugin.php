@@ -321,15 +321,9 @@ class QnAPlugin extends Gdn_Plugin {
             return;
         }
 
-        // Mark the question as answered.
-        if (!empty($args['Insert']) && !$discussion['Sink'] && !in_array($discussion['QnA'], ['Answered', 'Accepted'])) {
-            $sender->SQL->set('QnA', 'Answered');
-        } elseif (!isset($args['Insert'])) {
-            // This is not an edit so recalculate the QnA value entirely.
-            $set = $this->recalculateDiscussionQnA($discussion, true);
-            if (!empty($set)) {
-                $sender->SQL->set($set);
-            }
+        // Recalculate the Question state.
+        if (!empty($args['Insert'])) {
+            $this->recalculateDiscussionQnA($discussion);
         }
     }
 
@@ -567,10 +561,10 @@ class QnAPlugin extends Gdn_Plugin {
             ['DiscussionID' => val('DiscussionID', $discussion), 'QnA is not null' => ''], 'QnA, DateAccepted', 'asc', 1)->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$row) {
-            if (val('CountComments', $discussion) > 0) {
-                $set['QnA'] = 'Unanswered';
-            } else {
+            if (val('CountComments', $discussion, 0) > 0) {
                 $set['QnA'] = 'Answered';
+            } else {
+                $set['QnA'] = 'Unanswered';
             }
 
             $set['DateAccepted'] = null;
