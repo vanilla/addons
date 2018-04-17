@@ -417,6 +417,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             // Validate the signature.
             $CalculatedSignature = signJsConnect($JsData, $client_id, val('AssociationSecret', $Provider), val('HashType', $Provider, 'md5'));
             if ($CalculatedSignature != $Signature) {
+                Logger::event('jsconnect_error', Logger::ERROR, 'Invalid Signature', ['Data' => $JsData, 'ClientID' => $client_id, 'Secret' => val('AssociationSecret', $Provider), 'HashType' => val('HashType', $Provider, 'md5')]);
                 throw new Gdn_UserException(t("Signature invalid."), 400);
             }
         }
@@ -522,7 +523,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                     $message = t('Your sso timed out.', 'Your sso timed out during the request. Please try again.');
                 }
 
-                Logger::event('jsconnect_error', Logger::ERROR, 'JSConnect Timed Out', ['Message' => $message]);
+                Logger::event('jsconnect_error', Logger::ERROR, 'Displaying Error Page.', ['Data' => $jsData, 'ErrorMessage' => $message]);
                 Gdn::dispatcher()
                     ->passData('Exception', $message ? htmlspecialchars($message) : htmlspecialchars($error))
                     ->dispatch('home/error');
