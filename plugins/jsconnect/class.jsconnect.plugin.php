@@ -523,7 +523,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                     $message = t('Your sso timed out.', 'Your sso timed out during the request. Please try again.');
                 }
 
-                Logger::event('jsconnect_error', Logger::ERROR, 'Redirecting to error page.', ['Data' => $jsData, 'ErrorMessage' => $message]);
+                Logger::event('jsconnect_error', Logger::ERROR, 'Displaying Error Page.', ['Data' => $jsData, 'ErrorMessage' => $message]);
                 Gdn::dispatcher()
                     ->passData('Exception', $message ? htmlspecialchars($message) : htmlspecialchars($error))
                     ->dispatch('home/error');
