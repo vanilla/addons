@@ -314,7 +314,8 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function commentModel_beforeUpdateCommentCount_handler($sender, $args) {
-        $discussion =& $args['Discussion'];
+        // Merge the updated counts to the discussion.
+        $discussion = $args['Counts'] + $args['Discussion'];
 
         // Bail out if this isn't a comment on a question.
         if (strtolower($discussion['Type']) !== 'question') {
