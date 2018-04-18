@@ -1,7 +1,7 @@
 {
     "name": "Debug Bar",
-    "description": "The debug bar shows debuggin information at the bottom of the page.",
-    "version": "1.4.0",
+    "description": "The debug bar shows debugging information at the bottom of the page.",
+    "version": "1.4.1",
     "requiredTheme": false,
     "hasLocale": false,
     "registerPermissions": {

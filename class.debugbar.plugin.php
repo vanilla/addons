@@ -188,14 +188,14 @@ class DebugBarPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Start the debug bar timings as soon as possible.
+     * Override the container with debug objects.
+     *
+     * @param \Garden\Container\Container $dic The container to override.
      */
-    public function gdn_pluginManager_afterStart_handler() {
+    public function container_init(Garden\Container\Container $dic) {
         // Install the debugger database.
-        $tmp = Gdn::factoryOverwrite(true);
-        Gdn::factoryInstall(Gdn::AliasDatabase, '\Vanilla\DebugBar\DatabaseDebugBar', __DIR__.'/src/DatabaseDebugBar.php', Gdn::FactorySingleton, ['Database']);
-        Gdn::factoryOverwrite($tmp);
-        unset($tmp);
+        $dic->rule('Gdn_Database')
+            ->setClass(\Vanilla\DebugBar\DatabaseDebugBar::class);
 
         $bar = $this->debugBar();
         /* @var \DebugBar\DataCollector\TimeDataCollector $timer */
