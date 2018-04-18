@@ -185,7 +185,7 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
         $this->assertIsAnswer($response->getBody(), ['status' => 'pending']);
 
         $updatedQuestion = $this->getQuestion($question['discussionID']);
-        $this->assertIsQuestion($updatedQuestion, ['status' => 'unanswered']);
+        $this->assertIsQuestion($updatedQuestion, ['status' => 'answered']);
     }
 
     /**
