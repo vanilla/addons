@@ -8,9 +8,9 @@ use Vanilla\Addon;
 use Vanilla\AddonManager;
 
 /**
- * Class AkismetPlugin
+ * Class Akismet2Plugin
  */
-class AkismetPlugin extends Gdn_Plugin {
+class Akismet2Plugin extends Gdn_Plugin {
 
     /** Operation used by logging to flag SPAM. */
     const SPAM_OPERATION = 'Spam';
