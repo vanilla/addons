@@ -401,7 +401,7 @@ class AkismetPlugin extends Gdn_Plugin {
     /**
      * Update the database.
      */
-    private function structure() {
+    public function structure() {
         $userID = $this->userID();
         if (!$userID) {
             $user = $this->userModel->getWhere([
