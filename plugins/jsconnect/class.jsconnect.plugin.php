@@ -338,6 +338,7 @@ class JsConnectPlugin extends Gdn_Plugin {
      *
      * @param EntryController $Sender
      * @param array $Args
+     * @throws Exception Gdn_UserException
      */
     public function base_connectData_handler($Sender, $Args) {
         if (val(0, $Args) != 'jsconnect') {
@@ -354,26 +355,32 @@ class JsConnectPlugin extends Gdn_Plugin {
         $version = val('v', $JsData, null);
         $client_id = val('client_id', $JsData, val('clientid', $JsData, $Sender->Request->get('client_id')));
         $Signature = val('sig', $JsData, val('signature', $JsData, false));
+        // This is for logging only.
+        $jsDataReceived = $JsData;
         $String = val('sigStr', $JsData, false); // debugging
         unset($JsData['v'], $JsData['client_id'], $JsData['clientid'], $JsData['signature'], $JsData['sig'],
                 $JsData['sigStr'], $JsData['string']);
 
         if (!$client_id) {
+            Logger::event('jsconnect_error', Logger::ERROR, 'No Client ID Found', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived]);
             throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'client_id'), 400);
         }
         $Provider = self::getProvider($client_id);
         if (!$Provider) {
-            throw new Gdn_UserException(sprintf(t('Unknown client: %s.'), $client_id), 400);
+            Logger::event('jsconnect_error', Logger::ERROR, 'No Provider Found', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived, 'Client_id' => $client_id]);
+            throw new Gdn_UserException(sprintf(t('Unknown client: %s.'), htmlspecialchars($client_id)), 400);
         }
 
         if (!val('TestMode', $Provider)) {
             if (!$Signature) {
+                Logger::event('jsconnect_error', Logger::ERROR, 'No Signature Found', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived]);
                 throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'signature'), 400);
             }
 
             if ($version === '2') {
                 // Verify IP Address.
                 if (Gdn::request()->ipAddress() !== val('ip', $JsData, null)) {
+                    Logger::event('jsconnect_error', Logger::ERROR, 'No IP Found', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived]);
                     throw new Gdn_UserException(t('IP address invalid.'), 400);
                 }
 
@@ -381,6 +388,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $nonceModel = new UserAuthenticationNonceModel();
                 $nonce = val('nonce', $JsData, null);
                 if ($nonce === null) {
+                    Logger::event('jsconnect_error', Logger::ERROR, 'No Nonce Found in JSData', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived]);
                     throw new Gdn_UserException(t('Nonce not found.'), 400);
                 }
 
@@ -391,12 +399,14 @@ class JsConnectPlugin extends Gdn_Plugin {
                     $foundNonce = $nonceModel->getWhere(['Nonce' => $nonce])->firstRow(DATASET_TYPE_ARRAY);
                 }
                 if (!$foundNonce) {
+                    Logger::event('jsconnect_error', Logger::ERROR, 'No Nonce Found in Stash', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived]);
                     throw new Gdn_UserException(t('Nonce not found.'), 400);
                 }
 
                 // Clear nonce from the database.
                 $nonceModel->delete(['Nonce' => $nonce]);
                 if (strtotime($foundNonce['Timestamp']) < time() - self::NONCE_EXPIRATION) {
+                    Logger::event('jsconnect_error', Logger::ERROR, 'Timestamp Failed', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived, 'Timestamp' => $foundNonce['Timestamp'], 'Time' => time(), 'NonceExpiry' => self::NONCE_EXPIRATION]);
                     throw new Gdn_UserException(t('Nonce expired.'), 400);
                 }
 
@@ -409,9 +419,11 @@ class JsConnectPlugin extends Gdn_Plugin {
             // Validate the signature.
             $CalculatedSignature = signJsConnect($JsData, $client_id, val('AssociationSecret', $Provider), val('HashType', $Provider, 'md5'));
             if ($CalculatedSignature != $Signature) {
+                Logger::event('jsconnect_error', Logger::ERROR, 'Invalid Signature', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived, 'Signature' => $Signature, 'Secret' => val('AssociationSecret', $Provider), 'HashType' => val('HashType', $Provider, 'md5')]);
                 throw new Gdn_UserException(t("Signature invalid."), 400);
             }
         }
+        Logger::event('jsconnect_success', Logger::ERROR, 'JSData Passed Validation', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived, 'Secret' => val('AssociationSecret', $Provider), 'HashType' => val('HashType', $Provider, 'md5')]);
 
         // Map all of the standard jsConnect data.
         $Map = ['uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'fullname' => 'FullName', 'roles' => 'Roles'];
@@ -514,6 +526,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                     $message = t('Your sso timed out.', 'Your sso timed out during the request. Please try again.');
                 }
 
+                Logger::event('jsconnect_error', Logger::ERROR, 'Displaying Error Page.', ['JsData' => $jsData, 'ErrorMessage' => $message]);
                 Gdn::dispatcher()
                     ->passData('Exception', $message ? htmlspecialchars($message) : htmlspecialchars($error))
                     ->dispatch('home/error');
@@ -523,6 +536,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $provider = self::getProvider($client_id);
 
             if (empty($provider)) {
+                Logger::event('jsconnect_error', Logger::ERROR, 'No Provider Found', ['Client ID' => $client_id]);
                 throw notFoundException('Provider');
             }
 

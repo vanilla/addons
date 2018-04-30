@@ -314,22 +314,17 @@ class QnAPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function commentModel_beforeUpdateCommentCount_handler($sender, $args) {
-        $discussion =& $args['Discussion'];
+        // Merge the updated counts to the discussion.
+        $discussion = $args['Counts'] + $args['Discussion'];
 
         // Bail out if this isn't a comment on a question.
         if (strtolower($discussion['Type']) !== 'question') {
             return;
         }
 
-        // Mark the question as answered.
-        if (!empty($args['Insert']) && !$discussion['Sink'] && !in_array($discussion['QnA'], ['Answered', 'Accepted'])) {
-            $sender->SQL->set('QnA', 'Answered');
-        } elseif (!isset($args['Insert'])) {
-            // This is not an edit so recalculate the QnA value entirely.
-            $set = $this->recalculateDiscussionQnA($discussion, true);
-            if (!empty($set)) {
-                $sender->SQL->set($set);
-            }
+        // Recalculate the Question state.
+        if (!empty($args['Insert'])) {
+            $this->recalculateDiscussionQnA($discussion);
         }
     }
 
@@ -567,10 +562,10 @@ class QnAPlugin extends Gdn_Plugin {
             ['DiscussionID' => val('DiscussionID', $discussion), 'QnA is not null' => ''], 'QnA, DateAccepted', 'asc', 1)->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$row) {
-            if (val('CountComments', $discussion) > 0) {
-                $set['QnA'] = 'Unanswered';
-            } else {
+            if (val('CountComments', $discussion, 0) > 0) {
                 $set['QnA'] = 'Answered';
+            } else {
+                $set['QnA'] = 'Unanswered';
             }
 
             $set['DateAccepted'] = null;
@@ -1367,5 +1362,16 @@ class QnAPlugin extends Gdn_Plugin {
 
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Add QnA fields to the search schema.
+     *
+     * @param Schema $schema
+     */
+    public function searchResultSchema_init(Schema $schema) {
+        $types = $schema->getField('properties.type.enum');
+        $types[] = 'question';
+        $schema->setField('properties.type.enum', $types);
     }
 }

@@ -90,7 +90,7 @@ class HipChatPlugin extends Gdn_Plugin {
         }
 
         // Make sure we have a valid comment and that it's new.
-        if (val('CommentID', $args) && val('Insert', $args)) {
+        if (!val('CommentID', $args) || !val('Insert', $args)) {
             return;
         }
 
@@ -98,8 +98,12 @@ class HipChatPlugin extends Gdn_Plugin {
         $discussionModel = new DiscussionModel();
         $discussion = $discussionModel->getID($args['CommentData']['DiscussionID'], DATASET_TYPE_ARRAY);
 
+        // Get the comment data fresh so we don't get polluted info.
+        $commentModel = new CommentModel();
+        $comment = $commentModel->getID(val('CommentID', $args));
+
         // Prep HipChat message.
-        $author = Gdn::userModel()->getID(val('InsertUserID', $discussion));
+        $author = Gdn::userModel()->getID(val('InsertUserID', $comment));
         $message = sprintf(
             '%1$s commented on %2$s',
             userAnchor($author),
