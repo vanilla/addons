@@ -13,7 +13,7 @@ class BumpPlugin extends Gdn_Plugin {
         $discussion = $args['Discussion'];
         if (checkPermission('Garden.Moderation.Manage')) {
             $label = t('Bump');
-            $url = url("discussion/bump?discussionid={$discussion->DiscussionID}");
+            $url = url("discussion/bump?discussionid={$discussion->DiscussionID}", true);
             // Deal with inconsistencies in how options are passed
             if (isset($sender->Options)) {
                 $sender->Options .= wrap(anchor($label, $url, 'Bump'), 'li');
