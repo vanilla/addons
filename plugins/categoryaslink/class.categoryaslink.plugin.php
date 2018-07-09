@@ -122,9 +122,13 @@ if (!function_exists("categoryUrl")) {
             return safeURL(val('RedirectUrl', $category));
         }
 
-        // Build URL.
-        if (class_exists('SEOLinksPlugin')) {
-            // SEOLinks version
+        $categoryURL = '';
+        if (class_exists('SubcommunitiesPlugin')) {
+            // Subcommunities version.
+            $path = '/categories/'.rawurlencode(val('UrlCode', $category));
+            $categoryURL = SubcommunitiesPlugin::subcommunityURL(val('categoryID', $category), $path, $withDomain, $page);
+        } elseif (class_exists('SEOLinksPlugin')) {
+            // SEOLinks version.
             if (!isset($px)) {
                 $px = SEOLinksPlugin::Prefix();
             }
@@ -132,14 +136,15 @@ if (!function_exists("categoryUrl")) {
             if ($page && $page > 1) {
                 $result .= 'p' . $page . '/';
             }
+            $categoryURL = url($result, $withDomain);
         } else {
-            // Normal version
+            // Normal version.
             $result = '/categories/'.rawurlencode($category['UrlCode']);
             if ($page && $page > 1) {
                 $result .= '/p'.$page;
             }
+            $categoryURL = url($result, $withDomain);
         }
-
-        return url($result, $withDomain);
+        return $categoryURL;
     }
 }

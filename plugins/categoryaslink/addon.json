@@ -4,6 +4,7 @@
     "version": "1.0",
     "key": "categoryaslink",
     "type": "addon",
+    "priority": 1000,
     "authors": [
         {
             "name": "Patrick Kelly",
