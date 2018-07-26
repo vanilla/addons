@@ -449,12 +449,7 @@ class QnAPlugin extends Gdn_Plugin {
             Gdn::sql()->put('Comment', $CommentSet, ['CommentID' => $comment['CommentID']]);
 
             // Update the discussion.
-            if ($discussion['QnA'] != $qna && (!$discussion['QnA'] || in_array($discussion['QnA'], ['Unanswered', 'Answered', 'Rejected']))) {
-                Gdn::sql()->put(
-                    'Discussion',
-                    $discussionSet,
-                    ['DiscussionID' => $comment['DiscussionID']]);
-            }
+           $this->recalculateDiscussionQnA($discussion);
 
             // Determine QnA change
             if ($comment['QnA'] != $qna) {
