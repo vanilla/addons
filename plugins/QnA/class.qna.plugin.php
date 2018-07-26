@@ -553,31 +553,36 @@ class QnAPlugin extends Gdn_Plugin {
      *
      * @param array|object $discussion The discussion to recalculate.
      * @param bool $return Whether to return the result or update the discussion.
+     * @return array $set (optional based on the $return argument). Discussion QnA data.
      */
     public function recalculateDiscussionQnA($discussion, bool $return = false) {
-        // Find comments in this discussion with a QnA value.
         $set = [];
 
-        $row = Gdn::sql()->getWhere('Comment',
-            ['DiscussionID' => val('DiscussionID', $discussion), 'QnA is not null' => ''], 'QnA, DateAccepted', 'asc', 1)->firstRow(DATASET_TYPE_ARRAY);
+        // Look for at least one accepted answer/comment.
+        $acceptedComment = Gdn::sql()->getWhere('Comment',
+            ['DiscussionID' => val('DiscussionID', $discussion), 'QnA' => 'Accepted'], '', 'asc', 1)->firstRow(DATASET_TYPE_ARRAY);
 
-        if (!$row) {
-            if (val('CountComments', $discussion, 0) > 0) {
+        if ($acceptedComment) {
+            $set['QnA'] = 'Accepted';
+            $set['DateAccepted'] = $acceptedComment['DateAccepted'];
+            $set['DateOfAnswer'] = $acceptedComment['DateInserted'];
+        } else {
+            // Look for at least one untreated answer/comment.
+            $answeredCommment = Gdn::sql()->getWhere('Comment',
+                ['DiscussionID' => val('DiscussionID', $discussion), 'QnA is null' => ''], '', 'asc', 1)->firstRow(DATASET_TYPE_ARRAY);
+            if ($answeredCommment) {
                 $set['QnA'] = 'Answered';
+                $set['DateAccepted'] = null;
+                $set['DateOfAnswer'] = null;
+            } else if (val('CountComments', $discussion, 0) > 0) {
+                $set['QnA'] = 'Rejected';
+                $set['DateAccepted'] = null;
+                $set['DateOfAnswer'] = null;
             } else {
                 $set['QnA'] = 'Unanswered';
+                $set['DateAccepted'] = null;
+                $set['DateOfAnswer'] = null;
             }
-
-            $set['DateAccepted'] = null;
-            $set['DateOfAnswer'] = null;
-        } elseif ($row['QnA'] == 'Accepted') {
-            $set['QnA'] = 'Accepted';
-            $set['DateAccepted'] = $row['DateAccepted'];
-            $set['DateOfAnswer'] = $row['DateInserted'];
-        } elseif ($row['QnA'] == 'Rejected') {
-            $set['QnA'] = 'Rejected';
-            $set['DateAccepted'] = null;
-            $set['DateOfAnswer'] = null;
         }
 
         if ($return) {
