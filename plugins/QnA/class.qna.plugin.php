@@ -554,8 +554,9 @@ class QnAPlugin extends Gdn_Plugin {
         $set = [];
 
         // Look for at least one accepted answer/comment.
-        $acceptedComment = Gdn::sql()->getWhere('Comment',
-            ['DiscussionID' => val('DiscussionID', $discussion), 'QnA' => 'Accepted'], '', 'asc', 1)->firstRow(DATASET_TYPE_ARRAY);
+        $acceptedComment = Gdn::sql()->getWhere(
+            'Comment', ['DiscussionID' => val('DiscussionID', $discussion), 'QnA' => 'Accepted'], '', 'asc', 1
+        )->firstRow(DATASET_TYPE_ARRAY);
 
         if ($acceptedComment) {
             $set['QnA'] = 'Accepted';
@@ -563,16 +564,18 @@ class QnAPlugin extends Gdn_Plugin {
             $set['DateOfAnswer'] = $acceptedComment['DateInserted'];
         } else {
             // Look for at least one untreated answer/comment.
-            $answeredCommment = Gdn::sql()->getWhere('Comment',
-                ['DiscussionID' => val('DiscussionID', $discussion), 'QnA is null' => ''], '', 'asc', 1)->firstRow(DATASET_TYPE_ARRAY);
-            if ($answeredCommment) {
+            $answeredComment = Gdn::sql()->getWhere(
+                'Comment', ['DiscussionID' => val('DiscussionID', $discussion), 'QnA is null' => ''], '', 'asc', 1
+            )->firstRow(DATASET_TYPE_ARRAY);
+
+            $countComments = val('CountComments', $discussion, 0);
+
+            if ($answeredComment) {
                 $set['QnA'] = 'Answered';
                 $set['DateAccepted'] = null;
-                $set['DateOfAnswer'] = null;
-            } else if (val('CountComments', $discussion, 0) > 0) {
+            } else if ($countComments > 0) {
                 $set['QnA'] = 'Rejected';
                 $set['DateAccepted'] = null;
-                $set['DateOfAnswer'] = null;
             } else {
                 $set['QnA'] = 'Unanswered';
                 $set['DateAccepted'] = null;
