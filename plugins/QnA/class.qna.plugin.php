@@ -576,6 +576,7 @@ class QnAPlugin extends Gdn_Plugin {
             } else if ($countComments > 0) {
                 $set['QnA'] = 'Rejected';
                 $set['DateAccepted'] = null;
+                $set['DateOfAnswer'] = null;
             } else {
                 $set['QnA'] = 'Unanswered';
                 $set['DateAccepted'] = null;
