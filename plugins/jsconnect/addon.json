@@ -3,6 +3,7 @@
     "description": "Enables custom single sign-on solutions. They can be same-domain or cross-domain. See the <a href=\"http://docs.vanillaforums.com/help/sso/jsconnect/\">documentation</a> for details.",
     "version": "1.5.5",
     "mobileFriendly": true,
+    "license": "GNU GPL2",
     "settingsUrl": "/settings/jsconnect",
     "usePopupSettings": false,
     "settingsPermission": "Garden.Settings.Manage",
