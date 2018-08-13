@@ -163,7 +163,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         $this->setSignatureRules($sender);
 
         // Form submission handling.
-        if ($sender->Form->authenticatedPostBack()) {
+        if ($sender->Form->authenticatedPostBack(true)) {
             $values = $sender->Form->formValues();
 
             if ($canEditSignatures) {
