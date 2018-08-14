@@ -168,7 +168,7 @@ class SteamConnectPlugin extends Gdn_Plugin {
     /**
      * Get steam id
      *
-     * @param  array $openID
+     * @param object $openID
      * @return string|null
      */
     public function getSteamID($openID) {
