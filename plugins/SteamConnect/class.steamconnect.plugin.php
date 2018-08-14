@@ -51,8 +51,8 @@ class SteamConnectPlugin extends Gdn_Plugin {
     /**
      * Add Steam as an option to the normal signin page.
      *
-     * @param $sender
-     * @param $args
+     * @param EntryController $sender
+     * @param array $args
      */
     public function entryController_signIn_handler($sender, $args) {
         if (isset($sender->Data['Methods']) && $this->isConfig()) {
@@ -71,7 +71,7 @@ class SteamConnectPlugin extends Gdn_Plugin {
     /**
      * Add Steam-Connect button to MeModule
      *
-     * @param Gdn_Controller $sender
+     * @param MeModule $sender
      * @param array $args
      */
     public function base_signInIcons_handler($sender, $args) {
@@ -84,7 +84,7 @@ class SteamConnectPlugin extends Gdn_Plugin {
      * Inject a sign-in icon into the ME menu.
      *
      * @param Gdn_Controller $sender.
-     * @param Gdn_Controller $args.
+     * @param array $args.
      */
     public function base_beforeSignInButton_handler($sender, $args) {
         if ($this->isConfig()) {
@@ -104,7 +104,7 @@ class SteamConnectPlugin extends Gdn_Plugin {
     /**
      * Build-A-Button.
      *
-     * @return string
+     * @return string|null
      */
     private function _GetButton() {
         if ($this->isConfig()) {
@@ -116,7 +116,7 @@ class SteamConnectPlugin extends Gdn_Plugin {
     /**
      * Add Steam-Connect button to default mobile theme.
      *
-     * @param $sender
+     * @param DiscussionsController $sender
      */
     public function base_beforeSignInLink_handler($sender) {
         if (!Gdn::session()->isValid() && $this->isConfig()) {
@@ -127,8 +127,8 @@ class SteamConnectPlugin extends Gdn_Plugin {
     /**
      * Capture the user's UniqueID being sent back from provider and saving it to the session.
      *
-     * @param $sender
-     * @param $args
+     * @param OpenIDPlugin $sender
+     * @param array $args
      */
     public function openIDPlugin_afterConnectData_handler($sender, $args) {
         $form = $args['Form'];
@@ -168,8 +168,8 @@ class SteamConnectPlugin extends Gdn_Plugin {
     /**
      * Get steam id
      *
-     * @param $openID
-     * @return mixed
+     * @param  array $openID
+     * @return string|null
      */
     public function getSteamID($openID) {
         $ptn = "/^https?:\/\/steamcommunity\.com\/openid\/id\/(7[0-9]{15,25}+)$/";
