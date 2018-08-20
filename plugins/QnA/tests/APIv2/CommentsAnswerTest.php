@@ -211,4 +211,43 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
         $updatedQuestion = $this->getQuestion($question['discussionID']);
         $this->assertIsQuestion($updatedQuestion, ['status' => 'rejected']);
     }
+
+    /**
+     * Test rejecting an answer and then resubmitting an answer.
+     *
+     * @depends testPostAnswer
+     */
+    public function testResetRejectedQuestionStatus() {
+        $question = $this->createQuestion();
+        $answer = $this->testPostAnswer($question['discussionID']);
+
+        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
+            'status' => 'rejected',
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $updatedQuestion = $this->getQuestion($question['discussionID']);
+        $this->assertIsQuestion($updatedQuestion, ['status' => 'rejected']);
+
+        $answerAgain = $this->testPostAnswer($question['discussionID']);
+        $commentID = $answerAgain['commentID'];
+
+        $response = $this->api()->get("comments/{$commentID}");
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertIsAnswer($body, ['status' => 'pending']);
+
+        $answeredQuestion = $this->getQuestion($question['discussionID']);
+        $this->assertIsQuestion($answeredQuestion, ['status' => 'answered']);
+    }
+
+    /**
+     * Test that question created has a status of unanswered
+     *
+     * @depends testPostAnswer
+     */
+    public function testUnansweredQuestion() {
+        $question = $this->createQuestion();
+        $this->assertIsQuestion($question, ['status' => 'unanswered']);
+    }
 }
