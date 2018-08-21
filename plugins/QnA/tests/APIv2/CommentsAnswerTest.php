@@ -211,4 +211,80 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
         $updatedQuestion = $this->getQuestion($question['discussionID']);
         $this->assertIsQuestion($updatedQuestion, ['status' => 'rejected']);
     }
+
+    /**
+     * Test rejecting an answer and then resubmitting an answer.
+     *
+     * @depends testPostAnswer
+     */
+    public function testResetRejectedQuestionStatus() {
+        $question = $this->createQuestion();
+        $answer = $this->testPostAnswer($question['discussionID']);
+
+        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
+            'status' => 'rejected',
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $updatedQuestion = $this->getQuestion($question['discussionID']);
+        $this->assertIsQuestion($updatedQuestion, ['status' => 'rejected']);
+
+        $answerAgain = $this->testPostAnswer($question['discussionID']);
+        $commentID = $answerAgain['commentID'];
+
+        $response = $this->api()->get("comments/{$commentID}");
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertIsAnswer($body, ['status' => 'pending']);
+
+        $answeredQuestion = $this->getQuestion($question['discussionID']);
+        $this->assertIsQuestion($answeredQuestion, ['status' => 'answered']);
+    }
+
+    /**
+     * Test dateAccepted and dateAnswered correspond with the accepted answer.
+     *
+     * @depends testPostAnswer
+     */
+    public function testAnsweredQuestionDates() {
+
+        $question = $this->createQuestion();
+        $this->assertIsQuestion($question, ['dateAccepted' => null]);
+
+        $answer= $this->testPostAnswer($question['discussionID']);
+
+        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
+            'status' => 'accepted',
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $body = $response->getBody();
+        $date = new \DateTime($body['dateInserted']);
+
+        $answeredQuestion = $this->getQuestion($question['discussionID']);
+
+        $this->assertIsQuestion($answeredQuestion, ['dateAccepted' => $date]);
+        $this->assertIsQuestion($answeredQuestion, ['dateAnswered' => $date]);
+    }
+
+    /**
+     * Test dateAccepted and dateAnswered when answer is rejected.
+     */
+    public function testUnAnsweredQuestionDates() {
+
+        $question = $this->createQuestion();
+        $this->assertIsQuestion($question, ['dateAccepted' => null]);
+
+        $answerNumberOne = $this->testPostAnswer($question['discussionID']);
+
+        $response = $this->api()->patch('comments/answer/'.$answerNumberOne['commentID'], [
+            'status' => 'rejected',
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $unansweredQuestion = $this->getQuestion($question['discussionID']);
+
+        $this->assertIsQuestion($unansweredQuestion, ['dateAccepted' => null]);
+        $this->assertIsQuestion($unansweredQuestion, ['dateAnswered' => null]);
+    }
 }
