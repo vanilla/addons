@@ -75,6 +75,7 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
 
         $body = $response->getBody();
         $this->assertEquals('question', $body['type']);
+        $this->assertIsQuestion($body, ['status' => 'unanswered']);
 
         $this->assertTrue(is_int($body['discussionID']));
         $this->assertTrue($body['discussionID'] > 0);
@@ -110,4 +111,5 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
             $this->assertIsQuestion($question);
         }
     }
+
 }
