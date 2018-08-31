@@ -525,7 +525,7 @@ class QnAPlugin extends Gdn_Plugin {
                 $this->fireEvent('AfterAccepted');
             }
         }
-        redirectTo("/discussion/comment/{$comment['CommentID']}#Comment_{$comment['CommentID']}");
+        redirectTo("/discussion/comment/{$comment['CommentID']}#Comment_{$comment['CommentID']}", 302, false);
     }
 
     /**
