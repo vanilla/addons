@@ -207,13 +207,19 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @return array|mixed
      */
     public static function getProvider($client_id = null) {
+        $sqlCacheKey = 'getProvider:';
         if ($client_id !== null) {
+            $sqlCacheKey .= 'AuthenticationKey:'.$client_id;
             $where = ['AuthenticationKey' => $client_id];
         } else {
+            $sqlCacheKey .= 'AuthenticationSchemeAlias:jsconnect';
             $where = ['AuthenticationSchemeAlias' => 'jsconnect'];
         }
 
-        $result = Gdn::sql()->getWhere('UserAuthenticationProvider', $where)->resultArray();
+        $sql = Gdn::sql();
+        $sql->cache($sqlCacheKey, null, [Gdn_Cache::FEATURE_EXPIRY => 900]);
+        $result = $sql->getWhere('UserAuthenticationProvider', $where)->resultArray();
+
         foreach ($result as &$row) {
             $attributes = dbdecode($row['Attributes']);
             if (is_array($attributes)) {
