@@ -547,6 +547,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             $sender->setData('Title', t('Connecting...'));
             $sender->Form->Action = url('/entry/connect/jsconnect?'.http_build_query($get));
             $sender->Form->addHidden('JsConnect', '');
+
             if (!empty($target)) {
                 $sender->Form->addHidden('Target', safeURL($target));
             }
