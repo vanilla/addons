@@ -156,6 +156,7 @@ var GdnUploaders = null;
             jQuery('div.Attachments a.DeleteFile').popup({
                confirm: true,
                followConfirm: false,
+               doPost: true,
                deliveryType: 'VIEW',
                afterConfirm: function(json, sender) {
                   var MediaData = json.Delete;
@@ -568,8 +569,14 @@ var GdnUploaders = null;
                var DeleteAnchor = jQuery(FileListing.find('a.DeleteFile'));
                var DeleteHref = gdn.definition('WebRoot') + 'plugin/fileupload/delete/' + MediaID;
                $(document).on('click', DeleteAnchor.selector, function() {
-                  // Delete file
-                  jQuery.ajax({url: DeleteHref, type: 'GET'});
+                  // Delete file via POST.
+                  jQuery.ajax({
+                     url: DeleteHref,
+                     data: {
+                        'TransientKey': gdn.definition('TransientKey')
+                     },
+                     type: 'POST'
+                  });
                   // Remove image
                   jQuery(FileListing).remove();
                   // Stay here

@@ -102,6 +102,11 @@ class FileUploadPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function controller_delete($sender) {
+        // Block all non-POST, non-TK access.
+        if (!$sender->Form->authenticatedPostBack(true)) {
+            throw forbiddenException('GET');
+        }
+
         list($action, $mediaID) = $sender->RequestArgs;
         $sender->deliveryMethod(DELIVERY_METHOD_JSON);
         $sender->deliveryType(DELIVERY_TYPE_VIEW);
