@@ -304,7 +304,8 @@ class QnAPlugin extends Gdn_Plugin {
             ]
         ];
 
-        $activityModel->queue($activity, 'DiscussionComment');
+        $activityModel->queue($activity,'QuestionAnswered');
+        $activityModel->saveQueue();
     }
 
     /**
@@ -511,15 +512,14 @@ class QnAPlugin extends Gdn_Plugin {
                     'RecordType' => 'Comment',
                     'RecordID' => $comment['CommentID'],
                     'Route' => commentUrl($comment, '/'),
-                    'Emailed' => ActivityModel::SENT_PENDING,
-                    'Notified' => ActivityModel::SENT_PENDING,
                     'Data' => [
                         'Name' => val('Name', $discussion)
                     ]
                 ];
 
                 $ActivityModel = new ActivityModel();
-                $ActivityModel->save($activity);
+                $ActivityModel->queue($activity, 'AnswerAccepted');
+                $ActivityModel->saveQueue();
 
                 $this->EventArguments['Activity'] =& $activity;
                 $this->fireEvent('AfterAccepted');
@@ -1377,5 +1377,17 @@ class QnAPlugin extends Gdn_Plugin {
         $types = $schema->getField('properties.type.enum');
         $types[] = 'question';
         $schema->setField('properties.type.enum', $types);
+    }
+
+    /**
+     * Adds status notification options to profiles.
+     *
+     * @param ProfileController $sender
+     */
+    public function profileController_afterPreferencesDefined_handler($sender) {
+        $sender->Preferences['Notifications']['Email.AnswerAccepted'] = t( 'Notify me when people accept my answer');
+        $sender->Preferences['Notifications']['Popup.AnswerAccepted'] = t( 'Notify me when people accept my answer');
+        $sender->Preferences['Notifications']['Email.QuestionAnswered'] = t( 'Notify me when people answer my question');
+        $sender->Preferences['Notifications']['Popup.QuestionAnswered'] = t( 'Notify me when people answer my question');
     }
 }
