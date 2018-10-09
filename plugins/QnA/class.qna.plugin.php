@@ -1385,9 +1385,9 @@ class QnAPlugin extends Gdn_Plugin {
      * @param ProfileController $sender
      */
     public function profileController_afterPreferencesDefined_handler($sender) {
-        $sender->Preferences['Notifications']['Email.AnswerAccepted'] = t('Notify me when people accept my answer');
-        $sender->Preferences['Notifications']['Popup.AnswerAccepted'] = t('Notify me when people accept my answer');
-        $sender->Preferences['Notifications']['Email.QuestionAnswered'] = t('Notify me when people answer my question');
-        $sender->Preferences['Notifications']['Popup.QuestionAnswered'] = t('Notify me when people answer my question');
+        $sender->Preferences['Notifications']['Email.AnswerAccepted'] = t('Notify me when people accept my answer.');
+        $sender->Preferences['Notifications']['Popup.AnswerAccepted'] = t('Notify me when people accept my answer.');
+        $sender->Preferences['Notifications']['Email.QuestionAnswered'] = t('Notify me when people answer my question.');
+        $sender->Preferences['Notifications']['Popup.QuestionAnswered'] = t('Notify me when people answer my question.');
     }
 }
