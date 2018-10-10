@@ -17,7 +17,7 @@ class QnaModel extends Gdn_Model {
             case 'QnA':
                 $request = Gdn::request()->get();
                 $result = $this->recalculateDiscussionQnABatches($request['NumberOfBatchesDone'] ?? 0, $request['LatestID'] ?? 0);
-            break;
+                break;
         }
 
         return $result;
