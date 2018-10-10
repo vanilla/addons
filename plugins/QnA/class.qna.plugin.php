@@ -1378,4 +1378,11 @@ class QnAPlugin extends Gdn_Plugin {
         $types[] = 'question';
         $schema->setField('properties.type.enum', $types);
     }
+
+    public function dbaController_countJobs_handler($sender) {
+        $name = "Recalculate Discussion.QnA";
+        // We name the table QnA and not Discussion because the model is instantiated from the table name in DBAModel.
+        $url = "/dba/counts.json?".http_build_query(['table' => 'QnA', 'column' => 'QnA']);
+        $sender->Data['Jobs'][$name] = $url;
+    }
 }
