@@ -12,7 +12,7 @@ class QnaModel extends Gdn_Model {
     public function counts($column) {
         $result = ['Complete' => true];
 
-        switch($column) {
+        switch ($column) {
             // Discussion table, QnA column will be updated.
             case 'QnA':
                 $request = Gdn::request()->get();
@@ -105,13 +105,13 @@ class QnaModel extends Gdn_Model {
 
         $currentBatch = array_column($currentBatch, 'DiscussionID', 'DiscussionID');
 
-        $latestID = key(array_slice($currentBatch,-1,1,TRUE));
+        $latestID = key(array_slice($currentBatch, -1, 1, true));
 
         $this->recalculateDiscussionsQnA($currentBatch);
 
         $numberOfBatchesDone++;
 
-        if ($totalBatches == $numberOfBatchesDone) {
+        if ($totalBatches === $numberOfBatchesDone) {
             return ['Complete' => true];
         }
 
