@@ -1,10 +1,5 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
- */
-
-/**
  * Class QnaModel
  */
 class QnaModel extends Gdn_Model {
