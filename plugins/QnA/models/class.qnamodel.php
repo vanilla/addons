@@ -111,7 +111,7 @@ class QnaModel extends Gdn_Model {
 
         $numberOfBatchesDone++;
 
-        if ($totalBatches === $numberOfBatchesDone) {
+        if ($totalBatches == $numberOfBatchesDone) {
             return ['Complete' => true];
         }
 
