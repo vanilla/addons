@@ -1381,6 +1381,7 @@ class QnAPlugin extends Gdn_Plugin {
 
     /**
      * Add option to dba/counts to recalculate QnA state of discussions(questions).
+     * 
      * @param DBAController $sender
      */
     public function dbaController_countJobs_handler($sender) {
