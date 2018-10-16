@@ -1380,6 +1380,18 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add option to dba/counts to recalculate QnA state of discussions(questions).
+     * 
+     * @param DBAController $sender
+     */
+    public function dbaController_countJobs_handler($sender) {
+        $name = "Recalculate Discussion.QnA";
+        // We name the table QnA and not Discussion because the model is instantiated from the table name in DBAModel.
+        $url = "/dba/counts.json?" . http_build_query(['table' => 'QnA', 'column' => 'QnA']);
+        $sender->Data['Jobs'][$name] = $url;
+    }
+
+    /**
      * Adds status notification options to profiles.
      *
      * @param ProfileController $sender
