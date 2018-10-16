@@ -304,7 +304,8 @@ class QnAPlugin extends Gdn_Plugin {
             ]
         ];
 
-        $activityModel->queue($activity, 'DiscussionComment');
+        $activityModel->queue($activity, 'QuestionAnswered');
+        $activityModel->saveQueue();
     }
 
     /**
@@ -511,15 +512,14 @@ class QnAPlugin extends Gdn_Plugin {
                     'RecordType' => 'Comment',
                     'RecordID' => $comment['CommentID'],
                     'Route' => commentUrl($comment, '/'),
-                    'Emailed' => ActivityModel::SENT_PENDING,
-                    'Notified' => ActivityModel::SENT_PENDING,
                     'Data' => [
                         'Name' => val('Name', $discussion)
                     ]
                 ];
 
                 $ActivityModel = new ActivityModel();
-                $ActivityModel->save($activity);
+                $ActivityModel->queue($activity, 'AnswerAccepted');
+                $ActivityModel->saveQueue();
 
                 $this->EventArguments['Activity'] =& $activity;
                 $this->fireEvent('AfterAccepted');
@@ -1379,10 +1379,26 @@ class QnAPlugin extends Gdn_Plugin {
         $schema->setField('properties.type.enum', $types);
     }
 
+    /**
+     * Add option to dba/counts to recalculate QnA state of discussions(questions).
+     * @param DBAController $sender
+     */
     public function dbaController_countJobs_handler($sender) {
         $name = "Recalculate Discussion.QnA";
         // We name the table QnA and not Discussion because the model is instantiated from the table name in DBAModel.
-        $url = "/dba/counts.json?".http_build_query(['table' => 'QnA', 'column' => 'QnA']);
+        $url = "/dba/counts.json?" . http_build_query(['table' => 'QnA', 'column' => 'QnA']);
         $sender->Data['Jobs'][$name] = $url;
+    }
+
+    /**
+     * Adds status notification options to profiles.
+     *
+     * @param ProfileController $sender
+     */
+    public function profileController_afterPreferencesDefined_handler($sender) {
+        $sender->Preferences['Notifications']['Email.AnswerAccepted'] = t('Notify me when people accept my answer.');
+        $sender->Preferences['Notifications']['Popup.AnswerAccepted'] = t('Notify me when people accept my answer.');
+        $sender->Preferences['Notifications']['Email.QuestionAnswered'] = t('Notify me when people answer my question.');
+        $sender->Preferences['Notifications']['Popup.QuestionAnswered'] = t('Notify me when people answer my question.');
     }
 }
