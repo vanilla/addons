@@ -81,7 +81,6 @@ class QnaModel extends Gdn_Model {
     private function recalculateDiscussionQnABatches($numberOfBatchesDone, $latestID) {
         $perBatch = 1000;
 
-
         // Make sure we don't kill a database.
         $count = Gdn::sql()->getCount('Discussion', ['Type' => 'Question']);
         $threshold = c('Database.AlterTableThreshold', 250000);
