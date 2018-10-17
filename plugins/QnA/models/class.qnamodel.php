@@ -86,7 +86,7 @@ class QnaModel extends Gdn_Model {
         $count = Gdn::sql()->getCount('Discussion', ['Type' => 'Question']);
         $threshold = c('Database.AlterTableThreshold', 250000);
         if ($count > $threshold)  {
-            return ['Error' => 'Amount of questions is exceeding the database threshold of '.$threshold.'.'];
+            throw new Exception('Amount of questions is exceeding the database threshold of '.$threshold.'.');
         }
 
         // Get min and max discussionID for questions
