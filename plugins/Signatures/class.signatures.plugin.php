@@ -643,7 +643,7 @@ EOT;
                 ]);
             }
 
-            $userSignature = Gdn_Format::to($signature, $sigFormat)."<!-- $sigFormat -->";
+            $userSignature = Gdn_Format::to($signature, $sigFormat);
 
             // Restore original config.
             if (!$allowEmbeds) {
