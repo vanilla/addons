@@ -20,7 +20,7 @@ class HomepageCanonicalPlugin extends Gdn_Plugin {
         $requestURI = Gdn::request()->getRequestArguments('server')['REQUEST_URI'];
         $defaultController = Gdn::router()->getDestination('DefaultController');
         if ((strpos($requestURI,'?') === false) && preg_match('/\/'.$defaultController.'\/?$/i',$requestURI)) {
-            safeHeader('Location: '.url('/', true), true, '301');
+            redirectTo(url('/', true), '301', true);
         }
     }
 
@@ -35,7 +35,7 @@ class HomepageCanonicalPlugin extends Gdn_Plugin {
         // Use $SERVER['REQUEST_URI'], and not request()->path() because we alter path;
         $requestURI = Gdn::request()->getRequestArguments('server')['REQUEST_URI'];
         if ($requestURI === '/') {
-            // We are setting a new canonical tag so we have to, on this page load, stop the system from setting a conflicting canonical tag.
+            // We are setting a new canonical tag so on this page load we have to stop the system from setting a conflicting canonical tag.
             saveToConfig('Garden.Modules.NoCanonicalUrl', true, false);
             $sender->Head->addTag('link', ['rel' => 'canonical', 'href' => url('/', true)], null, false);
         }
