@@ -89,6 +89,12 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function structure() {
         include __DIR__.'/structure.php';
+        touchConfig([
+            'Preferences.Email.AnswerAccepted' => 1,
+            'Preferences.Popup.AnswerAccepted' => 1,
+            'Preferences.Email.QuestionAnswered' => 1,
+            'Preferences.Popup.QuestionAnswered' => 1
+        ]);
     }
 
     /**
