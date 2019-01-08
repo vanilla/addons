@@ -85,6 +85,7 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
         safeHeader('Content-Type: application/javascript; charset=utf-8', true);
         echo "{$request['callback']}($json)";
     } else {
+        safeHeader('Content-Type: application/json; charset=utf-8', true);
         echo $json;
     }
 }
