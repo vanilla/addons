@@ -67,9 +67,9 @@ class QnAPlugin extends Gdn_Plugin {
     public function setup() {
         $this->structure();
 
-        touchConfig('QnA.Points.Enabled', false);
-        touchConfig('QnA.Points.Answer', 1);
-        touchConfig('QnA.Points.AcceptedAnswer', 1);
+        \Gdn::config()->touch('QnA.Points.Enabled', false);
+        \Gdn::config()->touch('QnA.Points.Answer', 1);
+        \Gdn::config()->touch('QnA.Points.AcceptedAnswer', 1);
     }
 
     /**
@@ -89,7 +89,7 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function structure() {
         include __DIR__.'/structure.php';
-        touchConfig([
+        \Gdn::config()->touch([
             'Preferences.Email.AnswerAccepted' => 1,
             'Preferences.Popup.AnswerAccepted' => 1,
             'Preferences.Email.QuestionAnswered' => 1,
@@ -1387,7 +1387,7 @@ class QnAPlugin extends Gdn_Plugin {
 
     /**
      * Add option to dba/counts to recalculate QnA state of discussions(questions).
-     * 
+     *
      * @param DBAController $sender
      */
     public function dbaController_countJobs_handler($sender) {
