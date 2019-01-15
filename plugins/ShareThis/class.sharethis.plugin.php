@@ -9,85 +9,78 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class ShareThisPlugin extends Gdn_Plugin {
-   /**
-    * Show buttons after OP message body.
-    */
-	public function discussionController_afterDiscussionBody_handler($sender) {
-      $publisherNumber = c('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
-      $viaHandle = c('Plugin.ShareThis.ViaHandle', '');
-      $copyNShare = c('Plugin.ShareThis.CopyNShare', false);
+    /**
+     * Discussion Body
+     *
+     * Show buttons after OP message body.
+     * @param $sender
+     */
+    public function discussionController_afterDiscussionBody_handler($sender) {
 
-      $doNotHash = $copyNShare ? 'false' : 'true';
-      $doNotCopy = $copyNShare ? 'false' : 'true';
-      $domain = Gdn::request()->scheme() == 'https' ? 'https://ws.sharethis.com' : 'http://w.sharethis.com';
-
-      echo <<<SHARETHIS
-      <script type="text/javascript">var switchTo5x=true;</script>
-      <script type="text/javascript" src="{$domain}/button/buttons.js"></script>
-      <script type="text/javascript">stLight.options({
-         publisher: "{$publisherNumber}",
-         doNotHash: {$doNotHash},
-         doNotCopy: {$doNotCopy},
-         hashAddressBar: false
-      });</script>
-      <div class="ShareThisButtonWrapper Right">
-         <span class="st_twitter_hcount ShareThisButton" st_via="{$viaHandle}" displayText="Tweet"></span>
-         <span class="st_facebook_hcount ShareThisButton" displayText="Facebook"></span>
-         <span class="st_linkedin_hcount ShareThisButton Hidden" displayText="LinkedIn"></span>
-         <span class="st_googleplus_hcount ShareThisButton Hidden" displayText="Google +"></span>
-         <span class="st_reddit_hcount ShareThisButton Hidden" displayText="Reddit"></span>
-         <span class="st_pinterest_hcount ShareThisButton Hidden" displayText="Pinterest"></span>
-         <span class="st_email_hcount ShareThisButton" displayText="Email"></span>
-         <span class="st_sharethis_hcountShareThisButton" displayText="ShareThis"></span>
-      </div>
+        echo <<<SHARETHIS
+    <div class="sharethis-inline-share-buttons"></div>
 SHARETHIS;
+    }
 
-   }
 
-   public function setup() {
-      // Nothing to do here!
-   }
-   
-   /**
-    * Settings page.
-    */
-   public function pluginController_shareThis_create($sender) {
-   	$sender->permission('Garden.Settings.Manage');
-   	$sender->title('ShareThis');
-      $sender->addSideMenu('plugin/sharethis');
-      $sender->Form = new Gdn_Form();
+    public function setup() {
+        // Nothing to do here!
+    }
 
-      $publisherNumber = c('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
-      $viaHandle = c('Plugin.ShareThis.ViaHandle', '');
-      $copyNShare = c('Plugin.ShareThis.CopyNShare', false);
+    /**
+     * Settings page.
+     *
+     * @param $sender
+     */
+    public function pluginController_shareThis_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
+        $sender->title('ShareThis');
+        $sender->addSideMenu('plugin/sharethis');
+        $sender->Form = new Gdn_Form();
 
-      $validation = new Gdn_Validation();
-      $configurationModel = new Gdn_ConfigurationModel($validation);
-      $configArray = ['Plugin.ShareThis.PublisherNumber','Plugin.ShareThis.ViaHandle', 'Plugin.ShareThis.CopyNShare'];
-      if ($sender->Form->authenticatedPostBack() === FALSE) {
-         $configArray['Plugin.ShareThis.PublisherNumber'] = $publisherNumber;
-         $configArray['Plugin.ShareThis.ViaHandle'] = $viaHandle;
-         $configArray['Plugin.ShareThis.CopyNShare'] = $copyNShare;
-      }
+        $publisherNumber = c('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
+        $viaHandle = c('Plugin.ShareThis.ViaHandle', '');
+        $copyNShare = c('Plugin.ShareThis.CopyNShare', false);
 
-      $configurationModel->setField($configArray);
-      $sender->Form->setModel($configurationModel);
-      // If seeing the form for the first time...
-      if ($sender->Form->authenticatedPostBack() === FALSE) {
-         // Apply the config settings to the form.
-         $sender->Form->setData($configurationModel->Data);
-      } else {
-         // Define some validation rules for the fields being saved
-         $configurationModel->Validation->applyRule('Plugin.ShareThis.PublisherNumber', 'Required');
-         if ($sender->Form->save() !== FALSE)
-            $sender->informMessage(t("Your changes have been saved."));
-      }
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configArray = ['Plugin.ShareThis.PublisherNumber', 'Plugin.ShareThis.ViaHandle', 'Plugin.ShareThis.CopyNShare'];
+        if ($sender->Form->authenticatedPostBack() === false) {
+            $configArray['Plugin.ShareThis.PublisherNumber'] = $publisherNumber;
+            $configArray['Plugin.ShareThis.ViaHandle'] = $viaHandle;
+            $configArray['Plugin.ShareThis.CopyNShare'] = $copyNShare;
+        }
 
-      $sender->render('sharethis', '', 'plugins/ShareThis');
-   }
+        $configurationModel->setField($configArray);
+        $sender->Form->setModel($configurationModel);
+        // If seeing the form for the first time...
+        if ($sender->Form->authenticatedPostBack() === false) {
+            // Apply the config settings to the form.
+            $sender->Form->setData($configurationModel->Data);
+        } else {
+            // Define some validation rules for the fields being saved
+            $configurationModel->Validation->applyRule('Plugin.ShareThis.PublisherNumber', 'Required');
+            if ($sender->Form->save() !== false) {
+                $sender->informMessage(t("Your changes have been saved."));
+            }
+        }
 
+        $sender->render('sharethis', '', 'plugins/ShareThis');
+    }
+
+    /**
+     * Discussion Render Before
+     *
+     * @param $sender DiscussionController
+     */
     public function discussionController_render_before($sender) {
         $sender->addCssFile('ShareThis.css', 'plugins/ShareThis');
+        $sender->Head->addScript(
+            '//platform-api.sharethis.com/js/sharethis.js#property=5c3bb6075533a5001139a061&product=inline-share-buttons',
+            'text/javascript',
+            false,
+            ['async' => 'aysnc']
+        );
     }
 }
 
