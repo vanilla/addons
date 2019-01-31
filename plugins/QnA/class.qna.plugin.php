@@ -1034,12 +1034,6 @@ class QnAPlugin extends Gdn_Plugin {
         if (preg_match('`^(vanilla/)?discussion[^s]`i', $path)) {
             return;
         }
-
-        // Check to see if the user has answered questions.
-        $count = Gdn::sql()->getCount('Discussion', ['Type' => 'Question', 'InsertUserID' => Gdn::session()->UserID, 'QnA' => 'Answered']);
-        if ($count > 0) {
-            $sender->informMessage(formatString(t("You've asked questions that have now been answered", "<a href=\"{/discussions/mine?qna=Answered,url}\">You've asked questions that now have answers</a>. Make sure you accept/reject the answers.")), 'Dismissable');
-        }
     }
 
     /**
