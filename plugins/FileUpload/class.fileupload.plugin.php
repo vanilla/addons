@@ -425,6 +425,11 @@ class FileUploadPlugin extends Gdn_Plugin {
 
         $attachedFilesData = Gdn::request()->getValue('AttachedUploads');
         $allFilesData = Gdn::request()->getValue('AllUploads');
+        $allowUploads = $this->allowUpload($args, $attachedFilesData, $allFilesData);
+
+        if ($allowUploads === false) {
+            $allFilesData = $attachedFilesData = false;
+        }
 
         $this->attachAllFiles($attachedFilesData, $allFilesData, $commentID, 'comment');
     }
@@ -447,11 +452,56 @@ class FileUploadPlugin extends Gdn_Plugin {
 
         $attachedFilesData = Gdn::request()->getValue('AttachedUploads');
         $allFilesData = Gdn::request()->getValue('AllUploads');
+        // Check if the user can upload to a category & if the attached files belongs to the user.
+        $allowUploads = $this->allowUpload($args, $attachedFilesData, $allFilesData);
+
+        if ($allowUploads === false) {
+            $allFilesData = $attachedFilesData = false;
+        }
+
         $this->EventArguments['AllFilesData'] = $allFilesData;
         $this->EventArguments['CategoryID'] = $args['Discussion']->CategoryID;
         $this->fireEvent("InsertDiscussionMedia");
 
         $this->attachAllFiles($attachedFilesData, $allFilesData, $discussionID, 'discussion');
+    }
+
+    /**
+     * Check if a user is allowed to upload a file in a category.
+     *
+     * @param array $args
+     * @param array|bool $attachedData
+     * @param array|bool $allData
+     * @return bool
+     */
+    public function allowUpload($args, $attachedData, $allData) {
+        $allowUploads = true;
+
+        if (($attachedData && $allData) === false) {
+            return !$allowUploads;
+
+        } else {
+            foreach($allData as $value) {
+                $countMedia = Gdn::SQL()
+                    ->select('*')
+                    ->from('Media')
+                    ->where('InsertUserID', Gdn::session()->UserID)
+                    ->where('MediaID', $value)
+                    ->get()->NumRows();
+            }
+
+            if ($countMedia === 0) {
+                return !$allowUploads;
+            }
+        }
+
+        $categoryID = $args['Discussion']->CategoryID;
+        $category = CategoryModel::categories($categoryID);
+
+        if ($category && $category['AllowFileUploads'] !== 1 && $attachedData && $allData) {
+            return !$allowUploads;
+        }
+        return $allowUploads;
     }
 
     /**
@@ -745,7 +795,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             // Validate the file upload now.
             $FileErr  = $FileData['error'];
             $FileType = $FileData['type'];
-            $FileName = $FileData['name'];
+            $FileName = htmlspecialchars($FileData['name']);
             $FileTemp = $FileData['tmp_name'];
             $FileSize = $FileData['size'];
             $FileKey  = ($Sender->ApcKey ? $Sender->ApcKey : '');
