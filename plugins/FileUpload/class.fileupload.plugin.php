@@ -427,7 +427,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         $allFilesData = Gdn::request()->getValue('AllUploads');
         $allowUploads = $this->allowUpload($args, $attachedFilesData, $allFilesData);
 
-        if($allowUploads === false) {
+        if ($allowUploads === false) {
             $allFilesData = $attachedFilesData = false;
         }
 
@@ -455,7 +455,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         // Check if the user can upload to a category & if the attached files belongs to the user.
         $allowUploads = $this->allowUpload($args, $attachedFilesData, $allFilesData);
 
-        if($allowUploads === false) {
+        if ($allowUploads === false) {
             $allFilesData = $attachedFilesData = false;
         }
 
@@ -467,6 +467,8 @@ class FileUploadPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Check if a user is allowed to upload a file in a category.
+     *
      * @param array $args
      * @param array|bool $attachedData
      * @param array|bool $allData
@@ -481,11 +483,11 @@ class FileUploadPlugin extends Gdn_Plugin {
         } else {
             foreach($allData as $value) {
                 $countMedia = Gdn::SQL()
-                    ->Select('*')
-                    ->From('Media')
-                    ->Where('InsertUserID', Gdn::session()->UserID)
-                    ->Where('MediaID', $value)
-                    ->Get()->NumRows();
+                    ->select('*')
+                    ->from('Media')
+                    ->where('InsertUserID', Gdn::session()->UserID)
+                    ->where('MediaID', $value)
+                    ->get()->NumRows();
             }
 
             if ($countMedia === 0) {
@@ -496,7 +498,7 @@ class FileUploadPlugin extends Gdn_Plugin {
         $categoryID = $args['Discussion']->CategoryID;
         $category = CategoryModel::categories($categoryID);
 
-        if ($category && $category['AllowFileUploads'] !==1 && $attachedData && $allData) {
+        if ($category && $category['AllowFileUploads'] !== 1 && $attachedData && $allData) {
             return !$allowUploads;
         }
         return $allowUploads;
@@ -793,7 +795,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             // Validate the file upload now.
             $FileErr  = $FileData['error'];
             $FileType = $FileData['type'];
-            $FileName = htmlspecialchars(FileData['name']);
+            $FileName = htmlspecialchars($FileData['name']);
             $FileTemp = $FileData['tmp_name'];
             $FileSize = $FileData['size'];
             $FileKey  = ($Sender->ApcKey ? $Sender->ApcKey : '');
