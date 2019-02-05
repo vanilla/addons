@@ -9,7 +9,7 @@ echo $this->Form->errors();
 <div class="P">
     <?php
     echo '<i>'.t('Did this answer the question?').'</i>';
-    echo $this->Form->getFormValue('QnA');
+    echo htmlspecialchars($this->Form->getFormValue('QnA'));
     echo $this->Form->radioList('QnA', $this->data('_QnAs'), ['list' => true]);
     ?>
 </div>

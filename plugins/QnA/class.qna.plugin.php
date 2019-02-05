@@ -627,7 +627,7 @@ class QnAPlugin extends Gdn_Plugin {
 
         $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
 
-        if ($sender->Form->authenticatedPostBack()) {
+        if ($sender->Form->authenticatedPostBack(true)) {
             $newQnA = $sender->Form->getFormValue('QnA');
             if (!$newQnA) {
                 $newQnA = null;
