@@ -431,7 +431,7 @@ class IgnorePlugin extends Gdn_Plugin {
                      $sender->jsonTarget('a.IgnoreButton', t('Unignore'), 'Text');
                      $this->addIgnore(Gdn::session()->UserID, $userID);
                      $sender->informMessage(
-                        '<span class="InformSprite Contrast"></span>'.sprintf(t("%s is now on ignore."), $user->Name),
+                        '<span class="InformSprite Contrast"></span>'.sprintf(t("%s is now on ignore."), htmlspecialchars($user->Name)),
                         'AutoDismiss HasSprite'
                      );
                   }
@@ -444,7 +444,7 @@ class IgnorePlugin extends Gdn_Plugin {
                      $sender->jsonTarget('a.IgnoreButton', t('Ignore'), 'Text');
                      $this->removeIgnore(Gdn::session()->UserID, $userID);
                      $sender->informMessage(
-                        '<span class="InformSprite Brightness"></span>'.sprintf(t("%s is no longer on ignore."), $user->Name),
+                        '<span class="InformSprite Brightness"></span>'.sprintf(t("%s is no longer on ignore."), htmlspecialchars($user->Name)),
                         'AutoDismiss HasSprite'
                      );
                      $sender->setRedirectTo('/profile/ignore');
