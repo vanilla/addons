@@ -11,6 +11,7 @@
     "icon": "debugger.png",
     "key": "debugbar",
     "type": "addon",
+    "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Todd Burry",

@@ -1,12 +1,13 @@
 {
     "name": "Author Selector",
     "description": "Allows administrators to change the author of a discussion.",
-    "version": "1.2.1",
+    "version": "1.3",
     "mobileFriendly": true,
     "license": "GNU GPLv2",
     "icon": "author_selector.png",
     "key": "authorselector",
     "type": "addon",
+    "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Lincoln Russell",
@@ -15,6 +16,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.4"
+        "vanilla": ">=2.5"
     }
 }

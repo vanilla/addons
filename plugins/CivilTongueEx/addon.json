@@ -1,13 +1,14 @@
 {
     "name": "Civil Tongue Ex",
     "description": "A swear word filter for your forum. Making your forum safer for younger audiences.",
-    "version": "1.1",
+    "version": "1.2",
     "mobileFriendly": true,
     "settingsUrl": "/plugin/tongue",
     "settingsPermission": "Garden.Settings.Manage",
     "icon": "civil-tongue.png",
     "key": "civiltongueex",
     "type": "addon",
+    "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Todd Burry",

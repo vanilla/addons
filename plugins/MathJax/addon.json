@@ -4,6 +4,7 @@
     "mobileFriendly": true,
     "key": "mathjax",
     "type": "addon",
+    "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Tim Gunter",

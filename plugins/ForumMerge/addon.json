@@ -1,9 +1,10 @@
 {
     "name": "Forum Merge",
     "description": "Merge another Vanilla 2 forum into this one.",
-    "version": "1.1",
+    "version": "1.2",
     "key": "forummerge",
     "type": "addon",
+    "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Lincoln Russell",

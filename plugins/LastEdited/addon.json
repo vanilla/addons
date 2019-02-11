@@ -1,13 +1,14 @@
 {
     "name": "Last Edited",
     "description": "Appends \"Post edited by [User] at [Time]\" to the end of edited posts and links to change log.",
-    "version": "1.2",
+    "version": "1.3",
     "mobileFriendly": true,
     "hasLocale": true,
     "registerPermissions": false,
     "icon": "last-edited.png",
     "key": "lastedited",
     "type": "addon",
+    "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Tim Gunter",
