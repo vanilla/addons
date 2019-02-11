@@ -331,7 +331,7 @@ class IgnorePlugin extends Gdn_Plugin {
       foreach ($recipients as $recipientID) {
          if ($this->ignored($userID, $recipientID)) {
             $user = Gdn::userModel()->getID($recipientID, DATASET_TYPE_ARRAY);
-            $sender->Form->addError(sprintf(t("Unable to create conversation, %s is ignoring you."), $user['Name']));
+            $sender->Form->addError(sprintf(t("Unable to create conversation, %s is ignoring you."), htmlspecialchars($user['Name'])));
          }
       }
    }
@@ -354,7 +354,7 @@ class IgnorePlugin extends Gdn_Plugin {
       $userID = Gdn::session()->UserID;
       foreach ($recipients as $recipientID => $recipient) {
          if ($this->ignored($userID, $recipientID)) {
-            $sender->Form->addError(sprintf(t('Unable to send message, %s is ignoring you.'), $user['Name']));
+            $sender->Form->addError(sprintf(t('Unable to send message, %s is ignoring you.'), htmlspecialchars($userID['Name'])));
          }
       }
 
