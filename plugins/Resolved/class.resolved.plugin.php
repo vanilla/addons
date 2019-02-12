@@ -130,6 +130,13 @@ class ResolvedPlugin extends Gdn_Plugin {
         $discussionID = $sender->Request->get('discussionid');
         $resolve = $sender->Request->get('resolve');
 
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $discussion = new DiscussionModel();
+            $discussion = $discussion->getID($discussionID);
+            if ($discussion && $discussion->InsertUserID !== GDN::session()->UserID) {
+                throw new Exception(t('You do not have a permission to resolve that discussion.'));
+            }
+        }
         // Make sure we are posting back.
         if (!$sender->Request->isPostBack()) {
             throw permissionException('Javascript');
