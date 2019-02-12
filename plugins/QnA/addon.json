@@ -1,12 +1,13 @@
 {
     "name": "Q&A",
     "description": "Users may designate a discussion as a Question and then officially accept one or more of the comments as the answer.",
-    "version": "1.3.3",
+    "version": "1.4",
     "mobileFriendly": true,
     "settingsUrl": "/settings/qna",
     "icon": "qna.png",
     "key": "qna",
     "type": "addon",
+    "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Todd Burry",

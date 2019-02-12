@@ -1,6 +1,7 @@
 {
+    "name": "Ignore",
     "description": "This plugin allows users to ignore others, filtering their comments out of discussions.",
-    "version": "1.4.0",
+    "version": "1.5",
     "requiredTheme": false,
     "mobileFriendly": true,
     "hasLocale": false,
@@ -9,6 +10,7 @@
     "icon": "ignore.png",
     "key": "ignore",
     "type": "addon",
+    "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Tim Gunter",
@@ -17,6 +19,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1"
+        "vanilla": ">=2.5"
     }
 }

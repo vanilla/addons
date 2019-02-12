@@ -1,20 +1,21 @@
 {
     "name": "Role Titles",
     "description": "Lists users' roles under their name and adds role-specific CSS classes to their comments for theming.",
-    "version": "1.0",
+    "version": "1.1",
     "mobileFriendly": true,
     "registerPermissions": false,
     "icon": "role_titles.png",
     "key": "roletitle",
     "type": "addon",
+    "license": "GPL-2.0-only",
     "authors": [
         {
-            "name": "Matt Lincoln Russell",
+            "name": "Lincoln Russell",
             "email": "lincolnwebs@gmail.com",
             "homepage": "http://lincolnwebs.com"
         }
     ],
     "require": {
-        "vanilla": ">=2.0.18"
+        "vanilla": ">=2.5"
     }
 }
