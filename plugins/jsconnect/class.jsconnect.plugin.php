@@ -201,6 +201,21 @@ class JsConnectPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Generate cache key for get provider info sql query
+     *
+     * @param int|null $client_id
+     * @return string
+     */
+    public static function getProviderSqlCacheKey(?int $client_id) {
+        $key = 'getProvider:';
+        if ($client_id !== null) {
+            $key .= 'AuthenticationKey:'.$client_id;
+        } else {
+            $key .= 'AuthenticationSchemeAlias:jsconnect';
+        }
+        return $key;
+    }
+    /**
      *
      *
      * @param null $client_id
@@ -213,7 +228,11 @@ class JsConnectPlugin extends Gdn_Plugin {
             $where = ['AuthenticationSchemeAlias' => 'jsconnect'];
         }
 
-        $result = Gdn::sql()->getWhere('UserAuthenticationProvider', $where)->resultArray();
+        $sql = Gdn::sql();
+        $sqlCacheKey = self::getProviderSqlCacheKey($client_id);
+        $sql->cache($sqlCacheKey, null, [Gdn_Cache::FEATURE_EXPIRY => 900]);
+        $result = $sql->getWhere('UserAuthenticationProvider', $where)->resultArray();
+
         foreach ($result as &$row) {
             $attributes = dbdecode($row['Attributes']);
             if (is_array($attributes)) {
@@ -671,6 +690,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         $sender->addJsFile('jsconnect-settings.js', 'plugins/jsconnect');
 
         $client_id = $sender->Request->get('client_id');
+
         Gdn::locale()->setTranslation('AuthenticationKey', 'Client ID');
         Gdn::locale()->setTranslation('AssociationSecret', 'Secret');
         Gdn::locale()->setTranslation('AuthenticateUrl', 'Authentication Url');
@@ -696,6 +716,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $form->setFormValue('AuthenticationSchemeAlias', 'jsconnect');
 
                 if ($form->save(['ID' => $client_id])) {
+                    Gdn::cache()->remove(self::getProviderSqlCacheKey($client_id));
                     $sender->setRedirectTo('/settings/jsconnect');
                 }
             }
