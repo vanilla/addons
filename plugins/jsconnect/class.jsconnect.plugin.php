@@ -690,8 +690,6 @@ class JsConnectPlugin extends Gdn_Plugin {
 
         $client_id = $sender->Request->get('client_id');
 
-        Gdn::cache()->remove(self::getProviderSqlCacheKey($client_id));
-
         Gdn::locale()->setTranslation('AuthenticationKey', 'Client ID');
         Gdn::locale()->setTranslation('AssociationSecret', 'Secret');
         Gdn::locale()->setTranslation('AuthenticateUrl', 'Authentication Url');
@@ -717,6 +715,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $form->setFormValue('AuthenticationSchemeAlias', 'jsconnect');
 
                 if ($form->save(['ID' => $client_id])) {
+                    Gdn::cache()->remove(self::getProviderSqlCacheKey($client_id));
                     $sender->setRedirectTo('/settings/jsconnect');
                 }
             }
