@@ -224,7 +224,7 @@ class QnAPlugin extends Gdn_Plugin {
 
         $qnA = valr('Comment.QnA', $args);
 
-        if ($qnA && ($qnA == 'Accepted' || Gdn::session()->checkPermission('Garden.Moderation.Manage'))) {
+        if ($qnA && ($qnA == 'Accepted' || Gdn::session()->checkRankedPermission('Garden.Curation.Manage'))) {
             $title = t("QnA $qnA Answer", "$qnA Answer");
             echo ' <span class="Tag QnA-Box QnA-'.$qnA.'" title="'.htmlspecialchars($title).'"><span>'.$title.'</span></span> ';
         }
@@ -363,7 +363,7 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         // Check permissions.
-        $canAccept = Gdn::session()->checkPermission('Garden.Moderation.Manage');
+        $canAccept = Gdn::session()->checkRankedPermission('Garden.Curation.Manage');
         $canAccept |= Gdn::session()->UserID == val('InsertUserID', $discussion);
 
         if (!$canAccept) {
@@ -422,8 +422,8 @@ class QnAPlugin extends Gdn_Plugin {
         $discussion = Gdn::sql()->getWhere('Discussion', ['DiscussionID' => $comment['DiscussionID']])->firstRow(DATASET_TYPE_ARRAY);
 
         // Check for permission.
-        if (!(Gdn::session()->UserID == val('InsertUserID', $discussion) || Gdn::session()->checkPermission('Garden.Moderation.Manage'))) {
-            throw permissionException('Garden.Moderation.Manage');
+        if (!(Gdn::session()->UserID == val('InsertUserID', $discussion) || Gdn::session()->checkRankedPermission('Garden.Curation.Manage'))) {
+            throw permissionException('Garden.Curation.Manage');
         }
         if (!Gdn::session()->validateTransientKey($sender->Request->get('tkey'))) {
             throw permissionException();
