@@ -236,6 +236,9 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      * @param $sender
      */
     public function controller_DeleteFeed($sender) {
+        if (!$sender->Form->authenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
         $feedKey = val(1, $sender->RequestArgs, null);
         if (!is_null($feedKey) && $this->haveFeed($feedKey)) {
             $feed = $this->getFeed($feedKey, true);
