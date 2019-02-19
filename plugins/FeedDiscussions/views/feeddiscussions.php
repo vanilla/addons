@@ -88,14 +88,14 @@
                 </thead>
                 <tbody>
                 <?php
-                echo $this->Form->open([
-                    'action' => url('plugin/feeddiscussions/deletefeed/'.FeedDiscussionsPlugin::encodeFeedKey($FeedURL))
-                ]);
                 foreach ($this->data('Feeds') as $FeedURL => $FeedItem) {
                     $LastUpdate = $FeedItem['LastImport'];
                     $CategoryID = $FeedItem['Category'];
                     $Frequency = getValue($FeedItem['Refresh'], $Refreshments, t('Unknown'));
                     $Category = $this->data("Categories.{$CategoryID}.Name", 'Root');
+                    echo $this->Form->open([
+                        'action' => url('plugin/feeddiscussions/deletefeed/'.FeedDiscussionsPlugin::encodeFeedKey($FeedURL))
+                    ]);
                     ?>
                     <tr>
                         <td class="FeedItemURL"><?php echo anchor($FeedURL, $FeedURL); ?></td>
