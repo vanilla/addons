@@ -88,6 +88,9 @@
                 </thead>
                 <tbody>
                 <?php
+                echo $this->Form->open([
+                    'action' => url('plugin/feeddiscussions/deletefeed/'.FeedDiscussionsPlugin::encodeFeedKey($FeedURL))
+                ]);
                 foreach ($this->data('Feeds') as $FeedURL => $FeedItem) {
                     $LastUpdate = $FeedItem['LastImport'];
                     $CategoryID = $FeedItem['Category'];
@@ -99,9 +102,7 @@
                         <td><?php echo $LastUpdate; ?></td>
                         <td><?php echo $Frequency; ?></td>
                         <td><?php echo $Category; ?></td>
-                        <td class="DeleteFeed">
-                            <?php echo anchor(dashboardSymbol('delete'), '/plugin/feeddiscussions/deletefeed/'.FeedDiscussionsPlugin::encodeFeedKey($FeedURL), 'btn btn-icon', ['aria-label' => t('Delete this Feed')]); ?>
-                        </td>
+                        <td class="DeleteFeed"><?php echo $this->Form->Close('Delete'); ?></td>
                     </tr>
                 <?php } ?>
                 </tbody>
