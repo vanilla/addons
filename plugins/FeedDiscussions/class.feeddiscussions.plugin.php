@@ -160,7 +160,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      * @param $sender
      */
     public function controller_AddFeed($sender) {
-
+        $sender->permission('Garden.Settings.Manage');
         $categories = CategoryModel::categories();
         $sender->setData('Categories', $categories);
 
