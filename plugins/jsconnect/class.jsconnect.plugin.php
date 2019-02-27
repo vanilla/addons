@@ -206,7 +206,7 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @param int|null $client_id
      * @return string
      */
-    public static function getProviderSqlCacheKey(?int $client_id) {
+    public static function getProviderSqlCacheKey($client_id) {
         $key = 'getProvider:';
         if ($client_id !== null) {
             $key .= 'AuthenticationKey:'.$client_id;
