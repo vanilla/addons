@@ -112,7 +112,7 @@ class IgnorePlugin extends Gdn_Plugin {
 
       $sender->setData('ForceEditing', ($userID == Gdn::session()->UserID) ? FALSE : $sender->User->Name);
 
-      if ($sender->Form->isMyPostBack()) {
+      if ($sender->Form->authenticatedPostBack()) {
          $ignoreUsername = $sender->Form->getFormValue('AddIgnore');
          try {
             $addIgnoreUser = Gdn::userModel()->getByUsername($ignoreUsername);
