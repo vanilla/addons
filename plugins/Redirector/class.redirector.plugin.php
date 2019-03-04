@@ -249,7 +249,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             trace("Looking up comment {$Vars['CommentID']}.");
             $CommentModel = new CommentModel();
             // If a legacy slug is provided (assigned during a merge), attempt to lookup the comment using it
-            if (isset($Get['legacy']) && Gdn::structure()->table('Comment')->columnExists('ForeignID') && $Filename !== 't5') {
+            if (isset($Get['legacy']) && Gdn::structure()->table('Comment')->columnExists('ForeignID')) {
                 $Comment = $CommentModel->getWhere(['ForeignID' => $Vars['CommentID']])->firstRow();
 
             } else {
@@ -273,7 +273,7 @@ class RedirectorPlugin extends Gdn_Plugin {
 
             if (is_numeric($DiscussionID)) {
                 // If a legacy slug is provided (assigned during a merge), attempt to lookup the discussion using it
-                if (isset($Get['legacy']) && Gdn::structure()->table('Discussion')->columnExists('ForeignID')) {
+                if (isset($Get['legacy']) && Gdn::structure()->table('Discussion')->columnExists('ForeignID') && $Filename !== 't5') {
                     $Discussion = $DiscussionModel->getWhere(['ForeignID' => $DiscussionID])->firstRow();
                 } else {
                     $Discussion = $DiscussionModel->getID($Vars['DiscussionID']);
