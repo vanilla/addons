@@ -249,7 +249,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             trace("Looking up comment {$Vars['CommentID']}.");
             $CommentModel = new CommentModel();
             // If a legacy slug is provided (assigned during a merge), attempt to lookup the comment using it
-            if (isset($Get['legacy']) && Gdn::structure()->table('Comment')->columnExists('ForeignID')) {
+            if (isset($Get['legacy']) && Gdn::structure()->table('Comment')->columnExists('ForeignID') && $Filename !== 't5') {
                 $Comment = $CommentModel->getWhere(['ForeignID' => $Vars['CommentID']])->firstRow();
 
             } else {
@@ -399,6 +399,10 @@ class RedirectorPlugin extends Gdn_Plugin {
         } elseif (val('_arg2', $get) == 'm-p') { // Message => Comment
             $result = [
                 '_arg3' => 'CommentID',
+            ];
+        } elseif (val('_arg2', $get) == 'ta-p') { // Thread = Discussion
+            $result = [
+                '_arg3' => 'DiscussionID',
             ];
         } elseif (val('_arg2', $get) == 'td-p') { // Thread = Discussion
             $result = [
