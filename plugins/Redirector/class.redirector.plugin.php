@@ -273,7 +273,7 @@ class RedirectorPlugin extends Gdn_Plugin {
 
             if (is_numeric($DiscussionID)) {
                 // If a legacy slug is provided (assigned during a merge), attempt to lookup the discussion using it
-                if (isset($Get['legacy']) && Gdn::structure()->table('Discussion')->columnExists('ForeignID')) {
+                if (isset($Get['legacy']) && Gdn::structure()->table('Discussion')->columnExists('ForeignID') && $Filename !== 't5') {
                     $Discussion = $DiscussionModel->getWhere(['ForeignID' => $DiscussionID])->firstRow();
                 } else {
                     $Discussion = $DiscussionModel->getID($Vars['DiscussionID']);
@@ -399,6 +399,10 @@ class RedirectorPlugin extends Gdn_Plugin {
         } elseif (val('_arg2', $get) == 'm-p') { // Message => Comment
             $result = [
                 '_arg3' => 'CommentID',
+            ];
+        } elseif (val('_arg2', $get) == 'ta-p') { // Thread = Discussion
+            $result = [
+                '_arg3' => 'DiscussionID',
             ];
         } elseif (val('_arg2', $get) == 'td-p') { // Thread = Discussion
             $result = [
