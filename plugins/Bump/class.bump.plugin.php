@@ -16,12 +16,12 @@ class BumpPlugin extends Gdn_Plugin {
             $url = url("discussion/bump?discussionid={$discussion->DiscussionID}", true);
             // Deal with inconsistencies in how options are passed
             if (isset($sender->Options)) {
-                $sender->Options .= wrap(anchor($label, $url, 'Bump'), 'li');
+                $sender->Options .= wrap(anchor($label, $url, 'Bump Hijack'), 'li');
             } else {
                 $args['DiscussionOptions']['Bump'] = [
                     'Label' => $label,
                     'Url' => $url,
-                    'Class' => 'Bump'
+                    'Class' => 'Bump Hijack'
                 ];
             }
         }
@@ -37,16 +37,17 @@ class BumpPlugin extends Gdn_Plugin {
      */
     public function discussionController_bump_create($sender, $args) {
         $sender->permission('Garden.Moderation.Manage');
-
-        // Get discussion
-        $discussionID = $sender->Request->get('discussionid');
-        $discussion = $sender->DiscussionModel->getID($discussionID);
-        if (!$discussion) {
-            throw notFoundException('Discussion');
+        if ($sender->Form->authenticatedPostBack()) {
+            // Get discussion
+            $discussionID = $sender->Request->get('discussionid');
+            $discussion = $sender->DiscussionModel->getID($discussionID);
+            if (!$discussion) {
+                throw notFoundException('Discussion');
+            }
+            // Update DateLastComment & redirect
+            $sender->DiscussionModel->setProperty($discussionID, 'DateLastComment', Gdn_Format::toDateTime());
+            $sender->jsonTarget('', '', 'Refresh');
+            $sender->render('Blank', 'Utility', 'Dashboard');
         }
-
-        // Update DateLastComment & redirect
-        $sender->DiscussionModel->setProperty($discussionID, 'DateLastComment', Gdn_Format::toDateTime());
-        redirectTo(discussionUrl($discussion));
     }
 }

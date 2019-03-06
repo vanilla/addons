@@ -160,7 +160,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      * @param $sender
      */
     public function controller_AddFeed($sender) {
-
+        $sender->permission('Garden.Settings.Manage');
         $categories = CategoryModel::categories();
         $sender->setData('Categories', $categories);
 
@@ -236,6 +236,9 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      * @param $sender
      */
     public function controller_DeleteFeed($sender) {
+        if (!$sender->Form->authenticatedPostBack()) {
+            throw new Exception('Requires POST', 405);
+        }
         $feedKey = val(1, $sender->RequestArgs, null);
         if (!is_null($feedKey) && $this->haveFeed($feedKey)) {
             $feed = $this->getFeed($feedKey, true);

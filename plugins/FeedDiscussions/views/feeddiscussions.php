@@ -93,15 +93,16 @@
                     $CategoryID = $FeedItem['Category'];
                     $Frequency = getValue($FeedItem['Refresh'], $Refreshments, t('Unknown'));
                     $Category = $this->data("Categories.{$CategoryID}.Name", 'Root');
+                    echo $this->Form->open([
+                        'action' => url('plugin/feeddiscussions/deletefeed/'.FeedDiscussionsPlugin::encodeFeedKey($FeedURL))
+                    ]);
                     ?>
                     <tr>
                         <td class="FeedItemURL"><?php echo anchor($FeedURL, $FeedURL); ?></td>
                         <td><?php echo $LastUpdate; ?></td>
                         <td><?php echo $Frequency; ?></td>
                         <td><?php echo $Category; ?></td>
-                        <td class="DeleteFeed">
-                            <?php echo anchor(dashboardSymbol('delete'), '/plugin/feeddiscussions/deletefeed/'.FeedDiscussionsPlugin::encodeFeedKey($FeedURL), 'btn btn-icon', ['aria-label' => t('Delete this Feed')]); ?>
-                        </td>
+                        <td class="DeleteFeed"><?php echo $this->Form->Close('Delete'); ?></td>
                     </tr>
                 <?php } ?>
                 </tbody>
