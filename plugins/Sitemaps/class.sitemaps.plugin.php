@@ -10,6 +10,15 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class SitemapsPlugin extends Gdn_Plugin {
+    /**
+     * @var \Garden\EventManager
+     */
+    private $eventManager;
+
+    public function __construct(\Garden\EventManager $eventManager) {
+        parent::__construct();
+        $this->eventManager = $eventManager;
+    }
 
     /// Methods ///
 
@@ -100,6 +109,17 @@ class SitemapsPlugin extends Gdn_Plugin {
         $sender->deliveryMethod(DELIVERY_METHOD_XHTML);
         $sender->deliveryType(DELIVERY_TYPE_VIEW);
         $sender->setHeader('Content-Type', 'text/plain');
+
+        $robots = new \Vanilla\Sitemaps\Robots();
+        $robots->addSitemap('/sitemapindex.xml');
+        $robots->addRule(c('Sitemap.Robots.Rules', 'User-agent: *
+Disallow: /entry/
+Disallow: /messages/
+Disallow: /profile/comments/
+Disallow: /profile/discussions/
+Disallow: /search/'));
+        $sender->setData('robots', $robots);
+        $this->eventManager->fire('robots_init', $robots);
 
         $sender->render('Robots', '', 'plugins/Sitemaps');
     }

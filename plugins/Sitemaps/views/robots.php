@@ -1,13 +1,13 @@
 <?php if (!defined('APPLICATION')) { exit; }
 
-echo 'Sitemap: '.url('/sitemapindex.xml', true)."\n";
+/* @var \Vanilla\Sitemaps\Robots $robots */
+$robots = $this->data('robots');
 
-// TODO: Make this a settings page
-$Default = 'User-agent: *
-Disallow: /entry/
-Disallow: /messages/
-Disallow: /profile/comments/
-Disallow: /profile/discussions/
-Disallow: /search/';
+foreach ($robots->getSitemaps() as $sitemap) {
+    echo 'Sitemap: '.url($sitemap, true)."\n";
+}
 
-echo c('Sitemap.Robots.Rules', $Default);
+foreach ($robots->getRules() as $rule) {
+    echo $rule."\n";
+}
+
