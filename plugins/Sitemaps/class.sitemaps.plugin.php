@@ -110,7 +110,7 @@ class SitemapsPlugin extends Gdn_Plugin {
         $sender->deliveryType(DELIVERY_TYPE_VIEW);
         $sender->setHeader('Content-Type', 'text/plain');
 
-        $robots = new \Vanilla\Sitemap\Robots();
+        $robots = new \Vanilla\Web\Robots();
         $robots->addSitemap('/sitemapindex.xml');
         $robots->addRule(c('Sitemap.Robots.Rules', 'User-agent: *
 Disallow: /entry/
