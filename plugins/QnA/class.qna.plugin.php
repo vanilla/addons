@@ -1189,6 +1189,20 @@ class QnAPlugin extends Gdn_Plugin {
             ],
             'dateAccepted:dt|n' => 'When an answer was accepted.',
             'dateAnswered:dt|n' => 'When the last answer was inserted.',
+            "acceptedAnswers" => [
+                "object" => "Accepted answers.",
+                "type" => "array",
+                "items" => Schema::parse([
+                    "commentID" => [
+                        "type" => "integer",
+                        "description" => "Unique ID of the accepted answer's comment row."
+                    ],
+                    "body?" => [
+                        "type" => "string",
+                        "description" => "Rendered content of the answer."
+                    ],
+                ]),
+            ]
         ]);
     }
 
@@ -1203,6 +1217,18 @@ class QnAPlugin extends Gdn_Plugin {
                 'question?' => $this->fullQuestionMetaDataSchema(),
             ]),
         ]));
+    }
+
+    /**
+     * Update the schema when getting a specific discussion from the API.
+     *
+     * @param Schema $schema
+     */
+    public function discussionGetSchema_init(Schema $schema) {
+        // Add expanding a discussion's accepted answer content.
+        $expand = $schema->getField("properties.expand.items.enum");
+        $expand[] = "acceptedAnswers";
+        $schema->setField("properties.expand.items.enum", $expand);
     }
 
     /**
@@ -1222,10 +1248,27 @@ class QnAPlugin extends Gdn_Plugin {
             return $discussion;
         }
 
+        $expandAnswers = $discussionsApiController->isExpandField("acceptedAnswers", $options["expand"] ?? []);
+        $acceptedAnswers = [];
+        $acceptedAnswerRows = $this->commentModel->getWhere([
+            "DiscussionID" => $discussion["discussionID"],
+            "Qna" => "Accepted"
+        ])->resultArray();
+        foreach ($acceptedAnswerRows as $comment) {
+            $answer = [
+                "commentID" => $comment["CommentID"],
+            ];
+            if ($expandAnswers) {
+                $answer["body"] = Gdn_Format::to($comment["Body"], $comment["Format"]);
+            }
+            $acceptedAnswers[] = $answer;
+        }
+
         $discussion['attributes']['question'] = [
             'status' => strtolower($discussion['qnA']),
             'dateAccepted' => $discussion['dateAccepted'],
             'dateAnswered' => $discussion['dateOfAnswer'],
+            "acceptedAnswers" => $acceptedAnswers,
         ];
 
         return $discussion;
