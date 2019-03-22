@@ -112,4 +112,39 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
         }
     }
 
+    /**
+     * Verify accepted answer comment IDs are returned in a discussion response.
+     */
+    public function testAcceptedAnswersInDiscussion() {
+        // Create the question.
+        $question = $this->testGetQuestion();
+
+        // Create a few answers.
+        $answers = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $answers[] = $this->api()->post("comments", [
+                "body" => "Hello world.",
+                "discussionID" => $question["discussionID"],
+                "format" => "Markdown",
+            ])->getBody();
+        }
+
+        // FLag the first two answers as accepted.
+        $this->api()->patch("comments/answer/".$answers[0]["commentID"], ["status" => "accepted"]);
+        $this->api()->patch("comments/answer/".$answers[1]["commentID"], ["status" => "accepted"]);
+
+        $discussion = $this->api()->get("discussions/".$question['discussionID'])->getBody();
+
+        // Verify we have accepted answers.
+        $this->assertArrayHasKey("acceptedAnswers", $discussion["attributes"]["question"], "No accepted answers.");
+        $acceptedAnswers = $discussion["attributes"]["question"]["acceptedAnswers"];
+
+        // Verify we have exactly two accepted answers.
+        $this->assertEquals(2, count($acceptedAnswers), "Unexpected number of answers.");
+
+        // Verify we have the correct two answers.
+        $commentIDs = array_column($acceptedAnswers, "commentID");
+        $this->assertContains($answers[0]["commentID"], $commentIDs);
+        $this->assertContains($answers[1]["commentID"], $commentIDs);
+    }
 }
