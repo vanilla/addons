@@ -4,11 +4,24 @@
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license GPLv2
  */
+use Garden\Container\Container;
+use Garden\Container\Reference;
 
 class ParticipatedPlugin extends Gdn_Plugin {
 
     /** @var int|null  */
     protected $countParticipated = null;
+
+    /**
+     * Handle the container init event to register things with the container.
+     *
+     * @param Container $dic
+     */
+    public function container_init(Container $dic) {
+        $dic->rule(\Vanilla\Menu\CounterModel::class)
+            ->addCall('addProvider', [new Reference(\Vanilla\Participated\ParticipatedCounterProvider::class)])
+        ;
+    }
 
     /**
      * Get the current user's total participated discussions.
