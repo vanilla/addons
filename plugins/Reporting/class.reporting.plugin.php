@@ -97,6 +97,12 @@ class ReportingPlugin extends Gdn_Plugin {
       $reportElementModel = new $reportElementModelName();
       $reportElement = $reportElementModel->getID($elementID);
 
+      $hasPermission = CategoryModel::checkPermission($reportElement->CategoryID, 'Vanilla.Discussion.View');
+
+      if (!$hasPermission) {
+          throw permissionException("Vanilla.Discussion.View");
+      }
+
       $elementTitle = Gdn_Format::text(getValue('Name', $reportElement, NULL), FALSE);
       $elementExcerpt = Gdn_Format::text(getValue('Body', $reportElement, NULL), FALSE);
       if (!is_null($elementExcerpt)) {
