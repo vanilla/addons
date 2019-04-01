@@ -1,0 +1,19 @@
+{
+    "name": "Vanilla Scheduler",
+    "description": "This addon provides a Queue Scheduler with an implementation for Local Jobs",
+    "version": "1.0",
+    "icon": "scheduler.svg",
+    "hidden": true,
+    "key": "scheduler",
+    "type": "addon",
+    "require": {
+        "vanilla": ">=2.8"
+    },
+    "authors": [
+        {
+            "name": "Eduardo Garcia Julia",
+            "email": "eduardo.garciajulia@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

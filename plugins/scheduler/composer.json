@@ -1,0 +1,40 @@
+{
+    "name": "vanilla/scheduler",
+    "type": "vanilla-plugin",
+    "description": "Vanilla Scheduler",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eduardo Garcia Julia",
+            "email": "eduardo.garciajulia@vanillaforums.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/vanilla/vanilla"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "composer/installers": "~1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~6.0",
+        "vanilla/standards": "~1.3",
+        "vanilla/vanilla": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vanilla\\Scheduler\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "files": [
+            "class.scheduler.plugin.php"
+        ],
+        "psr-4": {
+            "Vanilla\\Scheduler\\Test\\": "tests/src"
+        }
+    }
+}
