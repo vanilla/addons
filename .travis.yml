@@ -18,7 +18,7 @@ jobs:
     - composer self-update
     - composer install --optimize-autoloader
     script:
-    - ./vendor/bin/phpunit --exclude-group=large
+    - "./vendor/bin/phpunit --exclude-group=large"
     yarn: true
   - name: JS Build & Test
     language: node_js
@@ -34,18 +34,17 @@ install:
 - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3
 - export PATH=$HOME/.yarn/bin:$PATH
 - phpenv config-rm xdebug.ini
-- ./travis/install.sh
+- "./travis/install.sh"
 - cd vanilla
 - yarn install --pure-lockfile
 cache:
   directories:
-  - $HOME/.composer/cache/files
-  - $TRAVIS_BUILD_DIR/vanilla/node_modules
-  - $TRAVIS_BUILD_DIR/vanilla/plugins/rich-editor/node_modules
+  - "$HOME/.composer/cache/files"
+  - "$TRAVIS_BUILD_DIR/vanilla/node_modules"
+  - "$TRAVIS_BUILD_DIR/vanilla/plugins/rich-editor/node_modules"
   yarn: true
-
 env:
 - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
 notifications:
   slack:
-    secure: S3KKpVrRhd0F/GsM1CyDT89meuYZeaU0eLhkFeE7LEAB1IXs+KwM4cOgW/kOdTt1Dszl8lEyq6ieSKcVYGAq8Nf5y1iX0vJ3ddypQ1khEMnUACifSbtS4A/6g8MNjguCPmpBah6U97PvWRwYt+ei19BN+QHNMYU5Jp79lIOZw2Y=
+    secure: PAmKfct35n4zELmENda1WxTniRqlaVuO8pqrEbSdiAonjh0M16kW5l99nQgTrMV/LzQFPniCyOaZ93X/897G2KnB1rMOVKB6XY4HBlXzaOSUh8qKj4PYGX6NIsBRQ/SbgIt1NSdsV0lMiUwL3MNFpm/Q3YZ3mZyTKsBXZGXY/fc=
