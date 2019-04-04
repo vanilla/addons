@@ -47,4 +47,4 @@ env:
 - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
 notifications:
   slack:
-    secure: YYlyi4RfI4ky8NRUgPzPEwVn4GE6uVNe9KohoQGgPJQ+TN6hDGJoWKrVqcMBiG+oe/FyIMFMZGCVoIYuDEQjd5Z8lzNLjSSpg2xoVs6qFmUGt72dtNw8eUiammlQDvlCqk0KSt8iD/jmnA/wVpwD2uz+77yUAQJpgEmofKQ1F4I=
+    secure: cV4ARCwdHlZ0CrUw0AH4Pde00L6dW/OCPwl58SQpZk8mfo2hTkeLf0ZmJ89pmTouJMV3Yt3GjQLxuD1Jo/FVC5Qn/O6z38bX95CU9JuhSUcsMhbwGpveFShz3frtPbTyCEgOnRpEHfg71CVRIn4Qkvrj4kWaJbsT7O0axJBSOAw=
