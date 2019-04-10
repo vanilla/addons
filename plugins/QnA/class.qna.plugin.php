@@ -1116,6 +1116,9 @@ class QnAPlugin extends Gdn_Plugin {
         $sender->View = PATH_PLUGINS.'/QnA/views/post.php';
         $sender->setData('Type', 'Question');
         $sender->discussion($categoryUrlCode);
+        if (!$sender->Request->isAuthenticatedPostBack()) {
+            throw forbiddenException('GET');
+        }
     }
 
     /**
