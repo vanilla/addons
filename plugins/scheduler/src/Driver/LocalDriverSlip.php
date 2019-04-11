@@ -19,10 +19,10 @@ class LocalDriverSlip implements DriverSlipInterface {
     /** @var string */
     protected $id;
 
-    /** @var \Vanilla\Scheduler\Job\JobExecutionStatus */
+    /** @var JobExecutionStatus */
     protected $status;
 
-    /** @var \Vanilla\Scheduler\Job\LocalJobInterface */
+    /** @var LocalJobInterface */
     protected $job;
 
     /** @var string */
@@ -51,7 +51,7 @@ class LocalDriverSlip implements DriverSlipInterface {
     /**
      * Get status
      *
-     * @return \Vanilla\Scheduler\Job\JobExecutionStatus
+     * @return JobExecutionStatus
      */
     public function getStatus(): JobExecutionStatus {
         return $this->status;
@@ -60,7 +60,7 @@ class LocalDriverSlip implements DriverSlipInterface {
     /**
      * Execute
      *
-     * @return \Vanilla\Scheduler\Job\JobExecutionStatus
+     * @return JobExecutionStatus
      */
     public function execute(): JobExecutionStatus {
         $this->status = JobExecutionStatus::progress();

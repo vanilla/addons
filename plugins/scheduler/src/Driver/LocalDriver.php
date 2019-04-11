@@ -69,7 +69,7 @@ class LocalDriver implements DriverInterface {
             throw new \Exception($missingInterfaceMsg);
         }
 
-        /* @var $driverSlip \Vanilla\Scheduler\Driver\LocalDriverSlip */
+        /* @var $driverSlip LocalDriverSlip */
         try {
             return $driverSlip->execute();
         } catch (\Throwable $t) {

@@ -27,9 +27,9 @@ interface DriverInterface {
     /**
      * Execute a Driver job
      *
-     * @param \Vanilla\Scheduler\Driver\DriverSlipInterface $driverSlip
+     * @param DriverSlipInterface $driverSlip
      *
-     * @return \Vanilla\Scheduler\Job\JobExecutionStatus
+     * @return JobExecutionStatus
      */
     public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus;
 }

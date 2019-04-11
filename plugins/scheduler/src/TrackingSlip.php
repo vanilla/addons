@@ -51,7 +51,7 @@ class TrackingSlip implements TrackingSlipInterface {
     /**
      * Get Status
      *
-     * @return \Vanilla\Scheduler\Job\JobExecutionStatus
+     * @return JobExecutionStatus
      */
     public function getStatus(): JobExecutionStatus {
         return $this->driverSlip->getStatus();
@@ -60,7 +60,7 @@ class TrackingSlip implements TrackingSlipInterface {
     /**
      * Get Driver Slip
      *
-     * @return \Vanilla\Scheduler\Driver\DriverSlipInterface
+     * @return DriverSlipInterface
      */
     public function getDriverSlip(): DriverSlipInterface {
         return $this->driverSlip;

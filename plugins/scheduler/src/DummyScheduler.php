@@ -11,6 +11,7 @@ use Interop\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Scheduler\Driver\DriverInterface;
 use Vanilla\Scheduler\Job\JobInterface;
+use Garden\Container\Container;
 
 /**
  * DummyScheduler
@@ -23,27 +24,27 @@ use Vanilla\Scheduler\Job\JobInterface;
  */
 class DummyScheduler implements SchedulerInterface {
     /**
-     * @var \Vanilla\Scheduler\TrackingSlip[]
+     * @var TrackingSlip[]
      */
     protected $trackingSlips = [];
 
     /**
-     * @var \Garden\Container\Container
+     * @var Container
      */
     protected $container;
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var LoggerInterface
      */
     protected $logger;
 
     /**
-     * @var \Vanilla\Scheduler\Driver\DriverInterface[]
+     * @var DriverInterface[]
      */
     protected $drivers = [];
 
     /**
-     * @var \Garden\EventManager
+     * @var EventManager
      */
     protected $eventManager = null;
 

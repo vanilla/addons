@@ -19,7 +19,7 @@ interface DriverSlipInterface extends TrackingSlipInterface {
     /**
      * Execute
      *
-     * @return \Vanilla\Scheduler\Job\JobExecutionStatus
+     * @return JobExecutionStatus
      */
     public function execute(): JobExecutionStatus;
 
