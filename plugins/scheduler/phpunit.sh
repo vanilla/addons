@@ -1,10 +1,7 @@
 #!/bin/bash
 
-echo "Deleting previous './tests/_coverage'"
-rm -rf ./tests/_coverage
-
-echo "Deleting previous 'tests/_testdox.html'"
-rm -f ./tests/_testdox.html
+echo "Deleting previous './tests.result'"
+rm -rf ./tests.result
 
 echo "Running 'composer dump-autoload -o'"
 composer dump-autoload -o

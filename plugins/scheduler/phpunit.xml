@@ -10,8 +10,7 @@
     </testsuites>
 
     <logging>
-        <log type="coverage-html" target="tests.result/coverage" lowUpperBound="75" highLowerBound="95"/>
-        <log type="testdox-html" target="tests.result/testdox.html"/>
+        <log type="coverage-html" target="tests.result" lowUpperBound="75" highLowerBound="95"/>
     </logging>
 
     <filter>
