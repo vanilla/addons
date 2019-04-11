@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 final class PluginTest extends \PHPUnit\Framework\TestCase {
 
-    public function testContainerInitHandler() {
+    public function test_ContainerInitHandler_Expect_Pass() {
         /** @var $container \Garden\Container\Container */
         $container = new Garden\Container\Container();
 

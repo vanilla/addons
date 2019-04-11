@@ -13,35 +13,7 @@ declare(strict_types=1);
  */
 final class LocalDriverTest extends \PHPUnit\Framework\TestCase {
 
-    protected function getNewContainer() {
-        $container = new \Garden\Container\Container();
-        $container
-            ->setInstance(\Interop\Container\ContainerInterface::class, $container)
-            //
-            ->rule(\Psr\Log\LoggerInterface::class)
-            ->setClass(\Vanilla\Logger::class)
-            ->setShared(true)
-        ;
-
-        return $container;
-    }
-
-    protected function getNewLocalDriver() {
-        $container = new \Garden\Container\Container();
-        $container
-            ->setInstance(\Interop\Container\ContainerInterface::class, $container)
-            //
-            ->rule(\Psr\Log\LoggerInterface::class)
-            ->setClass(\Vanilla\Logger::class)
-            ->setShared(true)
-        ;
-
-        $localDriver = $container->get(\Vanilla\Scheduler\Driver\LocalDriver::class);
-
-        return $localDriver;
-    }
-
-    public function testReceiveExpectPass() {
+    public function test_Receive_Expect_Pass() {
         /* @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 
@@ -55,7 +27,7 @@ final class LocalDriverTest extends \PHPUnit\Framework\TestCase {
         $this->assertNotNull($driverSlip);
     }
 
-    public function testReceiveExpectException() {
+    public function test_Receive_Expect_Exception() {
         /* @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 
@@ -71,7 +43,7 @@ final class LocalDriverTest extends \PHPUnit\Framework\TestCase {
         $localDriver->receive($nonDroveJob);
     }
 
-    public function testExecuteExpectException() {
+    public function test_Execute_Expect_Exception() {
         /* @var $container \Garden\Container\Container */
         $container = $this->getNewContainer();
 
@@ -87,4 +59,39 @@ final class LocalDriverTest extends \PHPUnit\Framework\TestCase {
         $localDriver->execute($nonCompliantDriverSlip);
     }
 
+    /**
+     * @return \Garden\Container\Container
+     */
+    protected function getNewContainer() {
+        $container = new \Garden\Container\Container();
+        $container
+            ->setInstance(\Interop\Container\ContainerInterface::class, $container)
+            //
+            ->rule(\Psr\Log\LoggerInterface::class)
+            ->setClass(\Vanilla\Logger::class)
+            ->setShared(true)
+        ;
+
+        return $container;
+    }
+
+    /**
+     * @return mixed
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    protected function getNewLocalDriver() {
+        $container = new \Garden\Container\Container();
+        $container
+            ->setInstance(\Interop\Container\ContainerInterface::class, $container)
+            //
+            ->rule(\Psr\Log\LoggerInterface::class)
+            ->setClass(\Vanilla\Logger::class)
+            ->setShared(true)
+        ;
+
+        $localDriver = $container->get(\Vanilla\Scheduler\Driver\LocalDriver::class);
+
+        return $localDriver;
+    }
 }

@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 final class BootstrapTest extends \PHPUnit\Framework\TestCase {
 
-    public function testSchedulerInjectionWithMissingRuleExpectNotFoundException() {
+    public function test_SchedulerInjection_WithMissingRule_Expect_NotFoundException() {
 
         $container = new Garden\Container\Container();
 
@@ -25,7 +25,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
         $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
     }
 
-    public function testSchedulerInjectionWithMissingDependenciesExpectMissingArgumentException() {
+    public function test_SchedulerInjection_WithMissingDependencies_Expect_MissingArgumentException() {
 
         $container = (new Garden\Container\Container())
             ->rule(\Vanilla\Scheduler\SchedulerInterface::class)
@@ -41,7 +41,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
         $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
     }
 
-    public function testSchedulerInjectionWithMissingLoggerExpectMissingArgumentException() {
+    public function test_SchedulerInjection_WithMissingLogger_Expect_MissingArgumentException() {
         $container = new Garden\Container\Container();
         $container
             ->setInstance(\Interop\Container\ContainerInterface::class, $container)
@@ -62,7 +62,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
         $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
     }
 
-    public function testSchedulerInjectionWithMissingEventManagerExpectPass() {
+    public function test_SchedulerInjection_WithMissingEventManager_Expect_Pass() {
         // This test will pass always because EventManager is a concrete class nor an interface
         // Container will inject a new class instance in case the class is not previously ruled inside the container
         // The only condition for this test to fail is if vanilla/vanilla is not composed-in
@@ -88,7 +88,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
      */
-    public function testSchedulerInjectionExpectPass() {
+    public function test_SchedulerInjection_Expect_Pass() {
         $container = new Garden\Container\Container();
         $container
             ->setInstance(\Interop\Container\ContainerInterface::class, $container)
@@ -114,33 +114,33 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * @depends testSchedulerInjectionExpectPass
+     * @depends test_SchedulerInjection_Expect_Pass
      *
      * @param \Vanilla\Scheduler\SchedulerInterface $dummyScheduler
      */
-    public function testSetDriverExpectPass(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
+    public function test_SetDriver_Expect_Pass(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
 
         $bool = $dummyScheduler->addDriver(\Vanilla\Scheduler\Job\LocalJobInterface::class, \Vanilla\Scheduler\Driver\LocalDriver::class);
         $this->assertTrue($bool);
     }
 
     /**
-     * @depends testSchedulerInjectionExpectPass
+     * @depends test_SchedulerInjection_Expect_Pass
      *
      * @param \Vanilla\Scheduler\SchedulerInterface $dummyScheduler
      */
-    public function testSetDispatchEventNameExpectPass(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
+    public function test_SetDispatchEventName_Expect_Pass(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
 
         $bool = $dummyScheduler->setDispatchEventName('dispatchEvent');
         $this->assertTrue($bool);
     }
 
     /**
-     * @depends testSchedulerInjectionExpectPass
+     * @depends test_SchedulerInjection_Expect_Pass
      *
      * @param \Vanilla\Scheduler\SchedulerInterface $dummyScheduler
      */
-    public function testSetDispatchedEventNameExpectPass(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
+    public function test_SetDispatchedEventName_Expect_Pass(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
 
         $bool = $dummyScheduler->setDispatchedEventName('dispatchedEvent');
         $this->assertTrue($bool);
