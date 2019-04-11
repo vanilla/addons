@@ -14,23 +14,21 @@ use Vanilla\Scheduler\Job\JobInterface;
 use Vanilla\Scheduler\Job\LocalJobInterface;
 
 /**
- * Class ThrowableDriver.
+ * Class VoidDriver
  *
  * @author Eduardo Garcia Julia <eduardo.garciajulia@vanillaforums.com>
  */
-class ThrowableDriver implements DriverInterface {
+class VoidDriver implements DriverInterface {
 
     public function receive(JobInterface $job): DriverSlipInterface {
         return new LocalDriverSlip($job);
     }
 
     public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus {
-        nonExistentFunction();
+        return JobExecutionStatus::complete();
     }
 
     public function getSupportedInterfaces(): array {
-        return [
-            LocalJobInterface::class
-        ];
+        return [];
     }
 }

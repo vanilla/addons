@@ -16,11 +16,10 @@ interface SchedulerInterface {
     /**
      * Add driver
      *
-     * @param string $jobType
      * @param string $driverType
      * @return bool
      */
-    public function addDriver(string $jobType, string $driverType): bool;
+    public function addDriver(string $driverType): bool;
 
     /**
      * Get driver

@@ -120,7 +120,7 @@ final class BootstrapTest extends \PHPUnit\Framework\TestCase {
      */
     public function test_SetDriver_Expect_Pass(\Vanilla\Scheduler\SchedulerInterface $dummyScheduler) {
 
-        $bool = $dummyScheduler->addDriver(\Vanilla\Scheduler\Job\LocalJobInterface::class, \Vanilla\Scheduler\Driver\LocalDriver::class);
+        $bool = $dummyScheduler->addDriver(\Vanilla\Scheduler\Driver\LocalDriver::class);
         $this->assertTrue($bool);
     }
 

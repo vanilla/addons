@@ -82,4 +82,13 @@ class LocalDriver implements DriverInterface {
             return $driverSlip->getStatus();
         }
     }
+
+    /**
+     * @return array
+     */
+    public function getSupportedInterfaces(): array {
+        return [
+            LocalJobInterface::class
+        ];
+    }
 }

@@ -33,7 +33,7 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The class `Vanilla\Scheduler\Test\UnknownDriver` cannot be found.');
 
-        $dummyScheduler->addDriver(\Vanilla\Scheduler\Job\LocalJobInterface::class, \Vanilla\Scheduler\Test\UnknownDriver::class);
+        $dummyScheduler->addDriver(\Vanilla\Scheduler\Test\UnknownDriver::class);
     }
 
     public function test_AddNonCompliantDriver_Expect_Exception() {
@@ -43,7 +43,17 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage("The class `Vanilla\Scheduler\Test\NonCompliantDriver` doesn't implement DriverInterface.");
 
-        $dummyScheduler->addDriver(\Vanilla\Scheduler\Job\LocalJobInterface::class, \Vanilla\Scheduler\Test\NonCompliantDriver::class);
+        $dummyScheduler->addDriver(\Vanilla\Scheduler\Test\NonCompliantDriver::class);
+    }
+
+    public function test_AddVoidDriver_Expect_Exception() {
+        /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
+        $dummyScheduler = $this->getNewContainer()->get(\Vanilla\Scheduler\SchedulerInterface::class);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("The class `Vanilla\Scheduler\Test\VoidDriver` doesn't support any Job implementation.");
+
+        $dummyScheduler->addDriver(\Vanilla\Scheduler\Test\VoidDriver::class);
     }
 
     public function test_AddEchoJob_Expect_Pass() {
@@ -198,7 +208,7 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         /* @var $dummyScheduler \Vanilla\Scheduler\SchedulerInterface */
         $dummyScheduler = $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
 
-        $bool = $dummyScheduler->addDriver(\Vanilla\Scheduler\Job\LocalJobInterface::class, \Vanilla\Scheduler\Test\ThrowableDriver::class);
+        $bool = $dummyScheduler->addDriver(\Vanilla\Scheduler\Test\ThrowableDriver::class);
         $this->assertTrue($bool);
 
         $trackingSlip = $dummyScheduler->addJob(\Vanilla\Scheduler\Test\ThrowableEchoJob::class);
@@ -250,7 +260,7 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         $dummyScheduler = $container->get(\Vanilla\Scheduler\SchedulerInterface::class);
         $this->assertTrue(get_class($dummyScheduler) == \Vanilla\Scheduler\DummyScheduler::class);
 
-        $bool = $dummyScheduler->addDriver(\Vanilla\Scheduler\Job\LocalJobInterface::class, \Vanilla\Scheduler\Driver\LocalDriver::class);
+        $bool = $dummyScheduler->addDriver(\Vanilla\Scheduler\Driver\LocalDriver::class);
         $this->assertTrue($bool);
 
         $bool = $dummyScheduler->setDispatchEventName(self::DISPATCH_EVENT);

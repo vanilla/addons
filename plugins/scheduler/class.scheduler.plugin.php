@@ -18,10 +18,7 @@ class SchedulerPlugin extends \Gdn_Plugin {
         $container
             ->rule(\Vanilla\Scheduler\SchedulerInterface::class)
             ->setClass(\Vanilla\Scheduler\DummyScheduler::class)
-            ->addCall('addDriver', [
-                \Vanilla\Scheduler\Job\LocalJobInterface::class,
-                \Vanilla\Scheduler\Driver\LocalDriver::class,
-            ])
+            ->addCall('addDriver', [\Vanilla\Scheduler\Driver\LocalDriver::class])
             ->addCall('setDispatchEventName', [self::DISPATCH_EVENT])
             ->addCall('setDispatchedEventName', [self::DISPATCHED_EVENT])
             ->setShared(true)

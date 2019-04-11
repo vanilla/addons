@@ -78,14 +78,13 @@ class DummyScheduler implements SchedulerInterface {
     /**
      * Add a Driver to the Scheduler
      *
-     * @param string $jobType
      * @param string $driverType
      *
      * @return bool
      * @throws \Exception The class `%s` cannot be found.
      * @throws \Exception The class `%s` doesn't implement DriverInterface.
      */
-    public function addDriver(string $jobType, string $driverType): bool {
+    public function addDriver(string $driverType): bool {
 
         if (!$this->container->has($driverType)) {
             $missingDriverMsg = "The class `$driverType` cannot be found.";
@@ -101,7 +100,17 @@ class DummyScheduler implements SchedulerInterface {
             throw new \Exception($missingInterfaceMsg);
         }
 
-        $this->drivers[$jobType] = $driver;
+        $jobTypes = $driver->getSupportedInterfaces();
+
+        if (count($jobTypes) === 0) {
+            $driverDoesntSupportAnyTypeMsg = "The class `$driverType` doesn't support any Job implementation.";
+            $this->logger->error($driverDoesntSupportAnyTypeMsg);
+            throw new \Exception($driverDoesntSupportAnyTypeMsg);
+        }
+
+        foreach ($jobTypes as $jobType) {
+            $this->drivers[$jobType] = $driver;
+        }
 
         return true;
     }

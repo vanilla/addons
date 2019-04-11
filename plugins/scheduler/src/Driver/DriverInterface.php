@@ -32,4 +32,12 @@ interface DriverInterface {
      * @return JobExecutionStatus
      */
     public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus;
+
+    /**
+     * Get Supported interfaces.
+     * Get the list of interfaces (string based) that the Driver would handle.
+     *
+     * @return array
+     */
+    public function getSupportedInterfaces(): array;
 }
