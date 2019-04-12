@@ -1114,11 +1114,8 @@ class QnAPlugin extends Gdn_Plugin {
     public function postController_question_create($sender, $categoryUrlCode = '') {
             // Create & call PostController->discussion()
             $sender->View = PATH_PLUGINS . '/QnA/views/post.php';
-
             $sender->setData('Type', 'Question');
-        if ($sender->Request->isAuthenticatedPostBack(true)) {
             $sender->discussion($categoryUrlCode);
-        }
     }
 
     /**
