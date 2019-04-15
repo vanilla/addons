@@ -1112,13 +1112,10 @@ class QnAPlugin extends Gdn_Plugin {
      * @param PostController $sender Sending controller instance.
      */
     public function postController_question_create($sender, $categoryUrlCode = '') {
-
-        if ($sender->RequestMethod == 'question') {
             // Create & call PostController->discussion()
             $sender->View = PATH_PLUGINS . '/QnA/views/post.php';
             $sender->setData('Type', 'Question');
             $sender->discussion($categoryUrlCode);
-        }
     }
 
     /**
