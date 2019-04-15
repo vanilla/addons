@@ -1112,10 +1112,13 @@ class QnAPlugin extends Gdn_Plugin {
      * @param PostController $sender Sending controller instance.
      */
     public function postController_question_create($sender, $categoryUrlCode = '') {
+
+        if ($sender->RequestMethod == 'question') {
             // Create & call PostController->discussion()
             $sender->View = PATH_PLUGINS . '/QnA/views/post.php';
             $sender->setData('Type', 'Question');
             $sender->discussion($categoryUrlCode);
+        }
     }
 
     /**
@@ -1124,9 +1127,11 @@ class QnAPlugin extends Gdn_Plugin {
      * @param PostController $sender Sending controller instance.
      */
     public function postController_beforeDiscussionRender_handler($sender) {
+        if ($sender->RequestMethod == 'question') {
             $sender->Form->addHidden('Type', 'Question');
             $sender->title(t('Ask a Question'));
             $sender->setData('Breadcrumbs', [['Name' => $sender->data('Title'), 'Url' => '/post/question']]);
+        }
     }
 
     /**
