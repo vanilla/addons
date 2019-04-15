@@ -1124,9 +1124,12 @@ class QnAPlugin extends Gdn_Plugin {
      * @param PostController $sender Sending controller instance.
      */
     public function postController_beforeDiscussionRender_handler($sender) {
+        // Override if we are looking at the question url.
+        if ($sender->RequestMethod == 'question') {
             $sender->Form->addHidden('Type', 'Question');
             $sender->title(t('Ask a Question'));
             $sender->setData('Breadcrumbs', [['Name' => $sender->data('Title'), 'Url' => '/post/question']]);
+        }
     }
 
     /**
