@@ -236,6 +236,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
      * @param $sender
      */
     public function controller_DeleteFeed($sender) {
+        $sender->permission('Garden.Settings.Manage');
         if (!$sender->Form->authenticatedPostBack()) {
             throw new Exception('Requires POST', 405);
         }
