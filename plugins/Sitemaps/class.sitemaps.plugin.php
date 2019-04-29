@@ -9,6 +9,8 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
+use Vanilla\Web\Robots;
+
 class SitemapsPlugin extends Gdn_Plugin {
     /**
      * @var \Garden\EventManager
@@ -100,28 +102,12 @@ class SitemapsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @param Gdn_Controller $sender
+     * Hook into the site's robots.txt generation.
+     *
+     * @param Robots $robots
      */
-    public function utilityController_robots_create($sender) {
-        // Clear the session to mimic a crawler.
-        Gdn::session()->UserID = 0;
-        Gdn::session()->User = false;
-        $sender->deliveryMethod(DELIVERY_METHOD_XHTML);
-        $sender->deliveryType(DELIVERY_TYPE_VIEW);
-        $sender->setHeader('Content-Type', 'text/plain');
-
-        $robots = new \Vanilla\Web\Robots();
-        $robots->addSitemap('/sitemapindex.xml');
-        $robots->addRule(c('Sitemap.Robots.Rules', 'User-agent: *
-Disallow: /entry/
-Disallow: /messages/
-Disallow: /profile/comments/
-Disallow: /profile/discussions/
-Disallow: /search/'));
-        $sender->setData('robots', $robots);
-        $this->eventManager->fire('robots_init', $robots);
-
-        $sender->render('Robots', '', 'plugins/Sitemaps');
+    public function robots_init(Robots $robots) {
+        $robots->addSitemap("/sitemapindex.xml");
     }
 
     /**
