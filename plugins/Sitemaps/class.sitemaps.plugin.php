@@ -88,7 +88,6 @@ class SitemapsPlugin extends Gdn_Plugin {
     public function structure() {
         Gdn::router()->setRoute('sitemapindex.xml', '/utility/sitemapindex.xml', 'Internal');
         Gdn::router()->setRoute('sitemap-(.+)', '/utility/sitemap/$1', 'Internal');
-        Gdn::router()->setRoute('robots.txt', '/utility/robots', 'Internal');
     }
 
 
