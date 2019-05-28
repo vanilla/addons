@@ -793,6 +793,7 @@ class QnAPlugin extends Gdn_Plugin {
 
             if ($unanswered) {
                 $args['Wheres']['Type'] = 'Question';
+                $args['Wheres']['Announce'] ='All';
                 $this->discussionModel->SQL->beginWhereGroup()
                     ->where('d.QnA', null)
                     ->orWhereIn('d.QnA', ['Unanswered', 'Rejected'])
