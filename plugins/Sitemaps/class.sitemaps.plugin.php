@@ -1,4 +1,7 @@
-<?php if (!defined('APPLICATION')) { exit; }
+<?php
+use Vanilla\Contracts\ConfigurationInterface;
+
+if (!defined('APPLICATION')) { exit; }
 
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
@@ -15,9 +18,13 @@ class SitemapsPlugin extends Gdn_Plugin {
      */
     private $eventManager;
 
-    public function __construct(\Garden\EventManager $eventManager) {
+    /** @var bool */
+    private $isSitePrivate;
+
+    public function __construct(\Garden\EventManager $eventManager, ConfigurationInterface $config) {
         parent::__construct();
         $this->eventManager = $eventManager;
+        $this->isSitePrivate = $config->get('Garden.PrivateCommunity', false);
     }
 
     /// Methods ///
@@ -95,6 +102,7 @@ class SitemapsPlugin extends Gdn_Plugin {
     public function settingsController_sitemaps_create($sender) {
         $sender->permission('Garden.Settings.Manage');
         $sender->setData('Title', t('Sitemap Settings'));
+        $sender->setData('isSitePrivate', $this->isSitePrivate);
         $sender->addSideMenu();
         $sender->render('Settings', '', 'plugins/Sitemaps');
     }
