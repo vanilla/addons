@@ -1121,7 +1121,7 @@ class QnAPlugin extends Gdn_Plugin {
             $isAllowedQuestion = in_array('Question', $category['allowedDiscussionType']);
         }
 
-        if ($category &&  !$isAllowedQuestion && $isAllowedTypes) {
+        if ($category && !$isAllowedQuestion && $isAllowedTypes) {
             $sender->Form->addError(t('You are not allowed to post a question in this category.'));
         }
         // Create & call PostController->discussion()
