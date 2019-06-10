@@ -1113,16 +1113,16 @@ class QnAPlugin extends Gdn_Plugin {
      * @param PostController $sender Sending controller instance.
      */
     public function postController_question_create($sender, $categoryUrlCode = '') {
-        $requestCategoryID = GDN::Request()->post('CategoryID');
-        $category = CategoryModel::categories($requestCategoryID);
-
-        if ($category && isset($category['AllowedDiscussionTypes'])) {
-            foreach($category['AllowedDiscussionTypes'] as $allowedDiscussionType) {
-                $allowedType[] = $allowedDiscussionType;
-            }
-            if (!in_array('Question', $allowedType)) {
-                $sender->Form->addError('You are not allowed to post a question in this category.');
-            }
+        $category = false;
+        if ($categoryUrlCode != '') {
+            $categoryModel = new CategoryModel();
+            $category = (array)$categoryModel->getByCode($categoryUrlCode);
+            $category = $categoryModel::permissionCategory($category);
+            $isAllowedTypes = isset($category['AllowedDiscussionTypes']);
+            $isAllowedQuestion = in_array('Question', $category['allowedDiscussionType']);
+        }
+        if ($category &&  !$isAllowedQuestion && $isAllowedTypes) {
+            $sender->Form->addError(t('You are not allowed to post a question in this category.'));
         }
         // Create & call PostController->discussion()
         $sender->View = PATH_PLUGINS . '/QnA/views/post.php';

@@ -21,6 +21,7 @@ if (c('Vanilla.Categories.Use') && is_object($this->Category)) {
             $options = [
                 'Value' => val('CategoryID', $this->Category),
                 'IncludeNull' => true,
+                'PermFilter' => ['AllowedDiscussionTypes' => 'Question'],
                 'DiscussionType' => 'Question',
             ];
             echo '<div class="P">';
