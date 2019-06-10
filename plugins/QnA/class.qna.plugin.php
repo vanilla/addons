@@ -1118,7 +1118,7 @@ class QnAPlugin extends Gdn_Plugin {
             $category = (array)$categoryModel->getByCode($categoryUrlCode);
             $category = $categoryModel::permissionCategory($category);
             $isAllowedTypes = isset($category['AllowedDiscussionTypes']);
-            $isAllowedQuestion = in_array('Question', $category['allowedDiscussionType']);
+            $isAllowedQuestion = in_array('Question', $category['AllowedDiscussionTypes']);
         }
 
         if ($category && !$isAllowedQuestion && $isAllowedTypes) {
