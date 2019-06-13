@@ -21,7 +21,7 @@ class NoIndexPlugin extends Gdn_Plugin {
             $sender->Options .= wrap(anchor($label, $url, 'NoIndex'), 'li');
          }
          else {
-            $args['DiscussionOptions']['Bump'] = [
+            $args['DiscussionOptions']['NoIndex'] = [
                'Label' => $label,
                'Url' => $url,
                'Class' => 'NoIndex'
