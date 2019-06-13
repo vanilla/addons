@@ -14,6 +14,10 @@ jobs:
         - realpath
       hosts:
       - vanilla.test
+    install:
+    - phpenv config-rm xdebug.ini
+    - "./travis/install.sh"
+    - cd vanilla
     before_script:
     - composer self-update
     - composer install --optimize-autoloader
@@ -22,7 +26,13 @@ jobs:
     yarn: true
   - name: JS Build & Test
     language: node_js
-    node_js: 10.9
+    install:
+    - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3
+    - export PATH=$HOME/.yarn/bin:$PATH
+    - "./travis/install.sh"
+    - cd vanilla
+    - yarn install --pure-lockfile
+    node_js: lts/*
     addons:
       chrome: stable
     env:
@@ -30,13 +40,6 @@ jobs:
     script:
     - yarn build -i
     - yarn test
-install:
-- curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3
-- export PATH=$HOME/.yarn/bin:$PATH
-- phpenv config-rm xdebug.ini
-- "./travis/install.sh"
-- cd vanilla
-- yarn install --pure-lockfile
 cache:
   directories:
   - "$HOME/.composer/cache/files"
