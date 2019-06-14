@@ -93,26 +93,29 @@ class WelcomePostPlugin extends Gdn_Plugin {
 
     /**
      * Redirect users to the /post/discussion end point after registration.
+     *
+     * @param EntryController $sender The owning controller.
+     * @param array $args Not used.
      */
     public function entryController_registrationSuccessful_handler($sender, $args) {
         if (!c('Garden.Registration.ConfirmEmail')) {
             $target = (Gdn::request()->post('Target')) ? '&Target='.Gdn::request()->post('Target') : null;
-            redirectTo('/post/discussion?welcomepost=true'.$target);
+            $sender->setRedirectTo('/post/discussion?welcomepost=true'.$target);
         }
     }
 
     /**
      * When connecting through SSO, redirect user to the Welcome Post page.
      *
-     * @param UserModel $sender
-     * @param UserModel $args
+     * @param UserModel $sender The model initiating the sign-in.
+     * @param array $args Used to get the `InsertUserID`.
      */
     public function userModel_afterSignIn_handler($sender, $args) {
         $target = (Gdn::request()->post('Target')) ? '&Target='.Gdn::request()->post('Target') : null;
         // AfterSignIn event is fired in several places, the InsertUserID
         // argument is only passed in the connect script.
         if (val('InsertUserID', $args)) {
-            redirectTo('/post/discussion?welcomepost=true'.$target);
+            Gdn::controller()->setRedirectTo('/post/discussion?welcomepost=true'.$target);
         }
     }
 
