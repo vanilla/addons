@@ -437,7 +437,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
             // Validate the signature.
             $CalculatedSignature = signJsConnect($JsData, $client_id, val('AssociationSecret', $Provider), val('HashType', $Provider, 'md5'));
-            if ($CalculatedSignature != $Signature) {
+            if (hash_equals($Signature, $CalculatedSignature) === false) {
                 Logger::event('jsconnect_error', Logger::ERROR, 'Invalid Signature', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived, 'Signature' => $Signature, 'Secret' => val('AssociationSecret', $Provider), 'HashType' => val('HashType', $Provider, 'md5')]);
                 throw new Gdn_UserException(t("Signature invalid."), 400);
             }
