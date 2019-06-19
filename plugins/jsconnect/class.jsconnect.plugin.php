@@ -480,6 +480,9 @@ class JsConnectPlugin extends Gdn_Plugin {
         $Sender->setData('Verified', true);
         $Sender->setData('Trusted', val('Trusted', $Provider, true)); // this is a trusted connection.
         $Sender->setData('SSOUser', $JsData);
+
+        $Sender->EventArguments['Profile'] = $Form->formValues();
+        $Sender->EventArguments['Form'] = $Form;
     }
 
     /**
