@@ -1224,11 +1224,20 @@ class QnAPlugin extends Gdn_Plugin {
      * @param Schema $schema
      */
     public function discussionSchema_init(Schema $schema) {
-        $schema->merge(Schema::parse([
-            'attributes' => Schema::parse([
-                'question?' => $this->fullQuestionMetaDataSchema(),
-            ]),
-        ]));
+        $attributes = $schema->getField('properties.attributes');
+
+        // Add to an existing "attributes" field or create a new one?
+        if ($attributes instanceof Schema) {
+            $attributes->merge(Schema::parse([
+                'question?' => $this->fullQuestionMetaDataSchema()
+            ]));
+        } else {
+            $schema->merge(Schema::parse([
+                'attributes?' => Schema::parse([
+                    'question?' => $this->fullQuestionMetaDataSchema()
+                ])
+            ]));
+        }
     }
 
     /**
