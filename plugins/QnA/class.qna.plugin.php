@@ -1108,6 +1108,16 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Update comment form filters on the post controller.
+     *
+     * @param PostController $sender
+     * @return array
+     */
+    public function postController_initialize(PostController $sender) {
+        $sender->CommentModel->addFilterField("QnA");
+    }
+
+    /**
      * Create the new question method on post controller.
      *
      * @param PostController $sender Sending controller instance.
