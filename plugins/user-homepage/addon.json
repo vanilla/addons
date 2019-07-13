@@ -1,0 +1,14 @@
+{
+    "key": "user-homepage",
+    "name": "User Homepage Selector",
+    "description": "Allow a user to select their own homepage preference.",
+    "version": "1.0",
+    "authors": [
+        {
+            "name": "Adam Charron",
+            "email": "adam.c@vanillaforums.com"
+        }
+    ],
+    "license": "GPLv2",
+    "type": "addon"
+}

@@ -1,0 +1,17 @@
+<style>
+    {# Ewwww #}
+    body.Profile.EditMode .userHomePageForm .RadioLabel,
+    body.Profile.EditMode .userHomePageForm input[type="radio"] {
+        display: inline-block;
+        width: initial;
+    }
+</style>
+<div class="FormTitleWrapper">
+    <h1>{{ t('Home Page Settings') }}</h1>
+    {{ form.open()|raw }}
+    {{ form.errors()|raw }}
+    <ul class="userHomePageForm">
+        {{ form.simple(formTemplate)|raw }}
+    </ul>
+    {{ form.close('Save', '', {'class': 'Button Primary'})|raw }}
+</div>
