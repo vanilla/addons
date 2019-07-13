@@ -53,13 +53,10 @@ class UserHomePagePlugin extends \Gdn_Plugin {
      * @return string|null
      */
     private function getUserHomepagePreference(): ?string {
-
-        // Guests get the default value.
         if (!$this->session->isValid()) {
             return null;
         }
 
-        //
         $currentUserID = $this->session->UserID;
         $result = $this->userMetaModel->getUserMeta($currentUserID, self::PREF_KEY);
         return $result['DefaultController'];
@@ -85,6 +82,20 @@ class UserHomePagePlugin extends \Gdn_Plugin {
             permissionException('Garden.Users.Edit');
         }
 
+        // Yuck we need to fudge the arguments when creating a handler here.
+        $args = $sender->RequestArgs;
+        if (sizeof($args) < 2) {
+            $args = array_merge($args, [0, 0]);
+        } elseif (sizeof($args) > 2) {
+            $args = array_slice($args, 0, 2);
+        }
+
+        list($userReference, $username) = $args;
+
+        $sender->getUserInfo($userReference, $username);
+
+        $sender->editMode(true);
+        $sender->title(t('Home Page Settings'));
         // Form initialization
         $homeUrl =  url('/', true);
         $formTemplate = [
@@ -120,7 +131,7 @@ class UserHomePagePlugin extends \Gdn_Plugin {
         }
         $sender->setData('formTemplate', $formTemplate);
         $sender->setData('form', $sender->Form);
-        $sender->render('homepage', '', 'plugins/user-homepage');
+        $sender->render('homepage', '', 'plugins/userhomepage');
     }
 
     /**

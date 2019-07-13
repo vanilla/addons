@@ -1,5 +1,5 @@
 {
-    "key": "user-homepage",
+    "key": "userhomepage",
     "name": "User Homepage Selector",
     "description": "Allow a user to select their own homepage preference.",
     "version": "1.0",
