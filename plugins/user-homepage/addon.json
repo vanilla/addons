@@ -3,6 +3,8 @@
     "name": "User Homepage Selector",
     "description": "Allow a user to select their own homepage preference.",
     "version": "1.0",
+    "icon": "user_home_page.png",
+    "documentationUrl": "https://github.com/vanilla/addons/tree/master/plugins/user-homepage",
     "authors": [
         {
             "name": "Adam Charron",
