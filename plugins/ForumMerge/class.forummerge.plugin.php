@@ -28,15 +28,36 @@ class ForumMergePlugin implements Gdn_IPlugin {
       $sender->addSideMenu('utility/merge');
 
       if ($sender->Form->authenticatedPostBack()) {
-         $database = $sender->Form->getFormValue('Database');
-         $prefix = $sender->Form->getFormValue('Prefix');
-         $legacySlug = $sender->Form->getFormValue('LegacySlug');
-         $this->MergeCategories = ($sender->Form->getFormValue('MergeCategories')) ? TRUE : FALSE;
-         $this->mergeForums($database, $prefix, $legacySlug);
+          if ($this->validateForm($sender->Form)) {
+              $database = $sender->Form->getFormValue('Database');
+              $prefix = $sender->Form->getFormValue('Prefix');
+              $legacySlug = $sender->Form->getFormValue('LegacySlug');
+              $this->MergeCategories = ($sender->Form->getFormValue('MergeCategories')) ? TRUE : FALSE;
+              $this->mergeForums($database, $prefix, $legacySlug);
+          }
       }
 
       $sender->render($sender->fetchViewLocation('merge', '', 'plugins/ForumMerge'));
    }
+
+    /**
+     * Validate form values.
+     *
+     * @param Gdn_Form $form
+     * @return bool
+     */
+   private function validateForm(Gdn_Form &$form): bool {
+       //Validate form value 'Database', other form values sanitized through PDO->prepare when query
+       $oldDatabase = trim(str_replace('`', '', $form->getFormValue('Database')));
+       $res = array_column(Gdn::sql()->query('SHOW DATABASES;')->resultArray(), 'Database');
+       if (!in_array($oldDatabase, $res)) {
+           $form->addError(t('Database not found.'), 'Database');
+       } else {
+           $form->setFormValue('Database', $oldDatabase);
+       }
+       return empty($form->errors());
+   }
+
 
    /**
     *  Match up columns existing in both target and source tables.
