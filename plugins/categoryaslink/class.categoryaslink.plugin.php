@@ -126,7 +126,9 @@ if (!function_exists("categoryUrl")) {
         if (class_exists('SubcommunitiesPlugin')) {
             // Subcommunities version.
             $path = '/categories/'.rawurlencode(val('UrlCode', $category));
-            $categoryURL = SubcommunitiesPlugin::subcommunityURL(val('categoryID', $category), $path, $withDomain, $page);
+            $categoryURL = Gdn::getContainer()
+                ->get(SubcommunitiesPlugin::class)
+                ->subcommunityURL($category['categoryID'] ?? 0, $path, $withDomain, $page, SubcommunitiesPlugin::URL_TYPE_CATEGORY);
         } elseif (class_exists('SEOLinksPlugin')) {
             // SEOLinks version.
             if (!isset($px)) {
