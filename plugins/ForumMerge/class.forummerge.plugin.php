@@ -47,7 +47,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
      * @return bool
      */
    private function validateForm(Gdn_Form &$form): bool {
-       //Validate form value 'Database', other form values sanitized through PDO->prepare when query
+       // Validate form value 'Database', other form values sanitized through PDO->prepare when query
        $oldDatabase = trim(str_replace('`', '', $form->getFormValue('Database')));
        $res = array_column(Gdn::sql()->query('SHOW DATABASES;')->resultArray(), 'Database');
        if (!in_array($oldDatabase, $res)) {
