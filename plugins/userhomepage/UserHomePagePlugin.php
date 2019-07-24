@@ -111,7 +111,6 @@ class UserHomePagePlugin extends \Gdn_Plugin {
                     '/discussions' => '/discussions',
                 ],
                 'Options' => ['Default' => $this->getDefaultHomepage()],
-
             ],
         ];
 
@@ -119,7 +118,6 @@ class UserHomePagePlugin extends \Gdn_Plugin {
         if ($userPref !== null) {
             $sender->Form->setData(['homepage' => $userPref]);
         }
-
 
         // Handle the form post back.
         if ($sender->Form->authenticatedPostBack()) {
@@ -135,7 +133,7 @@ class UserHomePagePlugin extends \Gdn_Plugin {
     }
 
     /**
-     * Add "Signature Settings" to profile edit mode side menu.
+     * Add "Home Page Settings" to profile edit mode side menu.
      *
      * @param \ProfileController $sender
      */
@@ -170,7 +168,7 @@ class UserHomePagePlugin extends \Gdn_Plugin {
     }
 
     /**
-     * Determine if the sessioned user can edit the signature of a particular user.
+     * Determine if the sessioned user can edit the home page settings of a particular user.
      *
      * @param \ProfileController $profileController
      * @return bool
