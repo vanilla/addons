@@ -14,7 +14,7 @@ class NoIndexPlugin extends Gdn_Plugin {
    public function base_discussionOptions_handler($sender, $args) {
       if (checkPermission(['Garden.Moderation.Manage', 'Garden.Curation.Manage'], FALSE)) {
          $discussion = $args['Discussion'];
-         $label = (getValue('NoIndex', $discussion)) ? t('Remove NoIndex') : t('Add NoIndex');
+         $label = (val('NoIndex', $discussion)) ? t('Remove NoIndex') : t('Add NoIndex');
          $url = "/discussion/noindex?discussionid={$discussion->DiscussionID}";
          // Deal with inconsistencies in how options are passed
          if (isset($sender->Options)) {
@@ -24,7 +24,7 @@ class NoIndexPlugin extends Gdn_Plugin {
             $args['DiscussionOptions']['NoIndex'] = [
                'Label' => $label,
                'Url' => $url,
-               'Class' => 'NoIndex'
+               'Class' => 'NoIndex js-hijack'
             ];
          }
       }
@@ -32,24 +32,28 @@ class NoIndexPlugin extends Gdn_Plugin {
 
    /**
     * Handle discussion option menu NoIndex action (simple toggle).
+    *
+    * @param Gdn_Controller $sender
+    * @param int $discussionID
     */
-   public function discussionController_noIndex_create($sender, $args) {
-      $sender->permission(['Garden.Moderation.Manage', 'Garden.Curation.Manage'], FALSE);
+    public function discussionController_noIndex_create($sender, $discussionID = 0) {
+        $sender->permission(['Garden.Moderation.Manage', 'Garden.Curation.Manage'], FALSE);
+        $sender->Request->isAuthenticatedPostBack(true);
 
-      // Get discussion
-      $discussionID = $sender->Request->get('discussionid');
-      $discussion = $sender->DiscussionModel->getID($discussionID);
-      if (!$discussion) {
-         throw notFoundException('Discussion');
-      }
+        // Get discussion
+        $discussion = $sender->DiscussionModel->getID($discussionID);
+        if (!$discussion) {
+            throw notFoundException('Discussion');
+        }
 
-      // Toggle NoIndex
-      $noIndex = getValue('NoIndex', $discussion) ? 0 : 1;
+        // Toggle NoIndex
+        $noIndex = val('NoIndex', $discussion) ? 0 : 1;
 
-      // Update DateLastComment & redirect
-      $sender->DiscussionModel->setProperty($discussionID, 'NoIndex', $noIndex);
-      redirectTo(discussionUrl($discussion));
-   }
+        // Update no-index & redirect
+        $sender->DiscussionModel->setProperty($discussionID, 'NoIndex', $noIndex);
+        $sender->setRedirectTo(discussionUrl($discussion));
+        $sender->render('blank', 'utility', 'dashboard');
+    }
 
     /**
      * Add a mod message to NoIndex discussions.
