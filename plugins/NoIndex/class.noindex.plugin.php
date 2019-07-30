@@ -58,16 +58,18 @@ class NoIndexPlugin extends Gdn_Plugin {
         if (!checkPermission(['Garden.Moderation.Manage', 'Garden.Curation.Manage'], FALSE))
             return;
 
-        if (getValue('NoIndex', $sender->data('Discussion'))) {
+        if ($sender->data('Discussion.NoIndex')) {
             echo wrap(t('Discussion marked as noindex'), 'div', ['class' => 'Warning']);
         }
     }
 
     /**
      * Add the noindex/noarchive meta tag.
+     *
+     * @param \DiscussionController
      */
     public function discussionController_render_before($sender, $args) {
-        if ($sender->Head && getValue('NoIndex', $sender->data('Discussion'))) {
+        if ($sender->Head && $sender->data('Discussion.NoIndex')) {
             $sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex,noarchive']);
         }
     }
@@ -76,7 +78,7 @@ class NoIndexPlugin extends Gdn_Plugin {
      * Show NoIndex meta tag on discussions list.
      */
     public function base_beforeDiscussionMeta_handler($sender, $args) {
-        $noIndex = getValue('NoIndex', getValue('Discussion', $args));
+        $noIndex = valr('Discussion.NoIndex', $args);
         if (checkPermission(['Garden.Moderation.Manage', 'Garden.Curation.Manage'], FALSE) && $noIndex) {
             echo ' <span class="Tag Tag-NoIndex">'.t('NoIndex').'</span> ';
         }
