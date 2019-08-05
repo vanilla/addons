@@ -1,7 +1,7 @@
 {
     "name": "Sitemaps",
     "description": "Creates an XML sitemap based on http://www.sitemaps.org.",
-    "version": "2.2",
+    "version": "2.2.1",
     "mobileFriendly": true,
     "requiredTheme": false,
     "hasLocale": true,
@@ -20,6 +20,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.5"
+        "vanilla": ">=3.1"
     }
 }
