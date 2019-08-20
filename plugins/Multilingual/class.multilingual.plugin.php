@@ -128,13 +128,14 @@ class MultilingualPlugin extends Gdn_Plugin {
     /**
      * Allow user to set their preferred locale via link-click.
      */
-    public function profileController_setLocale_create($sender, $locale, $tK) {
+    public function profileController_setLocale_create($sender, $locale) {
         if (!Gdn::session()->UserID) {
             throw permissionException('Garden.SignIn.Allow');
         }
 
+        $tk = gdn::request()->post('TransientKey');
         // Check intent.
-        if (!Gdn::session()->validateTransientKey($tK)) {
+        if (!Gdn::session()->validateTransientKey($tk)) {
             redirectTo($_SERVER['HTTP_REFERER']);
         }
 
