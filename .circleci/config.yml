@@ -1,8 +1,274 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/node:lts
-    steps:
-      - checkout
-      - run: echo "A first hello"
+version: 2.1
+aliases:
+    - &run_yarn
+        run:
+            name: Install Yarn Packages
+            command: |
+                cd ~/workspace/vanilla
+                yarn install --pure-lockfile
+                yarn install-all
+    - &attach_workspace
+        attach_workspace:
+            at: ~/workspace
+    - &run_composer
+        run:
+            name: Install Composer Packages
+            command: |
+                cd ~/workspace/vanilla
+                VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
+    - &run_php_lint
+        run:
+            name: Linting PHP
+            command: |
+                cd ~/workspace/vanilla
+                # Validate syntax in all the files
+                .circleci/scripts/php-lint.sh ./applications
+                .circleci/scripts/php-lint.sh ./conf
+                .circleci/scripts/php-lint.sh ./library
+                .circleci/scripts/php-lint.sh ./plugins
+                .circleci/scripts/php-lint.sh ./themes
+
+                # Run code sniffer on the diffed files.
+                ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
+orbs:
+    vanilla:
+        aliases:
+            - &db_env
+                MYSQL_USER: circleci
+                MYSQL_PASSWORD: ''
+                MYSQL_DATABASE: vanilla_test
+                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        executors:
+            php71:
+                docker:
+                    - image: circleci/php:7.1.30-fpm-node
+                    - image: mysql:5.7.26
+                      environment: *db_env
+            php72:
+                docker:
+                    - image: circleci/php:7.2.19-fpm-node
+                    - image: mysql:5.7.26
+                      environment: *db_env
+            php73:
+                docker:
+                    - image: circleci/php:7.3.6-fpm-node
+                    - image: mysql:5.7.26
+                      environment: *db_env
+            node:
+                docker:
+                    - image: circleci/node:lts-browsers
+        commands:
+            checkout:
+                steps:
+                    - run:
+                          name: Clone Scripts
+                          command: git clone https://github.com/vanilla/ci-scripts.git ~/workspace/ci-scripts
+                    - run:
+                          name: Clone Repo
+                          command: ~/workspace/ci-scripts/clone-repo.sh
+                    - run:
+                          name: Merge Target Branch
+                          command: ~/workspace/ci-scripts/merge-target-branch.sh
+            prepare_php_tests:
+                steps:
+                    - run:
+                          name: Prepare MySQL
+                          command: ~/workspace/ci-scripts/prepare-mysql.sh
+                    - run:
+                          name: Configuring Hosts
+                          command: |
+                              # Localhost redirects
+                              echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts
+                              cat /etc/hosts
+            prepare_nginx:
+                steps:
+                    - run:
+                          name: Prepare NGINX
+                          command: |
+                              sudo apt-get update && sudo apt-get install nginx
+                              cd  ~/workspace/repo
+                              php-fpm --daemonize
+                              sudo ./.circleci/scripts/start-nginx.sh
+        jobs:
+            frontend_setup:
+                executor: node
+                steps:
+                    - run:
+                          name: Versions
+                          command: |
+                              node --version
+                              yarn --version
+                    - checkout
+                    - run:
+                          name: Clone Vanilla Repo
+                          command: ~/workspace/ci-scripts/clone-vanilla.sh
+                    - run:
+                          # Makes workspace persisting much faster if not needed.
+                          name: Cleaning up git directory
+                          command: |
+                              cd ~/workspace/vanilla
+                              rm -rf .git
+                          # We explcitly don't cache dependencies.
+                          # The cache validation & fetching seems to take longer than fetching from source.
+                    - *run_yarn
+                    - persist_to_workspace:
+                          root: ~/workspace
+                          paths:
+                              - repo
+                              - ci-scripts
+                              - vanilla
+            frontend_build:
+                executor: node
+                resource_class: large
+                steps:
+                    - *attach_workspace
+                    -   run:
+                            name: Build Frontend
+                            command: |
+                                cd ~/workspace/vanilla
+                                yarn build
+            frontend_test:
+                executor: node
+                steps:
+                    - *attach_workspace
+                    -   run:
+                            name: Build Frontend
+                            command: |
+                                cd ~/workspace/vanilla
+                                yarn test
+            frontend_lint:
+                executor: node
+                steps:
+                    - *attach_workspace
+                    -   run: |
+                            cd ~/workspace/vanilla
+                            yarn lint
+                            yarn prettier --check "**/src/scripts/**/*"
+            frontend_typechecker:
+                executor: node
+                resource_class: large
+                steps:
+                    - *attach_workspace
+                    -   run: |
+                            cd ~/workspace/vanilla
+                            yarn check-types
+            php_setup:
+                executor: php72
+                steps:
+                    -   run:
+                            name: Versions
+                            command: |
+                                php --version
+                                composer --version
+                    - checkout
+                    -   run: ~/workspace/ci-scripts/clone-vanilla.sh
+                    # We explcitly don't cache dependencies.
+                    # The cache validation & fetching seems to take longer than fetching from source.
+                    - *run_composer
+                    -   persist_to_workspace:
+                            root: ~/workspace
+                            paths:
+                                - repo
+                                - ci-scripts
+                                - vanilla
+            php_72_lint:
+                executor: php72
+                steps: &php_lint_steps
+                    - checkout
+                    -   run: ~/workspace/ci-scripts/clone-vanilla.sh
+                    - *run_composer
+                    - *run_php_lint
+            php_72_tests:
+                executor: php72
+                steps: &php_unit_test_steps
+                    - *attach_workspace
+                    -   run:
+                            name: Test setup
+                            command: |
+                                cd ~/workspace/vanilla
+                                cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
+                    - prepare_php_tests
+                    -   run:
+                            name: Library Tests
+                            command: |
+                                cd ~/workspace/vanilla
+                                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
+                    -   run:
+                            name: APIv2 Tests
+                            command: |
+                                cd ~/workspace/vanilla
+                                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
+            php_73_lint:
+                executor: php73
+                steps: *php_lint_steps
+            php_73_tests:
+                executor: php73
+                steps: *php_unit_test_steps
+            dependency_audit:
+                executor: php72
+                steps:
+                    - checkout
+                    -   run: ~/workspace/ci-scripts/clone-vanilla.sh
+                    -   run: yarn audit
+workflows:
+    version: 2
+    commit:
+        jobs:
+            # PHP 7.2 jobs are only nightly until we move upwards on infra.
+            - vanilla/php_setup:
+                  name: php_setup
+            - vanilla/php_72_lint
+            - vanilla/php_72_tests:
+                  requires:
+                      - php_setup
+            # JS and browsers
+            - vanilla/frontend_setup:
+                  name: frontend_setup
+            - vanilla/frontend_lint:
+                  requires:
+                      - frontend_setup
+            - vanilla/frontend_typechecker:
+                  requires:
+                      - frontend_setup
+            - vanilla/frontend_build:
+                  requires:
+                      - frontend_setup
+            - vanilla/frontend_test:
+                  requires:
+                      - frontend_setup
+    nightly:
+        triggers:
+            - schedule:
+                  cron: "0 0 * * *" # Once a day.
+                  filters:
+                      branches:
+                          only:
+                              - master
+        jobs:
+            - vanilla/dependency_audit
+            # PHP and serverside
+            - vanilla/php_setup:
+                  name: php_setup
+            - vanilla/php_72_lint
+            - vanilla/php_73_lint
+            - vanilla/php_72_tests:
+                  requires:
+                      - php_setup
+            - vanilla/php_73_tests:
+                  requires:
+                      - php_setup
+            ## JS & browsers
+            - vanilla/frontend_setup:
+                  name: frontend_setup
+            - vanilla/frontend_lint:
+                  requires:
+                      - frontend_setup
+            - vanilla/frontend_typechecker:
+                  requires:
+                      - frontend_setup
+            - vanilla/frontend_build:
+                  requires:
+                      - frontend_setup
+            - vanilla/frontend_test:
+                  requires:
+                      - frontend_setup
