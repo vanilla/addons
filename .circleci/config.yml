@@ -1,8 +1,66 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/node:lts
-    steps:
-      - checkout
-      - run: echo "A first hello"
+version: 2.1
+orbs:
+    core: vanilla/core@2.1
+    jobs: vanilla/jobs@1.0
+workflows:
+    version: 2
+    commit:
+        jobs:
+            # PHP 7.2 jobs are only nightly until we move upwards on infra.
+            - jobs/php_setup:
+                  name: php_setup
+            - jobs/php_72_lint
+            - jobs/php_72_tests:
+                  requires:
+                      - php_setup
+            # JS and browsers
+            - jobs/frontend_setup:
+                  name: frontend_setup
+            - jobs/frontend_lint:
+                  requires:
+                      - frontend_setup
+            - jobs/frontend_typechecker:
+                  requires:
+                      - frontend_setup
+            - jobs/frontend_build:
+                  requires:
+                      - frontend_setup
+            - jobs/frontend_test:
+                  requires:
+                      - frontend_setup
+    nightly:
+        triggers:
+            - schedule:
+                  cron: "0 0 * * *" # Once a day.
+                  filters:
+                      branches:
+                          only:
+                              - master
+        jobs:
+            - jobs/dependency_audit
+            # PHP and serverside
+            - jobs/php_setup:
+                  name: php_setup
+            - jobs/php_72_lint
+            - jobs/php_73_lint
+            - jobs/php_72_tests:
+                  requires:
+                      - php_setup
+            - jobs/php_73_tests:
+                  requires:
+                      - php_setup
+            ## JS & browsers
+            - jobs/frontend_setup:
+                  name: frontend_setup
+            - jobs/frontend_lint:
+                  requires:
+                      - frontend_setup
+            - jobs/frontend_typechecker:
+                  requires:
+                      - frontend_setup
+            - jobs/frontend_build:
+                  requires:
+                      - frontend_setup
+            - jobs/frontend_test:
+                  requires:
+                      - frontend_setup
