@@ -171,23 +171,18 @@ class ResolvedPlugin extends Gdn_Plugin {
     /**
      * Handle comment form Resolved checkbox & new user comments.
      *
-     * @param CommentModel $sender The comment model.
-     * @param AfterSaveComment $args The event properties.
      * @return void
      */
     public function commentModel_afterSaveComment_handler($sender, $args) {
-        $isSetDiscussionID = $args['FormPostValues']['DiscussionID'] ?? false;
-        $isSetResolved = $args['FormPostValues']['Resolved'] ?? false;
-        $hasPermission = checkPermission(['Plugins.Resolved.Manage', 'Garden.Moderation.Manage']);
-
-        if (!$isSetResolved || !$hasPermission || !$isSetDiscussionID) {
+        $discussionID = $args['FormPostValues']['DiscussionID'] ?? false;
+        $resolved = $args['FormPostValues']['Resolved'] ?? false;
+        $hasPermission = checkPermission("Plugins.Resolved.Manage") || Gdn::session()->checkRankedPermission("Garden.Moderation.Manage");
+        if (!$resolved || !$hasPermission || !$discussionID) {
             return;
         }
-        $discussionID = val('DiscussionID', $args['FormPostValues']);
         $discussion = [
             'DiscussionID' => $discussionID
         ];
-        $resolved = valr('FormPostValues.Resolved', $args);
         $this->resolve($discussion, $resolved);
     }
 
@@ -198,17 +193,15 @@ class ResolvedPlugin extends Gdn_Plugin {
      * @param BeforeSaveComment $args The event properties.
      */
     public function commentModel_beforeSaveComment_handler($sender, $args) {
-        $isSetDiscussionID = $args['FormPostValues']['DiscussionID'] ?? false;
-        $hasPermission = checkPermission(['Plugins.Resolved.Manage', 'Garden.Moderation.Manage']);
-        if (!$isSetDiscussionID) {
+        $discussionID = $args['FormPostValues']['DiscussionID'] ?? false;
+        $hasPermission = checkPermission("Plugins.Resolved.Manage") || Gdn::session()->checkRankedPermission("Garden.Moderation.Manage");
+        if (!$discussionID) {
             return;
         }
-
-        $discussionID = valr('FormPostValues.DiscussionID', $args);
         $discussionModel = new DiscussionModel();
         $discussion = $discussionModel->getID($discussionID);
         $discussionResolved = $discussion->Resolved ?? 0;
-        $isStarter = (val('InsertUserID', $discussion) == Gdn::session()->UserID);
+        $isStarter = $discussion->InsertUserID === Gdn::session()->UserID ?? false;
         if ($discussionResolved === 1 && !$hasPermission && !$isStarter) {
             throw new Gdn_UserExceptiont(t('You cannot comment in a closed discussion.'));
         }
