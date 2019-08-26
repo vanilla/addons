@@ -174,10 +174,10 @@ class ResolvedPlugin extends Gdn_Plugin {
      * @return void
      */
     public function commentModel_afterSaveComment_handler($sender, $args) {
-        $discussionID = $args['FormPostValues']['DiscussionID'] ?? false;
-        $resolved = $args['FormPostValues']['Resolved'] ?? false;
+        $discussionID = $args['FormPostValues']['DiscussionID'] ?? null;
+        $resolved = $args['FormPostValues']['Resolved'] ?? null;
         $hasPermission = checkPermission("Plugins.Resolved.Manage") || Gdn::session()->checkRankedPermission("Garden.Moderation.Manage");
-        if (!$resolved || !$hasPermission || !$discussionID) {
+        if (!$hasPermission || !$discussionID || $resolved === null) {
             return;
         }
         $discussion = [
