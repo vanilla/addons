@@ -17,9 +17,9 @@ class LocaleChooserModule extends Gdn_Module {
      * Build footer link to change locale.
      */
     public function buildLocaleLink($name, $urlCode) {
-        $url = 'profile/setlocale/'.$urlCode.'/'.Gdn::session()->transientKey();
+        $url = 'profile/setlocale/'.$urlCode;
 
-        return wrap(anchor($name, $url), 'span', ['class' => 'LocaleOption '.$name.'Locale']);
+        return wrap(anchor($name, $url, 'js-hijack'), 'span', ['class' => 'LocaleOption '.$name.'Locale']);
     }
 
     /**
