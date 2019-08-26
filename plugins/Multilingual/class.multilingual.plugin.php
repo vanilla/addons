@@ -127,33 +127,34 @@ class MultilingualPlugin extends Gdn_Plugin {
 
     /**
      * Allow user to set their preferred locale via link-click.
+     *
+     * @param ProfileController $sender
+     * @param String $locale Two letter locale code to be saved to the user's profile as default language.
+     * @throws Exception
      */
     public function profileController_setLocale_create($sender, $locale) {
         if (!Gdn::session()->UserID) {
             throw permissionException('Garden.SignIn.Allow');
         }
-
-        $tk = gdn::request()->post('TransientKey');
-        // Check intent.
-        if (!Gdn::session()->validateTransientKey($tk)) {
-            redirectTo($_SERVER['HTTP_REFERER']);
-        }
-
-        // If we got a valid locale, save their preference
-        if (isset($locale)) {
-            $locale = $this->validateLocale($locale);
-            if ($locale) {
-                $this->setUserMeta(Gdn::session()->UserID, 'Locale', $locale);
+        $redirectURL = $_SERVER['HTTP_REFERER'] ?? url('/');
+        if ($sender->Form->authenticatedPostBack()) {
+            // If we got a valid locale, save their preference
+            if (isset($locale)) {
+                $locale = $this->validateLocale($locale);
+                if ($locale) {
+                    $this->setUserMeta(Gdn::session()->UserID, 'Locale', $locale);
+                }
             }
+
+            $target = gdn::request()->get('Target');
+            if ($target) {
+                $redirectURL = $target;
+            }
+            // Back from whence we came.
+            redirectTo($redirectURL);
         }
 
-        $successRedirect = $_SERVER['HTTP_REFERER'];
-        $target = gdn::request()->get('Target');
-        if ($target) {
-           $successRedirect = $target;
-        }
-        // Back from whence we came.
-        redirectTo($successRedirect);
+        redirectTo($redirectURL);
     }
 
     /**
