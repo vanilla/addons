@@ -198,8 +198,7 @@ class ResolvedPlugin extends Gdn_Plugin {
         if (!$discussionID) {
             return;
         }
-        $discussionModel = new DiscussionModel();
-        $discussion = $discussionModel->getID($discussionID);
+        $discussion = self::discussionModel()->getID($discussionID);
         $discussionResolved = $discussion->Resolved ?? 0;
         $isStarter = $discussion->InsertUserID === Gdn::session()->UserID ?? false;
         if ($discussionResolved === 1 && !$hasPermission && !$isStarter) {
