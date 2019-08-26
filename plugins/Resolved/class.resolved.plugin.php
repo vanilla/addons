@@ -187,26 +187,6 @@ class ResolvedPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Prior to saving a comment, check whether the discussion is resolved.
-     *
-     * @param CommentModel $sender The comment model.
-     * @param BeforeSaveComment $args The event properties.
-     */
-    public function commentModel_beforeSaveComment_handler($sender, $args) {
-        $discussionID = $args['FormPostValues']['DiscussionID'] ?? false;
-        $hasPermission = checkPermission("Plugins.Resolved.Manage") || Gdn::session()->checkRankedPermission("Garden.Moderation.Manage");
-        if (!$discussionID) {
-            return;
-        }
-        $discussion = self::discussionModel()->getID($discussionID);
-        $discussionResolved = $discussion->Resolved ?? 0;
-        $isStarter = $discussion->InsertUserID === Gdn::session()->UserID ?? false;
-        if ($discussionResolved === 1 && !$hasPermission && !$isStarter) {
-            throw new Gdn_UserExceptiont(t('You cannot comment in a closed discussion.'));
-        }
-    }
-
-    /**
      * Disallow comments in Resolved discussions by new participants.
      *
      * @param DiscussionController $sender
