@@ -201,7 +201,7 @@ class ResolvedPlugin extends Gdn_Plugin {
         $discussion = self::discussionModel()->getID($discussionID);
         $discussionResolved = $discussion->Resolved ?? 0;
         $isStarter = $discussion->InsertUserID === Gdn::session()->UserID ?? false;
-        if ($discussionResolved === 1 && !$hasPermission && !$isStarter) {
+        if ($discussionResolved && !$hasPermission && !$isStarter) {
             throw new Gdn_UserException(t('You cannot comment in a closed discussion.'));
         }
     }
