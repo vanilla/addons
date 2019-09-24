@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
+ * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -9,6 +9,10 @@ namespace Vanilla\QnA\Models;
 
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
 
+/**
+ * Class SearchRecordTypeAnswer
+ * @package Vanilla\QnA\Models
+ */
 class SearchRecordTypeAnswer implements SearchRecordTypeInterface {
     const PROVIDER_GROUP = 'sphinx';
 
