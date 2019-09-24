@@ -78,13 +78,12 @@ class QnAPlugin extends Gdn_Plugin {
     /**
      * @param Container $dic
      */
-    public function container_init(Container $dic)
-    {
+    public function container_init(Container $dic) {
         /*
          * Register additional advanced search sphinx record types
          */
         $dic
-            ->rule(Vanilla\Contracts\Search\SearchRecordTypesProviderInterface::class)
+            ->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
             ->addCall('setType', [new SearchRecordTypeQuestion()])
             ->addCall('setType', [new SearchRecordTypeAnswer()])
         ;
