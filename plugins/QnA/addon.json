@@ -12,10 +12,10 @@
         {
             "name": "Todd Burry",
             "email": "todd@vanillaforums.com",
-            "homepage": "http://www.vanillaforums.org/profile/todd"
+            "homepage": "https://www.vanillaforums.org/profile/todd"
         }
     ],
     "require": {
-        "vanilla": ">=2.4"
+        "vanilla": ">=3.2"
     }
 }
