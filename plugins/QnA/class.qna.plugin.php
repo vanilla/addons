@@ -7,6 +7,9 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Vanilla\ApiUtils;
+use Garden\Container\Container;
+use Vanilla\QnA\Models\SearchRecordTypeQuestion;
+use Vanilla\QnA\Models\SearchRecordTypeAnswer;
 
 /**
  * Adds Question & Answer format to Vanilla.
@@ -70,6 +73,21 @@ class QnAPlugin extends Gdn_Plugin {
         \Gdn::config()->touch('QnA.Points.Enabled', false);
         \Gdn::config()->touch('QnA.Points.Answer', 1);
         \Gdn::config()->touch('QnA.Points.AcceptedAnswer', 1);
+    }
+
+    /**
+     * @param Container $dic
+     */
+    public function container_init(Container $dic)
+    {
+        /*
+         * Register additional advanced search sphinx record types
+         */
+        $dic
+            ->rule(Vanilla\Contracts\Search\SearchRecordTypesProviderInterface::class)
+            ->addCall('setType', [new SearchRecordTypeQuestion()])
+            ->addCall('setType', [new SearchRecordTypeAnswer()])
+        ;
     }
 
     /**
