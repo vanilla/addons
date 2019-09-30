@@ -8,66 +8,41 @@
 namespace Vanilla\QnA\Models;
 
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
+use Vanilla\Contracts\Search\SearchRecordTypeTrait;
 
 /**
  * Class SearchRecordTypeQuestion
  * @package Vanilla\QnA\Models
  */
 class SearchRecordTypeQuestion implements SearchRecordTypeInterface {
+    use SearchRecordTypeTrait;
+
     const PROVIDER_GROUP = 'sphinx';
 
     const TYPE = 'discussion';
 
-    const CHECKBOX_ID = 'question';
+    const API_TYPE_KEY = 'question';
+
+    const SUB_KEY = 'question';
 
     const CHECKBOX_LABEL = 'questions';
 
-    /**
-     * SearchRecordTypeQuestion constructor.
-     */
-    public function __construct() {
-        $this->key = self::TYPE;
-    }
+    const SPHINX_DTYPE = 1;
+
+    const SPHINX_INDEX = 'Discussion';
+
+    const GUID_OFFSET = 1;
+
+    const GUID_MULTIPLIER = 10;
 
     /**
      * @inheritdoc
      */
-    public function getKey(): string {
-        return $this->key;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCheckBoxId(): string {
-        return self::TYPE.'_'.self::CHECKBOX_ID;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCheckBoxLabel(): string {
-        return self::CHECKBOX_LABEL;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getFeatures(): array {
-        return $this->structure;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getModel() {
-        return '';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getProviderGroup(): string {
-        return self::PROVIDER_GROUP;
+    public function getDocuments(array $IDs, \SearchModel $searchModel): array {
+        $result = $searchModel->getDiscussions($IDs);
+        foreach ($result as &$record) {
+            $record['guid'] = $record['PrimaryID'] * self::GUID_MULTIPLIER + self::GUID_OFFSET;
+        }
+        return $result;
     }
 }
