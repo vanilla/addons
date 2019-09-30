@@ -41,6 +41,7 @@ class SearchRecordTypeAnswer implements SearchRecordTypeInterface {
     public function getDocuments(array $IDs, \SearchModel $searchModel): array {
         $result = $searchModel->getComments($IDs);
         foreach ($result as &$record) {
+            $record['type'] = self::SUB_KEY;
             $record['guid'] = $record['PrimaryID'] * self::GUID_MULTIPLIER + self::GUID_OFFSET;
         }
         return $result;

@@ -1467,6 +1467,7 @@ class QnAPlugin extends Gdn_Plugin {
     public function searchResultSchema_init(Schema $schema) {
         $types = $schema->getField('properties.type.enum');
         $types[] = 'question';
+        $types[] = 'answer';
         $schema->setField('properties.type.enum', $types);
     }
 
