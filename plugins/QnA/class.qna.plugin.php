@@ -92,8 +92,8 @@ class QnAPlugin extends Gdn_Plugin {
     /**
      * Add Javascript.
      *
-     * @param $sender
-     * @param $args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
     public function base_render_before($sender, $args) {
         if ($sender->MasterView == 'admin') {
