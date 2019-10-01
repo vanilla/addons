@@ -45,7 +45,7 @@ class BumpPlugin extends Gdn_Plugin {
                 throw notFoundException('Discussion');
             }
             // Update DateLastComment & redirect
-            $sender->DiscussionModel->setProperty($discussionID, 'DateLastComment', Gdn_Format::toDateTime());
+            $sender->DiscussionModel->setField($discussionID, 'DateLastComment', Gdn_Format::toDateTime());
             $sender->jsonTarget('', '', 'Refresh');
             $sender->render('Blank', 'Utility', 'Dashboard');
         }
