@@ -1,7 +1,20 @@
 version: 2.1
 orbs:
-    core: vanilla/core@2.1
-    jobs: vanilla/jobs@1.0
+    core: vanilla/core@2.2
+    jobs: vanilla/jobs@1.1
+jobs:
+    php_sphinx_tests:
+        executor: core/sphinx
+        steps:
+            - attach_workspace:
+                at: ~/workspace
+            - core/checkout
+            - run: ~/workspace/ci-scripts/clone-vanilla.sh
+            - run: ~/workspace/ci-scripts/clone-alt-repo.sh internal
+            - core/composer_install
+            - core/prepare_php_tests
+            - core/prepare_sphinx
+            - core/run_sphinx_test_suite
 workflows:
     version: 2
     commit:
@@ -10,6 +23,7 @@ workflows:
             - jobs/php_setup:
                   name: php_setup
             - jobs/php_72_lint
+            - php_sphinx_tests
             - jobs/php_72_tests:
                   requires:
                       - php_setup
@@ -27,7 +41,7 @@ workflows:
                       - frontend_setup
             - jobs/frontend_test:
                   requires:
-                      - frontend_setup 
+                      - frontend_setup
     nightly:
         triggers:
             - schedule:
@@ -39,6 +53,7 @@ workflows:
         jobs:
             - jobs/dependency_audit
             # PHP and serverside
+            - php_sphinx_tests
             - jobs/php_setup:
                   name: php_setup
             - jobs/php_72_lint
