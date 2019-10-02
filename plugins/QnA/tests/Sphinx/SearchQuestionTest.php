@@ -37,6 +37,9 @@ class SearchQuestionTest extends AbstractAPIv2Test {
     /** @var bool */
     protected static $sphinxReindexed;
 
+    /** @var bool */
+    protected static $dockerResponse;
+
     protected static $addons = ['vanilla', 'sphinx', 'qna'];
 
     /**
