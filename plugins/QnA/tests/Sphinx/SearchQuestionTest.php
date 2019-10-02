@@ -48,7 +48,7 @@ class SearchQuestionTest extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
 
-        saveToConfig('Plugins.Sphinx.Server', 'sphinx');
+        saveToConfig('Plugins.Sphinx.Server', '127.0.0.1');
         saveToConfig('Plugins.Sphinx.UseDeltas', true);
 
         /** @var \Gdn_Session $session */
