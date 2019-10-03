@@ -30,7 +30,7 @@ trait QnaTestHelperTrait {
         $this->assertArrayHasKey('dateAccepted', $discussion['attributes']['question']);
         $this->assertArrayHasKey('dateAnswered', $discussion['attributes']['question']);
 
-        foreach($expectedAttributes as $attribute => $value) {
+        foreach ($expectedAttributes as $attribute => $value) {
             $this->assertEquals($value, $discussion['attributes']['question'][$attribute]);
         }
     }
@@ -51,7 +51,7 @@ trait QnaTestHelperTrait {
         $this->assertArrayHasKey('dateAccepted', $comment['attributes']['answer']);
         $this->assertArrayHasKey('acceptUserID', $comment['attributes']['answer']);
 
-        foreach($expectedAttributes as $attribute => $value) {
+        foreach ($expectedAttributes as $attribute => $value) {
             $this->assertEquals($value, $comment['attributes']['answer'][$attribute]);
         }
     }

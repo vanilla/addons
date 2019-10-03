@@ -7,6 +7,9 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Vanilla\ApiUtils;
+use Garden\Container\Container;
+use Vanilla\QnA\Models\SearchRecordTypeQuestion;
+use Vanilla\QnA\Models\SearchRecordTypeAnswer;
 
 /**
  * Adds Question & Answer format to Vanilla.
@@ -73,10 +76,24 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     * @param Container $dic
+     */
+    public function container_init(Container $dic) {
+        /*
+         * Register additional advanced search sphinx record types
+         */
+        $dic
+            ->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
+            ->addCall('setType', [new SearchRecordTypeQuestion()])
+            ->addCall('setType', [new SearchRecordTypeAnswer()])
+        ;
+    }
+
+    /**
      * Add Javascript.
      *
-     * @param $sender
-     * @param $args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
     public function base_render_before($sender, $args) {
         if ($sender->MasterView == 'admin') {
@@ -1450,6 +1467,7 @@ class QnAPlugin extends Gdn_Plugin {
     public function searchResultSchema_init(Schema $schema) {
         $types = $schema->getField('properties.type.enum');
         $types[] = 'question';
+        $types[] = 'answer';
         $schema->setField('properties.type.enum', $types);
     }
 
