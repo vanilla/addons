@@ -92,7 +92,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
         $config = [
             'anti_link_spam' => ['`.`', ''],
             'comment' => 1,
-            'cdata' => 3,
+            'cdata' => 1,
             'css_expression' => 1,
             'deny_attribute' => 'on*',
             'elements' => '*-applet-form-input-textarea-iframe-script-style',
