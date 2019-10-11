@@ -40,7 +40,7 @@ class SearchQuestionTest extends AbstractAPIv2Test {
     /** @var bool */
     protected static $dockerResponse;
 
-    protected static $addons = ['vanilla', 'sphinx', 'qna'];
+    protected static $addons = ['vanilla', 'advancedsearch', 'sphinx', 'qna'];
 
     /**
      * {@inheritdoc}

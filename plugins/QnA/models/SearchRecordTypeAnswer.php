@@ -19,6 +19,8 @@ class SearchRecordTypeAnswer implements SearchRecordTypeInterface {
 
     const PROVIDER_GROUP = 'sphinx';
 
+    const INFRASTRUCTURE_TEMPLATE = 'standard';
+
     const TYPE = 'comment';
 
     const API_TYPE_KEY = 'answer';
