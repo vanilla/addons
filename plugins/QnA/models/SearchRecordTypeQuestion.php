@@ -19,6 +19,8 @@ class SearchRecordTypeQuestion implements SearchRecordTypeInterface {
 
     const PROVIDER_GROUP = 'sphinx';
 
+    const INFRASTRUCTURE_TEMPLATE = 'standard';
+
     const TYPE = 'discussion';
 
     const API_TYPE_KEY = 'question';
