@@ -1,11 +1,13 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
  */
 
-Gdn::factoryInstall('IPBFormatter', 'IPBFormatterPlugin', __FILE__, Gdn::FactorySingleton);
+use IPBFormatter\Formats\IPBFormat;
+use IPBFormatter\Formatter;
+use Psr\Container\ContainerInterface;
+use Vanilla\Formatting\FormatService;
 
 class IPBFormatterPlugin extends Gdn_Plugin {
 
@@ -18,7 +20,19 @@ class IPBFormatterPlugin extends Gdn_Plugin {
     /** @var null  */
     protected $_Media = null;
 
-    /// Methods ///
+    /**
+     * Hook into the main container initialization.
+     *
+     * @param ContainerInterface $dic
+     */
+    public function container_init(ContainerInterface $dic) {
+        $formatService = $dic->get(FormatService::class);
+        $formatService->registerFormat(IPBFormat::FORMAT_KEY, $dic->get(IPBFormat::class));
+
+        $dic->rule("IPBFormatter")
+            ->setClass(Formatter::class)
+            ->setShared(true);
+    }
 
     /**
      *
