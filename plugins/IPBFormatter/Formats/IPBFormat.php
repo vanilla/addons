@@ -38,7 +38,9 @@ class IPBFormat extends HtmlFormat {
         $plainTextConverter->setAddNewLinesAfterDiv(true);
         $htmlSanitizer->setShouldEncodeCodeBlocks(false);
         parent::__construct($htmlSanitizer, $htmlEnhancer, $plainTextConverter, false);
+
         $this->bbcodeParser = $bbcodeParser;
+        $this->bbcodeParser->nbbc()->setIgnoreNewlines(true);
     }
 
     /**
