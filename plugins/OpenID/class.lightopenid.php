@@ -325,7 +325,7 @@ class LightOpenID {
                 }
 
                 # There are no relevant information in headers, so we search the body.
-                $content = ($this->request($url, 'GET'))->getRawBody();
+                $content = $this->request($url, 'GET')->getRawBody();
                 $location = $this->htmlTag($content, 'meta', 'http-equiv', 'X-XRDS-Location', 'content');
                 if ($location) {
                     $url = $this->build_url(parse_url($url), parse_url($location));
