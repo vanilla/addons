@@ -163,7 +163,7 @@ class LightOpenID {
      * @param array $params
      * @return \Garden\Http\HttpResponse
      */
-    protected function request ($url, $method = 'GET', $params = []) {
+    protected function request($url, $method = 'GET', $params = []) {
         if ($method === 'POST') {
             $result = $this->httpClient->post($url, $params);
         } elseif ($method === 'HEAD') {
