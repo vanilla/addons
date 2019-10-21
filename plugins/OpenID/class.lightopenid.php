@@ -165,13 +165,12 @@ class LightOpenID {
      * @return \Garden\Http\HttpResponse
      */
     protected function request($url, $method = 'GET', $params = []) {
-        $options = $this->httpClient->getDefaultOptions();
         if ($method === 'POST') {
-            $result = $this->httpClient->post($url, $params, [], $options);
+            $result = $this->httpClient->post($url, $params);
         } elseif ($method === 'HEAD') {
-            $result = $this->httpClient->head($url, $params, [], $options);
+            $result = $this->httpClient->head($url, $params);
         } else {
-            $result = $this->httpClient->get($url, $params, [], $options);
+            $result = $this->httpClient->get($url, $params);
         }
 
         $timeStart = microtime(true);
