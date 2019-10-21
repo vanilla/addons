@@ -252,8 +252,7 @@ class LightOpenID {
                 }
                 $header = $headers->getHeader('content-type');
                 if ($header && (strpos($header, 'application/xrds+xml') !== false
-                        || strpos($header, 'text/xml') !== false)
-                ) {
+                        || (strpos($header, 'text/xml') !== false))) {
                     # Apparently, some providers return XRDS documents as text/html.
                     # While it is against the spec, allowing this here shouldn't break
                     # compatibility with anything.
