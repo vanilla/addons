@@ -79,7 +79,13 @@ class CivilTongueExTest extends TestCase {
      */
     public function providePatternList() {
         $provider = [
-            ['poop;PoOp;$hit;a$$', 'this is poop the text.', 'this is **** the text.'],
+            'General' => ['poop;$hit;a$$', 'This poop is the text.', 'This **** is the text.'],
+            'TextBeginsWithSwear' => ['poop;$hit;a$$', 'poop the text', '**** the text'],
+            'TextEndsWithSwear' => ['poop;$hit;a$$', 'The text is poop', 'The text is ****'],
+            'SwearEndsWithDollarSign' => ['poop;$hit;a$$', 'The text is a$$', 'The text is ****'],
+            'SwearStartsWithDollarSign' => ['poop;$hit;a$$', '$hit the text', '**** the text'],
+            'SwearHasDollarSign' => ['poop;$hit;a$$', '$hithead the text', '$hithead the text'],
+            'SwearHasCamelCase' => ['poop;$hit;a$$', 'PoOp the text', '**** the text'],
         ];
         return $provider;
     }
