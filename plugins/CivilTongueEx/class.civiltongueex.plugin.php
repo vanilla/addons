@@ -20,7 +20,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
      */
     public function  __construct() {
         parent::__construct();
-        $this->Replacement = c('Plugins.CivilTongue.Replacement', '');
+        $this->setReplacement(c('Plugins.CivilTongue.Replacement', ''));
     }
 
     /**
@@ -312,7 +312,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
                 $explodedWords = explode(';', $words);
                 foreach ($explodedWords as $word) {
                     if (trim($word)) {
-                        $patterns[] = '`\b'.preg_quote(trim($word), '`').'\b`isu';
+                        $patterns[] = '`(?<![\pL])'.preg_quote(trim($word), '`').'(?![\pL])`isu';
                     }
                 }
             }
@@ -573,5 +573,25 @@ class CivilTonguePlugin extends Gdn_Plugin {
             $args['Group']['Name'] = $this->replace($args['Group']['Name']);
             $args['Group']['Description'] = $this->replace($args['Group']['Description']);
         }
+    }
+
+    /**
+     * Get the replacement string.
+     *
+     * @return string
+     */
+    public function getReplacement(): string
+    {
+        return $this->Replacement;
+    }
+
+    /**
+     * Set the replacement string.
+     * 
+     * @param mixed $replacement
+     */
+    public function setReplacement($replacement): void
+    {
+        $this->Replacement = $replacement;
     }
 }
