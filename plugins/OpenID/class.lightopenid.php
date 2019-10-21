@@ -78,7 +78,8 @@ class LightOpenID {
             'timeout' => 30,
             'verifyPeer' => false
         ];
-        $httpClient = new HttpClient('', $safeCurlHandler, $options);
+        $httpClient = new HttpClient('', $safeCurlHandler);
+        $httpClient->setDefaultOptions($options);
         $this->httpClient = $httpClient;
         $this->trustRoot = Gdn::request()->scheme().'://'.Gdn::request()->host();
         $uri = rtrim(preg_replace('#((?<=\?)|&)openid\.[^&]+#', '', $_SERVER['REQUEST_URI']), '?');
@@ -164,12 +165,13 @@ class LightOpenID {
      * @return \Garden\Http\HttpResponse
      */
     protected function request($url, $method = 'GET', $params = []) {
+        $options = $this->httpClient->getDefaultOptions();
         if ($method === 'POST') {
-            $result = $this->httpClient->post($url, $params);
+            $result = $this->httpClient->post($url, $params, [], $options);
         } elseif ($method === 'HEAD') {
-            $result = $this->httpClient->head($url, $params);
+            $result = $this->httpClient->head($url, $params, [], $options);
         } else {
-            $result = $this->httpClient->get($url, $params);
+            $result = $this->httpClient->get($url, $params, [], $options);
         }
 
         $timeStart = microtime(true);
