@@ -580,18 +580,16 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @return string
      */
-    public function getReplacement(): string
-    {
+    public function getReplacement(): string {
         return $this->Replacement;
     }
 
     /**
      * Set the replacement string.
-     * 
+     *
      * @param mixed $replacement
      */
-    public function setReplacement($replacement): void
-    {
+    public function setReplacement($replacement): void {
         $this->Replacement = $replacement;
     }
 }

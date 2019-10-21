@@ -38,8 +38,8 @@ class CivilTongueExTest extends TestCase {
     /**
      * Instantiate the plugin, config.
      *
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Container\ContainerException Error while retrieving the entry.
+     * @throws \Garden\Container\NotFoundException No entry was found for this identifier.
      */
     public function setUp() {
         parent::setUp();
