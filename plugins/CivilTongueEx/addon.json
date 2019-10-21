@@ -6,6 +6,7 @@
     "settingsUrl": "/plugin/tongue",
     "settingsPermission": "Garden.Settings.Manage",
     "icon": "civil-tongue.png",
+    "usePopupSettings": false,
     "key": "civiltongueex",
     "type": "addon",
     "license": "GPL-2.0-only",
