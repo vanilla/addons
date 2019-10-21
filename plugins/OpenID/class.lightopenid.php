@@ -156,14 +156,16 @@ class LightOpenID {
     }
 
     /**
-     * @param $url OpenID url.
+     * Prepares the httpClient request.
+     *
+     * @param string $url OpenID url.
      * @param string $method
-     * @param $params
+     * @param array $params
      * @return \Garden\Http\HttpResponse
      */
-    protected function request($url, $method = 'GET', $params = []) {
+    protected function request ($url, $method = 'GET', $params = []) {
         if ($method === 'POST') {
-            $result = $this->httpClient->post($url,  $params);
+            $result = $this->httpClient->post($url, $params);
         } elseif ($method === 'HEAD') {
             $result = $this->httpClient->head($url, $params);
         } else {
