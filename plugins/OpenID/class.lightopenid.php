@@ -165,6 +165,7 @@ class LightOpenID {
      * @return \Garden\Http\HttpResponse
      */
     protected function request($url, $method = 'GET', $params = []) {
+        $timeStart = microtime(true);
         if ($method === 'POST') {
             $result = $this->httpClient->post($url, $params);
         } elseif ($method === 'HEAD') {
@@ -173,9 +174,7 @@ class LightOpenID {
             $result = $this->httpClient->get($url, $params);
         }
 
-        $timeStart = microtime(true);
         $timeDiff = microtime(true) - $timeStart;
-
         // Make sure every request takes at least .5 second.
         // This nullify brute forcing
         if ($timeDiff < 500) {
