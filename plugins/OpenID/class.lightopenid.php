@@ -173,7 +173,6 @@ class LightOpenID {
         } else {
             $result = $this->httpClient->get($url, $params);
         }
-
         $timeDiff = microtime(true) - $timeStart;
         // Make sure every request takes at least .5 second.
         // This nullify brute forcing
