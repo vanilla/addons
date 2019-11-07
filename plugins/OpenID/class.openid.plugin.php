@@ -121,15 +121,15 @@ class OpenIDPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Capture the user's UniqueID being sent back from provider.
      *
-     *
-     * @param $sender
-     * @param $args
+     * @param EntryController $sender
+     * @param array $args
      * @throws Exception
      * @throws Gdn_UserException
      */
     public function base_connectData_handler($sender, $args) {
-        if (val(0, $args) != 'openid') {
+        if ($args[0] !== 'openid' || !$this->signInAllowed()) {
             return;
         }
 
