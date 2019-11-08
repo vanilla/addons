@@ -191,7 +191,7 @@ class OpenIDPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Endpoint for authenticating with OpenID.
      *
      * @param EntryController $Sender
      * @param array $Args
