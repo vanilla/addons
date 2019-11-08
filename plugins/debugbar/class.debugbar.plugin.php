@@ -110,7 +110,7 @@ class DebugBarPlugin extends Gdn_Plugin {
      * @return \DebugBar\JavascriptRenderer Returns the javascript script includer for the debug bar.
      */
     public function jsRenderer() {
-        $baseUrl = Gdn::request()->assetRoot().'/plugins/debugbar/vendor/maximebf/debugbar/src/DebugBar/Resources';
+        $baseUrl = Gdn::request()->getAssetRoot().'/plugins/debugbar/vendor/maximebf/debugbar/src/DebugBar/Resources';
         $jsRenderer = $this->debugBar()->getJavascriptRenderer($baseUrl);
 
         $jsRenderer->addAssets(
