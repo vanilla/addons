@@ -129,7 +129,10 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function base_connectData_handler($sender, $args) {
-        if ($args[0] !== 'openid' || !$this->signInAllowed()) {
+        if ($args[0] !== 'openid') {
+            return;
+        }
+        if (!$this->signInAllowed()) {
             throw new Gdn_UserException(t('OpenID signin has been disabled.'));
         }
 
