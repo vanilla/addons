@@ -34,7 +34,7 @@ class MathJaxPlugin extends Gdn_Plugin {
 <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
         jax: ["input/TeX","output/HTML-CSS"],
-        extensions: ["tex2jax.js","MathMenu.js","MathZoom.js"],
+        extensions: ["tex2jax.js","MathMenu.js","MathZoom.js","Safe.js"],
         TeX: {
             extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
         },
