@@ -129,7 +129,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function base_connectData_handler($sender, $args) {
-if (($args[0] ?? '') !== 'openid') {
+        if (($args[0] ?? '') !== 'openid') {
             return;
         }
         if (!$this->signInAllowed()) {
