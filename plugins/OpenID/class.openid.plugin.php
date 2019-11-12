@@ -121,16 +121,19 @@ class OpenIDPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Capture the user's UniqueID being sent back from provider.
      *
-     *
-     * @param $sender
-     * @param $args
+     * @param EntryController $sender
+     * @param array $args
      * @throws Exception
      * @throws Gdn_UserException
      */
     public function base_connectData_handler($sender, $args) {
-        if (val(0, $args) != 'openid') {
+        if (($args[0] ?? '') !== 'openid') {
             return;
+        }
+        if (!$this->signInAllowed()) {
+            throw new Gdn_UserException(t('OpenID signin has been disabled.'));
         }
 
         $mode = $sender->Request->get('openid_mode');
@@ -191,12 +194,15 @@ class OpenIDPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Endpoint for authenticating with OpenID.
      *
      * @param EntryController $Sender
      * @param array $Args
      */
     public function entryController_openID_create($Sender, $Args) {
+        if (!$this->signInAllowed()) {
+            throw new Gdn_UserException(t('OpenID signin has been disabled.'));
+        }
         $this->EventArguments = $Args;
 
         try {
