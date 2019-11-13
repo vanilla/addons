@@ -232,14 +232,14 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
          // Convert imported discussions to use new UserIDs
          Gdn::sql()->query('update '.$newPrefix.'Discussion d
-           set d.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = d.InsertUserID)
+           set d.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = d.InsertUserID limit 1)
            where d.OldID > 0');
          Gdn::sql()->query('update '.$newPrefix.'Discussion d
-           set d.UpdateUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = d.UpdateUserID)
+           set d.UpdateUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = d.UpdateUserID limit 1)
            where d.OldID > 0
              and d.UpdateUserID is not null');
          Gdn::sql()->query('update '.$newPrefix.'Discussion d
-           set d.CategoryID = (SELECT c.CategoryID from '.$newPrefix.'Category c where c.OldID = d.CategoryID)
+           set d.CategoryID = (SELECT c.CategoryID from '.$newPrefix.'Category c where c.OldID = d.CategoryID limit 1)
            where d.OldID > 0');
 
          // UserDiscussion
@@ -271,10 +271,10 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
          // Convert imported comments to use new UserIDs
          Gdn::sql()->query('update '.$newPrefix.'Comment c
-           set c.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = c.InsertUserID)
+           set c.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = c.InsertUserID limit 1)
            where c.OldID > 0');
          Gdn::sql()->query('update '.$newPrefix.'Comment c
-           set c.UpdateUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = c.UpdateUserID)
+           set c.UpdateUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = c.UpdateUserID limit 1)
            where c.OldID > 0
              and c.UpdateUserID is not null');
 
@@ -296,13 +296,13 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
          // InsertUserID
          Gdn::sql()->query('update '.$newPrefix.'Media m
-           set m.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = m.InsertUserID)
+           set m.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = m.InsertUserID limit 1)
            where m.OldID > 0');
 
          // ForeignID / ForeignTable
-         //Gdn::sql()->query('update '.$NewPrefix.'Media m
-         //  set m.ForeignID = (SELECT c.CommentID from '.$NewPrefix.'Comment c where c.OldID = m.ForeignID)
-         //  where m.OldID > 0 and m.ForeignTable = \'comment\'');
+         Gdn::sql()->query('update '.$newPrefix.'Media m
+            set m.ForeignID = (SELECT c.CommentID from '.$newPrefix.'Comment c where c.OldID = m.ForeignID)
+            where m.OldID > 0 and m.ForeignTable = \'comment\'');
          Gdn::sql()->query('update '.$newPrefix.'Media m
            set m.ForeignID = (SELECT d.DiscussionID from '.$newPrefix.'Discussion d where d.OldID = m.ForeignID)
            where m.OldID > 0 and m.ForeignTable = \'discussion\'');
@@ -319,11 +319,11 @@ class ForumMergePlugin implements Gdn_IPlugin {
             from `'.$oldDatabase.'`.'.$oldPrefix.'Conversation');
          // InsertUserID
          Gdn::sql()->query('update '.$newPrefix.'Conversation c
-           set c.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = c.InsertUserID)
+           set c.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = c.InsertUserID limit 1)
            where c.OldID > 0');
          // UpdateUserID
          Gdn::sql()->query('update '.$newPrefix.'Conversation c
-           set c.UpdateUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = c.UpdateUserID)
+           set c.UpdateUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = c.UpdateUserID limit 1)
            where c.OldID > 0');
          // Contributors
          // a. Build userid lookup
@@ -350,7 +350,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
             // c. Update each conversation
             $conversationID = getValue('ConversationID', $conversation);
             Gdn::sql()->query('update '.$newPrefix.'Conversation
-               set Contributors = "'.mysql_real_escape_string(dbencode($updatedContributors)).'"
+               set Contributors = "'.Gdn::sql()->escapeIdentifier(dbencode($updatedContributors)).'"
                where ConversationID = '.$conversationID);
          }
 
@@ -367,7 +367,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
            where cm.OldID > 0');
          // InsertUserID
          Gdn::sql()->query('update '.$newPrefix.'ConversationMessage c
-           set c.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = c.InsertUserID)
+           set c.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = c.InsertUserID limit 1)
            where c.OldID > 0');
 
          // Conversation FirstMessageID
@@ -412,10 +412,10 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
          // Convert imported polls & options to use new UserIDs
          Gdn::sql()->query('update '.$newPrefix.'Poll p
-           set p.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = p.InsertUserID)
+           set p.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = p.InsertUserID limit 1)
            where p.OldID > 0');
          Gdn::sql()->query('update '.$newPrefix.'PollOption o
-           set o.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = o.InsertUserID)
+           set o.InsertUserID = (SELECT u.UserID from '.$newPrefix.'User u where u.OldID = o.InsertUserID limit 1)
            where o.OldID > 0');
       }
 
