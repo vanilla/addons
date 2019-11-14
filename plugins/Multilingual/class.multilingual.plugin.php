@@ -50,7 +50,7 @@ class MultilingualPlugin extends Gdn_Plugin {
                 if (isset(static::$overrides[$locale]['Name'])) {
                     $locales[$locale] = static::$overrides[$locale]['Name'];
                 } else {
-                    $locales[$locale] = ucwords(Locale::getDisplayName($locale, $locale));
+                    $locales[$locale] = mb_convert_case(Locale::getDisplayName($locale, $locale), MB_CASE_TITLE, "UTF-8");
                 }
             }
             $defaultName = Locale::getDisplayName($defaultLocale, $defaultLocale);
