@@ -642,7 +642,7 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         $discussion = $this->discussionModel->getID(val('DiscussionID', $comment), DATASET_TYPE_ARRAY);
-        if (!Gdn::session()->checkRankedPermission('Garden.Curation.Manage')){
+        if (!Gdn::session()->checkRankedPermission('Garden.Curation.Manage')) {
             $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
         }
 
