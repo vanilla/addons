@@ -264,10 +264,10 @@ class QnAPlugin extends Gdn_Plugin {
             return;
         }
 
-        if (!Gdn::session()->checkRankedPermission('Garden.Curation.Manage')) {
-            if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
-                return;
-            }
+        $permissionDiscussion = Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID);
+        $permissionCuration = Gdn::session()->checkRankedPermission('Garden.Curation.Manage');
+        if (!($permissionDiscussion || $permissionCuration)) {
+            return;
         }
         $args['CommentOptions']['QnA'] = ['Label' => t('Q&A').'...', 'Url' => '/discussion/qnaoptions?commentid='.$comment->CommentID, 'Class' => 'Popup'];
     }
