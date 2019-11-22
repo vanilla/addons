@@ -264,10 +264,11 @@ class QnAPlugin extends Gdn_Plugin {
             return;
         }
 
-        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
+        $permissionDiscussion = Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID);
+        $permissionCuration = Gdn::session()->checkRankedPermission('Garden.Curation.Manage');
+        if (!($permissionDiscussion || $permissionCuration)) {
             return;
         }
-
         $args['CommentOptions']['QnA'] = ['Label' => t('Q&A').'...', 'Url' => '/discussion/qnaoptions?commentid='.$comment->CommentID, 'Class' => 'Popup'];
     }
 
@@ -641,8 +642,9 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         $discussion = $this->discussionModel->getID(val('DiscussionID', $comment), DATASET_TYPE_ARRAY);
-
-        $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
+        if (!Gdn::session()->checkRankedPermission('Garden.Curation.Manage')) {
+            $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
+        }
 
         if ($sender->Form->authenticatedPostBack(true)) {
             $newQnA = $sender->Form->getFormValue('QnA');
