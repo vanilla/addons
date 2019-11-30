@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
-    core: vanilla/core@2.2.1
-    jobs: vanilla/jobs@1.3.0
+    core: vanilla/core@2
+    jobs: vanilla/jobs@1
 jobs:
     php_sphinx_tests:
         executor: core/sphinx
