@@ -45,7 +45,7 @@ class SearchQuestionTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         saveToConfig('Plugins.Sphinx.UseDeltas', true);
 
@@ -109,7 +109,7 @@ class SearchQuestionTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         if (empty(self::$question)) {
@@ -132,7 +132,7 @@ class SearchQuestionTest extends AbstractAPIv2Test {
      */
     public static function sphinxReindex() {
         $sphinxHost = c('Plugins.Sphinx.Server');
-        exec('curl '.$sphinxHost.':9399', $dockerResponse);
+        $r = exec('curl -s '.$sphinxHost.':9399', $dockerResponse);
         self::$dockerResponse = $dockerResponse;
         self::$sphinxReindexed = ('Sphinx reindexed.' === end($dockerResponse));
         sleep(1);

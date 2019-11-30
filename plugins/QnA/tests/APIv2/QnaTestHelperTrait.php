@@ -18,7 +18,7 @@ trait QnaTestHelperTrait {
      * @param array $expectedAttributes
      */
     protected function assertIsQuestion($discussion, $expectedAttributes = []) {
-        $this->assertInternalType('array', $discussion);
+        $this->assertIsArray($discussion);
 
         $this->assertArrayHasKey('type', $discussion);
         $this->assertEquals('question', $discussion['type']);
@@ -42,7 +42,7 @@ trait QnaTestHelperTrait {
      * @param array $expectedAttributes
      */
     protected function assertIsAnswer($comment, $expectedAttributes = []) {
-        $this->assertInternalType('array', $comment);
+        $this->assertIsArray($comment);
 
         $this->assertArrayHasKey('attributes', $comment);
         $this->assertArrayHasKey('answer', $comment['attributes']);
