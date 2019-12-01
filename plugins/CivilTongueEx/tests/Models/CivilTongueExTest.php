@@ -30,7 +30,7 @@ class CivilTongueExTest extends TestCase {
     /**
      * Add CivilTongueEx plugin to addons.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['vanilla', 'civiltongueex'];
         static::siteTestBeforeClass();
     }
@@ -41,7 +41,7 @@ class CivilTongueExTest extends TestCase {
      * @throws \Garden\Container\ContainerException Error while retrieving the entry.
      * @throws \Garden\Container\NotFoundException No entry was found for this identifier.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->plugin = new \CivilTonguePlugin();
         $this->config = self::$container->get(\Gdn_Configuration::class);
@@ -51,7 +51,7 @@ class CivilTongueExTest extends TestCase {
     /**
      * Undo changes to config.
      */
-    public function tearDown() {
+    public function tearDown(): void {
         $this->config->set('Plugins.CivilTongue.Words', $this->words, true, false);
         parent::tearDown();
     }
