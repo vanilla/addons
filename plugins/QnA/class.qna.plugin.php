@@ -925,7 +925,7 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function discussionsController_beforeBuildPager_handler($sender, $args) {
         if (Gdn::controller()->RequestMethod == 'unanswered') {
-            $count = $this->getUnansweredCount();
+            $count = $this->getUnansweredCount(true);
             $sender->setData('CountDiscussions', $count);
         }
     }
@@ -933,9 +933,10 @@ class QnAPlugin extends Gdn_Plugin {
     /**
      * Return the number of unanswered questions.
      *
+     * @param bool $pager Whether this count affects the pager or not.
      * @return int
      */
-    public function getUnansweredCount() {
+    public function getUnansweredCount($pager = false) {
         // TODO: Dekludge this when category permissions are refactored (tburry).
         $cacheKey = Gdn::request()->webRoot().'/QnA-UnansweredCount';
         $questionCount = Gdn::cache()->get($cacheKey);
@@ -953,6 +954,7 @@ class QnAPlugin extends Gdn_Plugin {
 
         // Check to see if another plugin can handle this.
         $this->EventArguments['questionCount'] = &$questionCount;
+        $this->EventArguments['pagerCount'] = $pager;
         $this->fireEvent('unansweredCount');
 
         return $questionCount;
