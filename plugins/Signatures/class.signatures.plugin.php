@@ -594,10 +594,9 @@ EOT;
 
         $sourceUserID = val('InsertUserID', $data);
         $user = Gdn::userModel()->getID($sourceUserID, DATASET_TYPE_ARRAY);
-        if (val('HideSignature', $user, false)) {
+        if (!empty($user['HideSignature']) || !empty($user['Deleted']) || !empty($user['Banned'])) {
             return;
         }
-
 
         $signature = $this->signatures($sender, $sourceUserID);
 
