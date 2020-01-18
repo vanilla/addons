@@ -1,7 +1,7 @@
 {
     "name": "Invisibility Cloak",
     "description": "Hide your forum from the prying eyes of search engines and bots while you set it up.",
-    "version": "1.0",
+    "version": "1.1",
     "key": "invisibilitycloak",
     "type": "addon",
     "authors": [
@@ -13,5 +13,8 @@
     "require": {
         "vanilla": ">=2.1"
     },
-    "icon": "invisibility_cloak.png"
+    "icon": "invisibility_cloak.png",
+    "settingsUrl": "/settings/invisibility-cloak",
+    "settingsPermission": "Garden.Settings.Manage",
+    "usePopupSettings": true
 }
