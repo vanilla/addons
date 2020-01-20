@@ -1,6 +1,6 @@
 {
     "name": "Emotify :)",
-    "description": "Replaces <a href=\"http://en.wikipedia.org/wiki/Emoticon\">emoticons</a> (smilies) with friendly pictures.",
+    "description": "Replaces emoticons (smilies) with friendly pictures.",
     "version": "2.0.5.1",
     "mobileFriendly": true,
     "license": "GPL v2",
@@ -15,5 +15,6 @@
     ],
     "require": {
         "vanilla": ">=2.0.18"
-    }
+    },
+    "hidden": true
 }
