@@ -522,6 +522,7 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @throws /Exception Throws an exception when the jsConnect provider is not found.
      */
     public function entryController_jsConnect_create($sender, $action = '', $target = '') {
+        $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
         // Clear the nonce from the stash if any!
         Gdn::session()->stash('jsConnectNonce');
 
