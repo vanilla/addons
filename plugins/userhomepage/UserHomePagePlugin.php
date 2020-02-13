@@ -102,13 +102,13 @@ class UserHomePagePlugin extends \Gdn_Plugin {
             'homepage' => [
                 'LabelCode' => 'Home Page',
                 "Description" => sprintf(
-                    t("Choose the page you would like to see when you visit visit: %s."),
+                    t("Choose the page you would like to see when you visit: %s."),
                     "<strong><a href='$homeUrl'>$homeUrl</a></strong>"
                 ),
                 'Control' => 'RadioList',
                 'Items' => [
-                    '/categories' => '/categories',
-                    '/discussions' => '/discussions',
+                    '/categories' => 'categories',
+                    '/discussions' => 'discussions',
                 ],
                 'Options' => ['Default' => $this->getDefaultHomepage()],
             ],

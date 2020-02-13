@@ -1,6 +1,6 @@
 # User Home Page Selector Plugin
 
-This is a simple plugin to allow users to check set their preferred home page separately from the site's default settings.
+This is a simple plugin to allow users to set their preferred home page separately from the site's default settings.
 
 The plugin is made up of the following:
 
