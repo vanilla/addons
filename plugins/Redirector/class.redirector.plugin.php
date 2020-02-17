@@ -602,6 +602,7 @@ class RedirectorPlugin extends Gdn_Plugin {
                 '_arg2' => 'Page'
             ];
         } else {
+            // This is an ipb style topic. we do fix here 
             if (!isset($get['_arg3'])) {
 +                return [
 +                    '_arg0' => 'DiscussionID'
