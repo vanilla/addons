@@ -602,25 +602,23 @@ class RedirectorPlugin extends Gdn_Plugin {
                 '_arg2' => 'Page'
             ];
         } else {
-            if (val('_arg3', $get) == '') {
-                // This is punbb another style topic
-                return [
-                    '_arg0' => 'DiscussionID'
-                ];
-            } else {
-                // This is an ipb style topic.
-                return [
-                    'p' => 'CommentID',
-                    '_arg0' => [
-                        'DiscussionID',
-                        'Filter' => [__CLASS__, 'removeID'],
-                    ],
-                    '_arg1' => [
-                        'Page',
-                        'Filter' => [__CLASS__, 'IPBPageNumber'],
-                    ],
-                ];
-            }
+            if (!isset($get['_arg3'])) {
++                return [
++                    '_arg0' => 'DiscussionID'
++                ];
++            } else {
++                return [
++                    'p' => 'CommentID',
++                    '_arg0' => [
++                        'DiscussionID',
++                        'Filter' => [__CLASS__, 'removeID'],
++                    ],
++                    '_arg1' => [
++                        'Page',
++                        'Filter' => [__CLASS__, 'IPBPageNumber'],
++                    ],
++                ];
++            }
         }
     }
 
