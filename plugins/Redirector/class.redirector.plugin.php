@@ -604,22 +604,22 @@ class RedirectorPlugin extends Gdn_Plugin {
         } else {
             // This is an ipb style topic. we do fix here 
             if (!isset($get['_arg3'])) {
-+                return [
-+                    '_arg0' => 'DiscussionID'
-+                ];
-+            } else {
-+                return [
-+                    'p' => 'CommentID',
-+                    '_arg0' => [
-+                        'DiscussionID',
-+                        'Filter' => [__CLASS__, 'removeID'],
-+                    ],
-+                    '_arg1' => [
-+                        'Page',
-+                        'Filter' => [__CLASS__, 'IPBPageNumber'],
-+                    ],
-+                ];
-+            }
+                return [
+                    '_arg0' => 'DiscussionID'
+                ];
+            } else {
+                return [
+                    'p' => 'CommentID',
+                    '_arg0' => [
+                        'DiscussionID',
+                        'Filter' => [__CLASS__, 'removeID'],
+                    ],
+                    '_arg1' => [
+                        'Page',
+                        'Filter' => [__CLASS__, 'IPBPageNumber'],
+                    ],
+                ];
+            }
         }
     }
 
