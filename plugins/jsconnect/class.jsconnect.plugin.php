@@ -442,7 +442,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 throw new Gdn_UserException(t("Signature invalid."), 400);
             }
         }
-        Logger::event('jsconnect_success', Logger::ERROR, 'JSData Passed Validation', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived, 'Secret' => val('AssociationSecret', $Provider), 'HashType' => val('HashType', $Provider, 'md5')]);
+        Logger::event('jsconnect_success', Logger::INFO, 'JSData Passed Validation', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived, 'Secret' => val('AssociationSecret', $Provider), 'HashType' => val('HashType', $Provider, 'md5')]);
 
         // Map all of the standard jsConnect data.
         $Map = ['uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'fullname' => 'FullName', 'roles' => 'Roles'];
