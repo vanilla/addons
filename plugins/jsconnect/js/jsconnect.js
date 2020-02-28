@@ -21,6 +21,7 @@ $.jsConnectAuthenticate = function(url) {
         url: url,
         dataType: 'json',
         timeout: 10000,
+        cache: false,
         success: function(data) {
             var connectData = $.param(data);
 
@@ -114,6 +115,7 @@ $.fn.jsconnect = function(options) {
         $.ajax({
             url: url,
             dataType: 'json',
+            cache: false,
             success: function(data, textStatus) {
                 var connectUrl = gdn.url('/entry/jsconnect?client_id=' + client_id + '&Target=' + target);
 
