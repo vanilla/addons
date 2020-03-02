@@ -33,8 +33,8 @@ $.jsConnectAuthenticate = function(url) {
                     var target = $('#Form_Target').val();
                     if (!target)
                         target = '/';
-
-                    window.location.replace(gdn.url(target));
+                   var datapassed = encodeURIComponent(JSON.stringify(data));
+                    window.location.replace(gdn.url(target)+'&'+datapassed);
                     return;
                     //            data = {'error': 'unauthorized', 'message': 'You are not signed in.' };
                     //               $('#Form_JsConnect-Connect').attr('action', gdn.url('/entry/jsconnect/guest'));
