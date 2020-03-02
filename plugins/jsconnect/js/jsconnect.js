@@ -34,6 +34,7 @@ $.jsConnectAuthenticate = function(url) {
                     if (!target)
                         target = '/';
                    var datapassed = encodeURIComponent(JSON.stringify(data));
+                   console.log(datapassed);
                     window.location.replace(gdn.url(target)+'&'+datapassed);
                     return;
                     //            data = {'error': 'unauthorized', 'message': 'You are not signed in.' };
