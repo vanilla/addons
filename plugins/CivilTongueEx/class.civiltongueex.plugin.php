@@ -7,20 +7,27 @@
 
 // 1.0 - Fix empty pattern when list ends in semi-colon, use non-custom permission (2012-03-12 Lincoln)
 
+use Vanilla\Plugins\ContentFilterInterface;
+
 /**
  * Class CivilTonguePlugin
  */
-class CivilTonguePlugin extends Gdn_Plugin {
+class CivilTonguePlugin extends Gdn_Plugin implements ContentFilterInterface {
 
     /** @var mixed  */
     public $Replacement;
 
+    /** @var ContentFilterInterface */
+    protected $contentFilter;
+
     /**
-     *
+     * CivilTonguePlugin constructor.
+     * @param ContentFilterInterface $contentFilter
      */
-    public function  __construct() {
+    public function __construct(ContentFilterInterface $contentFilter) {
         parent::__construct();
         $this->setReplacement(c('Plugins.CivilTongue.Replacement', ''));
+        $this->contentFilter = $contentFilter;
     }
 
     /**
@@ -214,8 +221,9 @@ class CivilTonguePlugin extends Gdn_Plugin {
         $discussions = $sender->data('Discussions', []);
         if (is_array($discussions) || $discussions instanceof \Traversable) {
             foreach ($discussions as &$discussion) {
-                $discussion->Name = $this->replace($discussion->Name);
-                $discussion->Body = $this->replace($discussion->Body);
+//                $discussion->Name = $this->replace($discussion->Name);
+//                $discussion->Body = $this->replace($discussion->Body);
+                $discussion->Name = $this->contentFilter->replace($discussion->Name);
             }
         }
     }
