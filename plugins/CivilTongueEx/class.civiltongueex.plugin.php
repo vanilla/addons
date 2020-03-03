@@ -292,12 +292,16 @@ class CivilTonguePlugin extends Gdn_Plugin implements ContentFilterInterface {
     }
 
     /**
+     * Replace black listed words according to pattern
      *
-     *
-     * @param $text
+     * @param string $text
      * @return mixed
      */
-    public function replace($text) {
+    public function replace($text = '') {
+        if (!isset($text)) {
+            return $text;
+        }
+
         $patterns = $this->getPatterns();
         $result = preg_replace($patterns, $this->Replacement, $text);
 //      $Result = preg_replace_callback($Patterns, function($m) { return $m[0][0].str_repeat('*', strlen($m[0]) - 1); }, $Text);
