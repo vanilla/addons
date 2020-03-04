@@ -22,6 +22,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
 
     /**
      * CivilTonguePlugin constructor.
+     *
      * @param ContentFilterInterface $contentFilter
      */
     public function __construct(\CivilTongueEx\Library\ContentFilter $contentFilter) {
@@ -294,9 +295,9 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * Replace black listed words according to pattern
      *
      * @param string $text
-     * @return mixed
+     * @return string
      */
-    public function replace($text = '') {
+    public function replace($text = ''):string {
         return $this->contentFilter->replace($text);
     }
 
@@ -305,7 +306,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @return array
      */
-    public function getpatterns() {
+    public function getpatterns():array {
         return $this->contentFilter->getPatterns();
     }
 

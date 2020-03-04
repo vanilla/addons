@@ -42,7 +42,7 @@ class ContentFilter implements ContentFilterInterface {
      *
      * @return array
      */
-    public function getPatterns() {
+    public function getPatterns():array {
         static $patterns = null;
 
         if ($patterns === null) {
@@ -61,20 +61,26 @@ class ContentFilter implements ContentFilterInterface {
     }
 
     /**
+     * Get replacement
+     *
      * @return string
      */
-    public function getReplacement() {
+    public function getReplacement():string {
         return $this->replacement;
     }
 
     /**
+     * Get words
+     *
      * @return string
      */
-    public function getWords() {
+    public function getWords():string {
         return $this->words;
     }
 
     /**
+     * Set replacement
+     *
      * @param string $replacement
      */
     public function setReplacement($replacement) {
@@ -82,6 +88,8 @@ class ContentFilter implements ContentFilterInterface {
     }
 
     /**
+     * Set words
+     *
      * @param string $words
      */
     public function setWords($words) {

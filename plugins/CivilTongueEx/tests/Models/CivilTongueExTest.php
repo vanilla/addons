@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Models;
 
+use CivilTongueEx\Library\ContentFilter;
 use PHPUnit\Framework\TestCase;
 use VanillaTests\SiteTestTrait;
 
@@ -43,16 +44,17 @@ class CivilTongueExTest extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->plugin = new \CivilTonguePlugin();
+        $this->contentFilter = $this->container()->get(ContentFilter::class);
+        $this->plugin = new \CivilTonguePlugin($this->contentFilter);
         $this->config = self::$container->get(\Gdn_Configuration::class);
-        $this->words = $this->config->get('Plugins.CivilTongue.Words', '');
+        $this->words = $this->contentFilter->setWords($this->config->get('Plugins.CivilTongue.Words', ''));
     }
 
     /**
      * Undo changes to config.
      */
     public function tearDown(): void {
-        $this->config->set('Plugins.CivilTongue.Words', $this->words, true, false);
+        $this->contentFilter->setWords($this->words);
         parent::tearDown();
     }
 
@@ -66,7 +68,7 @@ class CivilTongueExTest extends TestCase {
      *
      */
     public function testReplacePatterns(string $patternList, string $text, string $expected) {
-        $this->config->set('Plugins.CivilTongue.Words', $patternList, true, false);
+        $this->contentFilter->setWords($patternList);
         $this->plugin->setReplacement('****');
         $output = $this->plugin->replace($text);
         $this->assertEquals($expected, $output);
