@@ -14,6 +14,7 @@ namespace Vanilla\Plugins;
 interface ContentFilterInterface {
 
     /**
+     * Replace black-listed words according to pattern
      *
      * @param string $text
      * @return mixed
