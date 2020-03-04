@@ -12,7 +12,7 @@ use Vanilla\Plugins\ContentFilterInterface;
 /**
  * Class CivilTonguePlugin
  */
-class CivilTonguePlugin extends Gdn_Plugin implements ContentFilterInterface {
+class CivilTonguePlugin extends Gdn_Plugin {
 
     /** @var mixed  */
     public $Replacement;
@@ -24,7 +24,7 @@ class CivilTonguePlugin extends Gdn_Plugin implements ContentFilterInterface {
      * CivilTonguePlugin constructor.
      * @param ContentFilterInterface $contentFilter
      */
-    public function __construct(ContentFilterInterface $contentFilter) {
+    public function __construct(\CivilTongueEx\Library\ContentFilter $contentFilter) {
         parent::__construct();
         $this->setReplacement(c('Plugins.CivilTongue.Replacement', ''));
         $this->contentFilter = $contentFilter;
@@ -298,14 +298,7 @@ class CivilTonguePlugin extends Gdn_Plugin implements ContentFilterInterface {
      * @return mixed
      */
     public function replace($text = '') {
-        if (!isset($text)) {
-            return $text;
-        }
-
-        $patterns = $this->getPatterns();
-        $result = preg_replace($patterns, $this->Replacement, $text);
-//      $Result = preg_replace_callback($Patterns, function($m) { return $m[0][0].str_repeat('*', strlen($m[0]) - 1); }, $Text);
-        return $result;
+        return $this->contentFilter->replace($text);
     }
 
     /**
@@ -314,22 +307,7 @@ class CivilTonguePlugin extends Gdn_Plugin implements ContentFilterInterface {
      * @return array
      */
     public function getpatterns() {
-        // Get config.
-        static $patterns = NULL;
-
-        if ($patterns === NULL) {
-            $patterns = [];
-            $words = c('Plugins.CivilTongue.Words', null);
-            if ($words !== null) {
-                $explodedWords = explode(';', $words);
-                foreach ($explodedWords as $word) {
-                    if (trim($word)) {
-                        $patterns[] = '`(?<![\pL])'.preg_quote(trim($word), '`').'(?![\pL])`isu';
-                    }
-                }
-            }
-        }
-        return $patterns;
+        return $this->contentFilter->getPatterns();
     }
 
     /**

@@ -6,10 +6,16 @@
  */
 
 use Vanilla\Plugins\ContentFilterInterface;
+use Vanilla\Utility\ContainerUtils;
 
 $container = \Gdn::getContainer();
 
 $container
-    ->setClass(\CivilTonguePlugin::class)
     ->rule(ContentFilterInterface::class)
-    ->addCall('replace');
+    ->setClass(\CivilTongueEx\Library\ContentFilter::class)
+    ->addCall('setReplacement', [
+        ContainerUtils::config('Plugins.CivilTongue.Replacement')
+    ])
+    ->addCall('setWords', [
+        ContainerUtils::config('Plugins.CivilTongue.Words')
+    ]);
