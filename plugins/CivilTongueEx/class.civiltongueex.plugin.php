@@ -221,9 +221,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
         $discussions = $sender->data('Discussions', []);
         if (is_array($discussions) || $discussions instanceof \Traversable) {
             foreach ($discussions as &$discussion) {
-//                $discussion->Name = $this->replace($discussion->Name);
-//                $discussion->Body = $this->replace($discussion->Body);
                 $discussion->Name = $this->contentFilter->replace($discussion->Name);
+                $discussion->Body = $this->contentFilter->($discussion->Body);
             }
         }
     }
