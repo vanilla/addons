@@ -25,9 +25,9 @@ class ContentFilter implements ContentFilterInterface {
      * Replace black-listed words according to pattern
      *
      * @param string $text
-     * @return mixed
+     * @return string
      */
-    public function replace($text = '') {
+    public function replace($text = ''): string {
         if (!isset($text)) {
             return $text;
         }
@@ -42,7 +42,7 @@ class ContentFilter implements ContentFilterInterface {
      *
      * @return array
      */
-    public function getPatterns():array {
+    public function getPatterns(): array {
         static $patterns = null;
 
         if ($patterns === null) {
@@ -65,7 +65,7 @@ class ContentFilter implements ContentFilterInterface {
      *
      * @return string
      */
-    public function getReplacement():string {
+    public function getReplacement(): string {
         return $this->replacement;
     }
 
@@ -74,7 +74,7 @@ class ContentFilter implements ContentFilterInterface {
      *
      * @return string
      */
-    public function getWords():string {
+    public function getWords(): string {
         return $this->words;
     }
 
