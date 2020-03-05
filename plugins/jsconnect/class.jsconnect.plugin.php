@@ -563,6 +563,18 @@ class JsConnectPlugin extends Gdn_Plugin {
             $get = arrayTranslate($sender->Request->get(), ['client_id', 'display']);
 
             $sender->addDefinition('JsAuthenticateUrl', self::connectUrl($provider, true));
+            if ($provider['TestMode'] ?? false) {
+                $sender->addDefinition('JsConnectTestMode', true);
+            }
+
+            if (gdn::config('Garden.PrivateCommunity') && $provider['IsDefault']) {
+                // jsconnect.js needs to know to not to redirect if there is an error
+                // and PrivateCommunity is on and this is the only log in method,
+                // this causes a loop.
+                $sender->addDefinition('PrivateCommunity', true);
+                $sender->addDefinition('GenericSSOErrorMessage', gdn::translate('An error has occurred, please try again.'));
+            }
+
             $sender->addJsFile('jsconnect.js', 'plugins/jsconnect');
             $sender->setData('Title', t('Connecting...'));
             $sender->Form->Action = url('/entry/connect/jsconnect?'.http_build_query($get));
