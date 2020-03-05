@@ -7,6 +7,8 @@
 
 // 1.0 - Fix empty pattern when list ends in semi-colon, use non-custom permission (2012-03-12 Lincoln)
 
+use \CivilTongueEx\Library\ContentFilter;
+
 /**
  * Class CivilTonguePlugin
  */
@@ -15,12 +17,18 @@ class CivilTonguePlugin extends Gdn_Plugin {
     /** @var mixed  */
     public $Replacement;
 
+    /** @var \CivilTongueEx\Library\ContentFilter */
+    protected $contentFilter;
+
     /**
+     * CivilTonguePlugin constructor.
      *
+     * @param ContentFilter $contentFilter
      */
-    public function  __construct() {
+    public function __construct(ContentFilter $contentFilter) {
         parent::__construct();
         $this->setReplacement(c('Plugins.CivilTongue.Replacement', ''));
+        $this->contentFilter = $contentFilter;
     }
 
     /**
@@ -284,40 +292,22 @@ class CivilTonguePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Replace black listed words according to pattern
      *
-     *
-     * @param $text
-     * @return mixed
+     * @param string $text
+     * @return ?string
      */
-    public function replace($text) {
-        $patterns = $this->getPatterns();
-        $result = preg_replace($patterns, $this->Replacement, $text);
-//      $Result = preg_replace_callback($Patterns, function($m) { return $m[0][0].str_repeat('*', strlen($m[0]) - 1); }, $Text);
-        return $result;
+    public function replace($text = ''): ?string {
+        return $this->contentFilter->replace($text);
     }
 
     /**
-     *
+     * Get word patterns.
      *
      * @return array
      */
-    public function getpatterns() {
-        // Get config.
-        static $patterns = NULL;
-
-        if ($patterns === NULL) {
-            $patterns = [];
-            $words = c('Plugins.CivilTongue.Words', null);
-            if ($words !== null) {
-                $explodedWords = explode(';', $words);
-                foreach ($explodedWords as $word) {
-                    if (trim($word)) {
-                        $patterns[] = '`(?<![\pL])'.preg_quote(trim($word), '`').'(?![\pL])`isu';
-                    }
-                }
-            }
-        }
-        return $patterns;
+    public function getpatterns(): array {
+        return $this->contentFilter->getPatterns();
     }
 
     /**
