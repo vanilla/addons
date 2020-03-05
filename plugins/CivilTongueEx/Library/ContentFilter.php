@@ -24,9 +24,9 @@ class ContentFilter {
      * Replace black-listed words according to pattern
      *
      * @param string $text
-     * @return string
+     * @return ?string
      */
-    public function replace($text = ''): string {
+    public function replace($text = ''): ?string {
         if (!isset($text)) {
             return $text;
         }

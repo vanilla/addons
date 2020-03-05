@@ -295,9 +295,9 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * Replace black listed words according to pattern
      *
      * @param string $text
-     * @return string
+     * @return ?string
      */
-    public function replace($text = ''): string {
+    public function replace($text = ''): ?string {
         return $this->contentFilter->replace($text);
     }
 
