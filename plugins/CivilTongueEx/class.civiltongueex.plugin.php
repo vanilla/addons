@@ -298,16 +298,16 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param string $text
      * @return string
      */
-    public function replace($text = ''):string {
+    public function replace($text = ''): string {
         return $this->contentFilter->replace($text);
     }
 
     /**
-     *
+     * Get word patterns.
      *
      * @return array
      */
-    public function getpatterns():array {
+    public function getpatterns(): array {
         return $this->contentFilter->getPatterns();
     }
 
