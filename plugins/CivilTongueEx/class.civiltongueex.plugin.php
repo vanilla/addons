@@ -8,6 +8,7 @@
 // 1.0 - Fix empty pattern when list ends in semi-colon, use non-custom permission (2012-03-12 Lincoln)
 
 use Vanilla\Plugins\ContentFilterInterface;
+use \CivilTongueEx\Library\ContentFilter;
 
 /**
  * Class CivilTonguePlugin
@@ -25,7 +26,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @param ContentFilterInterface $contentFilter
      */
-    public function __construct(\CivilTongueEx\Library\ContentFilter $contentFilter) {
+    public function __construct(ContentFilter $contentFilter) {
         parent::__construct();
         $this->setReplacement(c('Plugins.CivilTongue.Replacement', ''));
         $this->contentFilter = $contentFilter;
