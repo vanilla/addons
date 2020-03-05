@@ -20,7 +20,7 @@ class ContentFilterTest extends TestCase {
      */
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
-        require '../../Library/ContentFilter.php';
+        require PATH_ROOT.'/plugins/CivilTongueEx/Library/ContentFilter.php';
     }
 
     /**
