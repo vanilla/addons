@@ -5,14 +5,14 @@
  * @license GPL-2.0-only
  */
 
-use Vanilla\Plugins\ContentFilterInterface;
+use CivilTongueEx\Library\ContentFilter;
 use Vanilla\Utility\ContainerUtils;
 
 $container = \Gdn::getContainer();
 
 $container
-    ->rule(ContentFilterInterface::class)
-    ->setClass(\CivilTongueEx\Library\ContentFilter::class)
+    ->rule(ContentFilter::class)
+    ->setClass(ContentFilter::class)
     ->addCall('setReplacement', [
         ContainerUtils::config('Plugins.CivilTongue.Replacement')
     ])

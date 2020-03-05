@@ -16,11 +16,10 @@ use PHPUnit\Framework\TestCase;
 class ContentFilterTest extends TestCase {
 
     /**
-     * Include the abstract controller because it's in an addon.
+     * Bootstrap ContentFilter
      */
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
-        require '../../ContentFilterInterface.php';
         require '../../Library/ContentFilter.php';
     }
 

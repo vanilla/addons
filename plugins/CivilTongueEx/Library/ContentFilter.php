@@ -7,14 +7,12 @@
 
 namespace CivilTongueEx\Library;
 
-use Vanilla\Plugins\ContentFilterInterface;
-
 /**
  * Class ContentFilter
  *
  * @package CivilTongueEx\Library
  */
-class ContentFilter implements ContentFilterInterface {
+class ContentFilter {
 
     /** @var string? */
     private $replacement;
