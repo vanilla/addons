@@ -707,7 +707,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         if ($form->authenticatedPostBack()) {
             if ($form->getFormValue('Generate') || $sender->Request->post('Generate')) {
                 $generate = true;
-                $key = random_int(0, PHP_INT_MAX);
+                $key = random_int(1000000, 9999999);
                 $secret = betterRandomString(self::DEFAULT_SECRET_LENGTH, "Aa0");
                 $sender->setFormSaved(false);
             } else {
