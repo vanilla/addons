@@ -51,7 +51,7 @@ class ContentFilter {
                 $explodedWords = explode(';', $words);
                 foreach ($explodedWords as $word) {
                     if (trim($word)) {
-                        $patterns[] = '`(?<![\pL])'.preg_quote(trim($word), '`').'(?![\pL])`isu';
+                        $patterns[] = '`(?<![\pL\pN])'.preg_quote(trim($word), '`').'(?![\pL\pN])`isu';
                     }
                 }
             }
