@@ -259,7 +259,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         $maxLength = self::getMaximumTextLength();
         if ($maxLength !== null && $maxLength > 0) {
             $maxLength = intval($maxLength);
-            $format = config('Plugin.Signatures.Format', Gdn_Format::defaultFormat());
+            $format = isset($fields['Format']) ? $fields['Format'] : Gdn_Format::defaultFormat();
             $body = val('Plugin.Signatures.Sig', $fields, '');
             $plainTextLength = $this->formatService->getPlainTextLength($body, $format);
 
