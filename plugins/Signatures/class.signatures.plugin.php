@@ -39,6 +39,10 @@ class SignaturesPlugin extends Gdn_Plugin {
     /** @var array List of config settings can be overridden by sessions in other plugins */
     private $overriddenConfigSettings = ['MaxNumberImages', 'MaxLength'];
 
+    /**
+     * SignaturesPlugin constructor.
+     * @param FormatService $formatService
+     */
     public function __construct(FormatService $formatService) {
         parent::__construct();
         $this->formatService = $formatService;
@@ -257,12 +261,9 @@ class SignaturesPlugin extends Gdn_Plugin {
             $maxLength = intval($maxLength);
             $format = config('Plugin.Signatures.Format', Gdn_Format::defaultFormat());
             $body = val('Plugin.Signatures.Sig', $fields, '');
-            //$formatted = Gdn_Format::to($body, $format);
-            //$plainText = trim(Gdn_format::text($formatted));
             $plainTextLength = $this->formatService->getPlainTextLength($body, $format);
 
-            // Validate the amount of text.
-            //$length = strlen($plainText);
+            // Validate the amount of text
             $difference = $plainTextLength - $maxLength;
             if ($difference > 0) {
                 $sender->Form->addError(sprintf(
