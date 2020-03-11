@@ -22,6 +22,8 @@
  * @package Addons
  */
 
+use \Vanilla\Formatting\FormatService;
+
 class SignaturesPlugin extends Gdn_Plugin {
 
     const Unlimited = 'Unlimited';
@@ -31,9 +33,16 @@ class SignaturesPlugin extends Gdn_Plugin {
     /** @var bool */
     public $Disabled = false;
 
+    /** @var FormatService  */
+    private $formatService;
+
     /** @var array List of config settings can be overridden by sessions in other plugins */
     private $overriddenConfigSettings = ['MaxNumberImages', 'MaxLength'];
 
+    public function __construct(FormatService $formatService) {
+        parent::__construct();
+        $this->formatService = $formatService;
+    }
 
     /**
      * Add mapper methods
@@ -248,12 +257,13 @@ class SignaturesPlugin extends Gdn_Plugin {
             $maxLength = intval($maxLength);
             $format = config('Plugin.Signatures.Format', Gdn_Format::defaultFormat());
             $body = val('Plugin.Signatures.Sig', $fields, '');
-            $formatted = Gdn_Format::to($body, $format);
-            $plainText = trim(Gdn_format::text($formatted));
+            //$formatted = Gdn_Format::to($body, $format);
+            //$plainText = trim(Gdn_format::text($formatted));
+            $plainTextLength = $this->formatService->getPlainTextLength($body, $format);
 
             // Validate the amount of text.
-            $length = strlen($plainText);
-            $difference = $length - $maxLength;
+            //$length = strlen($plainText);
+            $difference = $plainTextLength - $maxLength;
             if ($difference > 0) {
                 $sender->Form->addError(sprintf(
                     t('ValidateLength'),
