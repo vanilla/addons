@@ -385,7 +385,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             if (val('_arg3', $get) == 'page') {
                 $result['_arg4'] = 'Page';
             }
-        } elseif (val('_arg1', $get) == 'bd-p') { // Board = Category
+        } elseif (val('_arg1', $get) == 'bd-p' || $get['_arg1'] == 'ct-p') { // bd-p ,ct-p ,tkb-p are Category, but pending for tkb-p
             $result = [
                 '_arg2' => [
                     'CategoryCode',
@@ -540,7 +540,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             ];
             self::vbFriendlyUrlID($get, 't');
         }
-        
+
         return $data;
 
     }
@@ -602,18 +602,24 @@ class RedirectorPlugin extends Gdn_Plugin {
                 '_arg2' => 'Page'
             ];
         } else {
-            // This is an ipb style topic.
-            return [
-                'p' => 'CommentID',
-                '_arg0' => [
-                    'DiscussionID',
-                    'Filter' => [__CLASS__, 'removeID'],
-                ],
-                '_arg1' => [
-                    'Page',
-                    'Filter' => [__CLASS__, 'IPBPageNumber'],
-                ],
-            ];
+            if (!isset($get['_arg3'])) {
+                return [
+                    '_arg0' => 'DiscussionID'
+                ];
+            } else {
+                // This is an ipb style topic.
+                return [
+                    'p' => 'CommentID',
+                    '_arg0' => [
+                        'DiscussionID',
+                        'Filter' => [__CLASS__, 'removeID'],
+                    ],
+                    '_arg1' => [
+                        'Page',
+                        'Filter' => [__CLASS__, 'IPBPageNumber'],
+                    ],
+                ];
+            }
         }
     }
 
