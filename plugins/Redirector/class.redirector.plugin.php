@@ -385,7 +385,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             if (val('_arg3', $get) == 'page') {
                 $result['_arg4'] = 'Page';
             }
-        } elseif (val('_arg1', $get) == 'bd-p' || $get['_arg1'] == 'ct-p') { // bd-p ,ct-p ,tkb-p are Category, but pending for tkb-p
+        } elseif (isset($get['_arg1']) && in_array($get['_arg1'], ['bd-p', 'ct-p', 'tkb-p'])) {
             $result = [
                 '_arg2' => [
                     'CategoryCode',
@@ -590,6 +590,7 @@ class RedirectorPlugin extends Gdn_Plugin {
      */
     public static function topicFilter(&$get) {
         if (val('_arg2', $get) == 'page') {
+            // Check issue from: https://github.com/vanilla/addons/issues/737
             // This is a punbb style topic.
             return [
                 '_arg0' => 'DiscussionID',
@@ -602,24 +603,18 @@ class RedirectorPlugin extends Gdn_Plugin {
                 '_arg2' => 'Page'
             ];
         } else {
-            if (!isset($get['_arg3'])) {
-                return [
-                    '_arg0' => 'DiscussionID'
-                ];
-            } else {
-                // This is an ipb style topic.
-                return [
-                    'p' => 'CommentID',
-                    '_arg0' => [
-                        'DiscussionID',
-                        'Filter' => [__CLASS__, 'removeID'],
-                    ],
-                    '_arg1' => [
-                        'Page',
-                        'Filter' => [__CLASS__, 'IPBPageNumber'],
-                    ],
-                ];
-            }
+            // This is an ipb style topic.
+            return [
+                'p' => 'CommentID',
+                '_arg0' => [
+                    'DiscussionID',
+                    'Filter' => [__CLASS__, 'removeID'],
+                ],
+                '_arg1' => [
+                    'Page',
+                    'Filter' => [__CLASS__, 'IPBPageNumber'],
+                ],
+            ];
         }
     }
 
