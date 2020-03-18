@@ -10,6 +10,8 @@
  */
 class JsConnectPlugin extends Gdn_Plugin {
 
+    const DEFAULT_SECRET_LENGTH = 64;
+
     const NONCE_EXPIRATION = 5 * 60;
 
     /**
@@ -717,8 +719,8 @@ class JsConnectPlugin extends Gdn_Plugin {
         if ($form->authenticatedPostBack()) {
             if ($form->getFormValue('Generate') || $sender->Request->post('Generate')) {
                 $generate = true;
-                $key = mt_rand();
-                $secret = md5(mt_rand());
+                $key = random_int(1000000, 9999999);
+                $secret = betterRandomString(self::DEFAULT_SECRET_LENGTH, "Aa0");
                 $sender->setFormSaved(false);
             } else {
                 $form->validateRule('AuthenticationKey', 'ValidateRequired');
