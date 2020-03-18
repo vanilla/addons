@@ -79,6 +79,11 @@ class TrollManagementPlugin extends Gdn_Plugin {
         $sender->permission('Garden.Moderation.Manage');
 
         $trollUserID = $userID;
+        // Make sure the user doesn't have the same permission.
+        $userModel = new UserModel();
+        if ($userModel->checkPermission($trollUserID, 'Garden.Moderation.Manage')) {
+            throw new \Garden\Web\Exception\ForbiddenException('You cannot ban someone with the Garden.Moderation.Manage permission');
+        }
 
         // Validate the transient key && permissions
         // Make sure we are posting back.
