@@ -27,6 +27,16 @@ class TrollManagementPlugin extends Gdn_Plugin {
     static $trolls = null;
 
     /**
+     * @var Gdn_Session.
+     */
+    private $session;
+
+    public function __construct(Gdn_Session $session) {
+        parent::__construct();
+        $this->session = $session;
+    }
+
+    /**
      * Setup: on enable
      */
     public function setup() {
@@ -74,38 +84,41 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * Validates the current user's permissions & transientkey and then marks a user as a troll.
      *
      * @param UserController $sender
+     * @throws \Garden\Web\Exception\ForbiddenException
+     * @throws Exception
      */
     public function userController_markTroll_create($sender, $userID, $troll = true) {
         $sender->permission('Garden.Moderation.Manage');
 
         $trollUserID = $userID;
         // Make sure the user doesn't have the same permission.
-        $userModel = new UserModel();
-        if ($userModel->checkPermission($trollUserID, 'Garden.Moderation.Manage')) {
-            throw new \Garden\Web\Exception\ForbiddenException('You cannot ban someone with the Garden.Moderation.Manage permission');
+//        $userModel = new UserModel();
+//        if ($userModel->checkPermission($trollUserID, 'Garden.Moderation.Manage')) {
+//            throw new \Garden\Web\Exception\ForbiddenException('You cannot mark someone with the Garden.Moderation.Manage permission as a troll.');
+//        }
+        if ($this->session->hasHigherPermissionLevel('Garden.Moderation.Manage', $trollUserID)) {
+            // Validate the transient key && permissions
+            // Make sure we are posting back.
+            if (!$sender->Request->isAuthenticatedPostBack()) {
+                throw permissionException('Javascript');
+            }
+
+            $trolls = self::getTrolls();
+
+            // Toggle troll value in DB
+            if (in_array($trollUserID, $trolls)) {
+                Gdn::sql()->update('User', ['Troll' => 0], ['UserID' => $trollUserID])->put();
+                unset($trolls[array_search($trollUserID, $trolls)]);
+            } else {
+                Gdn::sql()->update('User', ['Troll' => 1], ['UserID' => $trollUserID])->put();
+                $trolls[] = $trollUserID;
+            }
+
+            self::setTrolls($trolls);
+
+            $sender->jsonTarget('', '', 'Refresh');
+            $sender->render('Blank', 'Utility', 'Dashboard');
         }
-
-        // Validate the transient key && permissions
-        // Make sure we are posting back.
-        if (!$sender->Request->isAuthenticatedPostBack()) {
-            throw permissionException('Javascript');
-        }
-
-        $trolls = self::getTrolls();
-
-        // Toggle troll value in DB
-        if (in_array($trollUserID, $trolls)) {
-            Gdn::sql()->update('User', ['Troll' => 0], ['UserID' => $trollUserID])->put();
-            unset($trolls[array_search($trollUserID, $trolls)]);
-        } else {
-            Gdn::sql()->update('User', ['Troll' => 1], ['UserID' => $trollUserID])->put();
-            $trolls[] = $trollUserID;
-        }
-
-        self::setTrolls($trolls);
-
-        $sender->jsonTarget('', '', 'Refresh');
-        $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
