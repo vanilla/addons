@@ -34,6 +34,11 @@ class TrollManagementPlugin extends Gdn_Plugin {
      */
     private $session;
 
+    /**
+     * TrollManagementPlugin constructor.
+     *
+     * @param Gdn_Session $session Injected session.
+     */
     public function __construct(Gdn_Session $session) {
         parent::__construct();
         $this->session = $session;
