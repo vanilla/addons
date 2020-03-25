@@ -5,6 +5,9 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+
 /**
  * Troll Management Features
  *
@@ -87,8 +90,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param int|string $userID The userID number.
      * @param boolean $troll Whether to mark the user as a troll.
      * @throws Gdn_UserException Throws user exception.
-     * @throws \Garden\Container\ContainerException Throws exception if there's a problem getting a container.
-     * @throws \Garden\Container\NotFoundException Throws exception if there's a problem getting a container.
+     * @throws ContainerException Throws exception if there's a problem getting a container.
+     * @throws NotFoundException Throws exception if there's a problem getting a container.
      */
     public function userController_markTroll_create($sender, $userID, $troll = true) {
         $sender->permission('Garden.Moderation.Manage');
