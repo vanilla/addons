@@ -9,7 +9,7 @@ echo $this->Form->errors();
 switch ($this->data('Mode')) {
    case 'set':
       echo '<div class="P">'.sprintf(t('Are you sure you want to ignore <b>%s</b>?'), htmlspecialchars($this->data('User.Name'))).'</div>';
-      
+
       if ($this->data('Conversations')) {
          $Conversations = (array)$this->data('Conversations');
          $NumConversationsAffected = count($Conversations);
@@ -17,11 +17,11 @@ switch ($this->data('Mode')) {
          echo sprintf(t('Ignoring this person will remove you from <b>%s %s</b> with them.'), $NumConversationsAffected, plural($NumConversationsAffected, 'conversation', 'conversations'));
          echo '</div>';
       }
-      
+
       break;
-   
+
    case 'unset':
-      echo '<div class="P">'.sprintf(t('Are you sure you want to unignore <b>%s</b>?'), htmlspecialchars($this->data('User.Name'))).'</div>';
+      echo '<div class="P">'.sprintf(t('Are you sure you want to unignore %s?', 'Are you sure you want to unignore <b>%s</b>?'), htmlspecialchars($this->data('User.Name'))).'</div>';
       break;
 }
 
