@@ -106,14 +106,14 @@ class TrollManagementPlugin extends Gdn_Plugin {
         $trollPermissions = $sender->userModel->getPermissions($trollUserID);
         $rankCompare = $this->session->getPermissions()->compareRankTo($trollPermissions);
         if ($rankCompare < 0) {
-            throw forbiddenException('@'.t('You are not allowed to mark a user that has higher permissions than you as a troll'));
+            throw forbiddenException('@'.t('You are not allowed to mark a user that has higher permissions than you as a troll.'));
         }
         if ($rankCompare === 0) {
-            throw forbiddenException('@'.t('You are not allowed to mark a user with the same permission level as you as a troll'));
+            throw forbiddenException('@'.t('You are not allowed to mark a user with the same permission level as you as a troll.'));
         }
 
-            // Validate the transient key && permissions
-            // Make sure we are posting back.
+        // Validate the transient key && permissions
+        // Make sure we are posting back.
         if (!$sender->Request->isAuthenticatedPostBack()) {
             throw permissionException('Javascript');
         }
