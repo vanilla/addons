@@ -5,6 +5,8 @@
  * @since 1.1.2b Fixed ConnectUrl to examine given url for existing querystring params and concatenate query params appropriately.
  */
 
+use Vanilla\JsConnect\JsConnect;
+
 /**
  * Class JsConnectPlugin
  */
@@ -13,6 +15,22 @@ class JsConnectPlugin extends Gdn_Plugin {
     const DEFAULT_SECRET_LENGTH = 64;
 
     const NONCE_EXPIRATION = 5 * 60;
+    const PROTOCOL_V3 = 'v3';
+    const PROTOCOL_V2 = 'v2';
+    /**
+     * @var \Garden\Web\Cookie
+     */
+    private $cookie;
+
+    /**
+     * JsConnectPlugin constructor.
+     *
+     * @param \Garden\Web\Cookie $cookie
+     */
+    public function __construct(\Garden\Web\Cookie $cookie) {
+        parent::__construct();
+        $this->cookie = $cookie;
+    }
 
     /**
      * Add an element to the controls collection. Used to render settings forms.
@@ -154,7 +172,6 @@ class JsConnectPlugin extends Gdn_Plugin {
         $Query = ['client_id' => $Provider['AuthenticationKey']];
 
         if ($Secure) {
-            include_once dirname(__FILE__).'/functions.jsconnect.php';
             $nonceModel = new UserAuthenticationNonceModel();
             $nonce = uniqid('jsconnect_', true);
             $nonceModel->insert(['Nonce' => $nonce, 'Token' => 'jsConnect']);
@@ -231,8 +248,10 @@ class JsConnectPlugin extends Gdn_Plugin {
         }
 
         $sql = Gdn::sql();
-        $sqlCacheKey = self::getProviderSqlCacheKey($client_id);
-        $sql->cache($sqlCacheKey, null, [Gdn_Cache::FEATURE_EXPIRY => 900]);
+        if ($client_id !== null) {
+            $sqlCacheKey = self::getProviderSqlCacheKey($client_id);
+            $sql->cache($sqlCacheKey, null, [Gdn_Cache::FEATURE_EXPIRY => 900]);
+        }
         $result = $sql->getWhere('UserAuthenticationProvider', $where)->resultArray();
 
         foreach ($result as &$row) {
@@ -365,8 +384,6 @@ class JsConnectPlugin extends Gdn_Plugin {
         if (val(0, $Args) != 'jsconnect') {
             return;
         }
-
-        include_once dirname(__FILE__).'/functions.jsconnect.php';
 
         $Form = $Sender->Form;
         $JsConnect = $Form->getFormValue('JsConnect', $Form->getFormValue('Form/JsConnect'));
@@ -616,8 +633,6 @@ class JsConnectPlugin extends Gdn_Plugin {
      * @param array $Args
      */
     public function profileController_jsConnect_create($Sender, $Args = []) {
-        include_once dirname(__FILE__).'/functions.jsconnect.php';
-
         $client_id = $Sender->Request->get('client_id', 0);
 
         $Provider = self::getProvider($client_id);
@@ -689,6 +704,12 @@ class JsConnectPlugin extends Gdn_Plugin {
             case 'delete':
                 $this->settings_delete($sender, $args);
                 break;
+            case 'test':
+                $this->settingsTest($sender);
+                break;
+            case 'test-verify':
+                $this->settingsTestVerify($sender);
+                break;
             default:
                 $this->settings_index($sender, $args);
                 break;
@@ -732,17 +753,22 @@ class JsConnectPlugin extends Gdn_Plugin {
 
                 if ($form->save(['ID' => $client_id])) {
                     Gdn::cache()->remove(self::getProviderSqlCacheKey($client_id));
+                    Gdn::cache()->remove(self::getProviderSqlCacheKey(null));
                     $sender->setRedirectTo('/settings/jsconnect');
                 }
             }
         } else {
             if ($client_id) {
                 $provider = self::getProvider($client_id);
-                touchValue('Trusted', $provider, 1);
+                $provider += [
+                    'Protocol' => self::PROTOCOL_V2,
+                    'Trusted' => 1
+                ];
             } else {
                 $provider = [];
             }
             $form->setData($provider);
+            $sender->setData('warnings', $this->getProviderWarnings($provider));
         }
 
         // Set up the form controls for editing the connection.
@@ -752,11 +778,17 @@ class JsConnectPlugin extends Gdn_Plugin {
         $controls = [
             'AuthenticationKey' => [
                 'LabelCode' => 'Client ID',
-                'Description' => t('The client ID uniquely identifies the site.', 'The client ID uniquely identifies the site. You can generate a new ID with the button at the bottom of this page.')
+                'Description' => t(
+                    'The client ID uniquely identifies the site.',
+                    'The client ID uniquely identifies the site. You can generate a new ID with the button at the bottom of this page.'
+                )
             ],
             'AssociationSecret' => [
                 'LabelCode' => 'Secret',
-                'Description' => t('The secret secures the sign in process.', 'The secret secures the sign in process. Do <b>NOT</b> give the secret out to anyone.')
+                'Description' => t(
+                    'The secret secures the sign in process.',
+                    'The secret secures the sign in process. Do <b>NOT</b> give the secret out to anyone.'
+                )
             ],
             'Name' => [
                 'LabelCode' => 'Site Name',
@@ -788,18 +820,32 @@ class JsConnectPlugin extends Gdn_Plugin {
             ],
             'Advanced' => [
                 'Control' => 'callback',
-                'Callback' => function($form) {
+                'Callback' => function ($form) {
                     return subheading(t('Advanced'));
                 }
+            ],
+            'Protocol' => [
+                'Control' => 'dropdown',
+                'Description' => t(
+                    'Choose the protocol version.',
+                    'The protocol version must match your client library. You should always choose the most recent protocol if you can.'
+                ),
+                'Items' => [
+                    self::PROTOCOL_V3 => t('Version 3 (recommend)'),
+                    self::PROTOCOL_V2 => t('Version 2'),
+                ],
             ],
             'HashType' => [
                 'Control' => 'dropdown',
                 'LabelCode' => 'Hash Algorithm',
                 'Items' => $hashTypes,
-                'Description' => t(
-                    'Choose md5 if you\'re not sure what to choose.',
-                    "You can select a custom hash algorithm to sign your requests. The hash algorithm must also be used in your client library. Choose md5 if you're not sure what to choose."
-                ),
+                'Description' =>
+                    t(
+                        'You can select a custom hash algorithm to sign your requests.',
+                        "You can select a custom hash algorithm to sign your requests. The hash algorithm must also be used in your client library."
+                    ).' '.
+                    t('Choose sha256 if you\'re not sure what to choose.')
+                ,
                 'Options' => ['Default' => 'md5']
             ],
             'TestMode' => ['Control' => 'toggle', 'LabelCode' => 'This connection is in test-mode.']
@@ -858,7 +904,182 @@ class JsConnectPlugin extends Gdn_Plugin {
         }
 
         $providers = self::getProvider();
+        foreach ($providers as &$provider) {
+            $warnings = $this->getProviderWarnings($provider);
+            $provider['hasWarnings'] = !empty($warnings);
+        }
+
         $sender->setData('Providers', $providers);
         $sender->render('Settings', '', 'plugins/jsconnect');
+    }
+
+    /**
+     * Redirect to the appropriate authenticate URL for the purposes of testing.
+     *
+     * @param SettingsController $sender
+     */
+    private function settingsTest(SettingsController $sender): void {
+        $clientID = $sender->Request->get('client_id', '');
+        $provider = self::getProvider($clientID);
+
+        switch ($provider['Protocol'] ?? self::PROTOCOL_V2) {
+            case self::PROTOCOL_V3:
+                $jsc = $this->createJsConnectFrom($provider);
+                $jsc->setRedirectUrl(url('/settings/jsconnect/test-verify', true));
+                [$url, $cookie] = $jsc->generateRequest();
+                $this->cookie->set($this->getCSRFCookieName(), $cookie);
+                redirectTo($url, 302, false);
+                break;
+            case self::PROTOCOL_V2:
+            default:
+                redirectTo(str_replace('=?', '=test', self::connectUrl($provider, true)), 302, false);
+                break;
+        }
+    }
+
+    /**
+     * Verify the results of the SSO test.
+     *
+     * @param SettingsController $sender
+     */
+    private function settingsTestVerify(SettingsController $sender): void {
+        if ($sender->Request->isAuthenticatedPostBack(true)) {
+            $fragment = $sender->Request->post('fragment', '');
+            parse_str(substr($fragment, 1), $args);
+            if (empty($args) || empty($args['jwt'])) {
+                $sender->Form->addError("The JWT token was not found.");
+            } else {
+                try {
+                    $jsc = $this->createJsConnectFromJWT($args['jwt']);
+                    [$user, $state, $payload] = $jsc->validateResponse($args['jwt'], $this->cookie->get($this->getCSRFCookieName()));
+                    // TODO: Why isn't this deleting?
+                    $this->cookie->delete($this->getCSRFCookieName());
+
+                    $tokenDetails = [
+                        'client' => $payload['v'],
+                        'issued' => $this->formatDate($payload['iat'] ?? null),
+                        'expires' => $this->formatDate($payload['exp'] ?? null),
+                    ];
+
+                    $sender->setData('tokenDetails', $tokenDetails);
+                    $sender->setData('message', 'The SSO test was successful.');
+                    $sender->setData('messageClass', 'alert-success');
+                    $sender->setData('user', $user);
+
+                    if (empty($user)) {
+                        // TODO: Add the sign in URL redirect here.
+                        $sender->setData('signinUrl', '#');
+                    } else {
+                        // TODO: This might be better if we check against the user table, if that's appropriate.
+                        // Check to see if the user has appropriate fields. Map known fields and unknown fields.
+                        $fields = [
+                            JsConnect::FIELD_UNIQUE_ID,
+                            JsConnect::FIELD_NAME,
+                            JsConnect::FIELD_PHOTO,
+                            JsConnect::FIELD_EMAIL,
+                            JsConnect::FIELD_ROLES,
+                        ];
+                        $known = [];
+                        $unknown = [];
+                        foreach ($user as $key => $value) {
+                            $lkey = strtolower($key);
+
+                            if (in_array($lkey, $fields)) {
+                                $known[$key] = $value;
+                            } else {
+                                $unknown[$key] = $value;
+                            }
+                        }
+                        $sender->setData('known', $known);
+                        $sender->setData('unknown', $unknown);
+                    }
+                } catch (\Exception $ex) {
+                    $sender->Form->addError($ex);
+                }
+            }
+
+        }
+        $sender->Form->addHidden('fragment', '');
+        $sender->render('settings_test', '', 'plugins/jsconnect');
+    }
+
+    /**
+     * Create a `JsConnectServer` from a provider.
+     *
+     * @param array $provider
+     * @return \Vanilla\JsConnect\JsConnectServer
+     */
+    private function createJsConnectFrom(array $provider): \Vanilla\JsConnect\JsConnectServer {
+        $jsc = new \Vanilla\JsConnect\JsConnectServer();
+        $jsc->setSigningCredentials($provider['AuthenticationKey'], $provider['AssociationSecret']);
+        $jsc->setAuthenticateUrl($provider['AuthenticateUrl']);
+        $jsc->setRedirectUrl(url('/entry/jsconnect'));
+
+        return $jsc;
+    }
+
+    /**
+     * Create a `JsConnectServer` by looking at the `kid` in a JWT.
+     *
+     * @param string $jwt
+     * @return \Vanilla\JsConnect\JsConnectServer
+     */
+    private function createJsConnectFromJWT(string $jwt): \Vanilla\JsConnect\JsConnectServer {
+        $header = \Vanilla\JsConnect\JsConnect::decodeJWTHeader($jwt);
+        $clientID = $header[\Vanilla\JsConnect\JsConnect::FIELD_CLIENT_ID];
+        if (empty($clientID)) {
+            throw new \Gdn_UserException("The kid was not found in the JWT header.", 400);
+        }
+        $provider = self::getProvider($clientID);
+        if (empty($provider)) {
+            throw notFoundException("Provider");
+        }
+
+        $jsc = $this->createJsConnectFrom($provider);
+        return $jsc;
+    }
+
+    /**
+     * Get a list of warnings for a connection.
+     *
+     * @param array $provider
+     * @return array
+     */
+    private function getProviderWarnings(array $provider): array {
+        $r = [];
+
+        if ('v3' !== ($provider['Protocol'] ?? 'v2')) {
+            $r[] = 'You are using the old version 2 of the protocol. This will not work with many modern browsers. ' .
+                'You need to upgrade your client libraries and switch to the new protocol.';
+        }
+        if (stripos($provider['SignInUrl'], '{target}') === false) {
+            $r[] = 'Your sign in URL does not specify a {target}. You have to specify a redirect variable or else your SSO may not work.';
+        }
+        if (!empty($provider['RegisterUrl']) && stripos($provider['RegisterUrl'], '{target}') === false) {
+            $r[] = 'Your register URL dies not specify a {target}. You have to specify a redirect variable or else your SSO may not work.';
+        }
+
+        return $r;
+    }
+
+    /**
+     * @return string
+     */
+    private function getCSRFCookieName(): string {
+        return c('Garden.Cookie.Name', 'Vanilla') . '-ssostatetoken';
+    }
+
+    /**
+     * Format a timestamp.
+     *
+     * @param ?int $timestamp
+     * @return string
+     */
+    private function formatDate($timestamp): string {
+        if (!is_int($timestamp)) {
+            return 'unknown';
+        } else {
+            return Gdn_Format::dateFull($timestamp);
+        }
     }
 }

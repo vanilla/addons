@@ -72,13 +72,18 @@ foreach ($this->data('Providers') as $Provider) {
                 <td><?php echo htmlspecialchars($Provider['AuthenticateUrl']); ?></td>
                 <td>
                     <?php
-                    echo anchor(t('Test URL'), str_replace('=?', '=test', JsConnectPlugin::connectUrl($Provider, TRUE)));
+                    echo anchor(t('Test URL'), '/settings/jsconnect/test?client_id='.urlencode($Provider['AuthenticationKey']));
                     ?>
                     <div class="JsConnectContainer UserInfo"></div>
                 </td>
                 <td class="options">
                     <div class="btn-group">
                         <?php
+                        if ($Provider['hasWarnings'] ?? false) {
+                            $title = 'There are issues with your setup. Edit this connection for more information.';
+                            echo anchor(dashboardSymbol('question-mark'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal btn btn-icon', ['aria-label' => $title, 'title' => $title]);
+                        }
+
                         echo anchor(dashboardSymbol('edit'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
                         echo anchor(dashboardSymbol('delete'), '/settings/jsconnect/delete?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                         ?>
