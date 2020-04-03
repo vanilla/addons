@@ -6,6 +6,7 @@
  */
 
 use Vanilla\JsConnect\JsConnect;
+use Vanilla\JsConnect\JsConnectServer;
 
 /**
  * Class JsConnectPlugin
@@ -17,6 +18,11 @@ class JsConnectPlugin extends Gdn_Plugin {
     const NONCE_EXPIRATION = 5 * 60;
     const PROTOCOL_V3 = 'v3';
     const PROTOCOL_V2 = 'v2';
+
+    const FIELD_ACTION = 'act';
+    const ACTION_SIGN_IN = 'signin';
+    const ACTION_REGISTER = 'register';
+
     /**
      * @var \Garden\Web\Cookie
      */
@@ -65,9 +71,9 @@ class JsConnectPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Get the button used for signing in.
      *
-     *
-     * @param $provider
+     * @param array|string $provider
      * @param array $options
      * @return string
      */
@@ -75,6 +81,12 @@ class JsConnectPlugin extends Gdn_Plugin {
         if (!is_array($provider)) {
             $provider = self::getProvider($provider);
         }
+
+        if ($provider['Protocol'] === self::PROTOCOL_V3) {
+            $result = self::connectButtonV3($provider);
+            return $result;
+        }
+
 
         $url = htmlspecialchars(self::connectUrl($provider));
         $data = $provider;
@@ -125,6 +137,37 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $result = '<div class="JsConnect-Guest">'.anchor(sprintf(t('Sign In with %s'), $provider['Name']), $signInUrl, 'Button Primary SignInLink').$registerLink.'</div>';
             }
         }
+
+        return $result;
+    }
+
+    /**
+     * Generate a V3 version of the JsConnect button.
+     *
+     * @param array $provider
+     * @return string
+     */
+    private static function connectButtonV3(array $provider): string {
+        $target = Gdn::request()->get('target', Gdn::request()->get('target'));
+        if (!$target) {
+            $target = '/'.ltrim(Gdn::request()->path());
+        }
+        if (stringBeginsWith($target, '/entry/signin')) {
+            $target = '/';
+        }
+
+        $url = url('/entry/jsconnect-redirect').'?'.http_build_query([
+            'client_id' => $provider['AuthenticationKey'],
+            'target' => $target
+        ]);
+
+        $result = '<div class="JsConnect-Guest">'.
+            anchor(
+                sprintf(t('Sign In with %s v3'), $provider['Name']),
+                $url,
+                'Button Primary SignInLink'
+            ).
+            '</div>';
 
         return $result;
     }
@@ -259,6 +302,9 @@ class JsConnectPlugin extends Gdn_Plugin {
             if (is_array($attributes)) {
                 $row = array_merge($attributes, $row);
             }
+            $row += [
+                'Protocol' => self::PROTOCOL_V2,
+            ];
         }
 
         if ($client_id) {
@@ -374,131 +420,24 @@ class JsConnectPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Handle the jsConnect SSO data.
      *
-     *
-     * @param EntryController $Sender
+     * @param EntryController $sender
      * @param array $Args
      * @throws Exception Gdn_UserException
      */
-    public function base_connectData_handler($Sender, $Args) {
+    public function base_connectData_handler($sender, $Args) {
         if (val(0, $Args) != 'jsconnect') {
             return;
         }
 
-        $Form = $Sender->Form;
-        $JsConnect = $Form->getFormValue('JsConnect', $Form->getFormValue('Form/JsConnect'));
-        parse_str($JsConnect, $JsData);
-
-        // Make sure the data is valid.
-        $version = val('v', $JsData, null);
-        $client_id = val('client_id', $JsData, val('clientid', $JsData, $Sender->Request->get('client_id')));
-        $Signature = val('sig', $JsData, val('signature', $JsData, false));
-        // This is for logging only.
-        $jsDataReceived = $JsData;
-        $String = val('sigStr', $JsData, false); // debugging
-        unset($JsData['v'], $JsData['client_id'], $JsData['clientid'], $JsData['signature'], $JsData['sig'],
-                $JsData['sigStr'], $JsData['string']);
-
-        if (!$client_id) {
-            Logger::event('jsconnect_error', Logger::ERROR, 'No Client ID Found', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived]);
-            throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'client_id'), 400);
+        $form = $sender->Form;
+        $fragment = $form->getFormValue('fragment');
+        if (!empty($fragment)) {
+            $this->handleConnectDataV3($sender, $form);
+        } else {
+            $this->handleConnectDataV2($sender, $form);
         }
-        $Provider = self::getProvider($client_id);
-        if (!$Provider) {
-            Logger::event('jsconnect_error', Logger::ERROR, 'No Provider Found', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived, 'Client_id' => $client_id]);
-            throw new Gdn_UserException(sprintf(t('Unknown client: %s.'), htmlspecialchars($client_id)), 400);
-        }
-
-        if (!val('TestMode', $Provider)) {
-            if (!$Signature) {
-                Logger::event('jsconnect_error', Logger::ERROR, 'No Signature Found', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived]);
-                throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'signature'), 400);
-            }
-
-            if ($version === '2') {
-                // Verify IP Address.
-                if (Gdn::request()->ipAddress() !== val('ip', $JsData, null)) {
-                    Logger::event('jsconnect_error', Logger::ERROR, 'No IP Found', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived]);
-                    throw new Gdn_UserException(t('IP address invalid.'), 400);
-                }
-
-                // Verify nonce.
-                $nonceModel = new UserAuthenticationNonceModel();
-                $nonce = val('nonce', $JsData, null);
-                if ($nonce === null) {
-                    Logger::event('jsconnect_error', Logger::ERROR, 'No Nonce Found in JSData', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived]);
-                    throw new Gdn_UserException(t('Nonce not found.'), 400);
-                }
-
-                // Grab the nonce from the session's stash.
-                $foundNonce = Gdn::session()->stash('jsConnectNonce', '', false);
-                $grabbedFromStash = (bool)$foundNonce;
-                if (!$grabbedFromStash) {
-                    $foundNonce = $nonceModel->getWhere(['Nonce' => $nonce])->firstRow(DATASET_TYPE_ARRAY);
-                }
-                if (!$foundNonce) {
-                    Logger::event('jsconnect_error', Logger::ERROR, 'No Nonce Found in Stash', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived]);
-                    throw new Gdn_UserException(t('Nonce not found.'), 400);
-                }
-
-                // Clear nonce from the database.
-                $nonceModel->delete(['Nonce' => $nonce]);
-                if (strtotime($foundNonce['Timestamp']) < time() - self::NONCE_EXPIRATION) {
-                    Logger::event('jsconnect_error', Logger::ERROR, 'Timestamp Failed', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived, 'Timestamp' => $foundNonce['Timestamp'], 'Time' => time(), 'NonceExpiry' => self::NONCE_EXPIRATION]);
-                    throw new Gdn_UserException(t('Nonce expired.'), 400);
-                }
-
-                if (!$grabbedFromStash) {
-                    // Stash nonce in case we post back!
-                    Gdn::session()->stash('jsConnectNonce', $foundNonce);
-                }
-            }
-
-            // Validate the signature.
-            $CalculatedSignature = signJsConnect($JsData, $client_id, val('AssociationSecret', $Provider), val('HashType', $Provider, 'md5'));
-            if (hash_equals($Signature, $CalculatedSignature) === false) {
-                Logger::event('jsconnect_error', Logger::ERROR, 'Invalid Signature', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived, 'Signature' => $Signature, 'Secret' => val('AssociationSecret', $Provider), 'HashType' => val('HashType', $Provider, 'md5')]);
-                throw new Gdn_UserException(t("Signature invalid."), 400);
-            }
-        }
-        Logger::event('jsconnect_success', Logger::INFO, 'JSData Passed Validation', ['JsData' => $JsData, 'JsDataReceived' => $jsDataReceived, 'Secret' => val('AssociationSecret', $Provider), 'HashType' => val('HashType', $Provider, 'md5')]);
-
-        // Map all of the standard jsConnect data.
-        $Map = ['uniqueid' => 'UniqueID', 'name' => 'Name', 'email' => 'Email', 'photourl' => 'Photo', 'fullname' => 'FullName', 'roles' => 'Roles'];
-        foreach ($Map as $Key => $Value) {
-            if (array_key_exists($Key, $JsData)) {
-                $Form->setFormValue($Value, $JsData[$Key]);
-            }
-        }
-
-        // Now add any extended information that jsConnect might have sent.
-        $ExtData = array_diff_key($JsData, $Map);
-
-        if (class_exists('SimpleAPIPlugin')) {
-            SimpleAPIPlugin::translatePost($ExtData, false);
-        }
-
-        Gdn::userModel()->defineSchema();
-        $Keys = array_keys(Gdn::userModel()->Schema->fields());
-        $UserFields = array_change_key_case(array_combine($Keys, $Keys));
-
-        foreach ($ExtData as $Key => $Value) {
-            $lkey = strtolower($Key);
-            if (array_key_exists($lkey, $UserFields)) {
-                $Form->setFormValue($UserFields[$lkey], $Value);
-            } else {
-                $Form->setFormValue($Key, $Value);
-            }
-        }
-
-        $Form->setFormValue('Provider', $client_id);
-        $Form->setFormValue('ProviderName', val('Name', $Provider, ''));
-        $Form->addHidden('JsConnect', $JsData);
-
-        $Sender->setData('ClientID', $client_id);
-        $Sender->setData('Verified', true);
-        $Sender->setData('Trusted', val('Trusted', $Provider, true)); // this is a trusted connection.
-        $Sender->setData('SSOUser', $JsData);
     }
 
     /**
@@ -542,69 +481,67 @@ class JsConnectPlugin extends Gdn_Plugin {
      */
     public function entryController_jsConnect_create($sender, $action = '', $target = '') {
         $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
-        // Clear the nonce from the stash if any!
-        Gdn::session()->stash('jsConnectNonce');
 
-        $sender->setData('_NoMessages', true);
 
-        if ($action) {
-            if ($action == 'guest') {
-                $sender->addDefinition('CheckPopup', true);
+        $clientID = $sender->setData('client_id', $sender->Request->get('client_id', 0));
+        if (!empty($clientID)) {
+            $provider = self::getProvider($clientID);
+            $protocol = $provider['Protocol'] ?? self::PROTOCOL_V2;
 
-                $target = $sender->Form->getFormValue('Target', '/');
-                $sender->setRedirectTo($target, false);
+            $sender->addDefinition('jsconnect', [
+                'protocol' => $protocol,
+                'authenticateUrl' => url('/entry/jsconnect-redirect') . '?' . http_build_query([
+                        'client_id' => $clientID,
+                        'target' => $target,
+                    ])
+            ]);
 
-                $sender->render('JsConnect', '', 'plugins/jsconnect');
+            if ($protocol !== self::PROTOCOL_V3) {
+                $this->entryJsConnectV2($sender, $action, $target);
             } else {
-                parse_str($sender->Form->getFormValue('JsConnect'), $jsData);
-
-                $error = val('error', $jsData);
-                $message = val('message', $jsData);
-
-                if ($error === 'timeout' && !$message) {
-                    $message = t('Your sso timed out.', 'Your sso timed out during the request. Please try again.');
-                }
-
-                Logger::event('jsconnect_error', Logger::ERROR, 'Displaying Error Page.', ['JsData' => $jsData, 'ErrorMessage' => $message]);
-                Gdn::dispatcher()
-                    ->passData('Exception', $message ? htmlspecialchars($message) : htmlspecialchars($error))
-                    ->dispatch('home/error');
+                $this->entryJsConnectV3($sender);
             }
         } else {
-            $client_id = $sender->setData('client_id', $sender->Request->get('client_id', 0));
-            $provider = self::getProvider($client_id);
+            $sender->addDefinition('jsconnect', [
+                'protocol' => self::PROTOCOL_V3,
+                // Kludge, but we can't know if there is a fragment.
+                'authenticateUrl' => url('/').'?invalidJsConnect=1',
+            ]);
 
-            if (empty($provider)) {
-                Logger::event('jsconnect_error', Logger::ERROR, 'No Provider Found', ['Client ID' => $client_id]);
-                throw notFoundException('Provider');
-            }
+            // This might be a v3 return with the hash.
+            $this->entryJsConnectV3($sender);
+        }
+    }
 
-            $get = arrayTranslate($sender->Request->get(), ['client_id', 'display']);
+    /**
+     * Implementation of `/entry/jsconnect-redirect` for redirecting to v3 protocol authentication pages.
+     *
+     * @param EntryController $sender
+     * @param string $client_id
+     * @param string $target
+     * @param string $action
+     */
+    public function entryController_jsconnectRedirect_create($sender, $client_id = '', $target = '', $action = self::ACTION_SIGN_IN) {
+        $provider = self::getProvider($client_id);
+        if (empty($provider)) {
+            throw notFoundException("Provider");
+        }
 
-            $sender->addDefinition('JsAuthenticateUrl', self::connectUrl($provider, true));
-            if ($provider['TestMode'] ?? false) {
-                $sender->addDefinition('JsConnectTestMode', true);
-            }
-
-            if (gdn::config('Garden.PrivateCommunity') && $provider['IsDefault']) {
-                // jsconnect.js needs to know to not to redirect if there is an error
-                // and PrivateCommunity is on and this is the only log in method,
-                // this causes a loop.
-                $sender->addDefinition('PrivateCommunity', true);
-                $sender->addDefinition('GenericSSOErrorMessage', gdn::translate('An error has occurred, please try again.'));
-            }
-
-            $sender->addJsFile('jsconnect.js', 'plugins/jsconnect');
-            $sender->setData('Title', t('Connecting...'));
-            $sender->Form->Action = url('/entry/connect/jsconnect?'.http_build_query($get));
-            $sender->Form->addHidden('JsConnect', '');
-
-            if (!empty($target)) {
-                $sender->Form->addHidden('Target', safeURL($target));
-            }
-
-            $sender->MasterView = 'empty';
-            $sender->render('JsConnect', '', 'plugins/jsconnect');
+        $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+        switch ($provider['Protocol'] ?? self::PROTOCOL_V2) {
+            case self::PROTOCOL_V3:
+                $jsc = $this->createJsConnectFromProvider($provider);
+                [$requestUrl, $cookie] = $jsc->generateRequest([
+                    JsConnectServer::FIELD_TARGET => $target,
+                    self::FIELD_ACTION => $action,
+                ]);
+                $this->cookie->set($this->getCSRFCookieName(), $cookie);
+                redirectTo($requestUrl, 302, false);
+                break;
+            case self::PROTOCOL_V2:
+            default:
+                throw new \Gdn_UserException("This page does not support the jsConnect v2 protocol.");
+                break;
         }
     }
 
@@ -824,6 +761,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                     return subheading(t('Advanced'));
                 }
             ],
+            // TODO: Add Javascript to hide the hash type when the v3 protocol is chosen.
             'Protocol' => [
                 'Control' => 'dropdown',
                 'Description' => t(
@@ -904,10 +842,12 @@ class JsConnectPlugin extends Gdn_Plugin {
         }
 
         $providers = self::getProvider();
+        $hasWarnings = false;
         foreach ($providers as &$provider) {
             $warnings = $this->getProviderWarnings($provider);
-            $provider['hasWarnings'] = !empty($warnings);
+            $hasWarnings |= $provider['hasWarnings'] = !empty($warnings);
         }
+        $sender->setData('hasWarnings', $hasWarnings);
 
         $sender->setData('Providers', $providers);
         $sender->render('Settings', '', 'plugins/jsconnect');
@@ -924,7 +864,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
         switch ($provider['Protocol'] ?? self::PROTOCOL_V2) {
             case self::PROTOCOL_V3:
-                $jsc = $this->createJsConnectFrom($provider);
+                $jsc = $this->createJsConnectFromProvider($provider);
                 $jsc->setRedirectUrl(url('/settings/jsconnect/test-verify', true));
                 [$url, $cookie] = $jsc->generateRequest();
                 $this->cookie->set($this->getCSRFCookieName(), $cookie);
@@ -945,7 +885,7 @@ class JsConnectPlugin extends Gdn_Plugin {
     private function settingsTestVerify(SettingsController $sender): void {
         if ($sender->Request->isAuthenticatedPostBack(true)) {
             $fragment = $sender->Request->post('fragment', '');
-            parse_str(substr($fragment, 1), $args);
+            parse_str(ltrim($fragment, '#'), $args);
             if (empty($args) || empty($args['jwt'])) {
                 $sender->Form->addError("The JWT token was not found.");
             } else {
@@ -1007,13 +947,13 @@ class JsConnectPlugin extends Gdn_Plugin {
      * Create a `JsConnectServer` from a provider.
      *
      * @param array $provider
-     * @return \Vanilla\JsConnect\JsConnectServer
+     * @return JsConnectServer
      */
-    private function createJsConnectFrom(array $provider): \Vanilla\JsConnect\JsConnectServer {
-        $jsc = new \Vanilla\JsConnect\JsConnectServer();
+    private function createJsConnectFromProvider(array $provider): JsConnectServer {
+        $jsc = new JsConnectServer();
         $jsc->setSigningCredentials($provider['AuthenticationKey'], $provider['AssociationSecret']);
         $jsc->setAuthenticateUrl($provider['AuthenticateUrl']);
-        $jsc->setRedirectUrl(url('/entry/jsconnect'));
+        $jsc->setRedirectUrl(url('/entry/jsconnect', true));
 
         return $jsc;
     }
@@ -1022,11 +962,15 @@ class JsConnectPlugin extends Gdn_Plugin {
      * Create a `JsConnectServer` by looking at the `kid` in a JWT.
      *
      * @param string $jwt
-     * @return \Vanilla\JsConnect\JsConnectServer
+     * @return JsConnectServer
      */
-    private function createJsConnectFromJWT(string $jwt): \Vanilla\JsConnect\JsConnectServer {
-        $header = \Vanilla\JsConnect\JsConnect::decodeJWTHeader($jwt);
-        $clientID = $header[\Vanilla\JsConnect\JsConnect::FIELD_CLIENT_ID];
+    private function createJsConnectFromJWT(string $jwt): JsConnectServer {
+        if (empty($jwt)) {
+            throw new \Gdn_UserException("The JWT was not supplied or empty.");
+        }
+
+        $header = JsConnect::decodeJWTHeader($jwt);
+        $clientID = $header[JsConnect::FIELD_CLIENT_ID];
         if (empty($clientID)) {
             throw new \Gdn_UserException("The kid was not found in the JWT header.", 400);
         }
@@ -1035,7 +979,7 @@ class JsConnectPlugin extends Gdn_Plugin {
             throw notFoundException("Provider");
         }
 
-        $jsc = $this->createJsConnectFrom($provider);
+        $jsc = $this->createJsConnectFromProvider($provider);
         return $jsc;
     }
 
@@ -1081,5 +1025,371 @@ class JsConnectPlugin extends Gdn_Plugin {
         } else {
             return Gdn_Format::dateFull($timestamp);
         }
+    }
+
+    /**
+     * Redirect to the client's authenticate page
+     *
+     * @param array $provider
+     * @param array $state
+     */
+    private function authenticateRedirectV3(array $provider, array $state) {
+        $state += [
+            JsConnectServer::FIELD_TARGET => '/',
+            self::FIELD_ACTION => self::ACTION_SIGN_IN,
+        ];
+
+        $jsc = $this->createJsConnectFromProvider($provider);
+        [$location, $cookie] = $jsc->generateRequest($state);
+
+        redirectTo($location, 302, false);
+    }
+
+    /**
+     * Process `/entry/jsconnect` with the old jsConnect protocol.
+     *
+     * This is the old version of jsConnect that used to be `entryController_jsConnect_create()`.
+     *
+     * @param EntryController $sender
+     * @param string $action
+     * @param string $target
+     * @deprecated
+     */
+    private function entryJsConnectV2($sender, $action, $target): void {
+        // Clear the nonce from the stash if any!
+        Gdn::session()->stash('jsConnectNonce');
+
+        $sender->setData('_NoMessages', true);
+
+        if ($action) {
+            if ($action == 'guest') {
+                $sender->addDefinition('CheckPopup', true);
+
+                $target = $sender->Form->getFormValue('Target', '/');
+                $sender->setRedirectTo($target, false);
+
+                $sender->render('JsConnect', '', 'plugins/jsconnect');
+            } else {
+                parse_str($sender->Form->getFormValue('JsConnect'), $jsData);
+
+                $error = val('error', $jsData);
+                $message = val('message', $jsData);
+
+                if ($error === 'timeout' && !$message) {
+                    $message = t('Your sso timed out.', 'Your sso timed out during the request. Please try again.');
+                }
+
+                Logger::event('jsconnect_error', Logger::ERROR, 'Displaying Error Page.', ['JsData' => $jsData, 'ErrorMessage' => $message]);
+                Gdn::dispatcher()
+                    ->passData('Exception', $message ? htmlspecialchars($message) : htmlspecialchars($error))
+                    ->dispatch('home/error');
+            }
+        } else {
+            $client_id = $sender->setData('client_id', $sender->Request->get('client_id', 0));
+            $provider = self::getProvider($client_id);
+
+            if (empty($provider)) {
+                Logger::event('jsconnect_error', Logger::ERROR, 'No Provider Found', ['Client ID' => $client_id]);
+                throw notFoundException('Provider');
+            }
+
+            $get = arrayTranslate($sender->Request->get(), ['client_id', 'display']);
+
+            $sender->addDefinition('JsAuthenticateUrl', self::connectUrl($provider, true));
+            if ($provider['TestMode'] ?? false) {
+                $sender->addDefinition('JsConnectTestMode', true);
+            }
+
+            if (gdn::config('Garden.PrivateCommunity') && $provider['IsDefault']) {
+                // jsconnect.js needs to know to not to redirect if there is an error
+                // and PrivateCommunity is on and this is the only log in method,
+                // this causes a loop.
+                $sender->addDefinition('PrivateCommunity', true);
+                $sender->addDefinition('GenericSSOErrorMessage', gdn::translate('An error has occurred, please try again.'));
+            }
+
+            $sender->addJsFile('jsconnect.js', 'plugins/jsconnect');
+            $sender->setData('Title', t('Connecting...'));
+            $sender->Form->Action = url('/entry/connect/jsconnect?' . http_build_query($get));
+            $sender->Form->addHidden('JsConnect', '');
+
+            if (!empty($target)) {
+                $sender->Form->addHidden('Target', safeURL($target));
+            }
+
+            $sender->MasterView = 'empty';
+            $sender->render('JsConnect', '', 'plugins/jsconnect');
+        }
+    }
+
+    /**
+     * Process /entry/jsconnect using the new V3 protocol.
+     *
+     * @param EntryController $sender
+     */
+    private function entryJsConnectV3(EntryController $sender): void {
+//        if ($sender->Request->isPostBack()) {
+//            $fragment = $sender->Request->post('fragment', '');
+//            if (empty($fragment)) {
+//                // This should not happen in a normal case because we should have a JWT.
+//                // However, many clients will redirect to /entry/jsconnect for auto-SSO scenarios this will kick that off.
+//                // This works fine, but /entry/jsconnect-redirect is a bit more efficient.
+//                $this->authenticateRedirectV3($provider, [JsConnectServer::FIELD_TARGET => $target]);
+//                return;
+//            }
+//
+//            parse_str(ltrim($fragment, '#'), $args);
+//            $jwt = $args['jwt'] ?? '';
+//            if (!is_string($jwt)) {
+//                throw new \Gdn_UserException("The authentication JWT is not a valid string.");
+//            }
+//            $jsc = $this->createJsConnectFromJWT($jwt);
+//            try {
+//                [$user, $state] = $jsc->validateResponse($jwt, $this->cookie->get($this->getCSRFCookieName()));
+//                $this->cookie->delete($this->getCSRFCookieName());
+//            } catch (\Exception $ex) {
+//                $sender->Form->addError($ex);
+//            }
+//        }
+
+        $sender->addJsFile('jsconnect.js', 'plugins/jsconnect');
+        $sender->setData('Title', t('Connecting...'));
+        $sender->Form->Action = url('/entry/connect/jsconnect');
+        $sender->Form->addHidden('fragment', '');
+
+        $sender->MasterView = 'empty';
+        $sender->render('jsconnect', '', 'plugins/jsconnect');
+    }
+
+    /**
+     * Handle the SSO data.
+     *
+     * @param \Gdn_Controller $sender
+     * @param Gdn_Form $form
+     */
+    private function handleConnectDataV2($sender, Gdn_Form $form): void {
+        $jsConnect = $form->getFormValue('JsConnect', $form->getFormValue('Form/JsConnect'));
+        parse_str($jsConnect, $jsData);
+
+        // Make sure the data is valid.
+        $version = val('v', $jsData, null);
+        $clientID = val('client_id', $jsData, val('clientid', $jsData, $sender->Request->get('client_id')));
+        $signature = val('sig', $jsData, val('signature', $jsData, false));
+        // This is for logging only.
+        $jsDataReceived = $jsData;
+        $String = val('sigStr', $jsData, false); // debugging
+        unset($jsData['v'], $jsData['client_id'], $jsData['clientid'], $jsData['signature']);
+        unset($jsData['sig'], $jsData['sigStr'], $jsData['string']);
+
+        if (!$clientID) {
+            Logger::event('jsconnect_error', Logger::ERROR, 'No Client ID Found', ['JsData' => $jsData, 'JsDataReceived' => $jsDataReceived]);
+            throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'client_id'), 400);
+        }
+        $provider = self::getProvider($clientID);
+        if (!$provider) {
+            Logger::event(
+                'jsconnect_error',
+                Logger::ERROR,
+                'No Provider Found',
+                ['JsData' => $jsData, 'JsDataReceived' => $jsDataReceived, 'Client_id' => $clientID]
+            );
+            throw new Gdn_UserException(sprintf(t('Unknown client: %s.'), htmlspecialchars($clientID)), 400);
+        }
+
+        if (!val('TestMode', $provider)) {
+            if (!$signature) {
+                Logger::event('jsconnect_error', Logger::ERROR, 'No Signature Found', ['JsData' => $jsData, 'JsDataReceived' => $jsDataReceived]);
+                throw new Gdn_UserException(sprintf(t('ValidateRequired'), 'signature'), 400);
+            }
+
+            if ($version === '2') {
+                // Verify IP Address.
+                if (Gdn::request()->ipAddress() !== val('ip', $jsData, null)) {
+                    Logger::event('jsconnect_error', Logger::ERROR, 'No IP Found', ['JsData' => $jsData, 'JsDataReceived' => $jsDataReceived]);
+                    throw new Gdn_UserException(t('IP address invalid.'), 400);
+                }
+
+                // Verify nonce.
+                $nonceModel = new UserAuthenticationNonceModel();
+                $nonce = val('nonce', $jsData, null);
+                if ($nonce === null) {
+                    Logger::event(
+                        'jsconnect_error',
+                        Logger::ERROR,
+                        'No Nonce Found in JSData',
+                        ['JsData' => $jsData, 'JsDataReceived' => $jsDataReceived]
+                    );
+                    throw new Gdn_UserException(t('Nonce not found.'), 400);
+                }
+
+                // Grab the nonce from the session's stash.
+                $foundNonce = Gdn::session()->stash('jsConnectNonce', '', false);
+                $grabbedFromStash = (bool)$foundNonce;
+                if (!$grabbedFromStash) {
+                    $foundNonce = $nonceModel->getWhere(['Nonce' => $nonce])->firstRow(DATASET_TYPE_ARRAY);
+                }
+                if (!$foundNonce) {
+                    Logger::event(
+                        'jsconnect_error',
+                        Logger::ERROR,
+                        'No Nonce Found in Stash',
+                        ['JsData' => $jsData, 'JsDataReceived' => $jsDataReceived]
+                    );
+                    throw new Gdn_UserException(t('Nonce not found.'), 400);
+                }
+
+                // Clear nonce from the database.
+                $nonceModel->delete(['Nonce' => $nonce]);
+                if (strtotime($foundNonce['Timestamp']) < time() - self::NONCE_EXPIRATION) {
+                    Logger::event(
+                        'jsconnect_error',
+                        Logger::ERROR,
+                        'Timestamp Failed',
+                        [
+                            'JsData' => $jsData,
+                            'JsDataReceived' => $jsDataReceived,
+                            'Timestamp' => $foundNonce['Timestamp'],
+                            'Time' => time(),
+                            'NonceExpiry' => self::NONCE_EXPIRATION
+                        ]
+                    );
+                    throw new Gdn_UserException(t('Nonce expired.'), 400);
+                }
+
+                if (!$grabbedFromStash) {
+                    // Stash nonce in case we post back!
+                    Gdn::session()->stash('jsConnectNonce', $foundNonce);
+                }
+            }
+
+            // Validate the signature.
+            $calculatedSignature = signJsConnect($jsData, $clientID, val('AssociationSecret', $provider), val('HashType', $provider, 'md5'));
+            if (hash_equals($signature, $calculatedSignature) === false) {
+                Logger::event(
+                    'jsconnect_error',
+                    Logger::ERROR,
+                    'Invalid Signature',
+                    [
+                        'JsData' => $jsData,
+                        'JsDataReceived' => $jsDataReceived,
+                        'Signature' => $signature,
+                        'HashType' => $provider['HashType'] ?? 'md5'
+                    ]
+                );
+                throw new Gdn_UserException(t("Signature invalid."), 400);
+            }
+        }
+        Logger::event(
+            'jsconnect_success',
+            Logger::INFO,
+            'JSData Passed Validation',
+            ['JsData' => $jsData, 'JsDataReceived' => $jsDataReceived, 'HashType' => val('HashType', $provider, 'md5')]
+        );
+        $this->setSSOData($sender, $form, $jsData, $clientID, $provider);
+    }
+
+    /**
+     * Handle the SSO data.
+     *
+     * @param \Gdn_Controller $sender
+     * @param Gdn_Form $form
+     */
+    private function handleConnectDataV3($sender, Gdn_Form $form): void {
+        $fragment = $form->getFormValue('fragment');
+        $form->addHidden('fragment', $fragment); // for postbacks
+        parse_str(ltrim($fragment, '#'), $args);
+        $jwt = $args['jwt'] ?? '';
+
+        try {
+            if (!is_string($jwt)) {
+                throw new \Gdn_UserException("The SSO JWT is not a valid string.");
+            }
+
+            $jsc = $this->createJsConnectFromJWT($jwt);
+            [$user, $state] = $jsc->validateResponse($jwt, $this->cookie->get($this->getCSRFCookieName()));
+            $form->addHidden('Target', $state[JsConnect::FIELD_TARGET] ?? '/');
+        } catch (\Exception $ex) {
+            Logger::event('jsconnect_error', Logger::ERROR, $ex->getMessage(), ['jwt' => $jwt, 'protocol' => self::PROTOCOL_V3]);
+            throw new \Gdn_UserException($ex->getMessage(), $ex->getCode());
+        }
+
+        $header = JsConnect::decodeJWTHeader($jwt);
+        $clientID = $header[JsConnect::FIELD_CLIENT_ID];
+        $provider = self::getProvider($clientID);
+
+        if (empty($user)) {
+            // The user wasn't signed in so we'll need to redirect to whatever page.
+            if (($state[self::FIELD_ACTION] ?? '') === self::ACTION_REGISTER) {
+                $url = $provider['RegisterUrl'] ?: $provider['SignInUrl'];
+            } else {
+                $url = $provider['SignInUrl'];
+            }
+            $url = str_ireplace(
+                ['{target}', '{redirect}'],
+                urlencode(
+                    url('/entry/jsconnect-redirect', true).'?'.
+                    http_build_query(['client_id' => $clientID, 'target' => $state[JsConnect::FIELD_TARGET] ?? '/'])
+                ),
+                $url
+            );
+            $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+            redirectTo($url, 302, false);
+        } else {
+            Logger::event('jsconnect_success', Logger::INFO, 'JSData Passed Validation', ['user' => $user, 'protocol' => self::PROTOCOL_V3]);
+            $this->setSSOData($sender, $form, $user, $clientID, $provider);
+        }
+    }
+
+    /**
+     * Set the SSO data for the user.
+     *
+     * Note: This was extraced out of the old `base_connectData()` method and then casened.
+     *
+     * @param Gdn_Controller $sender
+     * @param Gdn_Form $form
+     * @param array $user
+     * @param string $clientID
+     * @param array $provider
+     */
+    private function setSSOData($sender, Gdn_Form $form, $user, $clientID, array $provider) {
+        // Map all of the standard jsConnect data.
+        $Map = [
+            'uniqueid' => 'UniqueID', JsConnect::FIELD_UNIQUE_ID => 'UniqueID', 'name' => 'Name', 'email' => 'Email',
+            'photourl' => 'Photo', 'fullname' => 'FullName', 'roles' => 'Roles'
+        ];
+        foreach ($Map as $Key => $Value) {
+            if (array_key_exists($Key, $user)) {
+                $form->setFormValue($Value, $user[$Key]);
+            }
+        }
+
+        // Now add any extended information that jsConnect might have sent.
+        $ExtData = array_diff_key($user, $Map);
+
+        if (class_exists('SimpleAPIPlugin')) {
+            SimpleAPIPlugin::translatePost($ExtData, false);
+        }
+
+        Gdn::userModel()->defineSchema();
+        $Keys = array_keys(Gdn::userModel()->Schema->fields());
+        $UserFields = array_change_key_case(array_combine($Keys, $Keys));
+
+        foreach ($ExtData as $Key => $Value) {
+            $lkey = strtolower($Key);
+            if (array_key_exists($lkey, $UserFields)) {
+                $form->setFormValue($UserFields[$lkey], $Value);
+            } else {
+                $form->setFormValue($Key, $Value);
+            }
+        }
+
+        $form->setFormValue('Provider', $clientID);
+        $form->setFormValue('ProviderName', val('Name', $provider, ''));
+        $form->addHidden('JsConnect', $user);
+
+        $sender->setData('ClientID', $clientID);
+        $sender->setData('Verified', true);
+        $sender->setData('Trusted', val('Trusted', $provider, true)); // this is a trusted connection.
+        $sender->setData('SSOUser', $user);
     }
 }
