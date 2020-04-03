@@ -1321,7 +1321,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
             $jsc = $this->createJsConnectFromJWT($jwt);
             [$user, $state] = $jsc->validateResponse($jwt, $this->cookie->get($this->getCSRFCookieName()));
-            $form->addHidden('Target', $state[JsConnect::FIELD_TARGET] ?? '/');
+            $form->addHidden('Target', $state[JsConnectServer::FIELD_TARGET] ?? '/');
         } catch (\Exception $ex) {
             Logger::event('jsconnect_error', Logger::ERROR, $ex->getMessage(), ['jwt' => $jwt, 'protocol' => self::PROTOCOL_V3]);
             throw new \Gdn_UserException($ex->getMessage(), $ex->getCode());
@@ -1342,7 +1342,10 @@ class JsConnectPlugin extends Gdn_Plugin {
                 ['{target}', '{redirect}'],
                 urlencode(
                     url('/entry/jsconnect-redirect', true).'?'.
-                    http_build_query(['client_id' => $clientID, 'target' => $state[JsConnect::FIELD_TARGET] ?? '/'])
+                    http_build_query([
+                        'client_id' => $clientID,
+                        'target' => $state[JsConnectServer::FIELD_TARGET] ?? '/'
+                    ])
                 ),
                 $url
             );
