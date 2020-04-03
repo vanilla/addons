@@ -1,16 +1,28 @@
 jQuery(document).ready(function($) {
 
     var jsUrl = gdn.definition('JsAuthenticateUrl', false);
-    if (jsUrl) {
+    var jsConnect = gdn.getMeta('jsconnect', {});
+
+    if (jsConnect['protocol'] === 'v3') {
+        if (window.location.hash) {
+            // The JWT is here. Let's post it.
+            $('#Form_JsConnect-Connect input[name$="fragment"]').val(window.location.hash);
+            $('#Form_JsConnect-Connect').submit();
+        } else {
+            // Go to the redirect page.
+            window.location = jsConnect.authenticateUrl;
+        }
+        return;
+    } else if (jsUrl) {
         // Reveal the please wait text after a small wait so that if the request is faster we never have to see it.
-        setTimeout(function() {
+        setTimeout(function () {
             $('.Connect-Wait').show();
         }, 2000);
 
         $.jsConnectAuthenticate(jsUrl);
     }
 
-    $('.JsConnect-Container').each(function() {
+    $('.JsConnect-Container').each(function () {
         $(this).jsconnect();
     });
 
