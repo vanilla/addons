@@ -896,7 +896,11 @@ class JsConnectPlugin extends Gdn_Plugin {
             } else {
                 try {
                     $jsc = $this->createJsConnectFromJWT($args['jwt']);
-                    [$user, $state, $payload] = $jsc->validateResponse($args['jwt'], $this->cookie->get($this->getCSRFCookieName()));
+
+                    [$user, $state, $payload] = $jsc->validateResponse(
+                        $args['jwt'],
+                        $this->cookie->get($this->getCSRFCookieName())
+                    );
                     $this->cookie->delete($this->getCSRFCookieName());
 
                     $tokenDetails = [
@@ -910,9 +914,18 @@ class JsConnectPlugin extends Gdn_Plugin {
                     $sender->setData('messageClass', 'alert-success');
                     $sender->setData('user', $user);
 
+                    $header = JsConnect::decodeJWTHeader($args['jwt']);
+                    $provider = static::getProvider($header['kid']);
+
+                    $signInUrl = str_replace(
+                        ["{target}", "{redirect}"],
+                        url("settings/jsconnect/test?client_id=".$header['kid'], true),
+                        $provider["SignInUrl"] ?? "#"
+                    );
+
                     if (empty($user)) {
                         // TODO: Add the sign in URL redirect here.
-                        $sender->setData('signinUrl', '#');
+                        $sender->setData('signinUrl', $signInUrl);
                     } else {
                         $userFields = $this->userFields();
 
@@ -940,7 +953,6 @@ class JsConnectPlugin extends Gdn_Plugin {
                     $sender->Form->addError($ex);
                 }
             }
-
         }
         $sender->Form->addHidden('fragment', '');
         $sender->render('settings_test', '', 'plugins/jsconnect');
