@@ -924,7 +924,6 @@ class JsConnectPlugin extends Gdn_Plugin {
                     );
 
                     if (empty($user)) {
-                        // TODO: Add the sign in URL redirect here.
                         $sender->setData('signinUrl', $signInUrl);
                     } else {
                         $userFields = $this->userFields();
