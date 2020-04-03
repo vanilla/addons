@@ -767,7 +767,6 @@ class JsConnectPlugin extends Gdn_Plugin {
                     return subheading(t('Advanced'));
                 }
             ],
-            // TODO: Add Javascript to hide the hash type when the v3 protocol is chosen.
             'Protocol' => [
                 'Control' => 'dropdown',
                 'Description' => t(
