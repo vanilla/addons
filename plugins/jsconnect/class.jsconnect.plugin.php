@@ -917,13 +917,13 @@ class JsConnectPlugin extends Gdn_Plugin {
                     $sender->setData('messageClass', 'alert-success');
                     $sender->setData('user', $user);
 
+                    if (empty($user)) {
                         $header = JsConnect::decodeJWTHeader($args['jwt']);
                         $provider = self::getProvider($header[JsConnect::FIELD_CLIENT_ID] ?? '');
 
                         $signInUrl = $this->replaceUrlTarget(
-                            $provider['SignInUrl'],
+                            $provider["SignInUrl"] ?? "#",
                             url('/settings/jsconnect/test', true).'?'.http_build_query(['client_id' => $header[JsConnect::FIELD_CLIENT_ID] ?? ''])
-                        $provider["SignInUrl"] ?? "#"
                         );
 
                         // Add the sign in URL redirect here.
@@ -1194,7 +1194,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         $signature = val('sig', $jsData, val('signature', $jsData, false));
         // This is for logging only.
         $jsDataReceived = $jsData;
-        $String = val('sigStr', $jsData, false); // debugging
+        $string = val('sigStr', $jsData, false); // debugging
         unset($jsData['v'], $jsData['client_id'], $jsData['clientid'], $jsData['signature']);
         unset($jsData['sig'], $jsData['sigStr'], $jsData['string']);
 
@@ -1342,7 +1342,6 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $url = $provider['SignInUrl'];
             }
             $target = url('/entry/jsconnect-redirect', true).'?'.
-                    http_build_query([
                 http_build_query(['client_id' => $clientID, 'target' => $state[JsConnect::FIELD_TARGET] ?? '/']);
             $url = $this->replaceUrlTarget($url, $target);
             $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
