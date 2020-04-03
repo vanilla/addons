@@ -7,6 +7,7 @@
 
 use Vanilla\JsConnect\JsConnect;
 use Vanilla\JsConnect\JsConnectServer;
+use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * Class JsConnectPlugin
@@ -28,14 +29,19 @@ class JsConnectPlugin extends Gdn_Plugin {
      */
     private $cookie;
 
+    /** @var UserModel */
+    private $userModel;
+
     /**
      * JsConnectPlugin constructor.
      *
      * @param \Garden\Web\Cookie $cookie
+     * @param UserModel $userModel
      */
-    public function __construct(\Garden\Web\Cookie $cookie) {
+    public function __construct(\Garden\Web\Cookie $cookie, UserModel $userModel) {
         parent::__construct();
         $this->cookie = $cookie;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -909,15 +915,14 @@ class JsConnectPlugin extends Gdn_Plugin {
                         // TODO: Add the sign in URL redirect here.
                         $sender->setData('signinUrl', '#');
                     } else {
-                        // TODO: This might be better if we check against the user table, if that's appropriate.
+                        $userFields = $this->userFields();
+
                         // Check to see if the user has appropriate fields. Map known fields and unknown fields.
-                        $fields = [
+                        $standardFields = [
                             JsConnect::FIELD_UNIQUE_ID,
-                            JsConnect::FIELD_NAME,
-                            JsConnect::FIELD_PHOTO,
-                            JsConnect::FIELD_EMAIL,
                             JsConnect::FIELD_ROLES,
                         ];
+                        $fields = array_merge($standardFields, $userFields);
                         $known = [];
                         $unknown = [];
                         foreach ($user as $key => $value) {
@@ -1390,5 +1395,41 @@ class JsConnectPlugin extends Gdn_Plugin {
         $sender->setData('Verified', true);
         $sender->setData('Trusted', val('Trusted', $provider, true)); // this is a trusted connection.
         $sender->setData('SSOUser', $user);
+    }
+
+    /**
+     * Get available user fields based on the database table schema, removing blacklisted fields.
+     *
+     * @return array
+     */
+    private function userFields(): array {
+        $scheme = new CamelCaseScheme();
+        $schema = $this->userModel->defineSchema()->fields();
+
+        $blacklist = [
+            $this->userModel->PrimaryKey,
+            "Attributes",
+            "HashMethod",
+            "Permissions",
+            "Password",
+            "Preferences",
+        ];
+
+        $result = [];
+        foreach ($schema as $field => $config) {
+            if (
+                in_array($field, $blacklist) ||
+                substr($field, 0, 5) === "Count" ||
+                substr($field, 0, 4) === "Date" ||
+                substr($field, -9) === "IPAddress" ||
+                substr($field, -6) === "UserID"
+            ) {
+                continue;
+            }
+
+            $result[] = $scheme->convert($field);
+        }
+
+        return $result;
     }
 }
