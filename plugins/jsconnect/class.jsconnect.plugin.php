@@ -7,6 +7,7 @@
 
 use Vanilla\JsConnect\JsConnect;
 use Vanilla\JsConnect\JsConnectServer;
+use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * Class JsConnectPlugin
@@ -29,14 +30,19 @@ class JsConnectPlugin extends Gdn_Plugin {
      */
     private $cookie;
 
+    /** @var UserModel */
+    private $userModel;
+
     /**
      * JsConnectPlugin constructor.
      *
      * @param \Garden\Web\Cookie $cookie
+     * @param UserModel $userModel
      */
-    public function __construct(\Garden\Web\Cookie $cookie) {
+    public function __construct(\Garden\Web\Cookie $cookie, UserModel $userModel) {
         parent::__construct();
         $this->cookie = $cookie;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -764,7 +770,6 @@ class JsConnectPlugin extends Gdn_Plugin {
                     return subheading(t('Advanced'));
                 }
             ],
-            // TODO: Add Javascript to hide the hash type when the v3 protocol is chosen.
             'Protocol' => [
                 'Control' => 'dropdown',
                 'Description' => t(
@@ -894,7 +899,11 @@ class JsConnectPlugin extends Gdn_Plugin {
             } else {
                 try {
                     $jsc = $this->createJsConnectFromJWT($args['jwt']);
-                    [$user, $state, $payload] = $jsc->validateResponse($args['jwt'], $this->cookie->get($this->getCSRFCookieName()));
+
+                    [$user, $state, $payload] = $jsc->validateResponse(
+                        $args['jwt'],
+                        $this->cookie->get($this->getCSRFCookieName())
+                    );
                     $this->cookie->delete($this->getCSRFCookieName());
 
                     $tokenDetails = [
@@ -908,26 +917,26 @@ class JsConnectPlugin extends Gdn_Plugin {
                     $sender->setData('messageClass', 'alert-success');
                     $sender->setData('user', $user);
 
-                    if (empty($user)) {
                         $header = JsConnect::decodeJWTHeader($args['jwt']);
                         $provider = self::getProvider($header[JsConnect::FIELD_CLIENT_ID] ?? '');
+
                         $signInUrl = $this->replaceUrlTarget(
                             $provider['SignInUrl'],
                             url('/settings/jsconnect/test', true).'?'.http_build_query(['client_id' => $header[JsConnect::FIELD_CLIENT_ID] ?? ''])
+                        $provider["SignInUrl"] ?? "#"
                         );
 
                         // Add the sign in URL redirect here.
                         $sender->setData('signinUrl', $signInUrl);
                     } else {
-                        // TODO: This might be better if we check against the user table, if that's appropriate.
+                        $userFields = $this->userFields();
+
                         // Check to see if the user has appropriate fields. Map known fields and unknown fields.
-                        $fields = [
+                        $standardFields = [
                             JsConnect::FIELD_UNIQUE_ID,
-                            JsConnect::FIELD_NAME,
-                            JsConnect::FIELD_PHOTO,
-                            JsConnect::FIELD_EMAIL,
                             JsConnect::FIELD_ROLES,
                         ];
+                        $fields = array_merge($standardFields, $userFields);
                         $known = [];
                         $unknown = [];
                         foreach ($user as $key => $value) {
@@ -946,7 +955,6 @@ class JsConnectPlugin extends Gdn_Plugin {
                     $sender->Form->addError($ex);
                 }
             }
-
         }
         $sender->Form->addHidden('fragment', '');
         $sender->render('settings_test', '', 'plugins/jsconnect');
@@ -1316,7 +1324,7 @@ class JsConnectPlugin extends Gdn_Plugin {
 
             $jsc = $this->createJsConnectFromJWT($jwt);
             [$user, $state] = $jsc->validateResponse($jwt, $this->cookie->get($this->getCSRFCookieName()));
-            $form->addHidden('Target', $state[JsConnect::FIELD_TARGET] ?? '/');
+            $form->addHidden('Target', $state[JsConnectServer::FIELD_TARGET] ?? '/');
         } catch (\Exception $ex) {
             Logger::event('jsconnect_error', Logger::ERROR, $ex->getMessage(), ['jwt' => $jwt, 'protocol' => self::PROTOCOL_V3]);
             throw new \Gdn_UserException($ex->getMessage(), $ex->getCode());
@@ -1334,6 +1342,7 @@ class JsConnectPlugin extends Gdn_Plugin {
                 $url = $provider['SignInUrl'];
             }
             $target = url('/entry/jsconnect-redirect', true).'?'.
+                    http_build_query([
                 http_build_query(['client_id' => $clientID, 'target' => $state[JsConnect::FIELD_TARGET] ?? '/']);
             $url = $this->replaceUrlTarget($url, $target);
             $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
@@ -1395,6 +1404,44 @@ class JsConnectPlugin extends Gdn_Plugin {
         $sender->setData('Verified', true);
         $sender->setData('Trusted', val('Trusted', $provider, true)); // this is a trusted connection.
         $sender->setData('SSOUser', $user);
+    }
+
+    /**
+     * Get available user fields based on the database table schema, removing blacklisted fields.
+     *
+     * @param string $url
+     * @param string $target
+     * @return array
+     */
+    private function userFields(): array {
+        $scheme = new CamelCaseScheme();
+        $schema = $this->userModel->defineSchema()->fields();
+
+        $blacklist = [
+            $this->userModel->PrimaryKey,
+            "Attributes",
+            "HashMethod",
+            "Permissions",
+            "Password",
+            "Preferences",
+        ];
+
+        $result = [];
+        foreach ($schema as $field => $config) {
+            if (
+                in_array($field, $blacklist) ||
+                substr($field, 0, 5) === "Count" ||
+                substr($field, 0, 4) === "Date" ||
+                substr($field, -9) === "IPAddress" ||
+                substr($field, -6) === "UserID"
+            ) {
+                continue;
+            }
+
+            $result[] = $scheme->convert($field);
+        }
+
+        return $result;
     }
 
     /**
