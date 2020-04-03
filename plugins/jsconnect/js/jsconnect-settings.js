@@ -35,4 +35,26 @@ $(document).on('click', '.js-generate', function (e) {
             $('form#jsConnect').submit();
         }
     });
+
+    jQuery(window.document).on("contentLoad", function(e) {
+        var context = e.target;
+
+        if ($(context).is(".modal-dialog") === false) {
+            return;
+        }
+
+        var updateControls = function() {
+            var protocol = $("#Form_Protocol", context).val();
+
+            var hashControl = $("#Form_HashType").parents(".form-group").first();
+            if (protocol === "v2") {
+                hashControl.show();
+            } else {
+                hashControl.hide();
+            }
+        }
+
+        $("#Form_Protocol", context).change(updateControls);
+        updateControls();
+    });
 })(window, jQuery);
