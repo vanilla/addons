@@ -892,7 +892,6 @@ class JsConnectPlugin extends Gdn_Plugin {
                 try {
                     $jsc = $this->createJsConnectFromJWT($args['jwt']);
                     [$user, $state, $payload] = $jsc->validateResponse($args['jwt'], $this->cookie->get($this->getCSRFCookieName()));
-                    // TODO: Why isn't this deleting?
                     $this->cookie->delete($this->getCSRFCookieName());
 
                     $tokenDetails = [
