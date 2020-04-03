@@ -3,6 +3,7 @@
 $links = '<ul>';
 $links .= '<li>'.anchor(t('jsConnect Documentation'), 'http://docs.vanillaforums.com/features/sso/jsconnect/').'</li>';
 $links .= '<li>'.anchor(t('jsConnect Client Libraries'), 'http://docs.vanillaforums.com/features/sso/jsconnect/overview/#your-endpoint').'</li>';
+$links .= '<li>'.anchor(t('Upgrading jsConnect to v3'), 'https://success.vanillaforums.com/kb/articles/206-upgrading-jsconnect-to-v3').'</li>';
 $links .= '</ul>';
 
 helpAsset(sprintf(t('About %s'), 'jsConnect'), t('You can connect to multiple sites that support jsConnect.'));
