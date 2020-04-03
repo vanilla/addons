@@ -764,11 +764,11 @@ class JsConnectPlugin extends Gdn_Plugin {
                     'Protocol' => self::PROTOCOL_V2,
                     'Trusted' => 1
                 ];
+                $sender->setData('warnings', $this->getProviderWarnings($provider));
             } else {
                 $provider = [];
             }
             $form->setData($provider);
-            $sender->setData('warnings', $this->getProviderWarnings($provider));
         }
 
         // Set up the form controls for editing the connection.
