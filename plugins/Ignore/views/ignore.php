@@ -10,7 +10,7 @@ $Restricted = $this->data('IgnoreRestricted');
 
 ?>
 <?php if ($this->data('ForceEditing', FALSE)): ?>
-   <div class="Warning"><?php echo sprintf(t("You are viewing %s's ignore list"),$this->data('ForceEditing')); ?></div>
+   <div class="Warning"><?php echo sprintf(t('You are viewing %s\'s ignore list'),$this->data('ForceEditing')); ?></div>
 <?php endif; ?>
 
 <?php if ($NumIgnoredUsers): ?>
@@ -47,22 +47,22 @@ $Restricted = $this->data('IgnoreRestricted');
 $NumIgnoreLimit = $this->data('IgnoreLimit');
 if ($NumIgnoreLimit != 'infinite'):
    $IgnoreListPercent = round(($NumIgnoredUsers / $NumIgnoreLimit) * 100, 2);
-   echo wrap(sprintf(t("Ignore list is <b>%s%%</b> full (<b>%d/%d</b>)."), $IgnoreListPercent, $NumIgnoredUsers, $NumIgnoreLimit), 'div');
+   echo wrap(sprintf(t('IgnoreListMeter'), $IgnoreListPercent, $NumIgnoredUsers, $NumIgnoreLimit), 'div');
 else:
-   echo wrap(sprintf(t("<b>Unlimited</b> list, ignored <b>%d</b> %s"), $NumIgnoredUsers, plural($NumIgnoredUsers, 'person','people')), 'div');
+   echo wrap(sprintf(t('IgnoreListUnlimited'), $NumIgnoredUsers, plural($NumIgnoredUsers, 'person','people')), 'div');
 endif;
 ?>
 
 <?php if ($Restricted): ?>
    <?php $ReferTo = ($this->data('ForceEditing') ? sprintf(t("%s is"), $this->data('ForceEditing')) : t("You are")); ?>
    <div class="Info">
-      <?php echo sprintf(t("%s prohibited from using the ignore feature."),$ReferTo); ?>
+      <?php echo sprintf(t('%s prohibited from using the ignore feature.'),$ReferTo); ?>
       <?php if ($Moderator && $this->data('ForceEditing', TRUE)):
          echo anchor('Restore', "/user/ignorelist/allow/{$this->User->UserID}/".Gdn_Format::url($this->User->Name), 'Ignore Hijack', ['id' => 'revoke']);
       endif; ?>
    </div>
 <?php elseif ($Moderator && $this->data('ForceEditing', TRUE)): ?>
-   <div class="Warning"><?php echo sprintf(t("Revoke <b>%s</b>'s ignore list privileges?"), $this->data('ForceEditing')); ?> <?php echo anchor('Revoke', "/user/ignorelist/revoke/{$this->User->UserID}/".Gdn_Format::url($this->User->Name), 'Ignore Hijack', ['id' => 'revoke']); ?></div>
+   <div class="Warning"><?php echo sprintf(t('IgnoreListRevoke'), $this->data('ForceEditing')); ?> <?php echo anchor('Revoke', "/user/ignorelist/revoke/{$this->User->UserID}/".Gdn_Format::url($this->User->Name), 'Ignore Hijack', ['id' => 'revoke']); ?></div>
 <?php endif; ?>
 
 <?php if (!$this->data('ForceEditing') && !$Restricted): ?>
