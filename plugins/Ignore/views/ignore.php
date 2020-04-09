@@ -54,9 +54,11 @@ endif;
 ?>
 
 <?php if ($Restricted): ?>
-   <?php $ReferTo = ($this->data('ForceEditing') ? sprintf(t("%s is"), $this->data('ForceEditing')) : t("You are")); ?>
    <div class="Info">
-      <?php echo sprintf(t('%s prohibited from using the ignore feature.'),$ReferTo); ?>
+      <?php if ($this->data('ForceEditing')):
+         echo sprintf(t('%s is prohibited from using the ignore feature.'));
+            else: echo t('You are prohibited from using the ignore feature.');
+      endif; ?>
       <?php if ($Moderator && $this->data('ForceEditing', TRUE)):
          echo anchor('Restore', "/user/ignorelist/allow/{$this->User->UserID}/".Gdn_Format::url($this->User->Name), 'Ignore Hijack', ['id' => 'revoke']);
       endif; ?>
