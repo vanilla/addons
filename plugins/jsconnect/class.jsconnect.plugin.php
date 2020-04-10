@@ -188,7 +188,7 @@ class JsConnectPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Calculat the querystring for connecting.
+     * Calculate the querystring for connecting.
      *
      * @param array $provider
      * @param ?string $target
@@ -644,6 +644,21 @@ class JsConnectPlugin extends Gdn_Plugin {
         Gdn::request()->pathAndQuery($url);
         Gdn::dispatcher()->dispatch();
         $args['Handled'] = true;
+    }
+
+    /**
+     * Set the 'IsDefault' field to zero before disabling to prevent conflicts.
+     *
+     * @param Gdn_Controller $sender The Controller info.
+     * @param Gdn_Controller $args Event args.
+     */
+    public function settingsController_beforeDisablePlugin_handler($sender, $args) {
+        if (isset($args['PluginName'])) {
+            $authenticationProvider = new Gdn_AuthenticationProviderModel();
+            $providerData = Gdn_AuthenticationProviderModel::getProviderByScheme($args['PluginName']);
+            $providerData['IsDefault'] = 0;
+            $authenticationProvider->save($providerData);
+        }
     }
 
     /**
