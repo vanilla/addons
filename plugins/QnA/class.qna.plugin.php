@@ -1317,7 +1317,7 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         $discussion['attributes']['question'] = [
-            'status' => strtolower($discussion['qnA']),
+            'status' => isset($discussion['qnA']) ? strtolower($discussion['qnA']) : 'unanswered',
             'dateAccepted' => $discussion['dateAccepted'],
             'dateAnswered' => $discussion['dateOfAnswer'],
             "acceptedAnswers" => $acceptedAnswers,
