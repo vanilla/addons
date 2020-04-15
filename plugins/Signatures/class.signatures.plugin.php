@@ -361,14 +361,13 @@ class SignaturesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @param $sender
+     * Modify a signature.
      *
-     * @throws Exception
+     * This method is also used for the GET endpoint.
+     *
+     * @param ProfileController $sender
      */
     public function controller_Modify($sender) {
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
-        }
         $sender->deliveryMethod(DELIVERY_METHOD_JSON);
         $sender->deliveryType(DELIVERY_TYPE_DATA);
 
@@ -399,7 +398,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
         $sender->setData('Signature', $sigData);
 
-        if ($sender->Form->isPostBack()) {
+        if ($sender->Request->isAuthenticatedPostBack(true)) {
             $sender->setData('Success', false);
 
             // Validate the signature.
