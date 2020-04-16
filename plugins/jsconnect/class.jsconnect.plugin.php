@@ -28,15 +28,6 @@ class JsConnectPlugin extends SSOAddon {
     private const AUTHENTICATION_SCHEME = 'jsconnect';
 
     /**
-     * Get the AuthenticationSchemeAlias value.
-     *
-     * @return string The AuthenticationSchemeAlias.
-     */
-    protected function getAuthenticationScheme(): string {
-        return self::AUTHENTICATION_SCHEME;
-    }
-
-    /**
      * @var \Garden\Web\Cookie
      */
     private $cookie;
@@ -54,6 +45,15 @@ class JsConnectPlugin extends SSOAddon {
         parent::__construct();
         $this->cookie = $cookie;
         $this->userModel = $userModel;
+    }
+
+    /**
+     * Get the AuthenticationSchemeAlias value.
+     *
+     * @return string The AuthenticationSchemeAlias.
+     */
+    protected function getAuthenticationSchemeAlias(): string {
+        return self::AUTHENTICATION_SCHEME;
     }
 
     /**
