@@ -13,7 +13,7 @@ use Vanilla\Utility\CamelCaseScheme;
 /**
  * Class JsConnectPlugin
  */
-class JsConnectPlugin extends Gdn_Plugin {
+class JsConnectPlugin extends SSOAddon {
 
     const DEFAULT_SECRET_LENGTH = 64;
 
@@ -25,6 +25,7 @@ class JsConnectPlugin extends Gdn_Plugin {
     const ACTION_SIGN_IN = 'signin';
     const ACTION_REGISTER = 'register';
     const FIELD_PROVIDER_CLIENT_ID = 'AuthenticationKey';
+    private const AUTHENTICATION_SCHEME = 'jsconnect';
 
     /**
      * @var \Garden\Web\Cookie
@@ -44,6 +45,15 @@ class JsConnectPlugin extends Gdn_Plugin {
         parent::__construct();
         $this->cookie = $cookie;
         $this->userModel = $userModel;
+    }
+
+    /**
+     * Get the AuthenticationSchemeAlias value.
+     *
+     * @return string The AuthenticationSchemeAlias.
+     */
+    protected function getAuthenticationSchemeAlias(): string {
+        return self::AUTHENTICATION_SCHEME;
     }
 
     /**
@@ -305,7 +315,7 @@ class JsConnectPlugin extends Gdn_Plugin {
         if ($client_id !== null) {
             $where = [self::FIELD_PROVIDER_CLIENT_ID => $client_id];
         } else {
-            $where = ['AuthenticationSchemeAlias' => 'jsconnect'];
+            $where = ['AuthenticationSchemeAlias' => self::AUTHENTICATION_SCHEME];
         }
 
         $sql = Gdn::sql();
