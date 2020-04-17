@@ -91,9 +91,14 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      * @param CategoriesController $args
      */
-    public function categoriesController_beforeCategoriesRender_handler($sender, $args) {
+    public function categoriesController_beforeCategoriesRender_handler(CategoriesController $sender, $args) {
         if ($sender->data('Category.RedirectUrl')) {
-            redirectTo(categoryUrl($sender->Data('Category')), 301);
+            $destination = categoryUrl($sender->Data('Category'));
+            $requestRoot = Gdn::request()->getRoot();
+            if ($requestRoot && strpos($destination, $requestRoot) === 0) {
+                $destination = substr($destination, strlen($requestRoot));
+            }
+            redirectTo($destination, 301);
         }
     }
 }
