@@ -95,6 +95,8 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
         if ($sender->data('Category.RedirectUrl')) {
             $destination = categoryUrl($sender->Data('Category'));
             $requestRoot = Gdn::request()->getRoot();
+            // Remove $requestRoot in $destination because it will appear twice because of url() or safeURL()
+            // usage from redirectTo().
             if ($requestRoot && strpos($destination, $requestRoot) === 0) {
                 $destination = substr($destination, strlen($requestRoot));
             }
