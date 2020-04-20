@@ -62,14 +62,12 @@ class CloudflareSupportPlugin extends Gdn_Plugin {
 
         // Iterate and see if connecting IP is from Cloudflare
         foreach ($currentRanges as $cloudflareIPRange) {
-
-            // Check if calling IP is a Cloudflare proxy
+            // Check if calling IP is a Cloudflare proxy.
             switch ($ipType) {
-
                 // IPv4
                 case self::CF_IPV4:
                     if (!$this->ipv4_in_range($requestAddress, $cloudflareIPRange)) {
-                        continue;
+                        continue 2;
                     }
                     break;
 
