@@ -89,18 +89,11 @@ class CategoryAsLinkPlugin extends Gdn_Plugin {
      * Redirect any request to a category that is aliased to a discussion or other URL.
      *
      * @param CategoriesController $sender
-     * @param CategoriesController $args
+     * @param array $args
      */
-    public function categoriesController_beforeCategoriesRender_handler(CategoriesController $sender, $args) {
+    public function categoriesController_beforeCategoriesRender_handler(CategoriesController $sender, array $args) {
         if ($sender->data('Category.RedirectUrl')) {
-            $destination = categoryUrl($sender->Data('Category'));
-            $requestRoot = Gdn::request()->getRoot();
-            // Remove $requestRoot in $destination because it will appear twice because of url() or safeURL()
-            // usage from redirectTo().
-            if ($requestRoot && strpos($destination, $requestRoot) === 0) {
-                $destination = substr($destination, strlen($requestRoot));
-            }
-            redirectTo($destination, 301);
+            redirectTo(categoryUrl($sender->Data('Category')), 301);
         }
     }
 }
@@ -122,6 +115,16 @@ if (!function_exists("categoryUrl")) {
             $category = CategoryModel::categories($category);
         }
         $category = (array)$category;
+
+        // If SubcommunitiesPlugin is enabled and the category use RedirectUrl feature.
+        if (class_exists('SubcommunitiesPlugin') && $category['RedirectUrl']) {
+            $requestRoot = Gdn::request()->getRoot();
+            // Remove $requestRoot in $destination because it will appear twice because of url() or safeURL().
+            $destination = $requestRoot && strpos($category['RedirectUrl'], $requestRoot) === 0 ?
+                substr($category['RedirectUrl'], strlen($requestRoot)) : $category['RedirectUrl'];
+
+            return safeURL($destination);
+        }
 
         // If there is a URL that links to a discussion it overrides the category or even a link to an alias category.
         if (val('RedirectUrl', $category)) {
