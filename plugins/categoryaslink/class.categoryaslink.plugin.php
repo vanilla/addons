@@ -120,10 +120,9 @@ if (!function_exists("categoryUrl")) {
         if (class_exists('SubcommunitiesPlugin') && $category['RedirectUrl']) {
             $requestRoot = Gdn::request()->getRoot();
             // Remove $requestRoot in $destination because it will appear twice because of url() or safeURL().
-            $destination = $requestRoot && strpos($category['RedirectUrl'], $requestRoot) === 0 ?
-                substr($category['RedirectUrl'], strlen($requestRoot)) : $category['RedirectUrl'];
-
-            return safeURL($destination);
+            $destination = safeURL($category['RedirectUrl']);
+            return $requestRoot && strpos($destination, $requestRoot) === 0 ?
+                substr($destination, strlen($requestRoot)) : $destination;
         }
 
         // If there is a URL that links to a discussion it overrides the category or even a link to an alias category.
