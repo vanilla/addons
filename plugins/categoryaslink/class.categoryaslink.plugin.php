@@ -116,19 +116,21 @@ if (!function_exists("categoryUrl")) {
         }
         $category = (array)$category;
 
-        // If SubcommunitiesPlugin is enabled and the category use RedirectUrl feature.
-        if (class_exists('SubcommunitiesPlugin') && $category['RedirectUrl']) {
-            $requestRoot = Gdn::request()->getRoot();
-            // Remove $requestRoot in $destination because it will appear twice because of url() or safeURL().
-            $destination = safeURL($category['RedirectUrl']);
-            return $requestRoot && strpos($destination, $requestRoot) === 0 ?
-                substr($destination, strlen($requestRoot)) : $destination;
-        }
-
         // If there is a URL that links to a discussion it overrides the category or even a link to an alias category.
         if (val('RedirectUrl', $category)) {
-            // SafeURL because you may be linking to another web property, another forum or knowledgebase.
-            return safeURL(val('RedirectUrl', $category));
+            // If SubcommunitiesPlugin is enabled we have to remove "community root directory of the request" in URL.
+            if (class_exists('SubcommunitiesPlugin')) {
+                $requestRoot = Gdn::request()->getRoot();
+                // Remove $requestRoot in $destination because it will appear twice because of url() or safeURL().
+                $destination = safeURL($category['RedirectUrl']);
+                $redirectUrlDestination = $requestRoot && strpos($destination, $requestRoot) === 0 ?
+                    substr($destination, strlen($requestRoot)) : $destination;
+            } else {
+                // SafeURL because you may be linking to another web property, another forum or knowledgebase.
+                $redirectUrlDestination = safeURL(val('RedirectUrl', $category));
+            }
+
+            return $redirectUrlDestination;
         }
 
         $categoryURL = '';
