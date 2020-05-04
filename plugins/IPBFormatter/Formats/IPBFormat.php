@@ -41,6 +41,7 @@ class IPBFormat extends HtmlFormat {
 
         $this->bbcodeParser = $bbcodeParser;
         $this->bbcodeParser->nbbc()->setIgnoreNewlines(true);
+        $this->bbcodeParser->nbbc()->setEscapeContent(false);
     }
 
     /**

@@ -29,9 +29,9 @@ class IPBFormatterPlugin extends Gdn_Plugin {
         $formatService = $dic->get(FormatService::class);
         $formatService->registerFormat(IPBFormat::FORMAT_KEY, $dic->get(IPBFormat::class));
 
-        $dic->rule("IPBFormatter")
-            ->setClass(Formatter::class)
-            ->setShared(true);
+//        $dic->rule("IPBFormatter")
+//            ->setClass(Formatter::class)
+//            ->setShared(true);
     }
 
     /**
@@ -248,15 +248,6 @@ EOT;
         }
 
         return '';
-    }
-
-    /**
-     * @param $sender
-     * @param $args
-     */
-    public function bBCode_afterBBCodeSetup_handler($sender, $args) {
-        $nbbc = $args['BBCode'];
-        $nbbc->setEscapeContent(false);
     }
 
     /**
