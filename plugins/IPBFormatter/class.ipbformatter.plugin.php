@@ -28,10 +28,6 @@ class IPBFormatterPlugin extends Gdn_Plugin {
     public function container_init(ContainerInterface $dic) {
         $formatService = $dic->get(FormatService::class);
         $formatService->registerFormat(IPBFormat::FORMAT_KEY, $dic->get(IPBFormat::class));
-
-//        $dic->rule("IPBFormatter")
-//            ->setClass(Formatter::class)
-//            ->setShared(true);
     }
 
     /**
