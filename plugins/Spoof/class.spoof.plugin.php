@@ -58,7 +58,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 			return;
 
 		$user = getValue('User', $sender->EventArguments);
-		if ($user) {
+		if ($user && $user->Admin !== 2) {
 			$attr = [
 				'aria-label' => t('Spoof'),
 				'title' => t('Spoof'),
