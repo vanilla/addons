@@ -34,7 +34,7 @@ class SpoofPlugin implements Gdn_IPlugin {
         $user = $sender->userModel->getId(intval($spoofUserID));
         $transientKey = getValue('1', $sender->RequestArgs);
 		// Validate the transient key && permissions
-		if (Gdn::session()->validateTransientKey($transientKey)
+        if (Gdn::session()->validateTransientKey($transientKey)
             && Gdn::session()->checkPermission('Garden.Settings.Manage')
             && $user->Admin !== 2) {
 			$identity = new Gdn_CookieIdentity();
@@ -61,7 +61,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 			return;
 
 		$user = getValue('User', $sender->EventArguments);
-		if ($user && $user->Admin !== 2) {
+        if ($user && $user->Admin !== 2) {
 			$attr = [
 				'aria-label' => t('Spoof'),
 				'title' => t('Spoof'),
