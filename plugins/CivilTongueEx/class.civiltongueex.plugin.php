@@ -566,6 +566,23 @@ class CivilTonguePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Replace dirty words in meta tags, so they won't appear when reposted to facebook, twitter, et al.
+     *
+     * @param HeadModule $sender The head module.
+     */
+    public function headModule_beforeToString_handler($sender) {
+        $tags = $sender->getTags();
+        $newTags = [];
+        foreach ($tags as $tag) {
+            if ($tag['_tag'] === 'meta') {
+                setValue('content', $tag, $this->replace($tag['content']));
+            }
+            $newTags[] = $tag;
+        }
+        $sender->tags($newTags);
+    }
+
+    /**
      * Get the replacement string.
      *
      * @return string
