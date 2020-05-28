@@ -48,6 +48,26 @@ class JsConnectPlugin extends SSOAddon {
     }
 
     /**
+     * @param array $provider
+     * @return string
+     */
+    private static function getV3SignInURL(array $provider): string {
+        $target = Gdn::request()->get('target', Gdn::request()->get('target'));
+        if (!$target) {
+            $target = '/' . ltrim(Gdn::request()->path());
+        }
+        if (stringBeginsWith($target, '/entry/signin')) {
+            $target = '/';
+        }
+
+        $baseURL = url('/entry/jsconnect-redirect');
+        return $baseURL . '?' . http_build_query([
+                'client_id' => $provider[self::FIELD_PROVIDER_CLIENT_ID],
+                'target' => $target
+            ]);
+    }
+
+    /**
      * Get the AuthenticationSchemeAlias value.
      *
      * @return string The AuthenticationSchemeAlias.
@@ -173,18 +193,7 @@ class JsConnectPlugin extends SSOAddon {
      * @return string
      */
     private static function connectButtonV3(array $provider): string {
-        $target = Gdn::request()->get('target', Gdn::request()->get('target'));
-        if (!$target) {
-            $target = '/'.ltrim(Gdn::request()->path());
-        }
-        if (stringBeginsWith($target, '/entry/signin')) {
-            $target = '/';
-        }
-
-        $url = url('/entry/jsconnect-redirect').'?'.http_build_query([
-            'client_id' => $provider[self::FIELD_PROVIDER_CLIENT_ID],
-            'target' => $target
-        ]);
+        $url = self::getV3SignInURL($provider);
 
         $result = '<div class="JsConnect-Guest">'.
             anchor(
@@ -355,7 +364,12 @@ class JsConnectPlugin extends SSOAddon {
             $provider = static::getProvider($provider);
         }
 
-        $signInUrl = val('SignInUrl', $provider);
+        if ($provider['Protocol'] === 'v3') {
+            $signInUrl = url('/entry/jsconnect-redirect');
+        } else {
+            $signInUrl = $provider['SignInUrl'];
+        }
+
         if (!$signInUrl) {
             return '';
         }
@@ -420,7 +434,9 @@ class JsConnectPlugin extends SSOAddon {
         $provider['SignInUrlFinal'] = static::getSignInUrl($provider, $target);
         $provider['RegisterUrlFinal'] = static::getRegisterUrl($provider, $target);
     }
-
+    public function entryController_overrideSignIn_handler($sender, $args) {
+        $args['DefaultProvider']['SignInUrl'] = static::getV3SignInURL($args['DefaultProvider']);
+    }
     /**
      * Add jsConnect buttons to the page.
      *
