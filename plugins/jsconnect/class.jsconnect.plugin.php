@@ -48,11 +48,13 @@ class JsConnectPlugin extends SSOAddon {
     }
 
     /**
-     * @param array $provider
-     * @return string
+     * Create a URL that directs the browser to the V3 redirect to create the JWT.
+     *
+     * @param array $provider JSConnect settings.
+     * @return string URL with the target.
      */
-    private static function getV3SignInURL(array $provider): string {
-        $target = Gdn::request()->get('target', Gdn::request()->get('target'));
+    private static function entryRedirectURL(array $provider): string {
+        $target = Gdn::request()->get('Target', Gdn::request()->get('Target'));
         if (!$target) {
             $target = '/' . ltrim(Gdn::request()->path());
         }
@@ -193,7 +195,7 @@ class JsConnectPlugin extends SSOAddon {
      * @return string
      */
     private static function connectButtonV3(array $provider): string {
-        $url = self::getV3SignInURL($provider);
+        $url = self::entryRedirectURL($provider);
 
         $result = '<div class="JsConnect-Guest">'.
             anchor(
@@ -364,12 +366,7 @@ class JsConnectPlugin extends SSOAddon {
             $provider = static::getProvider($provider);
         }
 
-        if ($provider['Protocol'] === 'v3') {
-            $signInUrl = url('/entry/jsconnect-redirect');
-        } else {
-            $signInUrl = $provider['SignInUrl'];
-        }
-
+        $signInUrl = val('SignInUrl', $provider);
         if (!$signInUrl) {
             return '';
         }
@@ -434,8 +431,18 @@ class JsConnectPlugin extends SSOAddon {
         $provider['SignInUrlFinal'] = static::getSignInUrl($provider, $target);
         $provider['RegisterUrlFinal'] = static::getRegisterUrl($provider, $target);
     }
+
+    /**
+     * If this is the default provider and V3, make sure it goes through the redirect URL.
+     *
+     * @param EntryController $sender
+     * @param array $args
+     */
     public function entryController_overrideSignIn_handler($sender, $args) {
-        $args['DefaultProvider']['SignInUrl'] = static::getV3SignInURL($args['DefaultProvider']);
+        $protocol = $args['DefaultProvider']['Protocol'] ?? null;
+        if ($protocol === self::PROTOCOL_V3) {
+            $args['DefaultProvider']['SignInUrl'] = static::entryRedirectURL($args['DefaultProvider']);
+        }
     }
     /**
      * Add jsConnect buttons to the page.
