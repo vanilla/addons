@@ -195,7 +195,18 @@ class JsConnectPlugin extends SSOAddon {
      * @return string
      */
     private static function connectButtonV3(array $provider): string {
-        $url = self::entryRedirectURL($provider);
+        $target = Gdn::request()->get('Target', Gdn::request()->get('target'));
+        if (!$target) {
+            $target = '/'.ltrim(Gdn::request()->path());
+        }
+        if (stringBeginsWith($target, '/entry/signin')) {
+            $target = '/';
+        }
+
+        $url = url('/entry/jsconnect-redirect').'?'.http_build_query([
+            'client_id' => $provider[self::FIELD_PROVIDER_CLIENT_ID],
+            'target' => $target
+        ]);
 
         $result = '<div class="JsConnect-Guest">'.
             anchor(
@@ -554,7 +565,7 @@ class JsConnectPlugin extends SSOAddon {
             if ($protocol !== self::PROTOCOL_V3) {
                 $this->entryJsConnectV2($sender, $action, $target);
             } else {
-                $this->entryJsConnectV3($sender);
+                $this->entryJsConnectV3($sender, $target);
             }
         } else {
             $sender->addDefinition('jsconnect', [
@@ -797,7 +808,7 @@ class JsConnectPlugin extends SSOAddon {
             ],
             'SignInUrl' => [
                 'LabelCode' => 'Sign In URL',
-                'Description' => t('The url that users use to sign in.').' '.t('Use {target} to specify a redirect.')
+                'Description' => t('The url that users use to sign in.').' '.t('Use {target} as placeholder to specify a redirect to where the user iniciated the signin.')
             ],
             'RegisterUrl' => [
                 'LabelCode' => 'Registration URL',
@@ -1195,12 +1206,17 @@ class JsConnectPlugin extends SSOAddon {
      * Note: This work is done in js so this is just a placeholder page.
      *
      * @param EntryController $sender
+     * @param string $target
      */
-    private function entryJsConnectV3(EntryController $sender): void {
+    private function entryJsConnectV3(EntryController $sender, $target = ''): void {
         $sender->addJsFile('jsconnect.js', 'plugins/jsconnect');
         $sender->setData('Title', t('Connecting...'));
         $sender->Form->Action = url('/entry/connect/jsconnect');
         $sender->Form->addHidden('fragment', '');
+
+        if (!empty($target)) {
+            $sender->Form->addHidden('Target', safeURL($target));
+        }
 
         $sender->MasterView = 'empty';
         $sender->render('jsconnect', '', 'plugins/jsconnect');
@@ -1353,6 +1369,7 @@ class JsConnectPlugin extends SSOAddon {
             $jsc = $this->createJsConnectFromJWT($jwt);
             [$user, $state] = $jsc->validateResponse($jwt, $this->cookie->get($this->getCSRFCookieName()));
             $form->addHidden('Target', $state[JsConnectServer::FIELD_TARGET] ?? '/');
+            $form->setFormValue('Target', $state[JsConnectServer::FIELD_TARGET] ?? '/');
         } catch (\Exception $ex) {
             Logger::event('jsconnect_error', Logger::ERROR, $ex->getMessage(), ['jwt' => $jwt, 'protocol' => self::PROTOCOL_V3]);
             throw new \Gdn_UserException($ex->getMessage(), $ex->getCode());
