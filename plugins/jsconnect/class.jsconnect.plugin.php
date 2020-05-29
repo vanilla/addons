@@ -173,7 +173,7 @@ class JsConnectPlugin extends SSOAddon {
      * @return string
      */
     private static function connectButtonV3(array $provider): string {
-        $target = Gdn::request()->get('target', Gdn::request()->get('target'));
+        $target = Gdn::request()->get('Target', Gdn::request()->get('target'));
         if (!$target) {
             $target = '/'.ltrim(Gdn::request()->path());
         }
