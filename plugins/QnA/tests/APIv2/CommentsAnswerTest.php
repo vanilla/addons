@@ -259,7 +259,7 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
         $this->assertEquals(200, $response->getStatusCode());
 
         $body = $response->getBody();
-        $date = new \DateTime($body['dateInserted']);
+        $date = (new \DateTime($body['dateInserted']))->format(DATE_ATOM);
 
         $answeredQuestion = $this->getQuestion($question['discussionID']);
 
