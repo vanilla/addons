@@ -903,6 +903,7 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function discussionsController_unanswered_create($sender, $args) {
         $sender->View = 'Index';
+        $sender->title(t('Unanswered Questions'));
         $sender->setData('_PagerUrl', 'discussions/unanswered/{Page}');
 
         // Be sure to display every unanswered question (ie from groups)
@@ -988,6 +989,8 @@ class QnAPlugin extends Gdn_Plugin {
             $sender->setData('Announcements', $announcements);
             $sender->AnnounceData = $announcements;
         }
+
+        $sender->setData('Breadcrumbs', [['Name' => t('Unanswered'), 'Url' => '/discussions/unanswered']]);
     }
 
     /**
