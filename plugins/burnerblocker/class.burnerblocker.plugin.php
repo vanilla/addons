@@ -83,7 +83,7 @@ class BurnerBlockerPlugin extends Gdn_Plugin {
     public function userModel_beforeRegister_handler($sender, $args) {
         // Get the user's email domain.
         $email = val('Email', $args['RegisteringUser']);
-        $domain = substr($email, strpos($email, '@')+1);
+        $domain = substr($email, strrpos($email, '@')+1);
 
         // Check the user's email domain against our private lists.
         $domainList = array_merge($this->getBurnerDomains(), $this->getFreemailDomains());

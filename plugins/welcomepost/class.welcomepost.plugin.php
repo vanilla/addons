@@ -99,23 +99,35 @@ class WelcomePostPlugin extends Gdn_Plugin {
      */
     public function entryController_registrationSuccessful_handler($sender, $args) {
         if (!c('Garden.Registration.ConfirmEmail')) {
-            $target = (Gdn::request()->post('Target')) ? '&Target='.Gdn::request()->post('Target') : null;
-            $sender->setRedirectTo('/post/discussion?welcomepost=true'.$target);
+            $target = ($sender->Form->getFormValue('Target')) ? '&Target='.urlencode($sender->Form->getFormValue('Target')) : null;
+            $sender->Form->setFormValue('Target', '/post/discussion?welcomepost=true'.$target);
         }
     }
 
     /**
      * When connecting through SSO, redirect user to the Welcome Post page.
      *
-     * @param UserModel $sender The model initiating the sign-in.
-     * @param array $args Used to get the `InsertUserID`.
+     * @param EntryController $sender
+     * @param array $args
      */
-    public function userModel_afterSignIn_handler($sender, $args) {
-        $target = (Gdn::request()->post('Target')) ? '&Target='.Gdn::request()->post('Target') : null;
-        // AfterSignIn event is fired in several places, the InsertUserID
-        // argument is only passed in the connect script.
-        if (val('InsertUserID', $args)) {
-            Gdn::controller()->setRedirectTo('/post/discussion?welcomepost=true'.$target);
+    public function entryController_afterConnectSave_handler($sender, $args) {
+        // If this is not an SSO connection, abort.
+        if (!$sender->Form->getFormValue('Provider')) {
+            return;
+        }
+
+        // Check if this is the first time the user has connected.
+        $existingUser = $sender->UserModel->getAuthentication($sender->Form->getFormValue('UniqueID'), $sender->Form->getFormValue('Provider'));
+        if ($existingUser) {
+            return;
+        }
+
+        // Do one last check, this person may have connected by some other, way.
+        $user = $sender->UserModel->getID($args['UserID'], DATASET_TYPE_ARRAY);
+        // If the user has logged in before, by whatever means, don't send them to the welcome post.
+        if (time() - strtotime($user['DateFirstVisit'])  < 60) {
+            $target = ($sender->Form->getFormValue('Target')) ? '&Target=' . urlencode($sender->Form->getFormValue('Target')) : null;
+            $sender->Form->setFormValue('Target', '/post/discussion?welcomepost=true' . $target);
         }
     }
 

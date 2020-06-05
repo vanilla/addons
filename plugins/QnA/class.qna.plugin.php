@@ -7,6 +7,9 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Vanilla\ApiUtils;
+use Garden\Container\Container;
+use Vanilla\QnA\Models\SearchRecordTypeQuestion;
+use Vanilla\QnA\Models\SearchRecordTypeAnswer;
 
 /**
  * Adds Question & Answer format to Vanilla.
@@ -73,10 +76,24 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     * @param Container $dic
+     */
+    public function container_init(Container $dic) {
+        /*
+         * Register additional advanced search sphinx record types
+         */
+        $dic
+            ->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
+            ->addCall('setType', [new SearchRecordTypeQuestion()])
+            ->addCall('setType', [new SearchRecordTypeAnswer()])
+        ;
+    }
+
+    /**
      * Add Javascript.
      *
-     * @param $sender
-     * @param $args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
     public function base_render_before($sender, $args) {
         if ($sender->MasterView == 'admin') {
@@ -247,10 +264,11 @@ class QnAPlugin extends Gdn_Plugin {
             return;
         }
 
-        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
+        $permissionDiscussion = Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID);
+        $permissionCuration = Gdn::session()->checkRankedPermission('Garden.Curation.Manage');
+        if (!($permissionDiscussion || $permissionCuration)) {
             return;
         }
-
         $args['CommentOptions']['QnA'] = ['Label' => t('Q&A').'...', 'Url' => '/discussion/qnaoptions?commentid='.$comment->CommentID, 'Class' => 'Popup'];
     }
 
@@ -624,8 +642,9 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         $discussion = $this->discussionModel->getID(val('DiscussionID', $comment), DATASET_TYPE_ARRAY);
-
-        $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
+        if (!Gdn::session()->checkRankedPermission('Garden.Curation.Manage')) {
+            $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
+        }
 
         if ($sender->Form->authenticatedPostBack(true)) {
             $newQnA = $sender->Form->getFormValue('QnA');
@@ -884,6 +903,7 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function discussionsController_unanswered_create($sender, $args) {
         $sender->View = 'Index';
+        $sender->title(t('Unanswered Questions'));
         $sender->setData('_PagerUrl', 'discussions/unanswered/{Page}');
 
         // Be sure to display every unanswered question (ie from groups)
@@ -906,7 +926,7 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function discussionsController_beforeBuildPager_handler($sender, $args) {
         if (Gdn::controller()->RequestMethod == 'unanswered') {
-            $count = $this->getUnansweredCount();
+            $count = $this->getUnansweredCount(true);
             $sender->setData('CountDiscussions', $count);
         }
     }
@@ -914,9 +934,10 @@ class QnAPlugin extends Gdn_Plugin {
     /**
      * Return the number of unanswered questions.
      *
+     * @param bool $pager Whether this count affects the pager or not.
      * @return int
      */
-    public function getUnansweredCount() {
+    public function getUnansweredCount($pager = false) {
         // TODO: Dekludge this when category permissions are refactored (tburry).
         $cacheKey = Gdn::request()->webRoot().'/QnA-UnansweredCount';
         $questionCount = Gdn::cache()->get($cacheKey);
@@ -934,6 +955,7 @@ class QnAPlugin extends Gdn_Plugin {
 
         // Check to see if another plugin can handle this.
         $this->EventArguments['questionCount'] = &$questionCount;
+        $this->EventArguments['pagerCount'] = $pager;
         $this->fireEvent('unansweredCount');
 
         return $questionCount;
@@ -967,6 +989,8 @@ class QnAPlugin extends Gdn_Plugin {
             $sender->setData('Announcements', $announcements);
             $sender->AnnounceData = $announcements;
         }
+
+        $sender->setData('Breadcrumbs', [['Name' => t('Unanswered'), 'Url' => '/discussions/unanswered']]);
     }
 
     /**
@@ -1296,7 +1320,7 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         $discussion['attributes']['question'] = [
-            'status' => strtolower($discussion['qnA']),
+            'status' => !empty($discussion['qnA']) ? strtolower($discussion['qnA']) : 'unanswered',
             'dateAccepted' => $discussion['dateAccepted'],
             'dateAnswered' => $discussion['dateOfAnswer'],
             "acceptedAnswers" => $acceptedAnswers,
@@ -1450,6 +1474,7 @@ class QnAPlugin extends Gdn_Plugin {
     public function searchResultSchema_init(Schema $schema) {
         $types = $schema->getField('properties.type.enum');
         $types[] = 'question';
+        $types[] = 'answer';
         $schema->setField('properties.type.enum', $types);
     }
 

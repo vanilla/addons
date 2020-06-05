@@ -17,5 +17,6 @@
             "email": "brendan@vanillaforums.com",
             "homepage": "http://www.dropthedigibomb.com"
         }
-    ]
+    ],
+    "hidden": true
 }

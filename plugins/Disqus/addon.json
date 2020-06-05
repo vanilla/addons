@@ -5,6 +5,7 @@
     "mobileFriendly": true,
     "settingsUrl": "/settings/disqus",
     "settingsPermission": "Garden.Settings.Manage",
+    "hidden": true,
     "icon": "disqus_sign_in.png",
     "socialConnect": true,
     "key": "disqus",

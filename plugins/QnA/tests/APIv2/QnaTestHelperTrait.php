@@ -18,7 +18,7 @@ trait QnaTestHelperTrait {
      * @param array $expectedAttributes
      */
     protected function assertIsQuestion($discussion, $expectedAttributes = []) {
-        $this->assertInternalType('array', $discussion);
+        $this->assertIsArray($discussion);
 
         $this->assertArrayHasKey('type', $discussion);
         $this->assertEquals('question', $discussion['type']);
@@ -30,7 +30,7 @@ trait QnaTestHelperTrait {
         $this->assertArrayHasKey('dateAccepted', $discussion['attributes']['question']);
         $this->assertArrayHasKey('dateAnswered', $discussion['attributes']['question']);
 
-        foreach($expectedAttributes as $attribute => $value) {
+        foreach ($expectedAttributes as $attribute => $value) {
             $this->assertEquals($value, $discussion['attributes']['question'][$attribute]);
         }
     }
@@ -42,7 +42,7 @@ trait QnaTestHelperTrait {
      * @param array $expectedAttributes
      */
     protected function assertIsAnswer($comment, $expectedAttributes = []) {
-        $this->assertInternalType('array', $comment);
+        $this->assertIsArray($comment);
 
         $this->assertArrayHasKey('attributes', $comment);
         $this->assertArrayHasKey('answer', $comment['attributes']);
@@ -51,7 +51,7 @@ trait QnaTestHelperTrait {
         $this->assertArrayHasKey('dateAccepted', $comment['attributes']['answer']);
         $this->assertArrayHasKey('acceptUserID', $comment['attributes']['answer']);
 
-        foreach($expectedAttributes as $attribute => $value) {
+        foreach ($expectedAttributes as $attribute => $value) {
             $this->assertEquals($value, $comment['attributes']['answer'][$attribute]);
         }
     }

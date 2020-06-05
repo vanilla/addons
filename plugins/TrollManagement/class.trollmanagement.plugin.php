@@ -5,6 +5,9 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+
 /**
  * Troll Management Features
  *
@@ -25,6 +28,21 @@
 class TrollManagementPlugin extends Gdn_Plugin {
 
     static $trolls = null;
+
+    /**
+     * @var Gdn_Session.
+     */
+    private $session;
+
+    /**
+     * TrollManagementPlugin constructor.
+     *
+     * @param Gdn_Session $session Injected session.
+     */
+    public function __construct(Gdn_Session $session) {
+        parent::__construct();
+        $this->session = $session;
+    }
 
     /**
      * Setup: on enable
@@ -74,11 +92,25 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * Validates the current user's permissions & transientkey and then marks a user as a troll.
      *
      * @param UserController $sender
+     * @param int|string $userID The userID number.
+     * @param boolean $troll Whether to mark the user as a troll.
+     * @throws Gdn_UserException Throws user exception.
+     * @throws ContainerException Throws exception if there's a problem getting a container.
+     * @throws NotFoundException Throws exception if there's a problem getting a container.
      */
     public function userController_markTroll_create($sender, $userID, $troll = true) {
         $sender->permission('Garden.Moderation.Manage');
 
         $trollUserID = $userID;
+        // Make sure the user has a higher permission level than the user they want to mark as a troll.
+        $trollPermissions = $sender->userModel->getPermissions($trollUserID);
+        $rankCompare = $this->session->getPermissions()->compareRankTo($trollPermissions);
+        if ($rankCompare < 0) {
+            throw forbiddenException('@'.t('You are not allowed to mark a user that has higher permissions than you as a troll.'));
+        }
+        if ($rankCompare === 0) {
+            throw forbiddenException('@'.t('You are not allowed to mark a user with the same permission level as you as a troll.'));
+        }
 
         // Validate the transient key && permissions
         // Make sure we are posting back.

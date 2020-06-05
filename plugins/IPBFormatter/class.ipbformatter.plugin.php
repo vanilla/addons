@@ -1,11 +1,13 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
  */
 
-Gdn::factoryInstall('IPBFormatter', 'IPBFormatterPlugin', __FILE__, Gdn::FactorySingleton);
+use IPBFormatter\Formats\IPBFormat;
+use IPBFormatter\Formatter;
+use Psr\Container\ContainerInterface;
+use Vanilla\Formatting\FormatService;
 
 class IPBFormatterPlugin extends Gdn_Plugin {
 
@@ -17,8 +19,6 @@ class IPBFormatterPlugin extends Gdn_Plugin {
 
     /** @var null  */
     protected $_Media = null;
-
-    /// Methods ///
 
     /**
      *
@@ -92,7 +92,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
         $config = [
             'anti_link_spam' => ['`.`', ''],
             'comment' => 1,
-            'cdata' => 3,
+            'cdata' => 1,
             'css_expression' => 1,
             'deny_attribute' => 'on*',
             'elements' => '*-applet-form-input-textarea-iframe-script-style',
@@ -234,15 +234,6 @@ EOT;
         }
 
         return '';
-    }
-
-    /**
-     * @param $sender
-     * @param $args
-     */
-    public function bBCode_afterBBCodeSetup_handler($sender, $args) {
-        $nbbc = $args['BBCode'];
-        $nbbc->setEscapeContent(false);
     }
 
     /**

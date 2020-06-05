@@ -1,7 +1,7 @@
 {
     "name": "Signatures",
     "description": "Users may create custom signatures that appear after each of their comments.",
-    "version": "1.6.1",
+    "version": "1.7",
     "requiredTheme": false,
     "hasLocale": true,
     "registerPermissions": {

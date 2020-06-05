@@ -1,5 +1,8 @@
 <?php
 
+use Garden\Http\HttpClient;
+use Vanilla\Web\SafeCurlHttpHandler;
+
 /**
  * This class provides a simple interface for OpenID (1.1 and 2.0) authentication.
  * Supports Yadis discovery.
@@ -53,6 +56,7 @@ class LightOpenID {
     , $capath = null
     , $cainfo = null;
     private $identity, $claimed_id;
+    protected $httpClient;
     protected $server, $version, $trustRoot, $aliases, $identifier_select = false
     , $ax = false, $sreg = false, $data;
     static protected $ax_to_sreg = [
@@ -68,6 +72,15 @@ class LightOpenID {
     ];
 
     public function __construct() {
+        $safeCurlHandler = new SafeCurlHttpHandler();
+        $safeCurlHandler->setFollowLocation(false);
+        $options = [
+            'timeout' => 30,
+            'verifyPeer' => false
+        ];
+        $httpClient = new HttpClient('', $safeCurlHandler);
+        $httpClient->setDefaultOptions($options);
+        $this->httpClient = $httpClient;
         $this->trustRoot = Gdn::request()->scheme().'://'.Gdn::request()->host();
         $uri = rtrim(preg_replace('#((?<=\?)|&)openid\.[^&]+#', '', $_SERVER['REQUEST_URI']), '?');
         $this->returnUrl = $this->trustRoot.$uri;
@@ -143,171 +156,24 @@ class LightOpenID {
         return !!gethostbynamel($server);
     }
 
-    protected function request_curl($url, $method = 'GET', $params = []) {
-        $params = http_build_query($params, '', '&');
-        $curl = curl_init($url.($method == 'GET' && $params ? '?'.$params : ''));
-        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Accept: application/xrds+xml, */*']);
-        curl_setopt($curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
-
-        if ($this->verify_peer !== null) {
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, $this->verify_peer);
-            if ($this->capath) {
-                curl_setopt($curl, CURLOPT_CAPATH, $this->capath);
-            }
-
-            if ($this->cainfo) {
-                curl_setopt($curl, CURLOPT_CAINFO, $this->cainfo);
-            }
-        }
-
-        if ($method == 'POST') {
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
-        } elseif ($method == 'HEAD') {
-            curl_setopt($curl, CURLOPT_HEADER, true);
-            curl_setopt($curl, CURLOPT_NOBODY, true);
-        } else {
-            curl_setopt($curl, CURLOPT_HTTPGET, true);
-        }
-        $response = curl_exec($curl);
-
-        if ($method == 'HEAD') {
-            $headers = [];
-            foreach (explode("\n", $response) as $header) {
-                $pos = strpos($header, ':');
-                $name = strtolower(trim(substr($header, 0, $pos)));
-                $headers[$name] = trim(substr($header, $pos + 1));
-            }
-
-            # Updating claimed_id in case of redirections.
-            $effective_url = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
-            if ($effective_url != $url) {
-                $this->identity = $this->claimed_id = $effective_url;
-            }
-
-            return $headers;
-        }
-
-        if (curl_errno($curl)) {
-            Logger::log(Logger::ERROR, 'lightopenid error', [
-                'location' => __METHOD__.':'.__LINE__,
-                'message' => 'Curl request failed.',
-                'cURLError' => curl_error($curl),
-                'cURLErrorNo' => curl_errno($curl),
-            ]);
-            throw new ErrorException('Request error.');
-        }
-
-        return $response;
-    }
-
-    protected function request_streams($url, $method = 'GET', $params = []) {
-        if (!$this->hostExists($url)) {
-            Logger::log(Logger::ERROR, 'lightopenid error', [
-                'location' => __METHOD__.':'.__LINE__,
-                'message' => 'Host "'.$url.'" not found',
-            ]);
-            throw new ErrorException('Request error.');
-        }
-
-        $params = http_build_query($params, '', '&');
-        switch ($method) {
-            case 'GET':
-                $opts = [
-                    'http' => [
-                        'method' => 'GET',
-                        'header' => 'Accept: application/xrds+xml, */*',
-                        'ignore_errors' => true,
-                    ]
-                ];
-                $url = $url.($params ? '?'.$params : '');
-                break;
-            case 'POST':
-                $opts = [
-                    'http' => [
-                        'method' => 'POST',
-                        'header' => 'Content-type: application/x-www-form-urlencoded',
-                        'content' => $params,
-                        'ignore_errors' => true,
-                    ]
-                ];
-                break;
-            case 'HEAD':
-                # We want to send a HEAD request,
-                # but since get_headers doesn't accept $context parameter,
-                # we have to change the defaults.
-                $default = stream_context_get_options(stream_context_get_default());
-                stream_context_get_default(
-                    ['http' => [
-                        'method' => 'HEAD',
-                        'header' => 'Accept: application/xrds+xml, */*',
-                        'ignore_errors' => true,
-                    ]]
-                );
-
-                $url = $url.($params ? '?'.$params : '');
-                $headers_tmp = get_headers($url);
-                if (!$headers_tmp) {
-                    return [];
-                }
-
-                # Parsing headers.
-                $headers = [];
-                foreach ($headers_tmp as $header) {
-                    $pos = strpos($header, ':');
-                    $name = strtolower(trim(substr($header, 0, $pos)));
-                    $headers[$name] = trim(substr($header, $pos + 1));
-
-                    # Following possible redirections. The point is just to have
-                    # claimed_id change with them, because get_headers() will
-                    # follow redirections automatically.
-                    # We ignore redirections with relative paths.
-                    # If any known provider uses them, file a bug report.
-                    if ($name == 'location') {
-                        if (strpos($headers[$name], 'http') === 0) {
-                            $this->identity = $this->claimed_id = $headers[$name];
-                        } elseif ($headers[$name][0] == '/') {
-                            $parsed_url = parse_url($this->claimed_id);
-                            $this->identity =
-                            $this->claimed_id = $parsed_url['scheme'].'://'
-                                .$parsed_url['host']
-                                .$headers[$name];
-                        }
-                    }
-                }
-
-                # And restore them.
-                stream_context_get_default($default);
-                return $headers;
-        }
-
-        if ($this->verify_peer) {
-            $opts += ['ssl' => [
-                'verify_peer' => true,
-                'capath' => $this->capath,
-                'cafile' => $this->cainfo,
-            ]];
-        }
-
-        $context = stream_context_create($opts);
-
-        return file_get_contents($url, false, $context);
-    }
-
+    /**
+     * Prepares the httpClient request.
+     *
+     * @param string $url OpenID url.
+     * @param string $method
+     * @param array $params
+     * @return \Garden\Http\HttpResponse
+     */
     protected function request($url, $method = 'GET', $params = []) {
         $timeStart = microtime(true);
-        if (function_exists('curl_init') && !ini_get('safe_mode')) {
-            $result = $this->request_curl($url, $method, $params);
+        if ($method === 'POST') {
+            $result = $this->httpClient->post($url, $params);
+        } elseif ($method === 'HEAD') {
+            $result = $this->httpClient->head($url, $params);
         } else {
-            $result = $this->request_streams($url, $method, $params);
+            $result = $this->httpClient->get($url, $params);
         }
         $timeDiff = microtime(true) - $timeStart;
-
         // Make sure every request takes at least .5 second.
         // This nullify brute forcing
         if ($timeDiff < 500) {
@@ -385,18 +251,15 @@ class LightOpenID {
                     $url = $this->build_url(parse_url($url), parse_url(trim($headers['x-xrds-location'])));
                     $next = true;
                 }
-
-                if (isset($headers['content-type'])
-                    && (strpos($headers['content-type'], 'application/xrds+xml') !== false
-                        || strpos($headers['content-type'], 'text/xml') !== false)
-                ) {
+                $header = $headers->getHeader('content-type');
+                if ($header && (strpos($header, 'application/xrds+xml') !== false
+                        || (strpos($header, 'text/xml') !== false))) {
                     # Apparently, some providers return XRDS documents as text/html.
                     # While it is against the spec, allowing this here shouldn't break
                     # compatibility with anything.
                     # ---
                     # Found an XRDS document, now let's find the server, and optionally delegate.
-                    $content = $this->request($url, 'GET');
-
+                    $content = $this->request($url, 'GET')->getRawBody();
                     preg_match_all('#<Service.*?>(.*?)</Service>#s', $content, $m);
                     foreach ($m[1] as $content) {
                         $content = ' '.$content; # The space is added, so that strpos doesn't return 0.
@@ -462,7 +325,7 @@ class LightOpenID {
                 }
 
                 # There are no relevant information in headers, so we search the body.
-                $content = $this->request($url, 'GET');
+                $content = $this->request($url, 'GET')->getRawBody();
                 $location = $this->htmlTag($content, 'meta', 'http-equiv', 'X-XRDS-Location', 'content');
                 if ($location) {
                     $url = $this->build_url(parse_url($url), parse_url($location));
@@ -689,8 +552,8 @@ class LightOpenID {
         $params['openid.mode'] = 'check_authentication';
 
         $response = $this->request($server, 'POST', $params);
-
-        return preg_match('/is_valid\s*:\s*true/i', $response);
+        $responseBody = $response->getRawBody();
+        return preg_match('/is_valid\s*:\s*true/i', $responseBody);
     }
 
     protected function getAxAttributes() {
