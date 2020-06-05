@@ -27,6 +27,12 @@ class SitemapsPlugin extends Gdn_Plugin {
      */
     private $discussionLimit = 1000;
 
+    /**
+     * SitemapsPlugin constructor.
+     *
+     * @param \Garden\EventManager $eventManager
+     * @param ConfigurationInterface $config
+     */
     public function __construct(\Garden\EventManager $eventManager, ConfigurationInterface $config) {
         parent::__construct();
         $this->eventManager = $eventManager;
@@ -40,7 +46,7 @@ class SitemapsPlugin extends Gdn_Plugin {
      *
      * @param string $urlCode The URL code of the category.
      * @param array $urls An array to collect URLs.
-     * @throws Exception
+     * @throws Exception Not found exception.
      */
     public function buildCategoryArchiveSiteMap($urlCode, &$urls) {
         $category = CategoryModel::categories($urlCode);
@@ -95,7 +101,6 @@ class SitemapsPlugin extends Gdn_Plugin {
                 'ChangeFreq' => ''
             ];
             $urls[] = $url;
-
         }
     }
 
@@ -143,22 +148,33 @@ class SitemapsPlugin extends Gdn_Plugin {
                 'LastMod' => '',
             ];
             $urls[] = $url;
-
         }
     }
 
+    /**
+     * Run once on enable.
+     *
+     * @return void
+     */
     public function setup() {
         $this->structure();
     }
 
+    /**
+     * Run on utility/update.
+     *
+     * @return void
+     */
     public function structure() {
         Gdn::router()->setRoute('sitemapindex.xml', '/utility/sitemapindex.xml', 'Internal');
         Gdn::router()->setRoute('sitemap-(.+)', '/utility/sitemap/$1', 'Internal');
     }
 
-
-    /// Event Handlers ///
-
+    /**
+     *  Render settings page
+     *
+     * @param SettingsController $sender
+     */
     public function settingsController_sitemaps_create($sender) {
         $sender->permission('Garden.Settings.Manage');
         $sender->setData('Title', t('Sitemap Settings'));
@@ -177,8 +193,9 @@ class SitemapsPlugin extends Gdn_Plugin {
     }
 
     /**
+     *  Render sitemaps index
+     *
      * @param UtilityController $sender Sending controller instance
-     * @param array $args Event's arguments
      */
     public function utilityController_siteMapIndex_create($sender) {
         if (\Vanilla\FeatureFlagHelper::featureEnabled(static::DISCUSSION_SITE_MAPS)) {
@@ -186,7 +203,6 @@ class SitemapsPlugin extends Gdn_Plugin {
         } else {
             $this->renderSitemapIndexOld($sender);
         }
-
     }
 
     /**
@@ -282,6 +298,8 @@ class SitemapsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Build sitemaps index
+     *
      * @param UtilityController $sender Sending controller instance
      * @param array $args Event's arguments
      */
@@ -322,6 +340,7 @@ class SitemapsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Get discussion limit
      * @return int
      */
     public function getDiscussionLimit(): int {
@@ -329,8 +348,8 @@ class SitemapsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Set discussion limit
      * @param int $discussionLimit
-     * @return $this
      */
     public function setDiscussionLimit(int $discussionLimit) {
         $this->discussionLimit = $discussionLimit;
