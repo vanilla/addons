@@ -8,6 +8,9 @@ use Vanilla\Contracts\ConfigurationInterface;
 
 use Vanilla\Web\Robots;
 
+/**
+ * Class SitemapsPlugin
+ */
 class SitemapsPlugin extends Gdn_Plugin {
     /**
      * This is the name of the feature flag to enable site maps that point directly to discussions.
