@@ -5,11 +5,10 @@
 class SharedFingerprintModule extends Gdn_Module {
 
 	protected $_Data = FALSE;
-	
+
 	public function getData($fingerprintUserID, $fingerprint) {
-		if (!Gdn::session()->checkPermission('Garden.Users.Edit'))
-			return;
-		
+        if (Gdn::session()->getPermissions()->hasRanked('Garden.Users.Edit') !== true)
+            return;
 		$this->_Data = Gdn::sql()
 			->select()
 			->from('User')
@@ -25,10 +24,10 @@ class SharedFingerprintModule extends Gdn_Module {
 	public function toString() {
       if (!$this->_Data)
 			return;
-      
+
 		if ($this->_Data->numRows() == 0)
 			return;
-		
+
 		ob_start();
 		?>
       <div id="SharedFingerprint" class="Box">
