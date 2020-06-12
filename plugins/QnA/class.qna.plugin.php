@@ -1041,9 +1041,9 @@ class QnAPlugin extends Gdn_Plugin {
     /**
      * Return QnA meta data tag string
      *
-     * @param stdClass $discussion
+     * @param object $discussion
      */
-    private function getDiscussionQnATagString(stdClass $discussion = null): string {
+    private function getDiscussionQnATagString(object $discussion = null): string {
         $tag = '';
         if (strtolower(val('Type', $discussion)) != 'question') {
             return $tag;
