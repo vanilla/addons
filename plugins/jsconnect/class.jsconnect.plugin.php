@@ -596,13 +596,28 @@ class JsConnectPlugin extends SSOAddon {
         $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
         switch ($provider['Protocol'] ?? self::PROTOCOL_V2) {
             case self::PROTOCOL_V3:
-                $jsc = $this->createJsConnectFromProvider($provider);
-                [$requestUrl, $cookie] = $jsc->generateRequest([
+                $state = [
                     JsConnectServer::FIELD_TARGET => $target,
                     self::FIELD_ACTION => $action,
-                ]);
-                $this->cookie->set($this->getCSRFCookieName(), $cookie);
-                redirectTo($requestUrl, 302, false);
+                ];
+                // Check to see if a cookie has already been issued. We do this mainly for private communities or
+                // multiple browser tabs where several requests may be made. If we don't re-use cookies then there will
+                // be race conditions. However, we may also see an old cookie stick around which will cause people to
+                // get expired SSO token errors if their cookies hang around. This big-ass comment is mainly to explain
+                // this situation to the next dev.
+                if ($csrfToken = $this->cookie->get($this->getCSRFCookieName(), false)) {
+                    $state[JsConnectServer::FIELD_COOKIE] = $csrfToken;
+                }
+
+                $jsc = $this->createJsConnectFromProvider($provider);
+                try {
+                    [$requestUrl, $cookie] = $jsc->generateRequest($state);
+                    $this->cookie->set($this->getCSRFCookieName(), $cookie);
+                    redirectTo($requestUrl, 302, false);
+                } catch (\Vanilla\JsConnect\Exceptions\InvalidValueException $ex) {
+                    $this->cookie->delete($this->getCSRFCookieName());
+                    throw new \Gdn_UserException($ex->getMessage());
+                }
                 break;
             case self::PROTOCOL_V2:
             default:
