@@ -41,7 +41,6 @@ class ShareThisPlugin extends Gdn_Plugin {
          <span class="st_sharethis_hcount ShareThisButton Hidden" displayText="ShareThis"></span>
       </div>
 SHARETHIS;
-
     }
 
    public function setup() {
