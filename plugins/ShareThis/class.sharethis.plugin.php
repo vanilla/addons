@@ -14,8 +14,8 @@ class ShareThisPlugin extends Gdn_Plugin {
     */
 	public function discussionController_afterDiscussionBody_handler($sender) {
       $publisherNumber = c('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
-      $viaHandle = c('Plugin.ShareThis.ViaHandle', '');
-      $copyNShare = c('Plugin.ShareThis.CopyNShare', false);
+      $viaHandle = htmlspecialchars(c('Plugin.ShareThis.ViaHandle', ''));
+      $copyNShare = htmlspecialchars(c('Plugin.ShareThis.CopyNShare', false));
 
       $doNotHash = $copyNShare ? 'false' : 'true';
       $doNotCopy = $copyNShare ? 'false' : 'true';
@@ -47,7 +47,7 @@ SHARETHIS;
    public function setup() {
       // Nothing to do here!
    }
-   
+
    /**
     * Settings page.
     */
