@@ -187,7 +187,7 @@ class SitemapsPlugin extends Gdn_Plugin {
         $configurationModule = new ConfigurationModule($sender);
         $configurationModule->initialize([
             'Feature.discussionSiteMaps.Enabled' => [
-                'LabelCode' => t('Discussion Based Sitemaps (BETA)'),
+                'LabelCode' => t('Discussion Based Sitemaps', 'Discussion Based Sitemaps (BETA)'),
                 'Control' => 'Toggle',
                 'Description' => t('Use the sitemaps that point directly to discussions instead of categories.'),
             ]]);
