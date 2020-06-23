@@ -62,8 +62,8 @@ class JsConnectPlugin extends SSOAddon {
             $target = '/';
         }
 
-        $baseURL = url('/entry/jsconnect-redirect');
-        return $baseURL . '?' . http_build_query([
+        $redictPath = '/entry/jsconnect-redirect';
+        return $redictPath . '?' . http_build_query([
                 'client_id' => $provider[self::FIELD_PROVIDER_CLIENT_ID],
                 'target' => $target
             ]);
@@ -203,7 +203,7 @@ class JsConnectPlugin extends SSOAddon {
             $target = '/';
         }
 
-        $url = url('/entry/jsconnect-redirect').'?'.http_build_query([
+        $redictPath = '/entry/jsconnect-redirect'.'?'.http_build_query([
             'client_id' => $provider[self::FIELD_PROVIDER_CLIENT_ID],
             'target' => $target
         ]);
@@ -211,7 +211,7 @@ class JsConnectPlugin extends SSOAddon {
         $result = '<div class="JsConnect-Guest">'.
             anchor(
                 sprintf(t('Sign In with %s'), $provider['Name']),
-                $url,
+                $redictPath,
                 'Button Primary SignInLink'
             ).
             '</div>';
