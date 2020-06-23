@@ -62,8 +62,8 @@ class JsConnectPlugin extends SSOAddon {
             $target = '/';
         }
 
-        $baseURL = url('/entry/jsconnect-redirect');
-        return $baseURL . '?' . http_build_query([
+        $redictPath = '/entry/jsconnect-redirect';
+        return $redictPath . '?' . http_build_query([
                 'client_id' => $provider[self::FIELD_PROVIDER_CLIENT_ID],
                 'target' => $target
             ]);
