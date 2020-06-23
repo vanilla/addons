@@ -121,7 +121,7 @@ class SitemapsPlugin extends Gdn_Plugin {
         $urlCode = $m[1];
         $offset = (int)max($m[2] - 1, 0);
         $limit = (int)min($m[3], 5000);
-        
+
         $category = CategoryModel::categories($urlCode);
         if (!$category || $offset > $category['countDiscussions']) {
             throw notFoundException();
@@ -183,6 +183,15 @@ class SitemapsPlugin extends Gdn_Plugin {
         $sender->setData('Title', t('Sitemap Settings'));
         $sender->setData('isSitePrivate', $this->isSitePrivate);
         $sender->addSideMenu();
+
+        $configurationModule = new ConfigurationModule($sender);
+        $configurationModule->initialize([
+            'Feature.discussionSiteMaps.Enabled' => [
+                'LabelCode' => t('Discussion Based Sitemaps', 'Discussion Based Sitemaps (BETA)'),
+                'Control' => 'Toggle',
+                'Description' => t('Use the sitemaps that point directly to discussions instead of categories.'),
+            ]]);
+        $sender->setData('ConfigurationModule', $configurationModule);
         $sender->render('Settings', '', 'plugins/Sitemaps');
     }
 
@@ -311,7 +320,7 @@ class SitemapsPlugin extends Gdn_Plugin {
         $sender->deliveryMethod(DELIVERY_METHOD_XHTML);
         $sender->deliveryType(DELIVERY_TYPE_VIEW);
         $sender->setHeader('Content-Type', 'text/xml');
-        
+
         $filename = $args[0] ?? '';
         if (substr($filename, -4) === '.xml') {
             $filename = substr($filename, 0, -4);
