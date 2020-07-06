@@ -23,6 +23,11 @@ use Vanilla\Search\AbstractSearchDriver;
  */
 class QnAPlugin extends Gdn_Plugin {
 
+    /**
+     * This is the name of the feature flag to display QnA tag in the discussion.
+     */
+    const FEATURE_FLAG = 'DiscussionQnATag';
+
     /** @var bool|array  */
     protected $Reactions = false;
 
@@ -911,6 +916,7 @@ class QnAPlugin extends Gdn_Plugin {
      */
     public function discussionsController_unanswered_create($sender, $args) {
         $sender->View = 'Index';
+        $sender->title(t('Unanswered Questions'));
         $sender->setData('_PagerUrl', 'discussions/unanswered/{Page}');
 
         // Be sure to display every unanswered question (ie from groups)
@@ -996,6 +1002,8 @@ class QnAPlugin extends Gdn_Plugin {
             $sender->setData('Announcements', $announcements);
             $sender->AnnounceData = $announcements;
         }
+
+        $sender->setData('Breadcrumbs', [['Name' => t('Unanswered'), 'Url' => '/discussions/unanswered']]);
     }
 
     /**
@@ -1013,19 +1021,43 @@ class QnAPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Print QnA meta data tag
      *
-     *
-     * @param $sender Sending controller instance.
-     * @param array $args Event arguments.
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
     public function base_beforeDiscussionMeta_handler($sender, $args) {
         $discussion = $args['Discussion'];
+        if (!empty($discussion)) {
+            echo $this->getDiscussionQnATagString($discussion);
+        }
+    }
 
+    /**
+     * Print QnA meta data tag
+     *
+     * @param Gdn_Controller $sender
+     * @param array $args
+     */
+    public function discussionController_discussionInfo_handler($sender, $args) {
+        $discussion = $args['Discussion'];
+        if (!empty($discussion) && \Vanilla\FeatureFlagHelper::featureEnabled(static::FEATURE_FLAG)) {
+            echo $this->getDiscussionQnATagString($discussion);
+        }
+    }
+
+    /**
+     * Return QnA meta data tag string
+     *
+     * @param object $discussion
+     */
+    private function getDiscussionQnATagString(object $discussion = null): string {
+        $tag = '';
         if (strtolower(val('Type', $discussion)) != 'question') {
-            return;
+            return $tag;
         }
 
-        $qnA = val('QnA', $discussion);
+        $qnA = $discussion->QnA;
         $title = '';
         switch ($qnA) {
             case '':
@@ -1036,7 +1068,7 @@ class QnAPlugin extends Gdn_Plugin {
                 break;
             case 'Answered':
                 $text = 'Answered';
-                if (val('InsertUserID', $discussion) == Gdn::session()->UserID) {
+                if ($discussion->InsertUserID == Gdn::session()->UserID) {
                     $qnA = 'Answered';
                     $title = ' title="'.t("Someone's answered your question. You need to accept/reject the answer.").'"';
                 }
@@ -1049,8 +1081,10 @@ class QnAPlugin extends Gdn_Plugin {
                 $qnA = false;
         }
         if ($qnA) {
-            echo ' <span class="Tag QnA-Tag-'.$qnA.'"'.$title.'>'.t("Q&A $qnA", $text).'</span> ';
+            $tag = '<span class="Tag QnA-Tag-'.$qnA.'" '.$title.'>'.t("Q&A $qnA", $text).'</span> ';
         }
+
+        return $tag;
     }
 
     /**
@@ -1325,7 +1359,7 @@ class QnAPlugin extends Gdn_Plugin {
         }
 
         $discussion['attributes']['question'] = [
-            'status' => strtolower($discussion['qnA']),
+            'status' => !empty($discussion['qnA']) ? strtolower($discussion['qnA']) : 'unanswered',
             'dateAccepted' => $discussion['dateAccepted'],
             'dateAnswered' => $discussion['dateOfAnswer'],
             "acceptedAnswers" => $acceptedAnswers,

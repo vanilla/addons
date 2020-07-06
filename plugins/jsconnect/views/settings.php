@@ -3,6 +3,7 @@
 $links = '<ul>';
 $links .= '<li>'.anchor(t('jsConnect Documentation'), 'http://docs.vanillaforums.com/features/sso/jsconnect/').'</li>';
 $links .= '<li>'.anchor(t('jsConnect Client Libraries'), 'http://docs.vanillaforums.com/features/sso/jsconnect/overview/#your-endpoint').'</li>';
+$links .= '<li>'.anchor(t('Upgrading jsConnect to v3'), 'https://success.vanillaforums.com/kb/articles/206-upgrading-jsconnect-to-v3').'</li>';
 $links .= '</ul>';
 
 helpAsset(sprintf(t('About %s'), 'jsConnect'), t('You can connect to multiple sites that support jsConnect.'));
@@ -53,6 +54,13 @@ foreach ($this->data('Providers') as $Provider) {
     </div>
     <?php echo $this->Form->close('Save'); ?>
 </section>
+<?php
+if ($this->data('hasWarnings')) {
+    echo '<div class="padded alert alert-warning">';
+    echo 'One or more of your connections has warnings. Edit a connection with warnings to get more information.';
+    echo '</div>';
+}
+?>
 <div class="table-wrap">
     <table class="table-data js-tj">
         <thead>
@@ -72,13 +80,18 @@ foreach ($this->data('Providers') as $Provider) {
                 <td><?php echo htmlspecialchars($Provider['AuthenticateUrl']); ?></td>
                 <td>
                     <?php
-                    echo anchor(t('Test URL'), str_replace('=?', '=test', JsConnectPlugin::connectUrl($Provider, TRUE)));
+                    echo anchor(t('Test URL'), '/settings/jsconnect/test?client_id='.urlencode($Provider['AuthenticationKey']));
                     ?>
                     <div class="JsConnectContainer UserInfo"></div>
                 </td>
                 <td class="options">
                     <div class="btn-group">
                         <?php
+                        if ($Provider['hasWarnings'] ?? false) {
+                            $title = 'There are issues with your setup. Edit this connection for more information.';
+                            echo anchor(dashboardSymbol('alert'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal btn btn-icon', ['aria-label' => $title, 'title' => $title]);
+                        }
+
                         echo anchor(dashboardSymbol('edit'), '/settings/jsconnect/addedit?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
                         echo anchor(dashboardSymbol('delete'), '/settings/jsconnect/delete?client_id='.urlencode($Provider['AuthenticationKey']), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                         ?>

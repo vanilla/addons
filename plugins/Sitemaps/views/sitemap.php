@@ -14,13 +14,13 @@ foreach ($this->data('Urls') as $Url) {
 
         echo '<url>';
         echo '<loc>'.$Loc.'</loc>';
-        if (val('LastMod', $Url)) {
+        if (!empty($Url['LastMod'])) {
             echo '<lastmod>'.gmdate('c', strtotime($Url['LastMod'])).'</lastmod>';
         }
-        if (val('ChangeFreq', $Url)) {
+        if (!empty($Url['ChangeFreq'])) {
             echo '<changefreq>'.$Url['ChangeFreq'].'<changefreq>';
         }
-        if (val('Priority', $Url)) {
+        if (!empty($Url['Priority'])) {
             echo '<priority>'.$Url['Priority'].'</priority>';
         }
         echo "</url>\n";

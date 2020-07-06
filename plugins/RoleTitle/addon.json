@@ -2,6 +2,7 @@
     "name": "Role Titles",
     "description": "Lists users' roles under their name and adds role-specific CSS classes to their comments for theming.",
     "version": "1.1",
+    "priority": 1100,
     "mobileFriendly": true,
     "registerPermissions": false,
     "icon": "role_titles.png",

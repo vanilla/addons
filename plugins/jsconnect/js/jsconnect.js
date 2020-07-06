@@ -1,16 +1,28 @@
 jQuery(document).ready(function($) {
 
     var jsUrl = gdn.definition('JsAuthenticateUrl', false);
-    if (jsUrl) {
+    var jsConnect = gdn.getMeta('jsconnect', {});
+
+    if (jsConnect['protocol'] === 'v3') {
+        if (window.location.hash) {
+            // The JWT is here. Let's post it.
+            $('#Form_JsConnect-Connect input[name$="fragment"]').val(window.location.hash);
+            $('#Form_JsConnect-Connect').submit();
+        } else {
+            // Go to the redirect page.
+            window.location = jsConnect.authenticateUrl;
+        }
+        return;
+    } else if (jsUrl) {
         // Reveal the please wait text after a small wait so that if the request is faster we never have to see it.
-        setTimeout(function() {
+        setTimeout(function () {
             $('.Connect-Wait').show();
         }, 2000);
 
         $.jsConnectAuthenticate(jsUrl);
     }
 
-    $('.JsConnect-Container').each(function() {
+    $('.JsConnect-Container').each(function () {
         $(this).jsconnect();
     });
 
@@ -21,8 +33,12 @@ $.jsConnectAuthenticate = function(url) {
         url: url,
         dataType: 'json',
         timeout: 10000,
+        cache: false,
         success: function(data) {
             var connectData = $.param(data);
+            if (gdn.definition('JsConnectTestMode', false)) {
+               console.log('AuthenticationResponse', JSON.stringify(data));
+            }
 
             if ($('#Form_JsConnect-Connect').length > 0) {
                 if (data['error']) {
@@ -30,8 +46,18 @@ $.jsConnectAuthenticate = function(url) {
                 } else if (!data['uniqueid']) {
                     // Just redirect to the target.
                     var target = $('#Form_Target').val();
-                    if (!target)
+                    if (!target) {
                         target = '/';
+                    }
+
+                    // Do not redirect if it is a private community, this will cause a loop.
+                    if (gdn.definition('PrivateCommunity', false)) {
+                       setTimeout(function() {
+                          $('.Connect-Wait').hide();
+                          $('.jsConnect-Connecting').html('<h2>'+gdn.definition('GenericSSOErrorMessage')+'</h2>');
+                       }, 2000);
+                       return;
+                    }
 
                     window.location.replace(gdn.url(target));
                     return;
@@ -39,7 +65,7 @@ $.jsConnectAuthenticate = function(url) {
                     //               $('#Form_JsConnect-Connect').attr('action', gdn.url('/entry/jsconnect/guest'));
                 } else {
                     for (var key in data) {
-                        if (data[key] == null) {
+                        if (data[key] === null) {
                             data[key] = '';
                         }
                     }
@@ -114,6 +140,7 @@ $.fn.jsconnect = function(options) {
         $.ajax({
             url: url,
             dataType: 'json',
+            cache: false,
             success: function(data, textStatus) {
                 var connectUrl = gdn.url('/entry/jsconnect?client_id=' + client_id + '&Target=' + target);
 
