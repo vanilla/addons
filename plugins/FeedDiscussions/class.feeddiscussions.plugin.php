@@ -194,7 +194,8 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                 // Check feed is valid RSS:
                 $pr = new ProxyRequest();
                 $feedRSS = $pr->request([
-                    'URL' => $feedURL
+                    'URL' => $feedURL,
+                    'Cookies' => false
                 ]);
 
                 if (!$feedRSS) {
@@ -281,7 +282,8 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
     protected function pollFeed($feedURL, $lastImportDate) {
         $pr = new ProxyRequest();
         $feedRSS = $pr->request([
-            'URL' => $feedURL
+            'URL' => $feedURL,
+            'Cookies' => false
         ]);
 
         if (!$feedRSS) {
