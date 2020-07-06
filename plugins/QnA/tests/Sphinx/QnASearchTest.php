@@ -3,6 +3,7 @@
  * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
+
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Search\CommentSearchType;
 use Vanilla\Forum\Search\DiscussionSearchType;
@@ -12,7 +13,6 @@ use Vanilla\Search\SearchService;
 use Vanilla\Sphinx\Search\SphinxSearchDriver;
 use Vanilla\Sphinx\Tests\Utils\SphinxTestTrait;
 use VanillaTests\APIv2\AbstractAPIv2Test;
-
 
 /**
  * Tests for Question and Answer Search types.
@@ -46,7 +46,7 @@ class QnASearchTest extends AbstractAPIv2Test {
             ->addCall('registerSearchType', [new \Garden\Container\Reference(AnswerSearchType::class)])
         ;
     }
-    
+
     /**
      * Clear info between tests.
      */
@@ -290,7 +290,7 @@ class QnASearchTest extends AbstractAPIv2Test {
             $categoryID = $category['categoryID'];
         }
 
-        return $this->api()->post('discussions/question',[
+        return $this->api()->post('discussions/question', [
             'categoryID' => $categoryID ?? $this->lastInsertedCategoryID,
             'name' => $body['name'] ?? 'Question',
             'body' => $body['body'] ?? 'Question being asked!',
@@ -338,6 +338,9 @@ class QnASearchTest extends AbstractAPIv2Test {
         ])->getBody();
     }
 
+    /**
+     * Reset necessary tables.
+     */
     protected function resetTables(): void {
         Gdn::database()->sql()->truncate('Category');
         Gdn::database()->sql()->truncate('Discussion');

@@ -43,7 +43,8 @@ class QuestionSearchType extends DiscussionSearchType {
         \TagModel $tagModel,
         BreadcrumbModel $breadcrumbModel
     ) {
-        parent::__construct($discussionsApi,
+        parent::__construct(
+            $discussionsApi,
             $categoryModel,
             $userModel,
             $tagModel,
