@@ -9,7 +9,6 @@ namespace Vanilla\QnA\Models;
 use Garden\Web\Exception\HttpException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Forum\Search\CommentSearchType;
-use Vanilla\Knowledge\Controllers\Api\CheckGlobalPermissionTrait;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\SearchResultItem;
@@ -19,8 +18,6 @@ use Vanilla\Utility\ArrayUtils;
  * Search record type for a questions
  */
 class AnswerSearchType extends CommentSearchType {
-    use CheckGlobalPermissionTrait;
-
     const TYPE_ANSWER = 101;
 
     /** @var \CommentsApiController */

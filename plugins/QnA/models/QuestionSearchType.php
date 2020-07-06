@@ -6,12 +6,9 @@
 
 namespace Vanilla\QnA\Models;
 
-use DiscussionsApiController;
 use Garden\Web\Exception\HttpException;
-use Gdn;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Forum\Search\DiscussionSearchType;
-use Vanilla\Knowledge\Controllers\Api\CheckGlobalPermissionTrait;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\SearchResultItem;
@@ -21,7 +18,6 @@ use Vanilla\Utility\ArrayUtils;
  * Search record type for a questions
  */
 class QuestionSearchType extends DiscussionSearchType {
-    use CheckGlobalPermissionTrait;
 
     const TYPE_QUESTION = 1;
 
