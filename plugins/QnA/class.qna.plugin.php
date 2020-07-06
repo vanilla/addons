@@ -4,12 +4,16 @@
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
+use Garden\Container\Reference;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Vanilla\ApiUtils;
 use Garden\Container\Container;
+use Vanilla\QnA\Models\AnswerSearchType;
+use Vanilla\QnA\Models\QuestionSearchType;
 use Vanilla\QnA\Models\SearchRecordTypeQuestion;
 use Vanilla\QnA\Models\SearchRecordTypeAnswer;
+use Vanilla\Search\AbstractSearchDriver;
 
 /**
  * Adds Question & Answer format to Vanilla.
@@ -87,6 +91,10 @@ class QnAPlugin extends Gdn_Plugin {
             ->addCall('setType', [new SearchRecordTypeQuestion()])
             ->addCall('setType', [new SearchRecordTypeAnswer()])
         ;
+
+        $dic->rule(AbstractSearchDriver::class)
+            ->addCall('registerSearchType', [new Reference(QuestionSearchType::class)])
+            ->addCall('registerSearchType', [new Reference(AnswerSearchType::class)]);
     }
 
     /**
