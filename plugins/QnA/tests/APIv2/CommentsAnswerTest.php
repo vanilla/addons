@@ -259,12 +259,11 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
         $this->assertEquals(200, $response->getStatusCode());
 
         $body = $response->getBody();
-        $date = new \DateTime($body['dateInserted']);
 
         $answeredQuestion = $this->getQuestion($question['discussionID']);
 
-        $this->assertIsQuestion($answeredQuestion, ['dateAccepted' => $date]);
-        $this->assertIsQuestion($answeredQuestion, ['dateAnswered' => $date]);
+        $this->assertIsQuestion($answeredQuestion, ['dateAccepted' => $body['dateInserted']]);
+        $this->assertIsQuestion($answeredQuestion, ['dateAnswered' => $body['dateInserted']]);
     }
 
     /**
