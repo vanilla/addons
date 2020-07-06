@@ -1,14 +1,13 @@
 <h1>{{Title}}</h1>
-<div class="padded">
+<div class="padded content">
     {% if isSitePrivate %}
-    <p class="Message AlertMessage">
-        Private Communities is currently enabled. As a result, your site map will be empty.
-    </p>
+       <p class="Message AlertMessage">
+         Private communities are currently enabled. Sitemaps are not recommended with private communities unless you know what you're doing.
+      </p>
     {% endif %}
-    <p>
-        A site map is an <a href="http://en.wikipedia.org/wiki/XML" target="_blank" rel="noopener">xml</a> file that search engines can use to help index your site.
-    </p>
-    <p>
+      <p>
+         A site map is an xml file that search engines can use to help index your site. Learn more about sitemaps at <a href="https://sitemaps.org" target="_blank" rel="noopener">sitemaps.org.</a>
+      </p>
     <ul>
         <li>
             Your main site map is located here: <a href="{{url('/sitemapindex.xml', true)}}">
@@ -20,14 +19,5 @@
             site map so that search engines that are aware of your site will know where to look.
         </li>
     </ul>
-    </p>
-    <p>{{t('Learn more about sitemaps from the following sites:')}}</p>
-    <ul>
-        <li>
-            <a href="https://www.sitemaps.org/" target="_blank" rel="noopener">sitemaps.org</a>
-        </li>
-        <li>
-            <a href="https://www.google.com/webmasters/" target="_blank" rel="noopener">Google webmaster center</a>
-        </li>
-    </ul>
+   {{ ConfigurationModule.render()|raw }}
 </div>

@@ -21,20 +21,6 @@ class IPBFormatterPlugin extends Gdn_Plugin {
     protected $_Media = null;
 
     /**
-     * Hook into the main container initialization.
-     *
-     * @param ContainerInterface $dic
-     */
-    public function container_init(ContainerInterface $dic) {
-        $formatService = $dic->get(FormatService::class);
-        $formatService->registerFormat(IPBFormat::FORMAT_KEY, $dic->get(IPBFormat::class));
-
-        $dic->rule("IPBFormatter")
-            ->setClass(Formatter::class)
-            ->setShared(true);
-    }
-
-    /**
      *
      *
      * @param $string
@@ -248,15 +234,6 @@ EOT;
         }
 
         return '';
-    }
-
-    /**
-     * @param $sender
-     * @param $args
-     */
-    public function bBCode_afterBBCodeSetup_handler($sender, $args) {
-        $nbbc = $args['BBCode'];
-        $nbbc->setEscapeContent(false);
     }
 
     /**
