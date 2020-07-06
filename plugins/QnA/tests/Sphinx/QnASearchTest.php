@@ -239,7 +239,7 @@ class QnASearchTest extends AbstractAPIv2Test {
         $params = [
             'query' => 'question',
             'recordTypes' => ['discussion', 'comment'],
-            'types' => ['question', 'answer'],
+            'types' => ['discussion', 'question', 'answer'],
         ];
         $response = $this->api()->get('/search?'.http_build_query($params));
         $this->assertEquals(200, $response->getStatusCode());

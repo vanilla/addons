@@ -99,14 +99,4 @@ class QuestionSearchType extends DiscussionSearchType {
             return [];
         }
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function applyToQuery(SearchQuery $query) {
-        $types = $query->getQueryParameter('types');
-        if ($types !== null && count($types) === 1 && in_array($this->getType(), $types)) {
-            $query->setFilter('dtype', [self::TYPE_QUESTION]);
-        }
-    }
 }
