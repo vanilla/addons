@@ -713,7 +713,7 @@ class IgnorePlugin extends Gdn_Plugin {
    }
 
     /**
-     * If a user is being deleting, remove them from other users' ignore lists.
+     * If a user is being deleted, remove them from other users' ignore lists.
      *
      * @param UserController $sender
      */
