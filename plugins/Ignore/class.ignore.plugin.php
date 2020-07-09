@@ -712,4 +712,19 @@ class IgnorePlugin extends Gdn_Plugin {
       return $commonConversationIDs;
    }
 
+    /**
+     * If a user is being deleting, remove them from other users' ignore lists.
+     *
+     * @param UserController $sender
+     */
+    public function userController_beforeUserDelete_handler($sender) {
+        $userID = $sender->ReflectArgs['userID'];
+        $requestBody = $sender->Request->getBody();
+        $deleting = $requestBody['Delete_User_Forever'];
+        $content = [];
+        if ($deleting === "Delete User Forever") {
+            $sender->userModel->getDelete('UserMeta', ['Name' => 'Plugin.Ignore.Blocked.User.'.$userID], $content);
+        }
+    }
+
 }
