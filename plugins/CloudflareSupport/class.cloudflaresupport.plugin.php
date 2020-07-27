@@ -74,7 +74,7 @@ class CloudflareSupportPlugin extends Gdn_Plugin {
                 // IPv6
                 case self::CF_IPV6:
                     if (!$this->ipv6_in_range($requestAddress, $cloudflareIPRange)) {
-                        continue;
+                        continue 2;
                     }
                     break;
 

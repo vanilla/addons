@@ -558,8 +558,6 @@ class IgnorePlugin extends Gdn_Plugin {
 
       if ($user === FALSE) {
          throw notFoundException();
-      } else if ($user->Deleted == 1) {
-         throw notFoundException();
       } else if (getValue('UserID', $user) == Gdn::session()->UserID) {
          throw notFoundException();
       } else {
