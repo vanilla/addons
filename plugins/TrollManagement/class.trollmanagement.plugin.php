@@ -410,4 +410,54 @@ class TrollManagementPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Check if the user creating the discussion is a troll.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function discussionModel_BeforeNotification_handler($sender, &$args) {
+        $discussion = $args['Discussion'];
+        $this->checkTroll($discussion['InsertUserID'], $args);
+    }
+
+    /**
+     * Check if the user creating the comment is a troll.
+     *
+     * @param CommentModel $sender
+     * @param array $args
+     */
+    public function commentModel_BeforeNotification_handler($sender, &$args) {
+        $comment = $args['Comment'];
+        $this->checkTroll($comment['InsertUserID'], $args);
+    }
+
+    /**
+     * Check if the user creating the activity post or comment is a troll.
+     *
+     * @param ActivityModel $sender
+     * @param array $args
+     */
+    public function activityModel_beforeWallNotificationSend_handler($sender, &$args) {
+        $activity = $args['Activity'];
+        $this->checkTroll($activity['ActivityUserID'], $args);
+    }
+    
+    /**
+     * Check if the user is a troll.
+     *
+     * @param array $args
+     * @param mixed $record
+     */
+    private function checkTroll($record, &$args) {
+        if ($args['IsValid'] === false) {
+            return;
+        }
+        $userModel = $args['UserModel'];
+        $userID = $record;
+        $user = $userModel->get($userID);
+        if ($user && $user->Troll === 1) {
+            $args['IsValid'] = false;
+        }
+    }
 }
