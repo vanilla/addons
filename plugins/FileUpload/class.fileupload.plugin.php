@@ -142,10 +142,8 @@ class FileUploadPlugin extends Gdn_Plugin {
 
         if ($media) {
             $delete['Media'] = $media;
-            $session = Gdn::session();
-            $userID = $session->UserID;
-            $isAdmin = $session->getPermissions()->hasRanked('Garden.Settings.Manage');
-            if ($media->InsertUserID === $userID || $isAdmin) {
+            $hasAccess = $this->$this->checkMedia($media);
+            if ($hasAccess) {
                 $this->mediaModel()->delete($media, true);
                 $delete['Status'] = 'success';
             } else {
