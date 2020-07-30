@@ -676,7 +676,10 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     protected function attachFile($fileID, $foreignID, $foreignType) {
         $media = $this->mediaModel()->getID($fileID);
-        if ($media) {
+        $session = Gdn::session();
+        $userID = $session->UserID;
+        $isAdmin = $session->getPermissions()->hasRanked('Garden.Settings.Manage');
+        if ($media->InsertUserID === $userID || $isAdmin) {
             $media->ForeignID = $foreignID;
             $media->ForeignTable = $foreignType;
             try {
