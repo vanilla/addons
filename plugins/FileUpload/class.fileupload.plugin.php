@@ -1060,32 +1060,28 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     protected function trashFile($mediaID) {
         $media = $this->mediaModel()->getID($mediaID);
-        $session = Gdn::session();
-        $isAdmin = $session->getPermissions()->hasRanked('Garden.Settings.Manage');
-        if ($media->InsertUserID === $session->UserID || $isAdmin) {
-            if ($media) {
-                $this->mediaModel()->delete($media);
-                $deleted = false;
-
-                // Allow interception
-                $this->EventArguments['Parsed'] = Gdn_Upload::parse($media->Path);
-                $this->EventArguments['Handled'] =& $deleted; // Allow skipping steps below
-                $this->fireEvent('TrashFile');
-
-                if (!$deleted) {
-                    $directPath = self::pathUploads().DS.$media->Path;
-                    if (file_exists($directPath)) {
-                        $deleted = @unlink($directPath);
-                    }
+        if ($media) {
+            return;
+        }
+        $hasAccess = $this->checkMedia($media);
+        if ($hasAccess) {
+            $this->mediaModel()->delete($media);
+            $deleted = false;
+            // Allow interception
+            $this->EventArguments['Parsed'] = Gdn_Upload::parse($media->Path);
+            $this->EventArguments['Handled'] =& $deleted; // Allow skipping steps below
+            $this->fireEvent('TrashFile');
+            if (!$deleted) {
+                $directPath = self::pathUploads().DS.$media->Path;
+                if (file_exists($directPath)) {
+                    $deleted = @unlink($directPath);
                 }
-
-                if (!$deleted) {
-                    $calcPath = FileUploadPlugin::findLocalMedia($media, true, true);
-                    if (file_exists($calcPath)) {
-                        @unlink($calcPath);
-                    }
+            }
+            if (!$deleted) {
+                $calcPath = FileUploadPlugin::findLocalMedia($media, true, true);
+                if (file_exists($calcPath)) {
+                    @unlink($calcPath);
                 }
-
             }
         }
     }
