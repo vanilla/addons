@@ -380,7 +380,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     *  Download a media file.
      *
      * @param DiscussionController $sender
      */
