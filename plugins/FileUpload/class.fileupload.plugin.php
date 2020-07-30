@@ -370,15 +370,15 @@ class FileUploadPlugin extends Gdn_Plugin {
      * @param array $media
      * @return bool
      */
-    private function checkMedia($media) {
+    private function checkMedia($media): bool {
         $hasAccess = false;
         $session = Gdn::session();
         $userID = $session->UserID;
         $isAdmin = $session->getPermissions()->hasRanked('Garden.Settings.Manage');
         if ($media->InsertUserID == $userID || $isAdmin) {
-            return !$hasAccess;
+            $hasAccess = true;
         }
-
+        return $hasAccess;
     }
 
     /**
