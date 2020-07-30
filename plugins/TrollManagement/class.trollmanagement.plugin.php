@@ -416,7 +416,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param DiscussionModel $sender
      * @param array $args
      */
-    public function discussionModel_BeforeNotification_handler($sender, &$args) {
+    public function discussionModel_BeforeNotification_handler(DiscussionModel $sender, array &$args) {
         $discussion = $args['Discussion'];
         $this->checkTroll($discussion['InsertUserID'], $args);
     }
@@ -427,7 +427,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param CommentModel $sender
      * @param array $args
      */
-    public function commentModel_BeforeNotification_handler($sender, &$args) {
+    public function commentModel_BeforeNotification_handler(CommentModel $sender, array &$args) {
         $comment = $args['Comment'];
         $this->checkTroll($comment['InsertUserID'], $args);
     }
@@ -438,23 +438,22 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param ActivityModel $sender
      * @param array $args
      */
-    public function activityModel_beforeWallNotificationSend_handler($sender, &$args) {
+    public function activityModel_beforeWallNotificationSend_handler(ActivityModel $sender, array &$args) {
         $activity = $args['Activity'];
         $this->checkTroll($activity['ActivityUserID'], $args);
     }
-    
+
     /**
      * Check if the user is a troll.
      *
      * @param array $args
      * @param mixed $record
      */
-    private function checkTroll($record, &$args) {
+    private function checkTroll(int $userID, array &$args) {
         if ($args['IsValid'] === false) {
             return;
         }
         $userModel = $args['UserModel'];
-        $userID = $record;
         $user = $userModel->get($userID);
         if ($user && $user->Troll === 1) {
             $args['IsValid'] = false;
