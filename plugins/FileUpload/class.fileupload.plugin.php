@@ -393,8 +393,8 @@ class FileUploadPlugin extends Gdn_Plugin {
             return;
         }
 
-        $hasAcess = $this->checkMedia($media);
-        if (!$this->CanDownload || !$hasAcess) {
+        $hasAccess = $this->checkMedia($media);
+        if (!$this->CanDownload || !$hasAccess) {
             throw permissionException("File could not be streamed: Access is denied");
         }
 
