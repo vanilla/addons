@@ -365,20 +365,37 @@ class FileUploadPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Check if user has access to the media record.
+     *
+     * @param array $media
+     * @return bool
+     */
+    private function checkMedia($media) {
+        $hasAccess = false;
+        $session = Gdn::session();
+        $userID = $session->UserID;
+        $isAdmin = $session->getPermissions()->hasRanked('Garden.Settings.Manage');
+        if ($media->InsertUserID == $userID || $isAdmin) {
+            return !$hasAccess;
+        }
+
+    }
+
+    /**
      *
      *
      * @param DiscussionController $sender
      */
     public function discussionController_download_create($sender) {
-        if (!$this->CanDownload) {
-            throw permissionException("File could not be streamed: Access is denied");
-        }
-
         list($mediaID) = $sender->RequestArgs;
         $media = $this->mediaModel()->getID($mediaID);
-
         if (!$media) {
             return;
+        }
+
+        $hasAcess = $this->checkMedia($media);
+        if (!$this->CanDownload || !$hasAcess) {
+            throw permissionException("File could not be streamed: Access is denied");
         }
 
         $filename = Gdn::request()->filename();
@@ -676,10 +693,11 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     protected function attachFile($fileID, $foreignID, $foreignType) {
         $media = $this->mediaModel()->getID($fileID);
-        $session = Gdn::session();
-        $userID = $session->UserID;
-        $isAdmin = $session->getPermissions()->hasRanked('Garden.Settings.Manage');
-        if ($media->InsertUserID === $userID || $isAdmin) {
+        if (!$media) {
+            return;
+        }
+        $hasAccess = $this->$this->checkMedia($media);
+        if ($hasAccess) {
             $media->ForeignID = $foreignID;
             $media->ForeignTable = $foreignType;
             try {
