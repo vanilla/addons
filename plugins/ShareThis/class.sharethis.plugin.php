@@ -12,24 +12,24 @@ class ShareThisPlugin extends Gdn_Plugin {
    /**
     * Show buttons after OP message body.
     */
-	public function discussionController_afterDiscussionBody_handler($sender) {
-      $publisherNumber = c('Plugin.ShareThis.PublisherNumber', 'Publisher Number');
-      $viaHandle = c('Plugin.ShareThis.ViaHandle', '');
-      $copyNShare = c('Plugin.ShareThis.CopyNShare', false);
+    public function discussionController_afterDiscussionBody_handler($sender) {
+        $publisherNumber = htmlspecialchars(c('Plugin.ShareThis.PublisherNumber', 'Publisher Number'));
+        $viaHandle = htmlspecialchars(c('Plugin.ShareThis.ViaHandle', ''));
+        $copyNShare = c('Plugin.ShareThis.CopyNShare', false);
 
-      $doNotHash = $copyNShare ? 'false' : 'true';
-      $doNotCopy = $copyNShare ? 'false' : 'true';
-      $domain = Gdn::request()->scheme() == 'https' ? 'https://ws.sharethis.com' : 'http://w.sharethis.com';
+        $doNotHash = $copyNShare ? 'false' : 'true';
+        $doNotCopy = $copyNShare ? 'false' : 'true';
+        $domain = Gdn::request()->scheme() == 'https' ? 'https://ws.sharethis.com' : 'http://w.sharethis.com';
 
-      echo <<<SHARETHIS
-      <script type="text/javascript">var switchTo5x=true;</script>
-      <script type="text/javascript" src="{$domain}/button/buttons.js"></script>
-      <script type="text/javascript">stLight.options({
+        echo <<<SHARETHIS
+        <script type="text/javascript">var switchTo5x=true;</script>
+        <script type="text/javascript" src="{$domain}/button/buttons.js"></script>
+        <script type="text/javascript">stLight.options({
          publisher: "{$publisherNumber}",
          doNotHash: {$doNotHash},
          doNotCopy: {$doNotCopy},
          hashAddressBar: false
-      });</script>
+        });</script>
       <div class="ShareThisButtonWrapper Right">
          <span class="st_twitter_hcount ShareThisButton" st_via="{$viaHandle}" displayText="Tweet"></span>
          <span class="st_facebook_hcount ShareThisButton" displayText="Facebook"></span>
@@ -41,13 +41,12 @@ class ShareThisPlugin extends Gdn_Plugin {
          <span class="st_sharethis_hcount ShareThisButton Hidden" displayText="ShareThis"></span>
       </div>
 SHARETHIS;
-
-   }
+    }
 
    public function setup() {
       // Nothing to do here!
    }
-   
+
    /**
     * Settings page.
     */
