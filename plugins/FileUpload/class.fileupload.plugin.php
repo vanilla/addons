@@ -1060,7 +1060,7 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     protected function trashFile($mediaID) {
         $media = $this->mediaModel()->getID($mediaID);
-        if ($media) {
+        if (!$media) {
             return;
         }
         $hasAccess = $this->checkMedia($media);
