@@ -450,7 +450,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param array $args
      */
     private function checkTroll(int $userID, array &$args) {
-        if ($args['IsValid'] === false) {
+        if ($args['IsValid'] === false || !isset($args['UserModel'])) {
             return;
         }
         $userModel = $args['UserModel'];
