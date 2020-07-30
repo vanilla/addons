@@ -446,8 +446,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
     /**
      * Check if the user is a troll.
      *
+     * @param int $userID
      * @param array $args
-     * @param mixed $record
      */
     private function checkTroll(int $userID, array &$args) {
         if ($args['IsValid'] === false) {
