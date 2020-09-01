@@ -142,8 +142,8 @@ class FileUploadPlugin extends Gdn_Plugin {
 
         if ($media) {
             $delete['Media'] = $media;
-            $userID = val('UserID', Gdn::session());
-            if (val('InsertUserID', $media, null) == $userID || Gdn::session()->checkPermission($permission, true, 'Category', $permissionCategoryID)) {
+            $hasAccess = $this->$this->checkMedia($media);
+            if ($hasAccess) {
                 $this->mediaModel()->delete($media, true);
                 $delete['Status'] = 'success';
             } else {
@@ -363,20 +363,37 @@ class FileUploadPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Check if user has access to the media record.
      *
+     * @param array $media
+     * @return bool
+     */
+    private function checkMedia($media): bool {
+        $hasAccess = false;
+        $session = Gdn::session();
+        $userID = $session->UserID;
+        $isAdmin = $session->getPermissions()->hasRanked('Garden.Settings.Manage');
+        if ($media->InsertUserID == $userID || $isAdmin) {
+            $hasAccess = true;
+        }
+        return $hasAccess;
+    }
+
+    /**
+     *  Download a media file.
      *
      * @param DiscussionController $sender
      */
     public function discussionController_download_create($sender) {
-        if (!$this->CanDownload) {
-            throw permissionException("File could not be streamed: Access is denied");
-        }
-
         list($mediaID) = $sender->RequestArgs;
         $media = $this->mediaModel()->getID($mediaID);
-
         if (!$media) {
             return;
+        }
+
+        $hasAccess = $this->checkMedia($media);
+        if (!$this->CanDownload || !$hasAccess) {
+            throw permissionException("File could not be streamed: Access is denied");
         }
 
         $filename = Gdn::request()->filename();
@@ -674,7 +691,11 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     protected function attachFile($fileID, $foreignID, $foreignType) {
         $media = $this->mediaModel()->getID($fileID);
-        if ($media) {
+        if (!$media) {
+            return;
+        }
+        $hasAccess = $this->$this->checkMedia($media);
+        if ($hasAccess) {
             $media->ForeignID = $foreignID;
             $media->ForeignTable = $foreignType;
             try {
@@ -1037,30 +1058,29 @@ class FileUploadPlugin extends Gdn_Plugin {
      */
     protected function trashFile($mediaID) {
         $media = $this->mediaModel()->getID($mediaID);
-
-        if ($media) {
+        if (!$media) {
+            return;
+        }
+        $hasAccess = $this->checkMedia($media);
+        if ($hasAccess) {
             $this->mediaModel()->delete($media);
             $deleted = false;
-
             // Allow interception
             $this->EventArguments['Parsed'] = Gdn_Upload::parse($media->Path);
             $this->EventArguments['Handled'] =& $deleted; // Allow skipping steps below
             $this->fireEvent('TrashFile');
-
             if (!$deleted) {
                 $directPath = self::pathUploads().DS.$media->Path;
                 if (file_exists($directPath)) {
                     $deleted = @unlink($directPath);
                 }
             }
-
             if (!$deleted) {
                 $calcPath = FileUploadPlugin::findLocalMedia($media, true, true);
                 if (file_exists($calcPath)) {
                     @unlink($calcPath);
                 }
             }
-
         }
     }
 
