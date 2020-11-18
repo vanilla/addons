@@ -444,6 +444,20 @@ class TrollManagementPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Check if the user is a troll before updating a category's latest post.
+     *
+     * @param CategoryModel $sender
+     * @param array $args
+     */
+    public function categoryModel_beforeUpdateLastPost_handler($sender, $args) {
+        $discussion = $args['Discussion'];
+        $comment = $args['Comment'];
+        if ($comment) {
+            $this->checkTroll($comment['InsertUserID'], $args);
+        }
+    }
+
+    /**
      * Check if the user is a troll.
      *
      * @param int $userID
