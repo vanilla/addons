@@ -452,6 +452,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
     public function categoryModel_beforeUpdateLastPost_handler($sender, $args) {
         $discussion = $args['Discussion'];
         $comment = $args['Comment'];
+        $this->checkTroll($discussion['InsertUserID'], $args);
         if ($comment) {
             $this->checkTroll($comment['InsertUserID'], $args);
         }
