@@ -240,6 +240,16 @@ class TrollManagementPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Attach to the Comment model and check if the user is a troll.
+     *
+     * @param CommentModel $sender
+     * @param array $args Event arguments.
+     */
+    public function commentModel_beforeSaveComment_handler(CommentModel $sender, array $args) {
+        $this->checkTroll(Gdn::session()->UserID, $args);
+    }
+
+    /**
      * Look in the sender event arguments for a dataset to clean of troll content.
      */
     private function _cleanDataSet($sender, $dataEventArgument) {
