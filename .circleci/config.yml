@@ -28,6 +28,7 @@ workflows:
                       - php_setup
             # JS and browsers
             - jobs/frontend_setup:
+                  executor: core/node
                   name: frontend_setup
             - jobs/frontend_lint:
                   requires:
