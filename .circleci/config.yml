@@ -34,6 +34,9 @@ jobs:
                     rm -rf .git
                     # We explcitly don't cache dependencies.
                     # The cache validation & fetching seems to take longer than fetching from source.
+            - run:
+                name: Install Yarn Packages
+                command: |
                     cd ~/workspace/vanilla
                     yarn install --pure-lockfile
                     yarn install-all
