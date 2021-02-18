@@ -14,6 +14,33 @@ jobs:
             - core/prepare_php_tests
             - core/prepare_sphinx
             - core/run_sphinx_test_suite
+    frontend_setup:
+        executor: core/node
+        steps:
+            - run:
+                name: Versions
+                command: |
+                  node --version
+                  yarn --version
+            - core/checkout
+            - run:
+                name: Clone Vanilla Repo
+                command: ~/workspace/ci-scripts/clone-vanilla.sh
+            - run:
+                # Makes workspace persisting much faster if not needed.
+                name: Cleaning up git directory
+                command: |
+                  cd ~/workspace/vanilla
+                  rm -rf .git
+                # We explcitly don't cache dependencies.
+                # The cache validation & fetching seems to take longer than fetching from source.
+            - *run_yarn
+            - persist_to_workspace:
+                root: ~/workspace
+                paths:
+                  - repo
+                  - ci-scripts
+                  - vanilla
 workflows:
     version: 2
     commit:
@@ -27,9 +54,7 @@ workflows:
                   requires:
                       - php_setup
             # JS and browsers
-            - jobs/frontend_setup:
-                  executor: core/node
-                  name: frontend_setup
+            - frontend_setup
             - jobs/frontend_lint:
                   requires:
                       - frontend_setup
