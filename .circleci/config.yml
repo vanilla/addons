@@ -30,13 +30,13 @@ jobs:
                 # Makes workspace persisting much faster if not needed.
                 name: Cleaning up git directory
                 command: |
-                  cd ~/workspace/vanilla
-                  rm -rf .git
-                # We explcitly don't cache dependencies.
-                # The cache validation & fetching seems to take longer than fetching from source.
-                 cd ~/workspace/vanilla
-                 yarn install --pure-lockfile
-                 yarn install-all
+                    cd ~/workspace/vanilla
+                    rm -rf .git
+                    # We explcitly don't cache dependencies.
+                    # The cache validation & fetching seems to take longer than fetching from source.
+                    cd ~/workspace/vanilla
+                    yarn install --pure-lockfile
+                    yarn install-all
             - persist_to_workspace:
                 root: ~/workspace
                 paths:
