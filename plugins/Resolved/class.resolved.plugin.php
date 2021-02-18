@@ -137,9 +137,10 @@ class ResolvedPlugin extends Gdn_Plugin {
                 throw new Exception(t('You do not have a permission to resolve that discussion.'));
             }
         }
+
         // Make sure we are posting back.
-        if (!$sender->Request->isPostBack()) {
-            throw permissionException('Javascript');
+        if (!$sender->Request->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
 
         $discussion = $sender->DiscussionModel->getID($discussionID);
