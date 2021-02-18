@@ -1,6 +1,8 @@
 {
   "name": "assets",
   "private": true,
+  "version": "3.0.0",
+  "workspaces": {},
   "devDependencies": {
     "bower": "*",
     "wiredep": "1.4.x",

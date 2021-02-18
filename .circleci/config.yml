@@ -10,7 +10,6 @@ jobs:
                 at: ~/workspace
             - core/checkout
             - run: ~/workspace/ci-scripts/clone-vanilla.sh
-#            - run: ~/workspace/ci-scripts/clone-alt-repo.sh internal
             - core/composer_install
             - core/prepare_php_tests
             - core/prepare_sphinx
