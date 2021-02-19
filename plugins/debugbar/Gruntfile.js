@@ -1,120 +1,80 @@
-'use strict';
+"use strict";
 
 module.exports = function (grunt) {
-    // Load all Grunt tasks matching the `grunt-*` pattern
-    require('load-grunt-tasks')(grunt);
+   // Load all Grunt tasks matching the `grunt-*` pattern
+   require("load-grunt-tasks")(grunt);
 
-    // Time how long tasks take. Can help when optimizing build times
-    require('time-grunt')(grunt);
+   // Time how long tasks take. Can help when optimizing build times
+   require("time-grunt")(grunt);
 
-    grunt.initConfig({
+   grunt.initConfig({
+      pkg: grunt.file.readJSON("package.json"),
 
-        pkg: grunt.file.readJSON('package.json'),
-
-        watch: {
-            js: {
-                files: ['js/src/**/*.js']
-                , tasks: ['jshint']
-            }
-            , gruntfile: {
-                files: ['Gruntfile.js']
-            }
-            , sass: {
-                files: ['scss/**/*.scss']
-                , tasks: ['sass', 'autoprefixer']
-            }
-            , livereload: {
-                options: {
-                    livereload: true
-                }
-                , files: [
-                    'design/**/*.css'
-                    , 'design/images/**/*'
-                    , 'js/**/*.js'
-                    , 'views/**/*.tpl'
-                ]
-            }
-        },
-
-        sass: {
+      watch: {
+         js: {
+            files: ["js/src/**/*.js"],
+            tasks: ["jshint"],
+         },
+         gruntfile: {
+            files: ["Gruntfile.js"],
+         },
+         sass: {
+            files: ["scss/**/*.scss"],
+            tasks: ["sass", "autoprefixer"],
+         },
+         livereload: {
             options: {
-                sourceMap: true,
-                outputStyle: "expanded"
+               livereload: true,
             },
-            dist: {
-                files: [{
-                        expand: true
-                        , cwd: 'scss/'
-                        , src: [
-                        '*.scss'
-                        , '!_*.scss'
-                    ]
-                        , dest: 'design/'
-                        , ext: '.css'
-                    }]
-            }
-        },
+            files: [
+               "design/**/*.css",
+               "design/images/**/*",
+               "js/**/*.js",
+               "views/**/*.tpl",
+            ],
+         },
+      },
 
-        scsslint: {
-            options: {
-                config: 'scss/.scss-lint.yml',
-                maxBuffer: 3000 * 1024,
-                colorizeOutput: true
-            }
-            , all: ['scss/**/*.scss']
-        },
+      sass: {
+         options: {
+            sourceMap: true,
+            outputStyle: "expanded",
+         },
+         dist: {
+            files: [
+               {
+                  expand: true,
+                  cwd: "scss/",
+                  src: ["*.scss", "!_*.scss"],
+                  dest: "design/",
+                  ext: ".css",
+               },
+            ],
+         },
+      },
 
-        autoprefixer: {
-            options: {
-                map: true,
-                cascade: false
-            },
-            dist: {
-                src: ['design/admin.css'
-                     ,'design/style.css' ]
-            }
-        },
+      autoprefixer: {
+         options: {
+            map: true,
+            cascade: false,
+         },
+         dist: {
+            src: ["design/admin.css", "design/style.css"],
+         },
+      },
 
-        jshint: {
-            options: {
-                jshintrc: 'js/.jshintrc'
-            }
-            , all: ['js/src/**/*.js']
-        },
+      jshint: {
+         options: {
+            jshintrc: "js/.jshintrc",
+         },
+         all: ["js/src/**/*.js"],
+      },
+      wiredep: {
+         dist: {
+            src: ["scss/**/*.scss"],
+         },
+      },
+   });
 
-        csslint: {
-            options: {
-                csslintrc: 'design/.csslintrc'
-            }
-            , all: ['design/admin.css'
-                   ,'design/style.css']
-        },
-
-        imagemin: {
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: 'design/images',
-                    src: '**/*.{gif,jpeg,jpg,png,svg}',
-                    dest: 'design/images'
-                }]
-            }
-        },
-
-        wiredep: {
-            dist: {
-                src: ['scss/**/*.scss']
-            }
-        }
-
-    });
-
-    grunt.registerTask('default', [
-          'scsslint'
-        , 'sass'
-        , 'autoprefixer'
-        , 'jshint'
-        , 'csslint'
-        , 'imagemin'
-    ]);
+   grunt.registerTask("default", [, "sass", "autoprefixer", "jshint"]);
 };
