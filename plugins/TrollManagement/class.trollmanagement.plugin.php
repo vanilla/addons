@@ -469,4 +469,52 @@ class TrollManagementPlugin extends Gdn_Plugin {
             $args['IsValid'] = false;
         }
     }
+
+    /**
+     * Create a method called "QnA" on the SettingController.
+     *
+     * @param $sender Sending controller instance
+     */
+    public function settingsController_trollManagement_create($sender) {
+        // Prevent non-admins from accessing this page
+        $sender->permission('Garden.Settings.Manage');
+
+        $sender->title(sprintf(t('%s settings'), t('Troll Management')));
+        $sender->setData('PluginDescription', $this->getPluginKey('Description'));
+//        $sender->addSideMenu('settings/QnA');
+
+        $sender->Form = new Gdn_Form();
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+
+        $configurationModel->setField([
+            'TrollManagement.PerFingerPrint.Enabled' => c('TrollManagement.PerFingerPrint.Enabled', false),
+            'TrollManagement.PerFingerPrint.MaxUserAccounts' => c('TrollManagement.PerFingerPrint.MaxUserAccounts', 5),
+        ]);
+
+        $sender->Form->setModel($configurationModel);
+
+        // If seeing the form for the first time...
+        if ($sender->Form->authenticatedPostBack() === false) {
+            $sender->Form->setData($configurationModel->Data);
+        } else {
+            $configurationModel->Validation->applyRule('TrollManagement.PerFingerPrint.Enabled', 'Boolean');
+
+            if ($sender->Form->getFormValue('TrollManagement.PerFingerPrint.Enabled')) {
+                $configurationModel->Validation->applyRule('TrollManagement.PerFingerPrint.MaxUserAccounts', 'Required');
+                $configurationModel->Validation->applyRule('TrollManagement.PerFingerPrint.MaxUserAccounts', 'Integer');
+                $configurationModel->Validation->applyRule(
+                    'TrollManagement.PerFingerPrint.MaxUserAccounts',
+                    'validatePositiveNumber',
+                    sprintf(t('%s must be a positive number.'), t("Maximum user's accounts"))
+                );
+            }
+
+            if ($sender->Form->save()) {
+                $sender->StatusMessage = t('Your changes have been saved.');
+            }
+        }
+
+        $sender->render($this->getView('configuration.php'));
+    }
 }
