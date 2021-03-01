@@ -27,7 +27,7 @@ if (!$fingerprintsEnabled) {
     <li class="form-group js-fingerprints-inputs" <?php echo $fingerprintsEnabled ? '' : ' style="display:none;"'?>>
 <?php
         echo $this->Form->labelWrap(
-            t('Maximum allowed number of user accounts tied to a single fingerprint'),
+            t('Maximum allowed number of user accounts tied to a single fingerprint.'),
             'TrollManagement.PerFingerPrint.MaxUserAccounts'
         );
         echo $this->Form->textBoxWrap('TrollManagement.PerFingerPrint.MaxUserAccounts', $fingerprintsChildrenAttributes);
