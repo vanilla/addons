@@ -136,7 +136,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Fingerprint the user.
+     * Set a fingerprint the user. See setFingerPrint();
      *
      * @param Gdn_Controller $sender
      */
@@ -145,6 +145,19 @@ class TrollManagementPlugin extends Gdn_Plugin {
         if (!Gdn::session()->isValid()) {
             return;
         }
+        $this->setFingerprint();
+    }
+
+    /**
+     * Set and return a Fingerprint to the provided userID's (or in session, when null) user.
+     *
+     * @param int|null $userID
+     * @return string Fingerprint
+     * @throws ContainerException
+     * @throws NotFoundException
+     */
+    private function setFingerprint($userID = null): string {
+        $userID = $userID ?? Gdn::session()->UserID;
 
         $cookieFingerprint = val('__vnf', $_COOKIE, null);
         $databaseFingerprint = val('Fingerprint', Gdn::session()->User, null);
@@ -153,9 +166,9 @@ class TrollManagementPlugin extends Gdn_Plugin {
         // Cookie and user record both empty, assign both
         if (empty($cookieFingerprint) && empty($databaseFingerprint)) {
             $databaseFingerprint = uniqid();
-            Gdn::sql()->update('User', ['Fingerprint' => $databaseFingerprint], ['UserID' => Gdn::session()->UserID])->put();
+            Gdn::sql()->update('User', ['Fingerprint' => $databaseFingerprint], ['UserID' => $userID])->put();
             safeCookie('__vnf', $databaseFingerprint, $expires);
-            return;
+            return $databaseFingerprint;
         }
 
         // If the cookie exists...
@@ -163,16 +176,19 @@ class TrollManagementPlugin extends Gdn_Plugin {
 
             // If the cookie disagrees with the database, update the database
             if ($databaseFingerprint != $cookieFingerprint) {
-                Gdn::sql()->update('User', ['Fingerprint' => $cookieFingerprint], ['UserID' => Gdn::session()->UserID])->put();
+                Gdn::sql()->update('User', ['Fingerprint' => $cookieFingerprint], ['UserID' => $userID])->put();
+                return $cookieFingerprint;
             }
 
-        // If only the user record exists, propagate it to the cookie
+            // If only the user record exists, propagate it to the cookie
         } else if (!empty($databaseFingerprint)) {
 
             // Propagate it to the cookie
             safeCookie('__vnf', $databaseFingerprint, $expires);
+            return $databaseFingerprint;
         }
 
+        return false;
     }
 
     /**
@@ -481,7 +497,6 @@ class TrollManagementPlugin extends Gdn_Plugin {
 
         $sender->title(sprintf(t('%s settings'), t('Troll Management')));
         $sender->setData('PluginDescription', $this->getPluginKey('Description'));
-//        $sender->addSideMenu('settings/QnA');
 
         $sender->Form = new Gdn_Form();
         $validation = new Gdn_Validation();
@@ -516,5 +531,62 @@ class TrollManagementPlugin extends Gdn_Plugin {
         }
 
         $sender->render($this->getView('configuration.php'));
+    }
+
+    /**
+     * Add a _probable_ justification as to why a user's is on the applicant's list if there are too many user
+     * accounts using the same fingerprint.
+     *
+     * @param Controller $sender
+     */
+    public function base_applicantInfo_handler($sender, $args) {
+        if (c('TrollManagement.PerFingerPrint.Enabled', false)) {
+            $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
+            $userFingerprint = val('Fingerprint', $args['User']);
+            $fingerprintUsages = $this->getSharedFingerprintsUsersCount($userFingerprint);
+            if ($fingerprintUsages >= $maxSiblingAccounts) {
+                $sender->EventArguments['ApplicantMeta'][] = sprintf(
+                    t("%s accounts are sharing the '%s' fingerprint."),
+                    $fingerprintUsages,
+                    $userFingerprint
+                );
+            }
+        }
+    }
+
+    /**
+     * Return a count of users using the same provided fingerprint.
+     *
+     * @param string $fingerprint
+     */
+    public function getSharedFingerprintsUsersCount(string $fingerprint) {
+        $sql = clone Gdn::sql();
+        $sql->reset();
+        $users = $sql
+            ->select('userID AS siblingsCount', 'count')
+            ->from('User')
+            ->where('Fingerprint', $fingerprint)
+            ->get()->firstRow(DATASET_TYPE_ARRAY);
+        return $users['siblingsCount'];
+    }
+
+    /**
+     * Upon user registration, we trigger an early Fingerprint tag & we check if this new registration trips the
+     * maximum amount of user accounts allowed for a single fingerprint. If it is, we give this new user the
+     * 'Applicant' role.
+     *
+     * @param UserModel $sender
+     * @param array $args
+     */
+    public function userModel_afterRegister_handler($sender, $args) {
+        $userID = $args['UserID'];
+
+        $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
+        $userFingerprint = $this->setFingerprint($userID);
+
+        $fingerprintUsages = $this->getSharedFingerprintsUsersCount($userFingerprint);
+        if ($fingerprintUsages >= $maxSiblingAccounts) {
+            Gdn::userModel()->addRoles($userID, [RoleModel::APPLICANT_ID], true);
+        }
     }
 }
