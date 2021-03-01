@@ -483,7 +483,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Create a method called "QnA" on the SettingController.
+     * Add a configuration popup to the Troll Management plugin.
      *
      * @param $sender Sending controller instance
      */
