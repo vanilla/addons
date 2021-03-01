@@ -173,17 +173,13 @@ class TrollManagementPlugin extends Gdn_Plugin {
 
         // If the cookie exists...
         if (!empty($cookieFingerprint)) {
-
             // If the cookie disagrees with the database, update the database
             if ($databaseFingerprint != $cookieFingerprint) {
                 Gdn::sql()->update('User', ['Fingerprint' => $cookieFingerprint], ['UserID' => $userID])->put();
                 return $cookieFingerprint;
             }
-
-            // If only the user record exists, propagate it to the cookie
         } else if (!empty($databaseFingerprint)) {
-
-            // Propagate it to the cookie
+            // If only the user record exists, propagate it to the cookie
             safeCookie('__vnf', $databaseFingerprint, $expires);
             return $databaseFingerprint;
         }
