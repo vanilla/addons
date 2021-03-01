@@ -16,7 +16,7 @@ if (!$fingerprintsEnabled) {
 <?php
         echo $this->Form->toggle(
             'TrollManagement.PerFingerPrint.Enabled',
-            t('Enables fingerprint checks.'),
+            t('Enable fingerprint checks.'),
             [
                 'id' => 'IsFingerprintChecksEnabled',
                 'data-children' => 'js-fingerprints-inputs'
