@@ -60,6 +60,25 @@ class TrollManagementPlugin extends Gdn_Plugin {
             ->column('Troll', 'int', '0')
             ->column('Fingerprint', 'varchar(50)', null, 'index')
             ->set();
+
+        $colBanType = Gdn::structure()->get('Ban')->columns('BanType');
+        $BanTypes = $colBanType->Enum;
+
+        $BanTypes[] = 'Fingerprint';
+
+        Gdn::structure()
+            ->table('Ban')
+            ->column('BanType', $BanTypes, false, 'unique')
+            ->set();
+    }
+
+    /**
+     * On plugin disable.
+     */
+    public function onDisable() {
+        // TODO: Ask Ryan about best practices here.
+        // TODO: Ban records that uses the BanType "Fingerprint"
+        // TODO: Remove "Fingerprint" from the table's Bantype enum.
     }
 
     /**
@@ -584,5 +603,73 @@ class TrollManagementPlugin extends Gdn_Plugin {
         if ($fingerprintUsages >= $maxSiblingAccounts) {
             Gdn::userModel()->addRoles($userID, [RoleModel::APPLICANT_ID], true);
         }
+    }
+
+    /**
+     * Adds "Fingerprint" to the allowed banTypes of the "Ban Rules" dashboard interface.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function settingsController_BeforeListBanTypes_handler($sender, $args) {
+        $args['banTypes']['Fingerprint'] = t('Fingerprint');
+    }
+
+    /**
+     * Either add "Fingerprint" row header or an fingerprint value to the dashboard's list of users.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function base_UserCell_handler($sender, $args) {
+        // If we have user data, we create a cell containing the fingerprint.
+        if (isset($args['User'])) {
+            echo '<td>' . val('Fingerprint', $args['User']) . '</td>';
+        } else {
+            // Otherwise, we output a column header.
+            $get = Gdn::request()->get();
+            $get['order'] = 'Fingerprint';
+            $orderUrl = '/dashboard/user?'.http_build_query($get);
+
+            echo '<th class="column-md">' . anchor(t('Fingerprint'), $orderUrl) . '</th>';
+        }
+    }
+
+    /**
+     * Add "Fingerprint" to the possible ban query.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function banModel_AfterbanWhere_handler($sender, $args) {
+        $ban = val('ban', $args);
+
+        if ($ban) {
+            switch (strtolower($ban['BanType'])) {
+                case 'fingerprint':
+                    $args['result']['u.Fingerprint like'] = $ban['BanValue'];
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Add ordering users by Fingerprint in the dashboard's users list.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function userController_BeforeAllowedSorting_handler($sender, $args) {
+        $args['allowedSorting']['Fingerprint'] = 'desc';
+    }
+
+    /**
+     * Add "Fingerprint" to hte dashboard's users list search query.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function userModel_BeforeSearchLikeUserTable_handler($sender, $args) {
+        $args['like']['u.Fingerprint'] = val('keywords', $args);
     }
 }
