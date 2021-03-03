@@ -664,4 +664,14 @@ class TrollManagementPlugin extends Gdn_Plugin {
         return $like;
     }
 
+    /**
+     * Add ordering users by Fingerprint in the dashboard's users list.
+     *
+     * @param array $allowedSorting
+     * @return array
+     */
+    public function userController_usersListAllowedSorting(array $allowedSorting): array {
+        $allowedSorting['Fingerprint'] = 'desc';
+        return $allowedSorting;
+    }
 }
