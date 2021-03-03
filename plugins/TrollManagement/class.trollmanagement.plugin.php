@@ -76,9 +76,6 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * On plugin disable.
      */
     public function onDisable() {
-        // TODO: Ask Ryan about best practices here.
-        // TODO: Ban records that uses the BanType "Fingerprint"
-        // TODO: Remove "Fingerprint" from the table's Bantype enum.
     }
 
     /**
