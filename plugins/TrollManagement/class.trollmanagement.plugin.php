@@ -608,11 +608,12 @@ class TrollManagementPlugin extends Gdn_Plugin {
     /**
      * Adds "Fingerprint" to the allowed banTypes of the "Ban Rules" dashboard interface.
      *
-     * @param $sender
-     * @param $args
+     * @param array $banTypes
+     * @return array
      */
-    public function settingsController_BeforeListBanTypes_handler($sender, $args) {
-        $args['banTypes']['Fingerprint'] = t('Fingerprint');
+    public function settingsController_listBanTypes(array $banTypes): array {
+        $banTypes['Fingerprint'] = t('Fingerprint');
+        return $banTypes;
     }
 
     /**
@@ -638,38 +639,29 @@ class TrollManagementPlugin extends Gdn_Plugin {
     /**
      * Add "Fingerprint" to the possible ban query.
      *
-     * @param $sender
-     * @param $args
+     * @param array $result
+     * @param array $ban
+     * @return array
      */
-    public function banModel_AfterbanWhere_handler($sender, $args) {
-        $ban = val('ban', $args);
-
-        if ($ban) {
-            switch (strtolower($ban['BanType'])) {
-                case 'fingerprint':
-                    $args['result']['u.Fingerprint like'] = $ban['BanValue'];
-                    break;
-            }
+    public function banModel_banWhere(array $result, array $ban): array {
+        switch (strtolower($ban['BanType'])) {
+            case 'fingerprint':
+                $result['u.Fingerprint like'] = $ban['BanValue'];
+                break;
         }
+        return $result;
     }
 
     /**
-     * Add ordering users by Fingerprint in the dashboard's users list.
+     * Add "Fingerprint" to the dashboard's users list search query.
      *
-     * @param $sender
-     * @param $args
+     * @param array $like
+     * @param string $keywords
+     * @return array
      */
-    public function userController_BeforeAllowedSorting_handler($sender, $args) {
-        $args['allowedSorting']['Fingerprint'] = 'desc';
+    public function userModel_searchKeyWords(array $like, string $keywords): array {
+        $like['u.Fingerprint'] = $keywords;
+        return $like;
     }
 
-    /**
-     * Add "Fingerprint" to hte dashboard's users list search query.
-     *
-     * @param $sender
-     * @param $args
-     */
-    public function userModel_BeforeSearchLikeUserTable_handler($sender, $args) {
-        $args['like']['u.Fingerprint'] = val('keywords', $args);
-    }
 }
