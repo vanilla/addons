@@ -155,7 +155,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Set a fingerprint the user. See setFingerPrint();
+     * Set a fingerprint to the user. See setFingerPrint();
      *
      * @param Gdn_Controller $sender
      */
