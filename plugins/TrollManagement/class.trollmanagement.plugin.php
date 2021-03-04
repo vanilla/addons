@@ -503,7 +503,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
     /**
      * Add a configuration popup to the Troll Management plugin.
      *
-     * @param $sender Sending controller instance
+     * @param Controller $sender
      */
     public function settingsController_trollManagement_create($sender) {
         // Prevent non-admins from accessing this page
@@ -552,6 +552,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * accounts using the same fingerprint.
      *
      * @param Controller $sender
+     * @param array $args
      */
     public function base_applicantInfo_handler($sender, $args) {
         if (c('TrollManagement.PerFingerPrint.Enabled', false)) {
@@ -618,10 +619,10 @@ class TrollManagementPlugin extends Gdn_Plugin {
     /**
      * Either add "Fingerprint" row header or an fingerprint value to the dashboard's list of users.
      *
-     * @param $sender
-     * @param $args
+     * @param Controller $sender
+     * @param array $args
      */
-    public function base_UserCell_handler($sender, $args) {
+    public function base_userCell_handler($sender, $args) {
         // If we have user data, we create a cell containing the fingerprint.
         if (isset($args['User'])) {
             echo '<td>' . val('Fingerprint', $args['User']) . '</td>';
