@@ -171,8 +171,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
      *
      * @param int|null $userID
      * @return string Fingerprint
-     * @throws ContainerException
-     * @throws NotFoundException
+     * @throws ContainerException Throws exception if there's a problem getting a container.
+     * @throws NotFoundException Throws exception if there's a problem getting a container.
      */
     private function setFingerprint($userID = null): string {
         $userID = $userID ?? Gdn::session()->UserID;
@@ -643,7 +643,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param array $ban
      * @return array
      */
-    public function banModel_banWhere(array $result, array $ban): array {
+    public function banModel_banWhere_handler(array $result, array $ban): array {
         switch (strtolower($ban['BanType'])) {
             case 'fingerprint':
                 $result['u.Fingerprint like'] = $ban['BanValue'];
@@ -659,7 +659,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param string $keywords
      * @return array
      */
-    public function userModel_searchKeyWords(array $like, string $keywords): array {
+    public function userModel_searchKeyWords_handler(array $like, string $keywords): array {
         $like['u.Fingerprint'] = $keywords;
         return $like;
     }
