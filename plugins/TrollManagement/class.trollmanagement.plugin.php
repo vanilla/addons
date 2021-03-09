@@ -558,13 +558,15 @@ class TrollManagementPlugin extends Gdn_Plugin {
         if (c('TrollManagement.PerFingerPrint.Enabled', false)) {
             $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
             $userFingerprint = val('Fingerprint', $args['User']);
-            $fingerprintUsages = $this->getSharedFingerprintsUsersCount($userFingerprint);
-            if ($fingerprintUsages >= $maxSiblingAccounts) {
-                $sender->EventArguments['ApplicantMeta'][] = sprintf(
-                    t("%s accounts are sharing the '%s' fingerprint."),
-                    $fingerprintUsages,
-                    $userFingerprint
-                );
+            if (!empty($userFingerprint)) {
+                $fingerprintUsages = $this->getSharedFingerprintsUsersCount($userFingerprint);
+                if ($fingerprintUsages >= $maxSiblingAccounts) {
+                    $sender->EventArguments['ApplicantMeta'][] = sprintf(
+                        t("%s accounts are sharing the '%s' fingerprint."),
+                        $fingerprintUsages,
+                        $userFingerprint
+                    );
+                }
             }
         }
     }
@@ -599,9 +601,11 @@ class TrollManagementPlugin extends Gdn_Plugin {
         $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
         $userFingerprint = $this->setFingerprint($userID);
 
-        $fingerprintUsages = $this->getSharedFingerprintsUsersCount($userFingerprint);
-        if ($fingerprintUsages >= $maxSiblingAccounts) {
-            Gdn::userModel()->addRoles($userID, [RoleModel::APPLICANT_ID], true);
+        if ($userFingerprint !== false) {
+            $fingerprintUsages = $this->getSharedFingerprintsUsersCount($userFingerprint);
+            if ($fingerprintUsages >= $maxSiblingAccounts) {
+                Gdn::userModel()->addRoles($userID, [RoleModel::APPLICANT_ID], true);
+            }
         }
     }
 
