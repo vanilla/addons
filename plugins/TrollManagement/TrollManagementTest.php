@@ -67,5 +67,5 @@ class TrollManagementTest extends UserModelTest {
         $this->assertNotContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs['1']);
         // The THIRD dummy user account is NOT an applicant
         $this->assertContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs['2']);
-     }
+    }
 }
