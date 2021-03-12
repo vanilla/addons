@@ -561,7 +561,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
             if (!empty($userFingerprint)) {
                 $fingerprintUsages = $this->getSharedFingerprintsUsersCount($userFingerprint);
                 if ($fingerprintUsages >= $maxSiblingAccounts) {
-                    $sender->EventArguments['ApplicantMeta'][] = sprintf(
+                    $sender->EventArguments['ApplicantMeta'][t("Fingerprint issue")] = sprintf(
                         t("%s accounts are sharing the '%s' fingerprint."),
                         $fingerprintUsages,
                         $userFingerprint
