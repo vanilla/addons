@@ -574,17 +574,21 @@ class TrollManagementPlugin extends Gdn_Plugin {
     /**
      * Return a count of users using the same provided fingerprint.
      *
-     * @param string $fingerprint
+     * @param null|string $fingerprint
+     * @return int
      */
-    public function getSharedFingerprintsUsersCount(string $fingerprint) {
-        $sql = clone Gdn::sql();
-        $sql->reset();
-        $users = $sql
-            ->select('userID AS siblingsCount', 'count')
-            ->from('User')
-            ->where('Fingerprint', $fingerprint)
-            ->get()->firstRow(DATASET_TYPE_ARRAY);
-        return $users['siblingsCount'];
+    public function getSharedFingerprintsUsersCount($fingerprint): int {
+        if (!is_null($fingerprint)) {
+            $sql = clone Gdn::sql();
+            $sql->reset();
+            $users = $sql
+                ->select('userID AS siblingsCount', 'count')
+                ->from('User')
+                ->where('Fingerprint', $fingerprint)
+                ->get()->firstRow(DATASET_TYPE_ARRAY);
+            return $users['siblingsCount'];
+        }
+        return 0;
     }
 
     /**
