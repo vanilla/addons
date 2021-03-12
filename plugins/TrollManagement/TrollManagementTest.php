@@ -58,7 +58,7 @@ class TrollManagementTest extends UserModelTest {
 
         // We pull the associated user's roles.
         foreach ($importedUsers as $importedUser) {
-            $importedUsersRolesIDs[] = $this->userModel->getRoleIDs($importedUser['UserID'])/*->resultArray()*/;
+            $importedUsersRolesIDs[] = $this->userModel->getRoleIDs($importedUser['UserID']);
         }
 
         // The FIRST dummy user account is NOT an applicant
@@ -67,5 +67,54 @@ class TrollManagementTest extends UserModelTest {
         $this->assertNotContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs['1']);
         // The THIRD dummy user account is NOT an applicant
         $this->assertContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs['2']);
+    }
+
+    /**
+     * Tests the automatic assignment of the "applicant" status to EVERY new user registration.
+     */
+    public function testRegisterAllApplicants(): void {
+        /** @var \Gdn_Configuration $configuration */
+        $configuration = static::container()->get('Config');
+
+        $configuration->set('TrollManagement.PerFingerPrint.Enabled', true);
+        $configuration->set('TrollManagement.PerFingerPrint.MaxUserAccounts', 0);
+
+        // Create 3 dummy accounts. (They should all be automatically set as "applicant")
+        $importedUsers[] = $this->insertDummyUser();
+        $importedUsers[] = $this->insertDummyUser();
+        $importedUsers[] = $this->insertDummyUser();
+
+        // We pull the associated user's roles.
+        foreach ($importedUsers as $importedUser) {
+            $importedUsersRolesIDs = $this->userModel->getRoleIDs($importedUser['UserID']);
+            // The dummy user account is an applicant.
+            $this->assertContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs);
+        }
+    }
+
+    /**
+     * The plugin is disabled. Even if every users are using the same fingerprint, none are flagged as "applicant".
+     */
+    public function testRegisterDisabledPlugin(): void {
+        /** @var \Gdn_Configuration $configuration */
+        $configuration = static::container()->get('Config');
+
+        $configuration->set('TrollManagement.PerFingerPrint.Enabled', false);
+        $configuration->set('TrollManagement.PerFingerPrint.MaxUserAccounts', 1);
+
+        // Ensure all future registered dummy users uses the same fingerprint.
+        $_COOKIE['__vnf'] = 'THISISAFAKEFINGERPRINT';
+
+        // Create 3 dummy accounts. (None should be automatically set as "applicant")
+        $importedUsers[] = $this->insertDummyUser();
+        $importedUsers[] = $this->insertDummyUser();
+        $importedUsers[] = $this->insertDummyUser();
+
+        // We pull the associated user's roles.
+        foreach ($importedUsers as $importedUser) {
+            $importedUsersRolesIDs = $this->userModel->getRoleIDs($importedUser['UserID']);
+            // The dummy user account is NOT an applicant
+            $this->assertNotContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs);
+        }
     }
 }

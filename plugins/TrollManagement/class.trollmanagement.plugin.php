@@ -600,15 +600,17 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function userModel_afterRegister_handler($sender, $args) {
-        $userID = $args['UserID'];
+        if (c('TrollManagement.PerFingerPrint.Enabled', false) == true) {
+            $userID = $args['UserID'];
 
-        $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
-        $userFingerprint = $this->setFingerprint($userID);
+            $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
+            $userFingerprint = $this->setFingerprint($userID);
 
-        if ($userFingerprint !== false) {
-            $fingerprintUsages = $this->getSharedFingerprintsUsersCount($userFingerprint);
-            if ($fingerprintUsages >= $maxSiblingAccounts) {
-                Gdn::userModel()->addRoles($userID, [RoleModel::APPLICANT_ID], true);
+            if ($userFingerprint !== false) {
+                $fingerprintUsages = $this->getSharedFingerprintsUsersCount($userFingerprint);
+                if ($fingerprintUsages >= $maxSiblingAccounts) {
+                    Gdn::userModel()->addRoles($userID, [RoleModel::APPLICANT_ID], true);
+                }
             }
         }
     }
