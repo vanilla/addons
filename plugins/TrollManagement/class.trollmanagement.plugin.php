@@ -75,12 +75,6 @@ class TrollManagementPlugin extends Gdn_Plugin {
     }
 
     /**
-     * On plugin disable.
-     */
-    public function onDisable() {
-    }
-
-    /**
      * Get list of current troll user IDs.
      *
      * @return array
@@ -559,11 +553,9 @@ class TrollManagementPlugin extends Gdn_Plugin {
             $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
             $userFingerprint = val('Fingerprint', $args['User']);
             if (!empty($userFingerprint)) {
-                $fingerprintUsages = $this->getSharedFingerprintsUsersCount($userFingerprint);
-                if ($fingerprintUsages >= $maxSiblingAccounts) {
+                if ($this->checkMaxSharedFingerprintsExceeded($userFingerprint, $maxSiblingAccounts)) {
                     $sender->EventArguments['ApplicantMeta'][t("Fingerprint issue")] = sprintf(
-                        t("%s accounts are sharing the '%s' fingerprint."),
-                        $fingerprintUsages,
+                        t("Too many accounts are using the '%s' fingerprint."),
                         $userFingerprint
                     );
                 }
@@ -572,23 +564,26 @@ class TrollManagementPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Return a count of users using the same provided fingerprint.
+     * Checks if the maximum amount of accounts using the same fingerprint has been reached.
      *
      * @param null|string $fingerprint
-     * @return int
+     * @param int $maxSiblingAccounts
+     * @return bool
      */
-    public function getSharedFingerprintsUsersCount($fingerprint): int {
+    private function checkMaxSharedFingerprintsExceeded($fingerprint, int $maxSiblingAccounts): bool {
         if (!is_null($fingerprint)) {
             $sql = clone Gdn::sql();
             $sql->reset();
             $users = $sql
-                ->select('userID AS siblingsCount', 'count')
+                ->select('userID')
                 ->from('User')
                 ->where('Fingerprint', $fingerprint)
-                ->get()->firstRow(DATASET_TYPE_ARRAY);
-            return $users['siblingsCount'];
+                ->limit($maxSiblingAccounts)
+                ->get()->resultArray();
+                //firstRow(DATASET_TYPE_ARRAY);
+            return (count($users) == $maxSiblingAccounts);
         }
-        return 0;
+        return false;
     }
 
     /**
@@ -600,15 +595,13 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function userModel_afterRegister_handler($sender, $args) {
+        $userID = $args['UserID'];
+        $userFingerprint = $this->setFingerprint($userID);
+
         if (c('TrollManagement.PerFingerPrint.Enabled', false) == true) {
-            $userID = $args['UserID'];
-
             $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
-            $userFingerprint = $this->setFingerprint($userID);
-
             if ($userFingerprint !== false) {
-                $fingerprintUsages = $this->getSharedFingerprintsUsersCount($userFingerprint);
-                if ($fingerprintUsages >= $maxSiblingAccounts) {
+                if ($this->checkMaxSharedFingerprintsExceeded($userFingerprint, $maxSiblingAccounts)) {
                     Gdn::userModel()->addRoles($userID, [RoleModel::APPLICANT_ID], true);
                 }
             }
@@ -656,7 +649,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
     public function banModel_banWhere_handler(array $result, array $ban): array {
         switch (strtolower($ban['BanType'])) {
             case 'fingerprint':
-                $result['u.Fingerprint like'] = $ban['BanValue'];
+                $result['u.Fingerprint'] = $ban['BanValue'];
                 break;
         }
         return $result;
