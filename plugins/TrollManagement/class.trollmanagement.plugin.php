@@ -665,7 +665,6 @@ class TrollManagementPlugin extends Gdn_Plugin {
     public function userModel_searchKeyWords_handler(array $like, string $keywords): array {
         $whereCriterias = [];
 
-//        $whereCriterias['like'] = $like;
         $whereCriterias['where']['u.Fingerprint'] = $keywords;
 
         return $whereCriterias;
