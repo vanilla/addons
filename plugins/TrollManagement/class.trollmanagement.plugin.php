@@ -524,6 +524,9 @@ class TrollManagementPlugin extends Gdn_Plugin {
             $configurationModel->Validation->applyRule('TrollManagement.PerFingerPrint.Enabled', 'Boolean');
 
             if ($sender->Form->getFormValue('TrollManagement.PerFingerPrint.Enabled')) {
+                //add custom validation rule
+                $configurationModel->Validation->addRule('validatePositiveNumber', 'function:validatePositiveNumber');
+
                 $configurationModel->Validation->applyRule('TrollManagement.PerFingerPrint.MaxUserAccounts', 'Required');
                 $configurationModel->Validation->applyRule('TrollManagement.PerFingerPrint.MaxUserAccounts', 'Integer');
                 $configurationModel->Validation->applyRule(
@@ -571,19 +574,19 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @return bool
      */
     private function checkMaxSharedFingerprintsExceeded($fingerprint, int $maxSiblingAccounts): bool {
-        if (!is_null($fingerprint)) {
-            $sql = clone Gdn::sql();
-            $sql->reset();
-            $users = $sql
-                ->select('userID')
-                ->from('User')
-                ->where('Fingerprint', $fingerprint)
-                ->limit($maxSiblingAccounts)
-                ->get()->resultArray();
-                //firstRow(DATASET_TYPE_ARRAY);
-            return (count($users) == $maxSiblingAccounts);
+        if (is_null($fingerprint)) {
+            return false;
         }
-        return false;
+
+        $sql = clone Gdn::sql();
+        $sql->reset();
+        $users = $sql
+            ->select('userID')
+            ->from('User')
+            ->where('Fingerprint', $fingerprint)
+            ->limit($maxSiblingAccounts)
+            ->get()->resultArray();
+        return (count($users) == $maxSiblingAccounts);
     }
 
     /**
@@ -679,5 +682,17 @@ class TrollManagementPlugin extends Gdn_Plugin {
     public function userController_usersListAllowedSorting(array $allowedSorting): array {
         $allowedSorting['Fingerprint'] = 'desc';
         return $allowedSorting;
+    }
+}
+
+if (!function_exists('validatePositiveNumber')) {
+    /**
+     * Validate if number is positive
+     *
+     * @param int|string $number
+     * @return bool
+     */
+    function validatePositiveNumber($number): bool {
+        return (is_numeric($number) && (int)$number > 0);
     }
 }
