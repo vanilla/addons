@@ -565,7 +565,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
     public function base_applicantInfo_handler($sender, $args) {
         if (c('TrollManagement.PerFingerPrint.Enabled', false)) {
             $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
-            $userFingerprint = val('Fingerprint', $args['User']);
+            $userFingerprint = val('Fingerprint', $args['User'], '');
             if (!empty($userFingerprint)) {
                 if ($this->checkMaxSharedFingerprintsExceeded($userFingerprint, $maxSiblingAccounts)) {
                     $sender->EventArguments['ApplicantMeta'][t("Fingerprint issue")] = sprintf(
@@ -580,11 +580,11 @@ class TrollManagementPlugin extends Gdn_Plugin {
     /**
      * Checks if the maximum amount of accounts using the same fingerprint has been reached.
      *
-     * @param null|string $fingerprint
+     * @param string $fingerprint
      * @param int $maxSiblingAccounts
      * @return bool
      */
-    private function checkMaxSharedFingerprintsExceeded($fingerprint, int $maxSiblingAccounts): bool {
+    private function checkMaxSharedFingerprintsExceeded(string $fingerprint, int $maxSiblingAccounts): bool {
         if (is_null($fingerprint)) {
             return false;
         }
