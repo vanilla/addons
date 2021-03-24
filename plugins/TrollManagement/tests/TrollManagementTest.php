@@ -7,11 +7,14 @@
 
 namespace VanillaTests\TrollManagement;
 
+use Garden\Container\Container;
 use UserModel;
 use RoleModel;
 use BanModel;
+use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestCase;
+use VanillaTests\TestInstallModel;
 
 /**
  * Class TrollManagementTest
@@ -22,8 +25,36 @@ class TrollManagementTest extends SiteTestCase {
     /** @var UserModel */
     protected $userModel;
 
-//    /** @var BanModel */
-//    protected $banModel;
+    /** @var \TrollManagementPlugin */
+    private $trollManagementPlugin;
+
+//    /**
+//     * Configure the container before addons are started.
+//     *
+//     * @param Container $container
+//     */
+//    public static function configureContainerBeforeStartup(Container $container) {
+//        $container->rule(TestInstallModel::class)
+//            ->addCall("setConfigDefaults", [self::CONFIG_DEFAULTS]);
+//    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUp(): void {
+        parent::setUp();
+//
+//        $this->container()->call(function (TermsManagerPlugin $termsManager, TermsManagerModel $termsManagerModel) {
+//            $this->termsManager = $termsManager;
+//            $this->termsManagerModel = $termsManagerModel;
+//        });
+//
+//        $this->termsID = $this->termsManagerModel->save(
+//            self::sprintfCounter(['Body' => 'Test %s', 'Active' => true, 'ForceRenew' => true, 'ShowInPopup' => 0])
+//        );
+        $this->createUserFixtures();
+//        $this->getSession()->end();
+    }
 
     /**
      * Setup routine, run before the test class is instantiated.
@@ -67,26 +98,53 @@ class TrollManagementTest extends SiteTestCase {
     }
 
     /**
-     * Tests the automatic assignment of the "applicant" status to EVERY new user registration.
+     * Test dashboard MaxUserAccounts' validations.
      */
-    public function testRegisterAllApplicants(): void {
+    public function testDashboardSetMaxUserAccounts(): void {
         /** @var \Gdn_Configuration $configuration */
         $configuration = static::container()->get('Config');
 
-        $configuration->set('TrollManagement.PerFingerPrint.Enabled', true);
-        $configuration->set('TrollManagement.PerFingerPrint.MaxUserAccounts', 0);
+        // As an admin...
+        $this->getSession()->start($this->adminID);
 
-        // Create 3 dummy accounts. (They should all be automatically set as "applicant")
-        $importedUsers[] = $this->insertDummyUser();
-        $importedUsers[] = $this->insertDummyUser();
-        $importedUsers[] = $this->insertDummyUser();
+        $html = $this->bessy()->getHtml('/settings/trollmanagement');
 
-        // We pull the associated user's roles.
-        foreach ($importedUsers as $importedUser) {
-            $importedUsersRolesIDs = $this->userModel->getRoleIDs($importedUser['UserID']);
-            // The dummy user account is an applicant.
-            $this->assertContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs);
-        }
+        // Test that a MaxUserAccounts of '0' fails.
+        $formValues = [
+            'TrollManagement.PerFingerPrint.Enabled' => true,
+            'TrollManagement.PerFingerPrint.MaxUserAccounts' => 0
+        ];
+
+        // Post/fail without throwing error.
+        $attempt = $this->bessy()->post(
+            '/settings/trollmanagement',
+            $formValues,
+            [TestDispatcher::OPT_THROW_FORM_ERRORS => false]
+        );
+        $firstAttemptErrorMsg = $attempt->Form->errorString();
+        // We have an error message.
+        $this->assertEquals($firstAttemptErrorMsg, "Maximum user's accounts must be a positive number.");
+        $firstAttemptMaxUserAccounts = $configuration->get('TrollManagement.PerFingerPrint.MaxUserAccounts');
+        // The MaxUserAccounts values wasn't set
+        $this->assertEquals(false, $firstAttemptMaxUserAccounts);
+
+        // Second attempt. This time we set a minimal valid MaxUserAccounts value of '1'
+        $formValues = [
+            'TrollManagement.PerFingerPrint.Enabled' => true,
+            'TrollManagement.PerFingerPrint.MaxUserAccounts' => 1
+        ];
+
+        $attempt = $this->bessy()->post(
+            '/settings/trollmanagement',
+            $formValues,
+            [TestDispatcher::OPT_THROW_FORM_ERRORS => false]
+        );
+        $secondAttemptErrorMsg = $attempt->Form->errorString();
+        // We do not have an error message.
+        $this->assertEquals($secondAttemptErrorMsg, "");
+        $secondAttemptMaxUserAccounts = $configuration->get('TrollManagement.PerFingerPrint.MaxUserAccounts');
+        // The MaxUserAccounts values was set to '1'
+        $this->assertEquals(1, $secondAttemptMaxUserAccounts);
     }
 
     /**

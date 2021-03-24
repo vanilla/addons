@@ -6,7 +6,7 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 $fingerprintsEnabled = (bool)c('TrollManagement.PerFingerPrint.Enabled');
-$textBoxAttributes = [];
+$fingerprintsChildrenAttributes = [];
 if (!$fingerprintsEnabled) {
     $fingerprintsChildrenAttributes['disabled'] = 'disabled';
 }

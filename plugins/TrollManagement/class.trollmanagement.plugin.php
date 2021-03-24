@@ -541,7 +541,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
             }
         }
 
-        $sender->render($this->getView('configuration.php'));
+        $sender->render('configuration', '', 'plugins/TrollManagement');
     }
 
     /**
