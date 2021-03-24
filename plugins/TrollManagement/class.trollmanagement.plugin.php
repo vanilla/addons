@@ -669,13 +669,11 @@ class TrollManagementPlugin extends Gdn_Plugin {
     /**
      * Add "Fingerprint" to the dashboard's users list search query.
      *
-     * @param array $like
+     * @param array $whereCriterias
      * @param string $keywords
      * @return array
      */
-    public function userModel_searchKeyWords_handler(array $like, string $keywords): array {
-        $whereCriterias = [];
-
+    public function userModel_searchKeyWords_handler(array $whereCriterias, string $keywords): array {
         $whereCriterias['where']['u.Fingerprint'] = $keywords;
 
         return $whereCriterias;
