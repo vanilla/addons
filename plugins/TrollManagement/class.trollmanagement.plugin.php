@@ -35,11 +35,22 @@ class TrollManagementPlugin extends Gdn_Plugin {
     private $session;
 
     /**
+     * @var UserModel
+     */
+    private $userModel;
+
+    /**
      * TrollManagementPlugin constructor.
      *
      * @param Gdn_Session $session Injected session.
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(Gdn_Session $session, UserModel $userModel = null) {
+        if ($userModel === null) {
+            $this->userModel = Gdn::getContainer()->get(UserModel::class);
+        } else {
+            $this->userModel = $userModel;
+        }
+
         parent::__construct();
         $this->session = $session;
     }
@@ -578,15 +589,12 @@ class TrollManagementPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $sql = clone Gdn::sql();
-        $sql->reset();
-        $users = $sql
+        $usersCount = $this->userModel->SQL
             ->select('userID')
             ->from('User')
             ->where('Fingerprint', $fingerprint)
-            ->limit($maxSiblingAccounts)
-            ->get()->resultArray();
-        return (count($users) == $maxSiblingAccounts);
+            ->limit($maxSiblingAccounts)->get()->numRows();
+        return ($usersCount == $maxSiblingAccounts);
     }
 
     /**

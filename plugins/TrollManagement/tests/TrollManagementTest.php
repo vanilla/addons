@@ -25,35 +25,12 @@ class TrollManagementTest extends SiteTestCase {
     /** @var UserModel */
     protected $userModel;
 
-    /** @var \TrollManagementPlugin */
-    private $trollManagementPlugin;
-
-//    /**
-//     * Configure the container before addons are started.
-//     *
-//     * @param Container $container
-//     */
-//    public static function configureContainerBeforeStartup(Container $container) {
-//        $container->rule(TestInstallModel::class)
-//            ->addCall("setConfigDefaults", [self::CONFIG_DEFAULTS]);
-//    }
-
     /**
      * {@inheritDoc}
      */
     public function setUp(): void {
         parent::setUp();
-//
-//        $this->container()->call(function (TermsManagerPlugin $termsManager, TermsManagerModel $termsManagerModel) {
-//            $this->termsManager = $termsManager;
-//            $this->termsManagerModel = $termsManagerModel;
-//        });
-//
-//        $this->termsID = $this->termsManagerModel->save(
-//            self::sprintfCounter(['Body' => 'Test %s', 'Active' => true, 'ForceRenew' => true, 'ShowInPopup' => 0])
-//        );
         $this->createUserFixtures();
-//        $this->getSession()->end();
     }
 
     /**
@@ -107,6 +84,8 @@ class TrollManagementTest extends SiteTestCase {
         // As an admin...
         $this->getSession()->start($this->adminID);
 
+        $preExistingMaxUserAccounts = $configuration->get('TrollManagement.PerFingerPrint.MaxUserAccounts');
+
         $html = $this->bessy()->getHtml('/settings/trollmanagement');
 
         // Test that a MaxUserAccounts of '0' fails.
@@ -125,8 +104,8 @@ class TrollManagementTest extends SiteTestCase {
         // We have an error message.
         $this->assertEquals($firstAttemptErrorMsg, "Maximum user's accounts must be a positive number.");
         $firstAttemptMaxUserAccounts = $configuration->get('TrollManagement.PerFingerPrint.MaxUserAccounts');
-        // The MaxUserAccounts values wasn't set
-        $this->assertEquals(false, $firstAttemptMaxUserAccounts);
+        // The MaxUserAccounts values is still the same as it was when starting the test.
+        $this->assertEquals($preExistingMaxUserAccounts, $firstAttemptMaxUserAccounts);
 
         // Second attempt. This time we set a minimal valid MaxUserAccounts value of '1'
         $formValues = [
