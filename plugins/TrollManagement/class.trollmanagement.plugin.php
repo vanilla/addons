@@ -39,14 +39,11 @@ class TrollManagementPlugin extends Gdn_Plugin {
      */
     private $userModel;
 
-
     /**
      * TrollManagementPlugin constructor.
      *
      * @param Gdn_Session $session Injected session.
      * @param UserModel|null $userModel
-     * @throws ContainerException
-     * @throws NotFoundException
      */
     public function __construct(Gdn_Session $session, UserModel $userModel = null) {
         if ($userModel === null) {
@@ -569,7 +566,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
     public function base_applicantInfo_handler($sender, $args) {
         if (c('TrollManagement.PerFingerPrint.Enabled', false)) {
             $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
-            $userFingerprint = val('Fingerprint', $args['User'], '');
+            $userFingerprint = $args['User']['Fingerprint'] ?? '';
             if (!empty($userFingerprint)) {
                 if ($this->checkMaxSharedFingerprintsExceeded($userFingerprint, $maxSiblingAccounts)) {
                     $sender->EventArguments['ApplicantMeta'][t("Fingerprint issue")] = sprintf(
