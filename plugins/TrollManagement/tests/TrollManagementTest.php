@@ -86,8 +86,6 @@ class TrollManagementTest extends SiteTestCase {
 
         $preExistingMaxUserAccounts = $configuration->get('TrollManagement.PerFingerPrint.MaxUserAccounts');
 
-        $html = $this->bessy()->getHtml('/settings/trollmanagement');
-
         // Test that a MaxUserAccounts of '0' fails.
         $formValues = [
             'TrollManagement.PerFingerPrint.Enabled' => true,
