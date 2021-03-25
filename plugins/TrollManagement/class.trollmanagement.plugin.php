@@ -39,10 +39,14 @@ class TrollManagementPlugin extends Gdn_Plugin {
      */
     private $userModel;
 
+
     /**
      * TrollManagementPlugin constructor.
      *
      * @param Gdn_Session $session Injected session.
+     * @param UserModel|null $userModel
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public function __construct(Gdn_Session $session, UserModel $userModel = null) {
         if ($userModel === null) {
