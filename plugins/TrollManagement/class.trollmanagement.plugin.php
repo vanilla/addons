@@ -462,7 +462,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param DiscussionModel $sender
      * @param array $args
      */
-    public function discussionModel_BeforeNotification_handler(DiscussionModel $sender, array &$args) {
+    public function discussionModel_BeforeNotification_handler(DiscussionModel $sender, array $args) {
         $discussion = $args['Discussion'];
         $this->checkTroll($discussion['InsertUserID'], $args);
     }
@@ -473,7 +473,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param CommentModel $sender
      * @param array $args
      */
-    public function commentModel_BeforeNotification_handler(CommentModel $sender, array &$args) {
+    public function commentModel_BeforeNotification_handler(CommentModel $sender, array $args) {
         $comment = $args['Comment'];
         $this->checkTroll($comment['InsertUserID'], $args);
     }
@@ -484,7 +484,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param ActivityModel $sender
      * @param array $args
      */
-    public function activityModel_beforeWallNotificationSend_handler(ActivityModel $sender, array &$args) {
+    public function activityModel_beforeWallNotificationSend_handler(ActivityModel $sender, array $args) {
         $activity = $args['Activity'];
         $this->checkTroll($activity['ActivityUserID'], $args);
     }
@@ -500,7 +500,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
             return;
         }
         $userModel = $args['UserModel'];
-        $user = $userModel->get($userID);
+        $user = $userModel->getID($userID);
         if ($user && $user->Troll === 1) {
             $args['IsValid'] = false;
         }
@@ -590,11 +590,13 @@ class TrollManagementPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $usersCount = $this->userModel->SQL
-            ->select('userID')
-            ->from('User')
-            ->where('Fingerprint', $fingerprint)
-            ->limit($maxSiblingAccounts + 1)->get()->numRows();
+        $usersCount = $this->userModel->getWhere(
+            ['Fingerprint' => $fingerprint],
+            '',
+            '',
+            $maxSiblingAccounts + 1)
+            ->numRows();
+
         return ($usersCount > $maxSiblingAccounts);
     }
 
@@ -689,17 +691,5 @@ class TrollManagementPlugin extends Gdn_Plugin {
     public function userController_usersListAllowedSorting(array $allowedSorting): array {
         $allowedSorting['Fingerprint'] = 'desc';
         return $allowedSorting;
-    }
-}
-
-if (!function_exists('validatePositiveNumber')) {
-    /**
-     * Validate if number is positive
-     *
-     * @param int|string $number
-     * @return bool
-     */
-    function validatePositiveNumber($number): bool {
-        return (is_numeric($number) && (int)$number > 0);
     }
 }

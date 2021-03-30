@@ -37,9 +37,18 @@ class TrollManagementTest extends SiteTestCase {
      * Setup routine, run before the test class is instantiated.
      */
     public static function setupBeforeClass(): void {
-        self::$addons = ['vanilla', 'trollmanagement'];
+        self::$addons = ['trollmanagement'];
 
         parent::setupBeforeClass();
+    }
+
+    /**
+     * Reset a few of the environment's key elements
+     */
+    public function tearDown(): void {
+        parent::tearDown();
+        // Remove the cookie value that's used for user's fingerprints/
+        unset($_COOKIE['__vnf']);
     }
 
     /**
@@ -70,7 +79,7 @@ class TrollManagementTest extends SiteTestCase {
         $this->assertNotContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs['0']);
         // The SECOND dummy user account is NOT an applicant
         $this->assertNotContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs['1']);
-        // The THIRD dummy user account should an applicant
+        // The THIRD dummy user account should be an applicant
         $this->assertContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs['2']);
     }
 
