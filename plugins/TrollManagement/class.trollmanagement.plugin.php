@@ -585,7 +585,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param int $maxSiblingAccounts
      * @return bool
      */
-    private function checkMaxSharedFingerprintsExceeded(string $fingerprint, int $maxSiblingAccounts): bool {
+    private function checkMaxSharedFingerprintsExceeded(?string $fingerprint, int $maxSiblingAccounts): bool {
         if (is_null($fingerprint)) {
             return false;
         }
