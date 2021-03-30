@@ -160,7 +160,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Set a fingerprint to the user. See setFingerPrint();
+     * Set a fingerprint to the user. See setFingerprint();
      *
      * @param Gdn_Controller $sender
      */
@@ -523,8 +523,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
         $configurationModel = new Gdn_ConfigurationModel($validation);
 
         $configurationModel->setField([
-            'TrollManagement.PerFingerPrint.Enabled' => c('TrollManagement.PerFingerPrint.Enabled', false),
-            'TrollManagement.PerFingerPrint.MaxUserAccounts' => c('TrollManagement.PerFingerPrint.MaxUserAccounts', 5),
+            'TrollManagement.PerFingerPrint.Enabled' => c('TrollManagement.PerFingerprint.Enabled', false),
+            'TrollManagement.PerFingerPrint.MaxUserAccounts' => c('TrollManagement.PerFingerprint.MaxUserAccounts', 5),
         ]);
 
         $sender->Form->setModel($configurationModel);
@@ -533,16 +533,16 @@ class TrollManagementPlugin extends Gdn_Plugin {
         if ($sender->Form->authenticatedPostBack() === false) {
             $sender->Form->setData($configurationModel->Data);
         } else {
-            $configurationModel->Validation->applyRule('TrollManagement.PerFingerPrint.Enabled', 'Boolean');
+            $configurationModel->Validation->applyRule('TrollManagement.PerFingerprint.Enabled', 'Boolean');
 
-            if ($sender->Form->getFormValue('TrollManagement.PerFingerPrint.Enabled')) {
+            if ($sender->Form->getFormValue('TrollManagement.PerFingerprint.Enabled')) {
                 //add custom validation rule
                 $configurationModel->Validation->addRule('validatePositiveNumber', 'function:validatePositiveNumber');
 
-                $configurationModel->Validation->applyRule('TrollManagement.PerFingerPrint.MaxUserAccounts', 'Required');
-                $configurationModel->Validation->applyRule('TrollManagement.PerFingerPrint.MaxUserAccounts', 'Integer');
+                $configurationModel->Validation->applyRule('TrollManagement.PerFingerprint.MaxUserAccounts', 'Required');
+                $configurationModel->Validation->applyRule('TrollManagement.PerFingerprint.MaxUserAccounts', 'Integer');
                 $configurationModel->Validation->applyRule(
-                    'TrollManagement.PerFingerPrint.MaxUserAccounts',
+                    'TrollManagement.PerFingerprint.MaxUserAccounts',
                     'validatePositiveNumber',
                     sprintf(t('%s must be a positive number.'), t("Maximum user's accounts"))
                 );
@@ -564,8 +564,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function base_applicantInfo_handler($sender, $args) {
-        if (c('TrollManagement.PerFingerPrint.Enabled', false)) {
-            $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
+        if (c('TrollManagement.PerFingerprint.Enabled', false)) {
+            $maxSiblingAccounts = c('TrollManagement.PerFingerprint.MaxUserAccounts');
             $userFingerprint = $args['User']['Fingerprint'] ?? '';
             if (!empty($userFingerprint)) {
                 if ($this->checkMaxSharedFingerprintsExceeded($userFingerprint, $maxSiblingAccounts)) {
@@ -585,7 +585,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param int $maxSiblingAccounts
      * @return bool
      */
-    private function checkMaxSharedFingerprintsExceeded(string $fingerprint, int $maxSiblingAccounts): bool {
+    private function checkMaxSharedFingerprintsExceeded(?string $fingerprint, int $maxSiblingAccounts): bool {
         if (is_null($fingerprint)) {
             return false;
         }
@@ -594,8 +594,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
             ->select('userID')
             ->from('User')
             ->where('Fingerprint', $fingerprint)
-            ->limit($maxSiblingAccounts)->get()->numRows();
-        return ($usersCount == $maxSiblingAccounts);
+            ->limit($maxSiblingAccounts + 1)->get()->numRows();
+        return ($usersCount > $maxSiblingAccounts);
     }
 
     /**
@@ -610,8 +610,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
         $userID = $args['UserID'];
         $userFingerprint = $this->setFingerprint($userID);
 
-        if (c('TrollManagement.PerFingerPrint.Enabled', false) == true) {
-            $maxSiblingAccounts = c('TrollManagement.PerFingerPrint.MaxUserAccounts');
+        if (c('TrollManagement.PerFingerprint.Enabled', false) == true) {
+            $maxSiblingAccounts = c('TrollManagement.PerFingerprint.MaxUserAccounts');
             if ($userFingerprint !== false) {
                 if ($this->checkMaxSharedFingerprintsExceeded($userFingerprint, $maxSiblingAccounts)) {
                     Gdn::userModel()->addRoles($userID, [RoleModel::APPLICANT_ID], true);

@@ -5,7 +5,7 @@
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
-$fingerprintsEnabled = (bool)c('TrollManagement.PerFingerPrint.Enabled');
+$fingerprintsEnabled = (bool)c('TrollManagement.PerFingerprint.Enabled');
 $fingerprintsChildrenAttributes = [];
 if (!$fingerprintsEnabled) {
     $fingerprintsChildrenAttributes['disabled'] = 'disabled';
@@ -15,7 +15,7 @@ if (!$fingerprintsEnabled) {
     <li class="form-group">
 <?php
         echo $this->Form->toggle(
-            'TrollManagement.PerFingerPrint.Enabled',
+            'TrollManagement.PerfingerPrint.Enabled',
             t('Enable fingerprint checks.'),
             [
                 'id' => 'IsFingerprintChecksEnabled',
@@ -28,9 +28,9 @@ if (!$fingerprintsEnabled) {
 <?php
         echo $this->Form->labelWrap(
             t('Maximum allowed number of user accounts tied to a single fingerprint.'),
-            'TrollManagement.PerFingerPrint.MaxUserAccounts'
+            'TrollManagement.PerFingerprint.MaxUserAccounts'
         );
-        echo $this->Form->textBoxWrap('TrollManagement.PerFingerPrint.MaxUserAccounts', $fingerprintsChildrenAttributes);
+        echo $this->Form->textBoxWrap('TrollManagement.PerFingerprint.MaxUserAccounts', $fingerprintsChildrenAttributes);
 ?>
     </li>
 </ul>

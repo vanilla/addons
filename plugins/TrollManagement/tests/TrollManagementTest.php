@@ -50,8 +50,8 @@ class TrollManagementTest extends SiteTestCase {
         /** @var \Gdn_Configuration $configuration */
         $configuration = static::container()->get('Config');
 
-        $configuration->set('TrollManagement.PerFingerPrint.Enabled', true);
-        $configuration->set('TrollManagement.PerFingerPrint.MaxUserAccounts', 3);
+        $configuration->set('TrollManagement.PerFingerprint.Enabled', true);
+        $configuration->set('TrollManagement.PerFingerprint.MaxUserAccounts', 2);
 
         // Ensure all future registered dummy users uses the same fingerprint.
         $_COOKIE['__vnf'] = 'THISISAFAKEFINGERPRINT';
@@ -84,12 +84,12 @@ class TrollManagementTest extends SiteTestCase {
         // As an admin...
         $this->getSession()->start($this->adminID);
 
-        $preExistingMaxUserAccounts = $configuration->get('TrollManagement.PerFingerPrint.MaxUserAccounts');
+        $preExistingMaxUserAccounts = $configuration->get('TrollManagement.PerFingerprint.MaxUserAccounts');
 
         // Test that a MaxUserAccounts of '0' fails.
         $formValues = [
-            'TrollManagement.PerFingerPrint.Enabled' => true,
-            'TrollManagement.PerFingerPrint.MaxUserAccounts' => 0
+            'TrollManagement.PerFingerprint.Enabled' => true,
+            'TrollManagement.PerFingerprint.MaxUserAccounts' => 0
         ];
 
         // Post/fail without throwing error.
@@ -101,14 +101,14 @@ class TrollManagementTest extends SiteTestCase {
         $firstAttemptErrorMsg = $attempt->Form->errorString();
         // We have an error message.
         $this->assertEquals($firstAttemptErrorMsg, "Maximum user's accounts must be a positive number.");
-        $firstAttemptMaxUserAccounts = $configuration->get('TrollManagement.PerFingerPrint.MaxUserAccounts');
+        $firstAttemptMaxUserAccounts = $configuration->get('TrollManagement.PerFingerprint.MaxUserAccounts');
         // The MaxUserAccounts values is still the same as it was when starting the test.
         $this->assertEquals($preExistingMaxUserAccounts, $firstAttemptMaxUserAccounts);
 
         // Second attempt. This time we set a minimal valid MaxUserAccounts value of '1'
         $formValues = [
-            'TrollManagement.PerFingerPrint.Enabled' => true,
-            'TrollManagement.PerFingerPrint.MaxUserAccounts' => 1
+            'TrollManagement.PerFingerprint.Enabled' => true,
+            'TrollManagement.PerFingerprint.MaxUserAccounts' => 1
         ];
 
         $attempt = $this->bessy()->post(
@@ -119,7 +119,7 @@ class TrollManagementTest extends SiteTestCase {
         $secondAttemptErrorMsg = $attempt->Form->errorString();
         // We do not have an error message.
         $this->assertEquals($secondAttemptErrorMsg, "");
-        $secondAttemptMaxUserAccounts = $configuration->get('TrollManagement.PerFingerPrint.MaxUserAccounts');
+        $secondAttemptMaxUserAccounts = $configuration->get('TrollManagement.PerFingerprint.MaxUserAccounts');
         // The MaxUserAccounts values was set to '1'
         $this->assertEquals(1, $secondAttemptMaxUserAccounts);
     }
@@ -132,8 +132,8 @@ class TrollManagementTest extends SiteTestCase {
         /** @var \Gdn_Configuration $configuration */
         $configuration = static::container()->get('Config');
 
-        $configuration->set('TrollManagement.PerFingerPrint.Enabled', false);
-        $configuration->set('TrollManagement.PerFingerPrint.MaxUserAccounts', 1);
+        $configuration->set('TrollManagement.PerFingerprint.Enabled', false);
+        $configuration->set('TrollManagement.PerFingerprint.MaxUserAccounts', 1);
 
         // Ensure all future registered dummy users uses the same fingerprint.
         $_COOKIE['__vnf'] = 'THISISAFAKEFINGERPRINT';
