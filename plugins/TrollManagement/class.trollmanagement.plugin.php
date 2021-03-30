@@ -462,7 +462,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param DiscussionModel $sender
      * @param array $args
      */
-    public function discussionModel_BeforeNotification_handler(DiscussionModel $sender, array $args) {
+    public function discussionModel_BeforeNotification_handler($sender, $args) {
         $discussion = $args['Discussion'];
         $this->checkTroll($discussion['InsertUserID'], $args);
     }
@@ -473,7 +473,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param CommentModel $sender
      * @param array $args
      */
-    public function commentModel_BeforeNotification_handler(CommentModel $sender, array $args) {
+    public function commentModel_BeforeNotification_handler($sender, $args) {
         $comment = $args['Comment'];
         $this->checkTroll($comment['InsertUserID'], $args);
     }
@@ -594,8 +594,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
             ['Fingerprint' => $fingerprint],
             '',
             '',
-            $maxSiblingAccounts + 1)
-            ->numRows();
+            $maxSiblingAccounts + 1
+        )->numRows();
 
         return ($usersCount > $maxSiblingAccounts);
     }
