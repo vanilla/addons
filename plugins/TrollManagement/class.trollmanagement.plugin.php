@@ -462,7 +462,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param DiscussionModel $sender
      * @param array $args
      */
-    public function discussionModel_beforeNotification_handler($sender, $args) {
+    public function discussionModel_BeforeNotification_handler(DiscussionModel $sender, array &$args) {
         $discussion = $args['Discussion'];
         $this->checkTroll($discussion['InsertUserID'], $args);
     }
@@ -473,7 +473,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param CommentModel $sender
      * @param array $args
      */
-    public function commentModel_beforeNotification_handler($sender, $args) {
+    public function commentModel_BeforeNotification_handler(CommentModel $sender, array &$args) {
         $comment = $args['Comment'];
         $this->checkTroll($comment['InsertUserID'], $args);
     }
@@ -484,7 +484,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * @param ActivityModel $sender
      * @param array $args
      */
-    public function activityModel_beforeWallNotificationSend_handler(ActivityModel $sender, array $args) {
+    public function activityModel_beforeWallNotificationSend_handler(ActivityModel $sender, array &$args) {
         $activity = $args['Activity'];
         $this->checkTroll($activity['ActivityUserID'], $args);
     }
