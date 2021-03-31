@@ -35,11 +35,23 @@ class TrollManagementPlugin extends Gdn_Plugin {
     private $session;
 
     /**
+     * @var UserModel
+     */
+    private $userModel;
+
+    /**
      * TrollManagementPlugin constructor.
      *
      * @param Gdn_Session $session Injected session.
+     * @param UserModel|null $userModel
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(Gdn_Session $session, UserModel $userModel = null) {
+        if ($userModel === null) {
+            $this->userModel = Gdn::getContainer()->get(UserModel::class);
+        } else {
+            $this->userModel = $userModel;
+        }
+
         parent::__construct();
         $this->session = $session;
     }
@@ -55,6 +67,18 @@ class TrollManagementPlugin extends Gdn_Plugin {
      * Database structure: on update
      */
     public function structure() {
+        $colBanType = Gdn::structure()->get('Ban')->columns('BanType');
+        $BanTypes = $colBanType->Enum;
+
+        if (!in_array('Fingerprint', $BanTypes)) {
+            $BanTypes[] = 'Fingerprint';
+
+            Gdn::structure()
+                ->table('Ban')
+                ->column('BanType', $BanTypes, false, 'unique')
+                ->set();
+        }
+
         Gdn::structure()
             ->table('User')
             ->column('Troll', 'int', '0')
@@ -136,7 +160,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Fingerprint the user.
+     * Set a fingerprint to the user. See setFingerprint();
      *
      * @param Gdn_Controller $sender
      */
@@ -145,6 +169,19 @@ class TrollManagementPlugin extends Gdn_Plugin {
         if (!Gdn::session()->isValid()) {
             return;
         }
+        $this->setFingerprint();
+    }
+
+    /**
+     * Set and return a Fingerprint to the provided userID's (or in session, when null) user.
+     *
+     * @param int|null $userID
+     * @return string Fingerprint
+     * @throws ContainerException Throws exception if there's a problem getting a container.
+     * @throws NotFoundException Throws exception if there's a problem getting a container.
+     */
+    private function setFingerprint($userID = null): string {
+        $userID = $userID ?? Gdn::session()->UserID;
 
         $cookieFingerprint = val('__vnf', $_COOKIE, null);
         $databaseFingerprint = val('Fingerprint', Gdn::session()->User, null);
@@ -153,26 +190,25 @@ class TrollManagementPlugin extends Gdn_Plugin {
         // Cookie and user record both empty, assign both
         if (empty($cookieFingerprint) && empty($databaseFingerprint)) {
             $databaseFingerprint = uniqid();
-            Gdn::sql()->update('User', ['Fingerprint' => $databaseFingerprint], ['UserID' => Gdn::session()->UserID])->put();
+            Gdn::sql()->update('User', ['Fingerprint' => $databaseFingerprint], ['UserID' => $userID])->put();
             safeCookie('__vnf', $databaseFingerprint, $expires);
-            return;
+            return $databaseFingerprint;
         }
 
         // If the cookie exists...
         if (!empty($cookieFingerprint)) {
-
             // If the cookie disagrees with the database, update the database
             if ($databaseFingerprint != $cookieFingerprint) {
-                Gdn::sql()->update('User', ['Fingerprint' => $cookieFingerprint], ['UserID' => Gdn::session()->UserID])->put();
+                Gdn::sql()->update('User', ['Fingerprint' => $cookieFingerprint], ['UserID' => $userID])->put();
+                return $cookieFingerprint;
             }
-
-        // If only the user record exists, propagate it to the cookie
         } else if (!empty($databaseFingerprint)) {
-
-            // Propagate it to the cookie
+            // If only the user record exists, propagate it to the cookie
             safeCookie('__vnf', $databaseFingerprint, $expires);
+            return $databaseFingerprint;
         }
 
+        return false;
     }
 
     /**
@@ -464,9 +500,196 @@ class TrollManagementPlugin extends Gdn_Plugin {
             return;
         }
         $userModel = $args['UserModel'];
-        $user = $userModel->get($userID);
+        $user = $userModel->getID($userID);
         if ($user && $user->Troll === 1) {
             $args['IsValid'] = false;
         }
+    }
+
+    /**
+     * Add a configuration popup to the Troll Management plugin.
+     *
+     * @param Controller $sender
+     */
+    public function settingsController_trollManagement_create($sender) {
+        // Prevent non-admins from accessing this page
+        $sender->permission('Garden.Settings.Manage');
+
+        $sender->title(sprintf(t('%s settings'), t('Troll Management')));
+        $sender->setData('PluginDescription', $this->getPluginKey('Description'));
+
+        $sender->Form = new Gdn_Form();
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+
+        $configurationModel->setField([
+            'TrollManagement.PerFingerPrint.Enabled' => c('TrollManagement.PerFingerprint.Enabled', false),
+            'TrollManagement.PerFingerPrint.MaxUserAccounts' => c('TrollManagement.PerFingerprint.MaxUserAccounts', 5),
+        ]);
+
+        $sender->Form->setModel($configurationModel);
+
+        // If seeing the form for the first time...
+        if ($sender->Form->authenticatedPostBack() === false) {
+            $sender->Form->setData($configurationModel->Data);
+        } else {
+            $configurationModel->Validation->applyRule('TrollManagement.PerFingerprint.Enabled', 'Boolean');
+
+            if ($sender->Form->getFormValue('TrollManagement.PerFingerprint.Enabled')) {
+                //add custom validation rule
+                $configurationModel->Validation->addRule('validatePositiveNumber', 'function:validatePositiveNumber');
+
+                $configurationModel->Validation->applyRule('TrollManagement.PerFingerprint.MaxUserAccounts', 'Required');
+                $configurationModel->Validation->applyRule('TrollManagement.PerFingerprint.MaxUserAccounts', 'Integer');
+                $configurationModel->Validation->applyRule(
+                    'TrollManagement.PerFingerprint.MaxUserAccounts',
+                    'validatePositiveNumber',
+                    sprintf(t('%s must be a positive number.'), t("Maximum user's accounts"))
+                );
+            }
+
+            if ($sender->Form->save()) {
+                $sender->StatusMessage = t('Your changes have been saved.');
+            }
+        }
+
+        $sender->render('configuration', '', 'plugins/TrollManagement');
+    }
+
+    /**
+     * Add a _probable_ justification as to why a user's is on the applicant's list if there are too many user
+     * accounts using the same fingerprint.
+     *
+     * @param Controller $sender
+     * @param array $args
+     */
+    public function base_applicantInfo_handler($sender, $args) {
+        if (c('TrollManagement.PerFingerprint.Enabled', false)) {
+            $maxSiblingAccounts = c('TrollManagement.PerFingerprint.MaxUserAccounts');
+            $userFingerprint = $args['User']['Fingerprint'] ?? '';
+            if (!empty($userFingerprint)) {
+                if ($this->checkMaxSharedFingerprintsExceeded($userFingerprint, $maxSiblingAccounts)) {
+                    $sender->EventArguments['ApplicantMeta'][t("Fingerprint issue")] = sprintf(
+                        t("Too many accounts are using the '%s' fingerprint."),
+                        $userFingerprint
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if the maximum amount of accounts using the same fingerprint has been reached.
+     *
+     * @param string $fingerprint
+     * @param int $maxSiblingAccounts
+     * @return bool
+     */
+    private function checkMaxSharedFingerprintsExceeded(?string $fingerprint, int $maxSiblingAccounts): bool {
+        if (is_null($fingerprint)) {
+            return false;
+        }
+
+        $usersCount = $this->userModel->getWhere(
+            ['Fingerprint' => $fingerprint],
+            '',
+            '',
+            $maxSiblingAccounts + 1
+        )->numRows();
+
+        return ($usersCount > $maxSiblingAccounts);
+    }
+
+    /**
+     * Upon user registration, we trigger an early Fingerprint tag & we check if this new registration trips the
+     * maximum amount of user accounts allowed for a single fingerprint. If it is, we give this new user the
+     * 'Applicant' role.
+     *
+     * @param UserModel $sender
+     * @param array $args
+     */
+    public function userModel_afterRegister_handler($sender, $args) {
+        $userID = $args['UserID'];
+        $userFingerprint = $this->setFingerprint($userID);
+
+        if (c('TrollManagement.PerFingerprint.Enabled', false) == true) {
+            $maxSiblingAccounts = c('TrollManagement.PerFingerprint.MaxUserAccounts');
+            if ($userFingerprint !== false) {
+                if ($this->checkMaxSharedFingerprintsExceeded($userFingerprint, $maxSiblingAccounts)) {
+                    Gdn::userModel()->addRoles($userID, [RoleModel::APPLICANT_ID], true);
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds "Fingerprint" to the allowed banTypes of the "Ban Rules" dashboard interface.
+     *
+     * @param array $banTypes
+     * @return array
+     */
+    public function settingsController_listBanTypes(array $banTypes): array {
+        $banTypes['Fingerprint'] = t('Fingerprint');
+        return $banTypes;
+    }
+
+    /**
+     * Either add "Fingerprint" row header or an fingerprint value to the dashboard's list of users.
+     *
+     * @param Controller $sender
+     * @param array $args
+     */
+    public function base_userCell_handler($sender, $args) {
+        // If we have user data, we create a cell containing the fingerprint.
+        if (isset($args['User'])) {
+            echo '<td>' . val('Fingerprint', $args['User']) . '</td>';
+        } else {
+            // Otherwise, we output a column header.
+            $get = Gdn::request()->get();
+            $get['order'] = 'Fingerprint';
+            $orderUrl = '/dashboard/user?'.http_build_query($get);
+
+            echo '<th class="column-md">' . anchor(t('Fingerprint'), $orderUrl) . '</th>';
+        }
+    }
+
+    /**
+     * Add "Fingerprint" to the possible ban query.
+     *
+     * @param array $result
+     * @param array $ban
+     * @return array
+     */
+    public function banModel_banWhere_handler(array $result, array $ban): array {
+        switch (strtolower($ban['BanType'])) {
+            case 'fingerprint':
+                $result['u.Fingerprint'] = $ban['BanValue'];
+                break;
+        }
+        return $result;
+    }
+
+    /**
+     * Add "Fingerprint" to the dashboard's users list search query.
+     *
+     * @param array $whereCriterias
+     * @param string $keywords
+     * @return array
+     */
+    public function userModel_searchKeyWords_handler(array $whereCriterias, string $keywords): array {
+        $whereCriterias['where']['u.Fingerprint'] = $keywords;
+
+        return $whereCriterias;
+    }
+
+    /**
+     * Add ordering users by Fingerprint in the dashboard's users list.
+     *
+     * @param array $allowedSorting
+     * @return array
+     */
+    public function userController_usersListAllowedSorting(array $allowedSorting): array {
+        $allowedSorting['Fingerprint'] = 'desc';
+        return $allowedSorting;
     }
 }
