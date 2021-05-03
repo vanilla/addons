@@ -15,7 +15,7 @@ if (!$fingerprintsEnabled) {
     <li class="form-group">
 <?php
         echo $this->Form->toggle(
-            'TrollManagement.PerfingerPrint.Enabled',
+            'TrollManagement.PerFingerprint.Enabled',
             t('Enable fingerprint checks.'),
             [
                 'id' => 'IsFingerprintChecksEnabled',
