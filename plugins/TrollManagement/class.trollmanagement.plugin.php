@@ -523,8 +523,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
         $configurationModel = new Gdn_ConfigurationModel($validation);
 
         $configurationModel->setField([
-            'TrollManagement.PerFingerPrint.Enabled' => c('TrollManagement.PerFingerprint.Enabled', false),
-            'TrollManagement.PerFingerPrint.MaxUserAccounts' => c('TrollManagement.PerFingerprint.MaxUserAccounts', 5),
+            'TrollManagement.PerFingerprint.Enabled' => c('TrollManagement.PerFingerprint.Enabled', false),
+            'TrollManagement.PerFingerprint.MaxUserAccounts' => c('TrollManagement.PerFingerprint.MaxUserAccounts', 5),
         ]);
 
         $sender->Form->setModel($configurationModel);
