@@ -523,8 +523,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
         $configurationModel = new Gdn_ConfigurationModel($validation);
 
         $configurationModel->setField([
-            'TrollManagement.PerFingerPrint.Enabled' => c('TrollManagement.PerFingerprint.Enabled', false),
-            'TrollManagement.PerFingerPrint.MaxUserAccounts' => c('TrollManagement.PerFingerprint.MaxUserAccounts', 5),
+            'TrollManagement.PerFingerprint.Enabled' => c('TrollManagement.PerFingerprint.Enabled', false),
+            'TrollManagement.PerFingerprint.MaxUserAccounts' => c('TrollManagement.PerFingerprint.MaxUserAccounts', 5),
         ]);
 
         $sender->Form->setModel($configurationModel);
@@ -566,14 +566,14 @@ class TrollManagementPlugin extends Gdn_Plugin {
     public function base_applicantInfo_handler($sender, $args) {
         if (c('TrollManagement.PerFingerprint.Enabled', false)) {
             $maxSiblingAccounts = c('TrollManagement.PerFingerprint.MaxUserAccounts');
-            $userFingerprint = $args['User']['Fingerprint'] ?? '';
+            $userFingerprint = $args['User']->Fingerprint ?? '';
             if (!empty($userFingerprint)) {
                 if ($this->checkMaxSharedFingerprintsExceeded($userFingerprint, $maxSiblingAccounts)) {
                     $sender->EventArguments['ApplicantMeta'][t("Fingerprint issue")] = sprintf(
                         t("Too many accounts are using the '%s' fingerprint."),
                         $userFingerprint
                     );
-                }
+                }cd
             }
         }
     }
