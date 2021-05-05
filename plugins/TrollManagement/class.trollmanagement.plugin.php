@@ -573,7 +573,7 @@ class TrollManagementPlugin extends Gdn_Plugin {
                         t("Too many accounts are using the '%s' fingerprint."),
                         $userFingerprint
                     );
-                }cd
+                }
             }
         }
     }
