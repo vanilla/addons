@@ -1,5 +1,5 @@
 // Initiate on our global event.
-$(document).on('contentLoad', function(e) {
+$(document).ready(function(e) {
     /// Author tag token input.
     var $author = $('.MultiComplete', e.target);
     var author = $author.val();
