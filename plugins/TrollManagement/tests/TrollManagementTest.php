@@ -79,8 +79,8 @@ class TrollManagementTest extends SiteTestCase {
         $this->assertNotContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs['0']);
         // The SECOND dummy user account is NOT an applicant
         $this->assertNotContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs['1']);
-        // The THIRD dummy user account should be an applicant
-        $this->assertContains(RoleModel::APPLICANT_ID, $importedUsersRolesIDs['2']);
+        // The THIRD dummy user account should ONLY be an applicant
+        $this->assertEquals([RoleModel::APPLICANT_ID], $importedUsersRolesIDs['2']);
     }
 
     /**

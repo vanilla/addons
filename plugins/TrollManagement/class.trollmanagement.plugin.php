@@ -616,6 +616,8 @@ class TrollManagementPlugin extends Gdn_Plugin {
             $maxSiblingAccounts = c('TrollManagement.PerFingerprint.MaxUserAccounts');
             if ($userFingerprint !== false) {
                 if ($this->checkMaxSharedFingerprintsExceeded($userFingerprint, $maxSiblingAccounts)) {
+                    $currentUserRoles = Gdn::userModel()->getRoles($userID)->resultArray();
+                    Gdn::userModel()->removeRoles($userID, array_column($currentUserRoles, 'RoleID'), false);
                     Gdn::userModel()->addRoles($userID, [RoleModel::APPLICANT_ID], true);
                 }
             }
