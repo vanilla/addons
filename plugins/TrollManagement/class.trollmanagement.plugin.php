@@ -69,15 +69,14 @@ class TrollManagementPlugin extends Gdn_Plugin {
     public function structure() {
         $colBanType = Gdn::structure()->get('Ban')->columns('BanType');
         $BanTypes = $colBanType->Enum;
-
         if (!in_array('Fingerprint', $BanTypes)) {
             $BanTypes[] = 'Fingerprint';
-
-            Gdn::structure()
-                ->table('Ban')
-                ->column('BanType', $BanTypes, false, 'unique')
-                ->set();
         }
+
+        Gdn::structure()
+            ->table('Ban')
+            ->column('BanType', $BanTypes, false, 'unique')
+            ->set();
 
         Gdn::structure()
             ->table('User')
