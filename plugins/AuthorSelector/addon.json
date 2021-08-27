@@ -1,6 +1,6 @@
 {
     "name": "Author Selector",
-    "description": "Allows administrators to change the author of a discussion.",
+    "description": "Allows administrators and moderators to change the author of a discussion.",
     "version": "1.3",
     "mobileFriendly": true,
     "license": "GNU GPLv2",
