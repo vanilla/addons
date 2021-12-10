@@ -86,9 +86,10 @@ class RoleTitlePlugin extends Gdn_Plugin {
 	    if (property_exists($sender, 'Discussion')) {
 	        $joinDiscussion = [$sender->Discussion];
 	        RoleModel::setUserRoles($joinDiscussion, 'InsertUserID');
-	        $comments = $sender->data('Comments');
-	        RoleModel::setUserRoles($comments->result(), 'InsertUserID');
-
+	        $comments = $sender->data('Comments', null);
+            if ($comments != null) {
+                RoleModel::setUserRoles($comments->result(), 'InsertUserID');
+            }
 	        $answers = $sender->data('Answers');
 	        if (is_array($answers)) {
 	            RoleModel::setUserRoles($answers, 'InsertUserID');
