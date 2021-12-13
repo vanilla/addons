@@ -20,16 +20,18 @@ class StopAutoDraftPlugin extends Gdn_Plugin {
 	   $sender->removeJsFile('autosave.js');
 		$sender->Head->addString('
 <script type="text/javascript">
-jQuery(document).ready(function($) {
-   $.fn.autosave = function(opts) {
-		return;
-	}
+window.onVanillaReady(function(){
+    jQuery(document).ready(function($) {
+        $.fn.autosave = function(opts) {
+             return;
+         }
+     });
 });
 </script>
 ');
    }
-	
+
    public function onDisable() { }
    public function setup() { }
-	
+
 }
