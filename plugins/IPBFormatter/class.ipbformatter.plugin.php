@@ -241,7 +241,7 @@ EOT;
      *
      * @param $sender Instance of EditorPlugin firing the event
      */
-    public function editorPlugin_getFormats_handler($sender, &$args) {
+    public function editorPlugin_getFormats_handler($sender, $args) {
         $formats =& $args['formats'];
 
         $formats[] = 'IPB';
@@ -253,7 +253,7 @@ EOT;
      *
      * @param $sender Instance of EditorPlugin firing the event
      */
-    public function editorPlugin_getJSDefinitions_handler($sender, &$args) {
+    public function editorPlugin_getJSDefinitions_handler($sender, $args) {
         $definitions =& $args['definitions'];
 
         /**
