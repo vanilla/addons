@@ -1,6 +1,6 @@
 {
     "name": "Liked",
-    "description": "Adds the facebook like feature to your discussions.",
+    "description": "Adds the Facebook like feature to your discussions.",
     "version": "1.6",
     "icon": "liked.png",
     "key": "liked",
