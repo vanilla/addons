@@ -50,7 +50,7 @@ $(function() {
                 break;
             case 'internal':
                //Test to see if we're hitting the leave warning page
-               if (/leaving\?/.test(href))
+               if (/\/home\/leaving\?/.test(href))
                    $(this).attr('rel', 'noopener noreferrer').attr('target', '_blank');
 
                break;
