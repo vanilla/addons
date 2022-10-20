@@ -48,9 +48,12 @@ $(function() {
             case 'external':
                 $(this).attr('rel', 'noopener noreferrer').attr('target', '_blank');
                 break;
-            // case 'internal':
-            //    $(this).attr('target', '');
-            //    break;
+            case 'internal':
+               //Test to see if we're hitting the leave warning page
+               if (/\/home\/leaving\?/.test(href))
+                   $(this).attr('rel', 'noopener noreferrer').attr('target', '_blank');
+
+               break;
         }
     });
 
