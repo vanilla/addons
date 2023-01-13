@@ -34,11 +34,16 @@ class StopAutoDraftPlugin extends Gdn_Plugin
         parent::__construct();
     }
 
-    public function container_init()
+    public function structure()
     {
         $this->config->saveToConfig("Vanilla.Drafts.Autosave", false);
         $addon = $this->addonManager->lookupAddon("stopautodraft");
         $this->addonModel->disable($addon);
+    }
+
+    public function setup()
+    {
+        $this->structure();
     }
 
     public function onDisable()
