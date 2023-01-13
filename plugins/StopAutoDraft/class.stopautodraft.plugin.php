@@ -23,6 +23,13 @@ class StopAutoDraftPlugin extends Gdn_Plugin
     /** @var AddonManager  */
     protected $addonManager;
 
+    /**
+     * D.I.
+     *
+     * @param \Vanilla\Contracts\ConfigurationInterface $config
+     * @param \Vanilla\Models\AddonModel $addonModel
+     * @param AddonManager $addonManager
+     */
     public function __construct(
         \Vanilla\Contracts\ConfigurationInterface $config,
         \Vanilla\Models\AddonModel $addonModel,
@@ -34,6 +41,9 @@ class StopAutoDraftPlugin extends Gdn_Plugin
         parent::__construct();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function structure()
     {
         $this->config->saveToConfig("Vanilla.Drafts.Autosave", false);
@@ -41,11 +51,17 @@ class StopAutoDraftPlugin extends Gdn_Plugin
         $this->addonModel->disable($addon);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setup()
     {
         $this->structure();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function onDisable()
     {
     }
