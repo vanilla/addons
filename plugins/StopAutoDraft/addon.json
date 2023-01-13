@@ -5,6 +5,7 @@
     "icon": "stop_auto_draft.png",
     "key": "stopautodraft",
     "type": "addon",
+    "hidden": true,
     "authors": [
         {
             "name": "Mark O'Sullivan",

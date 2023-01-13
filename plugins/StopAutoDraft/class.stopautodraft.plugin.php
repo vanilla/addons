@@ -1,4 +1,8 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\AddonManager;
+
+if (!defined("APPLICATION")) {
+    exit();
+}
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -8,28 +12,36 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class StopAutoDraftPlugin extends Gdn_Plugin {
+class StopAutoDraftPlugin extends Gdn_Plugin
+{
+    /** @var \Vanilla\Contracts\ConfigurationInterface */
+    protected $config;
 
-   public function discussionController_render_before($sender) {
-		$this->_NoDrafting($sender);
-	}
-   public function postController_render_before($sender) {
-		$this->_NoDrafting($sender);
-	}
-	private function _NoDrafting($sender) {
-	   $sender->removeJsFile('autosave.js');
-		$sender->Head->addString('
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-   $.fn.autosave = function(opts) {
-		return;
-	}
-});
-</script>
-');
-   }
-	
-   public function onDisable() { }
-   public function setup() { }
-	
+    /** @var \Vanilla\Models\AddonModel  */
+    protected $addonModel;
+
+    /** @var AddonManager  */
+    protected $addonManager;
+
+    public function __construct(
+        \Vanilla\Contracts\ConfigurationInterface $config,
+        \Vanilla\Models\AddonModel $addonModel,
+        AddonManager $addonManager
+    ) {
+        $this->config = $config;
+        $this->addonModel = $addonModel;
+        $this->addonManager = $addonManager;
+        parent::__construct();
+    }
+
+    public function container_init()
+    {
+        $this->config->saveToConfig("Vanilla.Drafts.Autosave", false);
+        $addon = $this->addonManager->lookupAddon("stopautodraft");
+        $this->addonModel->disable($addon);
+    }
+
+    public function onDisable()
+    {
+    }
 }
