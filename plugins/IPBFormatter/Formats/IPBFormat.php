@@ -7,6 +7,7 @@
 namespace IPBFormatter\Formats;
 
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\Formats\HtmlFormatParsed;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
@@ -14,8 +15,8 @@ use Vanilla\Formatting\Html\HtmlSanitizer;
 /**
  * Class for rendering content with the source format IPB.
  */
-class IPBFormat extends HtmlFormat {
-
+class IPBFormat extends HtmlFormat
+{
     const FORMAT_KEY = "ipb";
 
     /** @var \BBCode */
@@ -37,7 +38,12 @@ class IPBFormat extends HtmlFormat {
     ) {
         $plainTextConverter->setAddNewLinesAfterDiv(true);
         $htmlSanitizer->setShouldEncodeCodeBlocks(false);
-        parent::__construct($htmlSanitizer, $htmlEnhancer, $plainTextConverter, false);
+        parent::__construct(
+            $htmlSanitizer,
+            $htmlEnhancer,
+            $plainTextConverter,
+            false
+        );
 
         $this->bbcodeParser = $bbcodeParser;
         $this->bbcodeParser->nbbc()->setIgnoreNewlines(true);
@@ -47,19 +53,29 @@ class IPBFormat extends HtmlFormat {
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $value, bool $enhance = true): string {
-        $ipb = $this->prepareBBCode($value);
-        $renderedBBCode = $this->bbcodeParser->format($ipb);
-        return parent::renderHtml($renderedBBCode, $enhance);
+    public function renderHtml($content, bool $enhance = true): string
+    {
+        if ($content instanceof HtmlFormatParsed) {
+            return $content->getProcessedHtml();
+        } else {
+            $ipb = $this->prepareBBCode($content);
+            $rendered = $this->bbcodeParser->format($ipb);
+        }
+        return parent::renderHtml($rendered, $enhance);
     }
 
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $value): string {
-        $ipb = $this->prepareBBCode($value);
-        $renderedBBCode = $this->bbcodeParser->format($ipb);
-        return parent::renderQuote($renderedBBCode);
+    public function renderQuote($content): string
+    {
+        if ($content instanceof HtmlFormatParsed) {
+            $rendered = $content->getProcessedHtml();
+        } else {
+            $ipb = $this->prepareBBCode($content);
+            $rendered = $this->bbcodeParser->format($ipb);
+        }
+        return parent::renderQuote($rendered);
     }
 
     /**
@@ -68,19 +84,28 @@ class IPBFormat extends HtmlFormat {
      * @param string $bbCode
      * @return string
      */
-    private function prepareBBCode(string $bbCode): string {
-        $ipbCode = str_replace(['&quot;', '&#39;', '&#58;', 'Â'], ['"', "'", ':', ''], $bbCode);
-        $ipbCode = str_replace('<#EMO_DIR#>', 'default', $ipbCode);
-        $ipbCode = str_replace('<{POST_SNAPBACK}>', '<span class="SnapBack">»</span>', $ipbCode);
+    private function prepareBBCode(string $bbCode): string
+    {
+        $ipbCode = str_replace(
+            ["&quot;", "&#39;", "&#58;", "Â"],
+            ['"', "'", ":", ""],
+            $bbCode
+        );
+        $ipbCode = str_replace("<#EMO_DIR#>", "default", $ipbCode);
+        $ipbCode = str_replace(
+            "<{POST_SNAPBACK}>",
+            '<span class="SnapBack">»</span>',
+            $ipbCode
+        );
 
         /**
          * IPB inserts line break markup tags at line breaks.  They need to be removed in code blocks.
          * The original newline/line break should be left intact, so whitespace will be preserved in the pre tag.
          */
         $ipbCode = preg_replace_callback(
-            '/\[code\].*?\[\/code\]/is',
+            "/\[code\].*?\[\/code\]/is",
             function ($codeBlocks) {
-                return str_replace(['<br />'], [''], $codeBlocks[0]);
+                return str_replace(["<br />"], [""], $codeBlocks[0]);
             },
             $ipbCode
         );
@@ -98,7 +123,7 @@ class IPBFormat extends HtmlFormat {
                 $quoteContent = $blockQuotes[5];
 
                 // $Time will over as a timestamp. Convert it to a date string.
-                $date = date('F j Y, g:i A', $time);
+                $date = date("F j Y, g:i A", $time);
 
                 return "[quote name=\"{$author}\" url=\"{$cid}\" date=\"{$date}\"]{$quoteContent}[/quote]";
             },
