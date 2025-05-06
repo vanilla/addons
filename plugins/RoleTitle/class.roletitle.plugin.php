@@ -1,15 +1,16 @@
 <?php
 
-class RoleTitlePlugin extends Gdn_Plugin {
-
+class RoleTitlePlugin extends Gdn_Plugin
+{
     /**
      * Add role(s) CSS classes to the target.
      *
      * @param stdclass $target Discussion or Comment
      * @param string $cssClass CSS class(es) of the target
      */
-    private function injectCssClass($target, &$cssClass) {
-        $cssRoles = val('Roles', $target);
+    private function injectCssClass($target, &$cssClass)
+    {
+        $cssRoles = val("Roles", $target);
         if (empty($cssRoles) || !is_array($cssRoles)) {
             return;
         }
@@ -18,7 +19,7 @@ class RoleTitlePlugin extends Gdn_Plugin {
             $rawRole = $this->formatRoleCss($rawRole);
         }
 
-        $cssClass .= ' '.implode(' ', $cssRoles);
+        $cssClass .= " " . implode(" ", $cssRoles);
     }
 
     /**
@@ -27,8 +28,9 @@ class RoleTitlePlugin extends Gdn_Plugin {
      * @param string $rawRole role name
      * @return string CSS class
      */
-    private function formatRoleCss($rawRole) {
-        return 'Role_'.str_replace(' ', '_', Gdn_Format::alphaNumeric($rawRole));
+    private function formatRoleCss($rawRole)
+    {
+        return "Role_" . str_replace(" ", "_", Gdn_Format::alphaNumeric($rawRole));
     }
 
     /**
@@ -37,15 +39,16 @@ class RoleTitlePlugin extends Gdn_Plugin {
      * @param DiscussionController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function discussionController_authorInfo_handler($sender, $args) {
-        $target = $args['Type'];
+    public function discussionController_authorInfo_handler($sender, $args)
+    {
+        $target = $args["Type"];
 
-        $roles = val('Roles', $args[$target]);
+        $roles = val("Roles", $args[$target]);
         if (!$roles) {
             return;
         }
 
-        echo '<span class="MItem RoleTitle">'.implode(', ', $roles).'</span> ';
+        echo '<span class="MItem RoleTitle">' . implode(", ", $roles) . "</span> ";
     }
 
     /**
@@ -54,8 +57,9 @@ class RoleTitlePlugin extends Gdn_Plugin {
      * @param DiscussionController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function discussionController_beforeCommentDisplay_handler($sender, $args) {
-        $this->injectCssClass($args[$args['Type']], $args['CssClass']);
+    public function discussionController_beforeCommentDisplay_handler($sender, $args)
+    {
+        $this->injectCssClass($args[$args["Type"]], $args["CssClass"]);
     }
 
     /**
@@ -64,8 +68,9 @@ class RoleTitlePlugin extends Gdn_Plugin {
      * @param PostController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function postController_beforeCommentDisplay_handler($sender, $args) {
-        $this->injectCssClass($args[$args['Type']], $args['CssClass']);
+    public function postController_beforeCommentDisplay_handler($sender, $args)
+    {
+        $this->injectCssClass($args[$args["Type"]], $args["CssClass"]);
     }
 
     /**
@@ -75,49 +80,45 @@ class RoleTitlePlugin extends Gdn_Plugin {
      * @param DiscussionController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-	public function discussionController_render_before($sender, $args) {
-	    $session = Gdn::session();
-
-	    if ($session->isValid()) {
-	        $joinUser = [$session->User];
-	        RoleModel::setUserRoles($joinUser, 'UserID');
-	    }
-
-	    if (property_exists($sender, 'Discussion')) {
-	        $joinDiscussion = [$sender->Discussion];
-	        RoleModel::setUserRoles($joinDiscussion, 'InsertUserID');
-	        $comments = $sender->data('Comments', null);
+    public function discussionController_render_before($sender, $args)
+    {
+        if (property_exists($sender, "Discussion")) {
+            $joinDiscussion = [$sender->Discussion];
+            RoleModel::setUserRoles($joinDiscussion, "InsertUserID");
+            $comments = $sender->data("Comments", null);
             if ($comments != null) {
-                RoleModel::setUserRoles($comments->result(), 'InsertUserID');
+                RoleModel::setUserRoles($comments->result(), "InsertUserID");
             }
-	        $answers = $sender->data('Answers');
-	        if (is_array($answers)) {
-	            RoleModel::setUserRoles($answers, 'InsertUserID');
-	        }
+            $answers = $sender->data("Answers");
+            if (is_array($answers)) {
+                RoleModel::setUserRoles($answers, "InsertUserID");
+            }
 
             // And add the css class to the discussion
             if (is_array($sender->Discussion->Roles)) {
                 if (count($sender->Discussion->Roles)) {
-                    $cssRoles = val('Roles', $sender->Discussion);
+                    $cssRoles = val("Roles", $sender->Discussion);
                     foreach ($cssRoles as &$rawRole) {
                         $rawRole = $this->formatRoleCss($rawRole);
                     }
 
-                    $sender->Discussion->_CssClass = val('_CssClass', $sender->Discussion, '').' '.implode(' ',$cssRoles);
+                    $sender->Discussion->_CssClass =
+                        val("_CssClass", $sender->Discussion, "") . " " . implode(" ", $cssRoles);
                 }
             }
-	    }
-	}
+        }
+    }
 
     /**
      *
      * @param PostController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function postController_render_before($sender, $args) {
-        $data = $sender->data('Comments');
+    public function postController_render_before($sender, $args)
+    {
+        $data = $sender->data("Comments");
         if (is_object($data)) {
-            RoleModel::setUserRoles($data->result(), 'InsertUserID');
+            RoleModel::setUserRoles($data->result(), "InsertUserID");
         }
     }
 
@@ -127,19 +128,20 @@ class RoleTitlePlugin extends Gdn_Plugin {
      * @param object $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function base_beforeCommentForm_handler($sender, $args) {
-        $cssRoles = val('Roles', Gdn::session()->User);
+    public function base_beforeCommentForm_handler($sender, $args)
+    {
+        $cssRoles = val("Roles", Gdn::session()->User);
         if (!is_array($cssRoles)) {
             return;
         }
 
-        $cssClass = val('FormCssClass', $args, null);
+        $cssClass = val("FormCssClass", $args, null);
 
         foreach ($cssRoles as &$rawRole) {
             $rawRole = $this->formatRoleCss($rawRole);
         }
 
-        $args['FormCssClass'] = trim($cssClass.' '.implode(' ',$cssRoles));
+        $args["FormCssClass"] = trim($cssClass . " " . implode(" ", $cssRoles));
     }
 
     /**
@@ -148,8 +150,9 @@ class RoleTitlePlugin extends Gdn_Plugin {
      * @param ProfileController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function profileController_render_before($sender, $args) {
-        $cssRoles = $sender->data('UserRoles');
+    public function profileController_render_before($sender, $args)
+    {
+        $cssRoles = $sender->data("UserRoles");
         if (!is_array($cssRoles)) {
             return;
         }
@@ -158,6 +161,6 @@ class RoleTitlePlugin extends Gdn_Plugin {
             $rawRole = $this->formatRoleCss($rawRole);
         }
 
-        $sender->CssClass = trim($sender->CssClass.' '.implode(' ', $cssRoles));
+        $sender->CssClass = trim($sender->CssClass . " " . implode(" ", $cssRoles));
     }
 }
