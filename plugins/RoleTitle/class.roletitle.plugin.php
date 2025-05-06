@@ -123,28 +123,6 @@ class RoleTitlePlugin extends Gdn_Plugin
     }
 
     /**
-     * Add the roles to the comment form
-     *
-     * @param object $sender Sending controller instance.
-     * @param array $args Event arguments.
-     */
-    public function base_beforeCommentForm_handler($sender, $args)
-    {
-        $cssRoles = val("Roles", Gdn::session()->User);
-        if (!is_array($cssRoles)) {
-            return;
-        }
-
-        $cssClass = val("FormCssClass", $args, null);
-
-        foreach ($cssRoles as &$rawRole) {
-            $rawRole = $this->formatRoleCss($rawRole);
-        }
-
-        $args["FormCssClass"] = trim($cssClass . " " . implode(" ", $cssRoles));
-    }
-
-    /**
      * Add the roles to the profile body tag
      *
      * @param ProfileController $sender Sending controller instance.
