@@ -37,7 +37,7 @@ class PrefixDiscussionFilterPlugin extends Gdn_Plugin {
 
         $prefix = str_replace(' ', '-', strtolower($prefix));
         $prefix = preg_replace('#-+#', '-', $prefix);
-        $slug = preg_replace('#[^a-z0-9-]#', null, $prefix);
+        $slug = preg_replace('#[^a-z0-9-]#', "", $prefix);
 
         if (strlen($slug) === 0) {
             // Reliable way to get something 'unique' that is URL friendly
